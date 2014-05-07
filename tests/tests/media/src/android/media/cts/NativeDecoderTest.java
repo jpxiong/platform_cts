@@ -25,6 +25,10 @@ import android.media.MediaCodec.BufferInfo;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.Surface;
@@ -36,6 +40,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -383,8 +388,62 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         assertTrue("native playback error", ret);
     }
 
-    private native boolean testPlaybackNative(Surface surface,
+    private static native boolean testPlaybackNative(Surface surface,
             int fd, long startOffset, long length);
 
+    public void testMuxer() throws Exception {
+        testMuxer(R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, false);
+    }
+
+    private void testMuxer(int res, boolean webm) throws Exception {
+        AssetFileDescriptor infd = mResources.openRawResourceFd(res);
+
+        File base = mContext.getExternalFilesDir(null);
+        String tmpFile = base.getPath() + "/tmp.dat";
+        Log.i("@@@", "using tmp file " + tmpFile);
+        new File(tmpFile).delete();
+        ParcelFileDescriptor out = ParcelFileDescriptor.open(new File(tmpFile),
+                ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE);
+
+        assertTrue("muxer failed", testMuxerNative(
+                infd.getParcelFileDescriptor().getFd(), infd.getStartOffset(), infd.getLength(),
+                out.getFd(), webm));
+
+        // compare the original with the remuxed
+        MediaExtractor org = new MediaExtractor();
+        org.setDataSource(infd.getFileDescriptor(),
+                infd.getStartOffset(), infd.getLength());
+
+        MediaExtractor remux = new MediaExtractor();
+        remux.setDataSource(out.getFileDescriptor());
+
+        assertEquals("mismatched numer of tracks", org.getTrackCount(), remux.getTrackCount());
+        for (int i = 0; i < 2; i++) {
+            MediaFormat format1 = org.getTrackFormat(i);
+            MediaFormat format2 = remux.getTrackFormat(i);
+            Log.i("@@@", "org: " + format1);
+            Log.i("@@@", "remux: " + format2);
+            assertTrue("different formats", compareFormats(format1, format2));
+        }
+
+        org.release();
+        remux.release();
+
+        MediaPlayer player1 = MediaPlayer.create(mContext, res);
+        MediaPlayer player2 = MediaPlayer.create(mContext, Uri.parse("file://" + tmpFile));
+        assertEquals("duration is different", player1.getDuration(), player2.getDuration());
+        player1.release();
+        player2.release();
+        new File(tmpFile).delete();
+    }
+
+    boolean compareFormats(MediaFormat f1, MediaFormat f2) {
+        // there's no good way to compare two MediaFormats, so compare their string
+        // representation
+        return f1.toString().equals(f2.toString());
+    }
+
+    private static native boolean testMuxerNative(int in, long inoffset, long insize,
+            int out, boolean webm);
 }
 
