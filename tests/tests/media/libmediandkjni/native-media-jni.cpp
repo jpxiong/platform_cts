@@ -515,3 +515,56 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNI
 
 }
 
+extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testFormatNative(JNIEnv *env,
+        jclass /*clazz*/) {
+    AMediaFormat* format = AMediaFormat_new();
+    if (!format) {
+        return false;
+    }
+
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_BIT_RATE, 8000);
+    int32_t bitrate = 0;
+    if (!AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_BIT_RATE, &bitrate) || bitrate != 8000) {
+        ALOGE("AMediaFormat_getInt32 fail: %d", bitrate);
+        return false;
+    }
+
+    AMediaFormat_setInt64(format, AMEDIAFORMAT_KEY_DURATION, 123456789123456789ll);
+    int64_t duration = 0;
+    if (!AMediaFormat_getInt64(format, AMEDIAFORMAT_KEY_DURATION, &duration)
+            || duration != 123456789123456789ll) {
+        ALOGE("AMediaFormat_getInt64 fail: %lld", duration);
+        return false;
+    }
+
+    AMediaFormat_setFloat(format, AMEDIAFORMAT_KEY_FRAME_RATE, 25.0f);
+    float framerate = 0.0f;
+    if (!AMediaFormat_getFloat(format, AMEDIAFORMAT_KEY_FRAME_RATE, &framerate)
+            || framerate != 25.0f) {
+        ALOGE("AMediaFormat_getFloat fail: %f", framerate);
+        return false;
+    }
+
+    const char* value = "audio/mpeg";
+    AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, value);
+    const char* readback = NULL;
+    if (!AMediaFormat_getString(format, AMEDIAFORMAT_KEY_MIME, &readback)
+            || strcmp(value, readback) || value == readback) {
+        ALOGE("AMediaFormat_getString fail");
+        return false;
+    }
+
+    uint32_t foo = 0xdeadbeef;
+    AMediaFormat_setBuffer(format, "csd-0", &foo, sizeof(foo));
+    foo = 0xabadcafe;
+    void *bytes;
+    size_t bytesize = 0;
+    if(!AMediaFormat_getBuffer(format, "csd-0", &bytes, &bytesize)
+            || bytesize != sizeof(foo) || *((uint32_t*)bytes) != 0xdeadbeef) {
+        ALOGE("AMediaFormat_getBuffer fail");
+        return false;
+    }
+
+    return true;
+}
+
