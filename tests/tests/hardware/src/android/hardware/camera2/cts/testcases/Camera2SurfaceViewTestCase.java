@@ -348,6 +348,18 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
+     * Wait for AE to be: LOCKED
+     *
+     * @param resultListener The capture listener to get capture result back.
+     */
+    protected static void waitForAeLocked(SimpleCaptureListener resultListener) {
+        List<Integer> expectedAeStates = new ArrayList<Integer>();
+        expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_LOCKED));
+        waitForAnyResultValue(resultListener, CaptureResult.CONTROL_AE_STATE, expectedAeStates,
+                NUM_RESULTS_WAIT_TIMEOUT);
+    }
+
+    /**
      * Create an {@link ImageReader} object and get the surface.
      *
      * @param size The size of this ImageReader to be created.
