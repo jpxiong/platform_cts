@@ -64,12 +64,15 @@ public class SensorCtsHelper {
      *
      * @throws IllegalArgumentException if there are no events
      */
-    public static double[] getMeans(TestSensorEvent[] events) {
+    public static Float[] getMeans(TestSensorEvent[] events) {
         if (events.length == 0) {
             throw new IllegalArgumentException("Events cannot be empty");
         }
 
-        double[] means = new double[events[0].values.length];
+        Float[] means = new Float[events[0].values.length];
+        for (int i = 0; i < means.length; i++) {
+            means[i] = 0.0f;
+        }
         for (TestSensorEvent event : events) {
             for (int i = 0; i < means.length; i++) {
                 means[i] += event.values[i];
@@ -82,34 +85,42 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Calculates the variance for each of the values in the set of TestSensorEvents.
+     * Calculates the bias-corrected variance for each of the values in the set of TestSensorEvents.
      *
      * @throws IllegalArgumentException if there are no events
      */
-    public static double[] getVariances(TestSensorEvent[] events) {
-        double[] means = getMeans(events);
-        double[] variances = new double[means.length];
+    public static Float[] getVariances(TestSensorEvent[] events) {
+        Float[] means = getMeans(events);
+        Float[] variances = new Float[means.length];
+        for (int i = 0; i < variances.length; i++) {
+            variances[i] = 0.0f;
+        }
         for (int i = 0; i < means.length; i++) {
-            Collection<Double> squaredDiffs = new ArrayList<Double>(events.length);
+            Collection<Float> squaredDiffs = new ArrayList<Float>(events.length);
             for (TestSensorEvent event : events) {
-                double diff = event.values[i] - means[i];
+                float diff = event.values[i] - means[i];
                 squaredDiffs.add(diff * diff);
             }
-            variances[i] = getMean(squaredDiffs);
+            float sum = 0.0f;
+            for (float value : squaredDiffs) {
+                sum += value;
+            }
+            variances[i] = sum / (events.length - 1);
         }
         return variances;
     }
 
     /**
-     * Calculates the standard deviation for each of the values in the set of TestSensorEvents.
+     * Calculates the bias-corrected standard deviation for each of the values in the set of
+     * TestSensorEvents.
      *
      * @throws IllegalArgumentException if there are no events
      */
-    public static double[] getStandardDeviations(TestSensorEvent[] events) {
-        double[] variances = getVariances(events);
-        double[] stdDevs = new double[variances.length];
+    public static Float[] getStandardDeviations(TestSensorEvent[] events) {
+        Float[] variances = getVariances(events);
+        Float[] stdDevs = new Float[variances.length];
         for (int i = 0; i < variances.length; i++) {
-            stdDevs[i] = Math.sqrt(variances[i]);
+            stdDevs[i] = (float) Math.sqrt(variances[i]);
         }
         return stdDevs;
     }
@@ -130,7 +141,7 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Calculate the variance of a collection.
+     * Calculate the bias-corrected sample variance of a collection.
      *
      * @throws IllegalArgumentException if the collection is null or empty
      */
@@ -138,17 +149,21 @@ public class SensorCtsHelper {
         validateCollection(collection);
 
         double mean = getMean(collection);
-        ArrayList<Double> squaredDifferences = new ArrayList<Double>();
+        ArrayList<Double> squaredDiffs = new ArrayList<Double>();
         for(TValue value : collection) {
             double difference = mean - value.doubleValue();
-            squaredDifferences.add(Math.pow(difference, 2));
+            squaredDiffs.add(Math.pow(difference, 2));
         }
 
-        return getMean(squaredDifferences);
+        double sum = 0.0;
+        for (Double value : squaredDiffs) {
+            sum += value;
+        }
+        return sum / (squaredDiffs.size() - 1);
     }
 
     /**
-     * Calculate the standard deviation of a collection.
+     * Calculate the bias-corrected standard deviation of a collection.
      *
      * @throws IllegalArgumentException if the collection is null or empty
      */
@@ -283,6 +298,36 @@ public class SensorCtsHelper {
      */
     public static int getSecondsAsMicroSeconds(int seconds) {
         return (int) TimeUnit.MICROSECONDS.convert(seconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Convert the sensor delay or rate in microseconds into delay in microseconds.
+     * <p>
+     * The flags SensorManager.SENSOR_DELAY_[GAME|UI|NORMAL] are not supported since the CDD does
+     * not specify values for these flags. The rate is set to the max of
+     * {@link Sensor#getMinDelay()} and the rate given.
+     * </p>
+     */
+    public static int getDelay(Sensor sensor, int rateUs) {
+        int delay = -1;
+        switch (rateUs) {
+            case SensorManager.SENSOR_DELAY_FASTEST:
+                delay = 0;
+                break;
+            case SensorManager.SENSOR_DELAY_GAME:
+                delay = 20000;
+                break;
+            case SensorManager.SENSOR_DELAY_UI:
+                delay = 66667;
+                break;
+            case SensorManager.SENSOR_DELAY_NORMAL:
+                delay = 200000;
+                break;
+            default:
+                delay = rateUs;
+                break;
+        }
+        return Math.max(delay, sensor.getMinDelay());
     }
 
     /**

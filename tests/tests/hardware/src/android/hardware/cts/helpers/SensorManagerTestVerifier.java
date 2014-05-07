@@ -42,8 +42,8 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
 
     private final SensorManager mSensorManager;
     private final Sensor mSensorUnderTest;
-    private final int mSamplingRateInUs;
-    private final int mReportLatencyInUs;
+    private final int mRateUs;
+    private final int mMaxBatchReportLatencyUs;
 
     private TestSensorListener mEventListener;
 
@@ -53,14 +53,14 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
     public SensorManagerTestVerifier(
             Context context,
             int sensorType,
-            int samplingRateInUs,
-            int reportLatencyInUs) {
+            int rateUs,
+            int maxBatchReportLatencyUs) {
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         mSensorUnderTest = SensorCtsHelper.getSensor(context, sensorType);
-        mSamplingRateInUs = samplingRateInUs;
-        mReportLatencyInUs = reportLatencyInUs;
+        mRateUs = rateUs;
+        mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
 
-        mEventListener = new TestSensorListener(mSensorUnderTest, this);
+        mEventListener = new TestSensorListener(this);
     }
 
     /**
@@ -107,15 +107,14 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
     }
 
     /**
-     * Register the
-     * @param debugInfo
+     * Register the listener.
      */
     public void registerListener(String debugInfo) {
         boolean result = mSensorManager.registerListener(
                 mEventListener,
                 mSensorUnderTest,
-                mSamplingRateInUs,
-                mReportLatencyInUs);
+                mRateUs,
+                mMaxBatchReportLatencyUs);
         String message = SensorCtsHelper.formatAssertionMessage(
                 "registerListener",
                 mSensorUnderTest,
@@ -180,7 +179,6 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
      * Definition of support test classes.
      */
     private class TestSensorListener implements SensorEventListener2 {
-        private final Sensor mSensorUnderTest;
         private final SensorEventListener2 mListener;
 
         private final ConcurrentLinkedDeque<TestSensorEvent> mSensorEventsList =
@@ -189,14 +187,10 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
         private volatile CountDownLatch mEventLatch;
         private volatile CountDownLatch mFlushLatch = new CountDownLatch(1);
 
-        public TestSensorListener(Sensor sensor, SensorEventListener2 listener) {
-            if(sensor == null) {
-                throw new InvalidParameterException("sensor cannot be null");
-            }
+        public TestSensorListener(SensorEventListener2 listener) {
             if(listener == null) {
                 throw new InvalidParameterException("listener cannot be null");
             }
-            mSensorUnderTest = sensor;
             mListener = listener;
         }
 
@@ -240,7 +234,11 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
             mEventLatch = new CountDownLatch(eventCount);
             this.clearEvents();
             try {
-                boolean awaitCompleted = mEventLatch.await(WAIT_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+                int rateUs = SensorCtsHelper.getDelay(mSensorUnderTest, mRateUs);
+                // Timeout is 2 * event count * expected period + default wait
+                int timeoutUs = (int) ((eventCount * rateUs * 2)
+                        + TimeUnit.MICROSECONDS.convert(WAIT_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS));
+                boolean awaitCompleted = mEventLatch.await(timeoutUs, TimeUnit.MICROSECONDS);
                 // TODO: can we collect bug reports on error based only if needed? env var?
 
                 String message = SensorCtsHelper.formatAssertionMessage(

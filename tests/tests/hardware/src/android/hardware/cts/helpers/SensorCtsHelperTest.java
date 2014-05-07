@@ -59,7 +59,7 @@ public class SensorCtsHelperTest extends TestCase {
         long[] timestamps = {0, 1, 2, 3, 4};
 
         float[] values = {0, 1, 2, 3, 4};  // 2.0
-        double[] means = SensorCtsHelper.getMeans(getSensorEvents(timestamps, values));
+        Float[] means = SensorCtsHelper.getMeans(getSensorEvents(timestamps, values));
         assertEquals(1, means.length);
         assertEquals(2.0, means[0], 0.00001);
 
@@ -80,20 +80,20 @@ public class SensorCtsHelperTest extends TestCase {
     public void testGetVariences() {
         long[] timestamps = {0, 1, 2, 3, 4};
 
-        float[] values = {0, 1, 2, 3, 4};  // 2.0
-        double[] variances = SensorCtsHelper.getVariances(getSensorEvents(timestamps, values));
+        float[] values = {0, 1, 2, 3, 4};  // 2.5
+        Float[] variances = SensorCtsHelper.getVariances(getSensorEvents(timestamps, values));
         assertEquals(1, variances.length);
-        assertEquals(2.0, variances[0], 0.00001);
+        assertEquals(2.5, variances[0], 0.00001);
 
-        float[] values1 = {0, 1, 2, 3, 4};  // 2.0
-        float[] values2 = {1, 2, 3, 4, 5};  // 2.0
-        float[] values3 = {0, 2, 4, 6, 8};  // 8.0
+        float[] values1 = {0, 1, 2, 3, 4};  // 2.5
+        float[] values2 = {1, 2, 3, 4, 5};  // 2.5
+        float[] values3 = {0, 2, 4, 6, 8};  // 10.0
         variances = SensorCtsHelper.getVariances(
                 getSensorEvents(timestamps, values1, values2, values3));
         assertEquals(3, variances.length);
-        assertEquals(2.0, variances[0], 0.00001);
-        assertEquals(2.0, variances[1], 0.00001);
-        assertEquals(8.0, variances[2], 0.00001);
+        assertEquals(2.5, variances[0], 0.00001);
+        assertEquals(2.5, variances[1], 0.00001);
+        assertEquals(10.0, variances[2], 0.00001);
     }
 
     /**
@@ -102,21 +102,21 @@ public class SensorCtsHelperTest extends TestCase {
     public void testGetStandardDeviations() {
         long[] timestamps = {0, 1, 2, 3, 4};
 
-        float[] values = {0, 1, 2, 3, 4};  // sqrt(2.0)
-        double[] stddev = SensorCtsHelper.getStandardDeviations(
+        float[] values = {0, 1, 2, 3, 4};  // sqrt(2.5)
+        Float[] stddev = SensorCtsHelper.getStandardDeviations(
                 getSensorEvents(timestamps, values));
         assertEquals(1, stddev.length);
-        assertEquals(Math.sqrt(2.0), stddev[0], 0.00001);
+        assertEquals(Math.sqrt(2.5), stddev[0], 0.00001);
 
-        float[] values1 = {0, 1, 2, 3, 4};  // sqrt(2.0)
-        float[] values2 = {1, 2, 3, 4, 5};  // sqrt(2.0)
-        float[] values3 = {0, 2, 4, 6, 8};  // sqrt(8.0)
+        float[] values1 = {0, 1, 2, 3, 4};  // sqrt(2.5)
+        float[] values2 = {1, 2, 3, 4, 5};  // sqrt(2.5)
+        float[] values3 = {0, 2, 4, 6, 8};  // sqrt(10.0)
         stddev = SensorCtsHelper.getStandardDeviations(
                 getSensorEvents(timestamps, values1, values2, values3));
         assertEquals(3, stddev.length);
-        assertEquals(Math.sqrt(2.0), stddev[0], 0.00001);
-        assertEquals(Math.sqrt(2.0), stddev[1], 0.00001);
-        assertEquals(Math.sqrt(8.0), stddev[2], 0.00001);
+        assertEquals(Math.sqrt(2.5), stddev[0], 0.00001);
+        assertEquals(Math.sqrt(2.5), stddev[1], 0.00001);
+        assertEquals(Math.sqrt(10.0), stddev[2], 0.00001);
     }
 
     /**
@@ -142,15 +142,15 @@ public class SensorCtsHelperTest extends TestCase {
     public void testGetVariance() {
         List<Integer> values = Arrays.asList(0, 1, 2, 3, 4);
         double variance = SensorCtsHelper.getVariance(values);
-        assertEquals(2.0, variance, 0.00001);
+        assertEquals(2.5, variance, 0.00001);
 
         values = Arrays.asList(1, 2, 3, 4, 5);
         variance = SensorCtsHelper.getVariance(values);
-        assertEquals(2.0, variance, 0.00001);
+        assertEquals(2.5, variance, 0.00001);
 
         values = Arrays.asList(0, 2, 4, 6, 8);
         variance = SensorCtsHelper.getVariance(values);
-        assertEquals(8.0, variance, 0.00001);
+        assertEquals(10.0, variance, 0.00001);
     }
 
     /**
@@ -159,15 +159,15 @@ public class SensorCtsHelperTest extends TestCase {
     public void testGetStandardDeviation() {
         List<Integer> values = Arrays.asList(0, 1, 2, 3, 4);
         double stddev = SensorCtsHelper.getStandardDeviation(values);
-        assertEquals(Math.sqrt(2.0), stddev, 0.00001);
+        assertEquals(Math.sqrt(2.5), stddev, 0.00001);
 
         values = Arrays.asList(1, 2, 3, 4, 5);
         stddev = SensorCtsHelper.getStandardDeviation(values);
-        assertEquals(Math.sqrt(2.0), stddev, 0.00001);
+        assertEquals(Math.sqrt(2.5), stddev, 0.00001);
 
         values = Arrays.asList(0, 2, 4, 6, 8);
         stddev = SensorCtsHelper.getStandardDeviation(values);
-        assertEquals(Math.sqrt(8.0), stddev, 0.00001);
+        assertEquals(Math.sqrt(10.0), stddev, 0.00001);
     }
 
     /**
