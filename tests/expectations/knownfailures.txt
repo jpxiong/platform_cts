@@ -76,6 +76,10 @@
   {
     name: "android.provider.cts.CalendarTest#testEventColors",
     bug: 8241711
+  },
+  {
+    name: "android.media.cts.MediaCodecCapabilitiesTest#testAvcBaseline12",
+    bug: 14323112
   }
 ]
 
