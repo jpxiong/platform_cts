@@ -49,7 +49,7 @@ public class EventGapVerification extends AbstractSensorVerification {
      * @param rateUs the requested rate in us
      * @return the verification or null if the verification is not a continuous mode sensor.
      */
-    public EventGapVerification getDefault(Sensor sensor, int rateUs) {
+    public static EventGapVerification getDefault(Sensor sensor, int rateUs) {
         if (!SensorReportingMode.CONTINUOUS.equals(SensorTestInformation.getReportingMode(
                 sensor.getType()))) {
             return null;

@@ -23,6 +23,7 @@ import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.TestSensorManager;
 import android.hardware.cts.helpers.ValidatingSensorEventListener;
+import android.hardware.cts.helpers.sensorverification.EventGapVerification;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 import android.hardware.cts.helpers.sensorverification.FrequencyVerification;
 import android.hardware.cts.helpers.sensorverification.ISensorVerification;
@@ -117,6 +118,7 @@ public class TestSensorOperation extends AbstractSensorOperation {
      */
     public void setDefaultVerifications() {
         Sensor sensor = mSensorManager.getSensor();
+        addVerification(EventGapVerification.getDefault(sensor, mRateUs));
         addVerification(EventOrderingVerification.getDefault(sensor));
         addVerification(FrequencyVerification.getDefault(sensor, mRateUs));
         addVerification(JitterVerification.getDefault(sensor, mRateUs));
