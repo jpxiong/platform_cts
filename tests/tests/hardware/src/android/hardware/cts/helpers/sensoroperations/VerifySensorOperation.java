@@ -211,25 +211,17 @@ public class VerifySensorOperation extends AbstractSensorOperation {
 
         // sensorType: lowerThreshold, upperThreshold (% of expected frequency)
         Map<Integer, int[]> defaults = new HashMap<Integer, int[]>(12);
-        // Sensors that we don't want to test at this time but still want to record the values.
-        defaults.put(Sensor.TYPE_ACCELEROMETER, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_MAGNETIC_FIELD, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_GYROSCOPE, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_ORIENTATION, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_PRESSURE, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_GRAVITY, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_LINEAR_ACCELERATION,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_ROTATION_VECTOR,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_GAME_ROTATION_VECTOR,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
-        defaults.put(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR,
-                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_ACCELEROMETER, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_MAGNETIC_FIELD, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_GYROSCOPE, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_ORIENTATION, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_PRESSURE, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_GRAVITY, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_LINEAR_ACCELERATION, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_ROTATION_VECTOR, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_GAME_ROTATION_VECTOR, DEFAULT_FREQUENCY_THRESHOLDS);
+        defaults.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_FREQUENCY_THRESHOLDS);
 
         if (defaults.containsKey(mSensorType)) {
             // Expected frequency in Hz
