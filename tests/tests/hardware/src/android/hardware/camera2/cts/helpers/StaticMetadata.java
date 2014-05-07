@@ -642,7 +642,7 @@ public class StaticMetadata {
         if (hasFocuser()) {
             float minFocusDistance = getMinimumFocusDistanceChecked();
             checkTrueForKey(key, String.format(" hyperfocal distance %f should be in the range of"
-                    + " should be in the range of (%f, %f]", hyperfocalDistance, 0,
+                    + " should be in the range of (%f, %f]", hyperfocalDistance, 0.0f,
                     minFocusDistance),
                     hyperfocalDistance > 0 && hyperfocalDistance <= minFocusDistance);
         }

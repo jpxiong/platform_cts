@@ -24,6 +24,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Face;
@@ -68,7 +69,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
     private static final int NUM_TEST_FOCUS_DISTANCES = 10;
-    private static final float FOCUS_DISTANCE_ERROR_PERCENT = 0.05f; // 5 percent error margin
+    // 5 percent error margin for calibrated device
+    private static final float FOCUS_DISTANCE_ERROR_PERCENT_CALIBRATED = 0.05f;
+    // 25 percent error margin for uncalibrated device
+    private static final float FOCUS_DISTANCE_ERROR_PERCENT_UNCALIBRATED = 0.25f;
+    // 10 percent error margin for approximate device
+    private static final float FOCUS_DISTANCE_ERROR_PERCENT_APPROXIMATE = 0.10f;
     private static final int ANTI_FLICKERING_50HZ = 1;
     private static final int ANTI_FLICKERING_60HZ = 2;
 
@@ -592,9 +598,22 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             // Then wait for the lens.state to be stationary.
             waitForResultValue(resultListener, CaptureResult.LENS_STATE,
                     CaptureResult.LENS_STATE_STATIONARY, NUM_RESULTS_WAIT_TIMEOUT);
-            // Need exactly match.
-            verifyCaptureResultForKey(CaptureResult.LENS_FOCUS_DISTANCE, hyperFocalDistance,
-                    resultListener, NUM_FRAMES_VERIFIED);
+            // Need get reasonably accurate value.
+            CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            Float focusDistance = getValueNotNull(result, CaptureResult.LENS_FOCUS_DISTANCE);
+            float errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_UNCALIBRATED;
+            int calibrationStatus = mStaticInfo.getFocusDistanceCalibrationChecked();
+            if (calibrationStatus ==
+                    CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED) {
+                errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_CALIBRATED;
+            } else if (calibrationStatus ==
+                    CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_APPROXIMATE) {
+                errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_APPROXIMATE;
+            }
+            mCollector.expectInRange("Focus distance for hyper focal should be close enough to" +
+                    "requested value", focusDistance,
+                    hyperFocalDistance * (1.0f - errorMargin),
+                    hyperFocalDistance * (1.0f + errorMargin));
         }
     }
 
