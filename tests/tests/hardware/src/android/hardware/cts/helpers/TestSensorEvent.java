@@ -18,33 +18,51 @@ package android.hardware.cts.helpers;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener2;
 
 /**
- * Test class to wrap SensorEvent.
- * It currently only provides a way to clone SensorEvent data, but in the future it can contain
- * verifications and test checks.
+ * Class for holding information about individual {@link SensorEvent}s.
  */
 public class TestSensorEvent {
     public final Sensor sensor;
     public final long timestamp;
+    public final long receivedTimestamp;
     public final int accuracy;
     public final float values[];
 
-    public TestSensorEvent(SensorEvent event) {
+    /**
+     * Construct a TestSensorEvent from {@link SensorEvent} data and a received timestamp.
+     *
+     * @param event the {@link SensorEvent} to be cloned
+     * @param receivedTimestamp the timestamp when
+     * {@link SensorEventListener2#onSensorChanged(SensorEvent)} was called, in nanoseconds.
+     */
+    public TestSensorEvent(SensorEvent event, long receivedTimestamp) {
         values = new float[event.values.length];
-        System.arraycopy(event.values, 0, values, 0, event.values.length);
+        System.arraycopy(event.values, 0, values, 0, values.length);
 
         sensor = event.sensor;
         timestamp = event.timestamp;
         accuracy = event.accuracy;
+
+        this.receivedTimestamp = receivedTimestamp;
     }
 
     /**
      * Constructor for TestSensorEvent. Exposed for unit testing.
      */
-    protected TestSensorEvent(Sensor sensor, long timestamp, int accuracy, float[] values) {
+    TestSensorEvent(Sensor sensor, long timestamp, int accuracy, float[] values) {
+        this(sensor, timestamp, timestamp, accuracy, values);
+    }
+
+    /**
+     * Constructor for TestSensorEvent. Exposed for unit testing.
+     */
+    TestSensorEvent(Sensor sensor, long timestamp, long receivedTimestamp, int accuracy,
+            float[] values) {
         this.sensor = sensor;
         this.timestamp = timestamp;
+        this.receivedTimestamp = receivedTimestamp;
         this.accuracy = accuracy;
         this.values = values;
     }
