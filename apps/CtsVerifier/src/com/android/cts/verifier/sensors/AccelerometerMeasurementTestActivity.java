@@ -18,7 +18,8 @@ package com.android.cts.verifier.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.hardware.cts.helpers.sensorverification.MeanVerification;
 
 import java.util.concurrent.TimeUnit;
 
@@ -74,15 +75,15 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
      */
     private void verifyMeasurements(float ... expectations) throws Throwable {
         Thread.sleep(500 /*ms*/);
-        VerifySensorOperation verifyMeasurements = new VerifySensorOperation(
+        TestSensorOperation verifyMeasurements = new TestSensorOperation(
                 getApplicationContext(),
                 Sensor.TYPE_ACCELEROMETER,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
-        verifyMeasurements.verifyMean(
+        verifyMeasurements.addVerification(new MeanVerification(
                 expectations,
-                new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */);
+                new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */));
         verifyMeasurements.execute();
         logSuccess();
     }

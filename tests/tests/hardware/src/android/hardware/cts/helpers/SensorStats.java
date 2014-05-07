@@ -20,11 +20,13 @@ import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Class used to store stats related to {@link ISensorOperation}s.  Sensor stats may be linked
@@ -32,6 +34,17 @@ import java.util.Map.Entry;
  */
 public class SensorStats {
     public static final String DELIMITER = "__";
+
+    public static final String FIRST_TIMESTAMP_KEY = "first_timestamp";
+    public static final String LAST_TIMESTAMP_KEY = "last_timestamp";
+    public static final String EVENT_COUNT_KEY = "event_count";
+    public static final String EVENT_OUT_OF_ORDER_COUNT_KEY = "event_out_of_order_count";
+    public static final String EVENT_OUT_OF_ORDER_POSITIONS_KEY = "event_out_of_order_positions";
+    public static final String FREQUENCY_KEY = "frequency";
+    public static final String JITTER_95_PERCENTILE_KEY = "jitter_95_percentile";
+    public static final String MEAN_KEY = "mean";
+    public static final String STANDARD_DEVIATION_KEY = "standard_deviation";
+    public static final String MAGNITUDE_KEY = "magnitude";
 
     private final Map<String, Object> mValues = new HashMap<String, Object>();
     private final Map<String, SensorStats> mSensorStats = new HashMap<String, SensorStats>();
@@ -64,6 +77,22 @@ public class SensorStats {
     }
 
     /**
+     * Get the keys from the values table. Will not get the keys from the nested
+     * {@link SensorStats}.
+     */
+    public synchronized Set<String> getKeys() {
+        return mValues.keySet();
+    }
+
+    /**
+     * Get a value from the values table. Will not attempt to get values from nested
+     * {@link SensorStats}.
+     */
+    public synchronized Object getValue(String key) {
+        return mValues.get(key);
+    }
+
+    /**
      * Flattens the map and all sub {@link SensorStats} objects. Keys will be flattened using
      * {@value #DELIMITER}. For example, if a sub {@link SensorStats} is added with key
      * {@code "key1"} containing the key value pair {@code ("key2", "value")}, the flattened map
@@ -91,11 +120,31 @@ public class SensorStats {
         Collections.sort(keys);
         for (String key : keys) {
             Object value = flattened.get(key);
-            if (value instanceof Double || value instanceof Float) {
-                Log.v(tag, String.format("%s: %.4f", key, value));
+            if (value instanceof boolean[]) {
+                logStat(tag, key, Arrays.toString((boolean[]) value));
+            } else if (value instanceof byte[]) {
+                logStat(tag, key, Arrays.toString((byte[]) value));
+            } else if (value instanceof char[]) {
+                logStat(tag, key, Arrays.toString((char[]) value));
+            } else if (value instanceof double[]) {
+                logStat(tag, key, Arrays.toString((double[]) value));
+            } else if (value instanceof float[]) {
+                logStat(tag, key, Arrays.toString((float[]) value));
+            } else if (value instanceof int[]) {
+                logStat(tag, key, Arrays.toString((int[]) value));
+            } else if (value instanceof long[]) {
+                logStat(tag, key, Arrays.toString((long[]) value));
+            } else if (value instanceof short[]) {
+                logStat(tag, key, Arrays.toString((short[]) value));
+            } else if (value instanceof Object[]) {
+                logStat(tag, key, Arrays.toString((Object[]) value));
             } else {
-                Log.v(tag, String.format("%s: %s", key, value.toString()));
+                logStat(tag, key, value.toString());
             }
         }
+    }
+
+    private static void logStat(String tag, String key, String value) {
+        Log.v(tag, String.format("%s: %s", key, value));
     }
 }

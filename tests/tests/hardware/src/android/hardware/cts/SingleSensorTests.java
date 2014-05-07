@@ -22,11 +22,13 @@ import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Set of tests to verify that sensors operate correctly when operating alone.
@@ -214,12 +216,21 @@ public class SingleSensorTests extends SensorTestCase {
                 minDelay * 8,
                 minDelay * 16,
         };
+        int[] maxBatchReportLatencyUss = {
+                0, // No batching
+                (int) TimeUnit.MICROSECONDS.convert(1, TimeUnit.SECONDS),
+                (int) TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS),
+        };
         for (int rateUs : rateUss) {
-            VerifySensorOperation op = new VerifySensorOperation(this.getContext(), sensorType,
-                    rateUs, 0, 100);
-            op.setDefaultVerifications();
-            op.execute();
-            SensorStats.logStats(TAG, op.getStats());
+            for (int maxBatchReportLatencyUs : maxBatchReportLatencyUss) {
+                Log.v(TAG, String.format("Run on %d with rate %d and batch %d", sensorType, rateUs,
+                        maxBatchReportLatencyUs));
+                TestSensorOperation op = new TestSensorOperation(this.getContext(), sensorType,
+                        rateUs, maxBatchReportLatencyUs, 1, TimeUnit.SECONDS);
+                op.setDefaultVerifications();
+                op.execute();
+                SensorStats.logStats(TAG, op.getStats());
+            }
         }
     }
 }

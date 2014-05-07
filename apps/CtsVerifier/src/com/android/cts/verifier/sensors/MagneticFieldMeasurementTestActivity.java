@@ -21,8 +21,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
-import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.hardware.cts.helpers.sensorverification.MagnitudeVerification;
+import android.hardware.cts.helpers.sensorverification.StandardDeviationVerification;
 
 /**
  * Semi-automated test that focuses characteristics associated with Accelerometer measurements.
@@ -64,9 +67,9 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
 
         TestSensorManager magnetometer = new TestSensorManager(
                 this.getApplicationContext(), Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_NORMAL, 0, listener);
+                SensorManager.SENSOR_DELAY_NORMAL, 0);
         try {
-            magnetometer.registerListener();
+            magnetometer.registerListener(new TestSensorEventListener(listener));
             waitForUser();
         } finally {
             magnetometer.unregisterListener();
@@ -98,15 +101,15 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
         float magneticFieldEarthThreshold =
                 expectedMagneticFieldEarth - SensorManager.MAGNETIC_FIELD_EARTH_MIN;
-        VerifySensorOperation verifyNorm = new VerifySensorOperation(
+        TestSensorOperation verifyNorm = new TestSensorOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
-        verifyNorm.verifyMagnitude(
+        verifyNorm.addVerification(new MagnitudeVerification(
                 expectedMagneticFieldEarth,
-                magneticFieldEarthThreshold);
+                magneticFieldEarthThreshold));
         verifyNorm.execute();
         logSuccess();
     }
@@ -135,14 +138,14 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
      * the failure to help track down the issue.
      */
     private void verifyStandardDeviation() throws Throwable {
-        VerifySensorOperation verifyStdDev = new VerifySensorOperation(
+        TestSensorOperation verifyStdDev = new TestSensorOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
-        verifyStdDev.verifyStandardDeviation(
-                new float[]{2f, 2f, 2f} /* uT */);
+        verifyStdDev.addVerification(new StandardDeviationVerification(
+                new float[]{2f, 2f, 2f} /* uT */));
         verifyStdDev.execute();
         logSuccess();
     }
