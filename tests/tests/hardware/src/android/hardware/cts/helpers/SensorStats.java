@@ -17,8 +17,13 @@
 package android.hardware.cts.helpers;
 
 import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +42,7 @@ public class SensorStats {
 
     public static final String FIRST_TIMESTAMP_KEY = "first_timestamp";
     public static final String LAST_TIMESTAMP_KEY = "last_timestamp";
+    public static final String ERROR = "error";
     public static final String EVENT_COUNT_KEY = "event_count";
     public static final String EVENT_OUT_OF_ORDER_COUNT_KEY = "event_out_of_order_count";
     public static final String EVENT_OUT_OF_ORDER_POSITIONS_KEY = "event_out_of_order_positions";
@@ -116,35 +122,59 @@ public class SensorStats {
      */
     public static void logStats(String tag, SensorStats stats) {
         final Map<String, Object> flattened = stats.flatten();
-        final List<String> keys = new ArrayList<String>(flattened.keySet());
-        Collections.sort(keys);
-        for (String key : keys) {
+        for (String key : getSortedKeys(flattened)) {
             Object value = flattened.get(key);
-            if (value instanceof boolean[]) {
-                logStat(tag, key, Arrays.toString((boolean[]) value));
-            } else if (value instanceof byte[]) {
-                logStat(tag, key, Arrays.toString((byte[]) value));
-            } else if (value instanceof char[]) {
-                logStat(tag, key, Arrays.toString((char[]) value));
-            } else if (value instanceof double[]) {
-                logStat(tag, key, Arrays.toString((double[]) value));
-            } else if (value instanceof float[]) {
-                logStat(tag, key, Arrays.toString((float[]) value));
-            } else if (value instanceof int[]) {
-                logStat(tag, key, Arrays.toString((int[]) value));
-            } else if (value instanceof long[]) {
-                logStat(tag, key, Arrays.toString((long[]) value));
-            } else if (value instanceof short[]) {
-                logStat(tag, key, Arrays.toString((short[]) value));
-            } else if (value instanceof Object[]) {
-                logStat(tag, key, Arrays.toString((Object[]) value));
-            } else {
-                logStat(tag, key, value.toString());
-            }
+            Log.v(tag, String.format("%s: %s", key, getValueString(value)));
         }
     }
 
-    private static void logStat(String tag, String key, String value) {
-        Log.v(tag, String.format("%s: %s", key, value));
+    /**
+     * Utility method to log the stats to a file. Will overwrite the file if it already exists.
+     */
+    public static void logStatsToFile(String fileName, SensorStats stats) throws IOException {
+        final BufferedWriter writer = new BufferedWriter(new FileWriter(
+                new File(Environment.getExternalStorageDirectory(), fileName), false));
+        final Map<String, Object> flattened = stats.flatten();
+        try {
+            for (String key : getSortedKeys(flattened)) {
+                Object value = flattened.get(key);
+                writer.write(String.format("%s: %s\n", key, getValueString(value)));
+            }
+        } finally {
+            writer.flush();
+            writer.close();
+        }
+    }
+
+    private static List<String> getSortedKeys(Map<String, Object> flattenedStats) {
+        List<String> keys = new ArrayList<String>(flattenedStats.keySet());
+        Collections.sort(keys);
+        return keys;
+    }
+
+    private static String getValueString(Object value) {
+        if (value == null) {
+            return "";
+        } else if (value instanceof boolean[]) {
+            return Arrays.toString((boolean[]) value);
+        } else if (value instanceof byte[]) {
+            return Arrays.toString((byte[]) value);
+        } else if (value instanceof char[]) {
+            return Arrays.toString((char[]) value);
+        } else if (value instanceof double[]) {
+            return Arrays.toString((double[]) value);
+        } else if (value instanceof float[]) {
+            return Arrays.toString((float[]) value);
+        } else if (value instanceof int[]) {
+            return Arrays.toString((int[]) value);
+        } else if (value instanceof long[]) {
+            return Arrays.toString((long[]) value);
+        } else if (value instanceof short[]) {
+            return Arrays.toString((short[]) value);
+        } else if (value instanceof Object[]) {
+            return Arrays.toString((Object[]) value);
+        } else {
+            return value.toString();
+        }
     }
 }

@@ -24,7 +24,7 @@ import android.hardware.cts.helpers.SensorStats;
  */
 public abstract class AbstractSensorOperation implements ISensorOperation {
 
-    protected final SensorStats mStats = new SensorStats();
+    private final SensorStats mStats = new SensorStats();
 
     /**
      * Wrapper around {@link SensorStats#addSensorStats(String, SensorStats)}

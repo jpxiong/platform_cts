@@ -16,6 +16,8 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import android.hardware.cts.helpers.SensorStats;
+
 import junit.framework.Assert;
 
 import java.util.concurrent.TimeUnit;
@@ -58,9 +60,9 @@ public class FakeSensorOperation extends AbstractSensorOperation {
         long delayNs = TimeUnit.NANOSECONDS.convert(mDelay, mTimeUnit);
         try {
             Thread.sleep(delayNs / NANOS_PER_MILLI, (int) (delayNs % NANOS_PER_MILLI));
-            mStats.addValue("executed", true);
+            getStats().addValue("executed", true);
             if (mFail) {
-                Assert.fail("FakeSensorOperation failed");
+                doFail();
             }
         }catch (InterruptedException e) {
             // Ignore
@@ -73,5 +75,14 @@ public class FakeSensorOperation extends AbstractSensorOperation {
     @Override
     public FakeSensorOperation clone() {
         return new FakeSensorOperation(mFail, mDelay, mTimeUnit);
+    }
+
+    /**
+     * Fails the operation.
+     */
+    protected void doFail() {
+        String msg = "FakeSensorOperation failed";
+        getStats().addValue(SensorStats.ERROR, msg);
+        Assert.fail(msg);
     }
 }

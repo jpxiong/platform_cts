@@ -211,26 +211,41 @@ public class SingleSensorTests extends SensorTestCase {
                 SensorManager.SENSOR_DELAY_FASTEST, // Should be the same as min delay
                 (int) (minDelay * 1.5),
                 minDelay * 2,
-                minDelay * 4,
                 minDelay * 5,
                 minDelay * 8,
-                minDelay * 16,
         };
         int[] maxBatchReportLatencyUss = {
                 0, // No batching
-                (int) TimeUnit.MICROSECONDS.convert(1, TimeUnit.SECONDS),
-                (int) TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS),
+                (int) TimeUnit.MICROSECONDS.convert(2, TimeUnit.SECONDS),
         };
+
+        AssertionError firstError = null;
+
         for (int rateUs : rateUss) {
             for (int maxBatchReportLatencyUs : maxBatchReportLatencyUss) {
                 Log.v(TAG, String.format("Run on %d with rate %d and batch %d", sensorType, rateUs,
                         maxBatchReportLatencyUs));
                 TestSensorOperation op = new TestSensorOperation(this.getContext(), sensorType,
-                        rateUs, maxBatchReportLatencyUs, 1, TimeUnit.SECONDS);
+                        rateUs, maxBatchReportLatencyUs, 5, TimeUnit.SECONDS);
                 op.setDefaultVerifications();
-                op.execute();
+                try {
+                    op.execute();
+                } catch (AssertionError e) {
+                    if (firstError == null) {
+                        firstError = e;
+                    }
+                }
+
                 SensorStats.logStats(TAG, op.getStats());
+
+                String fileName = String.format("single_sensor_%d_%d_%d.txt", sensorType,
+                        rateUs, maxBatchReportLatencyUs);
+                SensorStats.logStatsToFile(fileName, op.getStats());
             }
+        }
+
+        if (firstError != null) {
+            throw firstError;
         }
     }
 }
