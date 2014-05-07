@@ -18,17 +18,10 @@ package android.hardware.cts.helpers;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +29,8 @@ import java.util.concurrent.TimeUnit;
  * Set of static helper methods for CTS tests.
  */
 public class SensorCtsHelper {
+
+    private static long NANOS_PER_MILLI = 1000000;
 
     /**
      * Private constructor for static class.
@@ -209,54 +204,6 @@ public class SensorCtsHelper {
     }
 
     /**
-     * NOTE:
-     * - The bug report is usually written to /sdcard/Downloads
-     * - In order for the test Instrumentation to gather useful data the following permissions are
-     *   required:
-     *      . android.permission.READ_LOGS
-     *      . android.permission.DUMP
-     */
-    public static String collectBugreport(String collectorId)
-            throws IOException, InterruptedException {
-        String commands[] = new String[] {
-                "dumpstate",
-                "dumpsys",
-                "logcat -d -v threadtime",
-                "exit"
-        };
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-y_H:m:s.S");
-        String outputFile = String.format(
-                "%s/%s_%s",
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                collectorId,
-                dateFormat.format(new Date()));
-
-        DataOutputStream processOutput = null;
-        try {
-            Process process = Runtime.getRuntime().exec("/system/bin/sh -");
-            processOutput = new DataOutputStream(process.getOutputStream());
-
-            for(String command : commands) {
-                processOutput.writeBytes(String.format("%s >> %s\n", command, outputFile));
-            }
-
-            processOutput.flush();
-            process.waitFor();
-
-            Log.d(collectorId, String.format("Bug-Report collected at: %s", outputFile));
-        } finally {
-            if(processOutput != null) {
-                try {
-                    processOutput.close();
-                } catch(IOException e) {}
-            }
-        }
-
-        return outputFile;
-    }
-
-    /**
      * Get the default sensor for a given type.
      */
     public static Sensor getSensor(Context context, int sensorType) {
@@ -332,57 +279,15 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Format an assertion message.
-     *
-     * @param verificationName The verification name
-     * @param sensor The sensor under test
-     * @param format The additional format string, use "" if blank
-     * @param params The additional format params
-     * @return The formatted string.
+     * Helper method to sleep for a given duration.
      */
-    public static String formatAssertionMessage(
-            String verificationName,
-            Sensor sensor,
-            String format,
-            Object ... params) {
-        return formatAssertionMessage(verificationName, null, sensor, format, params);
-    }
-
-    /**
-     * Format an assertion message.
-     *
-     * @param verificationName The verification name
-     * @param test The test, optional
-     * @param sensor The sensor under test
-     * @param format The additional format string, use "" if blank
-     * @param params The additional format params
-     * @return The formatted string.
-     */
-    public static String formatAssertionMessage(
-            String verificationName,
-            ISensorOperation test,
-            Sensor sensor,
-            String format,
-            Object ... params) {
-        StringBuilder builder = new StringBuilder();
-
-        // identify the verification
-        builder.append(verificationName);
-        builder.append("| ");
-        // add test context information
-        if(test != null) {
-            builder.append(test.toString());
-            builder.append("| ");
+    public static void sleep(long duration, TimeUnit timeUnit) {
+        long durationNs = TimeUnit.NANOSECONDS.convert(duration, timeUnit);
+        try {
+            Thread.sleep(durationNs / NANOS_PER_MILLI, (int) (durationNs % NANOS_PER_MILLI));
+        } catch (InterruptedException e) {
+            // Ignore
         }
-        // add context information
-        builder.append(SensorTestInformation.getSensorName(sensor.getType()));
-        builder.append(", handle:");
-        builder.append(sensor.getHandle());
-        builder.append("| ");
-        // add the custom formatting
-        builder.append(String.format(format, params));
-
-        return builder.toString();
     }
 
     /**
