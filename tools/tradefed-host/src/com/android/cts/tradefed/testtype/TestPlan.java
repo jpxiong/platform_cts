@@ -47,6 +47,7 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
     private static final String TEST_DELIM = ";";
     private static final String METHOD_DELIM = "#";
     private static final String EXCLUDE_ATTR = "exclude";
+    private static final String INCLUDE_ATTR = "include";
     private static final String URI_ATTR = "uri";
 
     private final String mName;
@@ -61,21 +62,23 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
                 throws SAXException {
             if (ENTRY_TAG.equals(localName)) {
                 final String entryUriValue = attributes.getValue(URI_ATTR);
-                TestFilter filter = parseExcludedTests(attributes.getValue(EXCLUDE_ATTR));
+                TestFilter filter = parseTestList(
+                        attributes.getValue(EXCLUDE_ATTR), attributes.getValue(INCLUDE_ATTR));
                 mUriExcludedTestsMap.put(entryUriValue, filter);
             }
         }
 
         /**
-         * Parse the semi colon separated list of tests to exclude.
+         * Parse a semicolon separated list of tests.
          * <p/>
          * Expected format:
          * testClassName[#testMethodName][;testClassName2...]
          *
          * @param excludedString the excluded string list
+         * @param includedString the included string list
          * @return
          */
-        private TestFilter parseExcludedTests(String excludedString) {
+        private TestFilter parseTestList(String excludedString, String includedString) {
             TestFilter filter = new TestFilter();
             if (excludedString != null) {
                 String[] testStrings = excludedString.split(TEST_DELIM);
@@ -89,6 +92,19 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
                     }
                 }
             }
+            if (includedString != null) {
+                String[] testStrings = includedString.split(TEST_DELIM);
+                for (String testString : testStrings) {
+                    String[] classMethodPair = testString.split(METHOD_DELIM);
+                    if (classMethodPair.length == 2) {
+                        filter.addIncludedTest(new TestIdentifier(classMethodPair[0],
+                                classMethodPair[1]));
+                    } else {
+                        filter.addIncludedClass(testString);
+                    }
+                }
+            }
+
             return filter;
         }
     }
@@ -198,16 +214,27 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
      */
     private void serializeFilter(KXmlSerializer serializer, TestFilter testFilter)
             throws IOException {
-        if (!testFilter.hasExclusion()) {
-            return;
+        if (testFilter.hasExclusion()) {
+            List<String> exclusionStrings = new ArrayList<String>();
+            exclusionStrings.addAll(testFilter.getExcludedClasses());
+            for (TestIdentifier test : testFilter.getExcludedTests()) {
+                // TODO: this relies on TestIdentifier.toString() using METHOD_DELIM.
+                exclusionStrings.add(test.toString());
+            }
+            String exclusionAttrValue = ArrayUtil.join(TEST_DELIM, exclusionStrings);
+            serializer.attribute(null, EXCLUDE_ATTR, exclusionAttrValue);
         }
-        List<String> exclusionStrings = new ArrayList<String>();
-        exclusionStrings.addAll(testFilter.getExcludedClasses());
-        for (TestIdentifier test : testFilter.getExcludedTests()) {
-            // TODO: this relies on TestIdentifier.toString() using METHOD_DELIM.
-            exclusionStrings.add(test.toString());
+
+        if (testFilter.hasInclusion()) {
+            List<String> inclusionStrings = new ArrayList<String>();
+            inclusionStrings.addAll(testFilter.getIncludedClasses());
+            for (TestIdentifier test : testFilter.getIncludedTests()) {
+                // TODO: this relies on TestIdentifier.toString() using METHOD_DELIM.
+                inclusionStrings.add(test.toString());
+            }
+            String exclusionAttrValue = ArrayUtil.join(TEST_DELIM, inclusionStrings);
+            serializer.attribute(null, INCLUDE_ATTR, exclusionAttrValue);
         }
-        String exclusionAttrValue = ArrayUtil.join(TEST_DELIM, exclusionStrings);
-        serializer.attribute(null, EXCLUDE_ATTR, exclusionAttrValue);
+
     }
 }
