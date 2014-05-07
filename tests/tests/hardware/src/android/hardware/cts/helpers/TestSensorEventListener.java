@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestSensorEventListener implements SensorEventListener2 {
     public static final String LOG_TAG = "TestSensorEventListener";
-    public static final boolean DEBUG = true;
     private static final long EVENT_TIMEOUT_US = TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS);
     private static final long FLUSH_TIMEOUT_US = TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS);
 
@@ -47,6 +46,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
     private Sensor mSensor = null;
     private int mRateUs = 0;
     private int mMaxBatchReportLatencyUs = 0;
+    private boolean mLogEvents = false;
 
     /**
      * Construct a {@link TestSensorEventListener}.
@@ -72,6 +72,13 @@ public class TestSensorEventListener implements SensorEventListener2 {
     }
 
     /**
+     * Set whether or not to log events
+     */
+    public void setLogEvents(boolean log) {
+        mLogEvents = log;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -82,7 +89,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
         if (mListener != null) {
             mListener.onSensorChanged(event);
         }
-        if (DEBUG) {
+        if (mLogEvents) {
             StringBuilder valuesSb = new StringBuilder();
             if (event.values.length == 1) {
                 valuesSb.append(String.format("%.2f", event.values[0]));
@@ -95,8 +102,9 @@ public class TestSensorEventListener implements SensorEventListener2 {
             }
 
             Log.v(LOG_TAG, String.format(
-                    "Sensor %d: device_timestamp=%d, values=%s",
-                    mSensor.getType(), event.timestamp, Arrays.toString(event.values)));
+                    "Sensor %d: sensor_timestamp=%d, received_timestamp=%d, values=%s",
+                    mSensor.getType(), event.timestamp, System.nanoTime(),
+                    Arrays.toString(event.values)));
         }
     }
 
@@ -134,7 +142,8 @@ public class TestSensorEventListener implements SensorEventListener2 {
         CountDownLatch latch = mFlushLatch;
         try {
             if(latch != null) {
-                String message = SensorCtsHelper.formatAssertionMessage(mSensor, "WaitForFlush");
+                String message = SensorCtsHelper.formatAssertionMessage(mSensor, "WaitForFlush",
+                        mRateUs, mMaxBatchReportLatencyUs);
                 Assert.assertTrue(message, latch.await(FLUSH_TIMEOUT_US, TimeUnit.MICROSECONDS));
             }
         } catch(InterruptedException e) {
@@ -156,7 +165,8 @@ public class TestSensorEventListener implements SensorEventListener2 {
                     + mMaxBatchReportLatencyUs + EVENT_TIMEOUT_US);
 
             String message = SensorCtsHelper.formatAssertionMessage(mSensor, "WaitForEvents",
-                    "count:%d, available:%d", eventCount, mEventLatch.getCount());
+                    mRateUs, mMaxBatchReportLatencyUs, "count:%d, available:%d", eventCount,
+                    mEventLatch.getCount());
             Assert.assertTrue(message, mEventLatch.await(timeoutUs, TimeUnit.MICROSECONDS));
         } catch(InterruptedException e) {
             // Ignore

@@ -29,7 +29,7 @@ import java.util.List;
  * A {@link ISensorVerification} which verifies that all events are received in the correct order.
  */
 public class EventOrderingVerification extends AbstractSensorVerification {
-    public static final String PASSED_KEY = "event_order_passed";
+    public static final String PASSED_KEY = "event_out_of_order_passed";
 
     private static final int MESSAGE_LENGTH = 3;
 
