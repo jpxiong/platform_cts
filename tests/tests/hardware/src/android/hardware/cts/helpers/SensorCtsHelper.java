@@ -16,65 +16,109 @@
 package android.hardware.cts.helpers;
 
 import android.content.Context;
-
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-
 import android.os.Environment;
-
 import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Set of static helper methods for CTS tests.
  */
 public class SensorCtsHelper {
+
     /**
-     * This is an static class.
+     * Private constructor for static class.
      */
     private SensorCtsHelper() {}
 
-    public static <TValue extends Comparable> TValue get95PercentileValue(
+    /**
+     * Get the value of the 95th percentile using nearest rank algorithm.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
+    public static <TValue extends Comparable<? super TValue>> TValue get95PercentileValue(
             Collection<TValue> collection) {
         validateCollection(collection);
 
-        ArrayList<TValue> arrayCopy = new ArrayList<TValue>(collection);
+        List<TValue> arrayCopy = new ArrayList<TValue>(collection);
         Collections.sort(arrayCopy);
 
         // zero-based array index
-        int arrayIndex = (int)(arrayCopy.size() * 0.95) - 1;
-        if(arrayIndex < 0) {
-            arrayIndex = 0;
-        }
+        int arrayIndex = (int) Math.round(arrayCopy.size() * 0.95 + .5) - 1;
 
         return arrayCopy.get(arrayIndex);
     }
 
     /**
      * Calculates the mean for each of the values in the set of TestSensorEvents.
+     *
+     * @throws IllegalArgumentException if there are no events
      */
-    public static void getMeans(TestSensorEvent events[], double means[]) {
-        for(TestSensorEvent event : events) {
-            for(int i = 0; i < means.length; ++i) {
+    public static double[] getMeans(TestSensorEvent[] events) {
+        if (events.length == 0) {
+            throw new IllegalArgumentException("Events cannot be empty");
+        }
+
+        double[] means = new double[events[0].values.length];
+        for (TestSensorEvent event : events) {
+            for (int i = 0; i < means.length; i++) {
                 means[i] += event.values[i];
             }
         }
-        for(int i = 0; i < means.length; ++i) {
+        for (int i = 0; i < means.length; i++) {
             means[i] /= events.length;
         }
+        return means;
     }
 
+    /**
+     * Calculates the variance for each of the values in the set of TestSensorEvents.
+     *
+     * @throws IllegalArgumentException if there are no events
+     */
+    public static double[] getVariances(TestSensorEvent[] events) {
+        double[] means = getMeans(events);
+        double[] variances = new double[means.length];
+        for (int i = 0; i < means.length; i++) {
+            Collection<Double> squaredDiffs = new ArrayList<Double>(events.length);
+            for (TestSensorEvent event : events) {
+                double diff = event.values[i] - means[i];
+                squaredDiffs.add(diff * diff);
+            }
+            variances[i] = getMean(squaredDiffs);
+        }
+        return variances;
+    }
+
+    /**
+     * Calculates the standard deviation for each of the values in the set of TestSensorEvents.
+     *
+     * @throws IllegalArgumentException if there are no events
+     */
+    public static double[] getStandardDeviations(TestSensorEvent[] events) {
+        double[] variances = getVariances(events);
+        double[] stdDevs = new double[variances.length];
+        for (int i = 0; i < variances.length; i++) {
+            stdDevs[i] = Math.sqrt(variances[i]);
+        }
+        return stdDevs;
+    }
+
+    /**
+     * Calculate the mean of a collection.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
     public static <TValue extends Number> double getMean(Collection<TValue> collection) {
         validateCollection(collection);
 
@@ -85,6 +129,11 @@ public class SensorCtsHelper {
         return sum / collection.size();
     }
 
+    /**
+     * Calculate the variance of a collection.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
     public static <TValue extends Number> double getVariance(Collection<TValue> collection) {
         validateCollection(collection);
 
@@ -95,58 +144,52 @@ public class SensorCtsHelper {
             squaredDifferences.add(Math.pow(difference, 2));
         }
 
-        double variance = getMean(squaredDifferences);
-        return variance;
-    }
-
-    public static <TValue extends Number> double getStandardDeviation(Collection<TValue> collection) {
-        validateCollection(collection);
-
-        double variance = getVariance(collection);
-        return Math.sqrt(variance);
+        return getMean(squaredDifferences);
     }
 
     /**
-     * Gets the jitter values associated with a set of sensor events.
+     * Calculate the standard deviation of a collection.
      *
-     * @param events The events to use to obtain the jittering information.
-     * @param jitterValues The Collection that will contain the computed jitter values.
-     * @return The mean of the jitter Values.
+     * @throws IllegalArgumentException if the collection is null or empty
      */
-    public static double getJitterMean(TestSensorEvent events[], Collection<Double> jitterValues) {
-        ArrayList<Long> timestampDelayValues = new ArrayList<Long>();
-        double averageTimestampDelay = SensorCtsHelper.getAverageTimestampDelayWithValues(events,
-                timestampDelayValues);
-        for(long frequency : timestampDelayValues) {
-            jitterValues.add(Math.abs(averageTimestampDelay - frequency));
-        }
-
-        double jitterMean = SensorCtsHelper.getMean(timestampDelayValues);
-        return jitterMean;
+    public static <TValue extends Number> double getStandardDeviation(
+            Collection<TValue> collection) {
+        return Math.sqrt(getVariance(collection));
     }
 
     /**
-     * Gets the frequency values associated with a set of sensor events.
+     * Get a list containing the delay between sensor events.
      *
-     * @param events The events to use to obtain the frequency information.
-     * @param timestampDelayValues The Collection that will contain the computed frequency values.
-     * @return The mean of the frequency values.
+     * @param events The array of {@link TestSensorEvent}.
+     * @return A list containing the delay between sensor events in nanoseconds.
      */
-    public static double getAverageTimestampDelayWithValues(
-            TestSensorEvent events[],
-            Collection<Long> timestampDelayValues) {
-        for(int i = 1; i < events.length; ++i) {
-            long previousTimestamp = events[i-1].timestamp;
-            long timestamp = events[i].timestamp;
-            timestampDelayValues.add(timestamp - previousTimestamp);
+    public static List<Long> getTimestampDelayValues(TestSensorEvent[] events) {
+        if (events.length < 2) {
+            return new ArrayList<Long>();
         }
-
-        double timestampDelayMean = SensorCtsHelper.getMean(timestampDelayValues);
-        return timestampDelayMean;
+        List<Long> timestampDelayValues = new ArrayList<Long>(events.length - 1);
+        for (int i = 1; i < events.length; i++) {
+            timestampDelayValues.add(events[i].timestamp - events[i - 1].timestamp);
+        }
+        return timestampDelayValues;
     }
 
-    public static int getSecondsAsMicroSeconds(int seconds) {
-        return (int) TimeUnit.MICROSECONDS.convert(seconds, TimeUnit.SECONDS);
+    /**
+     * Get a list containing the jitter values for a collection of sensor events.
+     *
+     * @param events The array of {@link TestSensorEvent}.
+     * @return A list containing the jitter values between each event.
+     * @throws IllegalArgumentException if the number of events is less that 2.
+     */
+    public static List<Double> getJitterValues(TestSensorEvent[] events) {
+        List<Long> timestampDelayValues = getTimestampDelayValues(events);
+        double averageTimestampDelay = getMean(timestampDelayValues);
+
+        List<Double> jitterValues = new ArrayList<Double>(timestampDelayValues.size());
+        for (long timestampDelay : timestampDelayValues) {
+            jitterValues.add(Math.abs(timestampDelay - averageTimestampDelay));
+        }
+        return jitterValues;
     }
 
     /**
@@ -197,12 +240,11 @@ public class SensorCtsHelper {
         return outputFile;
     }
 
+    /**
+     * Get the default sensor for a given type.
+     */
     public static Sensor getSensor(Context context, int sensorType) {
-        SensorManager sensorManager = (SensorManager)context.getSystemService(
-                Context.SENSOR_SERVICE);
-        if(sensorManager == null) {
-            throw new IllegalStateException("SensorService is not present in the system.");
-        }
+        SensorManager sensorManager = getSensorManager(context);
         Sensor sensor = sensorManager.getDefaultSensor(sensorType);
         if(sensor == null) {
             throw new SensorNotSupportedException(sensorType);
@@ -210,10 +252,48 @@ public class SensorCtsHelper {
         return sensor;
     }
 
-    public static <TReference extends Number> double getFrequencyInHz(TReference samplingRateInUs) {
-        return 1000000000 / samplingRateInUs.doubleValue();
+    /**
+     * Get all the sensors for a given type.
+     */
+    public static List<Sensor> getSensors(Context context, int sensorType) {
+        SensorManager sensorManager = getSensorManager(context);
+        List<Sensor> sensors = sensorManager.getSensorList(sensorType);
+        if (sensors.size() == 0) {
+            throw new SensorNotSupportedException(sensorType);
+        }
+        return sensors;
     }
 
+    /**
+     * Convert a period to frequency in Hz.
+     */
+    public static <TValue extends Number> double getFrequency(TValue period, TimeUnit unit) {
+        return 1000000000 / (TimeUnit.NANOSECONDS.convert(1, unit) * period.doubleValue());
+    }
+
+    /**
+     * Convert a frequency in Hz into a period.
+     */
+    public static <TValue extends Number> double getPeriod(TValue frequency, TimeUnit unit) {
+        return 1000000000 / (TimeUnit.NANOSECONDS.convert(1, unit) * frequency.doubleValue());
+    }
+
+    /**
+     * Convert number of seconds to number of microseconds.
+     */
+    public static int getSecondsAsMicroSeconds(int seconds) {
+        return (int) TimeUnit.MICROSECONDS.convert(seconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Format an assertion message.
+     *
+     * @param verificationName The verification name
+     * @param sensor The sensor under test
+     * @param format The additional format string, use "" if blank
+     * @param params The additional format params
+     * @return The formatted string.
+     */
     public static String formatAssertionMessage(
             String verificationName,
             Sensor sensor,
@@ -222,6 +302,16 @@ public class SensorCtsHelper {
         return formatAssertionMessage(verificationName, null, sensor, format, params);
     }
 
+    /**
+     * Format an assertion message.
+     *
+     * @param verificationName The verification name
+     * @param test The test, optional
+     * @param sensor The sensor under test
+     * @param format The additional format string, use "" if blank
+     * @param params The additional format params
+     * @return The formatted string.
+     */
     public static String formatAssertionMessage(
             String verificationName,
             SensorTestOperation test,
@@ -239,8 +329,7 @@ public class SensorCtsHelper {
             builder.append("| ");
         }
         // add context information
-        builder.append(
-                SensorTestInformation.getSensorName(sensor.getType()));
+        builder.append(SensorTestInformation.getSensorName(sensor.getType()));
         builder.append(", handle:");
         builder.append(sensor.getHandle());
         builder.append("| ");
@@ -251,11 +340,27 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Private helpers
+     * Validate that a collection is not null or empty.
+     *
+     * @throws IllegalStateException if collection is null or empty.
      */
-    private static void validateCollection(Collection collection) {
+    private static <T> void validateCollection(Collection<T> collection) {
         if(collection == null || collection.size() == 0) {
             throw new IllegalStateException("Collection cannot be null or empty");
         }
+    }
+
+    /**
+     * Get the SensorManager.
+     *
+     * @throws IllegalStateException if the SensorManager is not present in the system.
+     */
+    private static SensorManager getSensorManager(Context context) {
+        SensorManager sensorManager = (SensorManager) context.getSystemService(
+                Context.SENSOR_SERVICE);
+        if(sensorManager == null) {
+            throw new IllegalStateException("SensorService is not present in the system.");
+        }
+        return sensorManager;
     }
 }

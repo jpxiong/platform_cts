@@ -16,14 +16,16 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.content.Context;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
+import android.hardware.cts.helpers.SensorVerificationHelper;
+import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
+
+import junit.framework.Assert;
 
 import java.security.InvalidParameterException;
 
@@ -34,8 +36,8 @@ import java.security.InvalidParameterException;
 public class VerifySignumOperation extends SensorTestOperation {
     private final SensorManagerTestVerifier mSensor;
     private final int mAxisCount;
-    private final double mReferenceValues[];
-    private final double mNoiseThreshold;
+    private final int mReferenceValues[];
+    private final double mNoiseThresholds[];
 
     /**
      * @param noiseThreshold Defines the threshold that needs to be crossed to consider a
@@ -45,7 +47,7 @@ public class VerifySignumOperation extends SensorTestOperation {
             Context context,
             int sensorType,
             int samplingRateInUs,
-            double referenceValues[],
+            int referenceValues[],
             double noiseThreshold) {
         mAxisCount = SensorTestInformation.getAxisCount(sensorType);
         if(mAxisCount != referenceValues.length) {
@@ -53,7 +55,7 @@ public class VerifySignumOperation extends SensorTestOperation {
                     String.format("%d reference values are expected.", mAxisCount));
         }
         for(int i = 0; i < referenceValues.length; ++i) {
-            double value = referenceValues[i];
+            int value = referenceValues[i];
             if(value != 0 && value != -1 && value != +1) {
                 throw new InvalidParameterException(
                         "A ReferenceValue can only be one of the following: -1, 0, +1");
@@ -66,46 +68,23 @@ public class VerifySignumOperation extends SensorTestOperation {
                 0 /*reportLatencyInUs*/);
         // set expectations
         mReferenceValues = referenceValues;
-        mNoiseThreshold = noiseThreshold;
+        mNoiseThresholds = new double[mReferenceValues.length];
+        for (int i = 0; i < mNoiseThresholds.length; i++) {
+            mNoiseThresholds[i] = noiseThreshold;
+        }
     }
 
     @Override
     public void doWork() {
-        final String VALUE_SEPARATOR = ", ";
-        TestSensorEvent events[] = mSensor.collectEvents(100);
-        double measuredValues[] = new double[mReferenceValues.length];
-        SensorCtsHelper.getMeans(events, measuredValues);
-
-        boolean success = true;
-        StringBuilder referenceValuesBuilder = new StringBuilder();
-        StringBuilder measuredValuesBuilder = new StringBuilder();
-        for(int i = 0; i < mReferenceValues.length; i++) {
-            double reference = mReferenceValues[i];
-            double measurement = measuredValues[i];
-            if(reference == 0) {
-                success &= Math.abs(measurement) < mNoiseThreshold;
-            } else {
-                double combinedValue = reference * measurement;
-                if(combinedValue < mNoiseThreshold) {
-                    combinedValue = 0;
-                }
-                success &= combinedValue > 0;
-            }
-            referenceValuesBuilder.append(reference);
-            referenceValuesBuilder.append(VALUE_SEPARATOR);
-            measuredValuesBuilder.append(measurement);
-            measuredValuesBuilder.append(VALUE_SEPARATOR);
-        }
-        if(!success) {
-            String message = SensorCtsHelper.formatAssertionMessage(
+        TestSensorEvent[] events = mSensor.collectEvents(100);
+        VerificationResult result = SensorVerificationHelper.verifySignum(events, mReferenceValues,
+                mNoiseThresholds);
+        if (result.isFailed()) {
+            Assert.fail(SensorCtsHelper.formatAssertionMessage(
                     "Measurement",
                     this,
                     mSensor.getUnderlyingSensor(),
-                    "expected:( %s), actual:( %s), noiseThreshold:%f",
-                    referenceValuesBuilder.toString(),
-                    measuredValuesBuilder.toString(),
-                    mNoiseThreshold);
-            Assert.fail(message);
+                    result.getFailureMessage()));
         }
     }
 }
