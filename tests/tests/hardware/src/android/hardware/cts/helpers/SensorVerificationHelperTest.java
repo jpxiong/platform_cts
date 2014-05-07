@@ -38,28 +38,30 @@ public class SensorVerificationHelperTest extends TestCase {
         TestSensorEvent[] events1 = getSensorEvents(timestamps1, values);
         VerificationResult result = SensorVerificationHelper.verifyEventOrdering(events1);
         assertFalse(result.isFailed());
-        assertEquals(0, result.getValue("count"));
+        assertEquals(0, result.getValue(SensorVerificationHelper.EVENT_ORDER_COUNT_KEY));
 
         long[] timestamps2 = {0, 1, 2, 3, 4};
         TestSensorEvent[] events2 = getSensorEvents(timestamps2, values);
         result = SensorVerificationHelper.verifyEventOrdering(events2);
         assertFalse(result.isFailed());
-        assertEquals(0, result.getValue("count"));
+        assertEquals(0, result.getValue(SensorVerificationHelper.EVENT_ORDER_COUNT_KEY));
 
         long[] timestamps3 = {0, 2, 1, 3, 4};
         TestSensorEvent[] events3 = getSensorEvents(timestamps3, values);
         result = SensorVerificationHelper.verifyEventOrdering(events3);
         assertTrue(result.isFailed());
-        assertEquals(1, result.getValue("count"));
-        List<Integer> indices = (List<Integer>) result.getValue("positions");
+        assertEquals(1, result.getValue(SensorVerificationHelper.EVENT_ORDER_COUNT_KEY));
+        List<Integer> indices = (List<Integer>) result.getValue(
+                SensorVerificationHelper.EVENT_ORDER_POSITIONS_KEY);
         assertTrue(indices.contains(2));
 
         long[] timestamps4 = {4, 0, 1, 2, 3};
         TestSensorEvent[] events4 = getSensorEvents(timestamps4, values);
         result = SensorVerificationHelper.verifyEventOrdering(events4);
         assertTrue(result.isFailed());
-        assertEquals(4, result.getValue("count"));
-        indices = (List<Integer>) result.getValue("positions");
+        assertEquals(4, result.getValue(SensorVerificationHelper.EVENT_ORDER_COUNT_KEY));
+        indices = (List<Integer>) result.getValue(
+                SensorVerificationHelper.EVENT_ORDER_POSITIONS_KEY);
         assertTrue(indices.contains(1));
         assertTrue(indices.contains(2));
         assertTrue(indices.contains(3));
@@ -92,7 +94,7 @@ public class SensorVerificationHelperTest extends TestCase {
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifyJitter(TestSensorEvent[], double)}.
+     * Test {@link SensorVerificationHelper#verifyJitter(TestSensorEvent[], int, int)}.
      */
     public void testVerifyJitter() {
         final int SAMPLE_SIZE = 100;
@@ -106,9 +108,11 @@ public class SensorVerificationHelperTest extends TestCase {
             timestamps1[i] = i * 100000;
         }
         TestSensorEvent[] events1 = getSensorEvents(timestamps1, values);
-        VerificationResult result = SensorVerificationHelper.verifyJitter(events1, 100000);
+        VerificationResult result = SensorVerificationHelper.verifyJitter(events1, 1000, 10);
         assertFalse(result.isFailed());
-        assertEquals(0.0, (Double) result.getValue("jitter95Percentile"), 0.01);
+        Double jitter95 = (Double) result.getValue(
+                SensorVerificationHelper.JITTER_95_PERCENTILE_KEY);
+        assertEquals(0.0, jitter95, 0.01);
 
         long[] timestamps2 = new long[SAMPLE_SIZE];  // 90 samples at 1000Hz, 10 samples at 2000Hz
         long timestamp = 0;
@@ -117,14 +121,13 @@ public class SensorVerificationHelperTest extends TestCase {
             timestamp += (i % 10 == 0) ? 500000 : 1000000;
         }
         TestSensorEvent[] events2 = getSensorEvents(timestamps2, values);
-        result = SensorVerificationHelper.verifyJitter(events2, 100000);
+        result = SensorVerificationHelper.verifyJitter(events2, 1000, 10);
         assertTrue(result.isFailed());
-        assertNotNull(result.getValue("jitter"));
-        assertNotNull(result.getValue("jitter95Percentile"));
+        assertNotNull(result.getValue(SensorVerificationHelper.JITTER_95_PERCENTILE_KEY));
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifyMean(TestSensorEvent[], double[], double[])}.
+     * Test {@link SensorVerificationHelper#verifyMean(TestSensorEvent[], float[], float[])}.
      */
     public void testVerifyMean() {
         long[] timestamps = {0, 1, 2, 3, 4};
@@ -133,39 +136,40 @@ public class SensorVerificationHelperTest extends TestCase {
         float[] values3 = {0, 1, 4, 9, 16};
         TestSensorEvent[] events = getSensorEvents(timestamps, values1, values2, values3);
 
-        double[] expected1 = {2.0, 3.0, 6.0};
-        double[] threshold1 = {0.1, 0.1, 0.1};
+        float[] expected1 = {2.0f, 3.0f, 6.0f};
+        float[] threshold1 = {0.1f, 0.1f, 0.1f};
         VerificationResult result = SensorVerificationHelper.verifyMean(events, expected1,
                 threshold1);
         assertFalse(result.isFailed());
-        double[] means = (double[]) result.getValue("means");
-        assertEquals(2.0, means[0], 0.01);
-        assertEquals(3.0, means[1], 0.01);
-        assertEquals(6.0, means[2], 0.01);
+        @SuppressWarnings("unchecked")
+        List<Float> means = (List<Float>) result.getValue(SensorVerificationHelper.MEAN_KEY);
+        assertEquals(2.0f, means.get(0), 0.01);
+        assertEquals(3.0f, means.get(1), 0.01);
+        assertEquals(6.0f, means.get(2), 0.01);
 
-        double[] expected2 = {2.5, 2.5, 5.5};
-        double[] threshold2 = {0.6, 0.6, 0.6};
-        result = SensorVerificationHelper.verifyMean(events, expected2, threshold2);
+        float[] expected = {2.5f, 2.5f, 5.5f};
+        float[] threshold = {0.6f, 0.6f, 0.6f};
+        result = SensorVerificationHelper.verifyMean(events, expected, threshold);
         assertFalse(result.isFailed());
 
-        double[] expected3 = {2.5, 2.5, 5.5};
-        double[] threshold3 = {0.1, 0.6, 0.6};
-        result = SensorVerificationHelper.verifyMean(events, expected3, threshold3);
+        expected = new float[]{2.5f, 2.5f, 5.5f};
+        threshold = new float[]{0.1f, 0.6f, 0.6f};
+        result = SensorVerificationHelper.verifyMean(events, expected, threshold);
         assertTrue(result.isFailed());
 
-        double[] expected4 = {2.5, 2.5, 5.5};
-        double[] threshold4 = {0.6, 0.1, 0.6};
-        result = SensorVerificationHelper.verifyMean(events, expected4, threshold4);
+        expected = new float[]{2.5f, 2.5f, 5.5f};
+        threshold = new float[]{0.6f, 0.1f, 0.6f};
+        result = SensorVerificationHelper.verifyMean(events, expected, threshold);
         assertTrue(result.isFailed());
 
-        double[] expected5 = {2.5, 2.5, 5.5};
-        double[] threshold5 = {0.6, 0.6, 0.1};
-        result = SensorVerificationHelper.verifyMean(events, expected5, threshold5);
+        threshold = new float[]{2.5f, 2.5f, 5.5f};
+        threshold = new float[]{0.6f, 0.6f, 0.1f};
+        result = SensorVerificationHelper.verifyMean(events, expected, threshold);
         assertTrue(result.isFailed());
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifyMagnitude(TestSensorEvent[], double, double)}.
+     * Test {@link SensorVerificationHelper#verifyMagnitude(TestSensorEvent[], float, float)}.
      */
     public void testVerifyMagnitude() {
         long[] timestamps = {0, 1, 2, 3, 4};
@@ -174,99 +178,101 @@ public class SensorVerificationHelperTest extends TestCase {
         float[] values3 = {4, 3, 0, 4, 0};
         TestSensorEvent[] events = getSensorEvents(timestamps, values1, values2, values3);
 
-        double expected = 5.0;
-        double threshold = 0.1;
+        float expected = 5.0f;
+        float threshold = 0.1f;
         VerificationResult result = SensorVerificationHelper.verifyMagnitude(events, expected,
                 threshold);
         assertFalse(result.isFailed());
-        assertEquals(5.0, (Double) result.getValue("magnitude"), 0.01);
+        assertEquals(5.0f, (Float) result.getValue(SensorVerificationHelper.MAGNITUDE_KEY), 0.01);
 
-        expected = 4.5;
-        threshold = 0.6;
+        expected = 4.5f;
+        threshold = 0.6f;
         result = SensorVerificationHelper.verifyMagnitude(events, expected, threshold);
         assertFalse(result.isFailed());
 
-        expected = 5.5;
-        threshold = 0.6;
+        expected = 5.5f;
+        threshold = 0.6f;
         result = SensorVerificationHelper.verifyMagnitude(events, expected, threshold);
         assertFalse(result.isFailed());
 
-        expected = 4.5;
-        threshold = 0.1;
+        expected = 4.5f;
+        threshold = 0.1f;
         result = SensorVerificationHelper.verifyMagnitude(events, expected, threshold);
         assertTrue(result.isFailed());
 
-        expected = 5.5;
-        threshold = 0.1;
+        expected = 5.5f;
+        threshold = 0.1f;
         result = SensorVerificationHelper.verifyMagnitude(events, expected, threshold);
         assertTrue(result.isFailed());
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifySignum(TestSensorEvent[], int[], double[])}.
+     * Test {@link SensorVerificationHelper#verifySignum(TestSensorEvent[], int[], float[])}.
      */
     public void testVerifySignum() {
         long[] timestamps = {0};
         float[][] values = {{1}, {0.2f}, {0}, {-0.2f}, {-1}};
         TestSensorEvent[] events = getSensorEvents(timestamps, values);
 
-        int[] expected1 = {1, 1, 0, -1, -1};
-        double[] threshold1 = {0.1, 0.1, 0.1, 0.1, 0.1};
-        VerificationResult result = SensorVerificationHelper.verifySignum(events, expected1,
-                threshold1);
+        int[] expected = {1, 1, 0, -1, -1};
+        float[] threshold = {0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
+        VerificationResult result = SensorVerificationHelper.verifySignum(events, expected,
+                threshold);
         assertFalse(result.isFailed());
-        assertNotNull(result.getValue("means"));
+        assertNotNull(result.getValue(SensorVerificationHelper.MEAN_KEY));
 
-        int[] expected2 = {1, 0, 0, 0, -1};
-        double[] threshold2 = {0.5, 0.5, 0.5, 0.5, 0.5};
-        result = SensorVerificationHelper.verifySignum(events, expected2, threshold2);
-        assertFalse(result.isFailed());
-
-        int[] expected3 = {0, 1, 0, -1, 0};
-        double[] threshold3 = {1.5, 0.1, 0.1, 0.1, 1.5};
-        result = SensorVerificationHelper.verifySignum(events, expected3, threshold3);
+        expected = new int[]{1, 0, 0, 0, -1};
+        threshold = new float[]{0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+        result = SensorVerificationHelper.verifySignum(events, expected, threshold);
         assertFalse(result.isFailed());
 
-        int[] expected4 = {1, 0, 0, 0, 1};
-        double[] threshold4 = {0.5, 0.5, 0.5, 0.5, 0.5};
-        result = SensorVerificationHelper.verifySignum(events, expected4, threshold4);
+        expected = new int[]{0, 1, 0, -1, 0};
+        threshold = new float[]{1.5f, 0.1f, 0.1f, 0.1f, 1.5f};
+        result = SensorVerificationHelper.verifySignum(events, expected, threshold);
+        assertFalse(result.isFailed());
+
+        expected = new int[]{1, 0, 0, 0, 1};
+        threshold = new float[]{0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+        result = SensorVerificationHelper.verifySignum(events, expected, threshold);
         assertTrue(result.isFailed());
 
-        int[] expected5 = {-1, 0, 0, 0, -1};
-        double[] threshold5 = {0.5, 0.5, 0.5, 0.5, 0.5};
-        result = SensorVerificationHelper.verifySignum(events, expected5, threshold5);
+        expected = new int[]{-1, 0, 0, 0, -1};
+        threshold = new float[]{0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+        result = SensorVerificationHelper.verifySignum(events, expected, threshold);
         assertTrue(result.isFailed());
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifyStandardDeviation(TestSensorEvent[], double[])}.
+     * Test {@link SensorVerificationHelper#verifyStandardDeviation(TestSensorEvent[], float[])}.
      */
     public void testVerifyStandardDeviation() {
         long[] timestamps = {0, 1, 2, 3, 4};
-        float[] values1 = {0, 1, 2, 3, 4};  // sqrt(2.0)
-        float[] values2 = {1, 2, 3, 4, 5};  // sqrt(2.0)
-        float[] values3 = {0, 2, 4, 6, 8};  // sqrt(8.0)
+        float[] values1 = {0, 1, 2, 3, 4};  // sqrt(2.5)
+        float[] values2 = {1, 2, 3, 4, 5};  // sqrt(2.5)
+        float[] values3 = {0, 2, 4, 6, 8};  // sqrt(10.0)
         TestSensorEvent[] events = getSensorEvents(timestamps, values1, values2, values3);
 
-        double[] threshold1 = {2, 2, 3};
+        float[] threshold = {2, 2, 4};
         VerificationResult result = SensorVerificationHelper.verifyStandardDeviation(events,
-                threshold1);
+                threshold);
         assertFalse(result.isFailed());
-        double[] means = (double[]) result.getValue("stddevs");
-        assertEquals(Math.sqrt(2.0), means[0], 0.01);
-        assertEquals(Math.sqrt(2.0), means[1], 0.01);
-        assertEquals(Math.sqrt(8.0), means[2], 0.01);
+        @SuppressWarnings("unchecked")
+        List<Float> stddevs = (List<Float>) result.getValue(
+                SensorVerificationHelper.STANDARD_DEVIATION_KEY);
+        assertEquals(Math.sqrt(2.5), stddevs.get(0), 0.01);
+        assertEquals(Math.sqrt(2.5), stddevs.get(1), 0.01);
+        assertEquals(Math.sqrt(10.0), stddevs.get(2), 0.01);
 
-        double[] threshold2 = {1, 2, 3};
-        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold2);
+        threshold = new float[]{1, 2, 4};
+        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold);
         assertTrue(result.isFailed());
 
-        double[] threshold3 = {2, 1, 3};
-        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold3);
+        threshold = new float[]{2, 1, 4};
+        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold);
         assertTrue(result.isFailed());
 
-        double[] threshold4 = {2, 2, 2};
-        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold4);
+        threshold = new float[]{2, 2, 3};
+        result = SensorVerificationHelper.verifyStandardDeviation(events, threshold);
         assertTrue(result.isFailed());
     }
 

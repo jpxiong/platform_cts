@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,26 @@
 package android.hardware.cts.helpers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Set of static helper methods to verify sensor CTS tests.
  */
 public class SensorVerificationHelper {
+
+    public static final String EVENT_ORDER_COUNT_KEY = "event_order_count";
+    public static final String EVENT_ORDER_POSITIONS_KEY = "event_order_positions";
+    public static final String FREQUENCY_KEY = "frequency";
+    public static final String JITTER_95_PERCENTILE_KEY = "jitter_95_percentile";
+    public static final String MEAN_KEY = "mean";
+    public static final String MAGNITUDE_KEY = "magnitude";
+    public static final String STANDARD_DEVIATION_KEY = "standard_deviation";
 
     private static final int MESSAGE_LENGTH = 3;
 
@@ -52,6 +62,10 @@ public class SensorVerificationHelper {
 
         public void putValue(String key, Object value) {
             mValueMap.put(key, value);
+        }
+
+        public Set<String> getKeys() {
+            return mValueMap.keySet();
         }
 
         public Object getValue(String key) {
@@ -86,8 +100,8 @@ public class SensorVerificationHelper {
             }
         }
 
-        result.putValue("count", indices.size());
-        result.putValue("positions", indices);
+        result.putValue(EVENT_ORDER_COUNT_KEY, indices.size());
+        result.putValue(EVENT_ORDER_POSITIONS_KEY, indices);
 
         if (indices.size() > 0) {
             StringBuilder sb = new StringBuilder();
@@ -126,7 +140,7 @@ public class SensorVerificationHelper {
         List<Long> timestampDelayValues = SensorCtsHelper.getTimestampDelayValues(events);
         double frequency = SensorCtsHelper.getFrequency(
                 SensorCtsHelper.getMean(timestampDelayValues), TimeUnit.NANOSECONDS);
-        result.putValue("frequency", frequency);
+        result.putValue(FREQUENCY_KEY, frequency);
 
         if (Math.abs(frequency - expected) > threshold) {
             result.fail("Frequency out of range: frequency=%.2fHz, expected=%.2f+/-%.2fHz",
@@ -139,22 +153,23 @@ public class SensorVerificationHelper {
      * Verify that the jitter is in an acceptable range
      *
      * @param events The array of {@link TestSensorEvent}
-     * @param threshold The acceptable margin of error in nanoseconds
+     * @param expected the expected period in ns
+     * @param threshold The acceptable margin of error as a percentage
      * @return a {@link VerificationResult} containing the verification info including the keys
      *     "jitter" which is the list of computed jitter values and "jitter95Percentile" which is
      *     95th percentile of the jitter values.
      * @throws IllegalStateException if number of events less than 2.
      */
-    public static VerificationResult verifyJitter(TestSensorEvent[] events, double threshold) {
+    public static VerificationResult verifyJitter(TestSensorEvent[] events, int expected,
+            int threshold) {
         VerificationResult result = new VerificationResult();
         List<Double> jitterValues = SensorCtsHelper.getJitterValues(events);
         double jitter95Percentile = SensorCtsHelper.get95PercentileValue(jitterValues);
-        result.putValue("jitter", jitterValues);
-        result.putValue("jitter95Percentile", jitter95Percentile);
+        result.putValue(JITTER_95_PERCENTILE_KEY, jitter95Percentile);
 
-        if (jitter95Percentile > threshold) {
+        if (jitter95Percentile > expected * (threshold / 100.0)) {
             result.fail("Jitter out of range: jitter at 95th percentile=%.0fns, expected=<%.0fns",
-                    jitter95Percentile, threshold);
+                    jitter95Percentile, expected * (threshold / 100.0));
         }
         return result;
     }
@@ -169,11 +184,11 @@ public class SensorVerificationHelper {
      *     "mean" which is the computed means for each value of the sensor.
      * @throws IllegalStateException if number of events less than 1.
      */
-    public static VerificationResult verifyMean(TestSensorEvent[] events, double[] expected,
-            double[] threshold) {
+    public static VerificationResult verifyMean(TestSensorEvent[] events, float[] expected,
+            float[] threshold) {
         VerificationResult result = new VerificationResult();
-        double[] means = SensorCtsHelper.getMeans(events);
-        result.putValue("means", means);
+        Float[] means = SensorCtsHelper.getMeans(events);
+        result.putValue(MEAN_KEY, Arrays.asList(means));
 
         boolean failed = false;
         StringBuilder meanSb = new StringBuilder();
@@ -183,7 +198,7 @@ public class SensorVerificationHelper {
             meanSb.append("(");
             expectedSb.append("(");
         }
-        for (int i = 0; i < means.length && !failed; i++) {
+        for (int i = 0; i < means.length; i++) {
             if (Math.abs(means[i] - expected[i]) > threshold[i]) {
                 failed = true;
             }
@@ -214,21 +229,21 @@ public class SensorVerificationHelper {
      *     "magnitude" which is the mean of the computed magnitude of the sensor values.
      * @throws IllegalStateException if number of events less than 1.
      */
-    public static VerificationResult verifyMagnitude(TestSensorEvent[] events, double expected,
-            double threshold) {
+    public static VerificationResult verifyMagnitude(TestSensorEvent[] events, float expected,
+            float threshold) {
         VerificationResult result = new VerificationResult();
-        Collection<Double> magnitudes = new ArrayList<Double>(events.length);
+        Collection<Float> magnitudes = new ArrayList<Float>(events.length);
 
         for (TestSensorEvent event : events) {
-            double norm = 0;
+            float sumOfSquares = 0;
             for (int i = 0; i < event.values.length; i++) {
-                norm += event.values[i] * event.values[i];
+                sumOfSquares += event.values[i] * event.values[i];
             }
-            magnitudes.add(Math.sqrt(norm));
+            magnitudes.add((float) Math.sqrt(sumOfSquares));
         }
 
-        double mean = SensorCtsHelper.getMean(magnitudes);
-        result.putValue("magnitude", mean);
+        float mean = (float) SensorCtsHelper.getMean(magnitudes);
+        result.putValue(MAGNITUDE_KEY, mean);
 
         if (Math.abs(mean - expected) > threshold) {
             result.fail(String.format("Magnitude mean out of range: mean=%s, expected=%s+/-%s",
@@ -252,15 +267,15 @@ public class SensorVerificationHelper {
      * @throws IllegalStateException if number of events less than 1.
      */
     public static VerificationResult verifySignum(TestSensorEvent[] events, int[] expected,
-            double[] threshold) {
+            float[] threshold) {
         VerificationResult result = new VerificationResult();
         for (int i = 0; i < expected.length; i++) {
             if (!(expected[i] == -1 || expected[i] == 0 || expected[i] == 1)) {
                 throw new IllegalArgumentException("Expected value must be -1, 0, or 1");
             }
         }
-        double[] means = SensorCtsHelper.getMeans(events);
-        result.putValue("means", means);
+        Float[] means = SensorCtsHelper.getMeans(events);
+        result.putValue(MEAN_KEY, Arrays.asList(means));
 
         boolean failed = false;
         StringBuilder meanSb = new StringBuilder();
@@ -316,36 +331,36 @@ public class SensorVerificationHelper {
      * @throws IllegalStateException if number of events less than 1.
      */
     public static VerificationResult verifyStandardDeviation(TestSensorEvent[] events,
-            double[] threshold) {
+            float[] threshold) {
         VerificationResult result = new VerificationResult();
-        double[] standardDeviations = SensorCtsHelper.getStandardDeviations(events);
-        result.putValue("stddevs", standardDeviations);
+        Float[] standardDeviations = SensorCtsHelper.getStandardDeviations(events);
+        result.putValue(STANDARD_DEVIATION_KEY, Arrays.asList(standardDeviations));
 
         boolean failed = false;
-        StringBuilder meanSb = new StringBuilder();
+        StringBuilder stddevSb = new StringBuilder();
         StringBuilder expectedSb = new StringBuilder();
 
         if (standardDeviations.length > 1) {
-            meanSb.append("(");
+            stddevSb.append("(");
             expectedSb.append("(");
         }
-        for (int i = 0; i < standardDeviations.length && !failed; i++) {
+        for (int i = 0; i < standardDeviations.length; i++) {
             if (standardDeviations[i] > threshold[i]) {
                 failed = true;
             }
-            meanSb.append(String.format("%.2f", standardDeviations[i]));
-            if (i != standardDeviations.length - 1) meanSb.append(", ");
-            expectedSb.append(String.format("0+/-%.2f", threshold[i]));
+            stddevSb.append(String.format("%.2f", standardDeviations[i]));
+            if (i != standardDeviations.length - 1) stddevSb.append(", ");
+            expectedSb.append(String.format("<%.2f", threshold[i]));
             if (i != standardDeviations.length - 1) expectedSb.append(", ");
         }
         if (standardDeviations.length > 1) {
-            meanSb.append(")");
+            stddevSb.append(")");
             expectedSb.append(")");
         }
 
         if (failed) {
-            result.fail("Standard deviation out of range: mean=%s, expected=%s",
-                    meanSb.toString(), expectedSb.toString());
+            result.fail("Standard deviation out of range: stddev=%s, expected=%s",
+                    stddevSb.toString(), expectedSb.toString());
         }
         return result;
     }

@@ -21,8 +21,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
-import android.hardware.cts.helpers.sensorTestOperations.VerifyMagnitudeOperation;
-import android.hardware.cts.helpers.sensorTestOperations.VerifyStandardDeviationOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
 
 /**
  * Semi-automated test that focuses characteristics associated with Accelerometer measurements.
@@ -91,10 +90,13 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
         float magneticFieldEarthThreshold =
                 expectedMagneticFieldEarth - SensorManager.MAGNETIC_FIELD_EARTH_MIN;
-        VerifyMagnitudeOperation verifyNorm = new VerifyMagnitudeOperation(
+        VerifySensorOperation verifyNorm = new VerifySensorOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST,
+                0 /*reportLatencyInUs*/,
+                100 /* event count */);
+        verifyNorm.verifyMagnitude(
                 expectedMagneticFieldEarth,
                 magneticFieldEarthThreshold);
         verifyNorm.execute();
@@ -125,12 +127,14 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
      * the failure to help track down the issue.
      */
     private void verifyStandardDeviation() throws Throwable {
-        VerifyStandardDeviationOperation verifyStdDev = new VerifyStandardDeviationOperation(
+        VerifySensorOperation verifyStdDev = new VerifySensorOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
-                2f /* uT */);
+                100 /* event count */);
+        verifyStdDev.verifyStandardDeviation(
+                new float[]{2f, 2f, 2f} /* uT */);
         verifyStdDev.execute();
         logSuccess();
     }
