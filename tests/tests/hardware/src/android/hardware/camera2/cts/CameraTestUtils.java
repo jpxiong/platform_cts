@@ -77,7 +77,7 @@ public class CameraTestUtils extends Assert {
     public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
     public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
     public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
-    public static final int CAPTURE_RESULT_TIMEOUT_MS = 1000;
+    public static final int CAPTURE_RESULT_TIMEOUT_MS = 3000;
     public static final int CAPTURE_IMAGE_TIMEOUT_MS = 3000;
 
     /**

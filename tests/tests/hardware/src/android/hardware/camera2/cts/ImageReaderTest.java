@@ -23,6 +23,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.media.Image;
@@ -48,8 +49,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     private static final String TAG = "ImageReaderTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     // number of frame (for streaming requests) to be verified.
-    // TODO: Need extend it to bigger number
-    private static final int NUM_FRAME_VERIFIED = 1;
+    private static final int NUM_FRAME_VERIFIED = 2;
     // Max number of images can be accessed simultaneously from ImageReader.
     private static final int MAX_NUM_IMAGES = 5;
 
@@ -254,10 +254,16 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 CaptureRequest request = prepareCaptureRequest();
                 boolean repeating =
                         (format != ImageFormat.JPEG && format != ImageFormat.RAW_SENSOR);
-                startCapture(request, repeating, null, null);
+                SimpleCaptureListener listener = new SimpleCaptureListener();
+                startCapture(request, repeating, listener, mHandler);
+
+                int numFrameVerified = repeating ? NUM_FRAME_VERIFIED : 1;
 
                 // Validate images.
-                validateImage(sz, format);
+                validateImage(sz, format, numFrameVerified);
+
+                // Validate capture result.
+                validateCaptureResult(format, sz, listener, numFrameVerified);
 
                 // stop capture.
                 stopCapture(/*fast*/false);
@@ -265,6 +271,37 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 closeDefaultImageReader();
             }
 
+        }
+    }
+
+    /**
+     * Validate capture results.
+     *
+     * @param format The format of this capture.
+     * @param size The capture size.
+     * @param listener The capture listener to get capture result callbacks.
+     */
+    private void validateCaptureResult(int format, Size size, SimpleCaptureListener listener,
+            int numFrameVerified) {
+        for (int i = 0; i < numFrameVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+            Long exposureTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+            Integer sensitivity = getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
+            mCollector.expectInRange(
+                    String.format(
+                            "Capture for format %d, size %s exposure time is invalid.",
+                            format, size.toString()),
+                    exposureTime,
+                    mStaticInfo.getExposureMinimumOrDefault(),
+                    mStaticInfo.getExposureMaximumOrDefault());
+            mCollector.expectInRange(
+                    String.format("Capture for format %d, size %s sensitivity is invalid.",
+                            format, size.toString()),
+                    sensitivity,
+                    mStaticInfo.getSensitivityMinimumOrDefault(),
+                    mStaticInfo.getSensitivityMaximumOrDefault());
+
+            // TODO: add more key validations.
         }
     }
 
@@ -285,6 +322,13 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 imageAvailable.close();
             } else {
                 fail("wait for image available timed out after " + timeout + "ms");
+            }
+        }
+
+        public void closePendingImages() {
+            Image image = mReader.acquireLatestImage();
+            if (image != null) {
+                image.close();
             }
         }
     }
@@ -311,15 +355,9 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         return captureBuilder;
     }
 
-    private void validateImage(Size sz, int format) throws Exception {
+    private void validateImage(Size sz, int format, int captureCount) throws Exception {
         // TODO: Add more format here, and wrap each one as a function.
         Image img;
-
-        int captureCount = NUM_FRAME_VERIFIED;
-        // Only verify single image for still capture
-        if (format == ImageFormat.JPEG) {
-            captureCount = 1;
-        }
 
         for (int i = 0; i < captureCount; i++) {
             assertNotNull("Image listener is null", mListener);
@@ -334,7 +372,12 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             if (VERBOSE) Log.v(TAG, "Got the latest image");
             CameraTestUtils.validateImage(img, sz.getWidth(), sz.getHeight(), format,
                     DEBUG_FILE_NAME_BASE);
+            if (VERBOSE) Log.v(TAG, "finish vaildation of image " + i);
             img.close();
         }
+
+        // Return all pending images to the ImageReader as the validateImage may
+        // take a while to return and there could be many images pending.
+        mListener.closePendingImages();
     }
 }
