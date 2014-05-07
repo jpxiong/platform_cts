@@ -54,6 +54,7 @@ public class SensorOperationTest extends TestCase {
         } catch (AssertionError e) {
             // Expected
         }
+        assertTrue(op.getStats().flatten().keySet().contains(SensorStats.ERROR));
     }
 
     /**
@@ -129,11 +130,18 @@ public class SensorOperationTest extends TestCase {
         }
 
         statsKeys = op.getStats().flatten().keySet();
-        assertEquals(subOpCount, statsKeys.size());
+        assertEquals(subOpCount + 3, statsKeys.size());
         for (int i = 0; i < subOpCount; i++) {
             assertTrue(statsKeys.contains(String.format("%s_%03d%sexecuted",
                     ParallelSensorOperation.STATS_TAG, i, SensorStats.DELIMITER)));
+            if (i % 50 == 5) {
+                assertTrue(statsKeys.contains(String.format("%s_%03d%s%s",
+                        ParallelSensorOperation.STATS_TAG, i, SensorStats.DELIMITER,
+                        SensorStats.ERROR)));
+            }
+
         }
+        assertTrue(statsKeys.contains(SensorStats.ERROR));
     }
 
     /**
@@ -208,6 +216,7 @@ public class SensorOperationTest extends TestCase {
 
         ISensorOperation subOp = new FakeSensorOperation(0, TimeUnit.MILLISECONDS) {
             private int mExecutedCount = 0;
+            private SensorStats mFakeStats = new SensorStats();
 
             @Override
             public void execute() {
@@ -215,14 +224,20 @@ public class SensorOperationTest extends TestCase {
                 mExecutedCount++;
 
                 if (failCount == mExecutedCount) {
-                    fail("FakeSensorOperation failed");
+                    doFail();
                 }
             }
 
             @Override
             public FakeSensorOperation clone() {
                 // Don't clone
+                mFakeStats = new SensorStats();
                 return this;
+            }
+
+            @Override
+            public SensorStats getStats() {
+                return mFakeStats;
             }
         };
         ISensorOperation op = new RepeatingSensorOperation(subOp, iterations);
@@ -239,11 +254,15 @@ public class SensorOperationTest extends TestCase {
         }
 
         statsKeys = op.getStats().flatten().keySet();
-        assertEquals(failCount, statsKeys.size());
+        assertEquals(failCount + 2, statsKeys.size());
         for (int i = 0; i < failCount; i++) {
             assertTrue(statsKeys.contains(String.format("%s_%03d%sexecuted",
                     RepeatingSensorOperation.STATS_TAG, i, SensorStats.DELIMITER)));
         }
+        assertTrue(statsKeys.contains(String.format("%s_%03d%s%s",
+                RepeatingSensorOperation.STATS_TAG, failCount - 1, SensorStats.DELIMITER,
+                SensorStats.ERROR)));
+        assertTrue(statsKeys.contains(SensorStats.ERROR));
     }
 
     /**
@@ -304,10 +323,14 @@ public class SensorOperationTest extends TestCase {
         }
 
         statsKeys = op.getStats().flatten().keySet();
-        assertEquals(failCount, statsKeys.size());
+        assertEquals(failCount + 2, statsKeys.size());
         for (int i = 0; i < failCount; i++) {
             assertTrue(statsKeys.contains(String.format("%s_%03d%sexecuted",
                     SequentialSensorOperation.STATS_TAG, i, SensorStats.DELIMITER)));
         }
+        assertTrue(statsKeys.contains(String.format("%s_%03d%s%s",
+                SequentialSensorOperation.STATS_TAG, failCount - 1, SensorStats.DELIMITER,
+                SensorStats.ERROR)));
+        assertTrue(statsKeys.contains(SensorStats.ERROR));
     }
 }
