@@ -83,7 +83,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     /* timestamp */1199145602L,
                     /* orientation */270,
                     /* jpgQuality */(byte) 100,
-                    /* thumbQuality */(byte) 95)
+                    /* thumbQuality */(byte) 100)
     };
 
     // Some exif tags that are not defined by ExifInterface but supported.
@@ -654,6 +654,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 mCollector.expectTrue(
                         "Jpeg shouldn't have thumbnail when thumbnail size is (0, 0)",
                         !exif.hasThumbnail());
+            } else {
+                mCollector.expectTrue(
+                        "Jpeg must have thumbnail for thumbnail size " + testThumbnailSizes[i],
+                        exif.hasThumbnail());
             }
 
             // Validate capture result vs. request
