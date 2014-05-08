@@ -247,8 +247,8 @@ extern "C" jobject Java_android_media_cts_NativeDecoderTest_getDecodedDataNative
             ALOGE("no mime type");
             return NULL;
         } else if (!strncmp(mime, "audio/", 6) || !strncmp(mime, "video/", 6)) {
-            codec[i] = AMediaCodec_createByCodecType(mime);
-            AMediaCodec_configure(codec[i], format, NULL);
+            codec[i] = AMediaCodec_createDecoderByType(mime);
+            AMediaCodec_configure(codec[i], format, NULL, 0);
             AMediaCodec_start(codec[i]);
             sawInputEOS[i] = false;
             sawOutputEOS[i] = false;
@@ -396,8 +396,8 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackNative(
             ALOGE("no mime type");
             return false;
         } else if (!strncmp(mime, "video/", 6)) {
-            codec = AMediaCodec_createByCodecType(mime);
-            AMediaCodec_configure(codec, format, window);
+            codec = AMediaCodec_createDecoderByType(mime);
+            AMediaCodec_configure(codec, format, window, 0);
             AMediaCodec_start(codec);
             AMediaExtractor_selectTrack(ex, i);
         }
