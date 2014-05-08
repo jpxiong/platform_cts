@@ -114,6 +114,9 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
             assertNotAvailable(PackageManager.FEATURE_CAMERA_FLASH);
             assertNotAvailable(PackageManager.FEATURE_CAMERA_FRONT);
             assertNotAvailable(PackageManager.FEATURE_CAMERA_ANY);
+            assertFalse("Devices supporting external cameras must have a representative camera " +
+                    "connected for testing",
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_EXTERNAL));
         } else {
             assertAvailable(PackageManager.FEATURE_CAMERA_ANY);
             checkFrontCamera();
