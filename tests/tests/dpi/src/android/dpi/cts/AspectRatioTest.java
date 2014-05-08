@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -48,6 +49,12 @@ public class AspectRatioTest extends ActivityInstrumentationTestCase2<Orientatio
         double aspectRatio = getRealAspectRatio(getActivity());
         if (aspectRatio >= 1.333 && aspectRatio <= 1.86) {
             return;
+        }
+        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            // Watch allows for a different set of aspect ratios.
+            if (aspectRatio >= 1.0 && aspectRatio <= 1.86) {
+                return;
+            }
         }
         fail("Aspect ratio was not between 1.333 and 1.86: " + aspectRatio);
     }
