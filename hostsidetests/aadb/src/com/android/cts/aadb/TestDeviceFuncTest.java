@@ -338,8 +338,8 @@ public class TestDeviceFuncTest extends DeviceTestCase {
         try {
             FileUtil.writeToFile(source.createInputStream(), tmpPngFile);
             CLog.i("Created file at %s", tmpPngFile.getAbsolutePath());
-            assertTrue("Saved png file is less than 16K - is it invalid?",
-                    tmpPngFile.length() > 16*1024);
+            assertTrue("Saved png file is less than 10K - is it invalid?",
+                    tmpPngFile.length() > 10*1024);
             // TODO: add more stringent checks
         } finally {
             FileUtil.deleteFile(tmpPngFile);
