@@ -30,9 +30,7 @@ LOCAL_JNI_SHARED_LIBRARIES := libcts_jni
 # Resource unit tests use a private locale and some densities
 LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c small -c normal -c large -c xlarge \
         -c 320dpi -c 240dpi -c 160dpi -c 32dpi \
-	-c kok,kok_IN,kok_419,kok_419_VARIANT,kok_Knda_419,kok_Knda_419_VARIANT,kok_VARIANT,kok_Knda \
-        --preferred-configurations 320dpi --preferred-configurations 240dpi \
-        --preferred-configurations 160dpi --preferred-configurations 32dpi
+        -c kok,kok_IN,kok_419,kok_419_VARIANT,kok_Knda_419,kok_Knda_419_VARIANT,kok_VARIANT,kok_Knda
 
 LOCAL_PACKAGE_NAME := CtsTestStubs
 
