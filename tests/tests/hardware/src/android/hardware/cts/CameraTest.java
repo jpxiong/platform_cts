@@ -16,6 +16,7 @@
 
 package android.hardware.cts;
 
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -2936,6 +2937,25 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(result);
 
         terminateMessageLooper();
+    }
+
+    public void testCameraExternalConnected() {
+        if (getActivity().getPackageManager().
+                hasSystemFeature(PackageManager.FEATURE_CAMERA_EXTERNAL) ) {
+            int nCameras = Camera.getNumberOfCameras();
+            assertTrue("Devices with external camera support must have a camera connected for " +
+                    "testing",
+                    nCameras > 0);
+            for (int id = 0; id < nCameras; id++) {
+                try {
+                    Camera c = Camera.open(id);
+                    c.release();
+                } catch (Throwable e) {
+                    throw new AssertionError("Devices with external camera support must " +
+                            "have all listed cameras be connected and openable for testing", e);
+                }
+            }
+        }
     }
 
 }
