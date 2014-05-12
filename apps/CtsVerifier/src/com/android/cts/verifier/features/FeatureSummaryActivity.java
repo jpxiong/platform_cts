@@ -188,6 +188,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR, false),
     };
 
+    public static final Feature[] ALL_KITKAT_WATCH_FEATURES = {
+            new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE, false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -218,6 +222,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.KITKAT_WATCH) {
+            Collections.addAll(features, ALL_KITKAT_WATCH_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.KITKAT) {
             Collections.addAll(features, ALL_KITKAT_FEATURES);
         }
