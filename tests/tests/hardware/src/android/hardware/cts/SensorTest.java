@@ -99,6 +99,17 @@ public class SensorTest extends AndroidTestCase {
             assertNull(sensor);
         }
 
+        sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        boolean hasHeartRate = getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_SENSOR_HEART_RATE);
+        // heartrate sensor is optional
+        if (hasHeartRate) {
+            assertEquals(Sensor.TYPE_HEART_RATE, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
+
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         boolean hasCompass = getContext().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_SENSOR_COMPASS);
