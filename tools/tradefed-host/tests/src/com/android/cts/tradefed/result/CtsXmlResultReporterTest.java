@@ -15,6 +15,8 @@
  */
 package com.android.cts.tradefed.result;
 
+import static com.android.cts.tradefed.result.CtsXmlResultReporter.CTS_RESULT_FILE_VERSION;
+
 import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IFolderBuildInfo;
@@ -84,8 +86,9 @@ public class CtsXmlResultReporterTest extends TestCase {
     public void testEmptyGeneration() {
         final String expectedHeaderOutput = "<?xml version='1.0' encoding='UTF-8' standalone='no' ?>" +
             "<?xml-stylesheet type=\"text/xsl\" href=\"cts_result.xsl\"?>";
-        final String expectedTestOutput =
-            "<TestResult testPlan=\"NA\" starttime=\"ignore\" endtime=\"ignore\" version=\"1.13\"> ";
+        final String expectedTestOutput = String.format(
+            "<TestResult testPlan=\"NA\" starttime=\"ignore\" endtime=\"ignore\" " +
+                    "version=\"%s\" suite=\"%s\"> ", CTS_RESULT_FILE_VERSION, "CTS" );
         final String expectedSummaryOutput =
             "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />";
         final String expectedEndTag = "</TestResult>";
@@ -93,10 +96,10 @@ public class CtsXmlResultReporterTest extends TestCase {
         mResultReporter.invocationEnded(1);
         String actualOutput = getOutput();
         assertTrue(actualOutput.startsWith(expectedHeaderOutput));
-        assertTrue(String.format("test output did not contain expected test result. Got %s",
-                actualOutput), actualOutput.contains(expectedTestOutput));
-        assertTrue(String.format("test output did not contain expected test summary. Got %s",
-                actualOutput), actualOutput.contains(expectedSummaryOutput));
+        assertTrue(String.format("test output did not contain expected test result [%s]. Got %s",
+                expectedTestOutput, actualOutput), actualOutput.contains(expectedTestOutput));
+        assertTrue(String.format("test output did not contain expected test summary [%s]. Got %s",
+                expectedTestOutput, actualOutput), actualOutput.contains(expectedSummaryOutput));
         assertTrue(String.format("test output did not contain expected TestResult end tag. Got %s",
                 actualOutput), actualOutput.endsWith(expectedEndTag));
     }

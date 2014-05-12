@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * Unit tests for {@link TestFilter}.
  */
 public class TestFilterTest extends TestCase {
 
@@ -87,7 +87,7 @@ public class TestFilterTest extends TestCase {
     }
 
     /**
-     * Test {@link TestFilter#filter(java.util.Collection)} with at class
+     * Test {@link TestFilter#filter(java.util.Collection)} with a class
      */
     public void testFilter_includeTest() {
         mFilter.setTestInclusion(TEST1.getClassName(), TEST1.getTestName());
@@ -95,5 +95,83 @@ public class TestFilterTest extends TestCase {
         assertEquals(1, filteredList.size());
         Iterator<TestIdentifier> iter = filteredList.iterator();
         assertEquals(TEST1, iter.next());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} with an included test filter
+     */
+    public void testFilter_includeClasses() {
+        mFilter.addIncludedClass(TEST3.getClassName());
+        Collection<TestIdentifier> filteredList = mFilter.filter(mTestList);
+        assertEquals(1, filteredList.size());
+        assertEquals(TEST3, filteredList.iterator().next());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} with an included test filter
+     */
+    public void testFilter_includeTests() {
+        mFilter.addIncludedTest(TEST1);
+        mFilter.addIncludedTest(TEST3);
+        Collection<TestIdentifier> filteredList = mFilter.filter(mTestList);
+        assertEquals(2, filteredList.size());
+        Iterator<TestIdentifier> iter = filteredList.iterator();
+        assertEquals(TEST1, iter.next());
+        assertEquals(TEST3, iter.next());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)}. Exclusion overrides
+     * inclusion.
+     */
+    public void testFilter_includeAndExcludeClasses() {
+        String className = TEST3.getClassName();
+        mFilter.addExcludedClass(className);
+        mFilter.addIncludedClass(className);
+        assertTrue(mFilter.filter(mTestList).isEmpty());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} Exclusion overrides
+     * inclusion.
+     */
+    public void testFilter_includeAndExcludeTests() {
+        mFilter.addExcludedTest(TEST1);
+        mFilter.addIncludedTest(TEST1);
+        assertTrue(mFilter.filter(mTestList).isEmpty());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} Exclusion overrides
+     * inclusion.
+     */
+    public void testFilter_includeTestAndExcludeClass() {
+        mFilter.addExcludedClass(TEST1.getClassName());
+        mFilter.addIncludedTest(TEST1);
+        assertTrue(mFilter.filter(mTestList).isEmpty());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} Exclusion overrides
+     * inclusion.
+     */
+    public void testFilter_includeClassAndExcludeTest() {
+        mFilter.addExcludedTest(TEST1);
+        mFilter.addIncludedClass(TEST1.getClassName());
+        Collection<TestIdentifier> filteredList = mFilter.filter(mTestList);
+        assertEquals(1, filteredList.size());
+        Iterator<TestIdentifier> iter = filteredList.iterator();
+        assertEquals(TEST2, iter.next());
+    }
+
+    /**
+     * Test {@link TestFilter#filter(java.util.Collection)} Exclusion overrides
+     * inclusion.
+     */
+    public void testFilter_includeClassAndExcludeTests() {
+        mFilter.addExcludedTest(TEST1);
+        mFilter.addExcludedTest(TEST2);
+        mFilter.addIncludedClass(TEST1.getClassName());
+        assertTrue(mFilter.filter(mTestList).isEmpty());
     }
 }
