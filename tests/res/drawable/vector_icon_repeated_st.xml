@@ -23,10 +23,9 @@ limitations under the License.
         android:viewportHeight="128"
         android:viewportWidth="128" />
 
-    <group>
-        <path
-            android:fill="#FF00FF00"
-            android:pathData="m 20.20005 8.139153
+    <path
+        android:fill="#FF00FF00"
+        android:pathData="m 20.20005 8.139153
                 h 10.053165
                 s 14.2943 49.612846 35.520653 54.904068
                 50.1405 17.044182 5.470337 40.180553
@@ -41,8 +40,7 @@ limitations under the License.
                 40.156204 17.60786
                 40.12051 60.803394
                 "
-            android:stroke="#FF0000FF"
-            android:strokeWidth="1" />
-    </group>
+        android:stroke="#FF0000FF"
+        android:strokeWidth="1" />
 
 </vector>
