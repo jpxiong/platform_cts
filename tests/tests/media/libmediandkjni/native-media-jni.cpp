@@ -36,6 +36,7 @@
 
 #include "ndk/NdkMediaExtractor.h"
 #include "ndk/NdkMediaCodec.h"
+#include "ndk/NdkMediaCrypto.h"
 #include "ndk/NdkMediaFormat.h"
 #include "ndk/NdkMediaMuxer.h"
 
@@ -80,6 +81,7 @@ public:
 
 
 jobject testExtractor(AMediaExtractor *ex, JNIEnv *env) {
+
     simplevector<int> sizes;
     int numtracks = AMediaExtractor_getTrackCount(ex);
     sizes.add(numtracks);
@@ -249,7 +251,7 @@ extern "C" jobject Java_android_media_cts_NativeDecoderTest_getDecodedDataNative
             return NULL;
         } else if (!strncmp(mime, "audio/", 6) || !strncmp(mime, "video/", 6)) {
             codec[i] = AMediaCodec_createDecoderByType(mime);
-            AMediaCodec_configure(codec[i], format, NULL, 0);
+            AMediaCodec_configure(codec[i], format, NULL /* surface */, NULL /* crypto */, 0);
             AMediaCodec_start(codec[i]);
             sawInputEOS[i] = false;
             sawOutputEOS[i] = false;
@@ -399,7 +401,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackNative(
             return false;
         } else if (!strncmp(mime, "video/", 6)) {
             codec = AMediaCodec_createDecoderByType(mime);
-            AMediaCodec_configure(codec, format, window, 0);
+            AMediaCodec_configure(codec, format, window, NULL, 0);
             AMediaCodec_start(codec);
             AMediaExtractor_selectTrack(ex, i);
         }
@@ -455,7 +457,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackNative(
     return true;
 }
 
-extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNIEnv *env,
+extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNIEnv */*env*/,
         jclass /*clazz*/, int infd, jlong inoffset, jlong insize, int outfd, jboolean webm) {
 
 
@@ -518,7 +520,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNI
 
 }
 
-extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testFormatNative(JNIEnv *env,
+extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testFormatNative(JNIEnv * /*env*/,
         jclass /*clazz*/) {
     AMediaFormat* format = AMediaFormat_new();
     if (!format) {
@@ -613,7 +615,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackWithCal
             return false;
         } else if (!strncmp(mime, "video/", 6)) {
             codec = AMediaCodec_createDecoderByType(mime);
-            AMediaCodec_configure(codec, format, window, 0);
+            AMediaCodec_configure(codec, format, window, NULL, 0);
             AMediaCodec_setNotificationCallback(codec, callback, &sem);
             AMediaCodec_start(codec);
             AMediaExtractor_selectTrack(ex, i);
@@ -684,3 +686,90 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackWithCal
     AMediaExtractor_delete(ex);
     return true;
 }
+
+extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPsshNative(JNIEnv * /*env*/,
+        jclass /*clazz*/, int fd, jlong offset, jlong size) {
+
+    AMediaExtractor *ex = AMediaExtractor_new();
+    int err = AMediaExtractor_setDataSourceFd(ex, fd, offset, size);
+    if (err != 0) {
+        ALOGE("setDataSource error: %d", err);
+        return false;
+    }
+
+    PsshInfo* info = AMediaExtractor_getPsshInfo(ex);
+    if (info == NULL) {
+        ALOGI("null pssh");
+        return false;
+    }
+
+    ALOGI("pssh has %u entries", info->numentries);
+    if (info->numentries != 2) {
+        return false;
+    }
+
+    for (size_t i = 0; i < info->numentries; i++) {
+        PsshEntry *entry = &info->entries[i];
+        ALOGI("entry uuid %02x%02x..%02x%02x, data size %u",
+                entry->uuid[0],
+                entry->uuid[1],
+                entry->uuid[14],
+                entry->uuid[15],
+                entry->datalen);
+
+        AMediaCrypto *crypto = AMediaCrypto_new(entry->uuid, entry->data, entry->datalen);
+        if (crypto) {
+            ALOGI("got crypto");
+            AMediaCrypto_delete(crypto);
+        } else {
+            ALOGI("no crypto");
+        }
+    }
+    return true;
+}
+
+extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testCryptoInfoNative(JNIEnv * /*env*/,
+        jclass /*clazz*/) {
+
+    size_t numsubsamples = 4;
+    uint8_t key[16] = { 1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4 };
+    uint8_t iv[16] = { 4,3,2,1,4,3,2,1,4,3,2,1,4,3,2,1 };
+    size_t clearbytes[4] = { 5, 6, 7, 8 };
+    size_t encryptedbytes[4] = { 8, 7, 6, 5 };
+
+    AMediaCodecCryptoInfo *ci =
+            AMediaCodecCryptoInfo_new(numsubsamples, key, iv, 0, clearbytes, encryptedbytes);
+
+    if (AMediaCodecCryptoInfo_getNumSubSamples(ci) != 4) {
+        ALOGE("numsubsamples mismatch");
+        return false;
+    }
+    uint8_t bytes[16];
+    AMediaCodecCryptoInfo_getKey(ci, bytes);
+    if (memcmp(key, bytes, 16) != 0) {
+        ALOGE("key mismatch");
+        return false;
+    }
+    AMediaCodecCryptoInfo_getIV(ci, bytes);
+    if (memcmp(iv, bytes, 16) != 0) {
+        ALOGE("IV mismatch");
+        return false;
+    }
+    if (AMediaCodecCryptoInfo_getMode(ci) != 0) {
+        ALOGE("mode mismatch");
+        return false;
+    }
+    size_t sizes[numsubsamples];
+    AMediaCodecCryptoInfo_getClearBytes(ci, sizes);
+    if (memcmp(clearbytes, sizes, sizeof(size_t) * numsubsamples)) {
+        ALOGE("clear size mismatch");
+        return false;
+    }
+    AMediaCodecCryptoInfo_getEncryptedBytes(ci, sizes);
+    if (memcmp(encryptedbytes, sizes, sizeof(size_t) * numsubsamples)) {
+        ALOGE("encrypted size mismatch");
+        return false;
+    }
+    return true;
+}
+
