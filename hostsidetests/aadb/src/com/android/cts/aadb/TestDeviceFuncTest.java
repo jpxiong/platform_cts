@@ -30,11 +30,16 @@ import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.StreamUtil;
 
+import java.awt.image.BufferedImage;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 /**
  * Functional tests for adb connection
@@ -328,22 +333,21 @@ public class TestDeviceFuncTest extends DeviceTestCase {
     /**
      * Basic test for {@link TestDevice#getScreenshot()}.
      * <p/>
-     * Grab a screenshot, save it to a file, and perform a cursory size check to ensure its valid.
+     * Grab a screenshot and perform a cursory size check to ensure its valid.
      */
     public void testGetScreenshot() throws DeviceNotAvailableException, IOException {
-        CLog.i(LOG_TAG, "testGetScreenshot");
         InputStreamSource source = getDevice().getScreenshot();
         assertNotNull(source);
-        File tmpPngFile = FileUtil.createTempFile("screenshot", ".png");
+        InputStream inputStream = source.createInputStream();
         try {
-            FileUtil.writeToFile(source.createInputStream(), tmpPngFile);
-            CLog.i("Created file at %s", tmpPngFile.getAbsolutePath());
-            assertTrue("Saved png file is less than 10K - is it invalid?",
-                    tmpPngFile.length() > 10*1024);
-            // TODO: add more stringent checks
+            BufferedImage screenshotImage = ImageIO.read(inputStream);
+            CLog.i(LOG_TAG, "testGetScreenshot w=%d, h=%d",
+                    screenshotImage.getWidth(), screenshotImage.getHeight());
+            assertTrue(screenshotImage.getWidth() > 0);
+            assertTrue(screenshotImage.getHeight() > 0);
         } finally {
-            FileUtil.deleteFile(tmpPngFile);
-            source.cancel();
+            StreamUtil.cancel(source);
+            StreamUtil.close(inputStream);
         }
     }
 
