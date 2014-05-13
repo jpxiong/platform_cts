@@ -45,6 +45,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class NativeDecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
@@ -68,7 +71,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         System.loadLibrary("ctsmediacodec_jni");
         Log.i("@@@", "after loadlibrary");
     }
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -77,7 +80,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
     }
 
     // check that native extractor behavior matches java extractor
-    
+
     public void testExtractor() throws Exception {
         testExtractor(R.raw.sinesweepogg);
         testExtractor(R.raw.sinesweepmp3lame);
@@ -85,13 +88,13 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         testExtractor(R.raw.sinesweepm4a);
         testExtractor(R.raw.sinesweepflac);
         testExtractor(R.raw.sinesweepwav);
-        
+
         testExtractor(R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz);
         testExtractor(R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
         testExtractor(R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
         testExtractor(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_mono_24kbps_11025hz);
         testExtractor(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz);
-        
+
         CtsTestServer foo = new CtsTestServer(mContext);
         testExtractor(foo.getAssetUrl("noiseandchirps.ogg"));
         testExtractor(foo.getAssetUrl("ringer.mp3"));
@@ -101,19 +104,19 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
     private void testExtractor(String path) throws Exception {
         int[] jsizes = getSampleSizes(path);
         int[] nsizes = getSampleSizesNativePath(path);
-        
+
         //Log.i("@@@", Arrays.toString(jsizes));
         assertTrue("different samplesizes", Arrays.equals(jsizes, nsizes));
     }
-    
+
     private void testExtractor(int res) throws Exception {
         AssetFileDescriptor fd = mResources.openRawResourceFd(res);
-        
+
         int[] jsizes = getSampleSizes(
                 fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
         int[] nsizes = getSampleSizesNative(
                 fd.getParcelFileDescriptor().getFd(), fd.getStartOffset(), fd.getLength());
-        
+
         fd.close();
         //Log.i("@@@", Arrays.toString(jsizes));
         assertTrue("different samplesizes", Arrays.equals(jsizes, nsizes));
@@ -140,7 +143,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         foo.add(numtracks);
         for (int i = 0; i < numtracks; i++) {
             MediaFormat format = ex.getTrackFormat(i);
-            String mime = format.getString(MediaFormat.KEY_MIME); 
+            String mime = format.getString(MediaFormat.KEY_MIME);
             if (mime.startsWith("audio/")) {
                 foo.add(0);
                 foo.add(format.getInteger(MediaFormat.KEY_SAMPLE_RATE));
@@ -186,7 +189,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         testDecoder(R.raw.sinesweepm4a);
         testDecoder(R.raw.sinesweepflac);
         testDecoder(R.raw.sinesweepwav);
-        
+
         testDecoder(R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz);
         testDecoder(R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
         testDecoder(R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
@@ -197,12 +200,12 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
 
     private void testDecoder(int res) throws Exception {
         AssetFileDescriptor fd = mResources.openRawResourceFd(res);
-        
+
         int[] jdata = getDecodedData(
                 fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
         int[] ndata = getDecodedDataNative(
                 fd.getParcelFileDescriptor().getFd(), fd.getStartOffset(), fd.getLength());
-        
+
         fd.close();
         Log.i("@@@", Arrays.toString(jdata));
         Log.i("@@@", Arrays.toString(ndata));
@@ -226,7 +229,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         ByteBuffer[][] outbuffers = new ByteBuffer[numtracks][];
         for (int i = 0; i < numtracks; i++) {
             format[i] = ex.getTrackFormat(i);
-            String mime = format[i].getString(MediaFormat.KEY_MIME); 
+            String mime = format[i].getString(MediaFormat.KEY_MIME);
             if (mime.startsWith("audio/") || mime.startsWith("video/")) {
                 codec[i] = MediaCodec.createDecoderByType(mime);
                 codec[i].configure(format[i], null, null, 0);
@@ -239,9 +242,7 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
             }
             ex.selectTrack(i);
         }
-        
-        // TODO get input and output buffers from codecs
-        
+
         boolean[] sawInputEOS = new boolean[numtracks];
         boolean[] sawOutputEOS = new boolean[numtracks];
         int eosCount = 0;
@@ -329,13 +330,13 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
                 trackbytes[idx++] = src.get(j);
             }
         }
-        
+
         return trackbytes;
     }
 
     static void addSampleData(ArrayList<Integer> dst,
             ByteBuffer buf, int size, MediaFormat format) throws IOException{
-        
+
         Log.i("@@@", "addsample " + dst.size() + "/" + size);
         int width = format.getInteger(MediaFormat.KEY_WIDTH, size);
         int stride = format.getInteger(MediaFormat.KEY_STRIDE, width);
@@ -471,5 +472,39 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
     private static native boolean testPlaybackWithCallbackNative(Surface surface,
             int fd, long startOffset, long length);
 
+    public void testPssh() throws Exception {
+        testPssh(R.raw.psshtest);
+    }
+
+    private void testPssh(int res) throws Exception {
+        AssetFileDescriptor fd = mResources.openRawResourceFd(res);
+
+        MediaExtractor ex = new MediaExtractor();
+        ex.setDataSource(fd.getParcelFileDescriptor().getFileDescriptor(),
+                fd.getStartOffset(), fd.getLength());
+        testPssh(ex);
+        ex.release();
+
+        boolean ret = testPsshNative(
+                fd.getParcelFileDescriptor().getFd(), fd.getStartOffset(), fd.getLength());
+        assertTrue("native pssh error", ret);
+    }
+
+    private static void testPssh(MediaExtractor ex) {
+        Map<UUID, byte[]> map = ex.getPsshInfo();
+        Set<UUID> keys = map.keySet();
+        for (UUID uuid: keys) {
+            Log.i("@@@", "uuid: " + uuid + ", data size " +
+                    map.get(uuid).length);
+        }
+    }
+
+    private static native boolean testPsshNative(int fd, long offset, long size);
+
+    public void testCryptoInfo() throws Exception {
+        assertTrue("native cryptoinfo failed, see log for details", testCryptoInfoNative());
+    }
+
+    private static native boolean testCryptoInfoNative();
 }
 
