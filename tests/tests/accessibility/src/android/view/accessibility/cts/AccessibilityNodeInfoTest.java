@@ -23,6 +23,11 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
+import android.view.cts.accessibility.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for testing {@link AccessibilityNodeInfo}.
@@ -94,6 +99,70 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
     }
 
     /**
+     * Tests whether accessibility actions are properly added.
+     */
+    @SmallTest
+    public void testAddActions() {
+        List<AccessibilityAction> customActions = new ArrayList<AccessibilityAction>();
+        customActions.add(new AccessibilityAction(AccessibilityNodeInfo.ACTION_FOCUS, "Foo"));
+        customActions.add(new AccessibilityAction(R.id.foo_custom_action, "Foo"));
+
+        AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
+        info.addAction(AccessibilityNodeInfo.ACTION_FOCUS);
+        info.addAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+        for (AccessibilityAction customAction : customActions) {
+            info.addAction(customAction);
+        }
+
+        assertSame(info.getActions(), (AccessibilityNodeInfo.ACTION_FOCUS
+                | AccessibilityNodeInfo.ACTION_CLEAR_FOCUS));
+
+        List<AccessibilityAction> allActions = new ArrayList<AccessibilityAction>();
+        allActions.add(AccessibilityAction.ACTION_CLEAR_FOCUS);
+        allActions.addAll(customActions);
+        assertEquals(info.getActionList(), allActions);
+    }
+
+    /**
+     * Tests whether we catch addition of an action with invalid id.
+     */
+    @SmallTest
+    public void testCreateInvalidActionId() {
+        try {
+            new AccessibilityAction(3, null);
+        } catch (IllegalArgumentException iae) {
+            /* expected */
+        }
+    }
+
+    /**
+     * Tests whether accessibility actions are properly removed.
+     */
+    @SmallTest
+    public void testRemoveActions() {
+        AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
+
+        info.addAction(AccessibilityNodeInfo.ACTION_FOCUS);
+        assertSame(info.getActions(), AccessibilityNodeInfo.ACTION_FOCUS);
+
+        info.removeAction(AccessibilityNodeInfo.ACTION_FOCUS);
+        assertSame(info.getActions(), 0);
+        assertTrue(info.getActionList().isEmpty());
+
+        AccessibilityAction customFocus = new AccessibilityAction(
+                AccessibilityNodeInfo.ACTION_FOCUS, "Foo");
+        info.addAction(AccessibilityNodeInfo.ACTION_FOCUS);
+        info.addAction(customFocus);
+        assertSame(info.getActionList().size(), 1);
+        assertEquals(info.getActionList().get(0), customFocus);
+        assertSame(info.getActions(), AccessibilityNodeInfo.ACTION_FOCUS);
+
+        info.removeAction(customFocus);
+        assertSame(info.getActions(), 0);
+        assertTrue(info.getActionList().isEmpty());
+    }
+
+    /**
      * Fully populates the {@link AccessibilityNodeInfo} to marshal.
      *
      * @param info The node info to populate.
@@ -119,7 +188,10 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         info.setPassword(true);
         info.setScrollable(true);
         info.setSelected(true);
+        info.addAction(AccessibilityNodeInfo.ACTION_FOCUS);
         info.addAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+        info.addAction(new AccessibilityAction(AccessibilityNodeInfo.ACTION_FOCUS, "Foo"));
+        info.addAction(new AccessibilityAction(R.id.foo_custom_action, "Foo"));
         info.setAccessibilityFocused(true);
         info.setMovementGranularities(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
         info.setLabeledBy(new View(getContext()));
@@ -171,6 +243,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
                 receivedInfo.isSelected());
         assertSame("actions has incorrect value", expectedInfo.getActions(),
                 receivedInfo.getActions());
+        assertEquals("actionsSet has incorrect value", expectedInfo.getActionList(),
+                receivedInfo.getActionList());
         assertSame("childCount has incorrect value", expectedInfo.getChildCount(),
                 receivedInfo.getChildCount());
         assertSame("childCount has incorrect value", expectedInfo.getChildCount(),
