@@ -70,44 +70,69 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         super.tearDown();
     }
 
-    public void testImageReaderFromCameraFlexibleYuv() throws Exception {
-        for (int i = 0; i < mCameraIds.length; i++) {
-            try {
-                Log.i(TAG, "Testing Camera " + mCameraIds[i]);
-                openDevice(mCameraIds[i]);
-                bufferFormatTestByCamera(ImageFormat.YUV_420_888);
-            } finally {
-                closeDevice(mCameraIds[i]);
-            }
-        }
-    }
-
-    public void testImageReaderFromCameraJpeg() throws Exception {
-        for (int i = 0; i < mCameraIds.length; i++) {
-            try {
-                Log.v(TAG, "Testing Camera " + mCameraIds[i]);
-                openDevice(mCameraIds[i]);
-                bufferFormatTestByCamera(ImageFormat.JPEG);
-            } finally {
-                closeDevice(mCameraIds[i]);
-            }
-        }
-    }
-
-    public void testImageReaderFromCameraRaw() throws Exception {
+    public void testFlexibleYuv() throws Exception {
         for (String id : mCameraIds) {
             try {
-                Log.v(TAG, "Testing raw capture for camera " + id);
+                Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
-
-                bufferFormatTestByCamera(ImageFormat.RAW_SENSOR);
+                bufferFormatTestByCamera(ImageFormat.YUV_420_888, /*repeating*/true);
             } finally {
                 closeDevice(id);
             }
         }
     }
 
-    public void testImageReaderInvalidAccessTest() {
+    public void testJpeg() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing jpeg capture for Camera " + id);
+                openDevice(id);
+                bufferFormatTestByCamera(ImageFormat.JPEG, /*repeating*/false);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testRaw() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing raw capture for camera " + id);
+                openDevice(id);
+
+                bufferFormatTestByCamera(ImageFormat.RAW_SENSOR, /*repeating*/false);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testRepeatingJpeg() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing repeating jpeg capture for Camera " + id);
+                openDevice(id);
+                bufferFormatTestByCamera(ImageFormat.JPEG, /*repeating*/true);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testRepeatingRaw() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing repeating raw capture for camera " + id);
+                openDevice(id);
+
+                bufferFormatTestByCamera(ImageFormat.RAW_SENSOR, /*repeating*/true);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testInvalidAccessTest() {
         // TODO: test invalid access case, see if we can receive expected
         // exceptions
     }
@@ -117,7 +142,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
      *
      * <p>Both stream formats are mandatory for Camera2 API</p>
      */
-    public void testImageReaderYuvAndJpeg() throws Exception {
+    public void testYuvAndJpeg() throws Exception {
         for (String id : mCameraIds) {
             try {
                 Log.v(TAG, "YUV and JPEG testing for camera " + id);
@@ -233,7 +258,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         }
     }
 
-    private void bufferFormatTestByCamera(int format) throws Exception {
+    private void bufferFormatTestByCamera(int format, boolean repeating) throws Exception {
 
         Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(format,
                 CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
@@ -252,8 +277,6 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
 
                 // Start capture.
                 CaptureRequest request = prepareCaptureRequest();
-                boolean repeating =
-                        (format != ImageFormat.JPEG && format != ImageFormat.RAW_SENSOR);
                 SimpleCaptureListener listener = new SimpleCaptureListener();
                 startCapture(request, repeating, listener, mHandler);
 
