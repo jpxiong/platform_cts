@@ -106,6 +106,11 @@ public class DeviceInfoActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Dismiss keyguard and keep screen on while this test is on.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         super.onCreate(savedInstanceState);
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED,
