@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +44,11 @@ public class EglConfigStubActivity extends Activity {
         int configId = getConfigId();
         int contextClientVersion = getContextClientVersion();
         setTitle("EGL Config Id: " + configId + " Client Version: " + contextClientVersion);
+
+        // Dismiss keyguard and keep screen on while this test is on.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mFinishedDrawing = new CountDownLatch(1);
         mView = new EglConfigGLSurfaceView(this, configId, contextClientVersion, new Runnable() {
