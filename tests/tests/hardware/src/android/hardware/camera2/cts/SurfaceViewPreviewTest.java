@@ -122,6 +122,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         final int FPS_RANGE_SIZE = 2;
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
         int[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        boolean antiBandingOffIsSupported = mStaticInfo.isAntiBandingOffModeSupported();
         int[] fpsRange = new int[FPS_RANGE_SIZE];
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -133,6 +134,19 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             fpsRange[1] = fpsRanges[i + 1];
 
             requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+            // Turn off auto antibanding to avoid exposure time and frame duration interference
+            // from antibanding algorithm.
+            if (antiBandingOffIsSupported) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE,
+                        CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_OFF);
+            } else {
+                // The device doesn't implement the OFF mode, test continues. It need make sure
+                // that the antibanding algorithm doesn't interfere with the fps range control.
+                Log.i(TAG, "OFF antibanding mode is not supported, the camera device output must" +
+                        " satisfy the specified fps range regardless of its current antibanding" +
+                        " mode");
+            }
+
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 

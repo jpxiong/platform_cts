@@ -328,6 +328,18 @@ public class StaticMetadata {
         return modes;
     }
 
+    /**
+     * Check if the antibanding OFF mode is supported.
+     *
+     * @return true if antibanding OFF mode is supported, false otherwise.
+     */
+    public boolean isAntiBandingOffModeSupported() {
+        List<Byte> antiBandingModes =
+                Arrays.asList(CameraTestUtils.toObject(getAeAvailableAntiBandingModesChecked()));
+
+        return antiBandingModes.contains((byte)CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF);
+    }
+
     public Boolean getFlashInfoChecked() {
         Key<Boolean> key = CameraCharacteristics.FLASH_INFO_AVAILABLE;
         Boolean hasFlash = getValueFromKeyNonNull(key);
