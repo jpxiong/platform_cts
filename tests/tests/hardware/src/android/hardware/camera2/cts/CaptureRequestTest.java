@@ -1752,6 +1752,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         mCollector.expectTrue(String.format("Frame duration (%d) should be longer than exposure"
                 + " time (%d) for a given capture", frameDuration, expTime),
                 frameDuration >= expTime);
+
+        validatePipelineDepth(result);
     }
 
     private <T> T getValueNotNull(CaptureResult result, Key<T> key) {
@@ -1772,6 +1774,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             SimpleCaptureListener listener, int numFramesVerified) {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            validatePipelineDepth(result);
             T resultMode = getValueNotNull(result, key);
             if (VERBOSE) {
                 Log.v(TAG, "Expect value: " + requestMode.toString() + " result value: "
@@ -1843,6 +1846,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             for (int j = 0; j < numFramesVerified; j++) {
                 CaptureResult result =
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                validatePipelineDepth(result);
                 long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
                 mCollector.expectInRange(
                         "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
@@ -1853,6 +1857,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         mCamera.stopRepeating();
+    }
+
+    /**
+     * Validate the pipeline depth result.
+     *
+     * @param result The capture result to get pipeline depth data
+     */
+    private void validatePipelineDepth(CaptureResult result) {
+        final byte MIN_PIPELINE_DEPTH = 1;
+        byte maxPipelineDepth = mStaticInfo.getPipelineMaxDepthChecked();
+        Byte pipelineDepth = getValueNotNull(result, CaptureResult.REQUEST_PIPELINE_DEPTH);
+        mCollector.expectInRange(String.format("Pipeline depth must be in the range of [%d, %d]",
+                MIN_PIPELINE_DEPTH, maxPipelineDepth), pipelineDepth, MIN_PIPELINE_DEPTH,
+                maxPipelineDepth);
     }
 
     /**

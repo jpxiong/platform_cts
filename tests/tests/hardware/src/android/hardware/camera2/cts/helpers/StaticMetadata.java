@@ -66,6 +66,7 @@ public class StaticMetadata {
     private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN = -2;
     private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX = 2;
     private static final Rational CONTROL_AE_COMPENSATION_STEP_DEFAULT = new Rational(1, 2);
+    private static final byte REQUEST_PIPELINE_MAX_DEPTH_MAX = 8;
 
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
@@ -1242,6 +1243,26 @@ public class StaticMetadata {
                 modeList.contains((byte)CameraMetadata.CONTROL_EFFECT_MODE_OFF));
 
         return modes;
+    }
+
+    /**
+     * Get max pipeline depth and do the sanity check.
+     *
+     * @return max pipeline depth, default value if it is not available.
+     */
+    public byte getPipelineMaxDepthChecked() {
+        CameraMetadata.Key<Byte> key =
+                CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH;
+        Byte maxDepth = getValueFromKeyNonNull(key);
+
+        if (maxDepth == null) {
+            return REQUEST_PIPELINE_MAX_DEPTH_MAX;
+        }
+
+        checkTrueForKey(key, " max pipeline depth should be no larger than "
+                + REQUEST_PIPELINE_MAX_DEPTH_MAX, maxDepth <= REQUEST_PIPELINE_MAX_DEPTH_MAX);
+
+        return maxDepth;
     }
 
     /**
