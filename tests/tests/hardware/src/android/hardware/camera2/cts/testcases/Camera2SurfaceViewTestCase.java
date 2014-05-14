@@ -335,6 +335,26 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
+     * Wait for numResultWait frames
+     *
+     * @param resultListener The capture listener to get capture result back.
+     * @param numResultsWait Number of frame to wait
+     */
+    protected static void waitForNumResults(SimpleCaptureListener resultListener,
+            int numResultsWait) {
+        if (numResultsWait <= 0 || resultListener == null) {
+            throw new IllegalArgumentException(
+                    "Input must be positive number and listener must be non-null");
+        }
+
+        CaptureResult result;
+        for (int i = 0; i < numResultsWait; i++) {
+            result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        }
+        return;
+    }
+
+    /**
      * Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
      *
      * @param resultListener The capture listener to get capture result back.

@@ -97,6 +97,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_REGIONS_AF_INDEX = 2;
     private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 3000;
     private static final double AE_COMPENSATION_ERROR_TOLERANCE = 0.2;
+    private static final int NUM_FRAMES_WAITED = 30;
 
     @Override
     protected void setUp() throws Exception {
@@ -129,7 +130,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      * Test normal still capture sequence.
      * <p>
      * Preview and and jpeg output streams are configured. Max still capture
-     * size is used for jpeg capture. The sequnce of still capture being test
+     * size is used for jpeg capture. The sequence of still capture being test
      * is: start preview, auto focus, precapture metering (if AE is not
      * converged), then capture jpeg. The AWB and AE are in auto modes. AF mode
      * is CONTINUOUS_PICTURE.
@@ -316,6 +317,59 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Test preview is still running after a still request
+     */
+    public void testPreviewPersistence() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing preview persistence for Camera " + id);
+                openDevice(id);
+                previewPersistenceTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Start preview,take a picture and test preview is still running after snapshot
+     */
+    private void previewPersistenceTestByCamera() throws Exception {
+        Size maxStillSz = mOrderedStillSizes.get(0);
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        CaptureResult result;
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureListener stillResultListener = new SimpleCaptureListener();
+        SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+        CaptureRequest.Builder previewRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        CaptureRequest.Builder stillRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+        prepareStillCaptureAndStartPreview(previewRequest, stillRequest, maxPreviewSz,
+                maxStillSz, resultListener, imageListener);
+
+        // make sure preview is actually running
+        waitForNumResults(resultListener, NUM_FRAMES_WAITED);
+
+        // take a picture
+        CaptureRequest request = stillRequest.build();
+        mCamera.capture(request, stillResultListener, mHandler);
+        result = stillResultListener.getCaptureResultForRequest(request,
+                WAIT_FOR_RESULT_TIMEOUT_MS);
+
+        // validate image
+        Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+        validateJpegCapture(image, maxStillSz);
+
+        // make sure preview is still running after still capture
+        waitForNumResults(resultListener, NUM_FRAMES_WAITED);
+
+        stopPreview();
+        return;
+    }
+
+    /**
      * Take a picture for a given set of 3A regions for a particular camera.
      * <p>
      * Before take a still capture, it triggers an auto focus and lock it first,
@@ -419,8 +473,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         boolean canSetAeRegion =
                 (aeRegions != null) && isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
         if (canSetAeRegion) {
-            previewRequest.set(CaptureRequest.CONTROL_AE_REGIONS, awbRegions);
-            stillRequest.set(CaptureRequest.CONTROL_AE_REGIONS, awbRegions);
+            previewRequest.set(CaptureRequest.CONTROL_AE_REGIONS, aeRegions);
+            stillRequest.set(CaptureRequest.CONTROL_AE_REGIONS, aeRegions);
         }
         mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
@@ -466,8 +520,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
         validateJpegCapture(image, maxStillSz);
 
-        // stopPreview must be called here to make sure next time a preview stream
-        // is created with new size.
         stopPreview();
     }
 
