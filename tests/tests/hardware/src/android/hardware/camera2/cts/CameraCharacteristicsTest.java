@@ -751,75 +751,6 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidScalerAvailableFormats() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableFormats",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_FORMATS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableFormats", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_FORMATS));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableJpegMinDurations() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableJpegMinDurations",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_JPEG_MIN_DURATIONS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableJpegMinDurations", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_JPEG_MIN_DURATIONS));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableJpegSizes() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableJpegSizes",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableJpegSizes", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES));
-
-            }
-
-        }
-    }
-
     public void testCameraCharacteristicsAndroidScalerAvailableMaxDigitalZoom() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
@@ -843,7 +774,7 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidScalerAvailableProcessedMinDurations() throws Exception {
+    public void testCameraCharacteristicsAndroidScalerStreamConfigurationMap() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
@@ -852,129 +783,14 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
 
             {
 
-                assertNotNull("Invalid property: android.scaler.availableProcessedMinDurations",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_MIN_DURATIONS));
+                assertNotNull("Invalid property: android.scaler.streamConfigurationMap",
+                        props.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP));
 
                 List<Key<?>> allKeys = props.getKeys();
                 assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
                         ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableProcessedMinDurations", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_MIN_DURATIONS));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableProcessedSizes() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableProcessedSizes",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableProcessedSizes", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableInputOutputFormatsMap() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableInputOutputFormatsMap",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_INPUT_OUTPUT_FORMATS_MAP));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableInputOutputFormatsMap", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_INPUT_OUTPUT_FORMATS_MAP));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableStreamConfigurations() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableStreamConfigurations",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableStreamConfigurations", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableMinFrameDurations() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableMinFrameDurations",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_MIN_FRAME_DURATIONS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableMinFrameDurations", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_MIN_FRAME_DURATIONS));
-
-            }
-
-        }
-    }
-
-    public void testCameraCharacteristicsAndroidScalerAvailableStallDurations() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.scaler.availableStallDurations",
-                        props.get(CameraCharacteristics.SCALER_AVAILABLE_STALL_DURATIONS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.scaler.availableStallDurations", allKeys.contains(
-                        CameraCharacteristics.SCALER_AVAILABLE_STALL_DURATIONS));
+                assertTrue("Key not in keys list: android.scaler.streamConfigurationMap", allKeys.contains(
+                        CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP));
 
             }
 

@@ -24,6 +24,7 @@ import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.Rational;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -896,7 +897,7 @@ public class StaticMetadata {
      */
     public Size[] getRawOutputSizesChecked() {
         return getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
-                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+                StreamDirection.Output);
     }
 
     /**
@@ -906,41 +907,58 @@ public class StaticMetadata {
      */
     public Size[] getJpegOutputSizeChecked() {
         return getAvailableSizesForFormatChecked(ImageFormat.JPEG,
-                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+                StreamDirection.Output);
     }
 
     /**
-     * Get available sizes for given format
+     * Used to determine the stream direction for various helpers that look up
+     * format or size information.
+     */
+    public enum StreamDirection {
+        /** Stream is used with {@link android.hardware.camera2.CameraDevice#configureOutputs} */
+        Output,
+        /** Stream is used with {@code CameraDevice#configureInputs} -- NOT YET PUBLIC */
+        Input
+    }
+
+    /**
+     * Get available sizes for given user-defined format.
+     *
+     * <p><strong>Does not</strong> work with implementation-defined format.</p>
      *
      * @param format The format for the requested size array.
      * @param direction The stream direction, input or output.
      * @return The sizes of the given format, empty array if no available size is found.
      */
-    public Size[] getAvailableSizesForFormatChecked(int format, int direction) {
-        final int NUM_ELEMENTS_IN_STREAM_CONFIG = 4;
-        ArrayList<Size> sizeList = new ArrayList<Size>();
-        CameraMetadata.Key<int[]> key =
-                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS;
-        int[] config = getValueFromKeyNonNull(key);
+    public Size[] getAvailableSizesForFormatChecked(int format, StreamDirection direction) {
+        CameraMetadata.Key<StreamConfigurationMap> key =
+                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+        StreamConfigurationMap config = getValueFromKeyNonNull(key);
 
         if (config == null) {
             return new Size[0];
         }
 
-        checkTrueForKey(key, "array length is invalid", config.length
-                % NUM_ELEMENTS_IN_STREAM_CONFIG == 0);
-        // Round down to 4 boundary if it is not integer times of 4, to avoid array out of bound
-        // in case the above check fails.
-        int configLength = (config.length / NUM_ELEMENTS_IN_STREAM_CONFIG)
-                * NUM_ELEMENTS_IN_STREAM_CONFIG;
-        for (int i = 0; i < configLength; i += NUM_ELEMENTS_IN_STREAM_CONFIG) {
-            if (config[i] == format && config[i+3] == direction) {
-                sizeList.add(new Size(config[i+1], config[i+2]));
-            }
+        android.util.Size[] utilSizes;
+
+        switch (direction) {
+            case Output:
+                utilSizes = config.getOutputSizes(format);
+                break;
+            case Input:
+                utilSizes = config.getInputSizes(format);
+                break;
+            default:
+                throw new IllegalArgumentException("direction must be output or input");
         }
 
-        Size[] sizes = new Size[sizeList.size()];
-        return sizeList.toArray(sizes);
+        // TODO: Get rid of android.hardware.camera2.Size
+        Size[] sizes = new Size[utilSizes.length];
+        for (int i = 0; i < utilSizes.length; ++i) {
+            sizes[i] = new Size(utilSizes[i].getWidth(), utilSizes[i].getHeight());
+        }
+
+        return sizes;
     }
 
     /**
@@ -998,35 +1016,30 @@ public class StaticMetadata {
     }
 
     /**
-     * Get available minimal frame durations for a given format.
+     * Get available minimal frame durations for a given user-defined format.
+     *
+     * <p><strong>Does not</strong> work with implementation-defined format.</p>
      *
      * @param format One of the format from {@link ImageFormat}.
      * @return HashMap of minimal frame durations for different sizes, empty HashMap
      *         if availableMinFrameDurations is null.
      */
     public HashMap<Size, Long> getAvailableMinFrameDurationsForFormatChecked(int format) {
-        final int NUM_ELEMENTS_IN_DURATIONS = 4;
-        CameraMetadata.Key<long[]> key =
-                CameraCharacteristics.SCALER_AVAILABLE_MIN_FRAME_DURATIONS;
-        long[] minDurations = getValueFromKeyNonNull(key);
+
         HashMap<Size, Long> minDurationMap = new HashMap<Size, Long>();
 
-        if (minDurations == null) {
+        CameraMetadata.Key<StreamConfigurationMap> key =
+                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+        StreamConfigurationMap config = getValueFromKeyNonNull(key);
+
+        if (config == null) {
             return minDurationMap;
         }
 
-        checkTrueForKey(key, "array length is invalid", minDurations.length
-                % NUM_ELEMENTS_IN_DURATIONS == 0);
-        // Round down to 4 boundary if it is not integer times of 4, to avoid array out of bound
-        // in case the above check fails.
-        int durationLength = (minDurations.length / NUM_ELEMENTS_IN_DURATIONS)
-                * NUM_ELEMENTS_IN_DURATIONS;
-        for (int i = 0; i < durationLength; i += NUM_ELEMENTS_IN_DURATIONS) {
-            if (minDurations[i] == format) {
-                Size size = new Size((int)minDurations[i+1], (int)minDurations[i+2]);
-                Long value = minDurations[i + 3];
-                minDurationMap.put(size, value);
-            }
+        for (android.util.Size size : config.getOutputSizes(format)) {
+            long minFrameDuration = config.getOutputMinFrameDuration(format, size);
+
+            minDurationMap.put(new Size(size.getWidth(), size.getHeight()), minFrameDuration);
         }
 
         return minDurationMap;
