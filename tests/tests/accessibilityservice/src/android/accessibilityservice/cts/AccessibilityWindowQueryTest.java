@@ -31,6 +31,7 @@ import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
 import android.view.accessibility.AccessibilityWindowInfo;
 
 import com.android.cts.accessibilityservice.R;
@@ -43,7 +44,7 @@ import java.util.Queue;
 /**
  * Test cases for testing the accessibility APIs for querying of the screen content.
  * These APIs allow exploring the screen and requesting an action to be performed
- * on a given view from an AccessiiblityService.
+ * on a given view from an AccessibilityService.
  */
 public class AccessibilityWindowQueryTest
         extends AccessibilityActivityTestCase<AccessibilityWindowQueryActivity> {
@@ -533,6 +534,28 @@ public class AccessibilityWindowQueryTest
 
         // Make sure the expected event was received.
         assertNotNull(expected);
+    }
+
+
+    @MediumTest
+    public void testPerformCustomAction() throws Exception {
+        // find a view and make sure it is not selected
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
+
+        // find the custom action and perform it
+        List<AccessibilityAction> actions = button.getActionList();
+        final int actionCount = actions.size();
+        for (int i = 0; i < actionCount; i++) {
+            AccessibilityAction action = actions.get(i);
+            if (action.getId() == R.id.foo_custom_action) {
+                assertSame(action.getLabel(), "Foo");
+                // perform the action
+                assertTrue(button.performAction(action.getId()));
+                return;
+            }
+        }
     }
 
     @MediumTest
