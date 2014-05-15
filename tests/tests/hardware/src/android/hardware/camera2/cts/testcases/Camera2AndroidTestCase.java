@@ -24,7 +24,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;

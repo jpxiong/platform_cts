@@ -21,7 +21,7 @@ import static junit.framework.Assert.*;
 
 import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.helpers.MaybeNull;
 import android.hardware.camera2.cts.helpers.UncheckedCloseable;
 import android.hardware.camera2.cts.rs.Script.ParameterMap;

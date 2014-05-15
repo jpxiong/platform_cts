@@ -20,7 +20,7 @@ import static android.hardware.camera2.cts.helpers.Preconditions.*;
 
 import android.graphics.ImageFormat;
 import android.graphics.RectF;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.ScriptC_means_yuvx_444_2d_to_1d;
 import android.hardware.camera2.cts.rs.AllocationInfo.ElementInfo;
 import android.util.Log;

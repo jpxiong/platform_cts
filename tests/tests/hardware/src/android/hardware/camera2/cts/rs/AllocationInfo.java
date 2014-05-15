@@ -20,7 +20,7 @@ import static android.hardware.camera2.cts.helpers.Preconditions.*;
 
 import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;

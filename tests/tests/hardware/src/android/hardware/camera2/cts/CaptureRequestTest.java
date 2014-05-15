@@ -28,12 +28,12 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.Face;
-import android.hardware.camera2.Rational;
-import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
+import android.hardware.camera2.params.Face;
 import android.util.Log;
+import android.util.Rational;
+import android.util.Size;
 
 import java.util.ArrayList;
 import java.util.Arrays;

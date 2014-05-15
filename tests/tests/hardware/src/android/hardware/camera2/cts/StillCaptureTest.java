@@ -24,8 +24,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.Rational;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
 import android.hardware.camera2.cts.helpers.Camera2Focuser;
@@ -35,6 +34,7 @@ import android.media.Image;
 import android.os.Build;
 import android.os.ConditionVariable;
 import android.util.Log;
+import android.util.Rational;
 
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 

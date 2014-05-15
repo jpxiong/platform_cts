@@ -17,7 +17,7 @@ import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.media.CamcorderProfile;
 import android.media.MediaCodecInfo;

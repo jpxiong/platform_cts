@@ -18,7 +18,7 @@ package android.hardware.camera2.cts.rs;
 
 import static android.hardware.camera2.cts.helpers.Preconditions.*;
 
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.ScriptC_means_yuvx_444_1d_to_single;
 import android.hardware.camera2.cts.rs.AllocationInfo.ElementInfo;
 import android.renderscript.Element;

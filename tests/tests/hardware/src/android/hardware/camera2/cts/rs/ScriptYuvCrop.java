@@ -20,7 +20,7 @@ import static android.hardware.camera2.cts.helpers.Preconditions.*;
 
 import android.graphics.ImageFormat;
 import android.graphics.RectF;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.ScriptC_crop_yuvf_420_to_yuvx_444;
 import android.hardware.camera2.cts.rs.AllocationInfo.ElementInfo;
 import android.renderscript.Element;

@@ -32,8 +32,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.Rational;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.helpers.MaybeNull;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.rs.RenderScriptSingleton;
@@ -48,6 +47,7 @@ import android.renderscript.Allocation;
 import android.renderscript.Script.LaunchOptions;
 import android.test.AndroidTestCase;
 import android.util.Log;
+import android.util.Rational;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;

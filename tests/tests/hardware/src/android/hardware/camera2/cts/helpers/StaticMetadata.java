@@ -21,11 +21,11 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
-import android.hardware.camera2.Rational;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
+import android.util.Rational;
 
 import junit.framework.Assert;
 
@@ -965,7 +965,7 @@ public class StaticMetadata {
                 throw new IllegalArgumentException("direction must be output or input");
         }
 
-        // TODO: Get rid of android.hardware.camera2.Size
+        // TODO: Get rid of android.util.Size
         Size[] sizes = new Size[utilSizes.length];
         for (int i = 0; i < utilSizes.length; ++i) {
             sizes[i] = new Size(utilSizes[i].getWidth(), utilSizes[i].getHeight());

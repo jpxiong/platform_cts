@@ -30,8 +30,9 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.Size;
+import android.util.Size;
 import android.hardware.camera2.CameraMetadata.Key;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.Image.Plane;
@@ -423,28 +424,21 @@ public class CameraTestUtils extends Assert {
         }
     }
 
+    /**
+     * Get the available output sizes for the user-defined {@code format}.
+     *
+     * <p>Note that implementation-defined/hidden formats are not supported.</p>
+     */
     public static Size[] getSupportedSizeForFormat(int format, String cameraId,
             CameraManager cameraManager) throws CameraAccessException {
-        CameraMetadata.Key<Size[]> key = null;
         CameraCharacteristics properties = cameraManager.getCameraCharacteristics(cameraId);
         assertNotNull("Can't get camera characteristics!", properties);
         if (VERBOSE) {
             Log.v(TAG, "get camera characteristics for camera: " + cameraId);
         }
-        switch (format) {
-            case ImageFormat.JPEG:
-                key = CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES;
-                break;
-            case ImageFormat.YUV_420_888:
-            case ImageFormat.YV12:
-            case ImageFormat.NV21:
-                key = CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES;
-                break;
-            default:
-                throw new UnsupportedOperationException(
-                        String.format("Invalid format specified 0x%x", format));
-        }
-        Size[] availableSizes = properties.get(key);
+        StreamConfigurationMap configMap =
+                properties.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] availableSizes = configMap.getOutputSizes(format);
         assertArrayNotEmpty(availableSizes, "availableSizes should not be empty");
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
