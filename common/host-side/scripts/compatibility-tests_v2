@@ -22,17 +22,17 @@ checkFile() {
 }
 
 HOST_JAR_DIR=${ANDROID_HOST_OUT}/framework
-HOST_JARS="ddmlib-prebuilt.jar tradefed-prebuilt.jar hosttestlib.jar\
-    compatibility-tradefed_v2.jar compatibility-tradefed-tests_v2.jar\
-    compatibility-java-scanner_v2.jar compatibility-java-scanner-tests_v2.jar\
-    compatibility-native-scanner_v2.jar compatibility-native-scanner-tests_v2.jar\
-    compatibility-xml-plan-generator_v2.jar compatibility-xml-plan-generator-tests_v2.jar\
-    compatibility-device-util-tests_v2.jar compatibility-device-setup-tests_v2.jar\
-    compatibility-common-util-hostsidelib_v2.jar compatibility-common-util-tests_v2.jar"
+HOST_JARS="ddmlib-prebuilt tradefed-prebuilt hosttestlib\
+    compatibility-tradefed_v2 compatibility-tradefed-tests_v2\
+    compatibility-java-scanner_v2 compatibility-java-scanner-tests_v2\
+    compatibility-native-scanner_v2 compatibility-native-scanner-tests_v2\
+    compatibility-xml-plan-generator_v2 compatibility-xml-plan-generator-tests_v2\
+    compatibility-device-util-tests_v2 compatibility-device-setup-tests_v2\
+    compatibility-common-util-hostsidelib_v2 compatibility-common-util-tests_v2"
 
 for JAR in ${HOST_JARS}; do
-    checkFile ${HOST_JAR_DIR}/${JAR}
-    JAR_PATH=${JAR_PATH}:${HOST_JAR_DIR}/${JAR}
+    checkFile ${HOST_JAR_DIR}/${JAR}.jar
+    JAR_PATH=${JAR_PATH}:${HOST_JAR_DIR}/${JAR}.jar
 done
 
 DEVICE_LIBS_DIR=${ANDROID_PRODUCT_OUT}/obj/JAVA_LIBRARIES
