@@ -18,6 +18,10 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
+LOCAL_JAVA_LIBRARIES := compatibility-common-util-hostsidelib_v2
+
+LOCAL_STATIC_JAVA_LIBRARIES := vogarexpectlib
+
 LOCAL_JAR_MANIFEST := MANIFEST.mf
 
 LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
