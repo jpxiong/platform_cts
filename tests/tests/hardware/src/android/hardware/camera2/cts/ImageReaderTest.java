@@ -25,6 +25,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.media.Image;
 import android.media.ImageReader;
@@ -189,7 +190,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         final int NUM_SINGLE_CAPTURE_TESTED = MAX_NUM_IMAGES - 1;
         Size maxYuvSz = mOrderedPreviewSizes.get(0);
         Size[] targetCaptureSizes = mStaticInfo.getAvailableSizesForFormatChecked(format,
-                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+                StaticMetadata.StreamDirection.Output);
 
         for (Size captureSz : targetCaptureSizes) {
             if (VERBOSE) {
@@ -261,7 +262,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     private void bufferFormatTestByCamera(int format, boolean repeating) throws Exception {
 
         Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(format,
-                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+                StaticMetadata.StreamDirection.Output);
 
         // for each resolution, test imageReader:
         for (Size sz : availableSizes) {
