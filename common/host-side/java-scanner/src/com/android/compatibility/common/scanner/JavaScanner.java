@@ -16,12 +16,15 @@
 
 package com.android.compatibility.common.scanner;
 
+import com.android.compatibility.common.util.KeyValueArgsParser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -56,7 +59,7 @@ public class JavaScanner {
     }
 
     int scan() throws Exception {
-        final List<String> args = new ArrayList<String>();
+        final ArrayList<String> args = new ArrayList<String>();
         args.add("javadoc");
         args.add("-doclet");
         args.add("com.android.compatibility.common.scanner.JavaScannerDoclet");
@@ -90,7 +93,7 @@ public class JavaScanner {
     }
 
     private static String getSourcePath(File sourceDir) {
-        List<String> sourcePath = new ArrayList<String>(Arrays.asList(SOURCE_PATHS));
+        final ArrayList<String> sourcePath = new ArrayList<String>(Arrays.asList(SOURCE_PATHS));
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }
@@ -99,8 +102,8 @@ public class JavaScanner {
         return join(Arrays.asList(CLASS_PATHS), ":");
     }
 
-    private static List<String> getSourceFiles(File sourceDir) {
-        List<String> sourceFiles = new ArrayList<String>();
+    private static ArrayList<String> getSourceFiles(File sourceDir) {
+        final ArrayList<String> sourceFiles = new ArrayList<String>();
         final File[] files = sourceDir.listFiles(new FileFilter() {
             public boolean accept(File pathname) {
                 return pathname.isDirectory() || pathname.toString().endsWith(".java");
@@ -117,7 +120,7 @@ public class JavaScanner {
     }
 
     private static String join(List<String> list, String delimiter) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (String s : list) {
             builder.append(s);
             builder.append(delimiter);
@@ -128,19 +131,18 @@ public class JavaScanner {
     }
 
     public static void main(String[] args) throws Exception {
-        String sourcePath = null;
-        String docletPath = null;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-s") && ++i < args.length) {
-                sourcePath = args[i];
-            } else if (args[i].equals("-d") && ++i < args.length) {
-                docletPath = args[i];
-            }
-        }
+        final HashMap<String, String> argsMap = KeyValueArgsParser.parse(args);
+        final String sourcePath = argsMap.get("-s");
+        final String docletPath = argsMap.get("-d");
         if (sourcePath == null || docletPath == null) {
-            System.err.println("Usage: javascanner -s SOURCE_DIR -d DOCLET_PATH");
-            System.exit(1);
+            usage(args);
         }
         System.exit(new JavaScanner(new File(sourcePath), new File(docletPath)).scan());
+    }
+
+    private static void usage(String[] args) {
+        System.err.println("Arguments: " + Arrays.toString(args));
+        System.err.println("Usage: javascanner -s SOURCE_DIR -d DOCLET_PATH");
+        System.exit(1);
     }
 }

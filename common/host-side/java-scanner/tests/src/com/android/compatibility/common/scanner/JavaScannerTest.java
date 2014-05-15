@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -100,7 +99,7 @@ public class JavaScannerTest extends TestCase {
             out.print(content);
             out.flush();
             out.close();
-            List<String> args = new ArrayList<String>();
+            ArrayList<String> args = new ArrayList<String>();
             args.add("java");
             args.add("-jar");
             args.add(JAR);
