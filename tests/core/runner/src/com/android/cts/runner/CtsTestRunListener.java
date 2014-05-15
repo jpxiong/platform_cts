@@ -35,6 +35,7 @@ import java.net.Authenticator;
 import java.net.CookieHandler;
 import java.net.ResponseCache;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -154,14 +155,16 @@ public class CtsTestRunListener extends InstrumentationRunListener {
 
     // http://code.google.com/p/vogar/source/browse/trunk/src/vogar/target/TestEnvironment.java
     static class TestEnvironment {
-        private Locale mDefaultLocale;
-        private String mUserHome;
-        private String mJavaIoTmpDir;
-        private HostnameVerifier mHostnameVerifier;
-        private SSLSocketFactory mSslSocketFactory;
+        private final Locale mDefaultLocale;
+        private final TimeZone mDefaultTimeZone;
+        private final String mUserHome;
+        private final String mJavaIoTmpDir;
+        private final HostnameVerifier mHostnameVerifier;
+        private final SSLSocketFactory mSslSocketFactory;
 
         TestEnvironment() {
             mDefaultLocale = Locale.getDefault();
+            mDefaultTimeZone = TimeZone.getDefault();
             mUserHome = System.getProperty("user.home");
             mJavaIoTmpDir = System.getProperty("java.io.tmpdir");
             mHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
@@ -170,6 +173,7 @@ public class CtsTestRunListener extends InstrumentationRunListener {
 
         void reset() {
             Locale.setDefault(mDefaultLocale);
+            TimeZone.setDefault(mDefaultTimeZone);
             System.setProperty("user.home", mUserHome);
             System.setProperty("java.io.tmpdir", mJavaIoTmpDir);
             Authenticator.setDefault(null);
