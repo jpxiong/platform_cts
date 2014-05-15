@@ -486,6 +486,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
     /**
      * Test digitalZoom (center wise and non-center wise), validate the returned crop regions.
+     * The max preview size is used for each camera.
      */
     public void testDigitalZoom() throws Exception {
         for (String id : mCameraIds) {
@@ -495,8 +496,28 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
                     continue;
                 }
+                Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+                digitalZoomTestByCamera(maxPreviewSize);
+            } finally {
+                closeDevice();
+            }
+        }
+    }
 
-                digitalZoomTestByCamera();
+    /**
+     * Test digital zoom and all preview size combinations.
+     * TODO: this and above test should all be moved to preview test class.
+     */
+    public void testDigitalZoomPreviewCombinations() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                digitalZoomPreviewCombinationTestByCamera();
             } finally {
                 closeDevice();
             }
@@ -1513,7 +1534,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         stopPreview();
     }
 
-    private void digitalZoomTestByCamera() throws Exception {
+    private void digitalZoomTestByCamera(Size previewSize) throws Exception {
         final int ZOOM_STEPS = 30;
         final PointF[] TEST_ZOOM_CENTERS = new PointF[] {
                 new PointF(0.5f, 0.5f),   // Center point
@@ -1526,11 +1547,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         final Rect activeArraySize = mStaticInfo.getActiveArraySizeChecked();
         Rect[] cropRegions = new Rect[ZOOM_STEPS];
         MeteringRectangle[][] expectRegions = new MeteringRectangle[ZOOM_STEPS][];
-        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener listener = new SimpleCaptureListener();
-        startPreview(requestBuilder, maxPreviewSize, listener);
+        startPreview(requestBuilder, previewSize, listener);
         CaptureRequest[] requests = new CaptureRequest[ZOOM_STEPS];
 
         // Set algorithm regions to full active region
@@ -1549,7 +1569,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 cropRegions[i] = getCropRegionForZoom(zoomFactor, center, maxZoom, activeArraySize);
                 if (VERBOSE) {
                     Log.v(TAG, "Testing Zoom for factor " + zoomFactor + " and center " +
-                            center.toString() + " The cropRegion is " + cropRegions[i].toString());
+                            center + " The cropRegion is " + cropRegions[i] +
+                            " Preview size is " + previewSize);
                 }
                 requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRegions[i]);
                 requests[i] = requestBuilder.build();
@@ -1575,6 +1596,16 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         stopPreview();
+    }
+
+    private void digitalZoomPreviewCombinationTestByCamera() throws Exception {
+        for (Size size : mOrderedPreviewSizes) {
+            if (VERBOSE) {
+                Log.v(TAG, "Test preview size " + size.toString() + " digital zoom");
+            }
+
+            digitalZoomTestByCamera(size);
+        }
     }
 
     private void sceneModeTestByCamera() throws Exception {
