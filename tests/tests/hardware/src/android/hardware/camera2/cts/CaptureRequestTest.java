@@ -25,12 +25,12 @@ import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Face;
 import android.hardware.camera2.Rational;
 import android.hardware.camera2.Size;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
@@ -89,6 +89,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     };
     private final Rational ZERO_R = new Rational(0, 1);
     private final Rational ONE_R = new Rational(1, 1);
+
+    private final int NUM_ALGORITHMS = 3; // AE, AWB and AF
+    private final int INDEX_ALGORITHM_AE = 0;
+    private final int INDEX_ALGORITHM_AWB = 1;
+    private final int INDEX_ALGORITHM_AF = 2;
+    private final int LENGTH_ALGORITHM_REGION = 5;
 
     @Override
     protected void setUp() throws Exception {
@@ -1511,26 +1517,43 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 new PointF(0.75f, 0.75f), // bottom right corner zoom, minimal zoom: 2x
         };
         final float maxZoom = mStaticInfo.getAvailableMaxDigitalZoomChecked();
+        final Rect activeArraySize = mStaticInfo.getActiveArraySizeChecked();
+        Rect[] cropRegions = new Rect[ZOOM_STEPS];
+        int [][] expectRegions = new int[ZOOM_STEPS][];
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener listener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPreviewSize, listener);
         CaptureRequest[] requests = new CaptureRequest[ZOOM_STEPS];
-        Rect[] cropRegions = new Rect[ZOOM_STEPS];
+
+        // Set algorithm regions to full active region
+        // TODO: test more different 3A regions
+        final int[] algoDefaultRegion = new int[] {
+            0, // xmin
+            0, // ymin
+            activeArraySize.width() - 1,  // xmax
+            activeArraySize.height() - 1, // ymax
+            1, // weight
+        };
+
+        for (int algo = 0; algo < NUM_ALGORITHMS; algo++) {
+            update3aRegion(requestBuilder, algo,  algoDefaultRegion);
+        }
 
         for (PointF center : TEST_ZOOM_CENTERS) {
             for (int i = 0; i < ZOOM_STEPS; i++) {
                 float zoomFactor = (float) (1.0f + (maxZoom - 1.0) * i / ZOOM_STEPS);
-                cropRegions[i] = getCropRegionForZoom(zoomFactor, center,
-                        mStaticInfo.getAvailableMaxDigitalZoomChecked(),
-                        mStaticInfo.getActiveArraySizeChecked());
+                cropRegions[i] = getCropRegionForZoom(zoomFactor, center, maxZoom, activeArraySize);
                 if (VERBOSE) {
                     Log.v(TAG, "Testing Zoom for factor " + zoomFactor + " and center " +
                             center.toString() + " The cropRegion is " + cropRegions[i].toString());
                 }
                 requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRegions[i]);
                 requests[i] = requestBuilder.build();
+                expectRegions[i] = getExpectedOutputRegion(
+                        /*requestRegion*/algoDefaultRegion,
+                        /*cropRect*/     cropRegions[i]);
                 mCamera.capture(requests[i], listener, mHandler);
             }
 
@@ -1540,6 +1563,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                  result = listener.getCaptureResultForRequest(
                          requests[i], NUM_RESULTS_WAIT_TIMEOUT);
                  Rect cropRegion = getValueNotNull(result, CaptureResult.SCALER_CROP_REGION);
+                 // Verify Output 3A region is intersection of input 3A region and crop region
+                 for (int algo = 0; algo < NUM_ALGORITHMS; algo++) {
+                     validate3aRegion(result,algo,  expectRegions[i]);
+                 }
                  mCollector.expectEquals(" Request and result crop region should match",
                          cropRegions[i], cropRegion);
             }
@@ -1906,5 +1933,79 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         long correctedExpTime = exposureTime + (flickeringBoundary / 2);
         correctedExpTime = correctedExpTime - (correctedExpTime % flickeringBoundary);
         return correctedExpTime;
+    }
+
+    /**
+     * Update one 3A region in capture request builder if that region is supported. Do nothing
+     * if the specified 3A region is not supported by camera device.
+     * @param requestBuilder The request to be updated
+     * @param algoIdx The index to the algorithm. (AE: 0, AWB: 1, AF: 2)
+     * @param region The 3A region to be set
+     */
+    private void update3aRegion(CaptureRequest.Builder requestBuilder, int algoIdx, int[] region)
+    {
+        int[] maxRegions = mStaticInfo.get3aMaxRegionsChecked();
+
+        if (region.length == 0 ||
+                region.length % LENGTH_ALGORITHM_REGION != 0) {
+            throw new IllegalArgumentException("Invalid input 3A region!");
+        }
+
+        if (maxRegions[algoIdx] * LENGTH_ALGORITHM_REGION >= region.length)
+        {
+            switch (algoIdx) {
+                case INDEX_ALGORITHM_AE:
+                    requestBuilder.set(CaptureResult.CONTROL_AE_REGIONS, region);
+                    break;
+                case INDEX_ALGORITHM_AWB:
+                    requestBuilder.set(CaptureResult.CONTROL_AWB_REGIONS, region);
+                    break;
+                case INDEX_ALGORITHM_AF:
+                    requestBuilder.set(CaptureResult.CONTROL_AF_REGIONS, region);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown 3A Algorithm!");
+            }
+        }
+    }
+
+    /**
+     * Validate one 3A region in capture result equals to expected region if that region is
+     * supported. Do nothing if the specified 3A region is not supported by camera device.
+     * @param result The capture result to be validated
+     * @param algoIdx The index to the algorithm. (AE: 0, AWB: 1, AF: 2)
+     * @param expectRegion The 3A region expected
+     */
+    private void validate3aRegion(CaptureResult result, int algoIdx, int[] expectRegion)
+    {
+        int[] maxRegions = mStaticInfo.get3aMaxRegionsChecked();
+        int[] actualRegion;
+
+        if (expectRegion.length == 0 ||
+                expectRegion.length % LENGTH_ALGORITHM_REGION != 0) {
+            throw new IllegalArgumentException("Invalid expected 3A region!");
+        }
+
+        if (maxRegions[algoIdx] > 0)
+        {
+            switch (algoIdx) {
+                case INDEX_ALGORITHM_AE:
+                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
+                    break;
+                case INDEX_ALGORITHM_AWB:
+                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AWB_REGIONS);
+                    break;
+                case INDEX_ALGORITHM_AF:
+                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown 3A Algorithm!");
+            }
+            mCollector.expectEquals(
+                    "Expected 3A region: " + Arrays.toString(expectRegion) +
+                    " does not match actual one: " + Arrays.toString(actualRegion),
+                    toObject(expectRegion),
+                    toObject(actualRegion));
+        }
     }
 }
