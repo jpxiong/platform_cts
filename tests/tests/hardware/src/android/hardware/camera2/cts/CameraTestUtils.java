@@ -884,4 +884,25 @@ public class CameraTestUtils extends Assert {
                 /*right*/ cropCenterX + cropWidth / 2 - 1,
                 /*bottom*/cropCenterY + cropHeight / 2 - 1);
     }
+
+    /**
+     * Calculate output 3A region from the intersection of input 3A region and cropped region.
+     *
+     * @param requestRegion The input 3A region [xmin, ymin, xmax, ymax, weight]
+     * @param cropRect The cropped region
+     * @return expected 3A region output in capture result
+     */
+    public static int[] getExpectedOutputRegion(int[] requestRegion, Rect cropRect){
+        Rect requestRect = new Rect(requestRegion[0], requestRegion[1],
+                requestRegion[2], requestRegion[3]);
+        Rect resultRect = new Rect();
+        assertTrue("Input 3A region must intersect cropped region",
+                    resultRect.setIntersect(requestRect, cropRect));
+        return new int[] {
+                resultRect.left,
+                resultRect.top,
+                resultRect.right,
+                resultRect.bottom,
+                requestRegion[4]};
+    }
 }
