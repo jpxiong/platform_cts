@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.ConditionVariable;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -47,21 +48,14 @@ public class SeccompBpfTest extends AndroidTestCase implements ServiceConnection
      */
     static final int MSG_TEST_ENDED_CLEAN = 2;
 
-    final private Messenger mMessenger = new Messenger(new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_TEST_STARTED:
-                    onTestStarted();
-                    break;
-                case MSG_TEST_ENDED_CLEAN:
-                    onTestEnded(false);
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    });
+    /**
+     * Dedicated thread used to receive messages from the SeccompDeathTestService.
+     */
+    final private HandlerThread mHandlerThread = new HandlerThread("SeccompBpfTest handler");
+    /**
+     * Messenger that runs on mHandlerThread.
+     */
+    private Messenger mMessenger;
 
     /**
      * Condition that blocks the test/instrumentation thread that runs the
@@ -122,6 +116,36 @@ public class SeccompBpfTest extends AndroidTestCase implements ServiceConnection
 
         assertTrue(mTestStarted);
         assertTrue(mTestEnded);
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        mHandlerThread.start();
+        mMessenger = new Messenger(new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case MSG_TEST_STARTED:
+                        onTestStarted();
+                        break;
+                    case MSG_TEST_ENDED_CLEAN:
+                        onTestEnded(false);
+                        break;
+                    default:
+                        super.handleMessage(msg);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        try {
+            mHandlerThread.quitSafely();
+        } finally {
+            super.tearDown();
+        }
     }
 
     private void launchDeathTestService() {
