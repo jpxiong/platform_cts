@@ -42,14 +42,13 @@ import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
+import junit.framework.Test;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.lang.InterruptedException;
-import java.lang.System;
-import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,8 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
-import junit.framework.Test;
 
 /**
  * A {@link Test} for running CTS tests.
@@ -516,8 +513,13 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             for (String uri : plan.getTestUris()) {
                 if (!mExcludedPackageNames.contains(uri)) {
                     ITestPackageDef testPackage = testRepo.getTestPackage(uri);
-                    testPackage.setExcludedTestFilter(plan.getExcludedTestFilter(uri));
-                    testPkgDefs.add(testPackage);
+                    if (testPackage != null) {
+                        testPackage.setExcludedTestFilter(plan.getExcludedTestFilter(uri));
+                        testPkgDefs.add(testPackage);
+                    } else {
+                        CLog.e("Could not find test package uri %s referenced in plan %s", uri,
+                                mPlanName);
+                    }
                 }
             }
         } else if (mPackageNames.size() > 0){
