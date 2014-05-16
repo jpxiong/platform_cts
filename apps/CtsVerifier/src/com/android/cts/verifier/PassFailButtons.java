@@ -23,8 +23,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -86,6 +89,25 @@ public class PassFailButtons {
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
+        private WakeLock mWakeLock;
+
+        @Override
+        protected void onResume() {
+            super.onResume();
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+                mWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE))
+                        .newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "PassFailButtons");
+                mWakeLock.acquire();
+            }
+        }
+
+        @Override
+        protected void onPause() {
+            super.onPause();
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+                mWakeLock.release();
+            }
+        }
 
         @Override
         public void setPassFailButtonClickListeners() {
