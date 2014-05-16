@@ -23,7 +23,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -93,20 +92,23 @@ public class HeartRateMonitorTestActivity extends PassFailButtons.Activity {
         public void onSensorChanged(SensorEvent sensorEvent) {
             float value = sensorEvent.values[0];
             if (value > MAX_HEART_RATE || value < MIN_HEART_RATE) {
-                updateWidgets(value, R.drawable.fs_error);
+                updateWidgets(value, sensorEvent.accuracy, R.drawable.fs_error);
             } else {
-                updateWidgets(value, R.drawable.fs_good);
+                updateWidgets(value, sensorEvent.accuracy, R.drawable.fs_good);
             }
         }
 
-        void updateWidgets(float sensorValue, int icon) {
-            mSensorText.setText(String.format("%+.2f", sensorValue));
-            mSensorText.setCompoundDrawablesWithIntrinsicBounds(0, 0, icon, 0);
+        void updateWidgets(float value, float accuracy, int icon) {
+            TextView sensorText = (TextView) findViewById(R.id.sensor_value);
+            TextView sensorAccuracyText = (TextView) findViewById(R.id.sensor_accuracy_value);
+
+            sensorText.setText(String.format("%+.2f", value));
+            sensorText.setCompoundDrawablesWithIntrinsicBounds(0, 0, icon, 0);
+            sensorAccuracyText.setText(String.format("%+.2f", accuracy));
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) {
-
         }
     }
 }
