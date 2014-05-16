@@ -40,6 +40,9 @@ public class ActionBarTest extends ActivityInstrumentationTestCase2<ActionBarAct
 
     @UiThreadTest
     public void testAddTab() {
+        if (mBar == null) {
+            return;
+        }
         assertEquals(0, mBar.getTabCount());
 
         Tab t1 = createTab("Tab 1");
