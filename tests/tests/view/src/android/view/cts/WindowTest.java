@@ -997,6 +997,24 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         @Override
         public void takeInputQueue(InputQueue.Callback callback) {
         }
+
+        @Override
+        public void setStatusBarColor(int color) {
+        }
+
+        @Override
+        public int getStatusBarColor() {
+            return 0;
+        }
+
+        @Override
+        public void setNavigationBarColor(int color) {
+        }
+
+        @Override
+        public int getNavigationBarColor() {
+            return 0;
+        }
     }
 
     private class MockWindowCallback implements Window.Callback {

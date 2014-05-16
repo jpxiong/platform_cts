@@ -667,6 +667,24 @@ public class InstrumentationTest extends InstrumentationTestCase {
             @Override
             public void takeInputQueue(InputQueue.Callback queue) {
             }
+
+            @Override
+            public void setStatusBarColor(int color) {
+            }
+
+            @Override
+            public int getStatusBarColor() {
+                return 0;
+            }
+
+            @Override
+            public void setNavigationBarColor(int color) {
+            }
+
+            @Override
+            public int getNavigationBarColor() {
+                return 0;
+            }
         }
     }
 
