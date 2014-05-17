@@ -22,7 +22,7 @@ LOCAL_JAR_MANIFEST := MANIFEST.mf
 
 LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
 
-LOCAL_JAVA_LIBRARIES := junit
+LOCAL_JAVA_LIBRARIES := compatibility-common-util-hostsidelib_v2
 
 LOCAL_MODULE := compatibility-native-scanner_v2
 
