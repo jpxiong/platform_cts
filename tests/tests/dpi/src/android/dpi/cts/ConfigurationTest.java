@@ -17,6 +17,7 @@
 package android.dpi.cts;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -40,8 +41,13 @@ public class ConfigurationTest extends AndroidTestCase {
         double xInches = (double) metrics.widthPixels / metrics.xdpi;
         double yInches = (double) metrics.heightPixels / metrics.ydpi;
         double diagonalInches = Math.sqrt(Math.pow(xInches, 2) + Math.pow(yInches, 2));
-        assertTrue("Screen diagonal must be at least 2.5 inches: " + diagonalInches,
-                diagonalInches >= 2.5d);
+        double minSize = 2.5d;
+        if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            // Watches have a different minimum diagonal.
+            minSize = 1.0d;
+        }
+        assertTrue("Screen diagonal must be at least " + minSize + " inches: " + diagonalInches,
+                diagonalInches >= minSize);
 
         double density = 160.0d * metrics.density;
         assertTrue("Screen density must be at least 100 dpi: " + density, density >= 100.0d);
