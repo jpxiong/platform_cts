@@ -19,8 +19,8 @@ package android.hardware.camera2.cts.helpers;
 import android.graphics.Rect;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -354,7 +354,7 @@ public class StaticMetadata {
     }
 
     public int[] getAvailableTestPatternModesChecked() {
-        CameraMetadata.Key<int[]> key =
+        Key<int[]> key =
                 CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES;
         int[] modes = getValueFromKeyNonNull(key);
 
@@ -618,7 +618,7 @@ public class StaticMetadata {
             return 0;
         }
 
-        CameraMetadata.Key<Integer> key = CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY;
+        Key<Integer> key = CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY;
         Integer maxAnalogsensitivity = getValueFromKeyNonNull(key);
         int minSensitivity = getSensitivityMinimumOrDefault();
         int maxSensitivity = getSensitivityMaximumOrDefault();
@@ -647,7 +647,7 @@ public class StaticMetadata {
      * @return hyperfocalDistance of this device, -1 if this tag is not available.
      */
     public float getHyperfocalDistanceChecked() {
-        CameraMetadata.Key<Float> key = CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE;
+        Key<Float> key = CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE;
         Float hyperfocalDistance = getValueFromKeyNonNull(key);
         if (hyperfocalDistance == null) {
             return -1;
@@ -797,7 +797,7 @@ public class StaticMetadata {
      * @return AE available modes
      */
     public byte[] getAeAvailableModesChecked() {
-        CameraMetadata.Key<byte[]> modesKey = CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES;
+        Key<byte[]> modesKey = CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES;
         byte[] modes = getValueFromKeyNonNull(modesKey);
         if (modes == null) {
             modes = new byte[0];
@@ -813,7 +813,7 @@ public class StaticMetadata {
                 modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON));
 
         // All camera devices with flash units support ON_AUTO_FLASH and ON_ALWAYS_FLASH
-        CameraMetadata.Key<Boolean> flashKey= CameraCharacteristics.FLASH_INFO_AVAILABLE;
+        Key<Boolean> flashKey= CameraCharacteristics.FLASH_INFO_AVAILABLE;
         Boolean hasFlash = getValueFromKeyNonNull(flashKey);
         if (hasFlash == null) {
             hasFlash = false;
@@ -858,7 +858,7 @@ public class StaticMetadata {
      * unavailable.
      */
     public byte[] getAwbAvailableModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES;
         byte[] awbModes = getValueFromKeyNonNull(key);
 
@@ -884,7 +884,7 @@ public class StaticMetadata {
      * unavailable.
      */
     public byte[] getAfAvailableModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES;
         byte[] afModes = getValueFromKeyNonNull(key);
 
@@ -944,7 +944,7 @@ public class StaticMetadata {
      * @return The sizes of the given format, empty array if no available size is found.
      */
     public Size[] getAvailableSizesForFormatChecked(int format, StreamDirection direction) {
-        CameraMetadata.Key<StreamConfigurationMap> key =
+        Key<StreamConfigurationMap> key =
                 CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
         StreamConfigurationMap config = getValueFromKeyNonNull(key);
 
@@ -986,7 +986,7 @@ public class StaticMetadata {
      */
     public int[] getAeAvailableTargetFpsRangesChecked() {
         final int NUM_ELEMENTS_IN_FPS_RANGE = 2;
-        CameraMetadata.Key<int[]> key =
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES;
         int[] fpsRanges = getValueFromKeyNonNull(key);
 
@@ -1022,7 +1022,7 @@ public class StaticMetadata {
      * @return 0 if maxFrameDuration is null
      */
     public long getMaxFrameDurationChecked() {
-        CameraMetadata.Key<Long> key =
+        Key<Long> key =
                 CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION;
         Long maxDuration = getValueFromKeyNonNull(key);
 
@@ -1046,7 +1046,7 @@ public class StaticMetadata {
 
         HashMap<Size, Long> minDurationMap = new HashMap<Size, Long>();
 
-        CameraMetadata.Key<StreamConfigurationMap> key =
+        Key<StreamConfigurationMap> key =
                 CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
         StreamConfigurationMap config = getValueFromKeyNonNull(key);
 
@@ -1064,7 +1064,7 @@ public class StaticMetadata {
     }
 
     public byte[] getAvailableEdgeModesChecked() {
-        CameraMetadata.Key<byte[]> key = CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES;
+        Key<byte[]> key = CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES;
         byte[] edgeModes = getValueFromKeyNonNull(key);
 
         if (edgeModes == null) {
@@ -1083,7 +1083,7 @@ public class StaticMetadata {
     }
 
     public byte[] getAvailableNoiseReductionModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES;
         byte[] noiseReductionModes = getValueFromKeyNonNull(key);
 
@@ -1108,7 +1108,7 @@ public class StaticMetadata {
      * @return default value if the value is null.
      */
     public Rational getAeCompensationStepChecked() {
-        CameraMetadata.Key<Rational> key =
+        Key<Rational> key =
                 CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP;
         Rational compensationStep = getValueFromKeyNonNull(key);
 
@@ -1127,7 +1127,7 @@ public class StaticMetadata {
      * @return default value if the value is null or malformed.
      */
     public int[] getAeCompensationRangeChecked() {
-        CameraMetadata.Key<int[]> key =
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE;
         int[] compensationRange = getValueFromKeyNonNull(key);
         float compensationStep = getAeCompensationStepChecked().toFloat();
@@ -1156,7 +1156,7 @@ public class StaticMetadata {
      * @return available video stabilization modes, empty array if it is unavailable.
      */
     public byte[] getAvailableVideoStabilizationModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES;
         byte[] modes = getValueFromKeyNonNull(key);
 
@@ -1180,7 +1180,7 @@ public class StaticMetadata {
      * @return available optical stabilization modes, empty array if it is unavailable.
      */
     public byte[] getAvailableOpticalStabilizationChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION;
         byte[] modes = getValueFromKeyNonNull(key);
 
@@ -1201,7 +1201,7 @@ public class StaticMetadata {
      * @return available max digitial zoom, default value (1.0) if it is not available.
      */
     public float getAvailableMaxDigitalZoomChecked() {
-        CameraMetadata.Key<Float> key =
+        Key<Float> key =
                 CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM;
         Float maxZoom = getValueFromKeyNonNull(key);
         if (maxZoom == null) {
@@ -1215,7 +1215,7 @@ public class StaticMetadata {
     }
 
     public byte[] getAvailableSceneModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES;
         byte[] modes = getValueFromKeyNonNull(key);
 
@@ -1234,7 +1234,7 @@ public class StaticMetadata {
     }
 
     public byte[] getAvailableEffectModesChecked() {
-        CameraMetadata.Key<byte[]> key =
+        Key<byte[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS;
         byte[] modes = getValueFromKeyNonNull(key);
 
@@ -1256,7 +1256,7 @@ public class StaticMetadata {
      * @return max pipeline depth, default value if it is not available.
      */
     public byte getPipelineMaxDepthChecked() {
-        CameraMetadata.Key<Byte> key =
+        Key<Byte> key =
                 CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH;
         Byte maxDepth = getValueFromKeyNonNull(key);
 

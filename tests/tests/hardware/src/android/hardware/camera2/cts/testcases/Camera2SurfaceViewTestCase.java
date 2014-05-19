@@ -34,7 +34,6 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
@@ -282,7 +281,8 @@ public class Camera2SurfaceViewTestCase extends
      * seen before the result matching myRequest arrives, or each individual wait
      * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
      */
-    protected static <T> void waitForResultValue(SimpleCaptureListener listener, Key<T> resultKey,
+    protected static <T> void waitForResultValue(SimpleCaptureListener listener,
+            CaptureResult.Key<T> resultKey,
             T expectedValue, int numResultsWait) {
         List<T> expectedValues = new ArrayList<T>();
         expectedValues.add(expectedValue);
@@ -305,7 +305,8 @@ public class Camera2SurfaceViewTestCase extends
      * seen before the result matching myRequest arrives, or each individual wait
      * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
      */
-    protected static <T> void waitForAnyResultValue(SimpleCaptureListener listener, Key<T> resultKey,
+    protected static <T> void waitForAnyResultValue(SimpleCaptureListener listener,
+            CaptureResult.Key<T> resultKey,
             List<T> expectedValues, int numResultsWait) {
         if (numResultsWait < 0 || listener == null || expectedValues == null) {
             throw new IllegalArgumentException(

@@ -16,10 +16,10 @@
 
 package android.hardware.camera2.cts.helpers;
 
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
+import android.util.Log;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
@@ -36,6 +36,10 @@ import java.util.Set;
  * instead of failing the test immediately for each failure.
  */
 public class CameraErrorCollector extends ErrorCollector {
+
+    private static final String TAG = "CameraErrorCollector";
+    private static final boolean LOG_ERRORS = Log.isLoggable(TAG, Log.ERROR);
+
     private String mCameraMsg = "";
 
     @Override
@@ -50,7 +54,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param message A string containing the failure reason.
      */
     public void addMessage(String message) {
-        super.addError(new Throwable(mCameraMsg + message));
+        addErrorSuper(new Throwable(mCameraMsg + message));
     }
 
     /**
@@ -58,7 +62,12 @@ public class CameraErrorCollector extends ErrorCollector {
      */
     @Override
     public void addError(Throwable error) {
-        super.addError(new Throwable(mCameraMsg + error.getMessage(), error));
+        addErrorSuper(new Throwable(mCameraMsg + error.getMessage(), error));
+    }
+
+    private void addErrorSuper(Throwable error) {
+        if (LOG_ERRORS) Log.e(TAG, error.getMessage());
+        super.addError(error);
     }
 
     /**
@@ -297,7 +306,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureRequest} key to be checked.
      * @return The value of the key.
      */
-    public <T> T expectKeyValueNotNull(Builder request, Key<T> key) {
+    public <T> T expectKeyValueNotNull(Builder request, CaptureRequest.Key<T> key) {
 
         T value = request.get(key);
         if (value == null) {
@@ -314,7 +323,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureResult} key to be checked.
      * @return The value of the key.
      */
-    public <T> T expectKeyValueNotNull(CaptureResult result, Key<T> key) {
+    public <T> T expectKeyValueNotNull(CaptureResult result, CaptureResult.Key<T> key) {
         return expectKeyValueNotNull("", result, key);
     }
 
@@ -326,7 +335,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureResult} key to be checked.
      * @return The value of the key.
      */
-    public <T> T expectKeyValueNotNull(String msg, CaptureResult result, Key<T> key) {
+    public <T> T expectKeyValueNotNull(String msg, CaptureResult result, CaptureResult.Key<T> key) {
 
         T value = result.get(key);
         if (value == null) {
@@ -343,7 +352,8 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureRequest} key to be checked.
      * @param expected The expected value of the CaptureRequest key.
      */
-    public <T> void expectKeyValueNotEquals(Builder request, Key<T> key, T expected) {
+    public <T> void expectKeyValueNotEquals(
+            Builder request, CaptureRequest.Key<T> key, T expected) {
         if (request == null || key == null || expected == null) {
             throw new IllegalArgumentException("request, key and target shouldn't be null");
         }
@@ -364,7 +374,8 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureResult} key to be checked.
      * @param expected The expected value of the CaptureResult key.
      */
-    public <T> void expectKeyValueNotEquals(CaptureResult result, Key<T> key, T expected) {
+    public <T> void expectKeyValueNotEquals(
+            CaptureResult result, CaptureResult.Key<T> key, T expected) {
         if (result == null || key == null || expected == null) {
             throw new IllegalArgumentException("result, key and target shouldn't be null");
         }
@@ -387,7 +398,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param key The {@link CaptureRequest} key to be checked.
      * @param expected The expected value of the CaptureRequest key.
      */
-    public <T> void expectKeyValueEquals(Builder request, Key<T> key, T expected) {
+    public <T> void expectKeyValueEquals(Builder request, CaptureRequest.Key<T> key, T expected) {
         if (request == null || key == null || expected == null) {
             throw new IllegalArgumentException("request, key and target shouldn't be null");
         }

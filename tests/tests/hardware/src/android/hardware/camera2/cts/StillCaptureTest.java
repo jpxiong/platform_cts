@@ -21,7 +21,6 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
@@ -338,7 +337,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private void previewPersistenceTestByCamera() throws Exception {
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
-        CaptureResult result;
+
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         SimpleCaptureListener stillResultListener = new SimpleCaptureListener();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
@@ -355,7 +354,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         // take a picture
         CaptureRequest request = stillRequest.build();
         mCamera.capture(request, stillResultListener, mHandler);
-        result = stillResultListener.getCaptureResultForRequest(request,
+        stillResultListener.getCaptureResultForRequest(request,
                 WAIT_FOR_RESULT_TIMEOUT_MS);
 
         // validate image
@@ -460,7 +459,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 previewRequest.get(CaptureRequest.CONTROL_AWB_MODE),
                 result.get(CaptureResult.CONTROL_AWB_MODE));
         if (canSetAwbRegion) {
-            int[] resultAwbRegions = getValueNotNull(result, CaptureRequest.CONTROL_AWB_REGIONS);
+            int[] resultAwbRegions = getValueNotNull(result, CaptureResult.CONTROL_AWB_REGIONS);
             mCollector.expectEquals("AWB regions in result and request should be same",
                     toObject(awbRegions),
                     toObject(resultAwbRegions));
@@ -487,7 +486,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 previewRequest.get(CaptureRequest.CONTROL_AE_MODE),
                 result.get(CaptureResult.CONTROL_AE_MODE));
         if (canSetAeRegion) {
-            int[] resultAeRegions = getValueNotNull(result, CaptureRequest.CONTROL_AE_REGIONS);
+            int[] resultAeRegions = getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
             mCollector.expectEquals("AE regions in result and request should be same",
                     toObject(aeRegions),
                     toObject(resultAeRegions));
@@ -505,7 +504,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 stillRequest.get(CaptureRequest.CONTROL_AF_MODE),
                 result.get(CaptureResult.CONTROL_AF_MODE));
         if (canSetAfRegion) {
-            int[] resultAfRegions = getValueNotNull(result, CaptureRequest.CONTROL_AF_REGIONS);
+            int[] resultAfRegions = getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
             mCollector.expectEquals("AF regions in result and request should be same",
                     toObject(afRegions),
                     toObject(resultAfRegions));
@@ -720,7 +719,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             mCollector.expectEquals("JPEG thumbnail size result and request should match",
                     testThumbnailSizes[i],
                     stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE));
-            Key<double[]> gpsCoordsKey = CaptureResult.JPEG_GPS_COORDINATES;
+            CaptureResult.Key<double[]> gpsCoordsKey = CaptureResult.JPEG_GPS_COORDINATES;
             if (mCollector.expectKeyValueNotNull(stillResult, gpsCoordsKey) != null) {
                 mCollector.expectEquals("GPS coordinates result and request should match.",
                         toObject(EXIF_TEST_DATA[i].gpsCoordinates),

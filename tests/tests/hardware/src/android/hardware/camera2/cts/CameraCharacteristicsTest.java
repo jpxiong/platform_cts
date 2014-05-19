@@ -27,7 +27,7 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata.Key;
+import android.hardware.camera2.CameraCharacteristics.Key;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -791,6 +791,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.scaler.streamConfigurationMap", allKeys.contains(
                         CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidScalerCroppingType() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.scaler.croppingType",
+                        props.get(CameraCharacteristics.SCALER_CROPPING_TYPE));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.scaler.croppingType", allKeys.contains(
+                        CameraCharacteristics.SCALER_CROPPING_TYPE));
 
             }
 
