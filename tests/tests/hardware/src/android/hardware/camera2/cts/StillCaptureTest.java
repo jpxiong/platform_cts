@@ -28,6 +28,7 @@ import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
 import android.hardware.camera2.cts.helpers.Camera2Focuser;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.media.ExifInterface;
 import android.media.Image;
 import android.os.Build;
@@ -39,6 +40,7 @@ import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +48,7 @@ import java.util.List;
 public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "StillCaptureTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);;
+    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
     private static final String JPEG_FILE_NAME = DEBUG_FILE_NAME_BASE + "/test.jpeg";
     // 60 second to accommodate the possible long exposure time.
     private static final int EXIF_DATETIME_ERROR_MARGIN_SEC = 60;
@@ -254,9 +256,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                int[][] aeRegions = get3ATestRegionsForCamera();
-                for (int i = 0; i < aeRegions.length; i++) {
-                    takePictureTestByCamera(aeRegions[i], /*awbRegions*/null, /*afRegions*/null);
+                ArrayList<MeteringRectangle[]> aeRegionTestCases = get3ARegionTestCasesForCamera();
+                for (MeteringRectangle[] aeRegions : aeRegionTestCases) {
+                    takePictureTestByCamera(aeRegions, /*awbRegions*/null, /*afRegions*/null);
                 }
             } finally {
                 closeDevice();
@@ -279,9 +281,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                int[][] awbRegions = get3ATestRegionsForCamera();
-                for (int i = 0; i < awbRegions.length; i++) {
-                    takePictureTestByCamera(/*aeRegions*/null, awbRegions[i], /*afRegions*/null);
+                ArrayList<MeteringRectangle[]> awbRegionTestCases = get3ARegionTestCasesForCamera();
+                for (MeteringRectangle[] awbRegions : awbRegionTestCases) {
+                    takePictureTestByCamera(/*aeRegions*/null, awbRegions, /*afRegions*/null);
                 }
             } finally {
                 closeDevice();
@@ -304,9 +306,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                int[][] afRegions = get3ATestRegionsForCamera();
-                for (int i = 0; i < afRegions.length; i++) {
-                    takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, afRegions[i]);
+                ArrayList<MeteringRectangle[]> afRegionTestCases = get3ARegionTestCasesForCamera();
+                for (MeteringRectangle[] afRegions : afRegionTestCases) {
+                    takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, afRegions);
                 }
             } finally {
                 closeDevice();
@@ -381,8 +383,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      * @param awbRegions AWB regions for this capture
      * @param afRegions AF regions for this capture
      */
-    private void takePictureTestByCamera(int[] aeRegions, int[] awbRegions, int[] afRegions)
-            throws Exception {
+    private void takePictureTestByCamera(
+            MeteringRectangle[] aeRegions, MeteringRectangle[] awbRegions,
+            MeteringRectangle[] afRegions) throws Exception {
+
         boolean hasFocuser = mStaticInfo.hasFocuser();
 
         Size maxStillSz = mOrderedStillSizes.get(0);
@@ -459,10 +463,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 previewRequest.get(CaptureRequest.CONTROL_AWB_MODE),
                 result.get(CaptureResult.CONTROL_AWB_MODE));
         if (canSetAwbRegion) {
-            int[] resultAwbRegions = getValueNotNull(result, CaptureResult.CONTROL_AWB_REGIONS);
+            MeteringRectangle[] resultAwbRegions =
+                    getValueNotNull(result, CaptureResult.CONTROL_AWB_REGIONS);
             mCollector.expectEquals("AWB regions in result and request should be same",
-                    toObject(awbRegions),
-                    toObject(resultAwbRegions));
+                    awbRegions, resultAwbRegions);
         }
 
         /**
@@ -486,10 +490,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 previewRequest.get(CaptureRequest.CONTROL_AE_MODE),
                 result.get(CaptureResult.CONTROL_AE_MODE));
         if (canSetAeRegion) {
-            int[] resultAeRegions = getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
+            MeteringRectangle[] resultAeRegions =
+                    getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
             mCollector.expectEquals("AE regions in result and request should be same",
-                    toObject(aeRegions),
-                    toObject(resultAeRegions));
+                    aeRegions, resultAeRegions);
         }
 
         /**
@@ -504,10 +508,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 stillRequest.get(CaptureRequest.CONTROL_AF_MODE),
                 result.get(CaptureResult.CONTROL_AF_MODE));
         if (canSetAfRegion) {
-            int[] resultAfRegions = getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
+            MeteringRectangle[] resultAfRegions =
+                    getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
             mCollector.expectEquals("AF regions in result and request should be same",
-                    toObject(afRegions),
-                    toObject(resultAfRegions));
+                    afRegions, resultAfRegions);
         }
 
         if (hasFocuser) {
@@ -535,10 +539,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
         Camera2Focuser focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
                 mStaticInfo.getCharacteristics(), mHandler);
-        int[][] testAfRegions = get3ATestRegionsForCamera();
+        ArrayList<MeteringRectangle[]> testAfRegions = get3ARegionTestCasesForCamera();
 
-        for (int i = 0; i < testAfRegions.length; i++) {
-            focuser.touchForAutoFocus(testAfRegions[i]);
+        for (MeteringRectangle[] afRegions : testAfRegions) {
+            focuser.touchForAutoFocus(afRegions);
             afListener.waitForAutoFocusDone(WAIT_FOR_FOCUS_DONE_TIMEOUT_MS);
             focuser.cancelAutoFocus();
         }
@@ -1206,71 +1210,89 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
-     * Get 5 3A test square regions, one is at center, the other four are at corners of
+     * Get 5 3A region test cases, each with one square region in it.
+     * The first one is at center, the other four are at corners of
      * active array rectangle.
      *
      * @return array of test 3A regions
      */
-    private int[][] get3ATestRegionsForCamera() {
+    private ArrayList<MeteringRectangle[]> get3ARegionTestCasesForCamera() {
         final int TEST_3A_REGION_NUM = 5;
-        final int NUM_ELEMENT_IN_REGION = 5;
         final int DEFAULT_REGION_WEIGHT = 30;
         final int DEFAULT_REGION_SCALE_RATIO = 8;
-        int[][] regions = new int[TEST_3A_REGION_NUM][NUM_ELEMENT_IN_REGION];
+        ArrayList<MeteringRectangle[]> testCases =
+                new ArrayList<MeteringRectangle[]>(TEST_3A_REGION_NUM);
         final Rect activeArraySize = mStaticInfo.getActiveArraySizeChecked();
-        int regionWidth = activeArraySize.width() / DEFAULT_REGION_SCALE_RATIO;
-        int regionHeight = activeArraySize.height() / DEFAULT_REGION_SCALE_RATIO;
+        int regionWidth = activeArraySize.width() / DEFAULT_REGION_SCALE_RATIO - 1;
+        int regionHeight = activeArraySize.height() / DEFAULT_REGION_SCALE_RATIO - 1;
         int centerX = activeArraySize.width() / 2;
         int centerY = activeArraySize.height() / 2;
         int bottomRightX = activeArraySize.width() - 1;
         int bottomRightY = activeArraySize.height() - 1;
 
         // Center region
-        int i = 0;
-        regions[i][0] = centerX - regionWidth / 2;       // xmin
-        regions[i][1] = centerY - regionHeight / 2;      // ymin
-        regions[i][2] = centerX + regionWidth / 2 - 1;   // xmax
-        regions[i][3] = centerY + regionHeight / 2 - 1;  // ymax
-        regions[i][4] = DEFAULT_REGION_WEIGHT;
-        i++;
+        testCases.add(
+                new MeteringRectangle[] {
+                    new MeteringRectangle(
+                            centerX - regionWidth / 2,  // x
+                            centerY - regionHeight / 2, // y
+                            regionWidth,                // width
+                            regionHeight,               // height
+                            DEFAULT_REGION_WEIGHT)});
 
         // Upper left corner
-        regions[i][0] = 0;                // xmin
-        regions[i][1] = 0;                // ymin
-        regions[i][2] = regionWidth - 1;  // xmax
-        regions[i][3] = regionHeight - 1; // ymax
-        regions[i][4] = DEFAULT_REGION_WEIGHT;
-        i++;
+        testCases.add(
+                new MeteringRectangle[] {
+                    new MeteringRectangle(
+                            0,                // x
+                            0,                // y
+                            regionWidth,      // width
+                            regionHeight,     // height
+                            DEFAULT_REGION_WEIGHT)});
 
         // Upper right corner
-        regions[i][0] = activeArraySize.width() - regionWidth; // xmin
-        regions[i][1] = 0;                                     // ymin
-        regions[i][2] = bottomRightX;                          // xmax
-        regions[i][3] = regionHeight - 1;                      // ymax
-        regions[i][4] = DEFAULT_REGION_WEIGHT;
-        i++;
+        testCases.add(
+                new MeteringRectangle[] {
+                    new MeteringRectangle(
+                            bottomRightX - regionWidth, // x
+                            0,                          // y
+                            regionWidth,                // width
+                            regionHeight,               // height
+                            DEFAULT_REGION_WEIGHT)});
 
         // Bootom left corner
-        regions[i][0] = 0;                                       // xmin
-        regions[i][1] = activeArraySize.height() - regionHeight; // ymin
-        regions[i][2] = regionWidth - 1;                         // xmax
-        regions[i][3] = bottomRightY;                            // ymax
-        regions[i][4] = DEFAULT_REGION_WEIGHT;
-        i++;
+        testCases.add(
+                new MeteringRectangle[] {
+                    new MeteringRectangle(
+                            0,                           // x
+                            bottomRightY - regionHeight, // y
+                            regionWidth,                 // width
+                            regionHeight,                // height
+                            DEFAULT_REGION_WEIGHT)});
 
         // Bootom right corner
-        regions[i][0] = activeArraySize.width() - regionWidth;   // xmin
-        regions[i][1] = activeArraySize.height() - regionHeight; // ymin
-        regions[i][2] = bottomRightX;                            // xmax
-        regions[i][3] = bottomRightY;                            // ymax
-        regions[i][4] = DEFAULT_REGION_WEIGHT;
-        i++;
+        testCases.add(
+                new MeteringRectangle[] {
+                    new MeteringRectangle(
+                            bottomRightX - regionWidth,  // x
+                            bottomRightY - regionHeight, // y
+                            regionWidth,                 // width
+                            regionHeight,                // height
+                            DEFAULT_REGION_WEIGHT)});
 
         if (VERBOSE) {
-            Log.v(TAG, "Generated test regions are: " + Arrays.deepToString(regions));
+            StringBuilder sb = new StringBuilder();
+            for (MeteringRectangle[] mr : testCases) {
+                sb.append("{");
+                sb.append(Arrays.toString(mr));
+                sb.append("}, ");
+            }
+            if (sb.length() > 1)
+                sb.setLength(sb.length() - 2); // Remove the redundant comma and space at the end
+            Log.v(TAG, "Generated test regions are: " + sb.toString());
         }
 
-        return regions;
+        return testCases;
     }
 
     private boolean isRegionsSupportedFor3A(int index) {

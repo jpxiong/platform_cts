@@ -31,6 +31,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.util.Size;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
@@ -881,21 +882,22 @@ public class CameraTestUtils extends Assert {
     /**
      * Calculate output 3A region from the intersection of input 3A region and cropped region.
      *
-     * @param requestRegion The input 3A region [xmin, ymin, xmax, ymax, weight]
+     * @param requestRegions The input 3A regions
      * @param cropRect The cropped region
-     * @return expected 3A region output in capture result
+     * @return expected 3A regions output in capture result
      */
-    public static int[] getExpectedOutputRegion(int[] requestRegion, Rect cropRect){
-        Rect requestRect = new Rect(requestRegion[0], requestRegion[1],
-                requestRegion[2], requestRegion[3]);
-        Rect resultRect = new Rect();
-        assertTrue("Input 3A region must intersect cropped region",
-                    resultRect.setIntersect(requestRect, cropRect));
-        return new int[] {
-                resultRect.left,
-                resultRect.top,
-                resultRect.right,
-                resultRect.bottom,
-                requestRegion[4]};
+    public static MeteringRectangle[] getExpectedOutputRegion(
+            MeteringRectangle[] requestRegions, Rect cropRect){
+        MeteringRectangle[] resultRegions = new MeteringRectangle[requestRegions.length];
+        for (int i = 0; i < requestRegions.length; i++) {
+            Rect requestRect = requestRegions[i].getRect();
+            Rect resultRect = new Rect();
+            assertTrue("Input 3A region must intersect cropped region",
+                        resultRect.setIntersect(requestRect, cropRect));
+            resultRegions[i] = new MeteringRectangle(
+                    resultRect,
+                    requestRegions[i].getMeteringWeight());
+        }
+        return resultRegions;
     }
 }
