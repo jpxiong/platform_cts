@@ -181,7 +181,7 @@ do
                 depJar=`classnameToJar ${dep}`
                 classpath=${classpath}:${depJar}
             done
-            $valgrind $exe -Xint:$interpreter -Xmx512M -Xss32K -Xbootclasspath:$bpath $debug_opts \
+            $valgrind $exe -Xmx512M -Xss32K -Xbootclasspath:$bpath $debug_opts \
                 -classpath $dexcore:$classpath $mainclass >> $datadir/dalvikout 2>&1
 
             RESULTCODE=$?
