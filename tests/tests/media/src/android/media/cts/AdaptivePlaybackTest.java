@@ -44,6 +44,7 @@ import java.util.zip.CRC32;
 public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     private static final String TAG = "AdaptivePlaybackTest";
     private boolean sanity = false;
+    private static final int MIN_FRAMES_BEFORE_DRC = 2;
 
     public Iterable<Codec> H264(CodecFactory factory) {
         return factory.createCodecList(
@@ -466,6 +467,10 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             tests.add(
                 new Step("testing DRC with no reconfigure - init", this, c) {
                     public void run() throws Throwable {
+                        // FIXME wait 2 seconds to allow system to free up previous codecs
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {}
                         mDecoder = new Decoder(c.name);
                         mDecoder.configureAndStart(stepFormat(), stepSurface());
                         mAdjustTimeUs = 0;
@@ -473,7 +478,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                         mQueuedFrames = 0;
                     }});
 
-            for (int i = NUM_FRAMES, ix = 0; i > 1; i--, ix++) {
+            for (int i = NUM_FRAMES, ix = 0; i >= MIN_FRAMES_BEFORE_DRC; i--, ix++) {
                 final int mediaIx = ix % c.mediaList.length;
                 final int segmentSize = i;
                 tests.add(
@@ -481,9 +486,9 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                             this, c, mediaIx) {
                         public void run() throws Throwable {
                             mQueuedFrames += segmentSize;
-                            boolean lastSequence = segmentSize == 2;
+                            boolean lastSequence = segmentSize == MIN_FRAMES_BEFORE_DRC;
                             if (sanity) {
-                                lastSequence = (segmentSize >> 1) <= 2;
+                                lastSequence = (segmentSize >> 1) <= MIN_FRAMES_BEFORE_DRC;
                             }
                             int frames = mDecoder.queueInputBufferRange(
                                     stepMedia(),
@@ -589,7 +594,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             };
         }
         public void addTests(TestList tests, Codec c) {
-            for (int drcFrame = 6; drcFrame > 1; drcFrame--) {
+            for (int drcFrame = 6; drcFrame >= MIN_FRAMES_BEFORE_DRC; drcFrame--) {
                 for (int eosFrame = 6; eosFrame >= 1; eosFrame--) {
                     tests.add(testStep(c, drcFrame, eosFrame));
                 }
