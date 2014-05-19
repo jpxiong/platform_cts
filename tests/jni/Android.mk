@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog libdl
 
 LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
 LOCAL_C_INCLUDES += ndk/sources/cpufeatures
