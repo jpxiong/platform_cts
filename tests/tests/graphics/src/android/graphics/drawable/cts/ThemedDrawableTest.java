@@ -27,7 +27,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.NinePatchDrawable;
-import android.graphics.drawable.TouchFeedbackDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.test.AndroidTestCase;
 import android.util.SparseIntArray;
 import android.view.ContextThemeWrapper;
@@ -126,11 +126,11 @@ public class ThemedDrawableTest extends AndroidTestCase {
         // assertNotNull(d.getNinePatch());
     }
 
-    public void testTouchFeedbackDrawable() {
-        TouchFeedbackDrawable d = (TouchFeedbackDrawable) mContext.getDrawable(
-                R.drawable.touchfeedbackdrawable_theme);
+    public void testRippleDrawable() {
+        RippleDrawable d = (RippleDrawable) mContext.getDrawable(
+                R.drawable.rippledrawable_theme);
 
-        // assertEquals(Color.BLACK, d.getPressColor());
+        // assertEquals(Color.BLACK, d.getTint());
     }
     
     public void testLayerDrawable() {
