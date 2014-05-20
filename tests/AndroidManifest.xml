@@ -117,6 +117,9 @@
     <!-- Used for Transmit IR Test -->
     <uses-permission android:name="android.permission.TRANSMIT_IR" />
 
+    <!-- Used for SystemFeatures Test -->
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
+
     <!-- Used for PackageManager test, don't delete this permission-tree -->
     <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
                     android:label="Test Tree"/>
