@@ -31,6 +31,9 @@ public class WebView_WebViewTransportTest
 
     @UiThreadTest
     public void testAccessWebView() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         WebView webView = getActivity().getWebView();
         WebViewTransport transport = webView.new WebViewTransport();
 

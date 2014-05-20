@@ -54,12 +54,17 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     protected void setUp() throws Exception {
         super.setUp();
         mWebServer = new CtsTestServer(getActivity());
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+        }
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
         mWebServer.shutdown();
         super.tearDown();
         if (mIconDb != null) {
@@ -69,6 +74,9 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     }
 
     public void testWebHistoryItem() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final WaitForIconClient waitForIconClient = new WaitForIconClient(mOnUiThread);
         mOnUiThread.setWebChromeClient(waitForIconClient);
         runTestOnUiThread(new Runnable() {

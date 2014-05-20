@@ -65,8 +65,11 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
-        mSettings = mOnUiThread.getSettings();
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+            mSettings = mOnUiThread.getSettings();
+        }
         mContext = getInstrumentation().getTargetContext();
     }
 
@@ -75,7 +78,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
         super.tearDown();
     }
 
@@ -90,6 +95,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      * Safari/<major>.<minor>
      */
     public void testUserAgentString_default() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final String actualUserAgentString = mSettings.getUserAgentString();
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
         final String patternString =
@@ -131,6 +139,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessUserAgentString() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         startWebServer();
         String url = mWebServer.getUserAgentUrl();
 
@@ -159,6 +170,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessAllowFileAccess() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // This test is not compatible with 4.0.3
         if ("4.0.3".equals(Build.VERSION.RELEASE)) {
             return;
@@ -184,6 +198,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessCacheMode() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -249,6 +266,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessCursiveFontFamily() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getCursiveFontFamily());
 
         String newCusiveFamily = "Apple Chancery";
@@ -257,6 +277,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessFantasyFontFamily() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getFantasyFontFamily());
 
         String newFantasyFamily = "Papyrus";
@@ -265,6 +288,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessFixedFontFamily() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getFixedFontFamily());
 
         String newFixedFamily = "Courier";
@@ -273,6 +299,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessSansSerifFontFamily() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getSansSerifFontFamily());
 
         String newFixedFamily = "Verdana";
@@ -281,6 +310,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessSerifFontFamily() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getSerifFontFamily());
 
         String newSerifFamily = "Times";
@@ -289,6 +321,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessStandardFontFamily() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getStandardFontFamily());
 
         String newStandardFamily = "Times";
@@ -297,6 +332,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessDefaultFontSize() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         int defaultSize = mSettings.getDefaultFontSize();
         assertTrue(defaultSize > 0);
 
@@ -315,6 +353,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessDefaultFixedFontSize() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         int defaultSize = mSettings.getDefaultFixedFontSize();
         assertTrue(defaultSize > 0);
 
@@ -333,6 +374,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessDefaultTextEncodingName() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getDefaultTextEncodingName());
 
         String newEncodingName = "iso-8859-1";
@@ -341,6 +385,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessJavaScriptCanOpenWindowsAutomatically() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mSettings.setJavaScriptEnabled(true);
 
         mSettings.setJavaScriptCanOpenWindowsAutomatically(false);
@@ -365,6 +412,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessJavaScriptEnabled() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mSettings.setJavaScriptEnabled(true);
         assertTrue(mSettings.getJavaScriptEnabled());
         loadAssetUrl(TestHtmlConstants.JAVASCRIPT_URL);
@@ -388,6 +438,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessLayoutAlgorithm() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertEquals(WebSettings.LayoutAlgorithm.NARROW_COLUMNS, mSettings.getLayoutAlgorithm());
 
         mSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -398,6 +451,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessMinimumFontSize() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertEquals(8, mSettings.getMinimumFontSize());
 
         mSettings.setMinimumFontSize(100);
@@ -411,6 +467,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessMinimumLogicalFontSize() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertEquals(8, mSettings.getMinimumLogicalFontSize());
 
         mSettings.setMinimumLogicalFontSize(100);
@@ -424,6 +483,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessPluginsEnabled() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getPluginsEnabled());
 
         mSettings.setPluginsEnabled(true);
@@ -431,6 +493,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessPluginsPath() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertNotNull(mSettings.getPluginsPath());
 
         String pluginPath = "pluginPath";
@@ -440,6 +505,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessSaveFormData() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertTrue(mSettings.getSaveFormData());
 
         mSettings.setSaveFormData(false);
@@ -447,6 +515,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessTextSize() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertEquals(TextSize.NORMAL, mSettings.getTextSize());
 
         mSettings.setTextSize(TextSize.LARGER);
@@ -463,6 +534,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessUseDoubleTree() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getUseDoubleTree());
 
         mSettings.setUseDoubleTree(true);
@@ -471,6 +545,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessUseWideViewPort() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getUseWideViewPort());
 
         mSettings.setUseWideViewPort(true);
@@ -478,12 +555,18 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testSetNeedInitialFocus() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mSettings.setNeedInitialFocus(false);
 
         mSettings.setNeedInitialFocus(true);
     }
 
     public void testSetRenderPriority() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
 
         mSettings.setRenderPriority(WebSettings.RenderPriority.LOW);
@@ -492,6 +575,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessSupportMultipleWindows() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.supportMultipleWindows());
 
         mSettings.setSupportMultipleWindows(true);
@@ -499,6 +585,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessSupportZoom() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertTrue(mSettings.supportZoom());
 
         runTestOnUiThread(new Runnable() {
@@ -511,6 +600,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessBuiltInZoomControls() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getBuiltInZoomControls());
 
         runTestOnUiThread(new Runnable() {
@@ -523,6 +615,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAppCacheDisabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // Test that when AppCache is disabled, we don't get any AppCache
         // callbacks.
         startWebServer();
@@ -542,6 +637,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAppCacheEnabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // Note that the AppCache path can only be set once. This limits the
         // amount of testing we can do, and means that we must test all aspects
         // of setting the AppCache path in a single test to guarantee ordering.
@@ -587,6 +685,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     // using a URL. Finally, it looks like enabling database requires creating a
     // webChromeClient and listening to Quota callbacks, which is not documented.
     public void testDatabaseDisabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // Verify that websql database does not work when disabled.
         startWebServer();
 
@@ -605,6 +706,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testLoadsImagesAutomatically() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertTrue(mSettings.getLoadsImagesAutomatically());
 
         startWebServer();
@@ -637,6 +741,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testBlockNetworkImage() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getBlockNetworkImage());
 
         startWebServer();
@@ -666,6 +773,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testBlockNetworkLoads() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         assertFalse(mSettings.getBlockNetworkLoads());
 
         startWebServer();
@@ -702,6 +812,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     // Verify that an image in local file system can be loaded by an asset
     public void testLocalImageLoads() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
 
         mSettings.setJavaScriptEnabled(true);
         // Check that local images are loaded without issues regardless of domain checkings
@@ -716,6 +829,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     // Verify that javascript cross-domain request permissions matches file domain settings
     // for iframes
     public void testIframesWhenAccessFromFileURLsEnabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
 
         mSettings.setJavaScriptEnabled(true);
         // disable universal access from files
@@ -732,6 +848,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     // Verify that javascript cross-domain request permissions matches file domain settings
     // for iframes
     public void testIframesWhenAccessFromFileURLsDisabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
 
         mSettings.setJavaScriptEnabled(true);
         // disable universal access from files
@@ -750,11 +869,17 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     // Verify that enabling file access from file URLs enable XmlHttpRequest (XHR) across files
     public void testXHRWhenAccessFromFileURLsEnabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         verifyFileXHR(true);
     }
 
     // Verify that disabling file access from file URLs disable XmlHttpRequest (XHR) accross files
     public void testXHRWhenAccessFromFileURLsDisabled() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
 
         final ChromeClient webChromeClient = new ChromeClient(mOnUiThread);
         mOnUiThread.setWebChromeClient(webChromeClient);

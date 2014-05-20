@@ -43,12 +43,18 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+        }
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
+
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -138,6 +144,9 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testProceed() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
 
@@ -147,6 +156,9 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testCancel() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
 
@@ -159,6 +171,9 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testUseHttpAuthUsernamePassword() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
 

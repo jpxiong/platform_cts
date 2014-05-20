@@ -47,18 +47,24 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     protected void setUp() throws Exception {
         super.setUp();
         final WebViewStubActivity activity = getActivity();
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-                protected boolean check() {
-                return activity.hasWindowFocus();
-            }
-        }.run();
-        mOnUiThread = new WebViewOnUiThread(this, activity.getWebView());
+        WebView webview = activity.getWebView();
+        if (webview != null) {
+            new PollingCheck(TEST_TIMEOUT) {
+                @Override
+                    protected boolean check() {
+                    return activity.hasWindowFocus();
+                }
+            }.run();
+
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+        }
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -67,12 +73,18 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     // Verify that the shouldoverrideurlloading is false by default
     public void testShouldOverrideUrlLoadingDefault() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final WebViewClient webViewClient = new WebViewClient();
         assertFalse(webViewClient.shouldOverrideUrlLoading(mOnUiThread.getWebView(), null));
     }
 
     // Verify shouldoverrideurlloading called on top level navigation
     public void testShouldOverrideUrlLoading() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         mOnUiThread.getSettings().setJavaScriptEnabled(true);
@@ -86,6 +98,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     // Verify shouldoverrideurlloading called on webview called via onCreateWindow
     public void testShouldOverrideUrlLoadingOnCreateWindow() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mWebServer = new CtsTestServer(getActivity());
         // WebViewClient for main window
         final MockWebViewClient mainWebViewClient = new MockWebViewClient();
@@ -132,6 +147,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testLoadPage() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
@@ -165,6 +183,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnReceivedError() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
 
@@ -176,6 +197,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnFormResubmission() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         final WebSettings settings = mOnUiThread.getSettings();
@@ -201,6 +225,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testDoUpdateVisitedHistory() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
@@ -219,6 +246,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnReceivedHttpAuthRequest() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
@@ -230,6 +260,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testShouldOverrideKeyEvent() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
 
@@ -237,6 +270,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnUnhandledKeyEvent() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         requireLoadedPage();
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -256,6 +292,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnScaleChanged() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
@@ -281,6 +320,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     private void requireLoadedPage() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
     }
 
