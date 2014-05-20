@@ -966,6 +966,11 @@ public class StaticMetadata {
         }
 
         // TODO: Get rid of android.util.Size
+        if (utilSizes == null) {
+            Log.i(TAG, "This camera doesn't support format " + format + " for " + direction);
+            return new Size[0];
+        }
+
         Size[] sizes = new Size[utilSizes.length];
         for (int i = 0; i < utilSizes.length; ++i) {
             sizes[i] = new Size(utilSizes[i].getWidth(), utilSizes[i].getHeight());
