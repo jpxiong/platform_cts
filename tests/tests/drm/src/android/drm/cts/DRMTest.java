@@ -18,6 +18,7 @@ package android.drm.cts;
 
 
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import java.io.IOException;
@@ -60,10 +61,15 @@ public class DRMTest extends AndroidTestCase {
         }
     }
 
+    private boolean deviceSupportsDRM() {
+       /* Watches don't support DRM */
+        return !getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+    }
+
     private void register(Config config) throws Exception {
         DrmInfo drmInfo = executeAcquireDrmInfo(DrmInfoRequest.TYPE_REGISTRATION_INFO,
-                                            config.getInfoOfRegistration(),
-                                            config.getMimeType());
+                config.getInfoOfRegistration(),
+                config.getMimeType());
         executeProcessDrmInfo(drmInfo, config);
     }
 
@@ -82,86 +88,106 @@ public class DRMTest extends AndroidTestCase {
     }
 
     public void testIsDrmDirectoryExist() {
-        assertTrue("/data/drm/ does not exist", new File("/data/drm/").exists());
+        if (deviceSupportsDRM()) {
+            assertTrue("/data/drm/ does not exist", new File("/data/drm/").exists());
+        }
     }
 
     public void testRegisterAndDeregister() throws Exception {
-        for (Config config : mConfigs) {
-            register(config);
-            deregister(config);
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                register(config);
+                deregister(config);
+            }
         }
     }
 
     public void testAcquireRights() throws Exception {
-        for (Config config : mConfigs) {
-            register(config);
-            acquireRights(config);
-            deregister(config);
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                register(config);
+                acquireRights(config);
+                deregister(config);
+            }
         }
     }
 
     public void testGetConstraints() throws Exception {
-        for (Config config : mConfigs) {
-            register(config);
-            acquireRights(config);
-            ContentValues constraints = mDrmManagerClient.getConstraints(
-                                            config.getContentPath(),
-                                            DrmStore.Action.DEFAULT);
-            assertNotNull("Failed on plugin: " + config.getPluginName(), constraints);
-            deregister(config);
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                register(config);
+                acquireRights(config);
+                ContentValues constraints = mDrmManagerClient.getConstraints(
+                                                                             config.getContentPath(),
+                                                                             DrmStore.Action.DEFAULT);
+                assertNotNull("Failed on plugin: " + config.getPluginName(), constraints);
+                deregister(config);
+            }
         }
     }
 
     public void testCanHandle() throws Exception {
-        for (Config config : mConfigs) {
-            assertTrue("Failed on plugin: " + config.getPluginName(),
-                    mDrmManagerClient.canHandle(config.getContentPath(), config.getMimeType()));
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                assertTrue("Failed on plugin: " + config.getPluginName(),
+                        mDrmManagerClient.canHandle(config.getContentPath(), config.getMimeType()));
+            }
         }
     }
 
     public void testGetOriginalMimeType() throws Exception {
-        for (Config config : mConfigs) {
-            assertNotNull("Failed on plugin: " + config.getPluginName(),
-                    mDrmManagerClient.getOriginalMimeType(config.getContentPath()));
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                assertNotNull("Failed on plugin: " + config.getPluginName(),
+                        mDrmManagerClient.getOriginalMimeType(config.getContentPath()));
+            }
         }
     }
 
     public void testCheckRightsStatus() throws Exception {
-        for (Config config : mConfigs) {
-            register(config);
-            acquireRights(config);
-            int rightsStatus = mDrmManagerClient.checkRightsStatus(
-                                                config.getContentPath(),
-                                                DrmStore.Action.PLAY);
-            assertEquals("Failed on plugin: " + config.getPluginName(),
-                    DrmStore.RightsStatus.RIGHTS_VALID, rightsStatus);
-            deregister(config);
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                register(config);
+                acquireRights(config);
+                int rightsStatus = mDrmManagerClient.checkRightsStatus(
+                                                                       config.getContentPath(),
+                                                                       DrmStore.Action.PLAY);
+                assertEquals("Failed on plugin: " + config.getPluginName(),
+                        DrmStore.RightsStatus.RIGHTS_VALID, rightsStatus);
+                deregister(config);
+            }
         }
     }
 
     public void testRemoveRights() throws Exception {
-        for (Config config : mConfigs) {
-            assertEquals("Failed on plugin: " + config.getPluginName(),
-                    DrmManagerClient.ERROR_NONE,
-                    mDrmManagerClient.removeRights(config.getContentPath()));
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                assertEquals("Failed on plugin: " + config.getPluginName(),
+                        DrmManagerClient.ERROR_NONE,
+                        mDrmManagerClient.removeRights(config.getContentPath()));
+            }
         }
     }
 
     public void testRemoveAllRights() throws Exception {
-        for (Config config : mConfigs) {
-            assertEquals("Failed on plugin: " + config.getPluginName(),
-                    mDrmManagerClient.removeAllRights(), DrmManagerClient.ERROR_NONE);
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                assertEquals("Failed on plugin: " + config.getPluginName(),
+                        mDrmManagerClient.removeAllRights(), DrmManagerClient.ERROR_NONE);
+            }
         }
     }
 
     public void testConvertData() throws Exception {
-        for (Config config : mConfigs) {
-            byte[] inputData = new byte[]{'T','E','S','T'};
+        if (deviceSupportsDRM()) {
+            for (Config config : mConfigs) {
+                byte[] inputData = new byte[]{'T','E','S','T'};
 
-            int convertId = mDrmManagerClient.openConvertSession(config.getMimeType());
-            DrmConvertedStatus drmConvertStatus
-                                = mDrmManagerClient.convertData(convertId, inputData);
-            mDrmManagerClient.closeConvertSession(convertId);
+                int convertId = mDrmManagerClient.openConvertSession(config.getMimeType());
+                DrmConvertedStatus drmConvertStatus
+                    = mDrmManagerClient.convertData(convertId, inputData);
+                mDrmManagerClient.closeConvertSession(convertId);
+            }
         }
     }
 
