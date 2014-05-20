@@ -63,8 +63,16 @@ public class WebViewStartupTest
                 Log.i(TAG, "done setting cookie before creating webview");
             }
         });
+        NullWebViewUtils.NullWebViewFromThreadExceptionHandler h =
+                new NullWebViewUtils.NullWebViewFromThreadExceptionHandler();
+
+        background.setUncaughtExceptionHandler(h);
         background.start();
         background.join();
+
+        if (h.shouldExitTestEarly(mActivity)) {
+            return;
+        }
 
         // Now create WebView and test that setting the cookie beforehand really worked.
         mActivity.createAndAttachWebView();
