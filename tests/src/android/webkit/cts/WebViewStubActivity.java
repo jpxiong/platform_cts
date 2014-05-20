@@ -29,9 +29,13 @@ public class WebViewStubActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.webview_layout);
-        mWebView = (WebView) findViewById(R.id.web_page);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.webview_layout);
+            mWebView = (WebView) findViewById(R.id.web_page);
+        } catch (Exception e) {
+            NullWebViewUtils.determineIfWebViewAvailable(this, e);
+        }
     }
 
     public WebView getWebView() {
@@ -40,11 +44,13 @@ public class WebViewStubActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        ViewParent parent =  mWebView.getParent();
-        if (parent instanceof ViewGroup) {
-            ((ViewGroup) parent).removeView(mWebView);
+        if (mWebView != null) {
+            ViewParent parent =  mWebView.getParent();
+            if (parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(mWebView);
+            }
+            mWebView.destroy();
         }
-        mWebView.destroy();
         super.onDestroy();
     }
 }
