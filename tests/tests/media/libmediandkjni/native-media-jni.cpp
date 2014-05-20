@@ -738,7 +738,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testCryptoInfoNativ
     size_t encryptedbytes[4] = { 8, 7, 6, 5 };
 
     AMediaCodecCryptoInfo *ci =
-            AMediaCodecCryptoInfo_new(numsubsamples, key, iv, 0, clearbytes, encryptedbytes);
+            AMediaCodecCryptoInfo_new(numsubsamples, key, iv, AMEDIACODECRYPTOINFO_MODE_CLEAR, clearbytes, encryptedbytes);
 
     if (AMediaCodecCryptoInfo_getNumSubSamples(ci) != 4) {
         ALOGE("numsubsamples mismatch");
@@ -755,7 +755,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testCryptoInfoNativ
         ALOGE("IV mismatch");
         return false;
     }
-    if (AMediaCodecCryptoInfo_getMode(ci) != 0) {
+    if (AMediaCodecCryptoInfo_getMode(ci) != AMEDIACODECRYPTOINFO_MODE_CLEAR) {
         ALOGE("mode mismatch");
         return false;
     }
