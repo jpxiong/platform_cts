@@ -88,7 +88,6 @@ cts_test_packages := \
     CtsGraphicsTestCases \
     CtsGraphics2TestCases \
     CtsHardwareTestCases \
-    CtsHoloTestCases \
     CtsJniTestCases \
     CtsKeystoreTestCases \
     CtsLocationTestCases \
@@ -130,7 +129,6 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
-    CtsHoloHostTestCases \
     CtsHostJank \
     CtsHostUi \
     CtsMonkeyTestCases \
