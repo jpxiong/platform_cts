@@ -19,6 +19,7 @@ package android.theme.cts;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -85,7 +86,7 @@ public class DeviceDefaultTest extends ActivityInstrumentationTestCase2<DeviceDe
     }
 
     public void testGetActionBar_DeviceDefault_Light_DialogWhenLarge() {
-        assertActionBarWhenLarge(android.R.style.Theme_Holo_Light_DialogWhenLarge);
+        assertActionBarWhenLarge(android.R.style.Theme_DeviceDefault_Light_DialogWhenLarge);
     }
 
     public void testGetActionBar_DeviceDefault_Light_DialogWhenLarge_NoActionBar() {
@@ -122,6 +123,10 @@ public class DeviceDefaultTest extends ActivityInstrumentationTestCase2<DeviceDe
 
     private void assertGetActionBar(int themeId, boolean actionBar) {
         Activity activity = startActivity(themeId);
+        if (activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            assertNull(activity.getActionBar());
+            return;
+        }
         if (actionBar) {
             assertNotNull(activity.getActionBar());
         } else {
