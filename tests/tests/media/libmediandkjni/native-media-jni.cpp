@@ -508,7 +508,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNI
         info.flags = AMediaExtractor_getSampleFlags(ex);
 
         size_t idx = (size_t) AMediaExtractor_getSampleTrackIndex(ex);
-        AMediaMuxer_writeSampleData(muxer, idx, buf, info);
+        AMediaMuxer_writeSampleData(muxer, idx, buf, &info);
 
         AMediaExtractor_advance(ex);
     }
