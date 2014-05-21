@@ -267,40 +267,66 @@ public class LocationManagerTest extends InstrumentationTestCase {
      */
     public void testModeAndProviderApisConsistent() {
         ContentResolver cr = mContext.getContentResolver();
+
+        // Find out what the settings say about which providers are enabled
         int mode = Settings.Secure.getInt(
                 cr, Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
         boolean gps = Settings.Secure.isLocationProviderEnabled(cr, LocationManager.GPS_PROVIDER);
         boolean nlp = Settings.Secure.isLocationProviderEnabled(
                 cr, LocationManager.NETWORK_PROVIDER);
 
-        // Assert that if there are no test providers enabled, LocationManager just returns the
-        // values from Settings.Secure.
+        // Find out location manager's opinion on the matter, making sure we dont' get spurious
+        // results from test versions of the two providers.
         forceRemoveTestProvider(LocationManager.GPS_PROVIDER);
         forceRemoveTestProvider(LocationManager.NETWORK_PROVIDER);
         boolean lmGps = mManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean lmNlp = mManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        assertEquals("Inconsistent GPS values", gps, lmGps);
-        assertEquals("Inconsistent NLP values", nlp, lmNlp);
 
-        // Assert that isLocationProviderEnabled() values are consistent with the location mode
+        // Location Manager will report provider as off if it doesn't know about it
+        boolean expectedGps = gps && deviceHasProvider(LocationManager.GPS_PROVIDER);
+        boolean expectedNlp = nlp && deviceHasProvider(LocationManager.NETWORK_PROVIDER);
+
+        // Assert LocationManager returned the values from Settings.Secure (assuming the device has
+        // the appropriate hardware).
+        assertEquals("Inconsistent GPS values", expectedGps, lmGps);
+        assertEquals("Inconsistent NLP values", expectedNlp, lmNlp);
+
         switch (mode) {
             case Settings.Secure.LOCATION_MODE_OFF:
-                assertFalse("Bad GPS for mode " + mode, gps);
-                assertFalse("Bad NLP for mode " + mode, nlp);
+                expectedGps = false;
+                expectedNlp = false;
                 break;
             case Settings.Secure.LOCATION_MODE_SENSORS_ONLY:
-                assertEquals("Bad GPS for mode " + mode, hasGpsFeature(), gps);
-                assertFalse("Bad NLP for mode " + mode, nlp);
+                expectedGps = true;
+                expectedNlp = false;
                 break;
             case Settings.Secure.LOCATION_MODE_BATTERY_SAVING:
-                assertFalse("Bad GPS for mode " + mode, gps);
-                assertTrue("Bad NLP for mode " + mode, nlp);
+                expectedGps = false;
+                expectedNlp = true;
                 break;
             case Settings.Secure.LOCATION_MODE_HIGH_ACCURACY:
-                assertEquals("Bad GPS for mode " + mode, hasGpsFeature(), gps);
-                assertTrue("Bad NLP for mode " + mode, nlp);
+                expectedGps = true;
+                expectedNlp = true;
                 break;
         }
+
+        // Assert that isLocationProviderEnabled() values are consistent with the location mode
+        assertEquals("Bad GPS for mode " + mode, expectedGps, gps);
+        assertEquals("Bad NLP for mode " + mode, expectedNlp, nlp);
+    }
+
+    /**
+     * Returns true if the {@link LocationManager} reports that the device includes this flavor
+     * of location provider.
+     */
+    private boolean deviceHasProvider(String provider) {
+        List<String> providers = mManager.getAllProviders();
+        for (String aProvider : providers) {
+            if (aProvider.equals(provider)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
