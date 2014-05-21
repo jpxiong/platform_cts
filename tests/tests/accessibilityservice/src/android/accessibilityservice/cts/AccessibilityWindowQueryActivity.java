@@ -55,7 +55,10 @@ public class AccessibilityWindowQueryActivity extends Activity {
 
             @Override
             public boolean performAccessibilityAction(View host, int action, Bundle args) {
-                return (action == R.id.foo_custom_action);
+                if (action == R.id.foo_custom_action) {
+                    return true;
+                }
+                return super.performAccessibilityAction(host, action, args);
             }
         });
     }
