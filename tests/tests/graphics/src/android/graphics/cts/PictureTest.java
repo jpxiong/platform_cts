@@ -24,18 +24,88 @@ import junit.framework.TestCase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Picture;
+import android.graphics.Rect;
 import android.graphics.Paint.Style;
-
+import android.graphics.Region.Op;
 
 public class PictureTest extends TestCase {
 
     private static final int TEST_WIDTH = 4; // must be >= 2
     private static final int TEST_HEIGHT = 3; // must >= 2
 
-    public void testPicture() throws Exception {
+    private final Rect mClipRect = new Rect(0, 0, 2, 2);
 
+    // This method tests out some edge cases w.r.t. Picture creation.
+    // In particular, this test verifies that, in the following situations,
+    // the created picture (effectively) has balanced saves and restores:
+    //   - copy constructed picture from actively recording picture
+    //   - writeToStream/createFromStream created picture from actively recording picture
+    //   - actively recording picture after draw call
+    public void testSaveRestoreBalance() throws Exception {
+        Picture original = new Picture();
+        Canvas canvas = original.beginRecording(TEST_WIDTH, TEST_HEIGHT);
+        assertNotNull(canvas);
+        createImbalance(canvas);
+
+        int expectedSaveCount = canvas.getSaveCount();
+
+        Picture copy = new Picture(original);
+        checkBalance(copy);
+
+        assertEquals(expectedSaveCount, canvas.getSaveCount());
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        original.writeToStream(bout);
+
+        assertEquals(expectedSaveCount, canvas.getSaveCount());
+
+        Picture serialized = Picture.createFromStream(new ByteArrayInputStream(bout.toByteArray()));
+        // The serialization/deserialization process will balance the saves and restores
+        checkBalance(serialized);
+
+        assertEquals(expectedSaveCount, canvas.getSaveCount());
+
+        Bitmap bitmap = Bitmap.createBitmap(TEST_WIDTH, TEST_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas drawDest = new Canvas(bitmap);
+        original.draw(drawDest);
+        checkBalance(original);
+    }
+
+    // Add an extra save with a transform and clip
+    private void createImbalance(Canvas canvas) {
+        canvas.save();
+        canvas.clipRect(mClipRect, Op.REPLACE);
+        canvas.translate(1.0f, 1.0f);
+        Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        canvas.drawRect(0, 0, 10, 10, paint);
+    }
+
+    private void checkBalance(Picture picture) {
+        Bitmap bitmap = Bitmap.createBitmap(TEST_WIDTH, TEST_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        int beforeSaveCount = canvas.getSaveCount();
+
+        final Matrix beforeMatrix = canvas.getMatrix();
+
+        canvas.drawPicture(picture);
+
+        assertEquals(beforeSaveCount, canvas.getSaveCount());
+
+        assertTrue(beforeMatrix.equals(canvas.getMatrix()));
+
+        Rect afterClip = new Rect();
+
+        assertTrue(canvas.getClipBounds(afterClip));
+        assertEquals(TEST_WIDTH, afterClip.width());
+        assertEquals(TEST_HEIGHT, afterClip.height());
+    }
+
+    public void testPicture() throws Exception {
         Picture picture = new Picture();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
