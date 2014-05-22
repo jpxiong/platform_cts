@@ -666,6 +666,30 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("removedObject", resultObject.getResult());
     }
 
+    public void testJavascriptInterfaceCustomPropertiesClearedOnReload() throws Exception {
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+
+        class DummyJavaScriptInterface {
+        }
+        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        mOnUiThread.addJavascriptInterface(obj, "dummy");
+        mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
+
+        EvaluateJsResultPollingCheck jsResult;
+        jsResult = new EvaluateJsResultPollingCheck("42");
+        mOnUiThread.evaluateJavascript("dummy.custom_property = 42", jsResult);
+        jsResult.run();
+        jsResult = new EvaluateJsResultPollingCheck("true");
+        mOnUiThread.evaluateJavascript("'custom_property' in dummy", jsResult);
+        jsResult.run();
+
+        mOnUiThread.reload();
+
+        jsResult = new EvaluateJsResultPollingCheck("false");
+        mOnUiThread.evaluateJavascript("'custom_property' in dummy", jsResult);
+        jsResult.run();
+    }
+
     private final class TestPictureListener implements PictureListener {
         public int callCount;
 
