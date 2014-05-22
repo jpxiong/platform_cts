@@ -33,26 +33,37 @@ public class WallpaperManagerTest extends AndroidTestCase {
         mWallpaperManager = WallpaperManager.getInstance(mContext);
     }
 
+    /**
+     * Suggesting desired dimensions is only a hint to the system that can be ignored.
+     *
+     * Test if the desired minimum width or height the WallpaperManager returns
+     * is greater than 0. If so, then we check whether that the size is at least the
+     * as big as the screen.
+     */
     public void testSuggestDesiredDimensions() {
-        Point min = getScreenSize();
-        int w = min.x * 3;
-        int h = min.y * 2;
+        final Point min = getScreenSize();
+        final int w = min.x * 3;
+        final int h = min.y * 2;
 
-        mWallpaperManager.suggestDesiredDimensions(min.x / 2, min.y / 2);
-        assertEquals(min.x, mWallpaperManager.getDesiredMinimumWidth());
-        assertEquals(min.y, mWallpaperManager.getDesiredMinimumHeight());
+        assertDesiredMinimum(new Point(min.x / 2, min.y / 2), min);
 
-        mWallpaperManager.suggestDesiredDimensions(w, h);
-        assertEquals(w, mWallpaperManager.getDesiredMinimumWidth());
-        assertEquals(h, mWallpaperManager.getDesiredMinimumHeight());
+        assertDesiredMinimum(new Point(w, h),
+                             new Point(w, h));
 
-        mWallpaperManager.suggestDesiredDimensions(min.x / 2, h);
-        assertEquals(min.x, mWallpaperManager.getDesiredMinimumWidth());
-        assertEquals(h, mWallpaperManager.getDesiredMinimumHeight());
+        assertDesiredMinimum(new Point(min.x / 2, h),
+                             new Point(min.x, h));
 
-        mWallpaperManager.suggestDesiredDimensions(w, min.y / 2);
-        assertEquals(w, mWallpaperManager.getDesiredMinimumWidth());
-        assertEquals(min.y, mWallpaperManager.getDesiredMinimumHeight());
+        assertDesiredMinimum(new Point(w, min.y / 2),
+                             new Point(w, min.y));
+    }
+
+    private void assertDesiredMinimum(Point suggestedSize, Point expectedSize) {
+        mWallpaperManager.suggestDesiredDimensions(suggestedSize.x, suggestedSize.y);
+        Point actualSize = new Point(mWallpaperManager.getDesiredMinimumWidth(),
+                mWallpaperManager.getDesiredMinimumHeight());
+        if (actualSize.x > 0 || actualSize.y > 0) {
+            assertEquals(expectedSize, actualSize);
+        }
     }
 
     private Point getScreenSize() {
