@@ -20,6 +20,7 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.webkit.cts.NullWebViewUtils;
 import android.widget.RemoteViews;
 
 /**
@@ -28,7 +29,11 @@ import android.widget.RemoteViews;
 public class RemoteViewsStubActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.remoteviews_host);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.remoteviews_host);
+        } catch (Exception e) {
+            NullWebViewUtils.determineIfWebViewAvailable(this, e);
+        }
     }
 }
