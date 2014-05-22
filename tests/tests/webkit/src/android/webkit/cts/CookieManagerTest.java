@@ -42,13 +42,19 @@ public class CookieManagerTest extends
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
 
-        mCookieManager = CookieManager.getInstance();
-        assertNotNull(mCookieManager);
+            mCookieManager = CookieManager.getInstance();
+            assertNotNull(mCookieManager);
+        }
     }
 
     public void testGetInstance() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mOnUiThread.cleanUp();
         CookieManager c1 = CookieManager.getInstance();
         CookieManager c2 = CookieManager.getInstance();
@@ -57,9 +63,15 @@ public class CookieManagerTest extends
     }
 
     public void testClone() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
     }
 
     public void testAcceptCookie() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mCookieManager.removeAllCookie();
         mCookieManager.setAcceptCookie(false);
         assertFalse(mCookieManager.acceptCookie());
@@ -113,6 +125,9 @@ public class CookieManagerTest extends
     }
 
     public void testCookieManager() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // enable cookie
         mCookieManager.setAcceptCookie(true);
         assertTrue(mCookieManager.acceptCookie());
@@ -146,6 +161,9 @@ public class CookieManagerTest extends
 
     @SuppressWarnings("deprecation")
     public void testRemoveCookies() throws InterruptedException {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         // enable cookie
         mCookieManager.setAcceptCookie(true);
         assertTrue(mCookieManager.acceptCookie());
@@ -212,6 +230,9 @@ public class CookieManagerTest extends
     }
 
     public void testb3167208() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String uri = "http://host.android.com/path/";
         // note the space after the domain=
         String problemCookie = "foo=bar; domain= .android.com; path=/";

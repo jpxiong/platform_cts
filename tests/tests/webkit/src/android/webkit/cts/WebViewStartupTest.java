@@ -70,7 +70,7 @@ public class WebViewStartupTest
         background.start();
         background.join();
 
-        if (h.shouldExitTestEarly(mActivity)) {
+        if (!h.isWebViewAvailable(mActivity)) {
             return;
         }
 

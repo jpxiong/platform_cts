@@ -44,13 +44,18 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+        }
         mWebServer = new CtsTestServer(getActivity());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -62,6 +67,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnProgressChanged() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -78,6 +86,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnReceivedTitle() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -96,6 +107,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnReceivedIcon() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -161,20 +175,32 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }
     }
     public void testWindows() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         runWindowTest(true);
     }
 
     public void testBlockWindowsSync() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mBlockWindowCreationSync = true;
         runWindowTest(false);
     }
 
     public void testBlockWindowsAsync() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         mBlockWindowCreationAsync = true;
         runWindowTest(false);
     }
 
     public void testOnJsBeforeUnload() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -198,6 +224,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnJsAlert() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -220,6 +249,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnJsConfirm() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -242,6 +274,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     }
 
     public void testOnJsPrompt() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 

@@ -20,6 +20,7 @@ import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
+import android.webkit.WebView;
 
 
 public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
@@ -35,16 +36,24 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        WebView webview = getActivity().getWebView();
+        if (webview != null) {
+            mOnUiThread = new WebViewOnUiThread(this, webview);
+        }
     }
 
     @Override
     public void tearDown() throws Exception {
-        mOnUiThread.cleanUp();
+        if (mOnUiThread != null) {
+            mOnUiThread.cleanUp();
+        }
         super.tearDown();
     }
 
     public void testGetCurrentItem() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         WebBackForwardList list = mOnUiThread.copyBackForwardList();
 
         assertNull(list.getCurrentItem());
