@@ -107,4 +107,82 @@ public class PaintFlagsDrawFilterTest extends AndroidTestCase {
         // underline is under the text or at least at the bottom of it
         assertTrue(rect.top >= TEXT_Y);
     }
+
+    // Tests that FILTER_BITMAP_FLAG is handled properly.
+    public void testPaintFlagsDrawFilter2() {
+        // Create a bitmap with alternating black and white pixels.
+        int kWidth = 5;
+        int kHeight = 5;
+        int colors[] = new int [] { Color.WHITE, Color.BLACK };
+        int k = 0;
+        Bitmap grid = Bitmap.createBitmap(kWidth, kHeight, Config.ARGB_8888);
+        for (int i = 0; i < kWidth; ++i) {
+            for (int j = 0; j < kHeight; ++j) {
+                grid.setPixel(i, j, colors[k]);
+                k = (k + 1) % 2;
+            }
+        }
+
+        // Setup a scaled canvas for drawing the bitmap, with and without FILTER_BITMAP_FLAG set.
+        // When the flag is set, there will be gray pixels. When the flag is not set, all pixels
+        // will be either black or white.
+        int kScale = 5;
+        Bitmap dst = Bitmap.createBitmap(kWidth * kScale, kHeight * kScale, Config.ARGB_8888);
+        Canvas canvas = new Canvas(dst);
+        canvas.scale(kScale, kScale);
+
+        // Drawn without FILTER_BITMAP_FLAG, all pixels will be black or white.
+        Paint simplePaint = new Paint();
+        canvas.drawBitmap(grid, 0, 0, simplePaint);
+
+        assertContainsOnlyBlackAndWhite(dst);
+
+        // Drawn with FILTER_BITMAP_FLAG, some pixels will be somewhere in between.
+        Paint filterBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        canvas.drawBitmap(grid, 0, 0, filterBitmapPaint);
+
+        assertContainsNonBW(dst);
+
+        // Drawing with a paint that FILTER_BITMAP_FLAG set and a DrawFilter that removes
+        // FILTER_BITMAP_FLAG should remove the effect of the flag, resulting in all pixels being
+        // either black or white.
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.FILTER_BITMAP_FLAG, 0));
+        canvas.drawBitmap(grid, 0, 0, filterBitmapPaint);
+
+        assertContainsOnlyBlackAndWhite(dst);
+
+        // Likewise, drawing with a DrawFilter that sets FILTER_BITMAP_FLAG should filter,
+        // resulting in gray pixels.
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
+        canvas.drawBitmap(grid, 0, 0, simplePaint);
+
+        assertContainsNonBW(dst);
+    }
+
+    // Assert that at least one pixel is neither black nor white. This is used to verify that
+    // filtering was done, since the original bitmap only contained black and white pixels.
+    private void assertContainsNonBW(Bitmap bitmap) {
+        for (int i = 0; i < bitmap.getWidth(); ++i) {
+            for (int j = 0; j < bitmap.getHeight(); ++j) {
+                int color = bitmap.getPixel(i, j);
+                if (color != Color.BLACK && color != Color.WHITE) {
+                    // Filtering must have been done.
+                    return;
+                }
+            }
+        }
+        // Filtering did not happen.
+        assertTrue(false);
+    }
+
+    // Assert that every pixel is either black or white. Used to verify that no filtering was
+    // done, since the original bitmap contained only black and white pixels.
+    private void assertContainsOnlyBlackAndWhite(Bitmap bitmap) {
+        for (int i = 0; i < bitmap.getWidth(); ++i) {
+            for (int j = 0; j < bitmap.getHeight(); ++j) {
+                int color = bitmap.getPixel(i, j);
+                assertTrue(color == Color.BLACK || color == Color.WHITE);
+            }
+        }
+    }
 }
