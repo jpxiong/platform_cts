@@ -27,22 +27,35 @@ public class CookieSyncManagerStubActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CookieSyncManager.createInstance(this);
 
-        mWebView = new WebView(this);
-        setContentView(mWebView);
+        try {
+            CookieSyncManager.createInstance(this);
+
+            mWebView = new WebView(this);
+            setContentView(mWebView);
+        } catch (Exception e) {
+            NullWebViewUtils.determineIfWebViewAvailable(this, e);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CookieSyncManager.getInstance().startSync();
+        try {
+            CookieSyncManager.getInstance().startSync();
+        } catch (Exception e) {
+            // May throw on a device with no webview, OK to ignore at this point.
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        CookieSyncManager.getInstance().stopSync();
+        try {
+            CookieSyncManager.getInstance().stopSync();
+        } catch (Exception e) {
+            // May throw on a device with no webview, OK to ignore at this point.
+        }
     }
 
     public WebView getWebView(){
