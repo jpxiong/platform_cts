@@ -25,6 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.webkit.cts.NullWebViewUtils;
 import android.webkit.cts.WebViewOnUiThread;
 import android.widget.TextView;
 import android.widget.EditText;
@@ -58,7 +59,6 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivit
      */
     public void testEmojiGlyph() {
         CaptureCanvas ccanvas = new CaptureCanvas(getInstrumentation().getContext());
-        CaptureWebView cwebview = new CaptureWebView(getInstrumentation().getContext());
 
         Bitmap mBitmapA, mBitmapB;  // Emoji displayed Bitmaps to compare
 
@@ -92,11 +92,15 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivit
 
             assertFalse(mBitmapA.sameAs(mBitmapB));
 
-            mBitmapA = cwebview.capture(Character.toChars(comparedCodePoints[i][0]));
-            mBitmapB = cwebview.capture(Character.toChars(comparedCodePoints[i][1]));
-
-            assertFalse(mBitmapA.sameAs(mBitmapB));
-
+            // Trigger activity bringup so we can determine if a WebView is available on this
+            // device.
+            EmojiStubActivity activity = getActivity();
+            if (NullWebViewUtils.isWebViewAvailable()) {
+                CaptureWebView cwebview = new CaptureWebView(getInstrumentation().getContext());
+                mBitmapA = cwebview.capture(Character.toChars(comparedCodePoints[i][0]));
+                mBitmapB = cwebview.capture(Character.toChars(comparedCodePoints[i][1]));
+                assertFalse(mBitmapA.sameAs(mBitmapB));
+            }
         }
     }
 

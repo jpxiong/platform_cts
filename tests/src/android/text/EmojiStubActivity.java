@@ -21,15 +21,20 @@ import com.android.cts.stub.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
+import android.webkit.cts.NullWebViewUtils;
 
 public class EmojiStubActivity extends Activity {
     private WebView mWebView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.webview_layout);
-        mWebView = (WebView) findViewById(R.id.web_page);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.webview_layout);
+            mWebView = (WebView) findViewById(R.id.web_page);
+        } catch (Exception e) {
+            NullWebViewUtils.determineIfWebViewAvailable(this, e);
+        }
     }
 
     public WebView getWebView() {
@@ -38,7 +43,9 @@ public class EmojiStubActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        mWebView.destroy();
+        if (mWebView != null) {
+            mWebView.destroy();
+        }
         super.onDestroy();
     }
 }

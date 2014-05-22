@@ -23,6 +23,7 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.view.InflateException;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.cts.NullWebViewUtils;
 import android.widget.RemoteViews;
 
 import com.android.cts.stub.R;
@@ -96,6 +97,9 @@ public class RemoteViewsActivityTest
 
     @MediumTest
     public void testWebView() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         RemoteViews orig = new RemoteViews(PACKAGE_NAME, R.layout.remote_view_test_bad_2);
         Parcel p = Parcel.obtain();
         orig.writeToParcel(p, 0);
