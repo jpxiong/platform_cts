@@ -33,6 +33,9 @@ public class CookieSyncManagerTest
     }
 
     public void testCookieSyncManager() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         CookieSyncManager csm1 = CookieSyncManager.createInstance(getActivity());
         assertNotNull(csm1);
 

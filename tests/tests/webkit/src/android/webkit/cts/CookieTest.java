@@ -16,22 +16,30 @@
 
 package android.webkit.cts;
 
-import android.test.AndroidTestCase;
+import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 /**
  * Original framework tests for CookieManager
  */
-public class CookieTest extends AndroidTestCase {
+public class CookieTest extends ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
 
     private CookieManager mCookieManager;
     private static final long WAIT_TIME = 50;
 
+    public CookieTest() {
+        super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        CookieSyncManager.createInstance(getContext());
+
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         mCookieManager = CookieManager.getInstance();
         mCookieManager.removeAllCookie();
         // cookies are removed asynchronously, wait a bit for cookies to be removed
@@ -48,6 +56,9 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testDomain() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String url = "http://www.foo.com";
 
         // basic
@@ -86,6 +97,9 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testSubDomain() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String url_abcd = "http://a.b.c.d.com";
         String url_bcd = "http://b.c.d.com";
         String url_cd = "http://c.d.com";
@@ -127,6 +141,9 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testInvalidDomain() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String url = "http://foo.bar.com";
 
         mCookieManager.setCookie(url, "a=1; domain=.yo.foo.bar.com");
@@ -163,6 +180,9 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testPath() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String url = "http://www.foo.com";
 
         mCookieManager.setCookie(url, "a=b; path=/wee");
@@ -192,6 +212,9 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testEmptyValue() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         String url = "http://www.foobar.com";
 
         mCookieManager.setCookie(url, "bar=");
