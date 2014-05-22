@@ -1275,13 +1275,11 @@ class CodecFamily extends CodecList {
 
             /* test if the explicitly named codec is present on the system */
             if (explicitCodecName != null) {
-                try {
-                    MediaCodec codec = MediaCodec.createByCodecName(explicitCodecName);
-                    if (codec != null) {
-                        codec.release();
-                        add(new Codec(explicitCodecName, null, mediaList));
-                    }
-                } catch (IOException e) {}
+                MediaCodec codec = MediaCodec.createByCodecName(explicitCodecName);
+                if (codec != null) {
+                    codec.release();
+                    add(new Codec(explicitCodecName, null, mediaList));
+                }
             }
         } catch (Throwable t) {
             Log.wtf("Constructor failed", t);
