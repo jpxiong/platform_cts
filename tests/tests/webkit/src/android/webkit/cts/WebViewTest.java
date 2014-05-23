@@ -868,6 +868,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testJavascriptInterfaceCustomPropertiesClearedOnReload() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         mOnUiThread.getSettings().setJavaScriptEnabled(true);
 
         class DummyJavaScriptInterface {
