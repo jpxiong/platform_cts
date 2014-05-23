@@ -453,25 +453,6 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
 
     private static native boolean testFormatNative();
 
-    public void testVideoPlaybackWithCallback() throws Exception {
-        testVideoPlaybackWithCallback(R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz);
-        testVideoPlaybackWithCallback(R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
-        testVideoPlaybackWithCallback(R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
-        testVideoPlaybackWithCallback(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_mono_24kbps_11025hz);
-        testVideoPlaybackWithCallback(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz);
-    }
-
-    private void testVideoPlaybackWithCallback(int res) throws Exception {
-        AssetFileDescriptor fd = mResources.openRawResourceFd(res);
-
-        boolean ret = testPlaybackWithCallbackNative(mActivity.getSurfaceHolder().getSurface(),
-                fd.getParcelFileDescriptor().getFd(), fd.getStartOffset(), fd.getLength());
-        assertTrue("native playback error", ret);
-    }
-
-    private static native boolean testPlaybackWithCallbackNative(Surface surface,
-            int fd, long startOffset, long length);
-
     public void testPssh() throws Exception {
         testPssh(R.raw.psshtest);
     }
