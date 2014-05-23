@@ -9,8 +9,8 @@ import com.android.cts.verifier.R;
 import com.android.cts.verifier.nfc.NfcDialogs;
 
 public class DefaultRouteEmulatorActivity extends BaseEmulatorActivity {
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu("A000000476416E64726F6964484345"),
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu("A000000476416E64726F6964484345", true),
     };
     public static final String[] APDU_RESPONSE_SEQUENCE = {
         "148100009000"

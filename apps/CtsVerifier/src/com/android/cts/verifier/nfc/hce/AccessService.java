@@ -7,9 +7,9 @@ public class AccessService extends HceService {
             new ComponentName("com.android.cts.verifier",
             AccessService.class.getName());
 
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu(HceUtils.ACCESS_AID),
-        "80CA01F000"
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu(HceUtils.ACCESS_AID, true),
+        HceUtils.buildCommandApdu("80CA01F000", true)
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {

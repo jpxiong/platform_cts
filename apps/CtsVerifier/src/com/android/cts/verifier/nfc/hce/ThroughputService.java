@@ -9,23 +9,23 @@ public class ThroughputService extends HceService {
             new ComponentName("com.android.cts.verifier",
             ThroughputService.class.getName());
 
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu("F0010203040607FF"),
-        "80CA010000",
-        "80CA010100",
-        "80CA010200",
-        "80CA010300",
-        "80CA010400",
-        "80CA010500",
-        "80CA010600",
-        "80CA010700",
-        "80CA010800",
-        "80CA010900",
-        "80CA010A00",
-        "80CA010B00",
-        "80CA010C00",
-        "80CA010D00",
-        "80CA010E00",
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu("F0010203040607FF", true),
+        HceUtils.buildCommandApdu("80CA010100", true),
+        HceUtils.buildCommandApdu("80CA010200", true),
+        HceUtils.buildCommandApdu("80CA010300", true),
+        HceUtils.buildCommandApdu("80CA010400", true),
+        HceUtils.buildCommandApdu("80CA010500", true),
+        HceUtils.buildCommandApdu("80CA010600", true),
+        HceUtils.buildCommandApdu("80CA010700", true),
+        HceUtils.buildCommandApdu("80CA010800", true),
+        HceUtils.buildCommandApdu("80CA010900", true),
+        HceUtils.buildCommandApdu("80CA010A00", true),
+        HceUtils.buildCommandApdu("80CA010B00", true),
+        HceUtils.buildCommandApdu("80CA010C00", true),
+        HceUtils.buildCommandApdu("80CA010D00", true),
+        HceUtils.buildCommandApdu("80CA010E00", true),
+        HceUtils.buildCommandApdu("80CA010F00", true),
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {

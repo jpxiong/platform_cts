@@ -7,11 +7,11 @@ public class OffHostService {
             new ComponentName("com.android.cts.verifier",
                     OffHostService.class.getName());
 
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu("A000000151000000"),
-        "80CA9F7F00",
-        HceUtils.buildSelectApdu("A000000003000000"),
-        "80CA9F7F00"
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu("A000000151000000", true),
+        HceUtils.buildCommandApdu("80CA9F7F00", true),
+        HceUtils.buildSelectApdu("A000000003000000", true),
+        HceUtils.buildCommandApdu("80CA9F7F00", true)
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {
