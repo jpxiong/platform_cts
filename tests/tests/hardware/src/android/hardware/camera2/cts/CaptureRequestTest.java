@@ -25,7 +25,6 @@ import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
@@ -863,7 +862,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-            Long resultExpTime = result.get(CaptureRequest.SENSOR_EXPOSURE_TIME);
+            Long resultExpTime = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
             assertNotNull("Exposure time shouldn't be null", resultExpTime);
             Integer flicker = result.get(CaptureResult.STATISTICS_SCENE_FLICKER);
             // Scene flicker result should be always available.
@@ -1335,7 +1334,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             mCollector.expectEquals("Capture result tonemap mode should match request", tonemapMode,
-                    result.get(CaptureRequest.TONEMAP_MODE));
+                    result.get(CaptureResult.TONEMAP_MODE));
             float[] mapRed = result.get(CaptureResult.TONEMAP_CURVE_RED);
             float[] mapGreen = result.get(CaptureResult.TONEMAP_CURVE_GREEN);
             float[] mapBlue = result.get(CaptureResult.TONEMAP_CURVE_BLUE);
@@ -1461,8 +1460,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     NUM_FRAMES_VERIFIED);
 
             // Verify AF can finish a scan for CONTROL_AF_MODE_CONTINUOUS_* modes
-            if ((int)mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE ||
-                    (int)mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
+            if (mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE ||
+                    mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
                 List<Integer> afStateList = new ArrayList<Integer>();
                 afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED);
                 afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED);
@@ -1498,9 +1497,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         for (int mode : opticalStabModes) {
             listener = new SimpleCaptureListener();
-            requestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, (int) mode);
+            requestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            verifyCaptureResultForKey(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE, (int)mode,
+            verifyCaptureResultForKey(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE, mode,
                     listener, NUM_FRAMES_VERIFIED);
         }
 
@@ -1655,16 +1654,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
-     * Enable exposure manual control and change sensitivity and
-     * clamp the value into the supported range.
-     *
-     * <p>The exposure time is set to default value.</p>
-     */
-    private void changeExposure(CaptureRequest.Builder requestBuilder, int sensitivity) {
-        changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS, sensitivity);
-    }
-
-    /**
      * Get the exposure time array that contains multiple exposure time steps in
      * the exposure time range.
      */
@@ -1783,7 +1772,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         validatePipelineDepth(result);
     }
 
-    private <T> T getValueNotNull(CaptureResult result, Key<T> key) {
+    private <T> T getValueNotNull(CaptureResult result, CaptureResult.Key<T> key) {
         T value = result.get(key);
         assertNotNull("Value of Key " + key.getName() + " shouldn't be null", value);
         return value;
@@ -1797,7 +1786,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param listener The capture listener to get capture results
      * @param numFramesVerified The number of capture results to be verified
      */
-    private <T> void verifyCaptureResultForKey(Key<T> key, T requestMode,
+    private <T> void verifyCaptureResultForKey(CaptureResult.Key<T> key, T requestMode,
             SimpleCaptureListener listener, int numFramesVerified) {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
@@ -1955,13 +1944,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         {
             switch (algoIdx) {
                 case INDEX_ALGORITHM_AE:
-                    requestBuilder.set(CaptureResult.CONTROL_AE_REGIONS, region);
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, region);
                     break;
                 case INDEX_ALGORITHM_AWB:
-                    requestBuilder.set(CaptureResult.CONTROL_AWB_REGIONS, region);
+                    requestBuilder.set(CaptureRequest.CONTROL_AWB_REGIONS, region);
                     break;
                 case INDEX_ALGORITHM_AF:
-                    requestBuilder.set(CaptureResult.CONTROL_AF_REGIONS, region);
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, region);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown 3A Algorithm!");

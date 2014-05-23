@@ -25,13 +25,11 @@ import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
-import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
@@ -800,7 +798,7 @@ public class CameraTestUtils extends Assert {
         return;
     }
 
-    public static <T> T getValueNotNull(CaptureResult result, Key<T> key) {
+    public static <T> T getValueNotNull(CaptureResult result, CaptureResult.Key<T> key) {
         if (result == null) {
             throw new IllegalArgumentException("Result must not be null");
         }

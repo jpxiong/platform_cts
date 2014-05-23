@@ -41,7 +41,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
     private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
 
     // List that includes all public keys from CaptureResult
-    List<CameraMetadata.Key<?>> mAllKeys;
+    List<CaptureResult.Key<?>> mAllKeys;
 
     // List tracking the failed test keys.
 
@@ -77,7 +77,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
          * Hardcode a key waiver list for the keys that are allowed to be null.
          * FIXME: We need get ride of this list, see bug 11116270.
          */
-        List<CameraMetadata.Key<?>> waiverkeys = new ArrayList<CameraMetadata.Key<?>>();
+        List<CaptureResult.Key<?>> waiverkeys = new ArrayList<CaptureResult.Key<?>>();
         waiverkeys.add(CaptureResult.JPEG_GPS_COORDINATES);
         waiverkeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
         waiverkeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
@@ -145,13 +145,21 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
     }
 
     private void validateCaptureResult(SimpleCaptureListener captureListener,
-            List<CameraMetadata.Key<?>> skippedKeys, CaptureRequest.Builder requestBuilder,
+            List<CaptureResult.Key<?>> skippedKeys, CaptureRequest.Builder requestBuilder,
             int numFramesVerified) throws Exception {
         CaptureResult result = null;
         for (int i = 0; i < numFramesVerified; i++) {
             String failMsg = "Failed capture result " + i + " test ";
             result = captureListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-            for (CameraMetadata.Key<?> key : mAllKeys) {
+
+            if (VERBOSE) {
+                Log.v(TAG, "Dump result for frame " + i);
+                Log.v(TAG, "------------------------------ (START)");
+                result.dumpToLog();
+                Log.v(TAG, "------------------------------ (END)");
+            }
+
+            for (CaptureResult.Key<?> key : mAllKeys) {
                 if (!skippedKeys.contains(key)) {
                     /**
                      * Check the critical tags here.
@@ -211,8 +219,8 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
      * modify the comment blocks at the start or end.
      *~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~*/
 
-    private static List<CameraMetadata.Key<?>> getAllCaptureResultKeys() {
-        ArrayList<CameraMetadata.Key<?>> resultKeys = new ArrayList<CameraMetadata.Key<?>>();
+    private static List<CaptureResult.Key<?>> getAllCaptureResultKeys() {
+        ArrayList<CaptureResult.Key<?>> resultKeys = new ArrayList<CaptureResult.Key<?>>();
         resultKeys.add(CaptureResult.COLOR_CORRECTION_MODE);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
@@ -271,6 +279,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SHADING_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
+        resultKeys.add(CaptureResult.STATISTICS_FACES);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
@@ -280,10 +289,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.TONEMAP_CURVE_RED);
         resultKeys.add(CaptureResult.TONEMAP_MODE);
         resultKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
-
-        // Add STATISTICS_FACES key separately here because it is not
-        // defined in metadata xml file.
-        resultKeys.add(CaptureResult.STATISTICS_FACES);
 
         return resultKeys;
     }

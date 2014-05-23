@@ -19,14 +19,12 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 import static org.mockito.Mockito.*;
-import static android.hardware.camera2.CameraMetadata.*;
 import static android.hardware.camera2.CaptureRequest.*;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -439,15 +437,15 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
     }
 
-    private class IsCameraMetadataNotEmpty<T extends CameraMetadata>
-            extends ArgumentMatcher<T> {
+    private class IsCaptureResultNotEmpty
+            extends ArgumentMatcher<CaptureResult> {
         @Override
         public boolean matches(Object obj) {
             /**
              * Do the simple verification here. Only verify the timestamp for now.
              * TODO: verify more required capture result metadata fields.
              */
-            CameraMetadata result = (CameraMetadata) obj;
+            CaptureResult result = (CaptureResult) obj;
             Long timeStamp = result.get(CaptureResult.SENSOR_TIMESTAMP);
             if (timeStamp != null && timeStamp.longValue() > 0L) {
                 return true;
@@ -621,12 +619,12 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         .onCaptureCompleted(
                                 eq(mCamera),
                                 isA(CaptureRequest.class),
-                                argThat(new IsCameraMetadataNotEmpty<CaptureResult>()));
+                                argThat(new IsCaptureResultNotEmpty()));
         // Should not receive any capture failed callbacks.
         verify(mockListener, never())
                         .onCaptureFailed(
                                 eq(mCamera),
-                                argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()),
+                                isA(CaptureRequest.class),
                                 isA(CaptureFailure.class));
         // Should receive expected number of capture shutter calls
         verify(mockListener,
@@ -640,7 +638,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     private void checkFpsRange(CaptureRequest.Builder request, int template,
             CameraCharacteristics props) {
-        Key<int[]> fpsRangeKey = CONTROL_AE_TARGET_FPS_RANGE;
+        CaptureRequest.Key<int[]> fpsRangeKey = CONTROL_AE_TARGET_FPS_RANGE;
         int[] fpsRange;
         if ((fpsRange = mCollector.expectKeyValueNotNull(request, fpsRangeKey)) == null) {
             return;
@@ -700,15 +698,15 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             return;
         }
 
-        int targetAfMode = CONTROL_AF_MODE_AUTO;
+        int targetAfMode = CaptureRequest.CONTROL_AF_MODE_AUTO;
         byte[] availableAfMode = props.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
         if (template == CameraDevice.TEMPLATE_PREVIEW ||
                 template == CameraDevice.TEMPLATE_STILL_CAPTURE ||
                 template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG) {
             // Default to CONTINUOUS_PICTURE if it is available, otherwise AUTO.
             for (int i = 0; i < availableAfMode.length; i++) {
-                if (availableAfMode[i] == CONTROL_AF_MODE_CONTINUOUS_PICTURE) {
-                    targetAfMode = CONTROL_AF_MODE_CONTINUOUS_PICTURE;
+                if (availableAfMode[i] == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) {
+                    targetAfMode = CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE;
                     break;
                 }
             }
@@ -716,13 +714,13 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 template == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
             // Default to CONTINUOUS_VIDEO if it is available, otherwise AUTO.
             for (int i = 0; i < availableAfMode.length; i++) {
-                if (availableAfMode[i] == CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
-                    targetAfMode = CONTROL_AF_MODE_CONTINUOUS_VIDEO;
+                if (availableAfMode[i] == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
+                    targetAfMode = CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO;
                     break;
                 }
             }
         } else if (template == CameraDevice.TEMPLATE_MANUAL) {
-            targetAfMode = CONTROL_AF_MODE_OFF;
+            targetAfMode = CaptureRequest.CONTROL_AF_MODE_OFF;
         }
 
         mCollector.expectKeyValueEquals(request, CONTROL_AF_MODE, targetAfMode);
@@ -743,7 +741,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             CameraCharacteristics props) {
         // 3A settings--control.mode.
         if (template != CameraDevice.TEMPLATE_MANUAL) {
-            mCollector.expectKeyValueEquals(request, CONTROL_MODE, CONTROL_MODE_AUTO);
+            mCollector
+                    .expectKeyValueEquals(request, CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
         }
 
         // 3A settings--AE/AWB/AF.
@@ -751,22 +750,27 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         checkAfMode(request, template, props);
         checkFpsRange(request, template, props);
         if (template == CameraDevice.TEMPLATE_MANUAL) {
-            mCollector.expectKeyValueEquals(request, CONTROL_MODE, CONTROL_MODE_OFF);
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
-            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
+                    CaptureRequest.CONTROL_AWB_MODE_OFF);
 
         } else {
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_ON);
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON);
             mCollector.expectKeyValueNotEquals(request, CONTROL_AE_ANTIBANDING_MODE,
-                    CONTROL_AE_ANTIBANDING_MODE_OFF);
+                    CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_OFF);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
 
-            mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER, CONTROL_AF_TRIGGER_IDLE);
+            mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER,
+                    CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
 
-            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_AUTO);
+            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
+                    CaptureRequest.CONTROL_AWB_MODE_AUTO);
             mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
 
             // Check 3A regions.
@@ -816,51 +820,61 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         // ISP-processing settings.
         mCollector.expectKeyValueEquals(
-                request, STATISTICS_FACE_DETECT_MODE, STATISTICS_FACE_DETECT_MODE_OFF);
-        mCollector.expectKeyValueEquals(request, FLASH_MODE, FLASH_MODE_OFF);
+                request, STATISTICS_FACE_DETECT_MODE,
+                CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF);
+        mCollector.expectKeyValueEquals(request, FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
         mCollector.expectKeyValueEquals(
-                request, STATISTICS_LENS_SHADING_MAP_MODE, STATISTICS_LENS_SHADING_MAP_MODE_OFF);
+                request, STATISTICS_LENS_SHADING_MAP_MODE,
+                CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_OFF);
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
             // Not enforce high quality here, as some devices may not effectively have high quality
             // mode.
             mCollector.expectKeyValueNotEquals(
-                    request, COLOR_CORRECTION_MODE, COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
+                    request, COLOR_CORRECTION_MODE,
+                    CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
 
             List<Byte> availableEdgeModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
-            if (availableEdgeModes.contains((byte)EDGE_MODE_HIGH_QUALITY)) {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_HIGH_QUALITY);
-            } else if (availableEdgeModes.contains((byte)EDGE_MODE_FAST)) {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_FAST);
+            if (availableEdgeModes.contains((byte) CaptureRequest.EDGE_MODE_HIGH_QUALITY)) {
+                mCollector.expectKeyValueEquals(request, EDGE_MODE,
+                        CaptureRequest.EDGE_MODE_HIGH_QUALITY);
+            } else if (availableEdgeModes.contains((byte) CaptureRequest.EDGE_MODE_FAST)) {
+                mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_FAST);
             } else {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_OFF);
+                mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_OFF);
             }
 
             List<Byte> availableNoiseReductionModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableNoiseReductionModesChecked()));
-            if (availableNoiseReductionModes.contains((byte)NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
+            if (availableNoiseReductionModes
+                    .contains((byte) CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
                 mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_HIGH_QUALITY);
-            } else if (availableNoiseReductionModes.contains((byte)NOISE_REDUCTION_MODE_FAST)) {
+                        request, NOISE_REDUCTION_MODE,
+                        CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY);
+            } else if (availableNoiseReductionModes
+                    .contains((byte) CaptureRequest.NOISE_REDUCTION_MODE_FAST)) {
                 mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_FAST);
+                        request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_FAST);
             } else {
                 mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_OFF);
+                        request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_OFF);
             }
 
             List<Byte> availableToneMapModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableToneMapModesChecked()));
-            if (availableToneMapModes.contains((byte)TONEMAP_MODE_HIGH_QUALITY)) {
-                mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_HIGH_QUALITY);
+            if (availableToneMapModes.contains((byte) CaptureRequest.TONEMAP_MODE_HIGH_QUALITY)) {
+                mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_HIGH_QUALITY);
             } else {
-                mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_FAST);
+                mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_FAST);
             }
         } else {
             mCollector.expectKeyValueNotNull(request, EDGE_MODE);
             mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
-            mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE, TONEMAP_MODE_CONTRAST_CURVE);
+            mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
+                    CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
         }
 
         mCollector.expectKeyValueEquals(request, CONTROL_CAPTURE_INTENT, template);
