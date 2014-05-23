@@ -85,7 +85,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverkeys.add(CaptureResult.JPEG_QUALITY);
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_SIZE);
-        waiverkeys.add(CaptureResult.SENSOR_TEMPERATURE);
 
         for (String id : mCameraIds) {
             try {
@@ -271,7 +270,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
-        resultKeys.add(CaptureResult.SENSOR_TEMPERATURE);
         resultKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
         resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
