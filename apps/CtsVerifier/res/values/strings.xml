@@ -445,6 +445,9 @@
     <!-- Step Counter and Detector -->
     <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
 
+    <!-- Significant Motion -->
+    <string name="snsr_significant_motion_test">Significant Motion Tests</string>
+
     <!-- Strings for Sample Test Activities -->
     <string name="share_button_text">Share</string>
     <string name="sample_framework_test">Sample Framework Test</string>
