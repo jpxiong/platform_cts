@@ -49,14 +49,17 @@ public class DRMTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mDrmManagerClient = new DrmManagerClient(getContext());
-        String[] plugins = mDrmManagerClient.getAvailableDrmEngines();
 
-        mConfigs.clear();
-        for(String plugInName : plugins) {
-            Config config = ConfigFactory.getConfig(plugInName);
-            if (null != config) {
-                mConfigs.add(config);
+        if (deviceSupportsDRM()) {
+            mDrmManagerClient = new DrmManagerClient(getContext());
+            String[] plugins = mDrmManagerClient.getAvailableDrmEngines();
+
+            mConfigs.clear();
+            for(String plugInName : plugins) {
+                Config config = ConfigFactory.getConfig(plugInName);
+                if (null != config) {
+                    mConfigs.add(config);
+                }
             }
         }
     }
