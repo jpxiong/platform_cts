@@ -310,12 +310,12 @@ public class StaticMetadata {
      *
      * @return The array contains available anti-banding modes.
      */
-    public byte[] getAeAvailableAntiBandingModesChecked() {
-        Key<byte[]> key = CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES;
-        byte[] modes = getValueFromKeyNonNull(key);
+    public int[] getAeAvailableAntiBandingModesChecked() {
+        Key<int[]> key = CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
 
         boolean foundAuto = false;
-        for (byte mode : modes) {
+        for (int mode : modes) {
             checkTrueForKey(key, "mode value " + mode + " is out if range",
                     mode >= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF ||
                     mode <= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO);
@@ -336,10 +336,10 @@ public class StaticMetadata {
      * @return true if antibanding OFF mode is supported, false otherwise.
      */
     public boolean isAntiBandingOffModeSupported() {
-        List<Byte> antiBandingModes =
+        List<Integer> antiBandingModes =
                 Arrays.asList(CameraTestUtils.toObject(getAeAvailableAntiBandingModesChecked()));
 
-        return antiBandingModes.contains((byte)CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF);
+        return antiBandingModes.contains(CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF);
     }
 
     public Boolean getFlashInfoChecked() {
@@ -446,20 +446,20 @@ public class StaticMetadata {
      *
      * @return The non-null array of available face detection modes
      */
-    public byte[] getAvailableFaceDetectModesChecked() {
-        Key<byte[]> key = CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES;
-        byte[] modes = getValueFromKeyNonNull(key);
+    public int[] getAvailableFaceDetectModesChecked() {
+        Key<int[]> key = CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, "Array should contain OFF mode",
-                modeList.contains((byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF));
+                modeList.contains(CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF));
         checkElementDistinct(key, modeList);
-        checkArrayValuesInRange(key, modes, (byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF,
-                (byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL);
+        checkArrayValuesInRange(key, modes, CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF,
+                CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL);
 
         return modes;
     }
@@ -477,9 +477,9 @@ public class StaticMetadata {
             return 0;
         }
 
-        List<Byte> faceDetectModes =
+        List<Integer> faceDetectModes =
                 Arrays.asList(CameraTestUtils.toObject(getAvailableFaceDetectModesChecked()));
-        if (faceDetectModes.contains((byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF) &&
+        if (faceDetectModes.contains(CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF) &&
                 faceDetectModes.size() == 1) {
             checkTrueForKey(key, " value must be 0 if only OFF mode is supported in "
                     + "availableFaceDetectionModes", count == 0);
@@ -498,26 +498,26 @@ public class StaticMetadata {
      *
      * @return the availalbe tone map modes
      */
-    public byte[] getAvailableToneMapModesChecked() {
-        Key<byte[]> key = CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES;
-        byte[] modes = getValueFromKeyNonNull(key);
+    public int[] getAvailableToneMapModesChecked() {
+        Key<int[]> key = CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, " Camera devices must always support FAST mode",
-                modeList.contains((byte)CameraMetadata.TONEMAP_MODE_FAST));
+                modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
         if (isHardwareLevelFull()) {
             checkTrueForKey(key, "Full-capability camera devices must support"
                     + "CONTRAST_CURVE mode",
-                    modeList.contains((byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
-                    modeList.contains((byte)CameraMetadata.TONEMAP_MODE_FAST));
+                    modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
+                    modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
         }
         checkElementDistinct(key, modeList);
-        checkArrayValuesInRange(key, modes, (byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE,
-                (byte)CameraMetadata.TONEMAP_MODE_HIGH_QUALITY);
+        checkArrayValuesInRange(key, modes, CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE,
+                CameraMetadata.TONEMAP_MODE_HIGH_QUALITY);
 
         return modes;
     }
@@ -535,9 +535,9 @@ public class StaticMetadata {
             return 0;
         }
 
-        List<Byte> modeList =
+        List<Integer> modeList =
                 Arrays.asList(CameraTestUtils.toObject(getAvailableToneMapModesChecked()));
-        if (modeList.contains((byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE)) {
+        if (modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE)) {
             checkTrueForKey(key, "Full-capability camera device must support maxCurvePoints "
                     + ">= " + TONEMAP_MAX_CURVE_POINTS_AT_LEAST,
                     count >= TONEMAP_MAX_CURVE_POINTS_AT_LEAST);
@@ -797,14 +797,14 @@ public class StaticMetadata {
      * have to abort the execution even the aeMode list is invalid.</p>
      * @return AE available modes
      */
-    public byte[] getAeAvailableModesChecked() {
-        Key<byte[]> modesKey = CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES;
-        byte[] modes = getValueFromKeyNonNull(modesKey);
+    public int[] getAeAvailableModesChecked() {
+        Key<int[]> modesKey = CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES;
+        int[] modes = getValueFromKeyNonNull(modesKey);
         if (modes == null) {
-            modes = new byte[0];
+            modes = new int[0];
         }
         List<Integer> modeList = new ArrayList<Integer>();
-        for (byte mode : modes) {
+        for (int mode : modes) {
             modeList.add((int)(mode));
         }
         checkTrueForKey(modesKey, "value is empty", !modeList.isEmpty());
@@ -843,7 +843,7 @@ public class StaticMetadata {
         checkTrueForKey(modesKey, "Full capability device must have OFF mode", condition);
 
         // Boundary check.
-        for (byte mode : modes) {
+        for (int mode : modes) {
             checkTrueForKey(modesKey, "Value " + mode + " is out of bound",
                     mode >= CameraMetadata.CONTROL_AE_MODE_OFF
                     && mode <= CameraMetadata.CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE);
@@ -858,21 +858,21 @@ public class StaticMetadata {
      * @return array that contains available AWB modes, empty array if awbAvailableModes is
      * unavailable.
      */
-    public byte[] getAwbAvailableModesChecked() {
-        Key<byte[]> key =
+    public int[] getAwbAvailableModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES;
-        byte[] awbModes = getValueFromKeyNonNull(key);
+        int[] awbModes = getValueFromKeyNonNull(key);
 
         if (awbModes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modesList = Arrays.asList(CameraTestUtils.toObject(awbModes));
+        List<Integer> modesList = Arrays.asList(CameraTestUtils.toObject(awbModes));
         checkTrueForKey(key, " All camera devices must support AUTO mode",
-                modesList.contains((byte)CameraMetadata.CONTROL_AWB_MODE_AUTO));
+                modesList.contains(CameraMetadata.CONTROL_AWB_MODE_AUTO));
         if (isHardwareLevelFull()) {
             checkTrueForKey(key, " Full capability camera devices must support OFF mode",
-                    modesList.contains((byte)CameraMetadata.CONTROL_AWB_MODE_OFF));
+                    modesList.contains(CameraMetadata.CONTROL_AWB_MODE_OFF));
         }
 
         return awbModes;
@@ -884,21 +884,21 @@ public class StaticMetadata {
      * @return array that contains available AF modes, empty array if afAvailableModes is
      * unavailable.
      */
-    public byte[] getAfAvailableModesChecked() {
-        Key<byte[]> key =
+    public int[] getAfAvailableModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES;
-        byte[] afModes = getValueFromKeyNonNull(key);
+        int[] afModes = getValueFromKeyNonNull(key);
 
         if (afModes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modesList = Arrays.asList(CameraTestUtils.toObject(afModes));
+        List<Integer> modesList = Arrays.asList(CameraTestUtils.toObject(afModes));
         checkTrueForKey(key, " All camera devices must support OFF mode",
-                modesList.contains((byte)CameraMetadata.CONTROL_AF_MODE_OFF));
+                modesList.contains(CameraMetadata.CONTROL_AF_MODE_OFF));
         if (hasFocuser()) {
             checkTrueForKey(key, " Camera devices that have focuser units must support AUTO mode",
-                    modesList.contains((byte)CameraMetadata.CONTROL_AF_MODE_AUTO));
+                    modesList.contains(CameraMetadata.CONTROL_AF_MODE_AUTO));
         }
 
         return afModes;
@@ -1061,40 +1061,40 @@ public class StaticMetadata {
         return minDurationMap;
     }
 
-    public byte[] getAvailableEdgeModesChecked() {
-        Key<byte[]> key = CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES;
-        byte[] edgeModes = getValueFromKeyNonNull(key);
+    public int[] getAvailableEdgeModesChecked() {
+        Key<int[]> key = CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES;
+        int[] edgeModes = getValueFromKeyNonNull(key);
 
         if (edgeModes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
         // Full device should always include OFF and FAST
         if (isHardwareLevelFull()) {
-            List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(edgeModes));
+            List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(edgeModes));
             checkTrueForKey(key, "Full device must contain OFF and FAST edge modes",
-                    modeList.contains((byte)CameraMetadata.EDGE_MODE_OFF) &&
-                    modeList.contains((byte)CameraMetadata.EDGE_MODE_FAST));
+                    modeList.contains(CameraMetadata.EDGE_MODE_OFF) &&
+                    modeList.contains(CameraMetadata.EDGE_MODE_FAST));
         }
 
         return edgeModes;
     }
 
-    public byte[] getAvailableNoiseReductionModesChecked() {
-        Key<byte[]> key =
+    public int[] getAvailableNoiseReductionModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES;
-        byte[] noiseReductionModes = getValueFromKeyNonNull(key);
+        int[] noiseReductionModes = getValueFromKeyNonNull(key);
 
         if (noiseReductionModes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
         // Full device should always include OFF and FAST
         if (isHardwareLevelFull()) {
-            List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(noiseReductionModes));
+            List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(noiseReductionModes));
             checkTrueForKey(key, "Full device must contain OFF and FAST noise reduction modes",
-                    modeList.contains((byte)CameraMetadata.NOISE_REDUCTION_MODE_OFF) &&
-                    modeList.contains((byte)CameraMetadata.NOISE_REDUCTION_MODE_FAST));
+                    modeList.contains(CameraMetadata.NOISE_REDUCTION_MODE_OFF) &&
+                    modeList.contains(CameraMetadata.NOISE_REDUCTION_MODE_FAST));
         }
 
         return noiseReductionModes;
@@ -1148,21 +1148,21 @@ public class StaticMetadata {
      *
      * @return available video stabilization modes, empty array if it is unavailable.
      */
-    public byte[] getAvailableVideoStabilizationModesChecked() {
-        Key<byte[]> key =
+    public int[] getAvailableVideoStabilizationModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES;
-        byte[] modes = getValueFromKeyNonNull(key);
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, " All device should support OFF mode",
-                modeList.contains((byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF));
+                modeList.contains(CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF));
         checkArrayValuesInRange(key, modes,
-                (byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF,
-                (byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON);
+                CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF,
+                CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON);
 
         return modes;
     }
@@ -1172,18 +1172,18 @@ public class StaticMetadata {
      *
      * @return available optical stabilization modes, empty array if it is unavailable.
      */
-    public byte[] getAvailableOpticalStabilizationChecked() {
-        Key<byte[]> key =
+    public int[] getAvailableOpticalStabilizationChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION;
-        byte[] modes = getValueFromKeyNonNull(key);
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
         checkArrayValuesInRange(key, modes,
-                (byte)CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_OFF,
-                (byte)CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_ON);
+                CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_OFF,
+                CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_ON);
 
         return modes;
     }
@@ -1207,38 +1207,38 @@ public class StaticMetadata {
         return maxZoom;
     }
 
-    public byte[] getAvailableSceneModesChecked() {
-        Key<byte[]> key =
+    public int[] getAvailableSceneModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES;
-        byte[] modes = getValueFromKeyNonNull(key);
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         // FACE_PRIORITY must be included if face detection is supported.
         if (getMaxFaceCountChecked() > 0) {
             checkTrueForKey(key, " FACE_PRIORITY must be included if face detection is supported",
-                    modeList.contains((byte)CameraMetadata.CONTROL_SCENE_MODE_FACE_PRIORITY));
+                    modeList.contains(CameraMetadata.CONTROL_SCENE_MODE_FACE_PRIORITY));
         }
 
         return modes;
     }
 
-    public byte[] getAvailableEffectModesChecked() {
-        Key<byte[]> key =
+    public int[] getAvailableEffectModesChecked() {
+        Key<int[]> key =
                 CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS;
-        byte[] modes = getValueFromKeyNonNull(key);
+        int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
-            return new byte[0];
+            return new int[0];
         }
 
-        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         // OFF must be included.
         checkTrueForKey(key, " OFF must be included",
-                modeList.contains((byte)CameraMetadata.CONTROL_EFFECT_MODE_OFF));
+                modeList.contains(CameraMetadata.CONTROL_EFFECT_MODE_OFF));
 
         return modes;
     }
