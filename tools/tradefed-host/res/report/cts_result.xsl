@@ -538,15 +538,7 @@
                                                             <xsl:value-of select="@result"/>
                                                         </div>
                                                     </TD>
-                                                    <TD class="failuredetails">
-                                                        <div class="details">
-                                                            <ul>
-                                                              <xsl:for-each select="Details/ValueArray/Value">
-                                                                <li><xsl:value-of select="."/></li>
-                                                              </xsl:for-each>
-                                                            </ul>
-                                                        </div>
-                                                    </TD>
+                                                    <TD class="failuredetails"/>
                                                 </xsl:if>
 
                                                 <xsl:if test="@result='fail'">
