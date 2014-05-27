@@ -151,13 +151,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             String failMsg = "Failed capture result " + i + " test ";
             result = captureListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
 
-            if (VERBOSE) {
-                Log.v(TAG, "Dump result for frame " + i);
-                Log.v(TAG, "------------------------------ (START)");
-                result.dumpToLog();
-                Log.v(TAG, "------------------------------ (END)");
-            }
-
             for (CaptureResult.Key<?> key : mAllKeys) {
                 if (!skippedKeys.contains(key)) {
                     /**

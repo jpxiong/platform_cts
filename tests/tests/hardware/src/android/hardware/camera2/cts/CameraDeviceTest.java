@@ -28,6 +28,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.os.SystemClock;
 import android.util.Log;
@@ -438,14 +439,14 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     }
 
     private class IsCaptureResultNotEmpty
-            extends ArgumentMatcher<CaptureResult> {
+            extends ArgumentMatcher<TotalCaptureResult> {
         @Override
         public boolean matches(Object obj) {
             /**
              * Do the simple verification here. Only verify the timestamp for now.
              * TODO: verify more required capture result metadata fields.
              */
-            CaptureResult result = (CaptureResult) obj;
+            TotalCaptureResult result = (TotalCaptureResult) obj;
             Long timeStamp = result.get(CaptureResult.SENSOR_TIMESTAMP);
             if (timeStamp != null && timeStamp.longValue() > 0L) {
                 return true;

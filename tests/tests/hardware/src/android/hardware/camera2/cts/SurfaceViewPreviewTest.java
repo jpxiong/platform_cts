@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
@@ -233,10 +234,10 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         stopPreview();
     }
 
-    private class IsCaptureResultValid extends ArgumentMatcher<CaptureResult> {
+    private class IsCaptureResultValid extends ArgumentMatcher<TotalCaptureResult> {
         @Override
         public boolean matches(Object obj) {
-            CaptureResult result = (CaptureResult)obj;
+            TotalCaptureResult result = (TotalCaptureResult)obj;
             Long timeStamp = result.get(CaptureResult.SENSOR_TIMESTAMP);
             if (timeStamp != null && timeStamp.longValue() > 0L) {
                 return true;

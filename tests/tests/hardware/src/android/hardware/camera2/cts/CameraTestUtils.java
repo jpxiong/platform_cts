@@ -29,6 +29,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.util.Size;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
@@ -139,7 +140,7 @@ public class CameraTestUtils extends Assert {
 
         @Override
         public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
-                CaptureResult result) {
+                TotalCaptureResult result) {
             try {
                 mQueue.put(result);
             } catch (InterruptedException e) {
@@ -155,7 +156,7 @@ public class CameraTestUtils extends Assert {
 
         @Override
         public void onCaptureSequenceCompleted(CameraDevice camera, int sequenceId,
-                int frameNumber) {
+                long frameNumber) {
         }
 
         public CaptureResult getCaptureResult(long timeout) {

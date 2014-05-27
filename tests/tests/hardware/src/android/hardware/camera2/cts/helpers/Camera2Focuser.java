@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
@@ -355,7 +356,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
 
             @Override
             public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
-                    CaptureResult result) {
+                    TotalCaptureResult result) {
                     dispatchToFocuser(result);
             }
 
