@@ -18,7 +18,6 @@ package android.accessibilityservice.cts;
 
 import com.android.cts.accessibilityservice.R;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +27,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 /**
- * This class is an {@link Activity} used to perform end-to-end
+ * This class is an {@link android.app.Activity} used to perform end-to-end
  * testing of the accessibility feature by interaction with the
  * UI widgets.
  */
-public class AccessibilityEndToEndActivity extends Activity {
+public class AccessibilityEndToEndActivity extends AccessibilityTestActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

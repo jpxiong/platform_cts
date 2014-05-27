@@ -368,7 +368,6 @@ public class AccessibilityEndToEndTest extends
             && first.getCurrentItemIndex() == second.getCurrentItemIndex()
             && first.isEnabled() == second.isEnabled()
             && first.getFromIndex() == second.getFromIndex()
-            && first.isFullScreen() == second.isFullScreen()
             && first.getItemCount() == second.getItemCount()
             && first.isPassword() == second.isPassword()
             && first.getRemovedCount() == second.getRemovedCount()
