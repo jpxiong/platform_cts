@@ -32,6 +32,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.util.Size;
 import android.hardware.camera2.cts.helpers.MaybeNull;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
@@ -378,7 +379,7 @@ public class AllocationTest extends AndroidTestCase {
         mCamera.capture(request, new CameraDevice.CaptureListener() {
             @Override
             public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
-                    CaptureResult result) {
+                    TotalCaptureResult result) {
                 if (VERBOSE) Log.v(TAG, "Capture completed");
             }
         }, mHandler);
