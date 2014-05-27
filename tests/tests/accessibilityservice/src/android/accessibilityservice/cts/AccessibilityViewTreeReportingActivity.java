@@ -14,7 +14,6 @@
 
 package android.accessibilityservice.cts;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.android.cts.accessibilityservice.R;
@@ -26,7 +25,7 @@ import com.android.cts.accessibilityservice.R;
  * this activity is for verifying the hierarchical movement of the
  * accessibility focus.
  */
-public class AccessibilityViewTreeReportingActivity extends Activity {
+public class AccessibilityViewTreeReportingActivity extends AccessibilityTestActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

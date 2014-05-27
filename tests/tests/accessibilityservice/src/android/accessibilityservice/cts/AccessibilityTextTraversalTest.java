@@ -15,6 +15,7 @@
 package android.accessibilityservice.cts;
 
 import android.app.UiAutomation;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.text.Selection;
@@ -4486,6 +4487,11 @@ public class AccessibilityTextTraversalTest
 
     @MediumTest
     public void testTextEditingActions() throws Exception {
+        if (!getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_INPUT_METHODS)) {
+            return;
+        }
+
         final EditText editText = (EditText) getActivity().findViewById(R.id.edit);
         final String textContent = getString(R.string.foo_bar_baz);
 
@@ -4513,7 +4519,7 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
 
         // Copy the selected text.
-        text.performAction( AccessibilityNodeInfo.ACTION_COPY);
+        text.performAction(AccessibilityNodeInfo.ACTION_COPY);
 
         // Set selection at the end.
         final int textLength = editText.getText().length();

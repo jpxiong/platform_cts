@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -14,22 +14,17 @@
 
 package android.accessibilityservice.cts;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.view.WindowManager;
 
-import com.android.cts.accessibilityservice.R;
-
-/**
- * Activity for testing the accessibility focus APIs exposed to
- * accessibility services. These APIs allow moving accessibility
- * focus in the view tree from an AccessiiblityService. Specifically,
- * this activity is for verifying the the sync between accessibility
- * and input focus.
- */
-public class AccessibilityFocusAndInputFocusSyncActivity extends AccessibilityTestActivity {
+public abstract class AccessibilityTestActivity extends Activity {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.accessibility_focus_and_input_focus_sync_test);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 }
