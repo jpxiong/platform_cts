@@ -22,12 +22,13 @@ import android.app.UiAutomation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.accessibility.AccessibilityEvent;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * Base text case for testing accessibility APIs by instrumenting an Activity.
  */
 public abstract class AccessibilityActivityTestCase<T extends Activity>
         extends ActivityInstrumentationTestCase2<T> {
-
     /**
      * Timeout required for pending Binder calls or event processing to
      * complete.
@@ -37,7 +38,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
     /**
      * The timeout since the last accessibility event to consider the device idle.
      */
-    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 200;
+    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 500;
 
     /**
      * @param activityClass
@@ -55,11 +56,20 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         info.flags &= ~AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
         getInstrumentation().getUiAutomation().setServiceInfo(info);
 
+        startActivityAndWaitForFirstEvent();
+
+        waitForIdle();
+    }
+
+    /**
+     * Waits for the UI do be idle.
+     *
+     * @throws TimeoutException if idle cannot be detected.
+     */
+    public void waitForIdle() throws TimeoutException {
         getInstrumentation().getUiAutomation().waitForIdle(
                 TIMEOUT_ACCESSIBILITY_STATE_IDLE,
                 TIMEOUT_ASYNC_PROCESSING);
-
-        startActivityAndWaitForFirstEvent();
     }
 
     /**

@@ -14,7 +14,6 @@
 
 package android.accessibilityservice.cts;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.android.cts.accessibilityservice.R;
@@ -23,7 +22,7 @@ import com.android.cts.accessibilityservice.R;
  * Activity for testing the accessibility APIs for traversing the
  * text content of a View at several granularities.
  */
-public class AccessibilityTextTraversalActivity extends Activity {
+public class AccessibilityTextTraversalActivity extends AccessibilityTestActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

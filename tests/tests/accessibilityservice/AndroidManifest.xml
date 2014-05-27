@@ -22,8 +22,6 @@
   <uses-sdk android:minSdkVersion="18"
           android:targetSdkVersion="18" />
 
-  <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-
   <application android:theme="@android:style/Theme.Holo.NoActionBar" >
 
       <uses-library android:name="android.test.runner"/>
@@ -41,7 +39,7 @@
               android:name="android.accessibilityservice.cts.AccessibilityFocusAndInputFocusSyncActivity"/>
 
       <activity android:label="@string/accessibility_text_traversal_test_activity"
-              android:name="android.accessibilityservice.cts.AccessibilityTextTraversalActivity"/> 
+              android:name="android.accessibilityservice.cts.AccessibilityTextTraversalActivity"/>
 
   </application>
 
