@@ -21,6 +21,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.CaptureListener;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
@@ -50,11 +51,10 @@ public class Camera2Focuser implements AutoFocusStateListener {
     private final AutoFocusListener mAutoFocusListener;
     private final CameraDevice mCamera;
     private final Surface mRequestSurface;
-    private final int AF_REGION_NUM_ELEMENTS = 5;
     private final CameraCharacteristics mStaticInfo;
 
     private int mAfRun = 0;
-    private int[] mAfRegions; // int x AF_REGION_NUM_ELEMENTS array.
+    private MeteringRectangle[] mAfRegions;
     private boolean mLocked = false;
     private boolean mSuccess = false;
     private CaptureRequest.Builder mRepeatingBuilder;
@@ -165,7 +165,8 @@ public class Camera2Focuser implements AutoFocusStateListener {
      * array size is used if afRegions is null.
      * @throws CameraAccessException
      */
-    public synchronized void touchForAutoFocus(int[] afRegions) throws CameraAccessException {
+    public synchronized void touchForAutoFocus(MeteringRectangle[] afRegions)
+            throws CameraAccessException {
         startAutoFocusLocked(/*active*/true, afRegions);
     }
 
@@ -182,7 +183,8 @@ public class Camera2Focuser implements AutoFocusStateListener {
      *            array size is used if afRegions is null.
      * @throws CameraAccessException
      */
-    public synchronized void startAutoFocus(int[] afRegions) throws CameraAccessException {
+    public synchronized void startAutoFocus(MeteringRectangle[] afRegions)
+            throws CameraAccessException {
         startAutoFocusLocked(/*forceActive*/false, afRegions);
     }
 
@@ -222,7 +224,9 @@ public class Camera2Focuser implements AutoFocusStateListener {
         return mRepeatingBuilder.get(CaptureRequest.CONTROL_AF_MODE);
     }
 
-    private void startAutoFocusLocked(boolean forceActive, int[] afRegions) throws CameraAccessException {
+    private void startAutoFocusLocked(
+            boolean forceActive, MeteringRectangle[] afRegions) throws CameraAccessException {
+
         setAfRegions(afRegions);
         mAfRun++;
 
@@ -282,9 +286,6 @@ public class Camera2Focuser implements AutoFocusStateListener {
      * @throws CameraAccessException
      */
     private CaptureRequest.Builder createRequestBuilder() throws CameraAccessException {
-        if (mAfRegions == null) {
-            throw new IllegalStateException("AF regions are not initialized yet");
-        }
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -298,17 +299,16 @@ public class Camera2Focuser implements AutoFocusStateListener {
      * Set AF regions, fall back to default region if afRegions is null.
      *
      * @param afRegions The AF regions to set
-     * @throws IllegalArgumentException if the region is malformed (length is 0
-     *             or not multiple times of {@value #AF_REGION_NUM_ELEMENTS}).
+     * @throws IllegalArgumentException if the region is malformed (length is 0).
      */
-    private void setAfRegions(int[] afRegions) {
+    private void setAfRegions(MeteringRectangle[] afRegions) {
         if (afRegions == null) {
             setDefaultAfRegions();
             return;
         }
         // Throw IAE if AF regions are malformed.
-        if (afRegions.length % AF_REGION_NUM_ELEMENTS != 0 || afRegions.length == 0) {
-            throw new IllegalArgumentException("afRegions is malformed, length: " + afRegions.length);
+        if (afRegions.length == 0) {
+            throw new IllegalArgumentException("afRegions is malformed, length: 0");
         }
 
         mAfRegions = afRegions;
@@ -325,7 +325,8 @@ public class Camera2Focuser implements AutoFocusStateListener {
 
         // Initialize AF regions with all zeros, meaning that it is up to camera device to device
         // the regions used by AF.
-        mAfRegions = new int[]{0, 0, 0, 0, 0};
+        mAfRegions = new MeteringRectangle[] {
+                new MeteringRectangle(0, 0, 0, 0, 0)};
     }
     private CaptureListener createCaptureListener() {
 
