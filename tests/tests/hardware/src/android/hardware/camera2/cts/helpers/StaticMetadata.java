@@ -21,6 +21,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraMetadata;
+import android.util.Range;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -688,12 +689,14 @@ public class StaticMetadata {
      * @return The value reported by the camera device or the defaultValue otherwise.
      */
     public int getSensitivityMinimumOrDefault(int defaultValue) {
-        return getArrayElementOrDefault(
-                CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
-                defaultValue,
-                "minimum",
-                SENSOR_INFO_SENSITIVITY_RANGE_MIN,
-                SENSOR_INFO_SENSITIVITY_RANGE_SIZE);
+        Range<Integer> range = getValueFromKeyNonNull(
+                CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE);
+        if (range == null) {
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+                    "had no valid minimum value; using default of " + defaultValue);
+            return defaultValue;
+        }
+        return range.getLower();
     }
 
     /**
@@ -719,12 +722,14 @@ public class StaticMetadata {
      * @return The value reported by the camera device or the defaultValue otherwise.
      */
     public int getSensitivityMaximumOrDefault(int defaultValue) {
-        return getArrayElementOrDefault(
-                CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
-                defaultValue,
-                "maximum",
-                SENSOR_INFO_SENSITIVITY_RANGE_MAX,
-                SENSOR_INFO_SENSITIVITY_RANGE_SIZE);
+        Range<Integer> range = getValueFromKeyNonNull(
+                CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE);
+        if (range == null) {
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+                    "had no valid maximum value; using default of " + defaultValue);
+            return defaultValue;
+        }
+        return range.getUpper();
     }
 
     /**
@@ -737,12 +742,14 @@ public class StaticMetadata {
      * @return The value reported by the camera device or the defaultValue otherwise.
      */
     public long getExposureMinimumOrDefault(long defaultValue) {
-        return getArrayElementOrDefault(
-                CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
-                defaultValue,
-                "minimum",
-                SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN,
-                SENSOR_INFO_EXPOSURE_TIME_RANGE_SIZE);
+        Range<Long> range = getValueFromKeyNonNull(
+                CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+        if (range == null) {
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+                    "had no valid minimum value; using default of " + defaultValue);
+            return defaultValue;
+        }
+        return range.getLower();
     }
 
     /**
@@ -768,12 +775,14 @@ public class StaticMetadata {
      * @return The value reported by the camera device or the defaultValue otherwise.
      */
     public long getExposureMaximumOrDefault(long defaultValue) {
-        return getArrayElementOrDefault(
-                CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
-                defaultValue,
-                "maximum",
-                SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX,
-                SENSOR_INFO_EXPOSURE_TIME_RANGE_SIZE);
+        Range<Long> range = getValueFromKeyNonNull(
+                CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+        if (range == null) {
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+                    "had no valid maximum value; using default of " + defaultValue);
+            return defaultValue;
+        }
+        return range.getUpper();
     }
 
     /**
