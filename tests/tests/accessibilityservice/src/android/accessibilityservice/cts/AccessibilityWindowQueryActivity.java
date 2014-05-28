@@ -14,7 +14,6 @@
 
 package android.accessibilityservice.cts;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
@@ -28,7 +27,7 @@ import com.android.cts.accessibilityservice.R;
  * requesting an action to be performed on a given view from an
  * AccessibilityService.
  */
-public class AccessibilityWindowQueryActivity extends Activity {
+public class AccessibilityWindowQueryActivity extends AccessibilityTestActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

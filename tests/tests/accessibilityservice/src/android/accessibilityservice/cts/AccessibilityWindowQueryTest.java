@@ -27,7 +27,6 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.UiAutomation;
 import android.graphics.Rect;
-import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -624,7 +623,7 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_BACK));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
     }
 
     @MediumTest
@@ -633,7 +632,7 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_HOME));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
     }
 
     @MediumTest
@@ -643,14 +642,14 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_RECENTS));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
 
         // Clean up.
         getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK);
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
     }
 
     @MediumTest
@@ -660,14 +659,14 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
 
         // Clean up.
         assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
     }
 
     @MediumTest
@@ -677,14 +676,14 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS));
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
 
         // Clean up.
         getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK);
 
         // Sleep a bit so the UI is settles.
-        SystemClock.sleep(3000);
+        waitForIdle();
     }
 
     @MediumTest
@@ -741,9 +740,6 @@ public class AccessibilityWindowQueryTest
 
             // make list of expected nodes
             List<String> classNameAndTextList = new ArrayList<String>();
-            classNameAndTextList.add("android.widget.FrameLayout");
-            classNameAndTextList.add("android.widget.LinearLayout");
-            classNameAndTextList.add("android.widget.FrameLayout");
             classNameAndTextList.add("android.widget.LinearLayout");
             classNameAndTextList.add("android.widget.LinearLayout");
             classNameAndTextList.add("android.widget.LinearLayout");
@@ -758,6 +754,9 @@ public class AccessibilityWindowQueryTest
             classNameAndTextList.add("android.widget.ButtonB8");
             classNameAndTextList.add("android.widget.ButtonB9");
 
+            String contentViewIdResName = "com.android.cts.accessibilityservice:id/added_content";
+            boolean verifyContent = false;
+
             Queue<AccessibilityNodeInfo> fringe = new LinkedList<AccessibilityNodeInfo>();
             fringe.add(root);
 
@@ -765,13 +764,20 @@ public class AccessibilityWindowQueryTest
             while (!fringe.isEmpty()) {
                 AccessibilityNodeInfo current = fringe.poll();
 
-                CharSequence text = current.getText();
-                String receivedClassNameAndText = current.getClassName().toString()
-                    + ((text != null) ? text.toString() : "");
-                String expectedClassNameAndText = classNameAndTextList.remove(0);
+                if (!verifyContent
+                        && contentViewIdResName.equals(current.getViewIdResourceName())) {
+                    verifyContent = true;
+                }
 
-                assertEquals("Did not get the expected node info",
-                        expectedClassNameAndText, receivedClassNameAndText);
+                if (verifyContent) {
+                    CharSequence text = current.getText();
+                    String receivedClassNameAndText = current.getClassName().toString()
+                            + ((text != null) ? text.toString() : "");
+                    String expectedClassNameAndText = classNameAndTextList.remove(0);
+
+                    assertEquals("Did not get the expected node info",
+                            expectedClassNameAndText, receivedClassNameAndText);
+                }
 
                 final int childCount = current.getChildCount();
                 for (int i = 0; i < childCount; i++) {
