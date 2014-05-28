@@ -33,6 +33,8 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.params.ColorSpaceTransform;
+import android.hardware.camera2.params.RggbChannelVector;
 import android.util.Size;
 import android.hardware.camera2.cts.helpers.MaybeNull;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
@@ -149,14 +151,15 @@ public class AllocationTest extends AndroidTestCase {
 
         // Identity transform
         request.set(CaptureRequest.COLOR_CORRECTION_TRANSFORM,
-            new Rational[] {
+            new ColorSpaceTransform(new Rational[] {
                 ONE, ZERO, ZERO,
                 ZERO, ONE, ZERO,
                 ZERO, ZERO, ONE
-            });
+            }));
 
         // Identity gains
-        request.set(CaptureRequest.COLOR_CORRECTION_GAINS, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+        request.set(CaptureRequest.COLOR_CORRECTION_GAINS,
+                new RggbChannelVector(1.0f, 1.0f, 1.0f, 1.0f ));
         request.set(CaptureRequest.TONEMAP_MODE, CaptureRequest.TONEMAP_MODE_FAST);
     }
 

@@ -691,7 +691,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         int targetAfMode = CaptureRequest.CONTROL_AF_MODE_AUTO;
-        byte[] availableAfMode = props.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+        int[] availableAfMode = props.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
         if (template == CameraDevice.TEMPLATE_PREVIEW ||
                 template == CameraDevice.TEMPLATE_STILL_CAPTURE ||
                 template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG) {
@@ -799,7 +799,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             mCollector.expectKeyValueNotNull(request, LENS_FOCAL_LENGTH);
         }
 
-        byte[] availableOIS =
+        int[] availableOIS =
                 props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION);
         if (availableOIS.length > 1) {
             mCollector.expectKeyValueNotNull(request, LENS_OPTICAL_STABILIZATION_MODE);
@@ -826,26 +826,26 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     request, COLOR_CORRECTION_MODE,
                     CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
 
-            List<Byte> availableEdgeModes =
+            List<Integer> availableEdgeModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
-            if (availableEdgeModes.contains((byte) CaptureRequest.EDGE_MODE_HIGH_QUALITY)) {
+            if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_HIGH_QUALITY)) {
                 mCollector.expectKeyValueEquals(request, EDGE_MODE,
                         CaptureRequest.EDGE_MODE_HIGH_QUALITY);
-            } else if (availableEdgeModes.contains((byte) CaptureRequest.EDGE_MODE_FAST)) {
+            } else if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_FAST)) {
                 mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_FAST);
             } else {
                 mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_OFF);
             }
 
-            List<Byte> availableNoiseReductionModes =
+            List<Integer> availableNoiseReductionModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableNoiseReductionModesChecked()));
             if (availableNoiseReductionModes
-                    .contains((byte) CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
+                    .contains(CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
                 mCollector.expectKeyValueEquals(
                         request, NOISE_REDUCTION_MODE,
                         CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY);
             } else if (availableNoiseReductionModes
-                    .contains((byte) CaptureRequest.NOISE_REDUCTION_MODE_FAST)) {
+                    .contains(CaptureRequest.NOISE_REDUCTION_MODE_FAST)) {
                 mCollector.expectKeyValueEquals(
                         request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_FAST);
             } else {
@@ -853,9 +853,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_OFF);
             }
 
-            List<Byte> availableToneMapModes =
+            List<Integer> availableToneMapModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableToneMapModesChecked()));
-            if (availableToneMapModes.contains((byte) CaptureRequest.TONEMAP_MODE_HIGH_QUALITY)) {
+            if (availableToneMapModes.contains(CaptureRequest.TONEMAP_MODE_HIGH_QUALITY)) {
                 mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
                         CaptureRequest.TONEMAP_MODE_HIGH_QUALITY);
             } else {

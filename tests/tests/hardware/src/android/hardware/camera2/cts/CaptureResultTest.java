@@ -111,7 +111,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 requestBuilder.addTarget(mReaderSurface);
 
                 // Enable face detection if supported
-                byte[] faceModes = mStaticInfo.getAvailableFaceDetectModesChecked();
+                int[] faceModes = mStaticInfo.getAvailableFaceDetectModesChecked();
                 for (int i = 0; i < faceModes.length; i++) {
                     if (faceModes[i] == CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL) {
                         if (VERBOSE) {

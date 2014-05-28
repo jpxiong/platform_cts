@@ -31,6 +31,8 @@ import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.hardware.camera2.params.Face;
 import android.hardware.camera2.params.MeteringRectangle;
+import android.hardware.camera2.params.ColorSpaceTransform;
+import android.hardware.camera2.params.RggbChannelVector;
 import android.util.Log;
 import android.util.Range;
 import android.util.Rational;
@@ -238,12 +240,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                byte[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
+                int[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
 
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
 
-                for (byte mode : modes) {
+                for (int mode : modes) {
                     antiBandingTestByMode(previewSz, mode);
                 }
             } finally {
@@ -279,8 +281,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 updatePreviewSurface(maxPreviewSz);
 
                 // Test aeMode and lock
-                byte[] aeModes = mStaticInfo.getAeAvailableModesChecked();
-                for (byte mode : aeModes) {
+                int[] aeModes = mStaticInfo.getAeAvailableModesChecked();
+                for (int mode : aeModes) {
                     aeModeAndLockTestByMode(mode);
                 }
             } finally {
@@ -543,12 +545,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         Size maxPrevSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        byte[] availableModes = mStaticInfo.getAvailableNoiseReductionModesChecked();
+        int[] availableModes = mStaticInfo.getAvailableNoiseReductionModesChecked();
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPrevSize, resultListener);
 
-        for (byte mode : availableModes) {
-            requestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE, (int)mode);
+        for (int mode : availableModes) {
+            requestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE, mode);
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
@@ -660,14 +662,14 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void edgeModesTestByCamera() throws Exception {
         Size maxPrevSize = mOrderedPreviewSizes.get(0);
-        byte[] edgeModes = mStaticInfo.getAvailableEdgeModesChecked();
+        int[] edgeModes = mStaticInfo.getAvailableEdgeModesChecked();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPrevSize, resultListener);
 
-        for (byte mode : edgeModes) {
-            requestBuilder.set(CaptureRequest.EDGE_MODE, (int)mode);
+        for (int mode : edgeModes) {
+            requestBuilder.set(CaptureRequest.EDGE_MODE, mode);
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
@@ -707,12 +709,15 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         // TRANSFORM_MATRIX mode
         // Only test unit gain and identity transform
-        float[] UNIT_GAIN = {1.0f, 1.0f, 1.0f, 1.0f};
-        Rational[] IDENTITY_TRANSFORM = {
+        RggbChannelVector UNIT_GAIN = new RggbChannelVector(1.0f, 1.0f, 1.0f, 1.0f);
+
+        ColorSpaceTransform IDENTITY_TRANSFORM = new ColorSpaceTransform(
+            new Rational[] {
                 ONE_R, ZERO_R, ZERO_R,
                 ZERO_R, ONE_R, ZERO_R,
                 ZERO_R, ZERO_R, ONE_R
-        };
+            });
+
         manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
         manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
                 CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
@@ -721,11 +726,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         request = manualRequestBuilder.build();
         mCamera.capture(request, listener, mHandler);
         result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
-        float[] gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
-        Rational[] transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
+        RggbChannelVector gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
+        ColorSpaceTransform transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
         validateColorCorrectionResult(result);
         mCollector.expectEquals("Color correction gain result/request mismatch",
-                CameraTestUtils.toObject(UNIT_GAIN), CameraTestUtils.toObject(gains));
+                UNIT_GAIN, gains);
         mCollector.expectEquals("Color correction gain result/request mismatch",
                 IDENTITY_TRANSFORM, transform);
 
@@ -749,27 +754,24 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     private void validateColorCorrectionResult(CaptureResult result) {
-        float[] ZERO_GAINS = {0, 0, 0, 0};
+        final RggbChannelVector ZERO_GAINS = new RggbChannelVector(0, 0, 0, 0);
         final int TRANSFORM_SIZE = 9;
         Rational[] zeroTransform = new Rational[TRANSFORM_SIZE];
         Arrays.fill(zeroTransform, ZERO_R);
+        final ColorSpaceTransform ZERO_TRANSFORM = new ColorSpaceTransform(zeroTransform);
 
-        float[] resultGain;
+        RggbChannelVector resultGain;
         if ((resultGain = mCollector.expectKeyValueNotNull(result,
                 CaptureResult.COLOR_CORRECTION_GAINS)) != null) {
-            mCollector.expectEquals("Color correction gain size in incorrect",
-                    ZERO_GAINS.length, resultGain.length);
             mCollector.expectKeyValueNotEquals(result,
                     CaptureResult.COLOR_CORRECTION_GAINS, ZERO_GAINS);
         }
 
-        Rational[] resultTransform;
+        ColorSpaceTransform resultTransform;
         if ((resultTransform = mCollector.expectKeyValueNotNull(result,
                 CaptureResult.COLOR_CORRECTION_TRANSFORM)) != null) {
-            mCollector.expectEquals("Color correction transform size is incorrect",
-                    zeroTransform.length, resultTransform.length);
             mCollector.expectKeyValueNotEquals(result,
-                    CaptureResult.COLOR_CORRECTION_TRANSFORM, zeroTransform);
+                    CaptureResult.COLOR_CORRECTION_TRANSFORM, ZERO_TRANSFORM);
         }
     }
 
@@ -1152,15 +1154,15 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         if (!mStaticInfo.isHardwareLevelFull()) {
             return;
         }
-        byte[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
+        int[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
 
         SimpleCaptureListener listener;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
         Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
-        for (byte mode : faceDetectModes) {
-            requestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE, (int)mode);
+        for (int mode : faceDetectModes) {
+            requestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE, mode);
             if (VERBOSE) {
                 Log.v(TAG, "Start testing face detection mode " + mode);
             }
@@ -1273,9 +1275,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
 
-        byte[] toneMapModes = mStaticInfo.getAvailableToneMapModesChecked();
-        for (byte mode : toneMapModes) {
-            requestBuilder.set(CaptureRequest.TONEMAP_MODE, (int)mode);
+        int[] toneMapModes = mStaticInfo.getAvailableToneMapModesChecked();
+        for (int mode : toneMapModes) {
+            requestBuilder.set(CaptureRequest.TONEMAP_MODE, mode);
             if (VERBOSE) {
                 Log.v(TAG, "Testing tonemap mode " + mode);
             }
@@ -1387,20 +1389,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * </p>
      */
     private void awbModeAndLockTestByCamera() throws Exception {
-        byte[] awbModes = mStaticInfo.getAwbAvailableModesChecked();
+        int[] awbModes = mStaticInfo.getAwbAvailableModesChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
 
-        for (byte mode : awbModes) {
+        for (int mode : awbModes) {
             SimpleCaptureListener listener;
-            requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, (int)mode);
+            requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
 
             // Verify AWB mode in capture result.
-            verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, (int)mode, listener,
+            verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, mode, listener,
                     NUM_FRAMES_VERIFIED);
 
             // Verify color correction transform and gains stay unchanged after a lock.
@@ -1416,19 +1418,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void verifyAwbCaptureResultUnchanged(SimpleCaptureListener listener,
             int numFramesVerified) {
         CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-        float[] lockedGains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
-        Rational[] lockedTransform =
+        RggbChannelVector lockedGains =
+                getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
+        ColorSpaceTransform lockedTransform =
                 getValueNotNull(result, CaptureResult.COLOR_CORRECTION_TRANSFORM);
 
         for (int i = 0; i < numFramesVerified; i++) {
             result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             validateColorCorrectionResult(result);
 
-            float[] gains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
-            Rational[] transform =
+            RggbChannelVector gains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
+            ColorSpaceTransform transform =
                     getValueNotNull(result, CaptureResult.COLOR_CORRECTION_TRANSFORM);
             mCollector.expectEquals("Color correction gains should remain unchanged after awb lock",
-                    toObject(lockedGains), toObject(gains));
+                    lockedGains, gains);
             mCollector.expectEquals("Color correction transform should remain unchanged after"
                     + " awb lock", lockedTransform, transform);
         }
@@ -1444,20 +1447,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * </p>
      */
     private void afModeTestByCamera() throws Exception {
-        byte[] afModes = mStaticInfo.getAfAvailableModesChecked();
+        int[] afModes = mStaticInfo.getAfAvailableModesChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
 
-        for (byte mode : afModes) {
+        for (int mode : afModes) {
             SimpleCaptureListener listener;
-            requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, (int)mode);
+            requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
 
             // Verify AF mode in capture result.
-            verifyCaptureResultForKey(CaptureResult.CONTROL_AF_MODE, (int)mode, listener,
+            verifyCaptureResultForKey(CaptureResult.CONTROL_AF_MODE, mode, listener,
                     NUM_FRAMES_VERIFIED);
 
             // Verify AF can finish a scan for CONTROL_AF_MODE_CONTINUOUS_* modes
@@ -1477,17 +1480,17 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void stabilizationTestByCamera() throws Exception {
         // video stabilization test.
-        byte[] videoStabModes = mStaticInfo.getAvailableVideoStabilizationModesChecked();
-        byte[] opticalStabModes = mStaticInfo.getAvailableOpticalStabilizationChecked();
+        int[] videoStabModes = mStaticInfo.getAvailableVideoStabilizationModesChecked();
+        int[] opticalStabModes = mStaticInfo.getAvailableOpticalStabilizationChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener listener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPreviewSize, listener);
 
-        for ( byte mode : videoStabModes) {
+        for (int mode : videoStabModes) {
             listener = new SimpleCaptureListener();
-            requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, (int) mode);
+            requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             // TODO: enable below code when b/14059883 is fixed.
             /*
@@ -1572,7 +1575,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     private void sceneModeTestByCamera() throws Exception {
-        byte[] sceneModes = mStaticInfo.getAvailableSceneModesChecked();
+        int[] sceneModes = mStaticInfo.getAvailableSceneModesChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -1580,8 +1583,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         requestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
         startPreview(requestBuilder, maxPreviewSize, listener);
 
-        for(byte mode : sceneModes) {
-            requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, (int)mode);
+        for(int mode : sceneModes) {
+            requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             // Enable below check  when b/14059883 is fixed.
@@ -1596,7 +1599,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     private void effectModeTestByCamera() throws Exception {
-        byte[] effectModes = mStaticInfo.getAvailableEffectModesChecked();
+        int[] effectModes = mStaticInfo.getAvailableEffectModesChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -1604,8 +1607,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         SimpleCaptureListener listener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPreviewSize, listener);
 
-        for(byte mode : effectModes) {
-            requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, (int)mode);
+        for(int mode : effectModes) {
+            requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             // Enable below check  when b/14059883 is fixed.
