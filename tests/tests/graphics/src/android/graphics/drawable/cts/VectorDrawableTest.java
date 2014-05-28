@@ -49,6 +49,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_repeated_st,
             R.drawable.vector_icon_repeated_a_1,
             R.drawable.vector_icon_repeated_a_2,
+            R.drawable.vector_icon_clip_path_1,
+            R.drawable.vector_icon_transformation_1,
     };
 
     private int[] mGoldenImages = new int[] {
@@ -63,6 +65,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_repeated_st_golden,
             R.drawable.vector_icon_repeated_a_1_golden,
             R.drawable.vector_icon_repeated_a_2_golden,
+            R.drawable.vector_icon_clip_path_1_golden,
+            R.drawable.vector_icon_transformation_1_golden,
     };
 
     private static final int IMAGE_WIDTH = 64;
@@ -130,11 +134,16 @@ public class VectorDrawableTest extends AndroidTestCase {
         // Save the image to the disk.
         FileOutputStream out = null;
         try {
+            String outputFolder = "/sdcard/temp/";
+            File folder = new File(outputFolder);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
             String originalFilePath = mResources.getString(resIds[index]);
             File originalFile = new File(originalFilePath);
             String fileFullName = originalFile.getName();
             String fileTitle = fileFullName.substring(0, fileFullName.lastIndexOf("."));
-            String outputFilename = "/sdcard/temp/" + fileTitle + "_golden.png";
+            String outputFilename = outputFolder + fileTitle + "_golden.png";
             File outputFile = new File(outputFilename);
             if (!outputFile.exists()) {
                 outputFile.createNewFile();
