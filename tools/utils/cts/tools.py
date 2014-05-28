@@ -120,6 +120,45 @@ class TestPlan(object):
     self.all_packages = all_packages
     self.map = None
 
+    self.includedTestsMap = {}
+    self.excludedTestsMap = {}
+
+
+  def IncludeTests(self, package, test_list):
+    """Include only specific tests in this plan.
+
+    package The package that contains the tests. e.g. android.mypackage
+      This package should must be included via Include.
+    test_list A list of tests with methods to be included. e.g.
+      ['TestClass#testA', 'TestClass#testB']
+    """
+    packaged_test_list = []
+    for test in test_list:
+      packaged_test_list.append(package + '.' + test)
+
+    if package in self.includedTestsMap:
+      self.includedTestsMap[package] += packaged_test_list
+    else:
+      self.includedTestsMap[package] = packaged_test_list
+
+
+  def ExcludeTests(self, package, test_list):
+    """Exclude specific tests from this plan.
+
+    package The package that contains the tests. e.g. android.mypackage
+      This package should must be included via Include.
+    test_list A list of tests with methods to be excluded. e.g.
+      ['TestClass#testA', 'TestClass#textB']
+    """
+    packaged_test_list = []
+    for test in test_list:
+      packaged_test_list.append(package + '.' + test)
+    if package in self.excludedTestsMap:
+      self.excludedTestsMap[package] += packaged_test_list
+    else:
+      self.excludedTestsMap[package] = packaged_test_list
+
+
   def Exclude(self, pattern):
     """Exclude all packages matching the given regular expression from the plan.
 
@@ -167,6 +206,10 @@ class TestPlan(object):
       if self.map[package]:
         entry = doc.createElement('Entry')
         entry.setAttribute('uri', package)
+        if package in self.excludedTestsMap:
+          entry.setAttribute('exclude', ';'.join(self.excludedTestsMap[package]))
+        if package in self.includedTestsMap:
+          entry.setAttribute('include', ';'.join(self.includedTestsMap[package]))
         plan.appendChild(entry)
     stream = open(file_name, 'w')
     doc.writexml(stream, addindent='  ', newl='\n', encoding='UTF-8')
