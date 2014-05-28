@@ -287,7 +287,7 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidControlMaxRegions() throws Exception {
+    public void testCameraCharacteristicsAndroidControlMaxRegionsAe() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
@@ -296,14 +296,60 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
 
             {
 
-                assertNotNull("Invalid property: android.control.maxRegions",
-                        props.get(CameraCharacteristics.CONTROL_MAX_REGIONS));
+                assertNotNull("Invalid property: android.control.maxRegionsAe",
+                        props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE));
 
                 List<Key<?>> allKeys = props.getKeys();
                 assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
                         ids[i], props));
-                assertTrue("Key not in keys list: android.control.maxRegions", allKeys.contains(
-                        CameraCharacteristics.CONTROL_MAX_REGIONS));
+                assertTrue("Key not in keys list: android.control.maxRegionsAe", allKeys.contains(
+                        CameraCharacteristics.CONTROL_MAX_REGIONS_AE));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidControlMaxRegionsAwb() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.control.maxRegionsAwb",
+                        props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.control.maxRegionsAwb", allKeys.contains(
+                        CameraCharacteristics.CONTROL_MAX_REGIONS_AWB));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidControlMaxRegionsAf() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.control.maxRegionsAf",
+                        props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.control.maxRegionsAf", allKeys.contains(
+                        CameraCharacteristics.CONTROL_MAX_REGIONS_AF));
 
             }
 
@@ -636,7 +682,7 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidRequestMaxNumOutputStreams() throws Exception {
+    public void testCameraCharacteristicsAndroidRequestMaxNumOutputRaw() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
@@ -645,14 +691,60 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
 
             {
 
-                assertNotNull("Invalid property: android.request.maxNumOutputStreams",
-                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS));
+                assertNotNull("Invalid property: android.request.maxNumOutputRaw",
+                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW));
 
                 List<Key<?>> allKeys = props.getKeys();
                 assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
                         ids[i], props));
-                assertTrue("Key not in keys list: android.request.maxNumOutputStreams", allKeys.contains(
-                        CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS));
+                assertTrue("Key not in keys list: android.request.maxNumOutputRaw", allKeys.contains(
+                        CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidRequestMaxNumOutputProc() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.request.maxNumOutputProc",
+                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.request.maxNumOutputProc", allKeys.contains(
+                        CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidRequestMaxNumOutputProcStalling() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.request.maxNumOutputProcStalling",
+                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.request.maxNumOutputProcStalling", allKeys.contains(
+                        CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING));
 
             }
 

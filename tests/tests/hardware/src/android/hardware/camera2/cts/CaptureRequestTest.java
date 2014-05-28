@@ -32,6 +32,7 @@ import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.hardware.camera2.params.Face;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.util.Log;
+import android.util.Range;
 import android.util.Rational;
 import android.util.Size;
 
@@ -1816,26 +1817,24 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void verifyFpsNotSlowDown(CaptureRequest.Builder requestBuilder,
             int numFramesVerified)  throws Exception {
-        int[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        Range<Integer>[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
         boolean antiBandingOffIsSupported = mStaticInfo.isAntiBandingOffModeSupported();
-        final int FPS_RANGE_SIZE = 2;
-        int[] fpsRange = new int[FPS_RANGE_SIZE];
+        Range<Integer> fpsRange;
         SimpleCaptureListener resultListener;
 
-        for (int i = 0; i < fpsRanges.length; i += FPS_RANGE_SIZE) {
-            fpsRange[0] = fpsRanges[i];
-            fpsRange[1] = fpsRanges[i + 1];
+        for (int i = 0; i < fpsRanges.length; i += 1) {
+            fpsRange = fpsRanges[i];
             Size previewSz = getMaxPreviewSizeForFpsRange(fpsRange);
             // If unable to find a preview size, then log the failure, and skip this run.
             if (!mCollector.expectTrue(String.format(
-                    "Unable to find a preview size supporting given fps range [%d, %d]",
-                    fpsRange[0], fpsRange[1]), previewSz != null)) {
+                    "Unable to find a preview size supporting given fps range %s",
+                    fpsRange), previewSz != null)) {
                 continue;
             }
 
             if (VERBOSE) {
-                Log.v(TAG, String.format("Test fps range [%d, %d] for preview size %s",
-                        fpsRange[0], fpsRange[1], previewSz.toString()));
+                Log.v(TAG, String.format("Test fps range %s for preview size %s",
+                        fpsRange, previewSz.toString()));
             }
             requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             // Turn off auto antibanding to avoid exposure time and frame duration interference
@@ -1854,7 +1853,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             resultListener = new SimpleCaptureListener();
             startPreview(requestBuilder, previewSz, resultListener);
             long[] frameDurationRange =
-                    new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+                    new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
             for (int j = 0; j < numFramesVerified; j++) {
                 CaptureResult result =
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
