@@ -275,9 +275,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
-        resultKeys.add(CaptureResult.TONEMAP_CURVE_BLUE);
-        resultKeys.add(CaptureResult.TONEMAP_CURVE_GREEN);
-        resultKeys.add(CaptureResult.TONEMAP_CURVE_RED);
+        resultKeys.add(CaptureResult.TONEMAP_CURVE);
         resultKeys.add(CaptureResult.TONEMAP_MODE);
         resultKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
 

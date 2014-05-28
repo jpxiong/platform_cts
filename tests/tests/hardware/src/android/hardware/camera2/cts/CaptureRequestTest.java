@@ -33,6 +33,7 @@ import android.hardware.camera2.params.Face;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.RggbChannelVector;
+import android.hardware.camera2.params.TonemapCurve;
 import android.util.Log;
 import android.util.Range;
 import android.util.Rational;
@@ -1283,9 +1284,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             }
 
             if (mode == CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE) {
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_RED, TONEMAP_CURVE_LINEAR);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_GREEN, TONEMAP_CURVE_LINEAR);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_BLUE, TONEMAP_CURVE_LINEAR);
+                TonemapCurve tcLinear = new TonemapCurve(
+                        TONEMAP_CURVE_LINEAR, TONEMAP_CURVE_LINEAR, TONEMAP_CURVE_LINEAR);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcLinear);
                 // Create a new listener for each run to avoid the results from one run spill
                 // into another run.
                 listener = new SimpleCaptureListener();
@@ -1293,9 +1294,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
                         TONEMAP_CURVE_LINEAR);
 
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_RED, TONEMAP_CURVE_SRGB);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_GREEN, TONEMAP_CURVE_SRGB);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_BLUE, TONEMAP_CURVE_SRGB);
+                TonemapCurve tcSrgb = new TonemapCurve(
+                        TONEMAP_CURVE_SRGB, TONEMAP_CURVE_SRGB, TONEMAP_CURVE_SRGB);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcSrgb);
                 // Create a new listener for each run to avoid the results from one run spill
                 // into another run.
                 listener = new SimpleCaptureListener();
@@ -1338,18 +1339,16 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             mCollector.expectEquals("Capture result tonemap mode should match request", tonemapMode,
                     result.get(CaptureResult.TONEMAP_MODE));
-            float[] mapRed = result.get(CaptureResult.TONEMAP_CURVE_RED);
-            float[] mapGreen = result.get(CaptureResult.TONEMAP_CURVE_GREEN);
-            float[] mapBlue = result.get(CaptureResult.TONEMAP_CURVE_BLUE);
-            boolean redAvailable =
-                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
-                            + tonemapMode, mapRed != null);
-            boolean greenAvailable =
-                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
-                            + tonemapMode, mapGreen != null);
-            boolean blueAvailable =
-                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
-                            + tonemapMode, mapBlue != null);
+            TonemapCurve tc = getValueNotNull(result, CaptureResult.TONEMAP_CURVE);
+            int pointCount = tc.getPointCount(TonemapCurve.CHANNEL_RED);
+            float[] mapRed = new float[pointCount * TonemapCurve.POINT_SIZE];
+            pointCount = tc.getPointCount(TonemapCurve.CHANNEL_GREEN);
+            float[] mapGreen = new float[pointCount * TonemapCurve.POINT_SIZE];
+            pointCount = tc.getPointCount(TonemapCurve.CHANNEL_BLUE);
+            float[] mapBlue = new float[pointCount * TonemapCurve.POINT_SIZE];
+            tc.copyColorCurve(TonemapCurve.CHANNEL_RED, mapRed, 0);
+            tc.copyColorCurve(TonemapCurve.CHANNEL_GREEN, mapGreen, 0);
+            tc.copyColorCurve(TonemapCurve.CHANNEL_BLUE, mapBlue, 0);
             if (tonemapMode == CaptureResult.TONEMAP_MODE_CONTRAST_CURVE) {
                 /**
                  * TODO: need figure out a good way to measure the difference
@@ -1359,24 +1358,18 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             }
 
             // Tonemap curve result availability and basic sanity check for all modes.
-            if (redAvailable) {
-                mCollector.expectValuesInRange("Tonemap curve red values are out of range",
-                        CameraTestUtils.toObject(mapRed), /*min*/ZERO, /*max*/ONE);
-                mCollector.expectInRange("Tonemap curve red length is out of range",
-                        mapRed.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
-            }
-            if (greenAvailable) {
-                mCollector.expectValuesInRange("Tonemap curve green values are out of range",
-                        CameraTestUtils.toObject(mapGreen), /*min*/ZERO, /*max*/ONE);
-                mCollector.expectInRange("Tonemap curve green length is out of range",
-                        mapGreen.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
-            }
-            if (blueAvailable) {
-                mCollector.expectValuesInRange("Tonemap curve blue values are out of range",
-                        CameraTestUtils.toObject(mapBlue), /*min*/ZERO, /*max*/ONE);
-                mCollector.expectInRange("Tonemap curve blue length is out of range",
-                        mapBlue.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
-            }
+            mCollector.expectValuesInRange("Tonemap curve red values are out of range",
+                    CameraTestUtils.toObject(mapRed), /*min*/ZERO, /*max*/ONE);
+            mCollector.expectInRange("Tonemap curve red length is out of range",
+                    mapRed.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
+            mCollector.expectValuesInRange("Tonemap curve green values are out of range",
+                    CameraTestUtils.toObject(mapGreen), /*min*/ZERO, /*max*/ONE);
+            mCollector.expectInRange("Tonemap curve green length is out of range",
+                    mapGreen.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
+            mCollector.expectValuesInRange("Tonemap curve blue values are out of range",
+                    CameraTestUtils.toObject(mapBlue), /*min*/ZERO, /*max*/ONE);
+            mCollector.expectInRange("Tonemap curve blue length is out of range",
+                    mapBlue.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
         }
     }
 
