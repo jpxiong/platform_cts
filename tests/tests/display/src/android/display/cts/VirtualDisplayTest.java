@@ -29,6 +29,7 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
@@ -72,6 +73,8 @@ public class VirtualDisplayTest extends AndroidTestCase {
     private ImageReader mImageReader;
     private Surface mSurface;
     private ImageListener mImageListener;
+    private HandlerThread mCheckThread;
+    private Handler mCheckHandler;
 
     @Override
     protected void setUp() throws Exception {
@@ -80,11 +83,15 @@ public class VirtualDisplayTest extends AndroidTestCase {
         mDisplayManager = (DisplayManager)mContext.getSystemService(Context.DISPLAY_SERVICE);
         mHandler = new Handler(Looper.getMainLooper());
         mImageListener = new ImageListener();
+        // thread for image checking
+        mCheckThread = new HandlerThread("TestHandler");
+        mCheckThread.start();
+        mCheckHandler = new Handler(mCheckThread.getLooper());
 
         mImageReaderLock.lock();
         try {
             mImageReader = ImageReader.newInstance(WIDTH, HEIGHT, PixelFormat.RGBA_8888, 2);
-            mImageReader.setOnImageAvailableListener(mImageListener, mHandler);
+            mImageReader.setOnImageAvailableListener(mImageListener, mCheckHandler);
             mSurface = mImageReader.getSurface();
         } finally {
             mImageReaderLock.unlock();
@@ -94,7 +101,6 @@ public class VirtualDisplayTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-
         mImageReaderLock.lock();
         try {
             mImageReader.close();
@@ -103,6 +109,7 @@ public class VirtualDisplayTest extends AndroidTestCase {
         } finally {
             mImageReaderLock.unlock();
         }
+        mCheckThread.quit();
     }
 
     /**
