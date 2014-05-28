@@ -75,6 +75,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     private Locale mOldLocale;
 
+    private CallCounter mCancelOperationCounter;
     private CallCounter mLayoutCallCounter;
     private CallCounter mWriteCallCounter;
     private CallCounter mFinishCallCounter;
@@ -103,6 +104,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         }
 
         // Initialize the latches.
+        mCancelOperationCounter = new CallCounter();
         mLayoutCallCounter = new CallCounter();
         mFinishCallCounter = new CallCounter();
         mWriteCallCounter = new CallCounter();
@@ -145,6 +147,10 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         });
     }
 
+    protected void onCancelOperationCalled() {
+        mCancelOperationCounter.call();
+    }
+
     protected void onLayoutCalled() {
         mLayoutCallCounter.call();
     }
@@ -163,6 +169,11 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     protected void onPrinterDiscoverySessionDestroyCalled() {
         mDestroySessionCallCounter.call();
+    }
+
+    protected void waitForCancelOperationCallbackCalled() {
+        waitForCallbackCallCount(mCancelOperationCounter, 1,
+                "Did not get expected call to onCancel for the current operation.");
     }
 
     protected void waitForPrinterDiscoverySessionDestroyCallbackCalled() {
@@ -185,7 +196,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
                 "Did not get expected call to layout.");
     }
 
-    protected void waitForWriteForAdapterCallback() {
+    protected void waitForWriteAdapterCallback() {
         waitForCallbackCallCount(mWriteCallCounter, 1, "Did not get expected call to write.");
     }
 
@@ -243,6 +254,12 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         mActivity = launchActivity(
                 getInstrumentation().getTargetContext().getPackageName(),
                 PrintDocumentActivity.class, null);
+    }
+
+    protected void openPrintOptions() throws UiObjectNotFoundException {
+        UiObject expandHandle = new UiObject(new UiSelector().resourceId(
+                "com.android.printspooler:id/expand_collapse_handle"));
+        expandHandle.click();
     }
 
     protected void clearPrintSpoolerData() throws Exception {
@@ -358,20 +375,21 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         public void call() {
             synchronized (mLock) {
                 mCallCount++;
+                mLock.notifyAll();
             }
         }
 
-        public void waitForCount(int count, long timeoutMIllis) throws TimeoutException {
+        public void waitForCount(int count, long timeoutMillis) throws TimeoutException {
             synchronized (mLock) {
                 final long startTimeMillis = SystemClock.uptimeMillis();
                 while (mCallCount < count) {
                     try {
                         final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
-                        final long remainingTimeMillis = timeoutMIllis - elapsedTimeMillis;
+                        final long remainingTimeMillis = timeoutMillis - elapsedTimeMillis;
                         if (remainingTimeMillis <= 0) {
                             throw new TimeoutException();
                         }
-                        mLock.wait(timeoutMIllis);
+                        mLock.wait(timeoutMillis);
                     } catch (InterruptedException ie) {
                         /* ignore */
                     }

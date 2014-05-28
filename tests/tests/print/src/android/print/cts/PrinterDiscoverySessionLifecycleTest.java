@@ -92,7 +92,7 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write of the first page.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Select the first printer.
         selectPrinter(FIRST_PRINTER_NAME);
@@ -186,7 +186,7 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write of the first page.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Select the first printer.
         selectPrinter(FIRST_PRINTER_NAME);
@@ -222,15 +222,14 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         getUiDevice().pressBack(); // wakes up the device.
         getUiDevice().pressBack();
 
-        // Wait for all print jobs to be handled after which the session destroyed.
+        // Wait for all print jobs to be handled after which the is session destroyed.
         waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(firstSessionCallbacks);
 
-        // We start discovery as the print dialog was up.
+        // We start discovery with no printer history.
         List<PrinterId> priorityList = new ArrayList<PrinterId>();
-        priorityList.add(firstPrinterId);
         inOrder.verify(firstSessionCallbacks).onStartPrinterDiscovery(
                 priorityList);
 
@@ -238,11 +237,28 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         inOrder.verify(firstSessionCallbacks).onStartPrinterStateTracking(
                 firstPrinterId);
 
-        // We selected the second printer so the first should not be tracked.
+        // We confirmed print so the first should not be tracked.
         inOrder.verify(firstSessionCallbacks).onStopPrinterStateTracking(
                 firstPrinterId);
 
-        // ...next we stop printer discovery...
+        // We print again which brings the print activity up but the old
+        // print activity is not destroyed yet (just fine) which is the
+        // printer discovery session is not destroyed and the second print
+        // will join the ongoing session. Hence, instead of start printer
+        // discovery we are getting a printer validation request.
+        priorityList.add(firstPrinterId);
+        inOrder.verify(firstSessionCallbacks).onValidatePrinters(priorityList);
+
+        // The system selects the highest ranked historical printer.
+        inOrder.verify(firstSessionCallbacks).onStartPrinterStateTracking(
+                firstPrinterId);
+
+        // We canceled print so the first should not be tracked.
+        inOrder.verify(firstSessionCallbacks).onStopPrinterStateTracking(
+                firstPrinterId);
+
+
+        // Discovery is always stopped before the session is always destroyed.
         inOrder.verify(firstSessionCallbacks).onStopPrinterDiscovery();
 
         // ...last the session is destroyed.
