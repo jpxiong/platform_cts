@@ -111,7 +111,9 @@ public class CtsTestServer {
     private static final String QUERY_REDIRECT_PATH = "/alt_redirect";
     private static final String DELAY_PREFIX = "/delayed";
     private static final String BINARY_PREFIX = "/binary";
+    private static final String SET_COOKIE_PREFIX = "/setcookie";
     private static final String COOKIE_PREFIX = "/cookie";
+    private static final String LINKED_SCRIPT_PREFIX = "/linkedscriptprefix";
     private static final String AUTH_PREFIX = "/auth";
     private static final String SHUTDOWN_PREFIX = "/shutdown";
     public static final String NOLENGTH_POSTFIX = "nolength";
@@ -354,7 +356,6 @@ public class CtsTestServer {
         return sb.toString();
     }
 
-
     /**
      * Return an absolute URL that indirectly refers to the given asset.
      * When a client fetches this URL, the server will respond with a temporary redirect (302)
@@ -395,6 +396,43 @@ public class CtsTestServer {
         sb.append("?dest=");
         try {
             sb.append(URLEncoder.encode(getAssetUrl(path), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+        }
+        return sb.toString();
+    }
+
+    /**
+     * getSetCookieUrl returns a URL that attempts to set the cookie
+     * "key=value" when fetched.
+     * @param path a suffix to disambiguate mulitple Cookie URLs.
+     * @param key the key of the cookie.
+     * @return the url for a page that attempts to set the cookie.
+     */
+    public String getSetCookieUrl(String path, String key, String value) {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(SET_COOKIE_PREFIX);
+        sb.append(path);
+        sb.append("?key=");
+        sb.append(key);
+        sb.append("&value=");
+        sb.append(value);
+        return sb.toString();
+    }
+
+    /**
+     * getLinkedScriptUrl returns a URL for a page with a script tag where
+     * src equals the URL passed in.
+     * @param path a suffix to disambiguate mulitple Linked Script URLs.
+     * @param url the src of the script tag.
+     * @return the url for the page with the script link in.
+     */
+    public String getLinkedScriptUrl(String path, String url) {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(LINKED_SCRIPT_PREFIX);
+        sb.append(path);
+        sb.append("?url=");
+        try {
+            sb.append(URLEncoder.encode(url, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
         }
         return sb.toString();
@@ -681,8 +719,20 @@ public class CtsTestServer {
             }
 
             response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
-            response.setEntity(createEntity("<html><head><title>" + cookieString +
-                    "</title></head><body>" + cookieString + "</body></html>"));
+            response.setEntity(createPage(cookieString.toString(), cookieString.toString()));
+        } else if (path.startsWith(SET_COOKIE_PREFIX)) {
+            response = createResponse(HttpStatus.SC_OK);
+            Uri parsedUri = Uri.parse(uriString);
+            String key = parsedUri.getQueryParameter("key");
+            String value = parsedUri.getQueryParameter("value");
+            String cookie = key + "=" + value;
+            response.addHeader("Set-Cookie", cookie);
+            response.setEntity(createPage(cookie, cookie));
+        } else if (path.startsWith(LINKED_SCRIPT_PREFIX)) {
+            response = createResponse(HttpStatus.SC_OK);
+            String src = Uri.parse(uriString).getQueryParameter("url");
+            String scriptTag = "<script src=\"" + src + "\"></script>";
+            response.setEntity(createPage("LinkedScript", scriptTag));
         } else if (path.equals(USERAGENT_PATH)) {
             response = createResponse(HttpStatus.SC_OK);
             Header agentHeader = request.getFirstHeader("User-Agent");
@@ -690,8 +740,7 @@ public class CtsTestServer {
             if (agentHeader != null) {
                 agent = agentHeader.getValue();
             }
-            response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
-                    "<body>" + agent + "</body></html>"));
+            response.setEntity(createPage(agent, agent));
         } else if (path.equals(TEST_DOWNLOAD_PATH)) {
             response = createTestDownloadResponse(Uri.parse(uriString));
         } else if (path.equals(SHUTDOWN_PREFIX)) {
@@ -772,12 +821,7 @@ public class CtsTestServer {
         // Fill in error reason. Avoid use of the ReasonPhraseCatalog, which is Locale-dependent.
         String reason = getReasonString(status);
         if (reason != null) {
-            StringBuffer buf = new StringBuffer("<html><head><title>");
-            buf.append(reason);
-            buf.append("</title></head><body>");
-            buf.append(reason);
-            buf.append("</body></html>");
-            response.setEntity(createEntity(buf.toString()));
+            response.setEntity(createPage(reason, reason));
         }
         return response;
     }
@@ -794,6 +838,14 @@ public class CtsTestServer {
             Log.w(TAG, e);
         }
         return null;
+    }
+
+    /**
+     * Create a string entity for a bare bones html page with provided title and body.
+     */
+    private static StringEntity createPage(String title, String bodyContent) {
+        return createEntity("<html><head><title>" + title + "</title></head>" +
+                "<body>" + bodyContent + "</body></html>");
     }
 
     private static HttpResponse createTestDownloadResponse(Uri uri) throws IOException {

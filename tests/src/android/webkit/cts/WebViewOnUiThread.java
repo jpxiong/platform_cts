@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.DownloadListener;
+import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
@@ -737,6 +738,24 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void setAcceptThirdPartyCookies(final boolean accept) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CookieManager.getInstance().setAcceptThirdPartyCookies(mWebView, accept);
+            }
+        });
+    }
+
+    public boolean acceptThirdPartyCookies() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return CookieManager.getInstance().acceptThirdPartyCookies(mWebView);
+            }
+        });
+    }
+
     /**
      * Helper for running code on the UI thread where an exception is
      * a test failure. If this is already the UI thread then it runs
@@ -766,7 +785,7 @@ public class WebViewOnUiThread {
         return mWebView;
     }
 
-    private <T> T getValue(ValueGetter<T> getter) {
+    private<T> T getValue(ValueGetter<T> getter) {
         runOnUiThread(getter);
         return getter.getValue();
     }

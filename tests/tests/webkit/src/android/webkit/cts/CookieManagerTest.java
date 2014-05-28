@@ -36,8 +36,9 @@ public class CookieManagerTest extends
 
     private static final int TEST_TIMEOUT = 5000;
 
-    private WebViewOnUiThread mOnUiThread;
+    private WebView mWebView;
     private CookieManager mCookieManager;
+    private WebViewOnUiThread mOnUiThread;
 
     public CookieManagerTest() {
         super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
@@ -46,9 +47,9 @@ public class CookieManagerTest extends
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        WebView webview = getActivity().getWebView();
-        if (webview != null) {
-            mOnUiThread = new WebViewOnUiThread(this, webview);
+        mWebView = getActivity().getWebView();
+        if (mWebView != null) {
+            mOnUiThread = new WebViewOnUiThread(this, mWebView);
 
             mCookieManager = CookieManager.getInstance();
             assertNotNull(mCookieManager);
@@ -310,6 +311,63 @@ public class CookieManagerTest extends
         assertFalse(anyDeleted.get());
     }
 
+    public void testThirdPartyCookie() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+        CtsTestServer server = null;
+        try {
+            // In theory we need two servers to test this, one server ('the first party')
+            // which returns a response with a link to a second server ('the third party')
+            // at different origin. This second server attempts to set a cookie which should
+            // fail if AcceptThirdPartyCookie() is false.
+            // Strictly according to the letter of RFC6454 it should be possible to set this
+            // situation up with two TestServers on different ports (these count as having
+            // different origins) but Chrome is not strict about this and does not check the
+            // port. Instead we cheat making some of the urls come from localhost and some
+            // from 127.0.0.1 which count (both in theory and pratice) as having different
+            // origins.
+            server = new CtsTestServer(getActivity());
+
+            // Turn on Javascript (otherwise <script> aren't fetched spoiling the test).
+            mOnUiThread.getSettings().setJavaScriptEnabled(true);
+
+            // Turn global allow on.
+            mCookieManager.setAcceptCookie(true);
+            assertTrue(mCookieManager.acceptCookie());
+
+            // When third party cookies are disabled...
+            mOnUiThread.setAcceptThirdPartyCookies(false);
+            assertFalse(mOnUiThread.acceptThirdPartyCookies());
+
+            // ...we can't set third party cookies.
+            // First on the third party server we get a url which tries to set a cookie.
+            String cookieUrl = toThirdPartyUrl(
+                    server.getSetCookieUrl("cookie_1.js", "test1", "value1"));
+            // Then we create a url on the first party server which links to the first url.
+            String url = server.getLinkedScriptUrl("/content_1.html", cookieUrl);
+            mOnUiThread.loadUrlAndWaitForCompletion(url);
+            assertNull(mCookieManager.getCookie(cookieUrl));
+
+            // When third party cookies are enabled...
+            mOnUiThread.setAcceptThirdPartyCookies(true);
+            assertTrue(mOnUiThread.acceptThirdPartyCookies());
+
+            // ...we can set third party cookies.
+            cookieUrl = toThirdPartyUrl(
+                    server.getSetCookieUrl("/cookie_2.js", "test2", "value2"));
+            url = server.getLinkedScriptUrl("/content_2.html", cookieUrl);
+            mOnUiThread.loadUrlAndWaitForCompletion(url);
+            waitForCookie(cookieUrl);
+            String cookie = mCookieManager.getCookie(cookieUrl);
+            assertNotNull(cookie);
+            assertTrue(cookie.contains("test2"));
+        } finally {
+            if (server != null) server.shutdown();
+            mOnUiThread.getSettings().setJavaScriptEnabled(false);
+        }
+    }
+
     public void testb3167208() throws Exception {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
@@ -379,4 +437,13 @@ public class CookieManagerTest extends
             fail("Unexpected error while running on UI thread: " + t.getMessage());
         }
     }
-}
+
+    /**
+     * Makes a url look as if it comes from a different host.
+     * @param url the url to fake.
+     * @return the resulting url after faking.
+     */
+    public String toThirdPartyUrl(String url) {
+        return url.replace("localhost", "127.0.0.1");
+    }
+ }
