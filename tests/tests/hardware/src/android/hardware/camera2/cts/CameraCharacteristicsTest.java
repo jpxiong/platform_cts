@@ -613,29 +613,6 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidLensInfoShadingMapSize() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.lens.info.shadingMapSize",
-                        props.get(CameraCharacteristics.LENS_INFO_SHADING_MAP_SIZE));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.lens.info.shadingMapSize", allKeys.contains(
-                        CameraCharacteristics.LENS_INFO_SHADING_MAP_SIZE));
-
-            }
-
-        }
-    }
-
     public void testCameraCharacteristicsAndroidLensInfoFocusDistanceCalibration() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {

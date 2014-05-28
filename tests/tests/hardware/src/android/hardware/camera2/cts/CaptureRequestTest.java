@@ -29,11 +29,13 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
-import android.hardware.camera2.params.Face;
-import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.ColorSpaceTransform;
+import android.hardware.camera2.params.Face;
+import android.hardware.camera2.params.LensShadingMap;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.RggbChannelVector;
 import android.hardware.camera2.params.TonemapCurve;
+
 import android.util.Log;
 import android.util.Range;
 import android.util.Rational;
@@ -190,14 +192,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 requestBuilder.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                         STATISTICS_LENS_SHADING_MAP_MODE_ON);
 
-                Size mapSz = mStaticInfo.getCharacteristics().get(LENS_INFO_SHADING_MAP_SIZE);
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
 
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
 
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, mapSz, SHADING_MODE_OFF);
+                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_OFF);
 
                 // Shading map mode FAST, lensShadingMapMode ON, camera device
                 // should output valid maps.
@@ -207,7 +208,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 startPreview(requestBuilder, previewSz, listener);
 
                 // Allow at most one lock OFF state as the exposure is changed once.
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, mapSz, SHADING_MODE_FAST);
+                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_FAST);
 
                 // Shading map mode HIGH_QUALITY, lensShadingMapMode ON, camera device
                 // should output valid maps.
@@ -216,7 +217,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
 
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, mapSz, SHADING_MODE_HIGH_QUALITY);
+                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_HIGH_QUALITY);
 
                 stopPreview();
             } finally {
@@ -1105,19 +1106,18 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * Verify shading map for different shading modes.
      */
     private void verifyShadingMap(SimpleCaptureListener listener, int numFramesVerified,
-            Size mapSize, int shadingMode) throws Exception {
-        int numElementsInMap = mapSize.getWidth() * mapSize.getHeight() * RGGB_COLOR_CHANNEL_COUNT;
-        float[] unityMap = new float[numElementsInMap];
-        Arrays.fill(unityMap, 1.0f);
+            int shadingMode) throws Exception {
 
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             mCollector.expectEquals("Shading mode result doesn't match request",
                     shadingMode, result.get(CaptureResult.SHADING_MODE));
-            float[] map = result.get(CaptureResult.STATISTICS_LENS_SHADING_MAP);
+            LensShadingMap mapObj = result.get(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
+            assertNotNull("Map object must not be null", mapObj);
+            int numElementsInMap = mapObj.getGainFactorCount();
+            float[] map = new float[numElementsInMap];
+            mapObj.copyGainFactors(map, /*offset*/0);
             assertNotNull("Map must not be null", map);
-            assertTrue("Map size " + map.length + " must be " + numElementsInMap,
-                    map.length == numElementsInMap);
             assertFalse(String.format(
                     "Map size %d should be less than %d", numElementsInMap, MAX_SHADING_MAP_SIZE),
                     numElementsInMap >= MAX_SHADING_MAP_SIZE);
@@ -1139,6 +1139,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 assertEquals("Number of value in the map is " + badValueCnt + " out of "
                         + numElementsInMap, /*expected*/0, /*actual*/badValueCnt);
             } else if (shadingMode == CaptureRequest.SHADING_MODE_OFF) {
+                float[] unityMap = new float[numElementsInMap];
+                Arrays.fill(unityMap, 1.0f);
                 // shading mode is OFF, expect to receive a unity map.
                 assertTrue("Result map " + Arrays.toString(map) + " must be an unity map",
                         Arrays.equals(unityMap, map));

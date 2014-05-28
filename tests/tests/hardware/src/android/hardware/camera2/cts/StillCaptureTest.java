@@ -23,6 +23,8 @@ import android.graphics.Rect;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
@@ -57,32 +59,39 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     // TODO: exposure time error margin need to be scaled with exposure time.
     private static final float EXIF_EXPOSURE_TIME_ERROR_MARGIN_SEC = 0.002f;
     private static final float EXIF_APERTURE_ERROR_MARGIN = 0.001f;
+    private static final Location sTestLocation0 = new Location(LocationManager.GPS_PROVIDER);
+    private static final Location sTestLocation1 = new Location(LocationManager.GPS_PROVIDER);
+    private static final Location sTestLocation2 = new Location(LocationManager.NETWORK_PROVIDER);
+    static {
+        sTestLocation0.setTime(1199145600L);
+        sTestLocation0.setLatitude(37.736071);
+        sTestLocation0.setLongitude(-122.441983);
+        sTestLocation0.setAltitude(21.0);
+
+        sTestLocation1.setTime(1199145601L);
+        sTestLocation1.setLatitude(0.736071);
+        sTestLocation1.setLongitude(0.441983);
+        sTestLocation1.setAltitude(1.0);
+
+        sTestLocation2.setTime(1199145602L);
+        sTestLocation2.setLatitude(-89.736071);
+        sTestLocation2.setLongitude(-179.441983);
+        sTestLocation2.setAltitude(100000.0);
+    }
     // Exif test data vectors.
     private static final ExifTestData[] EXIF_TEST_DATA = {
             new ExifTestData(
-                    /* coords */new double[] {
-                            37.736071, -122.441983, 21.0
-                    },
-                    /* procMethod */"GPS NETWORK HYBRID ARE ALL FINE.",
-                    /* timestamp */1199145600L,
+                    /*gpsLocation*/ sTestLocation0,
                     /* orientation */90,
                     /* jpgQuality */(byte) 80,
                     /* thumbQuality */(byte) 75),
             new ExifTestData(
-                    /* coords */new double[] {
-                            0.736071, 0.441983, 1.0
-                    },
-                    /* procMethod */"GPS",
-                    /* timestamp */1199145601L,
+                    /*gpsLocation*/ sTestLocation1,
                     /* orientation */180,
                     /* jpgQuality */(byte) 90,
                     /* thumbQuality */(byte) 85),
             new ExifTestData(
-                    /* coords */new double[] {
-                            -89.736071, -179.441983, 100000.0
-                    },
-                    /* procMethod */"NETWORK",
-                    /* timestamp */1199145602L,
+                    /*gpsLocation*/ sTestLocation2,
                     /* orientation */270,
                     /* jpgQuality */(byte) 100,
                     /* thumbQuality */(byte) 100)
@@ -621,6 +630,15 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         // TODO: validate DNG metadata tags.
     }
 
+    private static boolean areGpsFieldsEqual(Location a, Location b) {
+        if (a == null || b == null) {
+            return false;
+        }
+
+        return a.getTime() == b.getTime() && a.getLatitude() == b.getLatitude() &&
+                a.getLongitude() == b.getLongitude() && a.getAltitude() == b.getAltitude() &&
+                a.getProvider() == b.getProvider();
+    }
     /**
      * Issue a Jpeg capture and validate the exif information.
      * <p>
@@ -666,10 +684,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
              *   present and semantically correct.
              */
             stillBuilder.set(CaptureRequest.JPEG_THUMBNAIL_SIZE, testThumbnailSizes[i]);
-            stillBuilder.set(CaptureRequest.JPEG_GPS_COORDINATES, EXIF_TEST_DATA[i].gpsCoordinates);
-            stillBuilder.set(CaptureRequest.JPEG_GPS_PROCESSING_METHOD,
-                    EXIF_TEST_DATA[i].gpsProcessingMethod);
-            stillBuilder.set(CaptureRequest.JPEG_GPS_TIMESTAMP, EXIF_TEST_DATA[i].gpsTimeStamp);
+            stillBuilder.set(CaptureRequest.JPEG_GPS_LOCATION, EXIF_TEST_DATA[i].gpsLocation);
             stillBuilder.set(CaptureRequest.JPEG_ORIENTATION, EXIF_TEST_DATA[i].jpegOrientation);
             stillBuilder.set(CaptureRequest.JPEG_QUALITY, EXIF_TEST_DATA[i].jpegQuality);
             stillBuilder.set(CaptureRequest.JPEG_THUMBNAIL_QUALITY,
@@ -679,15 +694,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             mCollector.expectEquals("JPEG thumbnail size request set and get should match",
                     testThumbnailSizes[i],
                     stillBuilder.get(CaptureRequest.JPEG_THUMBNAIL_SIZE));
-            mCollector.expectEquals("GPS coordinates request set and get should match.",
-                    toObject(EXIF_TEST_DATA[i].gpsCoordinates),
-                    toObject(stillBuilder.get(CaptureRequest.JPEG_GPS_COORDINATES)));
-            mCollector.expectEquals("GPS processing method request set and get should match",
-                    EXIF_TEST_DATA[i].gpsProcessingMethod,
-                    stillBuilder.get(CaptureRequest.JPEG_GPS_PROCESSING_METHOD));
-            mCollector.expectEquals("GPS time stamp request set and get should match",
-                    EXIF_TEST_DATA[i].gpsTimeStamp,
-                    stillBuilder.get(CaptureRequest.JPEG_GPS_TIMESTAMP));
+            mCollector.expectTrue("GPS locations request set and get should match.",
+                    areGpsFieldsEqual(EXIF_TEST_DATA[i].gpsLocation,
+                            stillBuilder.get(CaptureRequest.JPEG_GPS_LOCATION)));
             mCollector.expectEquals("JPEG orientation request set and get should match",
                     EXIF_TEST_DATA[i].jpegOrientation,
                     stillBuilder.get(CaptureRequest.JPEG_ORIENTATION));
@@ -724,18 +733,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             mCollector.expectEquals("JPEG thumbnail size result and request should match",
                     testThumbnailSizes[i],
                     stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE));
-            CaptureResult.Key<double[]> gpsCoordsKey = CaptureResult.JPEG_GPS_COORDINATES;
-            if (mCollector.expectKeyValueNotNull(stillResult, gpsCoordsKey) != null) {
-                mCollector.expectEquals("GPS coordinates result and request should match.",
-                        toObject(EXIF_TEST_DATA[i].gpsCoordinates),
-                        toObject(stillResult.get(gpsCoordsKey)));
+            if (mCollector.expectKeyValueNotNull(stillResult, CaptureResult.JPEG_GPS_LOCATION) !=
+                    null) {
+                mCollector.expectTrue("GPS location result and request should match.",
+                        areGpsFieldsEqual(EXIF_TEST_DATA[i].gpsLocation,
+                                stillResult.get(CaptureResult.JPEG_GPS_LOCATION)));
             }
-            mCollector.expectEquals("GPS processing method result and request should match",
-                    EXIF_TEST_DATA[i].gpsProcessingMethod,
-                    stillResult.get(CaptureResult.JPEG_GPS_PROCESSING_METHOD));
-            mCollector.expectEquals("GPS time stamp result and request should match",
-                    EXIF_TEST_DATA[i].gpsTimeStamp,
-                    stillResult.get(CaptureResult.JPEG_GPS_TIMESTAMP));
             mCollector.expectEquals("JPEG orientation result and request should match",
                     EXIF_TEST_DATA[i].jpegOrientation,
                     stillResult.get(CaptureResult.JPEG_ORIENTATION));
@@ -947,18 +950,14 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      * Immutable class wrapping the exif test data.
      */
     private static class ExifTestData {
-        public final double[] gpsCoordinates;
-        public final String gpsProcessingMethod;
-        public final long gpsTimeStamp;
+        public final Location gpsLocation;
         public final int jpegOrientation;
         public final byte jpegQuality;
         public final byte thumbnailQuality;
 
-        public ExifTestData(double[] coords, String procMethod, long timeStamp, int orientation,
+        public ExifTestData(Location location, int orientation,
                 byte jpgQuality, byte thumbQuality) {
-            gpsCoordinates = coords;
-            gpsProcessingMethod = procMethod;
-            gpsTimeStamp = timeStamp;
+            gpsLocation = location;
             jpegOrientation = orientation;
             jpegQuality = jpgQuality;
             thumbnailQuality = thumbQuality;

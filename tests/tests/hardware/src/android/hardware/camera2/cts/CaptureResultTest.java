@@ -241,9 +241,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.FLASH_MODE);
         resultKeys.add(CaptureResult.FLASH_STATE);
         resultKeys.add(CaptureResult.HOT_PIXEL_MODE);
-        resultKeys.add(CaptureResult.JPEG_GPS_COORDINATES);
-        resultKeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
-        resultKeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
+        resultKeys.add(CaptureResult.JPEG_GPS_LOCATION);
         resultKeys.add(CaptureResult.JPEG_ORIENTATION);
         resultKeys.add(CaptureResult.JPEG_QUALITY);
         resultKeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
@@ -271,7 +269,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACES);
-        resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
+        resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
