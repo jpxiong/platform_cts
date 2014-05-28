@@ -37,6 +37,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
+import android.util.Range;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
@@ -523,8 +524,8 @@ public class Camera2SurfaceViewTestCase extends
      * @param fpsRange The fps range the returned size must support.
      * @return max size that support the given fps range.
      */
-    protected Size getMaxPreviewSizeForFpsRange(int[] fpsRange) {
-        if (fpsRange == null || fpsRange[0] <= 0 || fpsRange[1] <= 0) {
+    protected Size getMaxPreviewSizeForFpsRange(Range<Integer> fpsRange) {
+        if (fpsRange == null || fpsRange.getLower() <= 0 || fpsRange.getUpper() <= 0) {
             throw new IllegalArgumentException("Invalid fps range argument");
         }
         if (mOrderedPreviewSizes == null || mMinPreviewFrameDurationMap == null) {
@@ -533,7 +534,7 @@ public class Camera2SurfaceViewTestCase extends
         }
 
         long[] frameDurationRange =
-                new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+                new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
         for (Size size : mOrderedPreviewSizes) {
             long minDuration = mMinPreviewFrameDurationMap.get(size);
             if (minDuration <= frameDurationRange[0]) {

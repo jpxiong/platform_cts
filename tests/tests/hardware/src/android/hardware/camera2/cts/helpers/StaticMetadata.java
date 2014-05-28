@@ -25,6 +25,7 @@ import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
+import android.util.Range;
 import android.util.Rational;
 
 import junit.framework.Assert;
@@ -984,27 +985,24 @@ public class StaticMetadata {
      *
      * @return Empty int array if aeAvailableTargetFpsRanges is invalid.
      */
-    public int[] getAeAvailableTargetFpsRangesChecked() {
-        final int NUM_ELEMENTS_IN_FPS_RANGE = 2;
-        Key<int[]> key =
+    @SuppressWarnings("raw")
+    public Range<Integer>[] getAeAvailableTargetFpsRangesChecked() {
+        Key<Range<Integer>[]> key =
                 CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES;
-        int[] fpsRanges = getValueFromKeyNonNull(key);
+        Range<Integer>[] fpsRanges = getValueFromKeyNonNull(key);
 
         if (fpsRanges == null) {
-            return new int[0];
+            return new Range[0];
         }
 
-        checkTrueForKey(key, "array length is invalid", fpsRanges.length
-                % NUM_ELEMENTS_IN_FPS_RANGE == 0);
         // Round down to 2 boundary if it is not integer times of 2, to avoid array out of bound
         // in case the above check fails.
-        int fpsRangeLength = (fpsRanges.length / NUM_ELEMENTS_IN_FPS_RANGE)
-                * NUM_ELEMENTS_IN_FPS_RANGE;
+        int fpsRangeLength = fpsRanges.length;
         int minFps, maxFps;
         long maxFrameDuration = getMaxFrameDurationChecked();
-        for (int i = 0; i < fpsRangeLength; i += NUM_ELEMENTS_IN_FPS_RANGE) {
-            minFps = fpsRanges[i];
-            maxFps = fpsRanges[i + 1];
+        for (int i = 0; i < fpsRangeLength; i += 1) {
+            minFps = fpsRanges[i].getLower();
+            maxFps = fpsRanges[i].getUpper();
             checkTrueForKey(key, " min fps must be no larger than max fps!",
                     minFps > 0 && maxFps >= minFps);
             long maxDuration = (long) (1e9 / minFps);
@@ -1126,26 +1124,21 @@ public class StaticMetadata {
      *
      * @return default value if the value is null or malformed.
      */
-    public int[] getAeCompensationRangeChecked() {
-        Key<int[]> key =
+    public Range<Integer> getAeCompensationRangeChecked() {
+        Key<Range<Integer>> key =
                 CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE;
-        int[] compensationRange = getValueFromKeyNonNull(key);
+        Range<Integer> compensationRange = getValueFromKeyNonNull(key);
         float compensationStep = getAeCompensationStepChecked().toFloat();
-        final int[] DEFAULT_RANGE = new int[] {
+        final Range<Integer> DEFAULT_RANGE = Range.create(
                 (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStep),
-                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStep)};
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStep));
         if (compensationRange == null) {
             return DEFAULT_RANGE;
         }
 
-        checkTrueForKey(key, " value must have 2 elements", compensationRange.length == 2);
-        if (compensationRange.length != 2) {
-            return DEFAULT_RANGE;
-        }
-
-        checkTrueForKey(key, " range value must be at least " + Arrays.toString(DEFAULT_RANGE),
-               compensationRange[0] <= DEFAULT_RANGE[0] &&
-               compensationRange[1] >= DEFAULT_RANGE[1]);
+        checkTrueForKey(key, " range value must be at least " + DEFAULT_RANGE,
+               compensationRange.getLower() <= DEFAULT_RANGE.getLower() &&
+               compensationRange.getUpper() >= DEFAULT_RANGE.getUpper());
 
         return compensationRange;
     }

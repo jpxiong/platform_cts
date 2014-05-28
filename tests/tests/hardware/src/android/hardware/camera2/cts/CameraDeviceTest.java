@@ -32,6 +32,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.Range;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingStateListener;
@@ -639,30 +640,20 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     private void checkFpsRange(CaptureRequest.Builder request, int template,
             CameraCharacteristics props) {
-        CaptureRequest.Key<int[]> fpsRangeKey = CONTROL_AE_TARGET_FPS_RANGE;
-        int[] fpsRange;
+        CaptureRequest.Key<Range<Integer>> fpsRangeKey = CONTROL_AE_TARGET_FPS_RANGE;
+        Range<Integer> fpsRange;
         if ((fpsRange = mCollector.expectKeyValueNotNull(request, fpsRangeKey)) == null) {
             return;
         }
 
-        // TODO: Use generated array dimensions
-        final int CONTROL_AE_TARGET_FPS_RANGE_SIZE = 2;
-        final int CONTROL_AE_TARGET_FPS_RANGE_MIN = 0;
-        final int CONTROL_AE_TARGET_FPS_RANGE_MAX = 1;
-
-        String cause = "Failed with fps range size check";
-        if (!mCollector.expectEquals(cause, CONTROL_AE_TARGET_FPS_RANGE_SIZE, fpsRange.length)) {
-            return;
-        }
-
-        int minFps = fpsRange[CONTROL_AE_TARGET_FPS_RANGE_MIN];
-        int maxFps = fpsRange[CONTROL_AE_TARGET_FPS_RANGE_MAX];
-        int[] availableFpsRange = props
+        int minFps = fpsRange.getLower();
+        int maxFps = fpsRange.getUpper();
+        Range<Integer>[] availableFpsRange = props
                 .get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
         boolean foundRange = false;
-        for (int i = 0; i < availableFpsRange.length; i += CONTROL_AE_TARGET_FPS_RANGE_SIZE) {
-            if (minFps == availableFpsRange[i + CONTROL_AE_TARGET_FPS_RANGE_MIN]
-                    && maxFps == availableFpsRange[i + CONTROL_AE_TARGET_FPS_RANGE_MAX]) {
+        for (int i = 0; i < availableFpsRange.length; i += 1) {
+            if (minFps == availableFpsRange[i].getLower()
+                    && maxFps == availableFpsRange[i].getUpper()) {
                 foundRange = true;
                 break;
             }

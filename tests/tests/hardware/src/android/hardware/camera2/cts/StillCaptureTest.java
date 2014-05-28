@@ -34,6 +34,7 @@ import android.media.Image;
 import android.os.Build;
 import android.os.ConditionVariable;
 import android.util.Log;
+import android.util.Range;
 import android.util.Rational;
 
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
@@ -965,10 +966,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     private void aeCompensationTestByCamera() throws Exception {
-        int[] compensationRange = mStaticInfo.getAeCompensationRangeChecked();
+        Range<Integer> compensationRange = mStaticInfo.getAeCompensationRangeChecked();
         Rational step = mStaticInfo.getAeCompensationStepChecked();
         int stepsPerEv = (int) Math.round(1.0 / step.toFloat());
-        int numSteps = (compensationRange[1] - compensationRange[0]) / stepsPerEv;
+        int numSteps = (compensationRange.getUpper() - compensationRange.getLower()) / stepsPerEv;
 
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
@@ -997,7 +998,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 maxStillSz, resultListener, numSteps, imageListener);
 
         for (int i = 0; i <= numSteps; i++) {
-            int exposureCompensation = i * stepsPerEv + compensationRange[0];
+            int exposureCompensation = i * stepsPerEv + compensationRange.getLower();
 
             // Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
             waitForAeStable(resultListener);
@@ -1076,10 +1077,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
     private long getMaxExposureValue(CaptureRequest.Builder request, long maxExposureTimeUs,
                 long maxSensitivity)  throws Exception {
-        int[] fpsRange = request.get(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
-        mCollector.expectEquals("Length of CaptureResult FPS range must be 2",
-                2, fpsRange.length);
-        long maxFrameDurationUs = Math.round(1000000.0 / fpsRange[0]);
+        Range<Integer> fpsRange = request.get(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
+        long maxFrameDurationUs = Math.round(1000000.0 / fpsRange.getLower());
         long currentMaxExposureTimeUs = Math.min(maxFrameDurationUs, maxExposureTimeUs);
         return currentMaxExposureTimeUs * maxSensitivity;
     }

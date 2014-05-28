@@ -28,6 +28,7 @@ import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
+import android.util.Range;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
@@ -122,17 +123,16 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     private void previewFpsRangeTestByCamera() throws Exception {
         final int FPS_RANGE_SIZE = 2;
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
-        int[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        Range<Integer>[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
         boolean antiBandingOffIsSupported = mStaticInfo.isAntiBandingOffModeSupported();
-        int[] fpsRange = new int[FPS_RANGE_SIZE];
+        Range<Integer> fpsRange;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         startPreview(requestBuilder, maxPreviewSz, resultListener);
 
-        for (int i = 0; i < fpsRanges.length; i += FPS_RANGE_SIZE) {
-            fpsRange[0] = fpsRanges[i];
-            fpsRange[1] = fpsRanges[i + 1];
+        for (int i = 0; i < fpsRanges.length; i += 1) {
+            fpsRange = fpsRanges[i];
 
             requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             // Turn off auto antibanding to avoid exposure time and frame duration interference
@@ -159,11 +159,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     }
 
     private void verifyPreviewTargetFpsRange(SimpleCaptureListener resultListener,
-            int numFramesVerified, int[] fpsRange, Size previewSz) {
+            int numFramesVerified, Range<Integer> fpsRange, Size previewSz) {
         CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
         long[] frameDurationRange =
-                new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+                new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
         mCollector.expectInRange(
                 "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
                 frameDuration, (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),

@@ -32,6 +32,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
+import android.util.Range;
 import android.view.SurfaceHolder;
 import android.view.Surface;
 
@@ -327,7 +328,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder recordingRequestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         // Make sure camera output frame rate is set to correct value.
-        int[] fpsRange = {VIDEO_FRAME_RATE, VIDEO_FRAME_RATE};
+        Range<Integer> fpsRange = Range.create(VIDEO_FRAME_RATE, VIDEO_FRAME_RATE);
         recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
         recordingRequestBuilder.addTarget(mRecordingSurface);
         recordingRequestBuilder.addTarget(mPreviewSurface);
