@@ -111,7 +111,7 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * Checks the PSNR difference between the encoded and decoded output and reference yuv input
      * does not change much for two different ways of the encoder call.
      */
-    public void testAsyncEncoding() throws Exception {
+    public void FIXME_testAsyncEncoding() throws Exception {
         int encodeSeconds = 9;
 
         // First test the encoder running in a looper thread with buffer callbacks enabled.

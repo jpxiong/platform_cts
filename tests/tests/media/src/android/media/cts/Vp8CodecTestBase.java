@@ -277,6 +277,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             } else {
                 params.timeoutDequeue = 0;
                 params.runInLooperThread = true;
+                continue; // FIXME add support for async
             }
             outputParameters.add(params);
         }
@@ -680,7 +681,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
      * is configured to run in async mode the function will run in a looper thread.
      * Encoded frame can be retrieved by calling getOutput() function.
      */
-    protected class MediaEncoderAsync extends Thread implements MediaCodec.NotificationCallback {
+    protected class MediaEncoderAsync extends Thread /* FIXME implements MediaCodec.NotificationCallback */ {
         private int mId;
         private MediaCodec mCodec;
         private MediaFormat mFormat;
@@ -708,7 +709,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         private Handler mHandler;
         private boolean mCallbackReceived;
 
-        @Override
+        /* FIXME @Override */
         public void onCodecNotify(MediaCodec codec) {
             synchronized (mCallbackEvent) {
                 Log.v(TAG, "MediaEncoder " + mId + " Event Callback");
@@ -795,7 +796,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             mCodec.configure(mFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mCodec.start();
             if (mAsync) {
-                mCodec.setNotificationCallback(this);
+                /* FIXME mCodec.setNotificationCallback(this); */
             }
             mInputBuffers = mCodec.getInputBuffers();
             mOutputBuffers = mCodec.getOutputBuffers();
