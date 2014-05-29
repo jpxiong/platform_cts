@@ -29,8 +29,8 @@ public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
     private static final Set<String> EXPECTED_RELEASES =
-        new HashSet<String>(Arrays.asList("4.4", "4.4.1", "4.4.2", "4.4.3"));
-    private static final int EXPECTED_SDK = 19;
+        new HashSet<String>(Arrays.asList("4.4W", "4.4", "4.4.1", "4.4.2", "4.4.3"));
+    private static final int EXPECTED_SDK = 20;
 
     @SuppressWarnings("deprecation")
     public void testReleaseVersion() {
