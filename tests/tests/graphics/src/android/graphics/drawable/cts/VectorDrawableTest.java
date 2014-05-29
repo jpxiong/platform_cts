@@ -53,6 +53,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_transformation_1,
             R.drawable.vector_icon_transformation_2,
             R.drawable.vector_icon_transformation_3,
+            R.drawable.vector_icon_transformation_4,
+            R.drawable.vector_icon_transformation_5,
     };
 
     private int[] mGoldenImages = new int[] {
@@ -71,6 +73,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_transformation_1_golden,
             R.drawable.vector_icon_transformation_2_golden,
             R.drawable.vector_icon_transformation_3_golden,
+            R.drawable.vector_icon_transformation_4_golden,
+            R.drawable.vector_icon_transformation_5_golden,
     };
 
     private static final int IMAGE_WIDTH = 64;
