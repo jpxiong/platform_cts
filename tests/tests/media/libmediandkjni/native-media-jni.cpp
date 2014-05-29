@@ -129,7 +129,7 @@ jobject testExtractor(AMediaExtractor *ex, JNIEnv *env) {
         sizes.add(n);
         sizes.add(AMediaExtractor_getSampleTrackIndex(ex));
         sizes.add(AMediaExtractor_getSampleFlags(ex));
-        sizes.add(AMediaExtractor_getSampletime(ex));
+        sizes.add(AMediaExtractor_getSampleTime(ex));
         AMediaExtractor_advance(ex);
     }
 
@@ -279,7 +279,7 @@ extern "C" jobject Java_android_media_cts_NativeDecoderTest_getDecodedDataNative
                     ALOGV("EOS");
                     //break;
                 }
-                int64_t presentationTimeUs = AMediaExtractor_getSampletime(ex);
+                int64_t presentationTimeUs = AMediaExtractor_getSampleTime(ex);
 
                 AMediaCodec_queueInputBuffer(codec[t], bufidx, 0, sampleSize, presentationTimeUs,
                         sawInputEOS[t] ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
@@ -421,7 +421,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackNative(
                 sawInputEOS = true;
                 ALOGV("EOS");
             }
-            int64_t presentationTimeUs = AMediaExtractor_getSampletime(ex);
+            int64_t presentationTimeUs = AMediaExtractor_getSampleTime(ex);
 
             AMediaCodec_queueInputBuffer(codec, bufidx, 0, sampleSize, presentationTimeUs,
                     sawInputEOS ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
@@ -504,7 +504,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNI
         }
         info.offset = 0;
         info.size = n;
-        info.presentationTimeUs = AMediaExtractor_getSampletime(ex);
+        info.presentationTimeUs = AMediaExtractor_getSampleTime(ex);
         info.flags = AMediaExtractor_getSampleFlags(ex);
 
         size_t idx = (size_t) AMediaExtractor_getSampleTrackIndex(ex);
