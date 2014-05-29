@@ -26,7 +26,6 @@ import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
-import android.util.Range;
 import android.util.Rational;
 
 import junit.framework.Assert;
@@ -161,11 +160,9 @@ public class StaticMetadata {
      * @return true if the device is FULL, false otherwise.
      */
     public boolean isHardwareLevelFull() {
-        // TODO: Make this key non-optional for all HAL3.2+ devices
         Integer hwLevel = getValueFromKeyNonNull(
                 CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
 
-        // Bad. Missing metadata. Warning is logged.
         if (hwLevel == null) {
             return false;
         }
@@ -1270,6 +1267,64 @@ public class StaticMetadata {
                 + REQUEST_PIPELINE_MAX_DEPTH_MAX, maxDepth <= REQUEST_PIPELINE_MAX_DEPTH_MAX);
 
         return maxDepth;
+    }
+
+    /**
+     * Get available capabilities and do the sanity check.
+     *
+     * @return reported available capabilities list, empty list if the value is unavailable.
+     */
+    public List<Integer> getAvailableCapabilitiesChecked() {
+        Key<int[]> key =
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES;
+        int[] availableCaps = getValueFromKeyNonNull(key);
+        List<Integer> capList;
+
+        if (availableCaps == null) {
+            return new ArrayList<Integer>();
+        }
+
+        checkArrayValuesInRange(key, availableCaps,
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);
+        capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
+        return capList;
+    }
+
+    /**
+     * Get max number of output streams and do the basic sanity check.
+     *
+     * @return reported max number of output stream array, empty array if the value is unavailable.
+     */
+    public int[] getMaxNumOutputStreamsChecked() {
+        Key<int[]> key =
+                CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS;
+        int[] maxNumStreams = getValueFromKeyNonNull(key);
+
+        if (maxNumStreams == null) {
+            return new int[0];
+        }
+
+        return maxNumStreams;
+    }
+
+    /**
+     * Get lens facing and do the sanity check
+     * @return lens facing, return default value (BACK) if value is unavailable.
+     */
+    public int getLensFacingChecked() {
+        Key<Integer> key =
+                CameraCharacteristics.LENS_FACING;
+        Integer facing = getValueFromKeyNonNull(key);
+
+        if (facing == null) {
+            return CameraCharacteristics.LENS_FACING_BACK;
+        }
+
+        checkTrueForKey(key, " value is out of range ",
+                facing >= CameraCharacteristics.LENS_FACING_FRONT &&
+                facing <= CameraCharacteristics.LENS_FACING_BACK);
+        return facing;
     }
 
     /**
