@@ -36,7 +36,7 @@ public class CookieTest extends ActivityInstrumentationTestCase2<CookieSyncManag
     protected void setUp() throws Exception {
         super.setUp();
 
-        if (!NullWebViewUtils.isWebViewAvailable()) {
+        if (getActivity().getWebView() == null) {
             return;
         }
 
