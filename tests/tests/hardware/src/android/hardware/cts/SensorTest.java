@@ -21,6 +21,7 @@ import java.lang.Override;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -34,12 +35,16 @@ import android.hardware.TriggerEventListener;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 public class SensorTest extends AndroidTestCase {
     private SensorManager mSensorManager;
     private TriggerListener mTriggerListener;
     private SensorListener mSensorListener;
-    private ArrayList<Sensor> mContinuousSensorList;
+    private List<Sensor> mSensorList;
+    private static final String TAG = "SensorTest";
+    // Test only SDK defined sensors. Any sensors with type > 100 are ignored.
+    private static final int MAX_SENSOR_TYPE = 100;
 
     @Override
     protected void setUp() throws Exception {
@@ -47,18 +52,7 @@ public class SensorTest extends AndroidTestCase {
         mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         mTriggerListener = new TriggerListener();
         mSensorListener = new SensorListener();
-        mContinuousSensorList = new ArrayList<Sensor>();
-        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
-            Sensor sensor = mSensorManager.getDefaultSensor(i);
-            // Skip all non-continuous mode sensors.
-            if (sensor == null || Sensor.TYPE_SIGNIFICANT_MOTION == i ||
-                Sensor.TYPE_STEP_COUNTER == i || Sensor.TYPE_STEP_DETECTOR == i ||
-                Sensor.TYPE_LIGHT == i || Sensor.TYPE_PROXIMITY == i ||
-                Sensor.TYPE_AMBIENT_TEMPERATURE == i) {
-                continue;
-            }
-            mContinuousSensorList.add(sensor);
-        }
+        mSensorList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
     }
 
     public void testSensorOperations() {
@@ -79,7 +73,7 @@ public class SensorTest extends AndroidTestCase {
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         boolean hasStepCounter = getContext().getPackageManager().hasSystemFeature(
-                                        PackageManager.FEATURE_SENSOR_STEP_COUNTER);
+                PackageManager.FEATURE_SENSOR_STEP_COUNTER);
         // stepcounter sensor is optional
         if (hasStepCounter) {
             assertEquals(Sensor.TYPE_STEP_COUNTER, sensor.getType());
@@ -90,7 +84,7 @@ public class SensorTest extends AndroidTestCase {
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         boolean hasStepDetector = getContext().getPackageManager().hasSystemFeature(
-                                        PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+                PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
         // stepdetector sensor is optional
         if (hasStepDetector) {
             assertEquals(Sensor.TYPE_STEP_DETECTOR, sensor.getType());
@@ -189,76 +183,77 @@ public class SensorTest extends AndroidTestCase {
     // Register for updates from each continuous mode sensor, wait for 25 events, call flush and
     // wait for flushCompleteEvent before unregistering for the sensor.
     public void testBatchAndFlush() throws Exception {
-        for (Sensor sensor : mContinuousSensorList) {
-            final CountDownLatch eventReceived = new CountDownLatch(25);
-            final CountDownLatch flushReceived = new CountDownLatch(1);
-            SensorEventListener2 listener = new SensorEventListener2() {
-                @Override
-                public void onSensorChanged(SensorEvent event) {
-                    eventReceived.countDown();
-                }
-
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                }
-
-                @Override
-                public void onFlushCompleted(Sensor sensor) {
-                    flushReceived.countDown();
-                }
-            };
-            boolean result = mSensorManager.registerListener(listener, sensor,
-                                            SensorManager.SENSOR_DELAY_NORMAL, 10000000);
-            assertTrue(result);
-            // Wait for 25 events and call flush.
-            eventReceived.await();
-            result = mSensorManager.flush(listener);
-            assertTrue(result);
-            flushReceived.await();
-            mSensorManager.unregisterListener(listener);
+        for (Sensor sensor : mSensorList) {
+            // Skip OEM defined sensors and trigger sensors.
+            if (sensor.getType() > MAX_SENSOR_TYPE || sensor.getMinDelay() < 0) {
+                continue;
+            }
+            registerListenerCallFlush(sensor, null);
         }
     }
 
     // Same as testBatchAndFlush but using Handler version of the API to register for sensors.
     // onSensorChanged is now called on a background thread.
     public void testBatchAndFlushWithHandler() throws Exception {
-        for (Sensor sensor : mContinuousSensorList) {
-            final CountDownLatch eventReceived = new CountDownLatch(25);
-            final CountDownLatch flushReceived = new CountDownLatch(1);
-            SensorEventListener2 listener = new SensorEventListener2() {
-                @Override
-                public void onSensorChanged(SensorEvent event) {
-                    eventReceived.countDown();
-                }
-
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                }
-
-                @Override
-                public void onFlushCompleted(Sensor sensor) {
-                    flushReceived.countDown();
-                }
-            };
-            HandlerThread handlerThread = new HandlerThread("sensorThread");
-            handlerThread.start();
-            Handler handler = new Handler(handlerThread.getLooper());
-            boolean result = mSensorManager.registerListener(listener, sensor,
-                                            SensorManager.SENSOR_DELAY_NORMAL, 15000000,
-                                            handler);
-            assertTrue(result);
-            // Wait for 25 events and call flush.
-            eventReceived.await();
-            result = mSensorManager.flush(listener);
-            assertTrue(result);
-            flushReceived.await();
-            mSensorManager.unregisterListener(listener);
+        HandlerThread handlerThread = new HandlerThread("sensorThread");
+        handlerThread.start();
+        Handler handler = new Handler(handlerThread.getLooper());
+        for (Sensor sensor : mSensorList) {
+            // Skip OEM defined sensors and trigger sensors.
+            if (sensor.getType() > MAX_SENSOR_TYPE || sensor.getMinDelay() < 0) {
+                continue;
+            }
+            registerListenerCallFlush(sensor, handler);
         }
+    }
+
+    private void registerListenerCallFlush(Sensor sensor, Handler handler)
+            throws InterruptedException {
+        final CountDownLatch eventReceived = new CountDownLatch(25);
+        final CountDownLatch flushReceived = new CountDownLatch(1);
+        SensorEventListener2 listener = new SensorEventListener2() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                eventReceived.countDown();
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
+
+            @Override
+            public void onFlushCompleted(Sensor sensor) {
+                flushReceived.countDown();
+            }
+        };
+        // Consider only continuous mode sensors for testing registerListener.
+        if (sensor.getMinDelay() > 0) {
+            Log.i(TAG, "testBatch " + sensor.getName());
+            boolean result = mSensorManager.registerListener(listener, sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL, 10000000, handler);
+            assertTrue("registerListener failed " + sensor.getName(), result);
+            // Wait for 25 events or 20 seconds.
+            boolean countZero = eventReceived.await(20, TimeUnit.SECONDS);
+            if (!countZero) {
+                fail("Timed out waiting for events from " + sensor.getName());
+            }
+        }
+
+        Log.i(TAG, "testFlush " + sensor.getName());
+        boolean result = mSensorManager.flush(listener);
+        assertTrue("flush failed " + sensor.getName(), result);
+        boolean countZero = flushReceived.await(20, TimeUnit.SECONDS);
+        if (!countZero) {
+            fail("Timed out waiting for flushCompleteEvent from " + sensor.getName());
+        }
+        mSensorManager.unregisterListener(listener);
+        Log.i(TAG, "testBatchAndFlush pass " + sensor.getName());
     }
 
     // Call registerListener for multiple sensors at a time and call flush.
     public void testBatchAndFlushWithMutipleSensors() throws Exception {
-        int numSensors = mContinuousSensorList.size() < 3 ? mContinuousSensorList.size() : 3;
+        final int MAX_SENSORS = 3;
+        int numSensors = mSensorList.size() < MAX_SENSORS ? mSensorList.size() : MAX_SENSORS;
         if (numSensors == 0) {
             return;
         }
@@ -279,17 +274,37 @@ public class SensorTest extends AndroidTestCase {
                 flushReceived.countDown();
             }
         };
-        for (int i = 0; i < numSensors; ++i) {
-            Sensor sensor = mContinuousSensorList.get(i);
+        StringBuilder registeredSensors = new StringBuilder(30);
+        for (Sensor sensor : mSensorList) {
+            // Skip all non-continuous sensors.
+            if (sensor.getMinDelay() <= 0 || sensor.getType() > MAX_SENSOR_TYPE) {
+                continue;
+            }
             boolean result = mSensorManager.registerListener(listener, sensor,
-                                            SensorManager.SENSOR_DELAY_FASTEST);
-            assertTrue(result);
+                    SensorManager.SENSOR_DELAY_FASTEST, 10000000);
+            assertTrue("registerListener failed for " + sensor.getName(), result);
+            registeredSensors.append(sensor.getName());
+            registeredSensors.append(" ");
+            if (--numSensors == 0) {
+                break;
+            }
         }
-        // Wait for N events and call flush.
-        eventReceived.await();
+        if (registeredSensors.toString().isEmpty()) {
+            return;
+        }
+
+        Log.i(TAG, "testBatchAndFlushWithMutipleSensors " + registeredSensors);
+        // Wait for numSensors * 50 events or 20 seconds.
+        boolean countZero = eventReceived.await(20, TimeUnit.SECONDS);
+        if (!countZero) {
+            fail("Timed out waiting for events from " + registeredSensors.toString());
+        }
         boolean result = mSensorManager.flush(listener);
-        assertTrue(result);
-        flushReceived.await();
+        assertTrue("flush failed " + registeredSensors.toString(), result);
+        countZero = flushReceived.await(20, TimeUnit.SECONDS);
+        if (!countZero) {
+            fail("Timed out waiting for flushCompleteEvent from " + registeredSensors.toString());
+        }
         mSensorManager.unregisterListener(listener);
     }
 
