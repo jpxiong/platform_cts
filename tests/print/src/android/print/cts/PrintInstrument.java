@@ -131,7 +131,7 @@ public final class PrintInstrument extends BaseCommand {
 
         args.putIBinder(ARG_PRIVILEGED_OPS, new PrivilegedOperations(mAm));
 
-        if (!mAm.startInstrumentation(cn, profileFile, 0, args, watcher, connection, userId)) {
+        if (!mAm.startInstrumentation(cn, profileFile, 0, args, watcher, connection, userId, null)) {
             throw new AndroidException("INSTRUMENTATION_FAILED: " + cn.flattenToString());
         }
 
