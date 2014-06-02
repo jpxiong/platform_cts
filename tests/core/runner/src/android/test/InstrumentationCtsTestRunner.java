@@ -75,16 +75,7 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     public void onCreate(Bundle arguments) {
         // We might want to move this to /sdcard, if is is mounted/writable.
         File cacheDir = getTargetContext().getCacheDir();
-
-        // Set some properties that the core tests absolutely need.
-        System.setProperty("user.language", "en");
-        System.setProperty("user.region", "US");
-
-        System.setProperty("java.home", cacheDir.getAbsolutePath());
-        System.setProperty("user.home", cacheDir.getAbsolutePath());
         System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
-        System.setProperty("user.dir", cacheDir.getAbsolutePath());
-
 
         mEnvironment = new TestEnvironment();
 
@@ -203,7 +194,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     static class TestEnvironment {
         private final Locale mDefaultLocale;
         private final TimeZone mDefaultTimeZone;
-        private final String mUserHome;
         private final String mJavaIoTmpDir;
         private final HostnameVerifier mHostnameVerifier;
         private final SSLSocketFactory mSslSocketFactory;
@@ -211,17 +201,16 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         TestEnvironment() {
             mDefaultLocale = Locale.getDefault();
             mDefaultTimeZone = TimeZone.getDefault();
-            mUserHome = System.getProperty("user.home");
             mJavaIoTmpDir = System.getProperty("java.io.tmpdir");
             mHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
             mSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
         }
 
         void reset() {
+            System.setProperties(null);
+            System.setProperty("java.io.tmpdir", mJavaIoTmpDir);
             Locale.setDefault(mDefaultLocale);
             TimeZone.setDefault(mDefaultTimeZone);
-            System.setProperty("user.home", mUserHome);
-            System.setProperty("java.io.tmpdir", mJavaIoTmpDir);
             Authenticator.setDefault(null);
             CookieHandler.setDefault(null);
             ResponseCache.setDefault(null);
