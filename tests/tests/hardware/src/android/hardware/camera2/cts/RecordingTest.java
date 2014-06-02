@@ -14,28 +14,29 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
-import android.hardware.camera2.CameraCharacteristics;
+import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.util.Size;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.media.CamcorderProfile;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaCodecList;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.util.Range;
-import android.view.SurfaceHolder;
 import android.view.Surface;
 
+import junit.framework.AssertionFailedError;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final Size VIDEO_SIZE_BOUND = new Size(1920, 1080);
     private static final int RECORDING_DURATION_MS = 2000;
     private static final int DURATION_MARGIN_MS = 400;
-    private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
+    private static final int FRAME_DURATION_ERROR_TOLERANCE_MS = 3;
     private static final int BIT_RATE_1080P = 16000000;
     private static final int BIT_RATE_MIN = 64000;
     private static final int BIT_RATE_MAX = 40000000;
@@ -69,13 +70,14 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             CamcorderProfile.QUALITY_QCIF,
             CamcorderProfile.QUALITY_QVGA,
     };
+    private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
 
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
-    private Surface mPreviewSurface;
     private MediaRecorder mMediaRecorder;
-    private Size mPreviewSz = new Size(0, 0);
     private String mOutMediaFileName;
+    private int mVideoFrameRate;
+    private Size mVideoSize;
 
     @Override
     protected void setUp() throws Exception {
@@ -171,19 +173,39 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
     /**
      * <p>
-     * Test video snapshot for each camera by using MediaRecorder.
+     * Test video snapshot for each camera.
      * </p>
      * <p>
-     * This test covers video snapshot typical use case. The MediaRecorder is
-     * used to record the video for each supported CamcorderProfile
-     * configuration. The largest still capture size is selected to capture the
-     * JPEG image. The still capture images are validated according to the
-     * capture configuration. The preview/recording jitters are evaluated such
-     * that still capture doesn't disrupt the recording session.
+     * This test covers video snapshot typical use case. The MediaRecorder is used to record the
+     * video for each available video size. The largest still capture size is selected to
+     * capture the JPEG image. The still capture images are validated according to the capture
+     * configuration. The timestamp of capture result before and after video snapshot is also
+     * checked to make sure no frame drop caused by video snapshot.
      * </p>
      */
-    public void testVideoSnapShot() throws Exception {
-        // TODO. Need implement.
+    public void testVideoSnapshot() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing video snapshot for camera " + id);
+                // Re-use the MediaRecorder object for the same camera device.
+                mMediaRecorder = new MediaRecorder();
+                openDevice(id);
+                mSupportedVideoSizes = getSupportedVideoSizes(id, mCameraManager, VIDEO_SIZE_BOUND);
+                // Use largest still size for video snapshot
+                Size videoSnapshotSz = mOrderedStillSizes.get(0);
+                // Image reader is shared for all tested profile, but listener is different per profile
+                // and will be set later
+                createImageReader(
+                        videoSnapshotSz, ImageFormat.JPEG,
+                        MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
+
+                videoSnapshotTestByCamera(videoSnapshotSz);
+            } finally {
+                closeDevice();
+                releasRecorder();
+                closeImageReader();
+            }
+        }
     }
 
     public void testTimelapseRecording() {
@@ -221,7 +243,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             prepareRecordingWithProfile(profile);
 
             // prepare preview surface: preview size is same as video size.
-            preparePreview(videoSz);
+            updatePreviewSurface(videoSz);
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
@@ -262,7 +284,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             prepareRecording(sz, VIDEO_FRAME_RATE);
 
             // prepare preview surface: preview size is same as video size.
-            preparePreview(sz);
+            updatePreviewSurface(sz);
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
@@ -279,6 +301,90 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Test video snapshot for each  available CamcorderProfile for a given camera.
+     * Preview size is set to the video size.
+     */
+    private void videoSnapshotTestByCamera(Size videoSnapshotSz) throws Exception {
+        for (int profileId : mCamcorderProfileList) {
+            int cameraId = Integer.valueOf(mCamera.getId());
+            if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
+                continue;
+            }
+
+            CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
+            Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+            assertTrue("Video size " + videoSz.toString()
+                    + " must be one of the camera device supported video size!",
+                    mSupportedVideoSizes.contains(videoSz));
+
+            if (VERBOSE) {
+                Log.v(TAG, "Testing camera recording with video size " + videoSz.toString());
+            }
+
+            // Configure preview and recording surfaces.
+            mOutMediaFileName = VIDEO_FILE_PATH + "/test_video.mp4";
+            if (DEBUG_DUMP) {
+                mOutMediaFileName = VIDEO_FILE_PATH + "/test_video_" + cameraId + "_"
+                        + videoSz.toString() + ".mp4";
+            }
+
+            prepareRecordingWithProfile(profile);
+
+            // prepare video snapshot
+            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+            CaptureRequest.Builder videoSnapshotRequestBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
+            prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
+
+            // prepare preview surface: preview size is same as video size.
+            updatePreviewSurface(videoSz);
+
+            // Start recording
+            startRecording(/* useMediaRecorder */true, resultListener);
+
+            // Record certain duration.
+            SystemClock.sleep(RECORDING_DURATION_MS / 2);
+
+            // take a video snapshot
+            CaptureRequest request = videoSnapshotRequestBuilder.build();
+            mCamera.capture(request, resultListener, mHandler);
+
+            // make sure recording is still going after video snapshot
+            SystemClock.sleep(RECORDING_DURATION_MS / 2);
+
+            // Stop recording and preview
+            stopRecording(/* useMediaRecorder */true);
+
+            // Validation recorded video
+            validateRecording(videoSz, RECORDING_DURATION_MS);
+
+            // validate video snapshot image
+            Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            validateVideoSnapshotCapture(image, videoSnapshotSz);
+
+            // validate if there is framedrop around video snapshot
+            validateFrameDropAroundVideoSnapshot(resultListener, image.getTimestamp());
+
+            //TODO: validate jittering. Should move to PTS
+            //validateJittering(resultListener);
+        }
+    }
+
+    /**
+     * Configure video snapshot request according to the still capture size
+     */
+    private void prepareVideoSnapshot(
+            CaptureRequest.Builder requestBuilder,
+            ImageReader.OnImageAvailableListener imageListener)
+            throws Exception {
+        mReader.setOnImageAvailableListener(imageListener, mHandler);
+        requestBuilder.addTarget(mRecordingSurface);
+        requestBuilder.addTarget(mPreviewSurface);
+        requestBuilder.addTarget(mReaderSurface);
+    }
+
+    /**
      * Configure MediaRecorder recording session with CamcorderProfile, prepare
      * the recording surface.
      */
@@ -292,6 +398,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mMediaRecorder.prepare();
         mRecordingSurface = mMediaRecorder.getSurface();
         assertNotNull("Recording surface must be non-null!", mRecordingSurface);
+        mVideoFrameRate = profile.videoFrameRate;
+        mVideoSize = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
     }
 
     /**
@@ -313,14 +421,21 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mMediaRecorder.prepare();
         mRecordingSurface = mMediaRecorder.getSurface();
         assertNotNull("Recording surface must be non-null!", mRecordingSurface);
+        mVideoFrameRate = frameRate;
+        mVideoSize = sz;
     }
 
-    private void startRecording(boolean useMediaRecorder) throws Exception {
+    private void startRecording(boolean useMediaRecorder, CameraDevice.CaptureListener listener)
+            throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(2);
         assertTrue("Both preview and recording surfaces should be valid",
                 mPreviewSurface.isValid() && mRecordingSurface.isValid());
         outputSurfaces.add(mPreviewSurface);
         outputSurfaces.add(mRecordingSurface);
+        // Video snapshot surface
+        if (mReaderSurface != null) {
+            outputSurfaces.add(mReaderSurface);
+        }
         mCamera.configureOutputs(outputSurfaces);
         mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
         mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
@@ -328,11 +443,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder recordingRequestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         // Make sure camera output frame rate is set to correct value.
-        Range<Integer> fpsRange = Range.create(VIDEO_FRAME_RATE, VIDEO_FRAME_RATE);
+        Range<Integer> fpsRange = Range.create(mVideoFrameRate, mVideoFrameRate);
         recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
         recordingRequestBuilder.addTarget(mRecordingSurface);
         recordingRequestBuilder.addTarget(mPreviewSurface);
-        mCamera.setRepeatingRequest(recordingRequestBuilder.build(), null, null);
+        mCamera.setRepeatingRequest(recordingRequestBuilder.build(), listener, mHandler);
 
         if (useMediaRecorder) {
             mMediaRecorder.start();
@@ -341,33 +456,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    /**
-     * Set the preview surface with given size.
-     *
-     * <p>This method shouldn't be called from UI/mail thread.</p>
-     */
-    private void preparePreview(final Size sz) {
-        // Don't need change the preview size if it is same as current one.
-        if (sz.equals(mPreviewSz)) {
-            return;
-        }
-        mPreviewSz = sz;
-
-        Camera2SurfaceViewStubActivity stubActivity = getActivity();
-        final SurfaceHolder holder = stubActivity.getSurfaceView().getHolder();
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                holder.setFixedSize(sz.getWidth(), sz.getHeight());
-            }
-        });
-
-        boolean res = stubActivity.waitForSurfaceSizeChanged(
-                WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS, sz.getWidth(), sz.getHeight());
-        assertTrue("wait for surface change to " + sz.toString() + " timed out", res);
-        mPreviewSurface = holder.getSurface();
-        assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
+    private void startRecording(boolean useMediaRecorder)  throws Exception {
+        startRecording(useMediaRecorder, null);
     }
 
     private void stopCameraStreaming() throws Exception {
@@ -423,6 +513,87 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             if (!DEBUG_DUMP) {
                 outFile.delete();
             }
+        }
+    }
+
+    /**
+     * Validate video snapshot capture image object sanity and test.
+     *
+     * <p> Check for size, format and jpeg decoding</p>
+     *
+     * @param image The JPEG image to be verified.
+     * @param size The JPEG capture size to be verified against.
+     */
+    private void validateVideoSnapshotCapture(Image image, Size size) {
+        CameraTestUtils.validateImage(image, size.getWidth(), size.getHeight(),
+                ImageFormat.JPEG, /*filePath*/null);
+    }
+
+    /**
+     * Validate if video snapshot causes frame drop.
+     * Here frame drop is defined as frame duration >= 2 * expected frame duration.
+     */
+    private void validateFrameDropAroundVideoSnapshot(
+            SimpleCaptureListener resultListener, long imageTimeStamp) {
+        int expectedDurationMs = 1000 / mVideoFrameRate;
+        CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
+        while (!resultListener.hasMoreResults()) {
+            CaptureResult currentResult =
+                    resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            long currentTS = getValueNotNull(currentResult, CaptureResult.SENSOR_TIMESTAMP);
+            if (currentTS == imageTimeStamp) {
+                // validate the timestamp before and after, then return
+                CaptureResult nextResult =
+                        resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                long nextTS = getValueNotNull(nextResult, CaptureResult.SENSOR_TIMESTAMP);
+                int durationMs = (int) (currentTS - prevTS) / 1000000;
+                mCollector.expectTrue(
+                        String.format(
+                                "Video %dx%d Frame drop detected before video snapshot: " +
+                                "duration %dms (expected %dms)",
+                                mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                durationMs, expectedDurationMs),
+                        durationMs < (expectedDurationMs * 2));
+                durationMs = (int) (nextTS - currentTS) / 1000000;
+                mCollector.expectTrue(
+                        String.format(
+                                "Video %dx%d Frame drop detected after video snapshot: " +
+                                "duration %dms (expected %dms)",
+                                mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                durationMs, expectedDurationMs),
+                        durationMs < (expectedDurationMs * 2));
+                return;
+            }
+            prevTS = currentTS;
+        }
+        throw new AssertionFailedError(
+                "Video snapshot timestamp does not match any of capture results!");
+    }
+
+    /**
+     * Validate frame jittering from the input simple listener's buffered results
+     */
+    private void validateJittering(SimpleCaptureListener resultListener) {
+        int expectedDurationMs = 1000 / mVideoFrameRate;
+        CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
+        while (!resultListener.hasMoreResults()) {
+            CaptureResult currentResult =
+                    resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            long currentTS = getValueNotNull(currentResult, CaptureResult.SENSOR_TIMESTAMP);
+            int durationMs = (int) (currentTS - prevTS) / 1000000;
+            int durationError = Math.abs(durationMs - expectedDurationMs);
+            int frameNumber = currentResult.getFrameNumber();
+            mCollector.expectTrue(
+                    String.format(
+                            "Resolution %dx%d Frame %d: jittering (%dms) exceeds bound [%dms,%dms]",
+                            mVideoSize.getWidth(), mVideoSize.getHeight(),
+                            frameNumber, durationMs,
+                            expectedDurationMs - FRAME_DURATION_ERROR_TOLERANCE_MS,
+                            expectedDurationMs + FRAME_DURATION_ERROR_TOLERANCE_MS),
+                    durationError <= FRAME_DURATION_ERROR_TOLERANCE_MS);
+            prevTS = currentTS;
         }
     }
 
