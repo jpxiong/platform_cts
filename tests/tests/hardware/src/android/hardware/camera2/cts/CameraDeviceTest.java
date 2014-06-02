@@ -53,9 +53,6 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     private static final int REPEATING_CAPTURE_EXPECTED_RESULT_COUNT = 5;
     private static final int MAX_NUM_IMAGES = 5;
     private static final int MIN_FPS_REQUIRED_FOR_STREAMING = 20;
-    private static final int AE_REGION_INDEX = 0;
-    private static final int AWB_REGION_INDEX = 1;
-    private static final int AF_REGION_INDEX = 2;
 
     private BlockingStateListener mCameraMockListener;
     private int mLatestState = STATE_UNINITIALIZED;
@@ -733,21 +730,24 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             CameraCharacteristics props) {
         // 3A settings--control.mode.
         if (template != CameraDevice.TEMPLATE_MANUAL) {
-            mCollector
-                    .expectKeyValueEquals(request, CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+            mCollector.expectKeyValueEquals(request, CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_AUTO);
         }
 
         // 3A settings--AE/AWB/AF.
-        int[] maxRegions = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS);
+        int maxRegionsAe = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
+        int maxRegionsAwb = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
+        int maxRegionsAf = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
+
         checkAfMode(request, template, props);
         checkFpsRange(request, template, props);
+
         if (template == CameraDevice.TEMPLATE_MANUAL) {
             mCollector.expectKeyValueEquals(request, CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_OFF);
             mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
                     CaptureRequest.CONTROL_AWB_MODE_OFF);
-
         } else {
             mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON);
@@ -767,15 +767,16 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
             // Check 3A regions.
             if (VERBOSE) {
-                Log.v(TAG, "maxRegions is: " + Arrays.toString(maxRegions));
+                Log.v(TAG, String.format("maxRegions is: {AE: %s, AWB: %s, AF: %s}",
+                        maxRegionsAe, maxRegionsAwb, maxRegionsAf));
             }
-            if (maxRegions[AE_REGION_INDEX] > 0) {
+            if (maxRegionsAe > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AE_REGIONS);
             }
-            if (maxRegions[AWB_REGION_INDEX] > 0) {
+            if (maxRegionsAwb > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AWB_REGIONS);
             }
-            if (maxRegions[AF_REGION_INDEX] > 0) {
+            if (maxRegionsAf > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AF_REGIONS);
             }
         }
