@@ -32,6 +32,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
 
     private static final String TAG = "MediaCodecCapabilitiesTest";
     private static final String AVC_MIME = "video/avc";
+    private static final String HEVC_MIME = "video/hevc";
     private static final int PLAY_TIME_MS = 30000;
 
     public void testAvcBaseline1() throws Exception {
@@ -121,6 +122,78 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                 + "&signature=2C836E04C4DDC98649CD44C8B91813D98342D1D1."
                 + "870A848D54CA08C197E5FDC34ED45E6ED7DB5CDA"
                 + "&key=test_key1", 1920, 1080, PLAY_TIME_MS);
+    }
+
+    public void testHevcMain1() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel1)) {
+            throw new RuntimeException("HECLevel1 support is required by CDD");
+        }
+        // We don't have a test stream, but at least we're testing
+        // that supports() returns true for something.
+    }
+    public void testHevcMain2() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel2)) {
+            Log.i(TAG, "HevcMain2 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain21() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel21)) {
+            Log.i(TAG, "HevcMain21 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain3() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel3)) {
+            Log.i(TAG, "HevcMain3 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain31() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel31)) {
+            Log.i(TAG, "HevcMain31 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain4() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel4)) {
+            Log.i(TAG, "HevcMain4 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain41() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel41)) {
+            Log.i(TAG, "HevcMain41 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain5() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel5)) {
+            Log.i(TAG, "HevcMain5 not supported");
+            return;
+        }
+    }
+
+    public void testHevcMain51() throws Exception {
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel51)) {
+            Log.i(TAG, "HevcMain51 not supported");
+            return;
+        }
     }
 
     private boolean supports(String mimeType, int profile) {

@@ -846,6 +846,19 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
 
+    public void testCodecBasicHEVC() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
+                RESET_MODE_NONE, -1 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 300, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
+                RESET_MODE_NONE, -1 /* eosframe */, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
     public void testCodecBasicH263() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
@@ -914,6 +927,14 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("wrong number of frames decoded", 120, frames1);
     }
 
+    public void testCodecEarlyEOSHEVC() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
+                RESET_MODE_NONE, 120 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
     public void testCodecEarlyEOSMpeg4() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
@@ -947,6 +968,17 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, s);
+    }
+
+    public void testCodecResetsHEVCWithoutSurface() throws Exception {
+        testCodecResets(
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz, null);
+    }
+
+    public void testCodecResetsHEVCWithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecResets(
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz, s);
     }
 
     public void testCodecResetsH263WithoutSurface() throws Exception {
@@ -1023,12 +1055,14 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("different number of frames when using flushed codec", frames1, frames3);
     }
 
-    private static MediaCodec createDecoder(String mime) {
+    private MediaCodec createDecoder(String mime) {
         try {
             if (false) {
                 // change to force testing software codecs
                 if (mime.contains("avc")) {
                     return MediaCodec.createByCodecName("OMX.google.h264.decoder");
+                } else if (mime.contains("hevc")) {
+                    return MediaCodec.createByCodecName("OMX.google.hevc.decoder");
                 } else if (mime.contains("3gpp")) {
                     return MediaCodec.createByCodecName("OMX.google.h263.decoder");
                 } else if (mime.contains("mp4v")) {
@@ -1368,6 +1402,11 @@ public class DecoderTest extends MediaPlayerTestBase {
         // this video has an I frame at 44
         testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
                 new int[] {44, 45, 55});
+    }
+    public void testEOSBehaviorHEVC() throws Exception {
+        testEOSBehavior(R.raw.video_480x360_mp4_hevc_650kbps_30fps_aac_stereo_128kbps_48000hz, 17);
+        testEOSBehavior(R.raw.video_480x360_mp4_hevc_650kbps_30fps_aac_stereo_128kbps_48000hz, 23);
+        testEOSBehavior(R.raw.video_480x360_mp4_hevc_650kbps_30fps_aac_stereo_128kbps_48000hz, 49);
     }
 
     public void testEOSBehaviorH263() throws Exception {
