@@ -448,7 +448,7 @@ pthread.
   pthread_no_op_detach_after_join
   pthread_join_self
   pthread_sigmask
-  __pthread_clone
+  __bionic_clone
   pthread_setname_np__too_long
   pthread_setname_np__self
   pthread_setname_np__other
