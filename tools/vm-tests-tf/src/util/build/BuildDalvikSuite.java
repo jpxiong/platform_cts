@@ -212,17 +212,21 @@ public class BuildDalvikSuite {
         "package " + pName + ";\n" +
         "import java.io.IOException;\n" +
         "import com.android.tradefed.testtype.DeviceTestCase;\n" +
+        "import com.android.tradefed.config.Option;\n" +
+        "import com.android.tradefed.config.Option.Importance;\n" +
+        "import com.android.tradefed.util.AbiFormatter;\n" +
         "\n" +
         "public class " + sourceName + " extends DeviceTestCase {\n";
     }
 
     private String getShellExecJavaLine(String classpath, String mainclass) {
-      String cmd = String.format("ANDROID_DATA=%s dalvikvm -Xmx512M -Xss32K " +
+      String cmd = String.format("ANDROID_DATA=%s dalvikvm|#ABI#| -Xmx512M -Xss32K " +
               "-Djava.io.tmpdir=%s -classpath %s %s", TARGET_JAR_ROOT_PATH, TARGET_JAR_ROOT_PATH,
               classpath, mainclass);
-      return "String res = getDevice().executeShellCommand(\""+ cmd + "\");\n" +
-             "// A sucessful adb shell command returns an empty string.\n" +
-             "assertEquals(\"" + cmd + "\", \"\", res);";
+      return "String cmd = AbiFormatter.formatCmdForAbi(\"" + cmd + "\", mForceAbi);\n" +
+          "String res = getDevice().executeShellCommand(cmd);\n" +
+          "// A sucessful adb shell command returns an empty string.\n" +
+          "assertEquals(cmd, \"\", res);";
     }
 
     private String getWarningMessage() {
@@ -278,6 +282,10 @@ public class BuildDalvikSuite {
             String instPrefix = "new " + classOnlyName + "()";
 
             openCTSHostFileFor(pName, classOnlyName);
+
+            curJunitFileData += "@Option(name = AbiFormatter.FORCE_ABI_STRING,\n" +
+                "description = AbiFormatter.FORCE_ABI_DESCRIPTION,\n" +
+                "importance = Importance.IF_UNSET)\nprivate String mForceAbi = null;\n\n";
 
             List<String> methods = entry.getValue();
             Collections.sort(methods, new Comparator<String>() {

@@ -26,6 +26,7 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.config.Option;
+import com.android.tradefed.config.OptionSetter;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.config.OptionCopier;
 import com.android.tradefed.device.DeviceNotAvailableException;
@@ -41,6 +42,7 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
+import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
 
 /**
  * A {@link Test} for running CTS tests.
@@ -157,6 +160,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "logs even if connection with device has been lost, as well as being much more " +
             "performant.")
     private boolean mLogcatOnFailures = false;
+
+    @Option(name = AbiFormatter.FORCE_ABI_STRING,
+            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
+            importance = Importance.IF_UNSET)
+    private String mForceAbi = null;
 
     @Option(name = "logcat-on-failure-size", description =
             "The max number of logcat data in bytes to capture when --logcat-on-failure is on. " +
@@ -439,11 +447,35 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 TestPackage knownTests = mRemainingTestPkgs.get(0);
 
                 IRemoteTest test = knownTests.getTestForPackage();
+
+                if (mForceAbi != null) {
+                    OptionSetter optionSetter = null;
+                    boolean hasField = false;
+                    try {
+                        optionSetter = new OptionSetter(test);
+                        if (optionSetter.getTypeForOption(AbiFormatter.FORCE_ABI_STRING)
+                                .equals("string")) {
+                            hasField = true;
+                        }
+                    } catch (ConfigurationException e) {
+                        // ignore if there are tests not taking force-abi option
+                        // for example native test do not need this option.
+                    }
+                    if (hasField) {
+                        try{
+                            optionSetter.setOptionValue(AbiFormatter.FORCE_ABI_STRING, mForceAbi);
+                        } catch (ConfigurationException e) {
+                            CLog.e(e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
                 if (test instanceof IDeviceTest) {
-                    ((IDeviceTest)test).setDevice(getDevice());
+                    ((IDeviceTest) test).setDevice(getDevice());
                 }
                 if (test instanceof IBuildReceiver) {
-                    ((IBuildReceiver)test).setBuild(mBuildInfo);
+                    ((IBuildReceiver) test).setBuild(mBuildInfo);
                 }
 
                 forwardPackageDetails(knownTests.getPackageDef(), listener);
@@ -700,7 +732,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         for (String apkName : prerequisiteApks) {
             try {
                 File apkFile = mCtsBuild.getTestApp(apkName);
-                String errorCode = getDevice().installPackage(apkFile, true);
+                String errorCode = null;
+                String[] options = {};
+                if (mForceAbi != null) {
+                    String abi = AbiFormatter.getDefaultAbi(getDevice(), mForceAbi);
+                    if (abi != null) {
+                        options = new String[]{String.format("--abi %s ", abi)};
+                    }
+                }
+                errorCode = getDevice().installPackage(apkFile, true, options);
                 if (errorCode != null) {
                     CLog.e("Failed to install %s. Reason: %s", apkName, errorCode);
                 }

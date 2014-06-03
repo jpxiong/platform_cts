@@ -26,12 +26,14 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
+import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.LogFileSaver;
 import com.android.tradefed.result.TestSummary;
+import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.StreamUtil;
 
@@ -100,6 +102,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private String mSuiteName;
 
     private static final Pattern mCtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
+
+    @Option(name = AbiFormatter.FORCE_ABI_STRING,
+            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
+            importance = Importance.IF_UNSET)
+    private String mForceAbi = null;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -367,7 +374,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
         serializer.attribute(ns, "suite", mSuiteName);
-
+        if (mForceAbi != null) {
+            serializer.attribute(ns, "abi", mForceAbi);
+        }
         mResults.serialize(serializer);
         // TODO: not sure why, but the serializer doesn't like this statement
         //serializer.endTag(ns, RESULT_TAG);
