@@ -44,6 +44,7 @@
         <path
             android:name="twoLines"
             android:pathData="M 100,10 v 90 M 10,100 h 90"
+            android:fill="#00000000"
             android:stroke="#FF00FF00"
             android:strokeWidth="10" />
     </group>
