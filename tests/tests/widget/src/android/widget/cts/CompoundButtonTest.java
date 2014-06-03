@@ -300,7 +300,7 @@ public class CompoundButtonTest extends AndroidTestCase {
 
         state = compoundButton.onSaveInstanceState();
         assertNotNull(state);
-        assertTrue(compoundButton.getFreezesText());
+        assertFalse(compoundButton.getFreezesText());
 
         compoundButton.setChecked(true);
 
