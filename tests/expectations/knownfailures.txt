@@ -33,5 +33,92 @@
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
   bug: 11352697
+},
+{
+  name: "android.app.cts.DownloadManagerTest#testDownloadManager"
+  name: "android.app.cts.DownloadManagerTest#testDownloadManagerDestination"
+  name: "android.app.cts.DownloadManagerTest#testDownloadManagerDestinationExtension"
+  name: "android.app.cts.DownloadManagerTest#testMinimumDownload"
+  name: "android.content.cts.ContentResolverSyncTestCase#testCallMultipleAccounts"
+  name: "android.content.cts.ContentResolverSyncTestCase#testCancelSync"
+  name: "android.content.cts.ContentResolverSyncTestCase#testRequestSync"
+  bug: 14657953
+},
+{
+  name: "android.database.sqlite.cts.SQLiteQueryBuilderTest#testSetProjectionMap"
+  bug: 12475524
+},
+{
+  name: "android.keystore.cts.KeyChainTest#testIsBoundKeyAlgorithm_RequiredAlgorithmsSupported",
+  bug: 15314696
+},
+{
+  name: "android.media.cts.AudioEffectTest"
+  bug: 15081808
+},
+{
+  name: "android.media.cts.AudioManagerTest#testMusicActive"
+  name: "android.media.cts.AudioManagerTest#testVolume"
+  bug: 15319269
+},
+{
+  name: "android.media.cts.AudioTrackTest#testGetTimestamp"
+  bug: 15320704
+},
+{
+  name: "android.media.cts.BassBoostTest"
+  bug: 15163233
+},
+{
+  name: "android.media.cts.DecoderTest"
+  bug: 15163143
+},
+{
+  name: "android.media.cts.EnvReverbTest"
+  bug: 15163233
+},
+{
+  name: "android.media.cts.MediaPlayerFlakyNetworkTest"
+  bug: 15350295
+},
+{
+  name: "android.media.cts.MediaPlayerTest"
+  bug: 15321806
+},
+{
+  name: "android.media.cts.PresetReverbTest"
+  bug: 15338282
+},
+{
+  name: "android.media.cts.RingtoneManagerTest"
+  bug: 15343572
+},
+{
+  name: "android.media.cts.RingtoneManagerTest"
+  bug: 15343572
+},
+{
+  name: "android.media.cts.SoundPoolAacTest"
+  name: "android.media.cts.SoundPoolOggTest"
+  bug: 15350147
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest"
+  bug: 15321207
+},
+{
+  name: "android.media.cts.VirtualizerTest"
+  bug: 15381765
+},
+{
+  name: "android.mediastress.cts.H263QcifLongPlayerTest"
+  name: "android.mediastress.cts.H264R480x360AacShortPlayerTest"
+  name: "android.mediastress.cts.Vp8R480x360LongPlayerTest"
+  bug: 15081769
+},
+{
+  name: "android.net.cts.ConnectivityManagerTest#testGetActiveNetworkInfo"
+  bug: 15087784
 }
+
 ]
