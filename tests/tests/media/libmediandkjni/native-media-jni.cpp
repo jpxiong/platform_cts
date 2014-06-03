@@ -129,7 +129,7 @@ jobject testExtractor(AMediaExtractor *ex, JNIEnv *env) {
         sizes.add(n);
         sizes.add(AMediaExtractor_getSampleTrackIndex(ex));
         sizes.add(AMediaExtractor_getSampleFlags(ex));
-        sizes.add(AMediaExtractor_getSampletime(ex));
+        sizes.add(AMediaExtractor_getSampleTime(ex));
         AMediaExtractor_advance(ex);
     }
 
@@ -279,7 +279,7 @@ extern "C" jobject Java_android_media_cts_NativeDecoderTest_getDecodedDataNative
                     ALOGV("EOS");
                     //break;
                 }
-                int64_t presentationTimeUs = AMediaExtractor_getSampletime(ex);
+                int64_t presentationTimeUs = AMediaExtractor_getSampleTime(ex);
 
                 AMediaCodec_queueInputBuffer(codec[t], bufidx, 0, sampleSize, presentationTimeUs,
                         sawInputEOS[t] ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
@@ -421,7 +421,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackNative(
                 sawInputEOS = true;
                 ALOGV("EOS");
             }
-            int64_t presentationTimeUs = AMediaExtractor_getSampletime(ex);
+            int64_t presentationTimeUs = AMediaExtractor_getSampleTime(ex);
 
             AMediaCodec_queueInputBuffer(codec, bufidx, 0, sampleSize, presentationTimeUs,
                     sawInputEOS ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
@@ -504,7 +504,7 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testMuxerNative(JNI
         }
         info.offset = 0;
         info.size = n;
-        info.presentationTimeUs = AMediaExtractor_getSampletime(ex);
+        info.presentationTimeUs = AMediaExtractor_getSampleTime(ex);
         info.flags = AMediaExtractor_getSampleFlags(ex);
 
         size_t idx = (size_t) AMediaExtractor_getSampleTrackIndex(ex);
@@ -573,119 +573,6 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testFormatNative(JN
     return true;
 }
 
-void callback(AMediaCodec *codec, void *userdata) {
-    sem_t *sem = (sem_t*) userdata;
-    sem_post(sem);
-}
-
-extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPlaybackWithCallbackNative(
-        JNIEnv *env,
-        jclass /*clazz*/,
-        jobject surface,
-        int fd, jlong offset, jlong size) {
-
-    ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
-    ALOGI("@@@@ native window: %p", window);
-
-    AMediaExtractor *ex = AMediaExtractor_new();
-    int err = AMediaExtractor_setDataSourceFd(ex, fd, offset, size);
-    if (err != 0) {
-        ALOGE("setDataSource error: %d", err);
-        return false;
-    }
-
-    int numtracks = AMediaExtractor_getTrackCount(ex);
-
-    sem_t sem;
-    sem_init(&sem, 0, 0);
-
-    AMediaCodec *codec = NULL;
-    AMediaFormat *format = NULL;
-    bool sawInputEOS = false;
-    bool sawOutputEOS = false;
-
-    ALOGV("input has %d tracks", numtracks);
-    for (int i = 0; i < numtracks; i++) {
-        AMediaFormat *format = AMediaExtractor_getTrackFormat(ex, i);
-        const char *s = AMediaFormat_toString(format);
-        ALOGI("track %d format: %s", i, s);
-        const char *mime;
-        if (!AMediaFormat_getString(format, AMEDIAFORMAT_KEY_MIME, &mime)) {
-            ALOGE("no mime type");
-            return false;
-        } else if (!strncmp(mime, "video/", 6)) {
-            codec = AMediaCodec_createDecoderByType(mime);
-            AMediaCodec_configure(codec, format, window, NULL, 0);
-            AMediaCodec_setNotificationCallback(codec, callback, &sem);
-            AMediaCodec_start(codec);
-            AMediaExtractor_selectTrack(ex, i);
-        }
-        AMediaFormat_delete(format);
-    }
-
-    while (!sawOutputEOS) {
-        // the callback will signal when a buffer is available
-        if (sem_wait(&sem)) {
-            ALOGI("sem_wait was interrupted");
-            continue;
-        }
-        bool didwork = false;
-        ssize_t bufidx = AMediaCodec_dequeueInputBuffer(codec, 0);
-        ALOGV("input buffer %d", bufidx);
-        if (bufidx >= 0) {
-            didwork = true;
-            size_t bufsize;
-            uint8_t *buf = AMediaCodec_getInputBuffer(codec, bufidx, &bufsize);
-            int sampleSize = AMediaExtractor_readSampleData(ex, buf, bufsize);
-            ALOGV("read %d", sampleSize);
-            if (sampleSize < 0) {
-                sampleSize = 0;
-                sawInputEOS = true;
-                ALOGV("EOS");
-            }
-            int64_t presentationTimeUs = AMediaExtractor_getSampletime(ex);
-
-            AMediaCodec_queueInputBuffer(codec, bufidx, 0, sampleSize, presentationTimeUs,
-                    sawInputEOS ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
-            AMediaExtractor_advance(ex);
-        }
-
-        AMediaCodecBufferInfo info;
-        int status = AMediaCodec_dequeueOutputBuffer(codec, &info, 0);
-        ALOGV("dequeueoutput returned: %d", status);
-        if (status >= 0) {
-            didwork = true;
-            if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
-                ALOGV("output EOS");
-                sawOutputEOS = true;
-            }
-            ALOGV("got decoded buffer size %d", info.size);
-            AMediaCodec_releaseOutputBuffer(codec, status, true);
-            usleep(20000);
-        } else if (status == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
-            didwork = true;
-            ALOGV("output buffers changed");
-        } else if (status == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
-            didwork = true;
-            format = AMediaCodec_getOutputFormat(codec);
-            ALOGV("format changed to: %s", AMediaFormat_toString(format));
-        } else if (status == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-            ALOGV("no output buffer right now");
-        } else {
-            ALOGV("unexpected info code: %d", status);
-        }
-
-        if (!didwork) {
-            ALOGE("called back for no reason");
-        }
-    }
-
-    sem_destroy(&sem);
-    AMediaCodec_stop(codec);
-    AMediaCodec_delete(codec);
-    AMediaExtractor_delete(ex);
-    return true;
-}
 
 extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPsshNative(JNIEnv * /*env*/,
         jclass /*clazz*/, int fd, jlong offset, jlong size) {
