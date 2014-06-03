@@ -91,7 +91,6 @@ public class VectorDrawableTest extends AndroidTestCase {
 
     private Resources mResources;
     private VectorDrawable mVectorDrawable;
-    private BitmapFactory.Options mOptions;
     private Bitmap mBitmap;
     private Canvas mCanvas;
 
@@ -107,9 +106,6 @@ public class VectorDrawableTest extends AndroidTestCase {
         mVectorDrawable.setBounds(0, 0, width, height);
 
         mResources = mContext.getResources();
-
-        mOptions = new BitmapFactory.Options();
-        mOptions.inScaled = false;
     }
 
     public void testSimpleVectorDrawables() throws Exception {
@@ -133,7 +129,7 @@ public class VectorDrawableTest extends AndroidTestCase {
                 saveVectorDrawableIntoPNG(mBitmap, resIds, i);
             } else {
                 // Start to compare
-                Bitmap golden = BitmapFactory.decodeResource(mResources, goldenImages[i], mOptions);
+                Bitmap golden = BitmapFactory.decodeResource(mResources, goldenImages[i]);
                 compareImages(mBitmap, golden, mResources.getString(resIds[i]));
             }
         }
