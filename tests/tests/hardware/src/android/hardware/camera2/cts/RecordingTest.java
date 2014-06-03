@@ -71,6 +71,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             CamcorderProfile.QUALITY_QVGA,
     };
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
+    private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
 
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
@@ -184,28 +185,23 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * </p>
      */
     public void testVideoSnapshot() throws Exception {
-        for (String id : mCameraIds) {
-            try {
-                Log.i(TAG, "Testing video snapshot for camera " + id);
-                // Re-use the MediaRecorder object for the same camera device.
-                mMediaRecorder = new MediaRecorder();
-                openDevice(id);
-                mSupportedVideoSizes = getSupportedVideoSizes(id, mCameraManager, VIDEO_SIZE_BOUND);
-                // Use largest still size for video snapshot
-                Size videoSnapshotSz = mOrderedStillSizes.get(0);
-                // Image reader is shared for all tested profile, but listener is different per profile
-                // and will be set later
-                createImageReader(
-                        videoSnapshotSz, ImageFormat.JPEG,
-                        MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
+        videoSnapshotHelper(/*burstTest*/false);
+    }
 
-                videoSnapshotTestByCamera(videoSnapshotSz);
-            } finally {
-                closeDevice();
-                releasRecorder();
-                closeImageReader();
-            }
-        }
+    /**
+     * <p>
+     * Test burst video snapshot for each camera.
+     * </p>
+     * <p>
+     * This test covers burst video snapshot capture. The MediaRecorder is used to record the
+     * video for each available video size. The largest still capture size is selected to
+     * capture the JPEG image. {@value #BURST_VIDEO_SNAPSHOT_NUM} video snapshot requests will be
+     * sent during the test. The still capture images are validated according to the capture
+     * configuration.
+     * </p>
+     */
+    public void testBurstVideoSnapshot() throws Exception {
+        videoSnapshotHelper(/*burstTest*/true);
     }
 
     public void testTimelapseRecording() {
@@ -301,10 +297,48 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
-     * Test video snapshot for each  available CamcorderProfile for a given camera.
-     * Preview size is set to the video size.
+     * Simple wrapper to wrap normal/burst video snapshot tests
      */
-    private void videoSnapshotTestByCamera(Size videoSnapshotSz) throws Exception {
+    private void videoSnapshotHelper(boolean burstTest) throws Exception {
+            for (String id : mCameraIds) {
+                try {
+                    Log.i(TAG, "Testing video snapshot for camera " + id);
+                    // Re-use the MediaRecorder object for the same camera device.
+                    mMediaRecorder = new MediaRecorder();
+                    openDevice(id);
+                    mSupportedVideoSizes =
+                            getSupportedVideoSizes(id, mCameraManager, VIDEO_SIZE_BOUND);
+                    // Use largest still size for video snapshot
+                    Size videoSnapshotSz = mOrderedStillSizes.get(0);
+                    // Image reader is shared for all tested profile, but listener is different
+                    // per profile and will be set later
+                    createImageReader(
+                            videoSnapshotSz, ImageFormat.JPEG,
+                            MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
+
+                    videoSnapshotTestByCamera(videoSnapshotSz, burstTest);
+                } finally {
+                    closeDevice();
+                    releasRecorder();
+                    closeImageReader();
+                }
+            }
+    }
+
+    /**
+     * Test video snapshot for each  available CamcorderProfile for a given camera.
+     *
+     * <p>
+     * Preview size is set to the video size. For the burst test, frame drop and jittering
+     * is not checked.
+     * </p>
+     *
+     * @param videoSnapshotSz The size of video snapshot image
+     * @param burstTest Perfrom burst capture or single capture. For burst capture
+     *                  {@value #BURST_VIDEO_SNAPSHOT_NUM} capture requests will be sent.
+     */
+    private void videoSnapshotTestByCamera(Size videoSnapshotSz, boolean burstTest)
+            throws Exception {
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
@@ -348,7 +382,16 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             // take a video snapshot
             CaptureRequest request = videoSnapshotRequestBuilder.build();
-            mCamera.capture(request, resultListener, mHandler);
+            if (burstTest) {
+                List<CaptureRequest> requests =
+                        new ArrayList<CaptureRequest>(BURST_VIDEO_SNAPSHOT_NUM);
+                for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
+                    requests.add(request);
+                }
+                mCamera.captureBurst(requests, resultListener, mHandler);
+            } else {
+                mCamera.capture(request, resultListener, mHandler);
+            }
 
             // make sure recording is still going after video snapshot
             SystemClock.sleep(RECORDING_DURATION_MS / 2);
@@ -359,15 +402,25 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             // Validation recorded video
             validateRecording(videoSz, RECORDING_DURATION_MS);
 
-            // validate video snapshot image
-            Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-            validateVideoSnapshotCapture(image, videoSnapshotSz);
+            if (burstTest) {
+                for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
+                    Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                    validateVideoSnapshotCapture(image, videoSnapshotSz);
+                    image.close();
+                }
+            } else {
+                // validate video snapshot image
+                Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                validateVideoSnapshotCapture(image, videoSnapshotSz);
 
-            // validate if there is framedrop around video snapshot
-            validateFrameDropAroundVideoSnapshot(resultListener, image.getTimestamp());
+                // validate if there is framedrop around video snapshot
+                validateFrameDropAroundVideoSnapshot(resultListener, image.getTimestamp());
 
-            //TODO: validate jittering. Should move to PTS
-            //validateJittering(resultListener);
+                //TODO: validate jittering. Should move to PTS
+                //validateJittering(resultListener);
+
+                image.close();
+            }
         }
     }
 
