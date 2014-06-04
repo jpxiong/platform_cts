@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Temporarily disable building the TV CTS until we finalize the API.
+# See b/15419005.
+ifeq (1,0)
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -29,3 +33,5 @@ LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)
+
+endif
