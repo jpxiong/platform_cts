@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -39,6 +40,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
 
     private LocationManager mLocationManager;
     private List<String> mAllProviders;
+    private boolean mHasTelephony;
 
     @Override
     protected void setUp() throws Exception {
@@ -46,6 +48,8 @@ public class NoLocationPermissionTest extends AndroidTestCase {
         mLocationManager = (LocationManager) getContext().getSystemService(
                 Context.LOCATION_SERVICE);
         mAllProviders = mLocationManager.getAllProviders();
+        mHasTelephony = getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_TELEPHONY);
 
         assertNotNull(mLocationManager);
         assertNotNull(mAllProviders);
@@ -63,6 +67,10 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testListenCellLocation() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
                 Context.TELEPHONY_SERVICE);
         PhoneStateListener phoneStateListener = new PhoneStateListener();
@@ -90,6 +98,10 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testListenCellLocation2() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
                 Context.TELEPHONY_SERVICE);
         PhoneStateListener phoneStateListener = new PhoneStateListener();
