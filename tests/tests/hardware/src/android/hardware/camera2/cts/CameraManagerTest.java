@@ -235,6 +235,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
         List<CameraDevice> cameraList = new ArrayList<CameraDevice>();
         List<MockStateListener> listenerList = new ArrayList<MockStateListener>();
+        List<BlockingStateListener> blockingListenerList = new ArrayList<BlockingStateListener>();
         try {
             for (int i = 0; i < ids.length; i++) {
                 // Ignore state changes from other cameras
@@ -320,10 +321,16 @@ public class CameraManagerTest extends AndroidTestCase {
                 // Keep track of cameras so we can close it later
                 cameraList.add(camera);
                 listenerList.add(mockListener);
+                blockingListenerList.add(mCameraListener);
             }
         } finally {
             for (CameraDevice camera : cameraList) {
                 camera.close();
+            }
+            for (BlockingStateListener blockingListener : blockingListenerList) {
+                blockingListener.waitForState(
+                        BlockingStateListener.STATE_CLOSED,
+                        CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
             }
         }
 
@@ -337,6 +344,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
             verify(listener).onClosed(eq(camera));
             verifyNoMoreInteractions(listener);
+            i++;
             // Only a #close can happen on the camera since we were done with it.
             // Also nothing else should've happened between the close and the open.
         }
@@ -415,7 +423,7 @@ public class CameraManagerTest extends AndroidTestCase {
                 mCameraManager.openCamera(ids[i], successListener, mHandler);
 
                 try {
-                    mCameraManager.openCamera(ids[i], mCameraListener,
+                    mCameraManager.openCamera(ids[i], failListener,
                             mHandler);
                 } catch (CameraAccessException e) {
                     // Optional (but common). Camera might fail asynchronously only.
@@ -434,7 +442,6 @@ public class CameraManagerTest extends AndroidTestCase {
                 ArgumentCaptor<CameraDevice> argument =
                         ArgumentCaptor.forClass(CameraDevice.class);
                 verify(mockSuccessListener, atLeastOnce()).onOpened(argument.capture());
-                successCamera = argument.getValue();
                 successListener.waitForState(BlockingStateListener.STATE_UNCONFIGURED,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
@@ -446,8 +453,8 @@ public class CameraManagerTest extends AndroidTestCase {
 
                 verify(mockFailListener)
                         .onError(
-                                and(notNull(CameraDevice.class), not(successCamera)),
-                                StateListener.ERROR_CAMERA_IN_USE);
+                                and(notNull(CameraDevice.class), not(eq(successCamera))),
+                                eq(StateListener.ERROR_CAMERA_IN_USE));
                 verifyNoMoreInteractions(mockFailListener);
             } finally {
                 if (successCamera != null) {
