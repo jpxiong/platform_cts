@@ -25,6 +25,8 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.location.Location;
 import android.location.LocationManager;
+import android.hardware.camera2.DngCreator;
+import android.media.ImageReader;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
@@ -38,9 +40,11 @@ import android.os.ConditionVariable;
 import android.util.Log;
 import android.util.Range;
 import android.util.Rational;
+import android.view.Surface;
 
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -176,8 +180,30 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                closeImageReader();
            }
        }
-   }
+    }
 
+
+    /**
+     * Test the full raw capture use case.
+     *
+     * This includes:
+     * - Configuring the camera with a preview, jpeg, and raw output stream.
+     * - Running preview until AE/AF can settle.
+     * - Capturing with a request targeting all three output streams.
+     */
+    public void testFullRawCapture() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                Log.i(TAG, "Testing raw capture for Camera " + mCameraIds[i]);
+                openDevice(mCameraIds[i]);
+
+                fullRawCaptureTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
     /**
      * Test touch for focus.
      * <p>
@@ -622,6 +648,102 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             verifyRawCaptureResult(rawRequest, resultListener);
             stopPreview();
+        }
+    }
+
+    private void fullRawCaptureTestByCamera() throws Exception {
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        Size maxStillSz = mOrderedStillSizes.get(0);
+        Size[] rawSizes = mStaticInfo.getRawOutputSizesChecked();
+        for (Size size : rawSizes) {
+            if (VERBOSE) {
+                Log.v(TAG, "Testing multi capture with size " + size.toString()
+                        + ", preview size " + maxPreviewSz);
+            }
+
+            // Prepare raw capture and start preview.
+            CaptureRequest.Builder previewBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            CaptureRequest.Builder multiBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+
+            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleImageReaderListener jpegListener = new SimpleImageReaderListener();
+            SimpleImageReaderListener rawListener = new SimpleImageReaderListener();
+
+            updatePreviewSurface(maxPreviewSz);
+
+            ImageReader rawReader = null;
+            ImageReader jpegReader = null;
+            try {
+
+                // Create ImageReaders.
+                rawReader = makeImageReader(size,
+                        ImageFormat.RAW_SENSOR, MAX_READER_IMAGES, rawListener, mHandler);
+                jpegReader = makeImageReader(maxStillSz,
+                        ImageFormat.JPEG, MAX_READER_IMAGES, jpegListener, mHandler);
+
+                // Configure output streams with preview and jpeg streams.
+                List<Surface> outputSurfaces = new ArrayList<Surface>();
+                outputSurfaces.add(rawReader.getSurface());
+                outputSurfaces.add(jpegReader.getSurface());
+                outputSurfaces.add(mPreviewSurface);
+                configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+
+                // Configure the requests.
+                previewBuilder.addTarget(mPreviewSurface);
+                multiBuilder.addTarget(mPreviewSurface);
+                multiBuilder.addTarget(rawReader.getSurface());
+                multiBuilder.addTarget(jpegReader.getSurface());
+
+                // Start preview.
+                mCamera.setRepeatingRequest(previewBuilder.build(), null, mHandler);
+
+                // Poor man's 3A, wait 2 seconds for AE/AF (if any) to settle.
+                // TODO: Do proper 3A trigger and lock (see testTakePictureTest).
+                Thread.sleep(3000);
+
+                multiBuilder.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
+                        CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
+                CaptureRequest multiRequest = multiBuilder.build();
+
+                mCamera.capture(multiRequest, resultListener, mHandler);
+
+                CaptureResult result = resultListener.getCaptureResultForRequest(multiRequest,
+                        NUM_RESULTS_WAIT_TIMEOUT);
+                Image jpegImage = jpegListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                basicValidateJpegImage(jpegImage, maxStillSz);
+                Image rawImage = rawListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                validateRaw16Image(rawImage, size);
+
+
+                DngCreator dngCreator = new DngCreator(mStaticInfo.getCharacteristics(), result);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                dngCreator.writeImage(outputStream, rawImage);
+
+                if (DEBUG) {
+                    byte[] rawBuffer = outputStream.toByteArray();
+                    String rawFileName =
+                            DEBUG_FILE_NAME_BASE + "/raw16_" + TAG + size.toString() +
+                                    "_cam_" + mCamera.getId() + ".dng";
+                    Log.d(TAG, "Dump raw file into " + rawFileName);
+                    dumpFile(rawFileName, rawBuffer);
+
+                    byte[] jpegBuffer = getDataFromImage(jpegImage);
+                    String jpegFileName =
+                            DEBUG_FILE_NAME_BASE + "/jpeg_" + TAG + size.toString() +
+                                    "_cam_" + mCamera.getId() + ".jpg";
+                    Log.d(TAG, "Dump jpeg file into " + rawFileName);
+                    dumpFile(jpegFileName, jpegBuffer);
+                }
+
+                stopPreview();
+            } finally {
+                closeImageReader(rawReader);
+                closeImageReader(jpegReader);
+                rawReader = null;
+                jpegReader = null;
+            }
         }
     }
 
