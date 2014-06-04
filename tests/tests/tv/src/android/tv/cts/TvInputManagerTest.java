@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.tv.cts;
+package android.media.tv.cts;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -23,16 +23,16 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.provider.TvContract;
 import android.test.AndroidTestCase;
 import android.text.TextUtils;
-import android.tv.TvInputInfo;
-import android.tv.TvInputManager;
-import android.tv.TvInputManager.Session;
-import android.tv.TvInputManager.SessionCallback;
-import android.tv.TvInputManager.TvInputListener;
-import android.tv.TvInputService;
-import android.tv.TvInputService.TvInputSessionImpl;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
+import android.media.tv.TvInputManager.Session;
+import android.media.tv.TvInputManager.SessionCallback;
+import android.media.tv.TvInputManager.TvInputListener;
+import android.media.tv.TvInputService;
+import android.media.tv.TvInputService.TvInputSessionImpl;
 import android.util.Log;
 import android.view.Surface;
 
@@ -40,7 +40,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Test for {@link android.tv.TvInputManager}.
+ * Test for {@link android.media.tv.TvInputManager}.
  */
 public class TvInputManagerTest extends AndroidTestCase {
     private static final String TAG = "TvInputManagerTest";
@@ -48,7 +48,7 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     private TvInputManager mManager;
     private Session mSession;
-    private SessionCallback mSessionCallback;
+    private final SessionCallback mSessionCallback;
     private boolean mAvailability;
     private TvInputListener mTvInputListener;
     private HandlerThread mCallbackThread;
