@@ -707,7 +707,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         // Default preview result should give valid color correction metadata.
         result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-        validateColorCorrectionResult(result);
+        validateColorCorrectionResult(result,
+                previewRequestBuilder.get(CaptureRequest.COLOR_CORRECTION_MODE));
 
         // TRANSFORM_MATRIX mode
         // Only test unit gain and identity transform
@@ -720,9 +721,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 ZERO_R, ZERO_R, ONE_R
             });
 
+        int colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX;
         manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
-                CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, colorCorrectionMode);
         manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_GAINS, UNIT_GAIN);
         manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_TRANSFORM, IDENTITY_TRANSFORM);
         request = manualRequestBuilder.build();
@@ -730,32 +731,38 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
         RggbChannelVector gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
         ColorSpaceTransform transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
-        validateColorCorrectionResult(result);
+        validateColorCorrectionResult(result, colorCorrectionMode);
+        mCollector.expectEquals("control mode result/request mismatch",
+                CaptureResult.CONTROL_MODE_OFF, result.get(CaptureResult.CONTROL_MODE));
         mCollector.expectEquals("Color correction gain result/request mismatch",
                 UNIT_GAIN, gains);
         mCollector.expectEquals("Color correction gain result/request mismatch",
                 IDENTITY_TRANSFORM, transform);
 
         // FAST mode
+        colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_FAST;
         manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
-                CaptureRequest.COLOR_CORRECTION_MODE_FAST);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, colorCorrectionMode);
         request = manualRequestBuilder.build();
         mCamera.capture(request, listener, mHandler);
         result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
-        validateColorCorrectionResult(result);
+        validateColorCorrectionResult(result, colorCorrectionMode);
+        mCollector.expectEquals("control mode result/request mismatch",
+                CaptureResult.CONTROL_MODE_AUTO, result.get(CaptureResult.CONTROL_MODE));
 
         // HIGH_QUALITY mode
+        colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_HIGH_QUALITY;
         manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
-                CaptureRequest.COLOR_CORRECTION_MODE_FAST);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, colorCorrectionMode);
         request = manualRequestBuilder.build();
         mCamera.capture(request, listener, mHandler);
         result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
-        validateColorCorrectionResult(result);
+        validateColorCorrectionResult(result, colorCorrectionMode);
+        mCollector.expectEquals("control mode result/request mismatch",
+                CaptureResult.CONTROL_MODE_AUTO, result.get(CaptureResult.CONTROL_MODE));
     }
 
-    private void validateColorCorrectionResult(CaptureResult result) {
+    private void validateColorCorrectionResult(CaptureResult result, int colorCorrectionMode) {
         final RggbChannelVector ZERO_GAINS = new RggbChannelVector(0, 0, 0, 0);
         final int TRANSFORM_SIZE = 9;
         Rational[] zeroTransform = new Rational[TRANSFORM_SIZE];
@@ -775,6 +782,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             mCollector.expectKeyValueNotEquals(result,
                     CaptureResult.COLOR_CORRECTION_TRANSFORM, ZERO_TRANSFORM);
         }
+
+        mCollector.expectEquals("color correction mode result/request mismatch",
+                colorCorrectionMode, result.get(CaptureResult.COLOR_CORRECTION_MODE));
     }
 
     /**
@@ -1420,7 +1430,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         for (int i = 0; i < numFramesVerified; i++) {
             result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-            validateColorCorrectionResult(result);
+            // Color correction mode check is skipped here, as it is checked in colorCorrectionTest.
+            validateColorCorrectionResult(result, result.get(CaptureResult.COLOR_CORRECTION_MODE));
 
             RggbChannelVector gains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
             ColorSpaceTransform transform =
@@ -1487,11 +1498,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             listener = new SimpleCaptureListener();
             requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            // TODO: enable below code when b/14059883 is fixed.
-            /*
             verifyCaptureResultForKey(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE, (int)mode,
                     listener, NUM_FRAMES_VERIFIED);
-            */
         }
 
         for (int mode : opticalStabModes) {
@@ -1582,11 +1590,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            // Enable below check  when b/14059883 is fixed.
-            /*
             verifyCaptureResultForKey(CaptureResult.CONTROL_SCENE_MODE,
-                    CaptureRequest.CONTROL_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
-            */
+                    mode, listener, NUM_FRAMES_VERIFIED);
             // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
             verifyCaptureResultForKey(CaptureResult.CONTROL_MODE,
                     CaptureRequest.CONTROL_MODE_USE_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
@@ -1606,11 +1611,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            // Enable below check  when b/14059883 is fixed.
-            /*
-            verifyCaptureResultForKey(CaptureResult.CONTROL_SCENE_MODE,
-                    CaptureRequest.CONTROL_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
-            */
+            verifyCaptureResultForKey(CaptureResult.CONTROL_EFFECT_MODE,
+                    mode, listener, NUM_FRAMES_VERIFIED);
             // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
             verifyCaptureResultForKey(CaptureResult.CONTROL_MODE,
                     CaptureRequest.CONTROL_MODE_AUTO, listener, NUM_FRAMES_VERIFIED);
