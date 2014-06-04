@@ -70,8 +70,6 @@ public class Camera2SurfaceViewTestCase extends
     private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
     private static final int MAX_READER_IMAGES = 5;
 
-    private Size mPreviewSize;
-
     // TODO: Use internal storage for this to make sure the file is only visible to test.
     protected static final String DEBUG_FILE_NAME_BASE =
             Environment.getExternalStorageDirectory().getPath();
@@ -92,6 +90,7 @@ public class Camera2SurfaceViewTestCase extends
     protected ImageReader mReader;
     protected Surface mReaderSurface;
     protected Surface mPreviewSurface;
+    protected Size mPreviewSize;
     protected List<Size> mOrderedPreviewSizes; // In descending order.
     protected List<Size> mOrderedVideoSizes; // In descending order.
     protected List<Size> mOrderedStillSizes; // In descending order.
