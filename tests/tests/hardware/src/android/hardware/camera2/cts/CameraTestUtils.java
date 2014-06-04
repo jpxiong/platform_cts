@@ -202,6 +202,11 @@ public class CameraTestUtils extends Assert {
             throw new TimeoutRuntimeException("Unable to get the expected capture result after "
                     + "waiting for " + numResultsWait + " results");
         }
+
+        public boolean hasMoreResults()
+        {
+            return mQueue.isEmpty();
+        }
     }
 
     /**
