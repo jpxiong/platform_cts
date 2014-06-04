@@ -17,6 +17,7 @@
 package android.permission.cts;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -26,11 +27,14 @@ import android.test.suitebuilder.annotation.SmallTest;
  */
 public class TelephonyManagerPermissionTest extends AndroidTestCase {
 
+    private boolean mHasTelephony;
     TelephonyManager mTelephonyManager = null;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mHasTelephony = getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_TELEPHONY);
         mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
         assertNotNull(mTelephonyManager);
     }
@@ -43,6 +47,10 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testGetDeviceId() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         try {
             String id = mTelephonyManager.getDeviceId();
             fail("Got device ID: " + id);
@@ -59,6 +67,10 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testGetLine1Number() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         try {
             String nmbr = mTelephonyManager.getLine1Number();
             fail("Got line 1 number: " + nmbr);
@@ -75,6 +87,10 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testGetSimSerialNumber() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         try {
             String nmbr = mTelephonyManager.getSimSerialNumber();
             fail("Got SIM serial number: " + nmbr);
@@ -91,6 +107,10 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testGetSubscriberId() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         try {
             String sid = mTelephonyManager.getSubscriberId();
             fail("Got subscriber id: " + sid);
@@ -107,6 +127,10 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testVoiceMailNumber() {
+        if (!mHasTelephony) {
+            return;
+        }
+
         try {
             String vmnum = mTelephonyManager.getVoiceMailNumber();
             fail("Got voicemail number: " + vmnum);
