@@ -339,8 +339,9 @@ public class CameraTestUtils extends Assert {
         if (format == ImageFormat.JPEG) {
             buffer = planes[0].getBuffer();
             assertNotNull("Fail to get jpeg ByteBuffer", buffer);
-            data = new byte[buffer.capacity()];
+            data = new byte[buffer.remaining()];
             buffer.get(data);
+            buffer.rewind();
             return data;
         }
 
