@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.test.AndroidTestCase;
@@ -51,6 +52,12 @@ public class NoProcessOutgoingCallPermissionTest extends AndroidTestCase {
      */
     // TODO: add back to LargeTest when test can cancel initiated call
     public void testProcessOutgoingCall() {
+        final PackageManager pm = getContext().getPackageManager();
+        if (!pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY) ||
+                !pm.hasSystemFeature(PackageManager.FEATURE_SIP_VOIP)) {
+            return;
+        }
+
         Log.i(LOG_TAG, "Beginning testProcessOutgoingCall");
         OutgoingCallBroadcastReceiver rcvr = new OutgoingCallBroadcastReceiver();
         Intent ntnt = mContext.registerReceiver(rcvr,
