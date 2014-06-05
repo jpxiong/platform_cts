@@ -29,5 +29,9 @@
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
   bug: 11352697
+},
+{
+  name: "android.provider.cts.ContactsContract_PinnedPositionsTest",
+  bug: 15430304
 }
 ]
