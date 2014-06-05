@@ -72,8 +72,6 @@ class CtsBuilder(object):
 
     self.test_repository = os.path.join(self.out_dir, 'repository/testcases')
     self.plan_repository = os.path.join(self.out_dir, 'repository/plans')
-    
-    #dirty hack to copy over prepopulated CTS test plans, stable vs flaky, for autoCTS
     self.definedplans_repository = os.path.join(self.android_root, 'cts/tests/plans')
 
   def GenerateTestDescriptions(self):
@@ -154,14 +152,111 @@ class CtsBuilder(object):
     plan.Include('android\.telephony')
     plan.Include('android\.nativemedia.*')
     plan.Include('com\.android\.cts\..*')#TODO(stuartscott): Should PDK have all these?
-    #TODO(stuartscott): Maybe move away from com.android.* to android.* - less typing
     self.__WritePlan(plan, 'PDK')
 
-    #dirty hack to copy over pre-populated CTS plans - flaky vs stable - to streamline autoCTS
-    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-flaky.xml'),
-        os.path.join(self.plan_repository, 'CTS-flaky.xml'))
-    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-stable.xml'),
-        os.path.join(self.plan_repository, 'CTS-stable.xml'))
+    flaky_tests = BuildCtsFlakyTestList()
+
+    # CTS Stable plan
+    plan = tools.TestPlan(packages)
+    plan.Exclude(r'android\.display')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-stable')
+
+    # CTS Flaky plan - inversion of CTS Stable
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.display')
+    for package, test_list in flaky_tests.iteritems():
+      plan.Include(package)
+      plan.IncludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-flaky')
+
+
+def BuildCtsFlakyTestList():
+  """ Construct a defaultdict that maps package name to a list of tests
+      that are known to be flaky. """
+  return {
+      'android.app' : [
+          'cts.ActivityManagerTest#testIsRunningInTestHarness',
+          'cts.AlertDialogTest#testAlertDialogCancelable',
+          'cts.ExpandableListActivityTest#testCallback',],
+      'android.hardware' : [
+          'cts.SensorIntegrationTests#testAccelerometerDoesNotStopGyroscope',
+          'cts.SensorIntegrationTests#testsAccelerometerDoesnNotStopMagnetometer',
+          'cts.SensorIntegrationTests#testAndroidTestCaseSetupProperly',
+          'cts.SensorIntegrationTests#testBatchAndFlush',
+          'cts.SensorIntegrationTests#testGyroscopeDoesNotStopAccelerometer',
+          'cts.SensorIntegrationTests#testGyroscopeDoesNotStopMagnetometer',
+          'cts.SensorIntegrationTests#testMagnetometerDoesNotStopAccelerometer',
+          'cts.SensorIntegrationTests#testMagnetometerDoesNotStopGyroscope',
+          'cts.SensorMagneticFieldTest#testBatchingStoppingOtherClients',
+          'cts.SensorMagneticFieldTest#testBatchingStoppingOtherClientsBatching',
+          'cts.SensorMagneticFieldTest#testFrequencyAccuracy',
+          'cts.SensorMagneticFieldTest#testOneClientSeveralThreads',
+          'cts.SensorMagneticFieldTest#testOneClientSeveralThreadsBatching',
+          'cts.SensorMagneticFieldTest#testStandardDeviationWhileStatic',
+          'cts.SensorMagneticFieldTest#testStoppingOtherClients',
+          'cts.SensorMagneticFieldTest#testStoppingOtherClientsBatching',
+          'cts.SensorAccelerometerTest#testBatchingStoppingOtherClients',
+          'cts.SensorAccelerometerTest#testBatchingStoppingOtherClientsBatching',
+          'cts.SensorAccelerometerTest#testFrequencyAccuracy',
+          'cts.SensorAccelerometerTest#testOneClientSeveralThreads',
+          'cts.SensorAccelerometerTest#testOneClientSeveralThreadsBatching',
+          'cts.SensorGyroscopeTest#testBatchingStoppingOtherClients',
+          'cts.SensorGyroscopeTest#testBatchingStoppingOtherClientsBatching',
+          'cts.SensorGyroscopeTest#testFrequencyAccuracy',
+          'cts.SensorGyroscopeTest#testOneClientSeveralThreads',
+          'cts.SensorGyroscopeTest#testOneClientSeveralThreadsBatching',
+          'cts.SensorGyroscopeTest#testStandardDeviationWhilStatic',
+          'cts.SensorGyroscopeTest#testStoppingOtherClients',
+          'cts.SensorGyroscopeTest#testStoppingOtherClientsBatching',
+          'cts.SensorAccelerometerTest#testStandardDeviationWhileStatic',
+          'cts.SensorAccelerometerTest#testStoppingOtherClients',
+          'cts.SensorAccelerometerTest#testStoppingOtherClientsBatching',
+          'camera2.cts.CameraDeviceTest#testCameraDeviceRepeatingRequest',
+          'camera2.cts.ImageReaderTest#testImageReaderFromCameraJpeg',
+          'cts.CameraGLTest#testCameraToSurfaceTextureMetadata',
+          'cts.CameraTest#testImmediateZoom',
+          'cts.CameraTest#testPreviewCallback',
+          'cts.CameraTest#testSmoothZoom',
+          'cts.CameraTest#testVideoSnapshot',
+          'cts.CameraGLTest#testSetPreviewTextureBothCallbacks',
+          'cts.CameraGLTest#testSetPreviewTexturePreviewCallback',
+          'cts.CameraGLTest#testSetPreviewTexturePreviewCallback',],
+      'android.media' : [
+          'cts.DecoderTest#testCodecResetsH264WithSurface',
+          'cts.StreamingMediaPlayerTest#testHLS',],
+      'android.mediastress' : [
+          'cts.NativeMediaTest#test480pPlay',],
+      'android.net' : [
+          'cts.ConnectivityManagerTest#testStartUsingNetworkFeature_enableHipri',
+          'wifi.cts.ScanResultTest#testScanResultTimeStamp',
+          'cts.DnsTest#testDnsWorks',
+          'cts.TrafficStatsTest#testTrafficStatsForLocalhost',
+          'wifi.cts.ScanResultTest#testAndroidTestCaseSetupProperly',
+          'wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',
+          'cts.SSLCertificateSocketFactoryTest#testCreateSocket',
+          'cts.SSLCertificateSocketFactoryTest#test_createSocket_bind',
+          'cts.SSLCertificateSocketFactoryTest#test_createSocket_simple',
+          'cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping',],
+      'android.security' : [
+          'cts.BannedFilesTest#testNoSu',
+          'cts.BannedFilesTest#testNoSuInPath',
+          'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports',
+          'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',
+          'cts.PackageSignatureTest#testPackageSignatures',],
+      'android.webkit' : [
+          'cts.WebViewClientTest#testDoUpdateVisitedHistory',
+          'cts.WebViewClientTest#testLoadPage',
+          'cts.WebViewClientTest#testOnFormResubmission',
+          'cts.WebViewClientTest#testOnReceivedError',
+          'cts.WebViewClientTest#testOnReceivedHttpAuthRequest',
+          'cts.WebViewClientTest#testOnScaleChanged',
+          'cts.WebViewClientTest#testOnUnhandledKeyEvent',
+          'cts.WebViewTest#testSetInitialScale',],
+      'android.widget' : [
+          'cts.GridViewTest#testSetNumColumns',],}
 
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name
