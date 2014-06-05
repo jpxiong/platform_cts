@@ -115,6 +115,46 @@
 {
   name: "android.net.cts.ConnectivityManagerTest#testGetActiveNetworkInfo",
   bug: 15087784
+},
+{
+  name: "android.app.cts.DialogTest#testSetFeatureDrawableResource",
+  bug: 15135607
+},
+{
+  name: "android.media.cts.MediaCodecListTest#testIsAVCBaselineProfileSupported",
+  name: "android.media.cts.MediaCodecListTest#testIsH263BaselineProfileSupported",
+  name: "android.media.cts.MediaCodecListTest#testIsM4VSimpleProfileSupported",
+  name: "android.media.cts.MediaCodecListTest#testRequiredMediaCodecList",
+  bug: 15433903
+},
+{
+  name: "android.permission.cts.AppWidgetManagerPermissionTest#testBindAppWidget",
+  bug: 15382292
+},
+{
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionCount",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionGetChildByDescription",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionGetChildByInstance",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionGetChildByText",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testComplexSelectors",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testDeviceSoftKeys",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testDragToCoordinates",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testDragToObject",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testGetVisibleBounds",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testPinchIn",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testPinchOut",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testRotation",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectAfterContentChanged",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectByClassMatch",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectByClassType",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectorDescriptionContains",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectorDescriptionStarts",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectorEnabled",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testSelectorResourceId",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testTextEraseAndInput",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testUiWatcher",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testVerifyMenuClicks",
+  name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testWaitForIdleTimeout",
+  bug: 15093828
 }
-
 ]
