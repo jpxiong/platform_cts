@@ -20,6 +20,7 @@ package android.permission.cts;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Vibrator;
 import android.telephony.gsm.SmsManager;
@@ -146,6 +147,10 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testSendSms() {
+        if (!getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
+
         SmsManager smsManager = SmsManager.getDefault();
         byte[] testData = new byte[10];
         try {
