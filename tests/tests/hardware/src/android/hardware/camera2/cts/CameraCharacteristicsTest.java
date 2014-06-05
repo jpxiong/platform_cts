@@ -728,29 +728,6 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidRequestMaxNumInputStreams() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            {
-
-                assertNotNull("Invalid property: android.request.maxNumInputStreams",
-                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.request.maxNumInputStreams", allKeys.contains(
-                        CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS));
-
-            }
-
-        }
-    }
-
     public void testCameraCharacteristicsAndroidRequestPipelineMaxDepth() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
