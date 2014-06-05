@@ -67,15 +67,13 @@
 },
 {
   name: "android.media.cts.BassBoostTest",
+  name: "android.media.cts.EnvReverbTest",
+  name: "android.media.cts.EqualizerTest",
   bug: 15163233
 },
 {
   name: "android.media.cts.DecoderTest",
   bug: 15163143
-},
-{
-  name: "android.media.cts.EnvReverbTest",
-  bug: 15163233
 },
 {
   name: "android.media.cts.MediaPlayerFlakyNetworkTest",
@@ -156,5 +154,40 @@
   name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testVerifyMenuClicks",
   name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testWaitForIdleTimeout",
   bug: 15093828
+},
+{
+  name: "android.media.cts.RingtoneTest#testRingtone",
+  bug: 15343572
+},
+{
+  name: "android.media.cts.VisualizerTest",
+  bug: 15381765
+},
+{
+  name: "android.mediastress.cts.H263QcifShortPlayerTest",
+  name: "android.mediastress.cts.Vp8R480x360ShortPlayerTest",
+  bug: 15081769
+},
+{
+  name: "android.speech.tts.cts.TextToSpeechTest",
+  bug: 15082733
+},
+{
+  name: "android.net.cts.DnsTest#testDnsWorks",
+  name: "android.net.cts.SSLCertificateSocketFactoryTest",
+  name: "android.net.wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly",
+  bug: 15004618
+},
+{
+  name: "android.media.cts.AudioRecord_BufferSizeTest#testGetMinBufferSize",
+  bug: 15319578
+},
+{
+  name: "android.text.cts.BoringLayoutTest#testScale",
+  bug: 15134518
+},
+{
+  name: "com.android.cts.browser.BrowserBenchTest#testOctane",
+  bug: 15406811
 }
 ]
