@@ -261,7 +261,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private SSLServerSocket serverBind() throws Exception {
+    public SSLServerSocket serverBind() throws Exception {
         // Load the server's private key and cert chain
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(
@@ -608,7 +608,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         return mFirstDetectedFatalAlertDescription;
     }
 
-    private static abstract class TlsProtocols {
+    public static abstract class TlsProtocols {
         public static final int CHANGE_CIPHER_SPEC = 20;
         public static final int ALERT = 21;
         public static final int HANDSHAKE = 22;
@@ -617,13 +617,13 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         private TlsProtocols() {}
     }
 
-    private static class TlsRecord {
-        private int protocol;
-        private int versionMajor;
-        private int versionMinor;
-        private byte[] fragment;
+    public static class TlsRecord {
+        public int protocol;
+        public int versionMajor;
+        public int versionMinor;
+        public byte[] fragment;
 
-        private static TlsRecord parse(byte[] record) throws IOException {
+        public static TlsRecord parse(byte[] record) throws IOException {
             TlsRecord result = new TlsRecord();
             if (record.length < TlsRecordReader.RECORD_HEADER_LENGTH) {
                 throw new IOException("Record too short: " + record.length);
@@ -645,7 +645,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
             return result;
         }
 
-        private static byte[] unparse(TlsRecord record) {
+        public static byte[] unparse(TlsRecord record) {
             byte[] result = new byte[TlsRecordReader.RECORD_HEADER_LENGTH + record.fragment.length];
             result[0] = (byte) record.protocol;
             result[1] = (byte) record.versionMajor;
@@ -659,7 +659,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private static final boolean isHandshakeMessageType(TlsRecord record, int type) {
+    public static final boolean isHandshakeMessageType(TlsRecord record, int type) {
         HandshakeMessage handshake = HandshakeMessage.tryParse(record);
         if (handshake == null) {
             return false;
@@ -667,18 +667,19 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         return handshake.type == type;
     }
 
-    private static class HandshakeMessage {
-        private static final int TYPE_SERVER_HELLO = 2;
-        private static final int TYPE_CLIENT_KEY_EXCHANGE = 16;
+    public static class HandshakeMessage {
+        public static final int TYPE_SERVER_HELLO = 2;
+        public static final int TYPE_CERTIFICATE = 11;
+        public static final int TYPE_CLIENT_KEY_EXCHANGE = 16;
 
-        private int type;
+        public int type;
 
         /**
          * Parses the provided TLS record as a handshake message.
          *
          * @return alert message or {@code null} if the record does not contain a handshake message.
          */
-        private static HandshakeMessage tryParse(TlsRecord record) {
+        public static HandshakeMessage tryParse(TlsRecord record) {
             if (record.protocol != TlsProtocols.HANDSHAKE) {
                 return null;
             }
@@ -691,19 +692,19 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private static class AlertMessage {
-        private static final int LEVEL_FATAL = 2;
-        private static final int DESCRIPTION_UNEXPECTED_MESSAGE = 10;
+    public static class AlertMessage {
+        public static final int LEVEL_FATAL = 2;
+        public static final int DESCRIPTION_UNEXPECTED_MESSAGE = 10;
 
-        private int level;
-        private int description;
+        public int level;
+        public int description;
 
         /**
          * Parses the provided TLS record as an alert message.
          *
          * @return alert message or {@code null} if the record does not contain an alert message.
          */
-        private static AlertMessage tryParse(TlsRecord record) {
+        public static AlertMessage tryParse(TlsRecord record) {
             if (record.protocol != TlsProtocols.ALERT) {
                 return null;
             }
@@ -747,7 +748,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
     /**
      * Reader of TLS records.
      */
-    private static class TlsRecordReader {
+    public static class TlsRecordReader {
         private static final int MAX_RECORD_LENGTH = 16384;
         public static final int RECORD_HEADER_LENGTH = 5;
 
@@ -884,7 +885,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private static void closeQuietly(ServerSocket socket) {
+    public static void closeQuietly(ServerSocket socket) {
         if (socket != null) {
             try {
                 socket.close();
@@ -892,7 +893,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private static void closeQuietly(Socket socket) {
+    public static void closeQuietly(Socket socket) {
         if (socket != null) {
             try {
                 socket.close();
@@ -900,7 +901,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
         }
     }
 
-    private static byte[] readResource(Context context, int resId) throws IOException {
+    public static byte[] readResource(Context context, int resId) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         InputStream in = null;
         byte[] buf = new byte[16 * 1024];
@@ -919,7 +920,7 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
     /**
      * {@link X509TrustManager} which trusts all certificate chains.
      */
-    private static class TrustAllX509TrustManager implements X509TrustManager {
+    public static class TrustAllX509TrustManager implements X509TrustManager {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
@@ -939,12 +940,12 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
     /**
      * {@link X509KeyManager} which uses the provided private key and cert chain for all sockets.
      */
-    private static class HardcodedCertX509KeyManager implements X509KeyManager {
+    public static class HardcodedCertX509KeyManager implements X509KeyManager {
 
         private final PrivateKey mPrivateKey;
         private final X509Certificate[] mCertChain;
 
-        private HardcodedCertX509KeyManager(PrivateKey privateKey, X509Certificate[] certChain) {
+        HardcodedCertX509KeyManager(PrivateKey privateKey, X509Certificate[] certChain) {
             mPrivateKey = privateKey;
             mCertChain = certChain;
         }
