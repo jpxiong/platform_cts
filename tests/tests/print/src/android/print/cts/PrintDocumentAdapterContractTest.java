@@ -70,7 +70,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(2)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -103,7 +103,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
@@ -212,7 +212,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel the printing.
         getUiDevice().pressBack(); // wakes up the device.
@@ -297,7 +297,10 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the second printer.
         selectPrinter("Second printer");
@@ -462,7 +465,10 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the second printer.
         selectPrinter("Second printer");
@@ -608,7 +614,10 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the second printer.
         selectPrinter("Second printer");
@@ -681,44 +690,47 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
-            new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
-                        .build();
-                // The content changes after every layout.
-                callback.onLayoutFinished(info, false);
-                return null;
-            }
-        }, new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                PageRange[] pages = (PageRange[]) args[0];
-                ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
-                WriteResultCallback callback = (WriteResultCallback) args[3];
-                fd.close();
-                callback.onWriteFinished(pages);
-                // Mark write was called.
-                onWriteCalled();
-                return null;
-            }
-        }, new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                // Mark finish was called.
-                onFinishCalled();
-                return null;
-            }
-        });
+                new Answer<Void>() {
+                    @Override
+                    public Void answer(InvocationOnMock invocation) throws Throwable {
+                        LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
+                        PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
+                                .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
+                                .build();
+                        // The content changes after every layout.
+                        callback.onLayoutFinished(info, true);
+                        return null;
+                    }
+                }, new Answer<Void>() {
+                    @Override
+                    public Void answer(InvocationOnMock invocation) throws Throwable {
+                        Object[] args = invocation.getArguments();
+                        PageRange[] pages = (PageRange[]) args[0];
+                        ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
+                        WriteResultCallback callback = (WriteResultCallback) args[3];
+                        fd.close();
+                        callback.onWriteFinished(pages);
+                        // Mark write was called.
+                        onWriteCalled();
+                        return null;
+                    }
+                }, new Answer<Void>() {
+                    @Override
+                    public Void answer(InvocationOnMock invocation) throws Throwable {
+                        // Mark finish was called.
+                        onFinishCalled();
+                        return null;
+                    }
+                });
 
         // Start printing.
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the third printer.
         selectPrinter("Third printer");
@@ -809,7 +821,10 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the second printer.
         selectPrinter("Second printer");
@@ -890,6 +905,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 cancellation.setOnCancelListener(new OnCancelListener() {
                     @Override
                     public void onCancel() {
+                        onCancelOperationCalled();
                         callback.onLayoutCancelled();
                     }
                 });
@@ -914,6 +930,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.
         getUiDevice().pressBack();
+
+        // Wait for the cancellation request.
+        waitForCancelOperationCallbackCalled();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -973,6 +992,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                         } catch (IOException ioe) {
                             /* ignore */
                         }
+                        onCancelOperationCalled();
                         callback.onWriteCancelled();
                     }
                 });
@@ -993,11 +1013,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.
         getUiDevice().pressBack();
+
+        // Wait for the cancellation request.
+        waitForCancelOperationCallbackCalled();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1135,7 +1158,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.
@@ -1216,7 +1239,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.
@@ -1354,7 +1377,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.

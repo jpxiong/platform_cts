@@ -30,6 +30,7 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentAdapter.LayoutResultCallback;
 import android.print.PrintDocumentAdapter.WriteResultCallback;
 import android.print.PrintDocumentInfo;
+import android.print.PrintJobInfo;
 import android.print.PrinterCapabilitiesInfo;
 import android.print.PrinterId;
 import android.print.PrinterInfo;
@@ -74,7 +75,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             public Void answer(InvocationOnMock invocation) {
                 PrintJob printJob = (PrintJob) invocation.getArguments()[0];
                 PageRange[] pages = printJob.getInfo().getPages();
-                assert(pages.length == 1 && PageRange.ALL_PAGES.equals(pages[0]));
+                assertTrue(pages.length == 1 && PageRange.ALL_PAGES.equals(pages[0]));
                 printJob.complete();
                 onPrintJobQueuedCalled();
                 return null;
@@ -126,7 +127,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Select the first printer.
         selectPrinter(FIRST_PRINTER);
@@ -223,7 +224,10 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the first printer.
         selectPrinter(FIRST_PRINTER);
@@ -268,9 +272,14 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             @Override
             public Void answer(InvocationOnMock invocation) {
                 PrintJob printJob = (PrintJob) invocation.getArguments()[0];
-                PageRange[] pages = printJob.getInfo().getPages();
-                assert(pages.length == 1 && pages[0].getStart() == 1
-                        && pages[0].getEnd() == 2);
+                PrintJobInfo printJobInfo = printJob.getInfo();
+                PageRange[] pages = printJobInfo.getPages();
+                // We asked only for page 3 (index 2) but got 4 and 3 (indices
+                // 2, 3), hence the written document has two pages (3 and 4)
+                // and the first one, i.e. 3 should be printed.
+                assertTrue(pages.length == 1 && pages[0].getStart() == 0
+                        && pages[0].getEnd() == 0);
+                assertSame(printJob.getDocument().getInfo().getPageCount(), 2);
                 printJob.complete();
                 onPrintJobQueuedCalled();
                 return null;
@@ -308,9 +317,9 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 assertSame(pages.length, 1);
                 fd.close();
 
-                PageRange reqeustedPages = pages[0];
-                if (reqeustedPages.getStart() == reqeustedPages.getEnd()
-                        && reqeustedPages.getEnd() == 0) {
+                PageRange requestedPages = pages[0];
+                if (requestedPages.getStart() == requestedPages.getEnd()
+                        && requestedPages.getEnd() == 0) {
                     // If asked for the first page, which is for preview
                     // then write it...
                     callback.onWriteFinished(pages);
@@ -335,7 +344,10 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
 
         // Select the first printer.
         selectPrinter(FIRST_PRINTER);
@@ -431,7 +443,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback();
+        waitForWriteAdapterCallback();
 
         // Cancel printing.
         getUiDevice().pressBack(); // wakes up the device.
@@ -476,7 +488,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 PrintService service = session.getService();
 
                 if (session.getPrinters().isEmpty()) {
-                          List<PrinterInfo> printers = new ArrayList<PrinterInfo>();
+                          List<PrinterInfo> printers = new ArrayList<>();
 
                     // Add one printer.
                     PrinterId firstPrinterId = service.generatePrinterId("first_printer");
