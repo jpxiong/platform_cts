@@ -156,7 +156,7 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         // text view and button are VISIBLE, they should be measured
         final TextView textView = (TextView) frameLayout.findViewById(R.id.framelayout_textview);
         compareScaledPixels(30, textView.getMeasuredHeight());
-        compareScaledPixels(100, textView.getMeasuredWidth());
+        compareScaledPixels(60, textView.getMeasuredWidth());
         assertEquals(textView.getMeasuredHeight(), frameLayout.getMeasuredHeight());
         assertEquals(textView.getMeasuredWidth(), frameLayout.getMeasuredWidth());
 
