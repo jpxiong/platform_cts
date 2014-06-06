@@ -19,6 +19,7 @@ package android.media.cts;
 import android.app.Presentation;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -150,6 +151,25 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
         }
     }
 
+    private static boolean hasCodec(String mimeType) {
+        int numCodecs = MediaCodecList.getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+                if (types[j].equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Prepares the encoder, decoder, and virtual display.
      */
@@ -158,6 +178,11 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
         MediaCodec decoder = null;
         OutputSurface outputSurface = null;
         VirtualDisplay virtualDisplay = null;
+
+        // Don't run the test of the codec isn't present.
+        if (!hasCodec(MIME_TYPE)) {
+            return;
+        }
 
         try {
             // Encoded video resolution matches virtual display.
