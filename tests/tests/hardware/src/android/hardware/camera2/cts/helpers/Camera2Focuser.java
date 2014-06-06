@@ -340,6 +340,8 @@ public class Camera2Focuser implements AutoFocusStateListener {
         return new CaptureListener() {
             private int mLatestFrameCount = -1;
 
+            // TODO: CaptureListener#onCpaturePartial is hidden. Replace it by
+            //       CameraCaptureSession.CaptureListener#onCapturePartial later.
             @Override
             public void onCapturePartial(CameraDevice camera, CaptureRequest request,
                     CaptureResult result) {

@@ -1929,27 +1929,32 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void update3aRegion(
             CaptureRequest.Builder requestBuilder, int algoIdx, MeteringRectangle[] regions)
     {
-        int[] maxRegions = mStaticInfo.get3aMaxRegionsChecked();
+        int maxRegions;
+        CaptureRequest.Key<MeteringRectangle[]> key;
 
         if (regions == null || regions.length == 0) {
             throw new IllegalArgumentException("Invalid input 3A region!");
         }
 
-        if (maxRegions[algoIdx] >= regions.length)
-        {
-            switch (algoIdx) {
-                case INDEX_ALGORITHM_AE:
-                    requestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, regions);
-                    break;
-                case INDEX_ALGORITHM_AWB:
-                    requestBuilder.set(CaptureRequest.CONTROL_AWB_REGIONS, regions);
-                    break;
-                case INDEX_ALGORITHM_AF:
-                    requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, regions);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown 3A Algorithm!");
-            }
+        switch (algoIdx) {
+            case INDEX_ALGORITHM_AE:
+                maxRegions = mStaticInfo.getAeMaxRegionsChecked();
+                key = CaptureRequest.CONTROL_AE_REGIONS;
+                break;
+            case INDEX_ALGORITHM_AWB:
+                maxRegions = mStaticInfo.getAwbMaxRegionsChecked();
+                key = CaptureRequest.CONTROL_AWB_REGIONS;
+                break;
+            case INDEX_ALGORITHM_AF:
+                maxRegions = mStaticInfo.getAfMaxRegionsChecked();
+                key = CaptureRequest.CONTROL_AF_REGIONS;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown 3A Algorithm!");
+        }
+
+        if (maxRegions >= regions.length) {
+            requestBuilder.set(key, regions);
         }
     }
 
@@ -1958,33 +1963,39 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * supported. Do nothing if the specified 3A region is not supported by camera device.
      * @param result The capture result to be validated
      * @param algoIdx The index to the algorithm. (AE: 0, AWB: 1, AF: 2)
-     * @param expectRegion The 3A regions expected in capture result
+     * @param expectRegions The 3A regions expected in capture result
      */
     private void validate3aRegion(
-            CaptureResult result, int algoIdx, MeteringRectangle[] expectRegion)
+            CaptureResult result, int algoIdx, MeteringRectangle[] expectRegions)
     {
-        int[] maxRegions = mStaticInfo.get3aMaxRegionsChecked();
+        int maxRegions;
+        CaptureResult.Key<MeteringRectangle[]> key;
         MeteringRectangle[] actualRegion;
 
-        if (maxRegions[algoIdx] > 0)
+        switch (algoIdx) {
+            case INDEX_ALGORITHM_AE:
+                maxRegions = mStaticInfo.getAeMaxRegionsChecked();
+                key = CaptureResult.CONTROL_AE_REGIONS;
+                break;
+            case INDEX_ALGORITHM_AWB:
+                maxRegions = mStaticInfo.getAwbMaxRegionsChecked();
+                key = CaptureResult.CONTROL_AWB_REGIONS;
+                break;
+            case INDEX_ALGORITHM_AF:
+                maxRegions = mStaticInfo.getAfMaxRegionsChecked();
+                key = CaptureResult.CONTROL_AF_REGIONS;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown 3A Algorithm!");
+        }
+
+        if (maxRegions > 0)
         {
-            switch (algoIdx) {
-                case INDEX_ALGORITHM_AE:
-                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
-                    break;
-                case INDEX_ALGORITHM_AWB:
-                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AWB_REGIONS);
-                    break;
-                case INDEX_ALGORITHM_AF:
-                    actualRegion = getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown 3A Algorithm!");
-            }
+            actualRegion = getValueNotNull(result, key);
             mCollector.expectEquals(
-                    "Expected 3A region: " + Arrays.toString(expectRegion) +
+                    "Expected 3A regions: " + Arrays.toString(expectRegions) +
                     " does not match actual one: " + Arrays.toString(actualRegion),
-                    expectRegion, actualRegion);
+                    expectRegions, actualRegion);
         }
     }
 }

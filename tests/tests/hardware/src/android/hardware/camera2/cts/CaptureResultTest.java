@@ -78,9 +78,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
          * FIXME: We need get ride of this list, see bug 11116270.
          */
         List<CaptureResult.Key<?>> waiverkeys = new ArrayList<CaptureResult.Key<?>>();
-        waiverkeys.add(CaptureResult.JPEG_GPS_COORDINATES);
-        waiverkeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
-        waiverkeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
+        waiverkeys.add(CaptureResult.JPEG_GPS_LOCATION);
         waiverkeys.add(CaptureResult.JPEG_ORIENTATION);
         waiverkeys.add(CaptureResult.JPEG_QUALITY);
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
