@@ -42,7 +42,7 @@ public class VpnServiceTest extends AndroidTestCase {
 
         // Should be always resolved by only one activity.
         int count = mContext.getPackageManager().queryIntentActivities(intent, 0).size();
-        assertEquals(count, 1);
+        assertEquals(1, count);
     }
 
     public void testEstablish() throws Exception {
