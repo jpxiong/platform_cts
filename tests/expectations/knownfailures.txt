@@ -185,9 +185,5 @@
 {
   name: "android.text.cts.BoringLayoutTest#testScale",
   bug: 15134518
-},
-{
-  name: "com.android.cts.browser.BrowserBenchTest#testOctane",
-  bug: 15406811
 }
 ]
