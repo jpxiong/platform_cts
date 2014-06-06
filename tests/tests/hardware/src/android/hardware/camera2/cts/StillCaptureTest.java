@@ -217,8 +217,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing touch for focus for Camera " + id);
                 openDevice(id);
-                int[] max3ARegions = mStaticInfo.get3aMaxRegionsChecked();
-                if (!(mStaticInfo.hasFocuser() && max3ARegions[MAX_REGIONS_AF_INDEX] > 0)) {
+                int maxAfRegions = mStaticInfo.getAfMaxRegionsChecked();
+                if (!(mStaticInfo.hasFocuser() && maxAfRegions > 0)) {
                     continue;
                 }
 
@@ -1089,7 +1089,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private void aeCompensationTestByCamera() throws Exception {
         Range<Integer> compensationRange = mStaticInfo.getAeCompensationRangeChecked();
         Rational step = mStaticInfo.getAeCompensationStepChecked();
-        int stepsPerEv = (int) Math.round(1.0 / step.toFloat());
+        float stepF = (float) step.getNumerator() / step.getDenominator();
+        int stepsPerEv = (int) Math.round(1.0 / stepF);
         int numSteps = (compensationRange.getUpper() - compensationRange.getLower()) / stepsPerEv;
 
         Size maxStillSz = mOrderedStillSizes.get(0);
@@ -1416,7 +1417,21 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     private boolean isRegionsSupportedFor3A(int index) {
-        boolean isRegionsSupported = mStaticInfo.get3aMaxRegionsChecked()[index] > 0;
+        int maxRegions = 0;
+        switch (index) {
+            case MAX_REGIONS_AE_INDEX:
+                maxRegions = mStaticInfo.getAeMaxRegionsChecked();
+                break;
+            case MAX_REGIONS_AWB_INDEX:
+                maxRegions = mStaticInfo.getAwbMaxRegionsChecked();
+                break;
+            case  MAX_REGIONS_AF_INDEX:
+                maxRegions = mStaticInfo.getAfMaxRegionsChecked();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown algorithm index");
+        }
+        boolean isRegionsSupported = maxRegions > 0;
         if (index == MAX_REGIONS_AF_INDEX && isRegionsSupported) {
             mCollector.expectTrue(
                     "Device reports non-zero max AF region count for a camera without focuser!",

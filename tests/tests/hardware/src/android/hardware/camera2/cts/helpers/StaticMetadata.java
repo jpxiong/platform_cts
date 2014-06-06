@@ -287,22 +287,43 @@ public class StaticMetadata {
     }
 
     /**
-     * Get max 3A regions and do sanity check.
+     * Get max AE regions and do sanity check.
      *
-     * @return 3A max regions supported by the camera device
+     * @return AE max regions supported by the camera device
      */
-    public int[] get3aMaxRegionsChecked() {
-        Key<int[]> key = CameraCharacteristics.CONTROL_MAX_REGIONS;
-        int[] regionCounts = getValueFromKeyNonNull(key);
-
-        if (regionCounts == null) {
-            return new int[]{0, 0, 0};
+    public int getAeMaxRegionsChecked() {
+        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
+        if (regionCount == null) {
+            return 0;
         }
-
-        checkTrueForKey(key, " value should contain 3 elements", regionCounts.length == 3);
-        return regionCounts;
+        return regionCount;
     }
 
+    /**
+     * Get max AWB regions and do sanity check.
+     *
+     * @return AWB max regions supported by the camera device
+     */
+    public int getAwbMaxRegionsChecked() {
+        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
+        if (regionCount == null) {
+            return 0;
+        }
+        return regionCount;
+    }
+
+    /**
+     * Get max AF regions and do sanity check.
+     *
+     * @return AF max regions supported by the camera device
+     */
+    public int getAfMaxRegionsChecked() {
+        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
+        if (regionCount == null) {
+            return 0;
+        }
+        return regionCount;
+    }
     /**
      * Get the available anti-banding modes.
      *
@@ -966,7 +987,7 @@ public class StaticMetadata {
                 utilSizes = config.getOutputSizes(format);
                 break;
             case Input:
-                utilSizes = config.getInputSizes(format);
+                utilSizes = null;
                 break;
             default:
                 throw new IllegalArgumentException("direction must be output or input");
@@ -1121,7 +1142,9 @@ public class StaticMetadata {
             return CONTROL_AE_COMPENSATION_STEP_DEFAULT;
         }
 
-        checkTrueForKey(key, " value must be no more than 1/2", compensationStep.toFloat() < 0.5f);
+        float compensationStepF =
+                (float) compensationStep.getNumerator() / compensationStep.getDenominator();
+        checkTrueForKey(key, " value must be no more than 1/2", compensationStepF < 0.5f);
         return compensationStep;
     }
 
@@ -1134,10 +1157,12 @@ public class StaticMetadata {
         Key<Range<Integer>> key =
                 CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE;
         Range<Integer> compensationRange = getValueFromKeyNonNull(key);
-        float compensationStep = getAeCompensationStepChecked().toFloat();
+        Rational compensationStep = getAeCompensationStepChecked();
+        float compensationStepF =
+                (float) compensationStep.getNumerator() / compensationStep.getDenominator();
         final Range<Integer> DEFAULT_RANGE = Range.create(
-                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStep),
-                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStep));
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStepF),
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStepF));
         if (compensationRange == null) {
             return DEFAULT_RANGE;
         }
@@ -1284,27 +1309,50 @@ public class StaticMetadata {
             return new ArrayList<Integer>();
         }
 
-        checkArrayValuesInRange(key, availableCaps,
+        // TODO: Backward compatible key is hidden. Fix that after we have better enum check
+        /*checkArrayValuesInRange(key, availableCaps,
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);*/
         capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
         return capList;
     }
 
     /**
-     * Get max number of output streams and do the basic sanity check.
+     * Get max number of output raw streams and do the basic sanity check.
      *
-     * @return reported max number of output stream array, empty array if the value is unavailable.
+     * @return reported max number of raw output stream
      */
-    public int[] getMaxNumOutputStreamsChecked() {
-        Key<int[]> key =
-                CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS;
-        int[] maxNumStreams = getValueFromKeyNonNull(key);
+    public int getMaxNumOutputStreamsRawChecked() {
+        Integer maxNumStreams =
+                getValueFromKeyNonNull(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW);
+        if (maxNumStreams == null)
+            return 0;
+        return maxNumStreams;
+    }
 
-        if (maxNumStreams == null) {
-            return new int[0];
-        }
+    /**
+     * Get max number of output processed streams and do the basic sanity check.
+     *
+     * @return reported max number of processed output stream
+     */
+    public int getMaxNumOutputStreamsProcessedChecked() {
+        Integer maxNumStreams =
+                getValueFromKeyNonNull(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC);
+        if (maxNumStreams == null)
+            return 0;
+        return maxNumStreams;
+    }
 
+    /**
+     * Get max number of output stalling processed streams and do the basic sanity check.
+     *
+     * @return reported max number of stalling processed output stream
+     */
+    public int getMaxNumOutputStreamsProcessedStallChecked() {
+        Integer maxNumStreams =
+                getValueFromKeyNonNull(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING);
+        if (maxNumStreams == null)
+            return 0;
         return maxNumStreams;
     }
 

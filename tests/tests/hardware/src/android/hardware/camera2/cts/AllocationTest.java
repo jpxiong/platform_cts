@@ -35,6 +35,7 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.RggbChannelVector;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Size;
 import android.hardware.camera2.cts.helpers.MaybeNull;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
@@ -769,13 +770,15 @@ public class AllocationTest extends AndroidTestCase {
 
             assertNotNull("Can't get camera properties!", properties);
 
-            int[] availableFormats = properties.get(CameraCharacteristics.SCALER_AVAILABLE_FORMATS);
-            assertArrayNotEmpty(availableFormats,
-                    "availableFormats should not be empty");
-            Arrays.sort(availableFormats);
+            StreamConfigurationMap config =
+                    properties.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            int[] availableOutputFormats = config.getOutputFormats();
+            assertArrayNotEmpty(availableOutputFormats,
+                    "availableOutputFormats should not be empty");
+            Arrays.sort(availableOutputFormats);
             assertTrue("Can't find the format " + format + " in supported formats " +
-                    Arrays.toString(availableFormats),
-                    Arrays.binarySearch(availableFormats, format) >= 0);
+                    Arrays.toString(availableOutputFormats),
+                    Arrays.binarySearch(availableOutputFormats, format) >= 0);
 
             Size[] availableSizes = getSupportedSizeForFormat(format, mCamera.getId(),
                     mCameraManager);
