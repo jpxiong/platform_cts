@@ -343,6 +343,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         attrs = DrawableTestUtils.getAttributeSet(
                 mContext.getResources().getXml(R.xml.bitmapdrawable), "bitmap_wrongsrc");
         try {
+            bitmapDrawable = new BitmapDrawable();
             bitmapDrawable.inflate(mContext.getResources(), parser, attrs);
             fail("Should throw XmlPullParserException if the bitmap source can't be decoded.");
         } catch (XmlPullParserException e) {
@@ -351,20 +352,23 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         attrs = DrawableTestUtils.getAttributeSet(
                 mContext.getResources().getXml(R.xml.bitmapdrawable), "bitmap_nosrc");
         try {
+            bitmapDrawable = new BitmapDrawable();
             bitmapDrawable.inflate(mContext.getResources(), parser, attrs);
-            fail("Should throw XmlPullParserException if the bitmap src doesn't be defined.");
+            fail("Should throw XmlPullParserException if the bitmap src is not defined.");
         } catch (XmlPullParserException e) {
         }
 
         attrs = DrawableTestUtils.getAttributeSet(
                 mContext.getResources().getXml(R.xml.bitmapdrawable), "bitmap_allattrs");
         try {
+            bitmapDrawable = new BitmapDrawable();
             bitmapDrawable.inflate(null, parser, attrs);
             fail("Should throw NullPointerException if resource is null");
         } catch (NullPointerException e) {
         }
 
         try {
+            bitmapDrawable = new BitmapDrawable();
             bitmapDrawable.inflate(mContext.getResources(), parser, null);
             fail("Should throw NullPointerException if attribute set is null");
         } catch (NullPointerException e) {
