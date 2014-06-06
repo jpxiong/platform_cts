@@ -16,6 +16,7 @@
 
 package android.telephony.cts;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -184,13 +185,14 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
-                boolean nwSupported = mCm.isNetworkSupported(mCm.TYPE_WIFI);
-                if (nwSupported) {
+                if (mCm.isNetworkSupported(ConnectivityManager.TYPE_WIFI)) {
                     assertSerialNumber();
-                    assertMacAddressReported();
+                    assertMacAddress(getWifiMacAddress());
+                } else if (mCm.isNetworkSupported(ConnectivityManager.TYPE_BLUETOOTH)) {
+                    assertSerialNumber();
+                    assertMacAddress(getBluetoothMacAddress());
                 } else {
-                    nwSupported = mCm.isNetworkSupported(mCm.TYPE_ETHERNET);
-                    assertTrue(nwSupported);
+                    assertTrue(mCm.isNetworkSupported(ConnectivityManager.TYPE_ETHERNET));
                 }
                 break;
 
@@ -284,15 +286,14 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 Pattern.matches("[0-9A-Za-z]+", Build.SERIAL));
     }
 
-    private void assertMacAddressReported() {
-        String macAddress = getMacAddress();
+    private void assertMacAddress(String macAddress) {
         String macPattern = "([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}";
         assertTrue("MAC Address " + macAddress + " does not match pattern " + macPattern,
                 Pattern.matches(macPattern, macAddress));
     }
 
     /** @return mac address which requires the WiFi system to be enabled */
-    private String getMacAddress() {
+    private String getWifiMacAddress() {
         WifiManager wifiManager = (WifiManager) getContext()
                 .getSystemService(Context.WIFI_SERVICE);
 
@@ -311,6 +312,15 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 wifiManager.setWifiEnabled(false);
             }
         }
+    }
+
+    private String getBluetoothMacAddress() {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null) {
+            return "";
+        }
+
+        return adapter.getAddress();
     }
 
     private static final String ISO_COUNTRY_CODE_PATTERN = "[a-z]{2}";
