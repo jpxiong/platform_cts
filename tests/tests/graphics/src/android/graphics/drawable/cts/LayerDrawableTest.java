@@ -301,6 +301,7 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         cb.reset();
         layerDrawable.scheduleDrawable(new BitmapDrawable(), new Runnable() {
+            @Override
             public void run() {
             }
         }, 1000L);
@@ -324,6 +325,7 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         cb.reset();
         layerDrawable.unscheduleDrawable(new BitmapDrawable(), new Runnable() {
+            @Override
             public void run() {
             }
         });
@@ -340,14 +342,17 @@ public class LayerDrawableTest extends AndroidTestCase {
         private boolean mCalledSchedule;
         private boolean mCalledUnschedule;
 
+        @Override
         public void invalidateDrawable(Drawable who) {
             mCalledInvalidate = true;
         }
 
+        @Override
         public void scheduleDrawable(Drawable who, Runnable what, long when) {
             mCalledSchedule = true;
         }
 
+        @Override
         public void unscheduleDrawable(Drawable who, Runnable what) {
             mCalledUnschedule = true;
         }
@@ -542,7 +547,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         LayerDrawable layerDrawable = new LayerDrawable(array);
         assertFalse(layerDrawable.isStateful());
 
-        array = new Drawable[] { new BitmapDrawable(), new MockDrawable() };
+        array = new Drawable[] { new BitmapDrawable(), new MockDrawable(false) };
         layerDrawable = new LayerDrawable(array);
         assertFalse(layerDrawable.isStateful());
 
@@ -552,8 +557,8 @@ public class LayerDrawableTest extends AndroidTestCase {
     }
 
     public void testOnStateChange() {
-        MockDrawable mockDrawable1 = new MockDrawable();
-        MockDrawable mockDrawable2 = new MockDrawable();
+        MockDrawable mockDrawable1 = new MockDrawable(true);
+        MockDrawable mockDrawable2 = new MockDrawable(true);
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
         MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
 
@@ -730,9 +735,19 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         private boolean mCalledDraw = false;
 
+        private boolean mIsStateful = false;
+
         private int mOpacity = PixelFormat.OPAQUE;
 
         Rect mPadding = null;
+
+        public MockDrawable() {
+            this(false);
+        }
+
+        public MockDrawable(boolean isStateful) {
+            mIsStateful = isStateful;
+        }
 
         @Override
         public void draw(Canvas canvas) {
@@ -813,10 +828,16 @@ public class LayerDrawableTest extends AndroidTestCase {
             return true;
         }
 
+        @Override
+        public boolean isStateful() {
+            return mIsStateful;
+        }
+
         public boolean hasCalledSetState() {
             return mCalledSetState;
         }
 
+        @Override
         public boolean setState(final int[] stateSet) {
             increasePadding();
             mCalledSetState = true;
