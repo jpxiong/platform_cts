@@ -34,7 +34,7 @@ import android.view.Surface;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import java.util.Locale;
 
 /**
  * General MediaCodec tests.
@@ -83,6 +83,10 @@ public class MediaCodecTest extends AndroidTestCase {
 
         // Replace color format with something that isn't COLOR_FormatSurface.
         MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
+        if (codecInfo == null) {
+            // Pass if no codec was available.
+            return;
+        }
         int colorFormat = findNonSurfaceColorFormat(codecInfo, MIME_TYPE);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
 
@@ -133,7 +137,11 @@ public class MediaCodecTest extends AndroidTestCase {
         InputSurface inputSurface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            encoder = createEncoderForMimeType(MIME_TYPE);
+            if (encoder == null) {
+                // Pass if no codec was available.
+                return;
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = new InputSurface(encoder.createInputSurface());
             inputSurface.makeCurrent();
@@ -181,7 +189,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            encoder = createEncoderForMimeType(MIME_TYPE);
+            if (encoder == null) {
+                // Pass if no codec was available.
+                return;
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
@@ -215,7 +227,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            encoder = createEncoderForMimeType(MIME_TYPE);
+            if (encoder == null) {
+                // Pass if no codec was available.
+                return;
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
@@ -289,8 +305,11 @@ public class MediaCodecTest extends AndroidTestCase {
             mediaExtractor = getMediaExtractorForMimeType(inputResourceId, "video/");
             MediaFormat mediaFormat =
                     mediaExtractor.getTrackFormat(mediaExtractor.getSampleTrackIndex());
-            mediaCodec =
-                    MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
+            mediaCodec = createDecoderForMimeType(mediaFormat.getString(MediaFormat.KEY_MIME));
+            if (mediaCodec == null) {
+              // Pass if no decoder was available.
+              return true;
+            }
             mediaCodec.configure(mediaFormat, outputSurface.getSurface(), null, 0);
             mediaCodec.start();
             boolean eos = false;
@@ -365,11 +384,15 @@ public class MediaCodecTest extends AndroidTestCase {
         MediaCodec audioDecoderA = null;
         MediaCodec audioDecoderB = null;
         try {
-            audioDecoderA = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoderA = createDecoderForMimeType(MIME_TYPE_AUDIO);
+            if (audioDecoderA == null) {
+              // Pass if no decoder was available.
+              return;
+            }
             audioDecoderA.configure(format, null, null, 0);
             audioDecoderA.start();
 
-            audioDecoderB = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoderB = createDecoderForMimeType(MIME_TYPE_AUDIO);
             audioDecoderB.configure(format, null, null, 0);
             audioDecoderB.start();
         } finally {
@@ -407,11 +430,19 @@ public class MediaCodecTest extends AndroidTestCase {
         MediaCodec audioEncoder = null;
         MediaCodec audioDecoder = null;
         try {
-            audioEncoder = MediaCodec.createEncoderByType(MIME_TYPE_AUDIO);
+            audioEncoder = createEncoderForMimeType(MIME_TYPE_AUDIO);
+            if (audioEncoder == null) {
+              // Pass if no encoder was available.
+              return;
+            }
             audioEncoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             audioEncoder.start();
 
-            audioDecoder = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoder = createDecoderForMimeType(MIME_TYPE_AUDIO);
+            if (audioDecoder == null) {
+              // Pass if no decoder was available.
+              return;
+            }
             audioDecoder.configure(decoderFormat, null, null, 0);
             audioDecoder.start();
         } finally {
@@ -440,6 +471,10 @@ public class MediaCodecTest extends AndroidTestCase {
         // audio only checks this and stop
         mVideoEncodingOngoing = true;
         final CodecInfo info = getAvcSupportedFormatInfo();
+        if (info == null) {
+            // Pass if no codec was available.
+            return;
+        }
         long start = System.currentTimeMillis();
         Thread videoEncodingThread = new Thread(new Runnable() {
             @Override
@@ -474,6 +509,9 @@ public class MediaCodecTest extends AndroidTestCase {
 
     private static CodecInfo getAvcSupportedFormatInfo() {
         MediaCodecInfo mediaCodecInfo = selectCodec(MIME_TYPE);
+        if (mediaCodecInfo == null) { // not supported
+            return null;
+        }
         CodecCapabilities cap = mediaCodecInfo.getCapabilitiesForType(MIME_TYPE);
         if (cap == null) { // not supported
             return null;
@@ -557,7 +595,11 @@ public class MediaCodecTest extends AndroidTestCase {
         InputSurface inputSurface = null;
         mVideoEncoderHadError = false;
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            encoder = createEncoderForMimeType(MIME_TYPE);
+            if (encoder == null) {
+              // Pass if no encoder was available.
+              return;
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = new InputSurface(encoder.createInputSurface());
             inputSurface.makeCurrent();
@@ -599,7 +641,11 @@ public class MediaCodecTest extends AndroidTestCase {
         MediaCodec encoder = null;
         mAudioEncoderHadError = false;
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE_AUDIO);
+            encoder = createEncoderForMimeType(MIME_TYPE_AUDIO);
+            if (encoder == null) {
+              // Pass if no codec was available.
+              return;
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             encoder.start();
@@ -700,6 +746,39 @@ public class MediaCodecTest extends AndroidTestCase {
         }
         fail("couldn't find a good color format for " + codecInfo.getName() + " / " + MIME_TYPE);
         return 0;   // not reached
+    }
+
+    /** Returns a decoder for {@code mimeType}, or {@code null} if none is available. */
+    private static MediaCodec createDecoderForMimeType(String mimeType) {
+        return createCodecForMimeType(mimeType, false);
+    }
+
+    /** Returns a encoder for {@code mimeType}, or {@code null} if none is available. */
+    private static MediaCodec createEncoderForMimeType(String mimeType) {
+        return createCodecForMimeType(mimeType, true);
+    }
+
+    /**
+     * Returns a codec for {@code mimeType}, or {@code null} if there is no suitable codec on this
+     * device. The codec is an encoder if {@code encoder} is {@code true}, and a decoder otherwise.
+     */
+    private static MediaCodec createCodecForMimeType(String mimeType, boolean encoder) {
+        mimeType = mimeType.toLowerCase(Locale.US);
+        for (int index = 0; index < MediaCodecList.getCodecCount(); index++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(index);
+            if (encoder != codecInfo.isEncoder()) {
+                continue;
+            }
+
+            for (String codecType : codecInfo.getSupportedTypes()) {
+                if (codecType.equals(mimeType)) {
+                    return encoder
+                            ? MediaCodec.createEncoderByType(codecType.toLowerCase(Locale.US))
+                            : MediaCodec.createDecoderByType(codecType.toLowerCase(Locale.US));
+                }
+            }
+        }
+        return null;
     }
 
     private MediaExtractor getMediaExtractorForMimeType(int resourceId, String mimeTypePrefix)
