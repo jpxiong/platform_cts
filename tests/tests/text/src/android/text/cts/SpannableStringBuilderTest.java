@@ -259,6 +259,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
             // expected exception
+        } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
