@@ -126,10 +126,6 @@
   bug: 15433903
 },
 {
-  name: "android.permission.cts.AppWidgetManagerPermissionTest#testBindAppWidget",
-  bug: 15382292
-},
-{
   name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionCount",
   name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionGetChildByDescription",
   name: "com.android.cts.uiautomatortest.CtsUiAutomatorTest#testCollectionGetChildByInstance",
