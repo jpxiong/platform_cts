@@ -18,6 +18,7 @@ package android.permission.cts;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -44,6 +45,11 @@ public class AppWidgetManagerPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testBindAppWidget() {
+        if (!getContext().getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_APP_WIDGETS)) {
+            return;
+        }
+
         try {
             mAppWidgetManager.bindAppWidgetId(1, new ComponentName(mContext, "foo"));
             fail("Was able to call bindAppWidgetId");
