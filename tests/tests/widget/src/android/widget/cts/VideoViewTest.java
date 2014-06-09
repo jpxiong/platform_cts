@@ -18,16 +18,18 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.cts.util.PollingCheck;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.View.MeasureSpec;
 import android.widget.MediaController;
 import android.widget.VideoView;
@@ -40,6 +42,8 @@ import java.io.OutputStream;
  * Test {@link VideoView}.
  */
 public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStubActivity> {
+    /** Debug TAG. **/
+    private static final String TAG = "VideoViewTest";
     /** The maximum time to wait for an operation. */
     private static final long   TIME_OUT = 15000L;
     /** The interval time to wait for completing an operation. */
@@ -48,6 +52,8 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     private static final int    TEST_VIDEO_DURATION = 11047;
     /** The full name of R.raw.testvideo. */
     private static final String VIDEO_NAME   = "testvideo.3gp";
+    /** The MIME type. */
+    private static final String MIME_TYPE = "video/3gpp";
     /** delta for duration in case user uses different decoders on different
         hardware that report a duration that's different by a few milliseconds */
     private static final int DURATION_DELTA = 100;
@@ -93,6 +99,28 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
         public void onCompletion(MediaPlayer mp) {
             super.onEvent();
         }
+    }
+
+    // TODO: Make a public method selectCodec() in common libraries (e.g. cts/libs/), to avoid
+    // redundant function definitions in this and other media related test files.
+    private static boolean hasCodec(String mimeType) {
+        int numCodecs = MediaCodecList.getCodecCount();
+
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+                if (types[j].equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -165,6 +193,12 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     }
 
     public void testPlayVideo1() throws Throwable {
+        // Don't run the test if the codec isn't supported.
+        if (!hasCodec(MIME_TYPE)) {
+            Log.w(TAG, "Codec " + MIME_TYPE + " not supported. Return from testPlayVideo1.");
+            return;
+        }
+
         final MockOnPreparedListener preparedListener = new MockOnPreparedListener();
         mVideoView.setOnPreparedListener(preparedListener);
         final MockOnCompletionListener completionListener = new MockOnCompletionListener();
@@ -219,6 +253,12 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     }
 
     public void testGetBufferPercentage() throws Throwable {
+        // Don't run the test if the codec isn't supported.
+        if (!hasCodec(MIME_TYPE)) {
+            Log.w(TAG, MIME_TYPE + " not supported. Return from testGetBufferPercentage.");
+            return;
+        }
+
         final MockOnPreparedListener prepareListener = new MockOnPreparedListener();
         mVideoView.setOnPreparedListener(prepareListener);
 
@@ -255,6 +295,12 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     }
 
     public void testGetDuration() throws Throwable {
+        // Don't run the test if the codec isn't supported.
+        if (!hasCodec(MIME_TYPE)) {
+            Log.w(TAG, "Codec " + MIME_TYPE + " not supported. Return from testGetDuration.");
+            return;
+        }
+
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mVideoView.setVideoPath(mVideoPath);
