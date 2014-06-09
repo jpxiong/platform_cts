@@ -30,6 +30,7 @@ import android.text.method.MovementMethod;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
@@ -68,6 +69,9 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
+                getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                
                 getActivity().setContentView(mTextView);
                 mTextView.setFocusable(true);
                 mTextView.requestFocus();
