@@ -19,7 +19,9 @@ package android.media.cts;
 import android.content.Context;
 import android.content.res.Resources;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.os.Bundle;
 import android.test.AndroidTestCase;
@@ -57,6 +59,28 @@ public class Vp8EncoderTest extends AndroidTestCase {
         mResources = mContext.getResources();
     }
 
+     // TODO: Make a public method selectCodec() in common libraries (e.g. cts/libs/), to avoid
+     // redundant function definitions in this and other media related test files.
+     private static boolean hasCodec(String mimeType) {
+         int numCodecs = MediaCodecList.getCodecCount();
+
+         for (int i = 0; i < numCodecs; i++) {
+             MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+             if (!codecInfo.isEncoder()) {
+                 continue;
+             }
+
+             String[] types = codecInfo.getSupportedTypes();
+             for (int j = 0; j < types.length; j++) {
+                 if (types[j].equalsIgnoreCase(mimeType)) {
+                     return true;
+                 }
+             }
+         }
+         return false;
+     }
+
     /**
      * A basic test for VP8 encoder.
      *
@@ -64,6 +88,11 @@ public class Vp8EncoderTest extends AndroidTestCase {
      * and then decodes it to verify the bitstream.
      */
     public void testBasic() throws Exception {
+        if (!hasCodec(VP8_MIME)) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testBasic.");
+            return;
+        }
+
         encode(BASIC_IVF,
                R.raw.video_176x144_yv12,
                176,  // width
@@ -79,6 +108,11 @@ public class Vp8EncoderTest extends AndroidTestCase {
      * encoder fails. The test does not verify the output stream.
      */
     public void testSyncFrame() throws Exception {
+        if (!hasCodec(VP8_MIME)) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testSyncFrame.");
+            return;
+        }
+
         encodeSyncFrame(R.raw.video_176x144_yv12,
                         176, // width
                         144, // height
@@ -92,6 +126,11 @@ public class Vp8EncoderTest extends AndroidTestCase {
      * bitrate and ensure the encoder responds.
      */
     public void testVariableBitrate() throws Exception {
+        if (!hasCodec(VP8_MIME)) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testVariableBitrate.");
+            return;
+        }
+
         encodeVariableBitrate(R.raw.video_176x144_yv12,
                               176, // width
                               144, // height
