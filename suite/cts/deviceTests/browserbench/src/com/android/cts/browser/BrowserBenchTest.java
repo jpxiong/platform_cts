@@ -16,7 +16,9 @@
 
 package com.android.cts.browser;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.cts.util.WatchDog;
 import android.net.Uri;
 import android.provider.Browser;
@@ -124,6 +126,10 @@ public class BrowserBenchTest extends CtsAndroidTestCase {
 
     @TimeoutReq(minutes = 60)
     public void testOctane() throws InterruptedException {
+        if (!hasWebViewFeature(getContext())) {
+            Log.w(TAG, "Skipping testOctane");
+            return;
+        }
         String url = mWebServer.getAssetUrl(OCTANE_START_FILE) + "?auto=1";
         final int kRepeat = 5;
         doTest(url, ResultType.LOWER_BETTER, ResultUnit.MS,
@@ -166,5 +172,10 @@ public class BrowserBenchTest extends CtsAndroidTestCase {
             }
             numberToProcess++;
         }
+    }
+
+    private static boolean hasWebViewFeature(Context context) {
+        // Query the system property that determines if there is a functional WebView on the device
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WEBVIEW);
     }
 }
