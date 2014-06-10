@@ -91,35 +91,38 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
                + "cid=0x271de9756065677e&fmt=13&user=android-device-test"),
         new Stream("MPEG4 SP Video, AAC Audio", "rtsp_mpeg4_aac",
                 "rtsp://v2.cache7.c.youtube.com/video.3gp?"
-                + "cid=0x271de9756065677e&fmt=13&user=android-device-test"),
+                + "cid=0x271de9756065677e&fmt=17&user=android-device-test"),
         new Stream("H264 Base Video, AAC Audio", "rtsp_h264_aac",
                 "rtsp://v2.cache7.c.youtube.com/video.3gp?"
-                + "cid=0x271de9756065677e&fmt=13&user=android-device-test"),
+                + "cid=0x271de9756065677e&fmt=18&user=android-device-test"),
     };
 
     private static final Stream[] HTTP_STREAMS = {
-        new Stream("H263 Video, AMR Audio", "http_h263_amr", "http://v20.lscache8.c.youtube.com/"
+        new Stream("H263 Video, AMR Audio", "http_h263_amr", "http://redirector.c.play.google.com/"
                 + "videoplayback?id=271de9756065677e"
                 + "&itag=13&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
                 + "&signature=372FA4C532AA49D14EAF049BCDA66460EEE161E9"
                 + ".6D8BF096B73B7A68A7032CA8685053CFB498D30A"
+                + "&source=youtube"
                 + "&key=test_key1&user=android-device-test"),
         new Stream("MPEG4 SP Video, AAC Audio", "http_mpeg4_aac",
-                "http://v20.lscache8.c.youtube.com/"
+                "http://redirector.c.play.google.com/"
                 + "videoplayback?id=271de9756065677e"
                 + "&itag=17&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
                 + "&signature=3DCD3F79E045F95B6AF661765F046FB0440FF016"
                 + ".06A42661B3AF6BAF046F012549CC9BA34EBC80A9"
+                + "&source=youtube"
                 + "&key=test_key1&user=android-device-test"),
         new Stream("H264 Base Video, AAC Audio", "http_h264_aac",
-                "http://v20.lscache8.c.youtube.com/"
+                "http://redirector.c.play.google.com/"
                 + "videoplayback?id=271de9756065677e"
                 + "&itag=18&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
                 + "&signature=1219C2B07AF0638C27916307A6093C0E43CB894E"
                 + ".126B6B916BD57157782738AA7C03E59F21DBC168"
+                + "&source=youtube"
                 + "&key=test_key1&user=android-device-test"),
     };
 
