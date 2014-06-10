@@ -92,6 +92,9 @@ public class PictureTest extends TestCase {
 
         final Matrix beforeMatrix = canvas.getMatrix();
 
+        Rect beforeClip = new Rect();
+        assertTrue(canvas.getClipBounds(beforeClip));
+
         canvas.drawPicture(picture);
 
         assertEquals(beforeSaveCount, canvas.getSaveCount());
@@ -101,8 +104,7 @@ public class PictureTest extends TestCase {
         Rect afterClip = new Rect();
 
         assertTrue(canvas.getClipBounds(afterClip));
-        assertEquals(TEST_WIDTH, afterClip.width());
-        assertEquals(TEST_HEIGHT, afterClip.height());
+        assertEquals(beforeClip, afterClip);
     }
 
     public void testPicture() throws Exception {
