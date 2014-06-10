@@ -115,10 +115,6 @@
   bug: 15087784
 },
 {
-  name: "android.app.cts.DialogTest#testSetFeatureDrawableResource",
-  bug: 15135607
-},
-{
   name: "android.media.cts.MediaCodecListTest#testIsAVCBaselineProfileSupported",
   name: "android.media.cts.MediaCodecListTest#testIsH263BaselineProfileSupported",
   name: "android.media.cts.MediaCodecListTest#testIsM4VSimpleProfileSupported",
