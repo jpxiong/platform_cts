@@ -23,6 +23,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.text.format.DateUtils;
 import android.text.method.cts.KeyListenerStubActivity;
 import android.text.method.KeyListener;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 /**
@@ -62,6 +63,9 @@ public abstract class KeyListenerTestCase extends
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
+
+        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         assertTrue(mActivity.waitForWindowFocus(5 * DateUtils.SECOND_IN_MILLIS));
     }
