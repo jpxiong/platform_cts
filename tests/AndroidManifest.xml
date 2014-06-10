@@ -669,7 +669,8 @@
         </activity>
 
         <activity android:name="android.app.cts.InstrumentationTestActivity"
-            android:label="InstrumentationTestActivity">
+                  android:theme="@style/Theme_NoSwipeDismiss"
+                  android:label="InstrumentationTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -861,7 +862,8 @@
         </activity>
 
         <activity android:name="android.app.cts.DialogStubActivity"
-            android:label="DialogStubActivity">
+                  android:theme="@style/Theme_NoSwipeDismiss"
+                  android:label="DialogStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
