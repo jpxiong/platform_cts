@@ -65,13 +65,15 @@ public class CamcorderProfileTest extends AndroidTestCase {
                    profile.quality == CamcorderProfile.QUALITY_480P ||
                    profile.quality == CamcorderProfile.QUALITY_720P ||
                    profile.quality == CamcorderProfile.QUALITY_1080P ||
+                   profile.quality == CamcorderProfile.QUALITY_2160P ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_LOW ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_HIGH ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_QCIF ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_CIF ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_480P ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_720P ||
-                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_1080P);
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_1080P ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_2160P);
         assertTrue(profile.videoBitRate > 0);
         assertTrue(profile.videoFrameRate > 0);
         assertTrue(profile.videoFrameWidth > 0);
@@ -136,6 +138,11 @@ public class CamcorderProfileTest extends AndroidTestCase {
                 assertEquals(1920, profile.videoFrameWidth);
                 assertTrue(1088 == profile.videoFrameHeight ||
                            1080 == profile.videoFrameHeight);
+                break;
+            case CamcorderProfile.QUALITY_2160P:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_2160P:
+                assertEquals(3840, profile.videoFrameWidth);
+                assertEquals(2160, profile.videoFrameHeight);
                 break;
         }
     }
@@ -210,14 +217,16 @@ public class CamcorderProfileTest extends AndroidTestCase {
                                           CamcorderProfile.QUALITY_CIF,
                                           CamcorderProfile.QUALITY_480P,
                                           CamcorderProfile.QUALITY_720P,
-                                          CamcorderProfile.QUALITY_1080P};
+                                          CamcorderProfile.QUALITY_1080P,
+                                          CamcorderProfile.QUALITY_2160P};
 
         int[] specificTimeLapseProfileQualities = {CamcorderProfile.QUALITY_TIME_LAPSE_QCIF,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_QVGA,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_CIF,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_480P,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_720P,
-                                                   CamcorderProfile.QUALITY_TIME_LAPSE_1080P};
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_1080P,
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_2160P};
 
         checkSpecificProfiles(cameraId, lowProfile, highProfile,
                 specificProfileQualities, videoSizes);

@@ -449,7 +449,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 CamcorderProfile.QUALITY_CIF,
                 CamcorderProfile.QUALITY_480P,
                 CamcorderProfile.QUALITY_720P,
-                CamcorderProfile.QUALITY_1080P
+                CamcorderProfile.QUALITY_1080P,
+                CamcorderProfile.QUALITY_2160P
         };
 
         String[] nameArray = {
@@ -460,7 +461,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 "CIF",
                 "480P",
                 "720P",
-                "1080P"
+                "1080P",
+                "2160P"
         };
 
         ArrayList<VideoSizeNamePair> availableSizes =
@@ -499,7 +501,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 CamcorderProfile.QUALITY_CIF,
                 CamcorderProfile.QUALITY_480P,
                 CamcorderProfile.QUALITY_720P,
-                CamcorderProfile.QUALITY_1080P
+                CamcorderProfile.QUALITY_1080P,
+                CamcorderProfile.QUALITY_2160P
         };
 
         ArrayList<ResolutionQuality> qualityList = new ArrayList<ResolutionQuality>();
