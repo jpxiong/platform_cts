@@ -28,10 +28,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.Contacts;
+import android.provider.Contacts.GroupMembership;
 import android.provider.Contacts.Groups;
 import android.provider.Contacts.GroupsColumns;
 import android.provider.Contacts.People;
 import android.test.InstrumentationTestCase;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,9 +54,6 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         };
     private static final int PEOPLE_ID_INDEX = 0;
     private static final int PEOPLE_LAST_CONTACTED_INDEX = 1;
-
-    private static final int MEMBERSHIP_PERSON_ID_INDEX = 1;
-    private static final int MEMBERSHIP_GROUP_ID_INDEX = 5;
 
     private static final String[] GROUPS_PROJECTION = new String[] {
         Groups._ID,
@@ -127,13 +126,19 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             mRowsAdded.add(People.addToMyContactsGroup(mContentResolver, personId));
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
                     Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null, null);
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             int groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
             cursor = People.queryGroups(mContentResolver, personId);
-            cursor.moveToFirst();
-            assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-            assertEquals(groupId, cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX));
+
+            int membershipGroupIdIndex =
+                    cursor.getColumnIndex(android.provider.Contacts.GroupMembership.GROUP_ID);
+            int membershipPersonIdIndex =
+                    cursor.getColumnIndex(android.provider.Contacts.GroupMembership.PERSON_ID);
+
+            assertTrue(cursor.moveToFirst());
+            assertEquals(personId, cursor.getInt(membershipPersonIdIndex));
+            assertEquals(groupId, cursor.getInt(membershipGroupIdIndex));
             cursor.close();
 
             // People: test_people_create, Group: Groups.GROUP_MY_CONTACTS
@@ -145,38 +150,38 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             cursor = mProvider.query(People.CONTENT_URI, PEOPLE_PROJECTION,
                     People.NAME + " = 'test_people_create'", null, null, null);
 
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             mRowsAdded.add(ContentUris.withAppendedId(People.CONTENT_URI, personId));
             cursor.close();
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
                     Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null, null);
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
             cursor = People.queryGroups(mContentResolver, personId);
-            cursor.moveToFirst();
-            assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-            assertEquals(groupId, cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX));
+            assertTrue(cursor.moveToFirst());
+            assertEquals(personId, cursor.getInt(membershipPersonIdIndex));
+            assertEquals(groupId, cursor.getInt(membershipGroupIdIndex));
             cursor.close();
 
             // People: test_people_1, Group: test_group_0
             cursor = mProvider.query(mPeopleRowsAdded.get(1), PEOPLE_PROJECTION,
                     null, null, null, null);
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             cursor.close();
             cursor = mProvider.query(mGroupRowsAdded.get(0), GROUPS_PROJECTION,
                     null, null, null, null);
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
             mRowsAdded.add(People.addToGroup(mContentResolver, personId, groupId));
             cursor = People.queryGroups(mContentResolver, personId);
             boolean found = false;
             while (cursor.moveToNext()) {
-                assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-                if (cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX) == groupId) {
+                assertEquals(personId, cursor.getInt(membershipPersonIdIndex));
+                if (cursor.getInt(membershipGroupIdIndex) == groupId) {
                     found = true;
                     break;
                 }
@@ -188,7 +193,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             // People: test_people_2, Group: test_group_1
             cursor = mProvider.query(mPeopleRowsAdded.get(2), PEOPLE_PROJECTION,
                     null, null, null, null);
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             cursor.close();
             String groupName = "test_group_1";
@@ -196,8 +201,8 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             cursor = People.queryGroups(mContentResolver, personId);
             List<Integer> groupIds = new ArrayList<Integer>();
             while (cursor.moveToNext()) {
-                assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-                groupIds.add(cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX));
+                assertEquals(personId, cursor.getInt(membershipPersonIdIndex));
+                groupIds.add(cursor.getInt(membershipGroupIdIndex));
             }
             cursor.close();
 
