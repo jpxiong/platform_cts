@@ -812,6 +812,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         assertTrue(d.isShowing());
         assertFalse(mCalledCallback);
         dialogDismiss(d);
+        Thread.sleep(SLEEP_TIME);
         assertTrue(mCalledCallback);
         assertFalse(d.isShowing());
 
