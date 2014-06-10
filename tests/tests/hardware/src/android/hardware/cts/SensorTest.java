@@ -243,18 +243,21 @@ public class SensorTest extends AndroidTestCase {
             }
         };
         // Consider only continuous mode sensors for testing registerListener.
-        if (sensor.getMinDelay() > 0) {
+        // For on-change sensors, call registerListener() so that the listener is associated
+        // with the sensor so that flush(listener) can be called on it.
+        if (sensor.getMinDelay() >= 0) {
             Log.i(TAG, "testBatch " + sensor.getName());
             boolean result = mSensorManager.registerListener(listener, sensor,
                     SensorManager.SENSOR_DELAY_NORMAL, 10000000, handler);
             assertTrue("registerListener failed " + sensor.getName(), result);
-            // Wait for 25 events or 40 seconds.
-            boolean countZero = eventReceived.await(TIMEOUT, TimeUnit.SECONDS);
-            if (!countZero) {
-                fail("Timed out waiting for events from " + sensor.getName());
+            // Wait for 25 events or 40 seconds only for continuous mode sensors.
+            if (sensor.getMinDelay() > 0) {
+                boolean countZero = eventReceived.await(TIMEOUT, TimeUnit.SECONDS);
+                if (!countZero) {
+                    fail("Timed out waiting for events from " + sensor.getName());
+                }
             }
         }
-
         Log.i(TAG, "testFlush " + sensor.getName());
         boolean result = mSensorManager.flush(listener);
         assertTrue("flush failed " + sensor.getName(), result);
