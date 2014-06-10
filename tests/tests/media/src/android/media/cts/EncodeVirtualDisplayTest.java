@@ -161,6 +161,25 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
         }
     }
 
+    private static boolean hasCodec(String mimeType) {
+        int numCodecs = MediaCodecList.getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+                if (types[j].equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns true if the encoder level, specified in the ENCODER_PARAM_TABLE, can be supported.
      */
@@ -225,6 +244,11 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
         MediaCodec decoder = null;
         OutputSurface outputSurface = null;
         VirtualDisplay virtualDisplay = null;
+
+        // Don't run the test of the codec isn't present.
+        if (!hasCodec(MIME_TYPE)) {
+            return;
+        }
 
         try {
             // Encoded video resolution matches virtual display.
