@@ -20,6 +20,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import android.content.Context;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.CameraManager;
@@ -115,7 +116,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
      */
     protected void startCapture(CaptureRequest request, boolean repeating,
             CaptureListener listener, Handler handler) throws Exception {
-        if (VERBOSE) Log.v(TAG, "Starting capture");
+        if (VERBOSE) Log.v(TAG, "Starting capture from device");
 
         if (repeating) {
             mCamera.setRepeatingRequest(request, listener, handler);

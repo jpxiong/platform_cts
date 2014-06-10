@@ -18,11 +18,14 @@ package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
 import static org.mockito.Mockito.*;
 import static android.hardware.camera2.CaptureRequest.*;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureFailure;
@@ -30,12 +33,15 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.Range;
 import android.view.Surface;
 
+import com.android.ex.camera2.blocking.BlockingSessionListener;
 import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.utils.StateWaiter;
 
 import org.mockito.ArgumentMatcher;
 
@@ -54,8 +60,13 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     private static final int MAX_NUM_IMAGES = 5;
     private static final int MIN_FPS_REQUIRED_FOR_STREAMING = 20;
 
+    private CameraCaptureSession mSession;
+
     private BlockingStateListener mCameraMockListener;
-    private int mLatestState = STATE_UNINITIALIZED;
+    private int mLatestDeviceState = STATE_UNINITIALIZED;
+    private BlockingSessionListener mSessionMockListener;
+    private StateWaiter mSessionWaiter;
+    private int mLatestSessionState = -1; // uninitialized
 
     private static int[] mTemplates = new int[] {
             CameraDevice.TEMPLATE_PREVIEW,
@@ -244,7 +255,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 }
             }
             finally {
-                closeDevice(mCameraIds[i], mCameraMockListener);
+                try {
+                    closeSession();
+                } finally {
+                    closeDevice(mCameraIds[i], mCameraMockListener);
+                }
             }
         }
     }
@@ -264,7 +279,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                                 anyInt());
             }
             finally {
-                closeDevice(mCameraIds[i], mCameraMockListener);
+                try {
+                    closeSession();
+                } finally {
+                    closeDevice(mCameraIds[i], mCameraMockListener);
+                }
             }
         }
     }
@@ -321,19 +340,27 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i], mCameraMockListener);
-                waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
+                waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
 
                 prepareCapture();
 
                 invalidRequestCaptureTestByCamera();
+
+                closeSession();
             }
             finally {
-                closeDevice(mCameraIds[i], mCameraMockListener);
+                try {
+
+                } finally {
+                    closeDevice(mCameraIds[i], mCameraMockListener);
+                }
             }
         }
     }
 
     private void invalidRequestCaptureTestByCamera() throws Exception {
+        if (VERBOSE) Log.v(TAG, "invalidRequestCaptureTestByCamera");
+
         List<CaptureRequest> emptyRequests = new ArrayList<CaptureRequest>();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -342,8 +369,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         unConfiguredRequests.add(unConfiguredRequest);
 
         try {
-            // Test: CameraDevice capture should throw IAE for null request.
-            mCamera.capture(/*request*/null, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession capture should throw IAE for null request.
+            mSession.capture(/*request*/null, /*listener*/null, mHandler);
             mCollector.addMessage(
                     "CameraDevice capture should throw IllegalArgumentException for null request");
         } catch (IllegalArgumentException e) {
@@ -351,9 +378,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice capture should throw IAE for request
+            // Test: CameraCaptureSession capture should throw IAE for request
             // without surface configured.
-            mCamera.capture(unConfiguredRequest, /*listener*/null, mHandler);
+            mSession.capture(unConfiguredRequest, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice capture should throw " +
                     "IllegalArgumentException for request without surface configured");
         } catch (IllegalArgumentException e) {
@@ -361,8 +388,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice setRepeatingRequest should throw IAE for null request.
-            mCamera.setRepeatingRequest(/*request*/null, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession setRepeatingRequest should throw IAE for null request.
+            mSession.setRepeatingRequest(/*request*/null, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice setRepeatingRequest should throw" +
                     "IllegalArgumentException for null request");
         } catch (IllegalArgumentException e) {
@@ -370,9 +397,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice setRepeatingRequest should throw IAE for for request
+            // Test: CameraCaptureSession setRepeatingRequest should throw IAE for for request
             // without surface configured.
-            mCamera.setRepeatingRequest(unConfiguredRequest, /*listener*/null, mHandler);
+            mSession.setRepeatingRequest(unConfiguredRequest, /*listener*/null, mHandler);
             mCollector.addMessage("Capture zero burst should throw IllegalArgumentException" +
                     "for request without surface configured");
         } catch (IllegalArgumentException e) {
@@ -380,8 +407,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice captureBurst should throw IAE for null request list.
-            mCamera.captureBurst(/*requests*/null, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession captureBurst should throw IAE for null request list.
+            mSession.captureBurst(/*requests*/null, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice captureBurst should throw" +
                     "IllegalArgumentException for null request list");
         } catch (IllegalArgumentException e) {
@@ -389,8 +416,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice captureBurst should throw IAE for empty request list.
-            mCamera.captureBurst(emptyRequests, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession captureBurst should throw IAE for empty request list.
+            mSession.captureBurst(emptyRequests, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice captureBurst should throw" +
                     " IllegalArgumentException for empty request list");
         } catch (IllegalArgumentException e) {
@@ -398,9 +425,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice captureBurst should throw IAE for request
+            // Test: CameraCaptureSession captureBurst should throw IAE for request
             // without surface configured.
-            mCamera.captureBurst(unConfiguredRequests, /*listener*/null, mHandler);
+            mSession.captureBurst(unConfiguredRequests, /*listener*/null, mHandler);
             fail("CameraDevice captureBurst should throw IllegalArgumentException" +
                     "for null request list");
         } catch (IllegalArgumentException e) {
@@ -408,8 +435,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice setRepeatingBurst should throw IAE for null request list.
-            mCamera.setRepeatingBurst(/*requests*/null, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession setRepeatingBurst should throw IAE for null request list.
+            mSession.setRepeatingBurst(/*requests*/null, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
                     "IllegalArgumentException for null request list");
         } catch (IllegalArgumentException e) {
@@ -417,8 +444,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice setRepeatingBurst should throw IAE for empty request list.
-            mCamera.setRepeatingBurst(emptyRequests, /*listener*/null, mHandler);
+            // Test: CameraCaptureSession setRepeatingBurst should throw IAE for empty request list.
+            mSession.setRepeatingBurst(emptyRequests, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
                     "IllegalArgumentException for empty request list");
         } catch (IllegalArgumentException e) {
@@ -426,9 +453,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // Test: CameraDevice setRepeatingBurst should throw IAE for request
+            // Test: CameraCaptureSession setRepeatingBurst should throw IAE for request
             // without surface configured.
-            mCamera.setRepeatingBurst(unConfiguredRequests, /*listener*/null, mHandler);
+            mSession.setRepeatingBurst(unConfiguredRequests, /*listener*/null, mHandler);
             mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
                     "IllegalArgumentException for request without surface configured");
         } catch (IllegalArgumentException e) {
@@ -467,7 +494,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i], mCameraMockListener);
-                waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
+                waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
 
                 prepareCapture();
 
@@ -502,7 +529,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                                 anyInt());
             }
             finally {
-                closeDevice(mCameraIds[i], mCameraMockListener);
+                try {
+                    closeSession();
+                } finally {
+                    closeDevice(mCameraIds[i], mCameraMockListener);
+                }
             }
         }
     }
@@ -513,13 +544,13 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             boolean repeating, boolean flush) throws Exception {
 
         assertEquals("Bad initial state for preparing to capture",
-                mLatestState, STATE_IDLE);
+                mLatestSessionState, SESSION_READY);
 
         CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(template);
         assertNotNull("Failed to create capture request", requestBuilder);
         requestBuilder.addTarget(mReaderSurface);
-        CameraDevice.CaptureListener mockCaptureListener =
-                mock(CameraDevice.CaptureListener.class);
+        CameraCaptureSession.CaptureListener mockCaptureListener =
+                mock(CameraCaptureSession.CaptureListener.class);
 
         if (VERBOSE) {
             Log.v(TAG, String.format("Capturing shot for device %s, template %d",
@@ -527,19 +558,19 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         startCapture(requestBuilder.build(), repeating, mockCaptureListener, mHandler);
-        waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_ACTIVE, SESSION_ACTIVE_TIMEOUT_MS);
 
         int expectedCaptureResultCount = repeating ? REPEATING_CAPTURE_EXPECTED_RESULT_COUNT : 1;
         verifyCaptureResults(mockCaptureListener, expectedCaptureResultCount);
 
         if (repeating) {
             if (flush) {
-                mCamera.flush();
+                mSession.abortCaptures();
             } else {
-                mCamera.stopRepeating();
+                mSession.stopRepeating();
             }
         }
-        waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_READY, SESSION_READY_TIMEOUT_MS);
     }
 
     private void captureBurstShot(
@@ -550,7 +581,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             boolean flush) throws Exception {
 
         assertEquals("Bad initial state for preparing to capture",
-                mLatestState, STATE_IDLE);
+                mLatestSessionState, SESSION_READY);
 
         assertTrue("Invalid args to capture function", len <= templates.length);
         List<CaptureRequest> requests = new ArrayList<CaptureRequest>();
@@ -560,20 +591,20 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             requestBuilder.addTarget(mReaderSurface);
             requests.add(requestBuilder.build());
         }
-        CameraDevice.CaptureListener mockCaptureListener =
-                mock(CameraDevice.CaptureListener.class);
+        CameraCaptureSession.CaptureListener mockCaptureListener =
+                mock(CameraCaptureSession.CaptureListener.class);
 
         if (VERBOSE) {
             Log.v(TAG, String.format("Capturing burst shot for device %s", id));
         }
 
         if (!repeating) {
-            mCamera.captureBurst(requests, mockCaptureListener, mHandler);
+            mSession.captureBurst(requests, mockCaptureListener, mHandler);
         }
         else {
-            mCamera.setRepeatingBurst(requests, mockCaptureListener, mHandler);
+            mSession.setRepeatingBurst(requests, mockCaptureListener, mHandler);
         }
-        waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_ACTIVE, SESSION_READY_TIMEOUT_MS);
 
         int expectedResultCount = len;
         if (repeating) {
@@ -584,55 +615,78 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         if (repeating) {
             if (flush) {
-                mCamera.flush();
+                mSession.abortCaptures();
             } else {
-                mCamera.stopRepeating();
+                mSession.stopRepeating();
             }
         }
-        waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_READY, SESSION_READY_TIMEOUT_MS);
     }
 
-    // Precondition: Device must be in known IDLE/UNCONFIGURED state (has been waited for)
+    /**
+     * Precondition: Device must be in known OPENED state (has been waited for).
+     *
+     * <p>Creates a new capture session and waits until it is in the {@code SESSION_READY} state.
+     * </p>
+     *
+     * <p>Any existing capture session will be closed as a result of calling this.</p>
+     * */
     private void prepareCapture() throws Exception {
-        assertTrue("Bad initial state for preparing to capture",
-                mLatestState == STATE_IDLE || mLatestState == STATE_UNCONFIGURED);
+        if (VERBOSE) Log.v(TAG, "prepareCapture");
 
-        List<Surface> outputSurfaces = new ArrayList<Surface>(1);
-        outputSurfaces.add(mReaderSurface);
-        mCamera.configureOutputs(outputSurfaces);
-        waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+        assertTrue("Bad initial state for preparing to capture",
+                mLatestDeviceState == STATE_OPENED);
+
+        if (mSession != null) {
+            if (VERBOSE) Log.v(TAG, "prepareCapture - closing existing session");
+            closeSession();
+        }
+
+        // Create a new session listener each time, it's not reusable across cameras
+        mSessionMockListener = spy(new BlockingSessionListener());
+        mSessionWaiter = mSessionMockListener.getStateWaiter();
+
+        List<Surface> outputSurfaces = new ArrayList<>(Arrays.asList(mReaderSurface));
+        mCamera.createCaptureSession(outputSurfaces, mSessionMockListener, mHandler);
+
+        mSession = mSessionMockListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_CONFIGURED, SESSION_CONFIGURE_TIMEOUT_MS);
+        waitForSessionState(SESSION_READY, SESSION_READY_TIMEOUT_MS);
 }
 
-    private void waitForState(int state, long timeout) {
-        mCameraMockListener.waitForState(state, timeout);
-        mLatestState = state;
+    private void waitForDeviceState(int state, long timeoutMs) {
+        mCameraMockListener.waitForState(state, timeoutMs);
+        mLatestDeviceState = state;
+    }
+
+    private void waitForSessionState(int state, long timeoutMs) {
+        mSessionWaiter.waitForState(state, timeoutMs);
+        mLatestSessionState = state;
     }
 
     private void verifyCaptureResults(
-            CameraDevice.CaptureListener mockListener,
+            CameraCaptureSession.CaptureListener mockListener,
             int expectResultCount) {
         // Should receive expected number of capture results.
         verify(mockListener,
                 timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
                         .onCaptureCompleted(
-                                eq(mCamera),
+                                eq(mSession),
                                 isA(CaptureRequest.class),
                                 argThat(new IsCaptureResultNotEmpty()));
         // Should not receive any capture failed callbacks.
         verify(mockListener, never())
                         .onCaptureFailed(
-                                eq(mCamera),
+                                eq(mSession),
                                 isA(CaptureRequest.class),
                                 isA(CaptureFailure.class));
         // Should receive expected number of capture shutter calls
         verify(mockListener,
                 atLeast(expectResultCount))
                         .onCaptureStarted(
-                               eq(mCamera),
+                               eq(mSession),
                                isA(CaptureRequest.class),
                                anyLong());
-
     }
 
     private void checkFpsRange(CaptureRequest.Builder request, int template,
@@ -892,7 +946,48 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             checkRequestForTemplate(request, template, props);
         }
         finally {
-            closeDevice(cameraId, mCameraMockListener);
+            try {
+                closeSession();
+            } finally {
+                closeDevice(cameraId, mCameraMockListener);
+            }
         }
+    }
+
+    /**
+     * Start capture with given {@link #CaptureRequest}.
+     *
+     * @param request The {@link #CaptureRequest} to be captured.
+     * @param repeating If the capture is single capture or repeating.
+     * @param listener The {@link #CaptureListener} camera device used to notify callbacks.
+     * @param handler The handler camera device used to post callbacks.
+     */
+    protected void startCapture(CaptureRequest request, boolean repeating,
+            CameraCaptureSession.CaptureListener listener, Handler handler)
+                    throws CameraAccessException {
+        if (VERBOSE) Log.v(TAG, "Starting capture from session");
+
+        if (repeating) {
+            mSession.setRepeatingRequest(request, listener, handler);
+        } else {
+            mSession.capture(request, listener, handler);
+        }
+    }
+
+    /**
+     * Close a {@link #CameraCaptureSession capture session}; blocking until
+     * the close finishes with a transition to {@link CameraCaptureSession.StateListener#onClosed}.
+     */
+    protected void closeSession() {
+        if (mSession == null) {
+            return;
+        }
+
+        mSession.close();
+        waitForSessionState(SESSION_CLOSED, SESSION_CLOSE_TIMEOUT_MS);
+        mSession = null;
+
+        mSessionMockListener = null;
+        mSessionWaiter = null;
     }
 }
