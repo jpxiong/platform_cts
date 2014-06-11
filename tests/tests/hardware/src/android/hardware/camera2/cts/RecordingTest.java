@@ -61,6 +61,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int VIDEO_FRAME_RATE = 30;
     private final String VIDEO_FILE_PATH = Environment.getExternalStorageDirectory().getPath();
     private static final int[] mCamcorderProfileList = {
+            CamcorderProfile.QUALITY_2160P,
             CamcorderProfile.QUALITY_1080P,
             CamcorderProfile.QUALITY_480P,
             CamcorderProfile.QUALITY_720P,

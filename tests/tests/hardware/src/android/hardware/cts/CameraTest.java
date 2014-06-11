@@ -2996,6 +2996,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private static final int[] mCamcorderProfileList = {
+        CamcorderProfile.QUALITY_2160P,
         CamcorderProfile.QUALITY_1080P,
         CamcorderProfile.QUALITY_480P,
         CamcorderProfile.QUALITY_720P,
