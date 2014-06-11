@@ -513,6 +513,102 @@ public class BitmapTest extends AndroidTestCase {
         }
     }
 
+    // Used by testAlphaAndPremul. FIXME: Should we also test Index8? That would require decoding a
+    // Bitmap, since one cannot be created directly. It will also have a Config of null, since it
+    // has no Java equivalent.
+    private static Config[] CONFIGS = new Config[] { Config.ALPHA_8, Config.ARGB_4444,
+            Config.ARGB_8888, Config.RGB_565 };
+
+    // test that reconfigure, setHasAlpha, and setPremultiplied behave as expected with
+    // respect to alpha and premultiplied.
+    public void testAlphaAndPremul() {
+        boolean falseTrue[] = new boolean[] { false, true };
+        for (Config fromConfig : CONFIGS) {
+            for (Config toConfig : CONFIGS) {
+                for (boolean hasAlpha : falseTrue) {
+                    for (boolean isPremul : falseTrue) {
+                        Bitmap bitmap = Bitmap.createBitmap(10, 10, fromConfig);
+
+                        // 4444 is deprecated, and will convert to 8888. No need to
+                        // attempt a reconfigure, which will be tested when fromConfig
+                        // is 8888.
+                        if (fromConfig == Config.ARGB_4444) {
+                            assertEquals(bitmap.getConfig(), Config.ARGB_8888);
+                            break;
+                        }
+
+                        bitmap.setHasAlpha(hasAlpha);
+                        bitmap.setPremultiplied(isPremul);
+
+                        checkAlphaAndPremul(bitmap, hasAlpha, isPremul, false);
+
+                        // reconfigure to a smaller size so the function will still succeed when
+                        // going to a Config that requires more bits.
+                        bitmap.reconfigure(1, 1, toConfig);
+                        if (toConfig == Config.ARGB_4444) {
+                            assertEquals(bitmap.getConfig(), Config.ARGB_8888);
+                        } else {
+                            assertEquals(bitmap.getConfig(), toConfig);
+                        }
+
+                        // Check that the alpha and premultiplied state has not changed (unless
+                        // we expected it to).
+                        checkAlphaAndPremul(bitmap, hasAlpha, isPremul, fromConfig == Config.RGB_565);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *  Assert that bitmap returns the appropriate values for hasAlpha() and isPremultiplied().
+     *  @param bitmap Bitmap to check.
+     *  @param expectedAlpha Expected return value from bitmap.hasAlpha(). Note that this is based
+     *          on what was set, but may be different from the actual return value depending on the
+     *          Config and convertedFrom565.
+     *  @param expectedPremul Expected return value from bitmap.isPremultiplied(). Similar to
+     *          expectedAlpha, this is based on what was set, but may be different from the actual
+     *          return value depending on the Config.
+     *  @param convertedFrom565 Whether bitmap was converted to its current Config by being
+     *          reconfigured from RGB_565. If true, and bitmap is now a Config that supports alpha,
+     *          hasAlpha() is expected to be true even if expectedAlpha is false.
+     */
+    private void checkAlphaAndPremul(Bitmap bitmap, boolean expectedAlpha, boolean expectedPremul,
+            boolean convertedFrom565) {
+        switch (bitmap.getConfig()) {
+            case ARGB_4444:
+                // This shouldn't happen, since we don't allow creating or converting
+                // to 4444.
+                assertFalse(true);
+                break;
+            case RGB_565:
+                assertFalse(bitmap.hasAlpha());
+                assertFalse(bitmap.isPremultiplied());
+                break;
+            case ALPHA_8:
+                // ALPHA_8 behaves mostly the same as 8888, except for premultiplied. Fall through.
+            case ARGB_8888:
+                // Since 565 is necessarily opaque, we revert to hasAlpha when switching to a type
+                // that can have alpha.
+                if (convertedFrom565) {
+                    assertTrue(bitmap.hasAlpha());
+                } else {
+                    assertEquals(bitmap.hasAlpha(), expectedAlpha);
+                }
+
+                if (bitmap.hasAlpha()) {
+                    // ALPHA_8's premultiplied status is undefined.
+                    if (bitmap.getConfig() != Config.ALPHA_8) {
+                        assertEquals(bitmap.isPremultiplied(), expectedPremul);
+                    }
+                } else {
+                    // Opaque bitmap is never considered premultiplied.
+                    assertFalse(bitmap.isPremultiplied());
+                }
+                break;
+        }
+    }
+
     public void testSetConfig() {
         mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.RGB_565);
         int alloc = mBitmap.getAllocationByteCount();
