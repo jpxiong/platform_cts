@@ -35,7 +35,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     private static final int PLAY_TIME_MS = 30000;
 
     public void testAvcBaseline1() throws Exception {
-        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline)) {
+          return;
+        }
+        if (supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel1)) {
             throw new RuntimeException("AVCLevel1 support is required by CDD");
         }
@@ -44,6 +47,9 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testAvcBaseline12() throws Exception {
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline)) {
+            return;
+        }
         if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel12)) {
             Log.i(TAG, "AvcBaseline12 not supported");
@@ -59,6 +65,9 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testAvcBaseline30() throws Exception {
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline)) {
+            return;
+        }
         if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel3)) {
             Log.i(TAG, "AvcBaseline30 not supported");
@@ -74,6 +83,9 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testAvcHigh31() throws Exception {
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileHigh)) {
+            return;
+        }
         if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileHigh,
                 CodecProfileLevel.AVCLevel31)) {
             Log.i(TAG, "AvcHigh31 not supported");
@@ -90,6 +102,9 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testAvcHigh40() throws Exception {
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileHigh)) {
+            return;
+        }
         if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileHigh,
                 CodecProfileLevel.AVCLevel4)) {
             Log.i(TAG, "AvcHigh40 not supported");
@@ -108,7 +123,15 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                 + "&key=test_key1", 1920, 1080, PLAY_TIME_MS);
     }
 
+    private boolean supports(String mimeType, int profile) {
+        return supports(mimeType, profile, 0, false);
+    }
+
     private boolean supports(String mimeType, int profile, int level) {
+        return supports(mimeType, profile, level, true);
+    }
+
+    private boolean supports(String mimeType, int profile, int level, boolean testLevel) {
         int numCodecs = MediaCodecList.getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
             MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
@@ -119,7 +142,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mimeType);
             for (CodecProfileLevel profileLevel : capabilities.profileLevels) {
                 if (profileLevel.profile == profile
-                        && profileLevel.level >= level) {
+                        && (!testLevel || profileLevel.level >= level)) {
                     return true;
                 }
             }
