@@ -19,6 +19,7 @@ import com.android.cts.stub.R;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.cts.util.PollingCheck;
 import android.os.Handler;
 import android.os.IBinder;
@@ -58,6 +59,11 @@ public class InputMethodManagerTest
     }
 
     public void testInputMethodManager() throws Throwable {
+        if (!getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_INPUT_METHODS)) {
+            return;
+        }
+
         Window window = mActivity.getWindow();
         final EditText view = (EditText) window.findViewById(R.id.entry);
 
