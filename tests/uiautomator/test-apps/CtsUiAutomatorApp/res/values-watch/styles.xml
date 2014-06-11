@@ -17,8 +17,6 @@
  -->
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light">
-        <item name="android:windowSwipeToDismiss">false</item>
-    </style>
+    <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar" />
 
 </resources>
