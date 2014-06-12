@@ -17,6 +17,7 @@
 package android.net.wifi.cts;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiEnterpriseConfig;
 import android.net.wifi.WifiEnterpriseConfig.Eap;
@@ -34,6 +35,11 @@ public class WifiEnterpriseConfigTest extends AndroidTestCase {
     private static final String ANON_IDENTITY = "anonidentity";
     private static final int ENABLE_DELAY = 10000;
 
+    private boolean hasWifi() {
+        return getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_WIFI);
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -42,10 +48,16 @@ public class WifiEnterpriseConfigTest extends AndroidTestCase {
         assertNotNull(mWifiManager);
         mWifiManager.setWifiEnabled(true);
         Thread.sleep(ENABLE_DELAY);
-        assertTrue(mWifiManager.isWifiEnabled());
+        if (hasWifi()) {
+            assertTrue(mWifiManager.isWifiEnabled());
+        }
     }
 
     public void testSettersAndGetters() {
+        if (!hasWifi()) {
+            return;
+        }
+
         WifiEnterpriseConfig config = new WifiEnterpriseConfig();
         assertTrue(config.getEapMethod() == Eap.NONE);
         config.setEapMethod(Eap.PEAP);
@@ -78,6 +90,10 @@ public class WifiEnterpriseConfigTest extends AndroidTestCase {
     }
 
     public void testAddEapNetwork() {
+        if (!hasWifi()) {
+            return;
+        }
+
         WifiConfiguration config = new WifiConfiguration();
         WifiEnterpriseConfig enterpriseConfig = new WifiEnterpriseConfig();
         enterpriseConfig.setEapMethod(Eap.PWD);
