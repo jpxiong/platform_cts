@@ -16,27 +16,29 @@
 
 package android.graphics.drawable.cts;
 
-import com.android.cts.stub.R;
-
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Shader;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
+import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.ShapeDrawable.ShaderFactory;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
+
+import com.android.cts.stub.R;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 
@@ -312,6 +314,12 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
         shapeDrawable.setColorFilter(null);
         assertNull(shapeDrawable.getPaint().getColorFilter());
+    }
+
+    public void testSetTint() {
+        final ShapeDrawable d = new ShapeDrawable(new RectShape());
+        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        assertEquals("Shape is tinted", Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
     }
 
     public void testSetDither() {
