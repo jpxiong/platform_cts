@@ -64,8 +64,12 @@ public abstract class KeyListenerTestCase extends
         mInstrumentation = getInstrumentation();
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
 
-        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Ensure that the screen is on for this test.
+                mTextView.setKeepScreenOn(true);
+            }
+        });
 
         assertTrue(mActivity.waitForWindowFocus(5 * DateUtils.SECOND_IN_MILLIS));
     }
