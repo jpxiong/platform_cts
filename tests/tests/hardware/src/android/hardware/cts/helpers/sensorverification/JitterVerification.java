@@ -21,6 +21,8 @@ import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEvent;
 
+import com.android.cts.util.StatisticsUtils;
+
 import junit.framework.Assert;
 
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class JitterVerification extends AbstractSensorVerification {
         }
 
         List<Double> jitters = getJitterValues();
-        double jitter95Percentile = SensorCtsHelper.get95PercentileValue(jitters);
+        double jitter95Percentile = StatisticsUtils.get95PercentileValue(jitters);
         boolean failed = (jitter95Percentile > mExpected * (mThreshold / 100.0));
 
         stats.addValue(PASSED_KEY, !failed);
@@ -127,7 +129,7 @@ public class JitterVerification extends AbstractSensorVerification {
         for (int i = 1; i < mTimestamps.size(); i++) {
             deltas.add(mTimestamps.get(i) - mTimestamps.get(i -1));
         }
-        double deltaMean = SensorCtsHelper.getMean(deltas);
+        double deltaMean = StatisticsUtils.getMean(deltas);
         List<Double> jitters = new ArrayList<Double>(deltas.size());
         for (long delta : deltas) {
             jitters.add(Math.abs(delta - deltaMean));
