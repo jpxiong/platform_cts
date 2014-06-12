@@ -155,5 +155,13 @@
 {
   name: "android.text.cts.BoringLayoutTest#testScale",
   bug: 15134518
+},
+{
+  name: "android.media.cts.MediaRecorderTest#testOnErrorListener",
+  name: "android.media.cts.MediaRecorderTest#testOnInfoListener",
+  name: "android.media.cts.MediaRecorderTest#testRecorderAudio",
+  name: "android.media.cts.MediaRecorderTest#testRecordingAudioInRawFormats",
+  name: "android.media.cts.MediaRecorderTest#testSetMaxDuration",
+  bug: 15106730
 }
 ]
