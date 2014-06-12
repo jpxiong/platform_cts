@@ -73,7 +73,6 @@ cts_test_packages := \
 	CtsGraphicsTestCases \
 	CtsGraphics2TestCases \
 	CtsHardwareTestCases \
-	CtsHoloTestCases \
 	CtsJniTestCases \
 	CtsLocationTestCases \
 	CtsMediaStressTestCases \
