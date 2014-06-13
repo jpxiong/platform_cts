@@ -112,6 +112,30 @@ public class PaintTest extends AndroidTestCase {
         // Reverse measure substring in the middle and restrict width to the last 2 characters.
         assertBreakText(text, textChars, textSpan, 2, 5, false, widths[3] + widths[4],
                 2, widths[3] + widths[4]);
+
+        // a single Emoji (U+1f601)
+        String emoji = "\ud83d\ude01";
+        char[] emojiChars = emoji.toCharArray();
+        SpannedString emojiSpan = new SpannedString(emoji);
+
+        float[] emojiWidths = new float[emoji.length()];
+        assertEquals(emoji.length(), p.getTextWidths(emoji, emojiWidths));
+
+        // Measure substring with a cluster
+        assertBreakText(emoji, emojiChars, emojiSpan, 0, 2, true, 0,
+                0, 0);
+
+        // Measure substring with a cluster
+        assertBreakText(emoji, emojiChars, emojiSpan, 0, 2, true, emojiWidths[0],
+                2, emojiWidths[0]);
+
+        // Reverse measure substring with a cluster
+        assertBreakText(emoji, emojiChars, emojiSpan, 0, 2, false, 0,
+                0, 0);
+
+        // Measure substring with a cluster
+        assertBreakText(emoji, emojiChars, emojiSpan, 0, 2, false, emojiWidths[0],
+                2, emojiWidths[0]);
     }
 
     private void assertBreakText(String text, char[] textChars, SpannedString textSpan,
