@@ -163,5 +163,9 @@
   name: "android.media.cts.MediaRecorderTest#testRecordingAudioInRawFormats",
   name: "android.media.cts.MediaRecorderTest#testSetMaxDuration",
   bug: 15106730
+},
+{
+  name: "android.widget.cts.TextViewTest#testTextAttr",
+  bug: 15131296
 }
 ]
