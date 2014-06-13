@@ -263,6 +263,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
+        resultKeys.add(CaptureResult.SENSOR_ROLLING_SHUTTER_SKEW);
         resultKeys.add(CaptureResult.SHADING_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
