@@ -195,6 +195,11 @@ public class InputMethodInfoTest extends AndroidTestCase {
     }
 
     public void testInputMethodSubtypesOfSystemImes() {
+        if (!getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_INPUT_METHODS)) {
+            return;
+        }
+
         final InputMethodManager imm = (InputMethodManager) mContext
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         final List<InputMethodInfo> imis = imm.getInputMethodList();
