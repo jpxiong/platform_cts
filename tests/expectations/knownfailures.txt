@@ -167,5 +167,9 @@
 {
   name: "android.widget.cts.TextViewTest#testTextAttr",
   bug: 15131296
+},
+{
+  name: "android.permission.cts.NoSystemFunctionPermissionTest#testSetWallpaper",
+  bug: 15383108
 }
 ]
