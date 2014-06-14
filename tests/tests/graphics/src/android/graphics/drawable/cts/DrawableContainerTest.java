@@ -20,12 +20,9 @@ import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
@@ -205,23 +202,6 @@ public class DrawableContainerTest extends TestCase {
         dr.reset();
         mDrawableContainer.setColorFilter(new ColorFilter());
         assertTrue(dr.hasSetColorFilterCalled());
-    }
-
-    public void testSetTint() {
-        assertConstantStateNotSet();
-        assertNull(mDrawableContainer.getCurrent());
-
-        mDrawableContainer.setConstantState(mDrawableContainerState);
-        mDrawableContainer.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
-
-        MockDrawable dr = new MockDrawable();
-        addAndSelectDrawable(dr);
-
-        assertEquals("Initial tint propagates", Mode.SRC_OVER, dr.getTintMode());
-
-        dr.reset();
-        mDrawableContainer.setTint(null, null);
-        assertTrue("setTint() propagates", dr.hasSetTintCalled());
     }
 
     public void testOnBoundsChange() {
@@ -773,28 +753,34 @@ public class DrawableContainerTest extends TestCase {
 
     private class MockDrawable extends Drawable {
         private boolean mHasCalledDraw;
+
         private boolean mHasCalledSetAlpha;
+
         private boolean mHasCalledSetColorFilter;
+
         private boolean mHasCalledSetDither;
-        private boolean mHasCalledSetTint;
+
         private boolean mHasCalledOnBoundsChanged;
+
         private boolean mHasCalledOnStateChanged;
+
         private boolean mHasCalledOnLevelChanged;
+
         private boolean mHasCalledMutate;
 
-        private boolean mIsStateful;
+        private boolean mIsStatful;
 
         private Rect mPadding;
 
         private int mIntrinsicHeight;
+
         private int mIntrinsicWidth;
 
         private int mMinimumHeight;
+
         private int mMinimumWidth;
 
         private int mOpacity;
-
-        private Mode mTintMode;
 
         @Override
         public int getOpacity() {
@@ -803,15 +789,11 @@ public class DrawableContainerTest extends TestCase {
 
         @Override
         public boolean isStateful() {
-            return mIsStateful;
+            return mIsStatful;
         }
 
         public void setStateful(boolean isStateful) {
-            mIsStateful = isStateful;
-        }
-
-        public Mode getTintMode() {
-            return mTintMode;
+            mIsStatful = isStateful;
         }
 
         public void setPadding(Rect rect) {
@@ -850,16 +832,9 @@ public class DrawableContainerTest extends TestCase {
             return mIntrinsicWidth;
         }
 
-        @Override
         public Drawable mutate() {
             mHasCalledMutate = true;
             return this;
-        }
-
-        @Override
-        public void setTint(ColorStateList tint, Mode tintMode) {
-            mTintMode = tintMode;
-            mHasCalledSetTint = true;
         }
 
         public void setMinimumHeight(int h) {
@@ -896,10 +871,6 @@ public class DrawableContainerTest extends TestCase {
 
         public boolean hasSetDitherCalled() {
             return mHasCalledSetDither;
-        }
-
-        public boolean hasSetTintCalled() {
-            return mHasCalledSetTint;
         }
 
         public boolean hasOnBoundsChangedCalled() {

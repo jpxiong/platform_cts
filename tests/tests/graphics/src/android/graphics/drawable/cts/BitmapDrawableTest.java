@@ -18,21 +18,19 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Shader;
 import android.graphics.Bitmap.Config;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
@@ -240,16 +238,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
 
         bitmapDrawable.setColorFilter(null);
         assertNull(bitmapDrawable.getPaint().getColorFilter());
-    }
-
-    public void testSetTint() {
-        final InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
-        final BitmapDrawable d = new BitmapDrawable(source);
-
-        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
-        assertEquals("Nine-patch is tinted", Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
-
-        d.setTint(null, null);
     }
 
     public void testGetOpacity() {
