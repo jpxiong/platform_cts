@@ -16,21 +16,20 @@
 
 package android.graphics.drawable.cts;
 
-import com.android.cts.stub.R;
-
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.content.res.Resources;
+import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.ColorDrawable;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
+
+import com.android.cts.stub.R;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 
@@ -120,9 +119,19 @@ public class ColorDrawableTest extends AndroidTestCase {
     }
 
     public void testSetColorFilter() {
-        final ColorDrawable colorDrawable = new ColorDrawable();
+        final ColorDrawable d = new ColorDrawable(Color.WHITE);
+        assertEquals(Color.WHITE, DrawableTestingUtils.getPixel(d, 0, 0));
 
-        // setColorFilter(ColorFilter) is a non-operation function.
-        colorDrawable.setColorFilter(null);
+        d.setColorFilter(Color.BLACK, Mode.SRC_OVER);
+        assertEquals(Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
+        
+    }
+
+    public void testSetTint() {
+        final ColorDrawable d = new ColorDrawable(Color.WHITE);
+        assertEquals(Color.WHITE, DrawableTestingUtils.getPixel(d, 0, 0));
+
+        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        assertEquals(Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
     }
 }
