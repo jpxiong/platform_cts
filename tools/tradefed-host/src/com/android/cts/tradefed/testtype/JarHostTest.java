@@ -19,9 +19,11 @@ import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+
 import com.android.tradefed.testtype.DeviceTestResult.RuntimeDeviceNotAvailableException;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
@@ -188,6 +190,14 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
     }
 
     /**
+     * setOptions sets options to the tests invoked from this test.
+     * It is used to passing options from JarHostTest to the tests started by JarHostTest.
+     * The default implementation does nothing.
+     */
+    protected void setOptions(Test junitTest) throws ConfigurationException {
+    }
+
+    /**
      * Run test with timeout support.
      */
     private void runTest(TestIdentifier testId, final Test junitTest, final TestResult junitResult) {
@@ -202,6 +212,11 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
         }
         if (junitTest instanceof IBuildReceiver) {
             ((IBuildReceiver)junitTest).setBuild(mBuildInfo);
+        }
+        try {
+            setOptions(junitTest);
+        } catch (ConfigurationException e) {
+            Log.e(LOG_TAG, e.toString());
         }
         TestRunnable testRunnable = new TestRunnable(junitTest, junitResult);
 

@@ -18,13 +18,17 @@ package com.android.cts.tradefed.testtype;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.config.Option;
+import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.InstrumentationTest;
+import com.android.tradefed.util.AbiFormatter;
 
 import junit.framework.Assert;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +46,11 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
     private Collection<String> mUninstallPackages = new ArrayList<String>();
 
     private CtsBuildHelper mCtsBuild = null;
+
+    @Option(name = AbiFormatter.FORCE_ABI_STRING,
+            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
+            importance = Importance.IF_UNSET)
+    private String mForceAbi = null;
 
     /**
      * {@inheritDoc}
@@ -75,11 +84,18 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
             Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
                     getDevice().getSerialNumber()));
             try {
-                String installCode = getDevice().installPackage(mCtsBuild.getTestApp(apkFileName),
-                        true);
+                File apkFile = mCtsBuild.getTestApp(apkFileName);
+                String errorCode = null;
+                String[] options = {};
+                if (mForceAbi != null) {
+                    String abi = AbiFormatter.getDefaultAbi(getDevice(), mForceAbi);
+                    if (abi != null) {
+                        options = new String[]{String.format("--abi %s ", abi)};
+                    }
+                }
+                errorCode = getDevice().installPackage(apkFile, true, options);
                 Assert.assertNull(String.format("Failed to install %s on %s. Reason: %s",
-                        apkFileName, getDevice().getSerialNumber(), installCode), installCode);
-
+                        apkFileName, getDevice().getSerialNumber(), errorCode), errorCode);
             } catch (FileNotFoundException e) {
                 Assert.fail(String.format("Could not find file %s", apkFileName));
             }

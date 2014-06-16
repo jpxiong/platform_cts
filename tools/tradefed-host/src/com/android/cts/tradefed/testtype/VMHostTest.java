@@ -16,11 +16,18 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.tradefed.config.ConfigurationException;
+import com.android.tradefed.config.Option;
+import com.android.tradefed.config.Option.Importance;
+import com.android.tradefed.config.OptionSetter;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.FileUtil;
+
+import junit.framework.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +41,12 @@ public class VMHostTest extends JarHostTest {
 
     private static final String VM_TEST_TEMP_DIR = "/data/local/tmp/vm-tests";
     private static final String EMULATOR_TEMP_DIR = "/data/local/tmp";
+
+    @Option(name = AbiFormatter.FORCE_ABI_STRING,
+            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
+            importance = Importance.IF_UNSET)
+    private String mForceAbi = null;
+
 
     /**
      * {@inheritDoc}
@@ -93,6 +106,14 @@ public class VMHostTest extends JarHostTest {
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void setOptions(Test junitTest) throws ConfigurationException{
+        if (mForceAbi != null) {
+            OptionSetter optionSetter = new OptionSetter(junitTest);
+            optionSetter.setOptionValue(AbiFormatter.FORCE_ABI_STRING, mForceAbi);
+        }
     }
 
     /**
