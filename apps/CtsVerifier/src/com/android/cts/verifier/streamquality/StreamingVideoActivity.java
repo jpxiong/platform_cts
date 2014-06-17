@@ -22,12 +22,24 @@ import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListAdapter;
 import com.android.cts.verifier.TestListAdapter.TestListItem;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Tests for verifying the quality of streaming videos.  Plays streams of different formats over
@@ -85,20 +97,27 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
         }
     }
 
-    private static final Stream[] RTSP_STREAMS = {
-        new Stream("H263 Video, AMR Audio", "rtsp_h263_amr",
-                "rtsp://v2.cache7.c.youtube.com/video.3gp?"
-               + "cid=0x271de9756065677e&fmt=13&user=android-device-test"),
-        new Stream("MPEG4 SP Video, AAC Audio", "rtsp_mpeg4_aac",
-                "rtsp://v2.cache7.c.youtube.com/video.3gp?"
-                + "cid=0x271de9756065677e&fmt=17&user=android-device-test"),
-        new Stream("H264 Base Video, AAC Audio", "rtsp_h264_aac",
-                "rtsp://v2.cache7.c.youtube.com/video.3gp?"
-                + "cid=0x271de9756065677e&fmt=18&user=android-device-test"),
-    };
+    private static final String TAG = StreamingVideoActivity.class.getName();
+    private static final int RTSP_URL_ERROR = 1;
+    private static final String ITAG_13_SIGNATURE =
+            "53A3A3A46DAB71E3C599DE8FA6A1484593DFACE3" +
+            ".9476B91AD5035D88C3895CC2A4703B6DD442E972";
+    private static final String ITAG_17_SIGNATURE =
+            "10D6D263112C41DA98822D74821DF47340F1A361" +
+            ".803649A2258E26BF40E76A95E646FBAE4009CEE8";
+    private static final String ITAG_18_SIGNATURE =
+            "618FBB112E1B2FBB66DA9F203AE8CC7DF93C7400" +
+            ".20498AA006E999F42BE69D66E3596F2C7CA18114";
+    private static final String RTSP_LOOKUP_URI_TEMPLATE =
+            "http://redirector.c.youtube.com/videoplayback?id=271de9756065677e" +
+            "&source=youtube&protocol=rtsp&sparams=ip,ipbits,expire,id,itag,source" +
+            "&ip=0.0.0.0&ipbits=0&expire=19000000000&key=ik0&alr=yes" +
+            "&itag=%d" +
+            "&signature=%s";
 
     private static final Stream[] HTTP_STREAMS = {
-        new Stream("H263 Video, AMR Audio", "http_h263_amr", "http://redirector.c.play.google.com/"
+        new Stream("H263 Video, AMR Audio", "http_h263_amr",
+                "http://redirector.c.play.google.com/"
                 + "videoplayback?id=271de9756065677e"
                 + "&itag=13&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
@@ -140,13 +159,35 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
         setTestListAdapter(getStreamAdapter());
     }
 
+    @Override
+    public Dialog onCreateDialog(int id, Bundle args) {
+        switch (id) {
+            case RTSP_URL_ERROR:
+                return new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.sv_failed_title))
+                        .setMessage(getString(R.string.sv_failed_message))
+                        .setNegativeButton("Close", new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                PassFailButtons.setTestResultAndFinish(StreamingVideoActivity.this,
+                                        getTestId(), null, false);
+                            }
+                        }).show();
+            default:
+                return super.onCreateDialog(id, args);
+        }
+    }
+
     private TestListAdapter getStreamAdapter() {
         ArrayTestListAdapter adapter = new ArrayTestListAdapter(this);
 
         adapter.add(TestListItem.newCategory("RTSP"));
-        for (Stream stream : RTSP_STREAMS) {
-            addStreamToTests(adapter, stream);
-        }
+        addRtspStreamToTest(
+                adapter, "H263 Video, AMR Audio", "rtsp_h263_amr", 13, ITAG_13_SIGNATURE);
+        addRtspStreamToTest(
+                adapter, "MPEG4 SP Video, AAC Audio", "rtsp_mpeg4_aac", 17, ITAG_17_SIGNATURE);
+        addRtspStreamToTest(
+                adapter, "H264 Base Video, AAC Audio", "rtsp_h264_aac", 18, ITAG_18_SIGNATURE);
 
         adapter.add(TestListItem.newCategory("HTTP Progressive"));
         for (Stream stream : HTTP_STREAMS) {
@@ -163,6 +204,16 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
         return adapter;
     }
 
+    private void addRtspStreamToTest(
+            ArrayTestListAdapter adapter, String name, String code, int itag, String signature) {
+        String rtspUrl = lookupRtspUrl(itag, signature);
+        if (rtspUrl == null) {
+            showDialog(RTSP_URL_ERROR);
+        }
+        Stream stream = new Stream(name, code, rtspUrl);
+        addStreamToTests(adapter, stream);
+    }
+
     private void addStreamToTests(ArrayTestListAdapter streams, Stream stream) {
         Intent i = new Intent(StreamingVideoActivity.this, PlayVideoActivity.class);
         i.putExtra(PlayVideoActivity.EXTRA_STREAM, stream);
@@ -172,5 +223,42 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
 
     private void updatePassButton() {
         getPassButton().setEnabled(mAdapter.allTestsPassed());
+    }
+
+    /** @returns the appropriate RTSP url, or null in case of failure */
+    private String lookupRtspUrl(int itag, String signature) {
+        String rtspLookupUri = String.format(RTSP_LOOKUP_URI_TEMPLATE, itag, signature);
+        try {
+            return new LookupRtspUrlTask().execute(rtspLookupUri).get();
+        } catch (Exception e) {
+            Log.e(TAG, "RTSP URL lookup time out.", e);
+            showDialog(RTSP_URL_ERROR);
+            return null;
+        }
+    }
+
+    /** Retrieve the URL for an RTSP stream */
+    private class LookupRtspUrlTask extends AsyncTask<String, Void, String> {
+        protected String doInBackground(String... rtspLookupUri) {
+            HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL(rtspLookupUri[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                if (urlConnection.getResponseCode() != 200) {
+                    throw new IOException("unable to get rtsp uri. Response Code:"
+                            + urlConnection.getResponseCode());
+                }
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                return reader.readLine();
+            } catch (Exception e) {
+                Log.e(TAG, "RTSP URL lookup failed.", e);
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+        }
     }
 }
