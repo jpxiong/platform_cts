@@ -16,6 +16,12 @@
 
 package android.view.cts;
 
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.view.LayoutInflater;
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 import com.google.android.collect.Lists;
@@ -3336,6 +3342,63 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.dispatchTouchEvent(obscuredTouch);
         assertTrue(touchListener.hasOnTouch());
         touchListener.reset();
+    }
+
+    public void testBackgroundTint() {
+        View inflatedView = mActivity.findViewById(R.id.background_tint);
+
+        assertEquals("Background tint inflated correctly",
+                Color.WHITE, inflatedView.getBackgroundTint().getDefaultColor());
+        assertEquals("Background tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getBackgroundTintMode());
+
+        MockDrawable bg = new MockDrawable();
+        View view = new View(mActivity);
+
+        view.setBackground(bg);
+        assertFalse("No background tint applied by default", bg.hasCalledSetTint());
+
+        view.setBackgroundTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Background tint applied when setBackgroundTint() called after setBackground()",
+                bg.hasCalledSetTint());
+
+        bg.reset();
+        view.setBackground(null);
+        view.setBackground(bg);
+        assertTrue("Background tint applied when setBackgroundTint() called before setBackground()",
+                bg.hasCalledSetTint());
+    }
+
+    private static class MockDrawable extends Drawable {
+        private boolean mCalledSetTint = false;
+
+        @Override
+        public void draw(Canvas canvas) {}
+
+        @Override
+        public void setAlpha(int alpha) {}
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {}
+
+        @Override
+        public int getOpacity() {
+            return 0;
+        }
+
+        @Override
+        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
+            super.setTint(tint, tintMode);
+            mCalledSetTint = true;
+        }
+
+        public boolean hasCalledSetTint() {
+            return mCalledSetTint;
+        }
+
+        public void reset() {
+            mCalledSetTint = false;
+        }
     }
 
     private static class MockEditText extends EditText {

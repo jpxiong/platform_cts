@@ -16,6 +16,12 @@
 
 package android.widget.cts;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.view.LayoutInflater;
+import android.widget.CompoundButton;
+import android.widget.ToggleButton;
 import com.android.cts.stub.R;
 
 
@@ -314,8 +320,81 @@ public class ProgressBarTest extends InstrumentationTestCase {
         // Do not test, it's controlled by View. Implementation details
     }
 
+    public void testProgressTint() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View layout = inflater.inflate(R.layout.progressbar_layout, null);
+        ProgressBar inflatedView = (ProgressBar) layout.findViewById(R.id.progress_tint);
+
+        assertEquals("Progress tint inflated correctly",
+                Color.WHITE, inflatedView.getProgressTint().getDefaultColor());
+        assertEquals("Progress tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getProgressTintMode());
+
+        assertEquals("Progress background tint inflated correctly",
+                Color.WHITE, inflatedView.getProgressBackgroundTint().getDefaultColor());
+        assertEquals("Progress background tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getProgressBackgroundTintMode());
+
+        assertEquals("Secondary progress tint inflated correctly",
+                Color.WHITE, inflatedView.getSecondaryProgressTint().getDefaultColor());
+        assertEquals("Secondary progress tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getSecondaryProgressTintMode());
+
+        MockDrawable progress = new MockDrawable();
+        ProgressBar view = new ProgressBar(mContext);
+
+        view.setProgressDrawable(progress);
+        assertFalse("No progress tint applied by default", progress.hasCalledSetTint());
+
+        view.setProgressBackgroundTint(ColorStateList.valueOf(Color.WHITE));
+        assertFalse("Progress background tint not applied when layer missing",
+                progress.hasCalledSetTint());
+
+        view.setSecondaryProgressTint(ColorStateList.valueOf(Color.WHITE));
+        assertFalse("Secondary progress tint not applied when layer missing",
+                progress.hasCalledSetTint());
+
+        view.setProgressTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Progress tint applied when setProgressTint() called after setProgress()",
+                progress.hasCalledSetTint());
+
+        progress.reset();
+        view.setProgressDrawable(null);
+        view.setProgressDrawable(progress);
+        assertTrue("Progress tint applied when setProgressTint() called before setProgress()",
+                progress.hasCalledSetTint());
+    }
+
+    public void testIndeterminateTint() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View layout = inflater.inflate(R.layout.progressbar_layout, null);
+        ProgressBar inflatedView = (ProgressBar) layout.findViewById(R.id.indeterminate_tint);
+
+        assertEquals("Indeterminate tint inflated correctly",
+                Color.WHITE, inflatedView.getIndeterminateTint().getDefaultColor());
+        assertEquals("Indeterminate tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getIndeterminateTintMode());
+
+        MockDrawable indeterminate = new MockDrawable();
+        ProgressBar view = new ProgressBar(mContext);
+
+        view.setIndeterminateDrawable(indeterminate);
+        assertFalse("No indeterminate tint applied by default", indeterminate.hasCalledSetTint());
+
+        view.setIndeterminateTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Indeterminate tint applied when setIndeterminateTint() called after "
+                + "setIndeterminate()", indeterminate.hasCalledSetTint());
+
+        indeterminate.reset();
+        view.setIndeterminateDrawable(null);
+        view.setIndeterminateDrawable(indeterminate);
+        assertTrue("Indeterminate tint applied when setIndeterminateTint() called before "
+                + "setIndeterminate()", indeterminate.hasCalledSetTint());
+    }
+
     private class MockDrawable extends Drawable {
         private boolean mCalledDraw = false;
+        private boolean mCalledSetTint = false;
 
         @Override
         public void draw(Canvas canvas) {
@@ -335,12 +414,23 @@ public class ProgressBarTest extends InstrumentationTestCase {
         public void setColorFilter(ColorFilter cf) {
         }
 
+        @Override
+        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
+            super.setTint(tint, tintMode);
+            mCalledSetTint = true;
+        }
+
+        public boolean hasCalledSetTint() {
+            return mCalledSetTint;
+        }
+
         public boolean hasCalledDraw() {
             return mCalledDraw;
         }
 
         public void reset() {
             mCalledDraw = false;
+            mCalledSetTint = false;
         }
 
     }
