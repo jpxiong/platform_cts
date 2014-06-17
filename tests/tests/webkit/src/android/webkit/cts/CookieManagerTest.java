@@ -21,7 +21,11 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
+import android.webkit.ValueCallback;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -48,6 +52,14 @@ public class CookieManagerTest extends
 
             mCookieManager = CookieManager.getInstance();
             assertNotNull(mCookieManager);
+
+            // We start with no cookies.
+            mCookieManager.removeAllCookie();
+            assertFalse(mCookieManager.hasCookies());
+
+            // But accepting cookies.
+            mCookieManager.setAcceptCookie(false);
+            assertFalse(mCookieManager.acceptCookie());
         }
     }
 
@@ -72,10 +84,9 @@ public class CookieManagerTest extends
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
         }
-        mCookieManager.removeAllCookie();
+
         mCookieManager.setAcceptCookie(false);
         assertFalse(mCookieManager.acceptCookie());
-        assertFalse(mCookieManager.hasCookies());
 
         CtsTestServer server = new CtsTestServer(getActivity(), false);
         String url = server.getCookieUrl("conquest.html");
@@ -119,114 +130,184 @@ public class CookieManagerTest extends
         m = pat.matcher(cookie);
         assertTrue(m.matches());
         assertEquals("42", m.group(1)); // value got incremented
-
-        // clean up all cookies
-        mCookieManager.removeAllCookie();
     }
 
-    public void testCookieManager() {
+    public void testSetCookie() {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
         }
-        // enable cookie
-        mCookieManager.setAcceptCookie(true);
-        assertTrue(mCookieManager.acceptCookie());
-
-        // first there should be no cookie stored
-        assertFalse(mCookieManager.hasCookies());
 
         String url = "http://www.example.com";
         String cookie = "name=test";
         mCookieManager.setCookie(url, cookie);
         assertEquals(cookie, mCookieManager.getCookie(url));
+        assertTrue(mCookieManager.hasCookies());
+    }
 
-        // sync cookie from RAM to FLASH, because hasCookies() only counts FLASH cookies
-        CookieSyncManager.getInstance().sync();
+    public void testSetCookieNullCallback() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final String url = "http://www.example.com";
+        final String cookie = "name=test";
+        mCookieManager.setCookie(url, cookie, null);
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mCookieManager.hasCookies();
+                String c = mCookieManager.getCookie(url);
+                return mCookieManager.getCookie(url).contains(cookie);
+            }
+        }.run();
+    }
+
+    public void testSetCookieCallback() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final Semaphore s = new Semaphore(0);
+        final AtomicBoolean status = new AtomicBoolean();
+        final ValueCallback<Boolean> callback = new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean success) {
+                status.set(success);
+                s.release();
+            }
+        };
+    }
+
+    public void testRemoveCookies() throws InterruptedException {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final String url = "http://www.example.com";
+        final String sessionCookie = "cookie1=peter";
+        final String longCookie = "cookie2=sue";
+        final String quickCookie = "cookie3=marc";
+
+        mCookieManager.setCookie(url, sessionCookie);
+        mCookieManager.setCookie(url, makeExpiringCookie(longCookie, 600));
+        mCookieManager.setCookie(url, makeExpiringCookieMs(quickCookie, 1500));
+
+        String allCookies = mCookieManager.getCookie(url);
+        assertTrue(allCookies.contains(sessionCookie));
+        assertTrue(allCookies.contains(longCookie));
+        assertTrue(allCookies.contains(quickCookie));
+
+        mCookieManager.removeSessionCookie();
+        allCookies = mCookieManager.getCookie(url);
+        assertFalse(allCookies.contains(sessionCookie));
+        assertTrue(allCookies.contains(longCookie));
+        assertTrue(allCookies.contains(quickCookie));
+
+        Thread.sleep(2000); // wait for quick cookie to expire
+        mCookieManager.removeExpiredCookie();
+        allCookies = mCookieManager.getCookie(url);
+        assertFalse(allCookies.contains(sessionCookie));
+        assertTrue(allCookies.contains(longCookie));
+        assertFalse(allCookies.contains(quickCookie));
+
+        mCookieManager.removeAllCookie();
+        assertNull(mCookieManager.getCookie(url));
+        assertFalse(mCookieManager.hasCookies());
+    }
+
+    public void testRemoveCookiesNullCallback() throws InterruptedException {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final String url = "http://www.example.com";
+        final String sessionCookie = "cookie1=peter";
+        final String longCookie = "cookie2=sue";
+        final String quickCookie = "cookie3=marc";
+
+        mCookieManager.setCookie(url, sessionCookie);
+        mCookieManager.setCookie(url, makeExpiringCookie(longCookie, 600));
+        mCookieManager.setCookie(url, makeExpiringCookieMs(quickCookie, 1500));
+
+        String allCookies = mCookieManager.getCookie(url);
+        assertTrue(allCookies.contains(sessionCookie));
+        assertTrue(allCookies.contains(longCookie));
+        assertTrue(allCookies.contains(quickCookie));
+
+        mCookieManager.removeSessionCookies(null);
+        allCookies = mCookieManager.getCookie(url);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                String c = mCookieManager.getCookie(url);
+                return !c.contains(sessionCookie) &&
+                        c.contains(longCookie) &&
+                        c.contains(quickCookie);
             }
         }.run();
 
-        // clean up all cookies
-        mCookieManager.removeAllCookie();
+        mCookieManager.removeAllCookies(null);
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return !mCookieManager.hasCookies();
             }
         }.run();
+        assertNull(mCookieManager.getCookie(url));
     }
 
-    @SuppressWarnings("deprecation")
-    public void testRemoveCookies() throws InterruptedException {
+    public void testRemoveCookiesCallback() throws InterruptedException {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
         }
-        // enable cookie
-        mCookieManager.setAcceptCookie(true);
-        assertTrue(mCookieManager.acceptCookie());
-        assertFalse(mCookieManager.hasCookies());
+
+        final Semaphore s = new Semaphore(0);
+        final AtomicBoolean anyDeleted = new AtomicBoolean();
+        final ValueCallback<Boolean> callback = new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean n) {
+                anyDeleted.set(n);
+                s.release();
+            }
+        };
 
         final String url = "http://www.example.com";
-        final String cookie1 = "cookie1=peter";
-        final String cookie2 = "cookie2=sue";
-        final String cookie3 = "cookie3=marc";
+        final String sessionCookie = "cookie1=peter";
+        final String normalCookie = "cookie2=sue";
 
-        mCookieManager.setCookie(url, cookie1); // session cookie
-
-        Date date = new Date();
-        date.setTime(date.getTime() + 1000 * 600);
-        String value2 = cookie2 + "; expires=" + date.toGMTString();
-        mCookieManager.setCookie(url, value2); // expires in 10min
-
-        long expiration = 3000;
-        date = new Date();
-        date.setTime(date.getTime() + expiration);
-        String value3 = cookie3 + "; expires=" + date.toGMTString();
-        mCookieManager.setCookie(url, value3); // expires in 3s
+        // We set one session cookie and one normal cookie.
+        mCookieManager.setCookie(url, sessionCookie);
+        mCookieManager.setCookie(url, makeExpiringCookie(normalCookie, 600));
 
         String allCookies = mCookieManager.getCookie(url);
-        assertTrue(allCookies.contains(cookie1));
-        assertTrue(allCookies.contains(cookie2));
-        assertTrue(allCookies.contains(cookie3));
+        assertTrue(allCookies.contains(sessionCookie));
+        assertTrue(allCookies.contains(normalCookie));
 
-        mCookieManager.removeSessionCookie();
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                String c = mCookieManager.getCookie(url);
-                return !c.contains(cookie1) && c.contains(cookie2) && c.contains(cookie3);
-            }
-        }.run();
+        // When we remove session cookies there are some to remove.
+        removeSessionCookiesOnUiThread(callback);
+        assertTrue(s.tryAcquire(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(anyDeleted.get());
 
-        Thread.sleep(expiration + 1000); // wait for cookie to expire
-        mCookieManager.removeExpiredCookie();
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                String c = mCookieManager.getCookie(url);
-                return !c.contains(cookie1) && c.contains(cookie2) && !c.contains(cookie3);
-            }
-        }.run();
+        // The normal cookie is not removed.
+        assertTrue(mCookieManager.getCookie(url).contains(normalCookie));
 
-        mCookieManager.removeAllCookie();
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mCookieManager.getCookie(url) == null;
-            }
-        }.run();
-    }
+        // When we remove session cookies again there are none to remove.
+        removeSessionCookiesOnUiThread(callback);
+        assertTrue(s.tryAcquire(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertFalse(anyDeleted.get());
 
-    private void waitForCookie(final String url) {
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mCookieManager.getCookie(url) != null;
-            }
-        }.run();
+        // When we remove all cookies there are some to remove.
+        removeAllCookiesOnUiThread(callback);
+        assertTrue(s.tryAcquire(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(anyDeleted.get());
+
+        // Now we have no cookies.
+        assertFalse(mCookieManager.hasCookies());
+        assertNull(mCookieManager.getCookie(url));
+
+        // When we remove all cookies again there are none to remove.
+        removeAllCookiesOnUiThread(callback);
+        assertTrue(s.tryAcquire(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertFalse(anyDeleted.get());
     }
 
     public void testb3167208() throws Exception {
@@ -240,5 +321,62 @@ public class CookieManagerTest extends
         String cookie = mCookieManager.getCookie(uri);
         assertNotNull(cookie);
         assertTrue(cookie.contains("foo=bar"));
+    }
+
+    private void waitForCookie(final String url) {
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mCookieManager.getCookie(url) != null;
+            }
+        }.run();
+    }
+
+    @SuppressWarnings("deprecation")
+    private String makeExpiringCookie(String cookie, int secondsTillExpiry) {
+        return makeExpiringCookieMs(cookie, 1000*secondsTillExpiry);
+    }
+
+    @SuppressWarnings("deprecation")
+    private String makeExpiringCookieMs(String cookie, int millisecondsTillExpiry) {
+        Date date = new Date();
+        date.setTime(date.getTime() + millisecondsTillExpiry);
+        return cookie + "; expires=" + date.toGMTString();
+    }
+
+    private void removeAllCookiesOnUiThread(final ValueCallback<Boolean> callback) {
+        runTestOnUiThreadAndCatch(new Runnable() {
+            @Override
+            public void run() {
+                mCookieManager.removeAllCookies(callback);
+            }
+        });
+    }
+
+    private void removeSessionCookiesOnUiThread(final ValueCallback<Boolean> callback) {
+        runTestOnUiThreadAndCatch(new Runnable() {
+            @Override
+            public void run() {
+                mCookieManager.removeSessionCookies(callback);
+            }
+        });
+    }
+
+    private void setCookieOnUiThread(final String url, final String cookie,
+            final ValueCallback<Boolean> callback) {
+        runTestOnUiThreadAndCatch(new Runnable() {
+            @Override
+            public void run() {
+                mCookieManager.setCookie(url, cookie, callback);
+            }
+        });
+    }
+
+    private void runTestOnUiThreadAndCatch(Runnable runnable) {
+        try {
+            runTestOnUiThread(runnable);
+        } catch (Throwable t) {
+            fail("Unexpected error while running on UI thread: " + t.getMessage());
+        }
     }
 }
