@@ -93,6 +93,32 @@ public class Camera2PermissionTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Add and remove availability listeners should work without permission.
+     */
+    public void testAvailabilityListener() throws Exception {
+        DummyCameraListener availabilityListener = new DummyCameraListener();
+        // Remove a not-registered listener is a no-op.
+        mCameraManager.removeAvailabilityListener(availabilityListener);
+        mCameraManager.addAvailabilityListener(availabilityListener, mHandler);
+        mCameraManager.removeAvailabilityListener(availabilityListener);
+        mCameraManager.addAvailabilityListener(availabilityListener, mHandler);
+        mCameraManager.addAvailabilityListener(availabilityListener, mHandler);
+        mCameraManager.removeAvailabilityListener(availabilityListener);
+        // Remove a previously-added listener second time is a no-op.
+        mCameraManager.removeAvailabilityListener(availabilityListener);
+    }
+
+    private class DummyCameraListener extends CameraManager.AvailabilityListener {
+        @Override
+        public void onCameraAvailable(String cameraId) {
+        }
+
+        @Override
+        public void onCameraUnavailable(String cameraId) {
+        }
+    }
+
     private void openCamera(String cameraId) throws Exception {
         mCamera = (new BlockingCameraManager(mCameraManager)).openCamera(
                 cameraId, mCameraListener, mHandler);
