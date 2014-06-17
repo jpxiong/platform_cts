@@ -21,7 +21,7 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_JAVA_LIBRARIES := telephony-common
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner guava
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner guava android-ex-camera2
 
 LOCAL_JNI_SHARED_LIBRARIES := libctspermission_jni
 
