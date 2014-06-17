@@ -25,4 +25,11 @@
          android:progress="50"
          android:secondaryProgress="75" />
 
+    <SeekBar
+        android:id="@+id/thumb_tint"
+        android:thumbTint="@android:color/white"
+        android:thumbTintMode="src_over"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

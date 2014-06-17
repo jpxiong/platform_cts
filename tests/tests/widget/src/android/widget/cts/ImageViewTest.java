@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.widget.FrameLayout;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
@@ -437,6 +440,31 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertTrue(mockImageView.verifyDrawable(bgdrawable));
     }
 
+    public void testImageTint() {
+        ImageView inflatedView = (ImageView) mActivity.findViewById(R.id.image_tint);
+
+        assertEquals("Image tint inflated correctly",
+                Color.WHITE, inflatedView.getTint().getDefaultColor());
+        assertEquals("Image tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getTintMode());
+
+        MockDrawable image = new MockDrawable();
+        ImageView view = new ImageView(mActivity);
+
+        view.setImageDrawable(image);
+        assertFalse("No image tint applied by default", image.hasCalledSetTint());
+
+        view.setTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Image tint applied when setTint() called after set()",
+                image.hasCalledSetTint());
+
+        image.reset();
+        view.setImageDrawable(null);
+        view.setImageDrawable(image);
+        assertTrue("Image tint applied when setTint() called before set()",
+                image.hasCalledSetTint());
+    }
+
     private static class MockImageView extends ImageView {
         private boolean mOnSizeChangedCalled = false;
 
@@ -500,6 +528,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     private class MockDrawable extends Drawable {
         private ColorFilter mColorFilter;
         private boolean mDrawCalled = false;
+        private boolean mCalledSetTint = false;
         private int mAlpha;
 
         public boolean hasDrawCalled() {
@@ -536,6 +565,20 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
 
         public boolean isStateful() {
             return true;
+        }
+
+        @Override
+        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
+            super.setTint(tint, tintMode);
+            mCalledSetTint = true;
+        }
+
+        public boolean hasCalledSetTint() {
+            return mCalledSetTint;
+        }
+
+        public void reset() {
+            mCalledSetTint = false;
         }
     }
 }

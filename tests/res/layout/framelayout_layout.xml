@@ -48,4 +48,11 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/foreground_tint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:foregroundTint="@android:color/white"
+        android:foregroundTintMode="src_over" />
+
 </LinearLayout>

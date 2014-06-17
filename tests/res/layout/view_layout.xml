@@ -93,4 +93,11 @@
             android:paddingEnd="8px"
             android:background="@drawable/no_padding" />
 
+    <View
+        android:id="@+id/background_tint"
+        android:backgroundTint="@android:color/white"
+        android:backgroundTintMode="src_over"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

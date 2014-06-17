@@ -16,6 +16,12 @@
 
 package android.widget.cts;
 
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.widget.SeekBar;
 import com.android.cts.stub.R;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -268,6 +274,31 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         assertTrue(myFrameLayout.verifyDrawable(null));
     }
 
+    public void testForegroundTint() {
+        FrameLayout inflatedView = (FrameLayout) mActivity.findViewById(R.id.foreground_tint);
+
+        assertEquals("Foreground tint inflated correctly",
+                Color.WHITE, inflatedView.getForegroundTint().getDefaultColor());
+        assertEquals("Foreground tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getForegroundTintMode());
+
+        MockDrawable foreground = new MockDrawable();
+        FrameLayout view = new FrameLayout(mActivity);
+
+        view.setForeground(foreground);
+        assertFalse("No foreground tint applied by default", foreground.hasCalledSetTint());
+
+        view.setForegroundTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Foreground tint applied when setForegroundTint() called after setForeground()",
+                foreground.hasCalledSetTint());
+
+        foreground.reset();
+        view.setForeground(null);
+        view.setForeground(foreground);
+        assertTrue("Foreground tint applied when setForegroundTint() called before setForeground()",
+                foreground.hasCalledSetTint());
+    }
+
     private static void assertCenterAligned(View container, Drawable drawable) {
         Rect rect = drawable.getBounds();
         int leftDelta = rect.left - container.getLeft();
@@ -283,6 +314,38 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         XmlPullParser parser = mActivity.getResources().getLayout(R.layout.framelayout_layout);
         WidgetTestUtils.beginDocument(parser, "LinearLayout");
         return Xml.asAttributeSet(parser);
+    }
+
+    private static class MockDrawable extends Drawable {
+        private boolean mCalledSetTint = false;
+
+        @Override
+        public void draw(Canvas canvas) {}
+
+        @Override
+        public void setAlpha(int alpha) {}
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {}
+
+        @Override
+        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
+            super.setTint(tint, tintMode);
+            mCalledSetTint = true;
+        }
+
+        @Override
+        public int getOpacity() {
+            return 0;
+        }
+
+        public boolean hasCalledSetTint() {
+            return mCalledSetTint;
+        }
+
+        public void reset() {
+            mCalledSetTint = false;
+        }
     }
 
     private static class MyFrameLayout extends FrameLayout {

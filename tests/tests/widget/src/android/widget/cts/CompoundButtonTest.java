@@ -16,6 +16,13 @@
 
 package android.widget.cts;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.view.LayoutInflater;
+import android.widget.SeekBar;
+import android.widget.ToggleButton;
 import com.android.cts.stub.R;
 
 
@@ -319,6 +326,65 @@ public class CompoundButtonTest extends AndroidTestCase {
         compoundButton.setButtonDrawable(drawable);
         assertTrue(compoundButton.verifyDrawable(null));
         assertTrue(compoundButton.verifyDrawable(drawable));
+    }
+
+    public void testButtonTint() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View layout = inflater.inflate(R.layout.togglebutton_layout, null);
+        CompoundButton inflatedView = (CompoundButton) layout.findViewById(R.id.button_tint);
+
+        assertEquals("Button tint inflated correctly",
+                Color.WHITE, inflatedView.getButtonTint().getDefaultColor());
+        assertEquals("Button tint mode inflated correctly",
+                PorterDuff.Mode.SRC_OVER, inflatedView.getButtonTintMode());
+
+        MockDrawable button = new MockDrawable();
+        CompoundButton view = new ToggleButton(mContext);
+
+        view.setButtonDrawable(button);
+        assertFalse("No button tint applied by default", button.hasCalledSetTint());
+
+        view.setButtonTint(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Button tint applied when setButtonTint() called after setButton()",
+                button.hasCalledSetTint());
+
+        button.reset();
+        view.setButtonDrawable(null);
+        view.setButtonDrawable(button);
+        assertTrue("Button tint applied when setButtonTint() called before setButton()",
+                button.hasCalledSetTint());
+    }
+
+    private static class MockDrawable extends Drawable {
+        private boolean mCalledSetTint = false;
+
+        @Override
+        public void draw(Canvas canvas) {}
+
+        @Override
+        public void setAlpha(int alpha) {}
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {}
+
+        @Override
+        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
+            super.setTint(tint, tintMode);
+            mCalledSetTint = true;
+        }
+
+        @Override
+        public int getOpacity() {
+            return 0;
+        }
+
+        public boolean hasCalledSetTint() {
+            return mCalledSetTint;
+        }
+
+        public void reset() {
+            mCalledSetTint = false;
+        }
     }
 
     private final class MockCompoundButton extends CompoundButton {
