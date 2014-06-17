@@ -33,7 +33,7 @@ public class SeekBarStubActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.seekbar);
+        setContentView(R.layout.seekbar_layout);
 
         View v = findViewById(R.id.seekBar);
         v.setEnabled(true);
