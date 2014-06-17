@@ -5,3 +5,5 @@
 .cproject
 .classpath
 /bin
+.idea/*
+.idea/
