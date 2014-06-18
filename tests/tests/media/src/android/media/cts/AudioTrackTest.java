@@ -1322,6 +1322,16 @@ public class AudioTrackTest extends AndroidTestCase {
         return vai;
     }
 
+    public static float[] createSoundDataInFloatArray(int bufferSize, final int sampleRate,
+            double frequency) {
+        final double rad = 2 * Math.PI * frequency / sampleRate;
+        float[] vaf = new float[bufferSize];
+        for (int j = 0; j < vaf.length; j++) {
+            vaf[j] = (float) (Math.sin(j * rad));
+        }
+        return vaf;
+    }
+
     public void testPlayStreamData() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlayStreamData";
@@ -1357,6 +1367,60 @@ public class AudioTrackTest extends AndroidTestCase {
         Thread.sleep(WAIT_MSEC);
         // -------- tear down --------------
         track.release();
+    }
+
+    public void testPlayStreamFloat() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testPlayStreamFloat";
+        final int TEST_SR_ARRAY[] = {
+                22050,
+                44100,
+                48000,
+        };
+        final int TEST_CONF_ARRAY[] = {
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.CHANNEL_OUT_STEREO,
+        };
+        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_FLOAT;
+        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+
+        double frequency = 800; // frequency changes for each test
+        for (int TEST_SR : TEST_SR_ARRAY) {
+            for (int TEST_CONF : TEST_CONF_ARRAY) {
+                // -------- initialization --------------
+                int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
+                int bufferSize = 3 * minBufferSize;
+                // Note: stereo will have twice the frequency
+                float data[] = createSoundDataInFloatArray(bufferSize, TEST_SR,
+                        frequency);
+                AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
+                        TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
+                // -------- test --------------
+                assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+                boolean hasPlayed = false;
+                int written = 0;
+                while (written < data.length) {
+                    if (data.length - written <= minBufferSize) {
+                        written += track.write(data, written, data.length - written,
+                                AudioTrack.WRITE_BLOCKING);
+                    } else {
+                        written += track.write(data, written, minBufferSize,
+                                AudioTrack.WRITE_BLOCKING);
+                        if (!hasPlayed) {
+                            track.play();
+                            hasPlayed = true;
+                        }
+                    }
+                }
+                Thread.sleep(WAIT_MSEC);
+                track.stop();
+                Thread.sleep(WAIT_MSEC);
+                // -------- tear down --------------
+                track.release();
+                frequency += 200; // increment test tone frequency
+            }
+        }
     }
 
     public void testGetTimestamp() throws Exception {
