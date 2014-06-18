@@ -45,6 +45,10 @@
   bug: 14657953
 },
 {
+  name: "android.app.cts.DialogTest#testTouchEvent",
+  bug: 15455341
+},
+{
   name: "android.database.sqlite.cts.SQLiteQueryBuilderTest#testSetProjectionMap",
   bug: 12475524
 },
