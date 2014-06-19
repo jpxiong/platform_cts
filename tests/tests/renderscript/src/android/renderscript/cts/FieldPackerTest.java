@@ -146,7 +146,7 @@ public class FieldPackerTest extends RSBaseCompute {
             }
         }
 
-        int[] badResetArgs = {-1000, -2, -1, 256, 257, 1000};
+        int[] badResetArgs = {-1000, -2, -1, 257, 1000};
         for (int arg: badResetArgs) {
             try {
                 fp.reset(arg);
