@@ -57,6 +57,11 @@
   bug: 15314696
 },
 {
+  name: "android.location.cts.LocationManagerTest",
+  name: "android.location.cts.LocationProviderTest",
+  bug: 15748237
+},
+{
   name: "android.media.cts.AudioEffectTest",
   bug: 15081808
 },
