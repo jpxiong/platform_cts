@@ -19,6 +19,7 @@ package android.hardware.camera2.cts.testcases;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED;
 
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Environment;
@@ -572,7 +573,12 @@ public class Camera2SurfaceViewTestCase extends
         long[] frameDurationRange =
                 new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
         for (Size size : mOrderedPreviewSizes) {
-            long minDuration = mMinPreviewFrameDurationMap.get(size);
+            Long minDuration = mMinPreviewFrameDurationMap.get(size);
+            if (minDuration == null ||
+                    minDuration == StreamConfigurationMap.NO_MIN_FRAME_DURATION) {
+                throw new IllegalArgumentException(
+                        "No min frame duration available for the selected format.");
+            }
             if (minDuration <= frameDurationRange[0]) {
                 return size;
             }
