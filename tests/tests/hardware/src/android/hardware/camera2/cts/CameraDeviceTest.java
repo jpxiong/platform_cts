@@ -372,7 +372,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             // Test: CameraCaptureSession capture should throw IAE for null request.
             mSession.capture(/*request*/null, /*listener*/null, mHandler);
             mCollector.addMessage(
-                    "CameraDevice capture should throw IllegalArgumentException for null request");
+                    "Session capture should throw IllegalArgumentException for null request");
         } catch (IllegalArgumentException e) {
             // Pass.
         }
@@ -381,7 +381,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             // Test: CameraCaptureSession capture should throw IAE for request
             // without surface configured.
             mSession.capture(unConfiguredRequest, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice capture should throw " +
+            mCollector.addMessage("Session capture should throw " +
                     "IllegalArgumentException for request without surface configured");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -390,7 +390,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         try {
             // Test: CameraCaptureSession setRepeatingRequest should throw IAE for null request.
             mSession.setRepeatingRequest(/*request*/null, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice setRepeatingRequest should throw" +
+            mCollector.addMessage("Session setRepeatingRequest should throw " +
                     "IllegalArgumentException for null request");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -400,7 +400,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             // Test: CameraCaptureSession setRepeatingRequest should throw IAE for for request
             // without surface configured.
             mSession.setRepeatingRequest(unConfiguredRequest, /*listener*/null, mHandler);
-            mCollector.addMessage("Capture zero burst should throw IllegalArgumentException" +
+            mCollector.addMessage("Capture zero burst should throw IllegalArgumentException " +
                     "for request without surface configured");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -409,7 +409,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         try {
             // Test: CameraCaptureSession captureBurst should throw IAE for null request list.
             mSession.captureBurst(/*requests*/null, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice captureBurst should throw" +
+            mCollector.addMessage("Session captureBurst should throw " +
                     "IllegalArgumentException for null request list");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -418,7 +418,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         try {
             // Test: CameraCaptureSession captureBurst should throw IAE for empty request list.
             mSession.captureBurst(emptyRequests, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice captureBurst should throw" +
+            mCollector.addMessage("Session captureBurst should throw " +
                     " IllegalArgumentException for empty request list");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -428,7 +428,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             // Test: CameraCaptureSession captureBurst should throw IAE for request
             // without surface configured.
             mSession.captureBurst(unConfiguredRequests, /*listener*/null, mHandler);
-            fail("CameraDevice captureBurst should throw IllegalArgumentException" +
+            fail("Session captureBurst should throw IllegalArgumentException " +
                     "for null request list");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -437,7 +437,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         try {
             // Test: CameraCaptureSession setRepeatingBurst should throw IAE for null request list.
             mSession.setRepeatingBurst(/*requests*/null, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
+            mCollector.addMessage("Session setRepeatingBurst should throw " +
                     "IllegalArgumentException for null request list");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -446,7 +446,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         try {
             // Test: CameraCaptureSession setRepeatingBurst should throw IAE for empty request list.
             mSession.setRepeatingBurst(emptyRequests, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
+            mCollector.addMessage("Session setRepeatingBurst should throw " +
                     "IllegalArgumentException for empty request list");
         } catch (IllegalArgumentException e) {
             // Pass.
@@ -456,7 +456,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             // Test: CameraCaptureSession setRepeatingBurst should throw IAE for request
             // without surface configured.
             mSession.setRepeatingBurst(unConfiguredRequests, /*listener*/null, mHandler);
-            mCollector.addMessage("CameraDevice setRepeatingBurst should throw" +
+            mCollector.addMessage("Session setRepeatingBurst should throw " +
                     "IllegalArgumentException for request without surface configured");
         } catch (IllegalArgumentException e) {
             // Pass.
