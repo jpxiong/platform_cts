@@ -108,6 +108,13 @@ public class Camera2SurfaceViewTestCase extends
          */
         super.setUp();
         mContext = getActivity();
+        /**
+         * Workaround for mockito and JB-MR2 incompatibility
+         *
+         * Avoid java.lang.IllegalArgumentException: dexcache == null
+         * https://code.google.com/p/dexmaker/issues/detail?id=2
+         */
+        System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
         assertNotNull("Unable to get CameraManager", mCameraManager);
         mCameraIds = mCameraManager.getCameraIdList();

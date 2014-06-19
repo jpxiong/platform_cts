@@ -81,6 +81,15 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        /**
+         * Workaround for mockito and JB-MR2 incompatibility
+         *
+         * Avoid java.lang.IllegalArgumentException: dexcache == null
+         * https://code.google.com/p/dexmaker/issues/detail?id=2
+         */
+        System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
+
         mCameraIds = mCameraManager.getCameraIdList();
         assertNotNull("Camera ids shouldn't be null", mCameraIds);
         mHandlerThread = new HandlerThread(TAG);
