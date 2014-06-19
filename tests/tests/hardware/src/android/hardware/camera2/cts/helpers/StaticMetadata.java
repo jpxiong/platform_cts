@@ -251,7 +251,18 @@ public class StaticMetadata {
      */
     public float getMinimumFocusDistanceChecked() {
         Key<Float> key = CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE;
-        Float minFocusDistance = getValueFromKeyNonNull(key);
+        Float minFocusDistance;
+
+        /**
+         * android.lens.info.minimumFocusDistance - required for FULL and MANUAL_SENSOR-capable
+         *   devices; optional for all other devices.
+         */
+        if (isHardwareLevelFull() || isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            minFocusDistance = getValueFromKeyNonNull(key);
+        } else {
+            minFocusDistance = mCharacteristics.get(key);
+        }
 
         if (minFocusDistance == null) {
             return 0.0f;
@@ -832,7 +843,7 @@ public class StaticMetadata {
         }
         List<Integer> modeList = new ArrayList<Integer>();
         for (int mode : modes) {
-            modeList.add((int)(mode));
+            modeList.add(mode);
         }
         checkTrueForKey(modesKey, "value is empty", !modeList.isEmpty());
 
@@ -1317,6 +1328,27 @@ public class StaticMetadata {
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);*/
         capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
         return capList;
+    }
+
+    /**
+     * Determine whether the current device supports a capability or not.
+     *
+     * @param capability (non-negative)
+     *
+     * @return {@code true} if the capability is supported, {@code false} otherwise.
+     *
+     * @throws IllegalArgumentException if {@code capability} was negative
+     *
+     * @see CameraCharacteristics#REQUEST_AVAILABLE_CAPABILITIES
+     */
+    public boolean isCapabilitySupported(int capability) {
+        if (capability < 0) {
+            throw new IllegalArgumentException("capability must be non-negative");
+        }
+
+        List<Integer> availableCapabilities = getAvailableCapabilitiesChecked();
+
+        return availableCapabilities.contains(capability);
     }
 
     /**
