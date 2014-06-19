@@ -112,17 +112,13 @@ void computeReference_uMax(rs_allocation a, rs_allocation result) {
 
 void __attribute__((kernel)) test_Cas(int32_t v) {
     int tmp = gISum;
-    int retryCount = 10000;
-    while (retryCount && (rsAtomicCas(&gISum, tmp, tmp + 1) != tmp)) {
-        retryCount--;
+    while (rsAtomicCas(&gISum, tmp, tmp + 1) != tmp) {
         tmp = gISum;
     }
 }
 void __attribute__((kernel)) test_uCas(uint32_t v) {
     uint tmp = gUSum;
-    int retryCount = 10000;
-    while (retryCount && (rsAtomicCas(&gUSum, tmp, tmp + 1) != tmp)) {
-        retryCount--;
+    while (rsAtomicCas(&gUSum, tmp, tmp + 1) != tmp) {
         tmp = gUSum;
     }
 }
