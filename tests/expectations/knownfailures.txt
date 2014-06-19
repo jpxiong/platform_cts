@@ -157,6 +157,10 @@
   bug: 15319578
 },
 {
+  name: "android.media.cts.AudioRecordTest#testAudioRecordOP",
+  bug: 15340791
+},
+{
   name: "android.text.cts.BoringLayoutTest#testScale",
   bug: 15134518
 },
