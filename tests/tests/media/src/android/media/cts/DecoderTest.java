@@ -133,6 +133,62 @@ public class DecoderTest extends MediaPlayerTestBase {
                 R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_dash);
     }
 
+    public void testBFrames() throws Exception {
+        testBFrames(R.raw.video_h264_main_b_frames);
+        testBFrames(R.raw.video_h264_main_b_frames_frag);
+    }
+
+    public void testBFrames(int res) throws Exception {
+        AssetFileDescriptor fd = mResources.openRawResourceFd(res);
+        MediaExtractor ex = new MediaExtractor();
+        ex.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+        MediaFormat format = ex.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        assertTrue("not a video track. Wrong test file?", mime.startsWith("video/"));
+        MediaCodec dec = MediaCodec.createDecoderByType(mime);
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        dec.configure(format, s, null, 0);
+        dec.start();
+        ByteBuffer[] buf = dec.getInputBuffers();
+        ex.selectTrack(0);
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        long lastPresentationTimeUsFromExtractor = -1;
+        long lastPresentationTimeUsFromDecoder = -1;
+        boolean inputoutoforder = false;
+        while(true) {
+            int flags = ex.getSampleFlags();
+            long time = ex.getSampleTime();
+            if (time >= 0 && time < lastPresentationTimeUsFromExtractor) {
+                inputoutoforder = true;
+            }
+            lastPresentationTimeUsFromExtractor = time;
+            int bufidx = dec.dequeueInputBuffer(5000);
+            if (bufidx >= 0) {
+                int n = ex.readSampleData(buf[bufidx], 0);
+                if (n < 0) {
+                    flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+                    time = 0;
+                    n = 0;
+                }
+                dec.queueInputBuffer(bufidx, 0, n, time, flags);
+                ex.advance();
+            }
+            int status = dec.dequeueOutputBuffer(info, 5000);
+            if (status >= 0) {
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    break;
+                }
+                assertTrue("out of order timestamp from decoder",
+                        info.presentationTimeUs > lastPresentationTimeUsFromDecoder);
+                dec.releaseOutputBuffer(status, true);
+                lastPresentationTimeUsFromDecoder = info.presentationTimeUs;
+            }
+        }
+        assertTrue("extractor timestamps were ordered, wrong test file?", inputoutoforder);
+        dec.release();
+        ex.release();
+      }
+
     private void testTrackSelection(int resid) throws Exception {
         AssetFileDescriptor fd1 = null;
         try {
