@@ -126,7 +126,7 @@
     <string name="accessibility_text_traversal_test_activity">Accessibility text traversal test</string>
 
     <string name="android_wiki_short">
-        Android is a Linux-based operating</string>
+        Android is a\nLinux-based\noperating</string>
 
     <string name="android_wiki">
         Android is a Linux-based operating system for mobile devices such as smartphones and tablet
