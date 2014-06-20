@@ -18,10 +18,13 @@ package android.provider.cts;
 
 import static android.provider.cts.contacts.ContactUtil.newContentValues;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.OperationApplicationException;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.AggregationExceptions;
 import android.provider.ContactsContract.Contacts;
@@ -32,11 +35,16 @@ import android.provider.cts.contacts.ContactUtil;
 import android.provider.cts.contacts.DatabaseAsserts;
 import android.provider.cts.contacts.RawContactUtil;
 import android.test.AndroidTestCase;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 /**
  * CTS tests for {@link android.provider.ContactsContract.PinnedPositions} API
  */
 public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
+    private static final String TAG = "ContactsContract_PinnedPositionsTest";
+
     private ContentResolver mResolver;
 
     @Override
@@ -50,7 +58,7 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
      * {@link PinnedPositions#STAR_WHEN_PINNING} boolean parameter is set to true, and that the
      * values are correctly propogated to the contact's constituent raw contacts.
      */
-    public void testPinnedPositionsUpdateForceStar() {
+    public void testPinnedPositionsUpdate() {
         final DatabaseAsserts.ContactIdPair i1 = DatabaseAsserts.assertAndCreateContact(mResolver);
         final DatabaseAsserts.ContactIdPair i2 = DatabaseAsserts.assertAndCreateContact(mResolver);
         final DatabaseAsserts.ContactIdPair i3 = DatabaseAsserts.assertAndCreateContact(mResolver);
@@ -72,13 +80,13 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         assertValuesForRawContact(i3.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
         assertValuesForRawContact(i4.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
 
-        final ContentValues values =
-                newContentValues(i1.mContactId, 1, i3.mContactId, 3, i4.mContactId, 2);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon()
-                .appendQueryParameter(PinnedPositions.STAR_WHEN_PINNING, "true").build(),
-                values, null, null);
+        final ArrayList<ContentProviderOperation> operations =
+                new ArrayList<ContentProviderOperation>();
+        operations.add(newPinningOperation(i1.mContactId, 1, true));
+        operations.add(newPinningOperation(i3.mContactId, 3, true));
+        operations.add(newPinningOperation(i4.mContactId, 2, false));
+        applyBatch(mResolver, operations);
 
-        // Pinning a contact should automatically star it if we specified the boolean parameter.
         assertValuesForContact(i1.mContactId,
                 newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 1));
         assertValuesForContact(i2.mContactId,
@@ -86,7 +94,7 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         assertValuesForContact(i3.mContactId,
                 newContentValues(Contacts.PINNED, 3, Contacts.STARRED, 1));
         assertValuesForContact(i4.mContactId,
-                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 1));
+                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 0));
 
         // Make sure the values are propagated to raw contacts.
         assertValuesForRawContact(i1.mRawContactId, newContentValues(RawContacts.PINNED, 1));
@@ -94,12 +102,12 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         assertValuesForRawContact(i3.mRawContactId, newContentValues(RawContacts.PINNED, 3));
         assertValuesForRawContact(i4.mRawContactId, newContentValues(RawContacts.PINNED, 2));
 
-        final ContentValues unpin = newContentValues(i3.mContactId, unpinned);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon()
-                .appendQueryParameter(PinnedPositions.STAR_WHEN_PINNING, "true").build(),
-                unpin, null, null);
+        operations.clear();
 
-        // Unpinning a contact should automatically unstar it.
+        // Now unpin the contact
+        operations.add(newPinningOperation(i3.mContactId, unpinned, false));
+        applyBatch(mResolver, operations);
+
         assertValuesForContact(i1.mContactId,
                 newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 1));
         assertValuesForContact(i2.mContactId,
@@ -107,7 +115,7 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         assertValuesForContact(i3.mContactId,
                 newContentValues(Contacts.PINNED, unpinned, Contacts.STARRED, 0));
         assertValuesForContact(i4.mContactId,
-                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 1));
+                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 0));
 
         assertValuesForRawContact(i1.mRawContactId,
                 newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 1));
@@ -116,149 +124,7 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         assertValuesForRawContact(i3.mRawContactId,
                 newContentValues(RawContacts.PINNED, unpinned, RawContacts.STARRED, 0));
         assertValuesForRawContact(i4.mRawContactId,
-                newContentValues(RawContacts.PINNED, 2, RawContacts.STARRED, 1));
-
-        ContactUtil.delete(mResolver, i1.mContactId);
-        ContactUtil.delete(mResolver, i2.mContactId);
-        ContactUtil.delete(mResolver, i3.mContactId);
-        ContactUtil.delete(mResolver, i4.mContactId);
-    }
-
-    /**
-     * Tests that the ContactsProvider does not automatically star/unstar a pinned/unpinned contact
-     * if {@link PinnedPositions#STAR_WHEN_PINNING} boolean parameter not set to true or not
-     * provided.
-     */
-    public void testPinnedPositionsUpdateDontForceStar() {
-        final DatabaseAsserts.ContactIdPair i1 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i2 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i3 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i4 = DatabaseAsserts.assertAndCreateContact(mResolver);
-
-        final int unpinned = PinnedPositions.UNPINNED;
-
-        final ContentValues values =
-                newContentValues(i1.mContactId, 1, i3.mContactId, 3, i4.mContactId, 2);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI, values, null, null);
-
-        // Pinning a contact should not automatically star it since we didn't specify the
-        // STAR_WHEN_PINNING boolean parameter.
-        assertValuesForContact(i1.mContactId,
-                newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 0));
-        assertValuesForContact(i2.mContactId,
-                newContentValues(Contacts.PINNED, unpinned, Contacts.STARRED, 0));
-        assertValuesForContact(i3.mContactId,
-                newContentValues(Contacts.PINNED, 3, Contacts.STARRED, 0));
-        assertValuesForContact(i4.mContactId,
-                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 0));
-
-        // Make sure the values are propagated to raw contacts.
-        assertValuesForRawContact(i1.mRawContactId,
-                newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i2.mRawContactId,
-                newContentValues(RawContacts.PINNED, unpinned, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i3.mRawContactId,
-                newContentValues(RawContacts.PINNED, 3, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i4.mRawContactId,
                 newContentValues(RawContacts.PINNED, 2, RawContacts.STARRED, 0));
-
-        // Manually star contact 3.
-        assertEquals(1,
-                updateItemForContact(Contacts.CONTENT_URI, i3.mContactId, Contacts.STARRED, "1"));
-
-        // Check the third contact and raw contact is starred.
-        assertValuesForContact(i1.mContactId,
-                newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 0));
-        assertValuesForContact(i2.mContactId,
-                newContentValues(Contacts.PINNED, unpinned, Contacts.STARRED, 0));
-        assertValuesForContact(i3.mContactId,
-                newContentValues(Contacts.PINNED, 3, Contacts.STARRED, 1));
-        assertValuesForContact(i4.mContactId,
-                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 0));
-
-        assertValuesForRawContact(i1.mRawContactId,
-                newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i2.mRawContactId,
-                newContentValues(RawContacts.PINNED, unpinned, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i3.mRawContactId,
-                newContentValues(RawContacts.PINNED, 3, RawContacts.STARRED, 1));
-        assertValuesForRawContact(i4.mRawContactId,
-                newContentValues(RawContacts.PINNED, 2, RawContacts.STARRED, 0));
-
-        final ContentValues unpin = newContentValues(i3.mContactId, unpinned);
-
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI, unpin, null, null);
-
-        // Unpinning a contact should not automatically unstar it.
-        assertValuesForContact(i1.mContactId,
-                newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 0));
-        assertValuesForContact(i2.mContactId,
-                newContentValues(Contacts.PINNED, unpinned, Contacts.STARRED, 0));
-        assertValuesForContact(i3.mContactId,
-                newContentValues(Contacts.PINNED, unpinned, Contacts.STARRED, 1));
-        assertValuesForContact(i4.mContactId,
-                newContentValues(Contacts.PINNED, 2, Contacts.STARRED, 0));
-
-        assertValuesForRawContact(i1.mRawContactId,
-                newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i2.mRawContactId,
-                newContentValues(RawContacts.PINNED, unpinned, RawContacts.STARRED, 0));
-        assertValuesForRawContact(i3.mRawContactId,
-                newContentValues(RawContacts.PINNED, unpinned, RawContacts.STARRED, 1));
-        assertValuesForRawContact(i4.mRawContactId,
-                newContentValues(RawContacts.PINNED, 2, RawContacts.STARRED, 0));
-
-        ContactUtil.delete(mResolver, i1.mContactId);
-        ContactUtil.delete(mResolver, i2.mContactId);
-        ContactUtil.delete(mResolver, i3.mContactId);
-        ContactUtil.delete(mResolver, i4.mContactId);
-    }
-
-    /**
-     * Tests that updating the ContactsProvider with illegal pinned position correctly
-     * throws an IllegalArgumentException.
-     */
-    public void testPinnedPositionsUpdateIllegalValues() {
-        final DatabaseAsserts.ContactIdPair i1 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i2 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i3 = DatabaseAsserts.assertAndCreateContact(mResolver);
-        final DatabaseAsserts.ContactIdPair i4 = DatabaseAsserts.assertAndCreateContact(mResolver);
-
-        final int unpinned = PinnedPositions.UNPINNED;
-
-        assertValuesForContact(i1.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i2.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i3.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i4.mContactId, newContentValues(Contacts.PINNED, unpinned));
-
-        // Unsupported string should throw an IllegalArgumentException.
-        final ContentValues values = newContentValues(i1.mContactId, 1, i3.mContactId, 3,
-                i4.mContactId, "undemotemeplease!");
-        try {
-            mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI, values, null, null);
-            fail("Pinned position must be an integer.");
-        } catch (IllegalArgumentException expected) {
-        }
-
-        // Unsupported pinned position (e.g. float value) should throw an IllegalArgumentException.
-        final ContentValues values2 = newContentValues(i1.mContactId, "1.1");
-        try {
-            mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI, values2, null, null);
-            fail("Pinned position must be an integer");
-        } catch (IllegalArgumentException expected) {
-        }
-
-        // Nothing should have been changed.
-
-        assertValuesForContact(i1.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i2.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i3.mContactId, newContentValues(Contacts.PINNED, unpinned));
-        assertValuesForContact(i4.mContactId, newContentValues(Contacts.PINNED, unpinned));
-
-        assertValuesForRawContact(i1.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
-        assertValuesForRawContact(i2.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
-        assertValuesForRawContact(i3.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
-        assertValuesForRawContact(i4.mRawContactId, newContentValues(RawContacts.PINNED, unpinned));
 
         ContactUtil.delete(mResolver, i1.mContactId);
         ContactUtil.delete(mResolver, i2.mContactId);
@@ -278,11 +144,16 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         final DatabaseAsserts.ContactIdPair i5 = DatabaseAsserts.assertAndCreateContact(mResolver);
         final DatabaseAsserts.ContactIdPair i6 = DatabaseAsserts.assertAndCreateContact(mResolver);
 
-        final ContentValues values = newContentValues(i1.mContactId, 1, i2.mContactId, 2,
-                i3.mContactId, 3, i5.mContactId, 5, i6.mContactId, 6);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon()
-                .appendQueryParameter(PinnedPositions.STAR_WHEN_PINNING, "true").build(),
-                values, null, null);
+        final ArrayList<ContentProviderOperation> operations =
+                new ArrayList<ContentProviderOperation>();
+
+        operations.add(newPinningOperation(i1.mContactId, 1, true));
+        operations.add(newPinningOperation(i2.mContactId, 2, true));
+        operations.add(newPinningOperation(i3.mContactId, 3, true));
+        operations.add(newPinningOperation(i5.mContactId, 5, true));
+        operations.add(newPinningOperation(i6.mContactId, 6, true));
+
+        applyBatch(mResolver, operations);
 
         // Aggregate raw contact 1 and 4 together.
         ContactUtil.setAggregationException(mResolver, AggregationExceptions.TYPE_KEEP_TOGETHER,
@@ -349,9 +220,9 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
                 newContentValues(RawContacts.PINNED, 6, RawContacts.STARRED, 1));
 
         // Now demote contact 5.
-        final ContentValues cv = newContentValues(i5.mContactId, PinnedPositions.DEMOTED);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon().build(),
-                cv, null, null);
+        operations.clear();
+        operations.add(newPinningOperation(i5.mContactId, PinnedPositions.DEMOTED, false));
+        applyBatch(mResolver, operations);
 
         // Get new contact Ids for contacts composing of raw contacts 1 and 4 because they have
         // changed.
@@ -382,6 +253,37 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
     }
 
     /**
+     * Tests that calling {@link PinnedPositions#UNDEMOTE_METHOD} with an illegal argument correctly
+     * throws an IllegalArgumentException.
+     */
+    public void testPinnedPositionsDemoteIllegalArguments() {
+        try {
+            mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
+                    null, null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
+                    "1.1", null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
+                    "NotANumber", null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        // Valid contact ID that does not correspond to an actual contact is silently ignored
+        mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD, "999",
+                null);
+    }
+
+    /**
      * Tests that pinned positions are correctly handled for contacts that have been demoted
      * or undemoted.
      */
@@ -389,13 +291,12 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         final DatabaseAsserts.ContactIdPair i1 = DatabaseAsserts.assertAndCreateContact(mResolver);
         final DatabaseAsserts.ContactIdPair i2 = DatabaseAsserts.assertAndCreateContact(mResolver);
 
-        final ContentValues values =
-                newContentValues(i1.mContactId, 0, i2.mContactId, PinnedPositions.DEMOTED);
-
-        // Pin contact 1 and demote contact 2.
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon().
-                appendQueryParameter(PinnedPositions.STAR_WHEN_PINNING, "true").
-                build(), values, null, null);
+        // Pin contact 1 and demote contact 2
+        final ArrayList<ContentProviderOperation> operations =
+                new ArrayList<ContentProviderOperation>();
+        operations.add(newPinningOperation(i1.mContactId, 0, true));
+        operations.add(newPinningOperation(i2.mContactId, PinnedPositions.DEMOTED, false));
+        applyBatch(mResolver, operations);
 
         assertValuesForContact(i1.mContactId,
                 newContentValues(Contacts.PINNED, 0, Contacts.STARRED, 1));
@@ -408,10 +309,10 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
                 newContentValues(RawContacts.PINNED, PinnedPositions.DEMOTED, RawContacts.STARRED, 0));
 
         // Now undemote both contacts.
-        final ContentValues values2 = newContentValues(i1.mContactId, PinnedPositions.UNDEMOTE,
-                i2.mContactId, PinnedPositions.UNDEMOTE);
-        mResolver.update(ContactsContract.PinnedPositions.UPDATE_URI.buildUpon().
-                build(), values2, null, null);
+        mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
+                String.valueOf(i1.mContactId), null);
+        mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
+                String.valueOf(i2.mContactId), null);
 
         // Contact 1 remains pinned at 0, while contact 2 becomes unpinned.
         assertValuesForContact(i1.mContactId,
@@ -484,6 +385,25 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         ContentValues values = new ContentValues();
         CommonDatabaseUtils.extrasVarArgsToValues(values, extras);
         return mResolver.update(uri, values, null, null);
+    }
+
+    private ContentProviderOperation newPinningOperation(long id, int pinned, boolean star) {
+        final Uri uri = Uri.withAppendedPath(Contacts.CONTENT_URI, String.valueOf(id));
+        final ContentValues values = new ContentValues();
+        values.put(Contacts.PINNED, pinned);
+        values.put(Contacts.STARRED, star ? 1 : 0);
+        return ContentProviderOperation.newUpdate(uri).withValues(values).build();
+    }
+
+    private static void applyBatch(ContentResolver resolver,
+            ArrayList<ContentProviderOperation> operations) {
+        try {
+            resolver.applyBatch(ContactsContract.AUTHORITY, operations);
+        } catch (OperationApplicationException e) {
+            Log.wtf(TAG, "ContentResolver batch operation failed.");
+        } catch (RemoteException e) {
+            Log.wtf(TAG, "Remote exception when performing batch operation.");
+        }
     }
 }
 
