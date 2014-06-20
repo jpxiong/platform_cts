@@ -161,23 +161,30 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     private void verifyPreviewTargetFpsRange(SimpleCaptureListener resultListener,
             int numFramesVerified, Range<Integer> fpsRange, Size previewSz) {
         CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-        long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
-        long[] frameDurationRange =
-                new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
-        mCollector.expectInRange(
-                "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
-                frameDuration, (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
-                (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
-        long expTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
-        mCollector.expectTrue(String.format("Exposure time %d must be no larger than frame"
-                + "duration %d", expTime, frameDuration), expTime <= frameDuration);
+        List<Integer> capabilities = mStaticInfo.getAvailableCapabilitiesChecked();
 
-        Long minFrameDuration = mMinPreviewFrameDurationMap.get(previewSz);
-        boolean findDuration = mCollector.expectTrue("Unable to find minFrameDuration for size "
-                + previewSz.toString(), minFrameDuration != null);
-        if (findDuration) {
-            mCollector.expectTrue("Frame duration " + frameDuration + " must be no smaller than"
-                    + " minFrameDuration " + minFrameDuration, frameDuration >= minFrameDuration);
+        if (capabilities.contains(CaptureRequest.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+            long[] frameDurationRange =
+                    new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
+            mCollector.expectInRange(
+                    "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
+                    frameDuration, (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
+                    (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
+            long expTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+            mCollector.expectTrue(String.format("Exposure time %d must be no larger than frame"
+                    + "duration %d", expTime, frameDuration), expTime <= frameDuration);
+
+            Long minFrameDuration = mMinPreviewFrameDurationMap.get(previewSz);
+            boolean findDuration = mCollector.expectTrue("Unable to find minFrameDuration for size "
+                    + previewSz.toString(), minFrameDuration != null);
+            if (findDuration) {
+                mCollector.expectTrue("Frame duration " + frameDuration + " must be no smaller than"
+                        + " minFrameDuration " + minFrameDuration, frameDuration >= minFrameDuration);
+            }
+        } else {
+            Log.i(TAG, "verifyPreviewTargetFpsRange - MANUAL_SENSOR control is not supported," +
+                    " skipping duration and exposure time check.");
         }
     }
 
