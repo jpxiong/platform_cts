@@ -574,6 +574,10 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
             assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
                                         props);
 
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
             {
 
                 assertNotNull("Invalid property: android.lens.info.minimumFocusDistance",
