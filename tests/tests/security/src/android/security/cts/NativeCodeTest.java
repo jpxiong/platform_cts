@@ -45,6 +45,14 @@ public class NativeCodeTest extends TestCase {
         assertEquals(0, result);
     }
 
+    public void testFutex() throws Exception {
+        assertTrue("Device is vulnerable to CVE-2014-3153, a vulnerability in the futex() system "
+                   + "call. Please apply the security patch at "
+                   + "https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/"
+                   + "?id=e9c243a5a6de0be8e584c604d353412584b592f8",
+                   doFutexTest());
+    }
+
     /**
      * Returns true iff this device is vulnerable to CVE-2013-2094.
      * A patch for CVE-2013-2094 can be found at
@@ -84,6 +92,17 @@ public class NativeCodeTest extends TestCase {
     public void testCVE20141710() throws Exception {
         assertTrue("Device is vulnerable to CVE-2014-1710", doCVE20141710Test());
     }
+
+    /**
+     * ANDROID-15455425 / CVE-2014-3153
+     *
+     * Returns true if the device is patched against the futex() system call vulnerability.
+     *
+     * More information on this vulnerability is at http://seclists.org/oss-sec/2014/q2/467 and
+     * the patch is at:
+     * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=e9c243a5a6de0be8e584c604d353412584b592f8
+     */
+    private static native boolean doFutexTest();
 
     /**
      * Returns true if the device is immune to CVE-2014-1710,
