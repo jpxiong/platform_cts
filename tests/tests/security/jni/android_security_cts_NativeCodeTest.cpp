@@ -294,6 +294,34 @@ static jint android_security_cts_NativeCodeTest_doSockDiagTest(JNIEnv* env, jobj
     return UNKNOWN_ERROR;
 }
 
+/* This isn't defined in linux/futex.h on JB */
+#define FUTEX_CMP_REQUEUE_PI    12
+
+static inline int futex_syscall(volatile int* uaddr, int op, int val, const struct timespec* ts,
+                                volatile int* uaddr2, int val3) {
+    return syscall(__NR_futex, uaddr, op, val, ts, uaddr2, val3);
+}
+
+/*
+ * Test for vulnerability to CVE-2014-3153, a bug in the futex() syscall that can
+ * lead to privilege escalation and was used by the towelroot exploit. Returns true
+ * if device is patched, false if still vulnerable.
+ */
+static jboolean android_security_cts_NativeCodeTest_doFutexTest(JNIEnv*, jobject)
+{
+    jboolean result = false;
+
+    int futex = 1;
+    int ret;
+
+    /* The patch will reject FUTEX_CMP_REQUEUE_PI calls where addr == addr2, so
+     * that's what we're checking for - they're both &futex. Patched systems will
+     * return -1 and set errno to 22 (EINVAL), vulnerable systems will return 0.
+     */
+    ret = futex_syscall(&futex, FUTEX_CMP_REQUEUE_PI, 1, NULL, &futex, 0);
+    return (ret == -1 && errno == EINVAL);
+}
+
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doPerfEventTest },
@@ -305,6 +333,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_NativeCodeTest_doVrootTest },
     {  "doCVE20141710Test", "()Z",
             (void *) android_security_cts_NativeCodeTest_doCVE20141710Test },
+    {  "doFutexTest", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doFutexTest },
 };
 
 int register_android_security_cts_NativeCodeTest(JNIEnv* env)
