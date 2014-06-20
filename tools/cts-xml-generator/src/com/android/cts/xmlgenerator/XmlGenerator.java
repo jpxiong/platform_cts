@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -72,9 +73,12 @@ class XmlGenerator {
     /** ExpectationStore to filter out known failures. */
     private final ExpectationStore mExpectations;
 
+    private final Map<String, String> mAdditionalAttributes;
+
     XmlGenerator(ExpectationStore expectations, String appNameSpace, String appPackageName,
             String name, String runner, String targetBinaryName, String targetNameSpace,
-            String jarPath, String testType, String outputPath) {
+            String jarPath, String testType, String outputPath,
+            Map<String, String> additionalAttributes) {
         mAppNamespace = appNameSpace;
         mAppPackageName = appPackageName;
         mName = name;
@@ -85,6 +89,7 @@ class XmlGenerator {
         mTestType = testType;
         mOutputPath = outputPath;
         mExpectations = expectations;
+        mAdditionalAttributes = additionalAttributes;
     }
 
     public void writePackageXml() throws IOException {
@@ -131,6 +136,10 @@ class XmlGenerator {
 
         if (mJarPath != null) {
             writer.append(" jarPath=\"").append(mJarPath).append("\"");
+        }
+
+        for (Map.Entry<String, String> entry : mAdditionalAttributes.entrySet()) {
+            writer.append(String.format(" %s=\"%s\"", entry.getKey(), entry.getValue()));
         }
 
         writer.println(" version=\"1.0\">");

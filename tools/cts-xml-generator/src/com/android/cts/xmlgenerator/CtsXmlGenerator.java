@@ -24,7 +24,9 @@ import vogar.ModeId;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,7 +38,7 @@ public class CtsXmlGenerator {
         System.err.println("Arguments: " + Arrays.asList(args));
         System.err.println("Usage: cts-xml-generator -p PACKAGE_NAME -n NAME [-t TEST_TYPE]"
                 + " [-j JAR_PATH] [-i INSTRUMENTATION] [-m MANIFEST_FILE] [-e EXPECTATION_FILE]"
-                + " [-o OUTPUT_FILE]");
+                + " [-o OUTPUT_FILE] [-a APP_NAME_SPACE] [-x ADDITIONAL_ATTRIBUTE_KEY->VALUE]");
         System.exit(1);
     }
 
@@ -51,6 +53,7 @@ public class CtsXmlGenerator {
         String jarPath = null;
         String appNameSpace = null;
         String targetNameSpace = null;
+        Map<String, String> additionalAttributes = new HashMap<String, String>();
 
         for (int i = 0; i < args.length; i++) {
             if ("-p".equals(args[i])) {
@@ -74,6 +77,20 @@ public class CtsXmlGenerator {
                 appNameSpace =  getArg(args, ++i, "Missing value for app name space");
             } else if ("-r".equals(args[i])) {
                 targetNameSpace =  getArg(args, ++i, "Missing value for target name space");
+            } else if ("-x".equals(args[i])) {
+                String value = getArg(args, ++i, "Missing value for additional attribute");
+                String[] tokens = value.split("->");
+                if (tokens.length != 2) {
+                    System.err.println(
+                            "For specifying additional attributes; use the format KEY->VALUE");
+                    usage(args);
+                }
+                if (additionalAttributes.containsKey(tokens[0])) {
+                    System.err.println(String.format(
+                            "Additional attribute %s has already been specified", tokens[0]));
+                    usage(args);
+                }
+                additionalAttributes.put(tokens[0], tokens[1]);
             } else {
                 System.err.println("Unsupported flag: " + args[i]);
                 usage(args);
@@ -103,7 +120,8 @@ public class CtsXmlGenerator {
 
         ExpectationStore store = ExpectationStore.parse(expectationFiles, ModeId.DEVICE);
         XmlGenerator generator = new XmlGenerator(store, appNameSpace, appPackageName,
-                name, runner, instrumentation, targetNameSpace, jarPath, testType, outputPath);
+                name, runner, instrumentation, targetNameSpace, jarPath, testType, outputPath,
+                additionalAttributes);
         generator.writePackageXml();
     }
 
