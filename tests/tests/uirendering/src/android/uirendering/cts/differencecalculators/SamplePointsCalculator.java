@@ -16,32 +16,35 @@
 package android.uirendering.cts.differencecalculators;
 
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
+import android.util.Log;
 
 /**
- * This calculator counts the number of pixels that are different amongs the two images. If the
- * number of pixels is under a certain percentile then it will pass.
+ * This class will test specific points, and ensure that they match up perfectly with the input colors
  */
-public class DifferentPixelCalculator implements DifferenceCalculator{
-    private final float MAX_PERCENT = .1f;
+public class SamplePointsCalculator extends DifferenceCalculator {
+    private Point[] mTestPoints;
+    private int[] mExpectedColors;
+
+    public SamplePointsCalculator(Point[] testPoints, int[] expectedColors) {
+        mTestPoints = testPoints;
+        mExpectedColors = expectedColors;
+    }
 
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
-        int count = 0;
-
-        for (int i = 0 ; i < height ; i++) {
-            for (int j = 0 ; j < width ; j++) {
-                int index = offset + (i * stride) + j;
-                if (ideal[index] != given[index]) {
-                    count++;
-                }
+        for (int i = 0 ; i < mTestPoints.length; i++) {
+            int xPos = mTestPoints[i].x;
+            int yPos = mTestPoints[i].y;
+            int index = indexFromXAndY(xPos, yPos, stride, offset);
+            if (ideal[index] != mExpectedColors[i] || given[index] != mExpectedColors[i]) {
+                return false;
             }
         }
-
-        float percent = ((count) * 1.0f / (width * height));
-        return (percent < MAX_PERCENT);
+        return true;
     }
 
     @Override

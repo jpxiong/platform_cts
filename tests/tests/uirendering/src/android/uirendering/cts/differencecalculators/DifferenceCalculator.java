@@ -22,7 +22,7 @@ import android.renderscript.RenderScript;
 /**
  * This abstract class can be used by the tester to implement their own comparison methods
  */
-public interface DifferenceCalculator{
+public abstract class DifferenceCalculator{
     /**
      * Compares the two bitmaps given using Java.
      * @param offset where in the bitmaps to start
@@ -31,14 +31,21 @@ public interface DifferenceCalculator{
      * @param height the height of the subsection being tested
      * @return
      */
-    public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
+    public abstract boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height);
 
     /**
      * Compare the two bitmaps using RenderScript code.
      * @return if the method deems the two images are similar enough then the result is true
      */
-    public boolean verifySameRS(Resources resources, Allocation ideal,
+    public abstract boolean verifySameRS(Resources resources, Allocation ideal,
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript);
+
+    /**
+     * This calculates the position in an array that would represent a bitmap given the parameters.
+     */
+    protected static int indexFromXAndY(int x, int y, int stride, int offset) {
+        return x + (y * stride) + offset;
+    }
 }

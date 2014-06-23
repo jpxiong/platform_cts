@@ -17,27 +17,34 @@ package android.uirendering.cts.differencecalculators;
 
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
-import android.util.Log;
 
 /**
  * Uses the Peak Signal-to-Noise Ratio approach to determine if two images are considered the same.
  */
-public class PSNRCalculator implements DifferenceCalculator{
+public class PSNRCalculator extends DifferenceCalculator {
     private final float MAX = 255;
-    private final float MIN_PSNR = 20;
     private final int REGION_SIZE = 10;
+
+    private float mThreshold;
+
+    /**
+     * @param threshold the PSNR necessary to pass the test, if the calculated PSNR is below this
+     *                  value, then the test will fail.
+     */
+    public PSNRCalculator(float threshold) {
+        mThreshold = threshold;
+    }
 
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
         float MSE = 0f;
         int interestingRegions = 0;
-        for (int i = 0 ; i < height ; i += REGION_SIZE) {
-            for (int j = 0 ; j < width ; j += REGION_SIZE) {
-                int index = offset + (i * stride) + j;
+        for (int y = 0 ; y < height ; y += REGION_SIZE) {
+            for (int x = 0 ; x < width ; x += REGION_SIZE) {
+                int index = indexFromXAndY(x, y, stride, offset);
                 if (inspectRegion(ideal, index)) {
                     interestingRegions++;
                 }
@@ -48,9 +55,9 @@ public class PSNRCalculator implements DifferenceCalculator{
             return true;
         }
 
-        for (int i = 0 ; i < height ; i += REGION_SIZE) {
-            for (int j = 0 ; j < width ; j += REGION_SIZE) {
-                int index = offset + (i * stride) + j;
+        for (int y = 0 ; y < height ; y += REGION_SIZE) {
+            for (int x = 0 ; x < width ; x += REGION_SIZE) {
+                int index = indexFromXAndY(x, y, stride, offset);
                 if (ideal[index] == given[index]) {
                     continue;
                 }
@@ -68,9 +75,7 @@ public class PSNRCalculator implements DifferenceCalculator{
         fraction = (float) Math.log(fraction);
         fraction *= 10;
 
-        Log.d(CanvasCompareActivityTest.TAG_NAME, "PSNR : " + fraction);
-
-        return (fraction > MIN_PSNR);
+        return (fraction > mThreshold);
     }
 
     private boolean inspectRegion(int[] ideal, int index) {

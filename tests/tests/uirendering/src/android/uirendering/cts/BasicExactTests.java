@@ -158,7 +158,6 @@ public class BasicExactTests extends CanvasCompareActivityTest {
                 canvas.drawText(testString, 30, 50, p);
             }
         };
-
         executeCanvasTest(canvasClient, mBitmapComparer);
     }
 
