@@ -19,20 +19,13 @@ package android.uirendering.cts;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencecalculators.ExactComparer;
 import android.test.suitebuilder.annotation.SmallTest;
 
-/*
-    First test class that will be the start of the graphics hardware testing.
- */
 public class BasicExactTests extends CanvasCompareActivityTest {
-    private DifferenceCalculator mBitmapComparer;
-
-    public BasicExactTests() {
-        super();
-        mBitmapComparer = new ExactComparer();
-    }
+    private final DifferenceCalculator mBitmapComparer = new ExactComparer();
 
     @SmallTest
     public void testBlueRect() {
@@ -162,6 +155,19 @@ public class BasicExactTests extends CanvasCompareActivityTest {
                 p.setColor(Color.WHITE);
                 p.setStrokeWidth(5);
                 canvas.drawText(testString, 30, 50, p);
+            }
+        };
+
+        executeCanvasTest(canvasClient, mBitmapComparer);
+    }
+
+    @SmallTest
+    public void testBasicColorXfermode() {
+        CanvasClient canvasClient = new CanvasClient() {
+            @Override
+            public void draw(Canvas canvas, int width, int height) {
+                canvas.drawColor(Color.GRAY);
+                canvas.drawColor(Color.BLUE, PorterDuff.Mode.MULTIPLY);
             }
         };
 
