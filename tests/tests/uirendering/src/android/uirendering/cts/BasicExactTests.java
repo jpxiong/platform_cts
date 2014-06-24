@@ -16,13 +16,14 @@
 
 package android.uirendering.cts;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencecalculators.ExactComparer;
-import android.test.suitebuilder.annotation.SmallTest;
 
 public class BasicExactTests extends CanvasCompareActivityTest {
     private final DifferenceCalculator mBitmapComparer = new ExactComparer();
@@ -172,5 +173,23 @@ public class BasicExactTests extends CanvasCompareActivityTest {
         };
 
         executeCanvasTest(canvasClient, mBitmapComparer);
+    }
+
+    /**
+     * Ensure that both render paths are producing independent output. We do this
+     * by verifying that two paths that should render differently *do* render
+     * differently.
+     */
+    @SmallTest
+    public void testRenderSpecIsolation() {
+        CanvasClient canvasClient = new CanvasClient() {
+            @Override
+            public void draw(Canvas canvas, int width, int height) {
+                canvas.drawColor(canvas.isHardwareAccelerated() ? Color.WHITE : Color.BLACK);
+            }
+        };
+        Bitmap softwareCapture = captureRenderSpec(0, canvasClient, false);
+        Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, true);
+        assertFalse(compareBitmaps(softwareCapture, hardwareCapture, new ExactComparer()));
     }
 }

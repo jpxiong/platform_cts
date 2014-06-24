@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -34,7 +33,6 @@ public class DrawActivity extends Activity {
 
     private Handler mHandler;
     private View mView;
-    private DrawCounterListener mOnDrawListener;
 
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -44,10 +42,6 @@ public class DrawActivity extends Activity {
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         mView = parent;
-        if (mView != null) {
-            mOnDrawListener = new DrawCounterListener();
-            mView.getViewTreeObserver().addOnPreDrawListener(mOnDrawListener);
-        }
         return super.onCreateView(parent, name, context, attrs);
     }
 
@@ -89,14 +83,16 @@ public class DrawActivity extends Activity {
             }
             mView.setLayerType(message.arg2, null);
 
-            mOnDrawListener.resetDraws();
+            DrawCounterListener onDrawListener = new DrawCounterListener();
+
+            mView.getViewTreeObserver().addOnPreDrawListener(onDrawListener);
 
             mView.postInvalidate();
         }
     }
 
     private class DrawCounterListener implements ViewTreeObserver.OnPreDrawListener {
-        private static final int MIN_NUMBER_OF_DRAWS = 10;
+        private static final int MIN_NUMBER_OF_DRAWS = 5;
         private int mCurrentDraws = 0;
 
         @Override
@@ -108,12 +104,9 @@ public class DrawActivity extends Activity {
                 synchronized (mLock) {
                     mLock.notify();
                 }
+                mView.getViewTreeObserver().removeOnPreDrawListener(this);
             }
             return true;
-        }
-
-        public void resetDraws() {
-            mCurrentDraws = 0;
         }
     }
 }

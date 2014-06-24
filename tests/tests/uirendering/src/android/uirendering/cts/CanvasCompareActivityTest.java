@@ -101,14 +101,8 @@ public abstract class CanvasCompareActivityTest extends
      * test.
      */
     protected void executeLayoutTest(int layoutResID, DifferenceCalculator comparer) {
-        getActivity().enqueueRenderSpecAndWait(layoutResID, null, false);
-
-        Bitmap softwareCapture = takeScreenshot();
-
-        getActivity().enqueueRenderSpecAndWait(layoutResID, null, true);
-
-        Bitmap hardwareCapture = takeScreenshot();
-
+        Bitmap softwareCapture = captureRenderSpec(layoutResID, null, false);
+        Bitmap hardwareCapture = captureRenderSpec(layoutResID, null, true);
         assertTrue(compareBitmaps(softwareCapture, hardwareCapture, comparer));
     }
 
@@ -118,35 +112,25 @@ public abstract class CanvasCompareActivityTest extends
      * screen cap, hardware screen cap, and difference map using the test name
      */
     protected void executeCanvasTest(CanvasClient canvasClient, DifferenceCalculator comparer) {
-        getActivity().enqueueRenderSpecAndWait(0, canvasClient, false);
-
-        Bitmap softwareCapture = takeScreenshot();
-
-        getActivity().enqueueRenderSpecAndWait(0, canvasClient, true);
-
-        Bitmap hardwareCapture = takeScreenshot();
-
+        Bitmap softwareCapture = captureRenderSpec(0, canvasClient, false);
+        Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, true);
         assertTrue(compareBitmaps(softwareCapture, hardwareCapture, comparer));
     }
 
-    protected void executeMultipleCanvasTest(CanvasClient canvasClient1, CanvasClient canvasClient2,
-            DifferenceCalculator calculator) {
-        getActivity().enqueueRenderSpecAndWait(0, canvasClient1, false);
-
-        Bitmap bitmap1 = takeScreenshot();
-
-        getActivity().enqueueRenderSpecAndWait(0, canvasClient2, true);
-
-        Bitmap bitmap2 = takeScreenshot();
-
-        assertTrue(compareBitmaps(bitmap1, bitmap2, calculator));
+    /**
+     * Used to execute a specific part of a test and get the resultant bitmap
+     */
+    protected Bitmap captureRenderSpec(int layoutId, CanvasClient canvasClient,
+            boolean useHardware) {
+        getActivity().enqueueRenderSpecAndWait(layoutId, canvasClient, useHardware);
+        return takeScreenshot();
     }
 
     /**
      * Compares the two bitmaps saved using the given test. If they fail, the files are saved using
      * the test name.
      */
-    private boolean compareBitmaps(Bitmap bitmap1, Bitmap bitmap2, DifferenceCalculator comparer) {
+    protected boolean compareBitmaps(Bitmap bitmap1, Bitmap bitmap2, DifferenceCalculator comparer) {
         boolean res;
 
         if (USE_RS) {
