@@ -96,33 +96,57 @@ public class DecoderTest extends MediaPlayerTestBase {
     // phase and delay errors, channel swap, etc.
     public void testDecodeMp3Lame() throws Exception {
         decode(R.raw.sinesweepmp3lame, 804.f);
+        testTimeStampOrdering(R.raw.sinesweepmp3lame);
     }
     public void testDecodeMp3Smpb() throws Exception {
         decode(R.raw.sinesweepmp3smpb, 413.f);
+        testTimeStampOrdering(R.raw.sinesweepmp3smpb);
     }
     public void testDecodeM4a() throws Exception {
         decode(R.raw.sinesweepm4a, 124.f);
+        testTimeStampOrdering(R.raw.sinesweepm4a);
     }
     public void testDecodeOgg() throws Exception {
         decode(R.raw.sinesweepogg, 168.f);
+        testTimeStampOrdering(R.raw.sinesweepogg);
     }
     public void testDecodeWav() throws Exception {
         decode(R.raw.sinesweepwav, 0.0f);
+        testTimeStampOrdering(R.raw.sinesweepwav);
     }
     public void testDecodeFlac() throws Exception {
         decode(R.raw.sinesweepflac, 0.0f);
+        testTimeStampOrdering(R.raw.sinesweepflac);
     }
 
     public void testDecodeMonoMp3() throws Exception {
         monoTest(R.raw.monotestmp3);
+        testTimeStampOrdering(R.raw.monotestmp3);
     }
 
     public void testDecodeMonoM4a() throws Exception {
         monoTest(R.raw.monotestm4a);
+        testTimeStampOrdering(R.raw.monotestm4a);
     }
 
     public void testDecodeMonoOgg() throws Exception {
         monoTest(R.raw.monotestogg);
+        testTimeStampOrdering(R.raw.monotestogg);
+    }
+
+    public void testDecodeAacTs() throws Exception {
+        testTimeStampOrdering(R.raw.sinesweeptsaac);
+    }
+
+    private void testTimeStampOrdering(int res) throws Exception {
+        List<Long> timestamps = new ArrayList<Long>();
+        decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, timestamps);
+        Long lastTime = Long.MIN_VALUE;
+        for (int i = 0; i < timestamps.size(); i++) {
+            Long thisTime = timestamps.get(i);
+            assertTrue("timetravel occurred: " + lastTime + " > " + thisTime, thisTime >= lastTime);
+            lastTime = thisTime;
+        }
     }
 
     public void testTrackSelection() throws Exception {
