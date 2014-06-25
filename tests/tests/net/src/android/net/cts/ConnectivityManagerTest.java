@@ -272,9 +272,13 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             return;
         }
 
-        boolean isWifiConnected = mWifiManager.isWifiEnabled()
-                && mWifiManager.getConnectionInfo().getSSID() != null;
+        boolean isWifiEnabled = mWifiManager.isWifiEnabled();
+        boolean isWifiConnected = false;
 
+        NetworkInfo nwInfo = mCm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (nwInfo != null) {
+            isWifiConnected = nwInfo.isConnected();
+        }
         try {
             // Make sure WiFi is connected to an access point.
             if (!isWifiConnected) {
@@ -308,7 +312,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             // TODO wait for HIPRI to go
             // TODO check dns selection
             // TODO check routes
-            if (!isWifiConnected) {
+            if (!isWifiEnabled) {
                 mWifiManager.setWifiEnabled(false);
             }
         }
