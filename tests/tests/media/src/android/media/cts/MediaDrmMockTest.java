@@ -22,6 +22,7 @@ import android.media.MediaDrm.KeyRequest;
 import android.media.MediaDrm.CryptoSession;
 import android.media.MediaDrmException;
 import android.media.NotProvisionedException;
+import android.media.ResourceBusyException;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import java.util.HashMap;
@@ -784,6 +785,8 @@ public class MediaDrmMockTest extends AndroidTestCase {
         try {
             sessionId = md.openSession();
         } catch (NotProvisionedException e) {
+            // ignore, not thrown by mock
+        } catch (ResourceBusyException e) {
             // ignore, not thrown by mock
         }
         return sessionId;
