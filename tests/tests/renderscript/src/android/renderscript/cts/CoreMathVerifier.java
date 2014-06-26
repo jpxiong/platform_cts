@@ -893,12 +893,12 @@ public class CoreMathVerifier {
     }
 
     static public void computeLgamma(TestLgamma.ArgumentsFloatFloat args) {
-        args.out = new Floaty(lgamma(args.in));
+        args.out = new Floaty(lgamma(args.in), 16, 128);
     }
 
     static public void computeLgamma(TestLgamma.ArgumentsFloatIntFloat args) {
         LgammaResult result = lgamma2(args.inX);
-        args.out = new Floaty(result.lgamma);
+        args.out = new Floaty(result.lgamma, 16, 128);
         args.outY = result.gammaSign;
     }
 
