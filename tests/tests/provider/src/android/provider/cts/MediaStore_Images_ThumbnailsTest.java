@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
+import android.provider.MediaStore.MediaColumns;
 import android.test.InstrumentationTestCase;
 
 import java.io.File;
@@ -282,6 +283,76 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
                     + "database");
         } catch (UnsupportedOperationException e) {
             // expected
+        }
+    }
+
+    public void testThumbnailOrderedQuery() throws Exception {
+        Bitmap src = BitmapFactory.decodeResource(mContext.getResources(), R.raw.scenery);
+        Uri url[] = new Uri[3];
+        try{
+            for (int i = 0; i < url.length; i++) {
+                url[i] = Uri.parse(Media.insertImage(mContentResolver, src, null, null));
+                long origId = Long.parseLong(url[i].getLastPathSegment());
+                Bitmap foo = MediaStore.Images.Thumbnails.getThumbnail(mContentResolver,
+                        origId, Thumbnails.MICRO_KIND, null);
+                assertNotNull(foo);
+            }
+
+            // remove one of the images, its thumbnail, and the thumbnail cache
+            Cursor c = mContentResolver.query(url[1], null, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            String path = c.getString(c.getColumnIndex(MediaColumns.DATA));
+            long id = c.getLong(c.getColumnIndex(MediaColumns._ID));
+            c.close();
+            assertTrue(new File(path).delete());
+
+            long removedId = Long.parseLong(url[1].getLastPathSegment());
+            long remainingId1 = Long.parseLong(url[0].getLastPathSegment());
+            long remainingId2 = Long.parseLong(url[2].getLastPathSegment());
+            c = mContentResolver.query(
+                    MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI, null,
+                    Thumbnails.IMAGE_ID + "=?", new String[] { Long.toString(removedId) }, null);
+            assertTrue(c.getCount() > 0);  // one or more thumbnail kinds
+            while (c.moveToNext()) {
+                path = c.getString(c.getColumnIndex(MediaColumns.DATA));
+                assertTrue(new File(path).delete());
+            }
+            c.close();
+
+            File thumbdir = new File(path).getParentFile();
+            File[] list = thumbdir.listFiles();
+            for (int i = 0; i < list.length; i++) {
+                if (list[i].getName().startsWith(".thumbdata")) {
+                    assertTrue(list[i].delete());
+                }
+            }
+
+            // check if a thumbnail is still being returned for the image that was removed
+            Bitmap foo = MediaStore.Images.Thumbnails.getThumbnail(mContentResolver,
+                    removedId, Thumbnails.MICRO_KIND, null);
+            assertNull(foo);
+
+            for (String order: new String[] { " ASC", " DESC" }) {
+                c = mContentResolver.query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null,
+                        MediaColumns._ID + order);
+                while (c.moveToNext()) {
+                    id = c.getLong(c.getColumnIndex(MediaColumns._ID));
+                    foo = MediaStore.Images.Thumbnails.getThumbnail(
+                            mContentResolver, id,
+                            MediaStore.Images.Thumbnails.MICRO_KIND, null);
+                    if (id == removedId) {
+                        assertNull("unexpected bitmap with" + order + " ordering", foo);
+                    } else if (id == remainingId1 || id == remainingId2) {
+                        assertNotNull("missing bitmap with" + order + " ordering", foo);
+                    }
+                }
+                c.close();
+            }
+        } catch (UnsupportedOperationException e) {
+            // the tests will be aborted because the image will be put in sdcard
+            fail("There is no sdcard attached! " + e.getMessage());
         }
     }
 }
