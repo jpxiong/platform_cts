@@ -148,6 +148,7 @@ public class CtsTestServer {
     private final Map<String, HttpRequest> mLastRequestMap = new HashMap<String, HttpRequest>();
     private long mDocValidity;
     private long mDocAge;
+    private X509TrustManager mTrustManager;
 
     /**
      * Create and start a local HTTP server instance.
@@ -186,6 +187,18 @@ public class CtsTestServer {
      * @throws Exception
      */
     public CtsTestServer(Context context, SslMode sslMode) throws Exception {
+        this(context, sslMode, new CtsTrustManager());
+    }
+
+    /**
+     * Create and start a local HTTP server instance.
+     * @param context The application context to use for fetching assets.
+     * @param sslMode Whether to use SSL, and if so, what client auth (if any) to use.
+     * @param trustManager the trustManager
+     * @throws Exception
+     */
+    public CtsTestServer(Context context, SslMode sslMode, X509TrustManager trustManager)
+            throws Exception {
         mContext = context;
         mAssets = mContext.getAssets();
         mResources = mContext.getResources();
@@ -193,6 +206,7 @@ public class CtsTestServer {
         mRequestEntities = new ArrayList<HttpEntity>();
         mMap = MimeTypeMap.getSingleton();
         mQueries = new Vector<String>();
+        mTrustManager = trustManager;
         mServerThread = new ServerThread(this, mSsl);
         if (mSsl == SslMode.INSECURE) {
             mServerUri = "http:";
@@ -281,10 +295,10 @@ public class CtsTestServer {
     }
 
     /**
-     * @returns a trust manager array configured to permit any trust decision.
+     * @return a trust manager array of size 1.
      */
-    private static CtsTrustManager[] getTrustManagers() {
-        return new CtsTrustManager[] { new CtsTrustManager() };
+    private X509TrustManager[] getTrustManagers() {
+        return new X509TrustManager[] { mTrustManager };
     }
 
     /**
@@ -907,7 +921,7 @@ public class CtsTestServer {
                         mSocket = new ServerSocket(0);
                     } else {  // Use SSL
                         mSslContext = SSLContext.getInstance("TLS");
-                        mSslContext.init(getKeyManagers(), getTrustManagers(), null);
+                        mSslContext.init(getKeyManagers(), mServer.getTrustManagers(), null);
                         mSocket = mSslContext.getServerSocketFactory().createServerSocket(0);
                         if (mSsl == SslMode.WANTS_CLIENT_AUTH) {
                             ((SSLServerSocket) mSocket).setWantClientAuth(true);
