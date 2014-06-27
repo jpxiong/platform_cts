@@ -401,9 +401,15 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         float widthRatio = mNextPreviewSize.width / (float)mPreviewTexWidth;
         float heightRatio = mNextPreviewSize.height / (float)mPreviewTexHeight;
 
-        transform.setScale(1, heightRatio/widthRatio);
-        transform.postTranslate(0,
+        if (heightRatio < widthRatio) {
+            transform.setScale(1, heightRatio/widthRatio);
+            transform.postTranslate(0,
                 mPreviewTexHeight * (1 - heightRatio/widthRatio)/2);
+        } else {
+            transform.setScale(widthRatio/heightRatio, 1);
+            transform.postTranslate(mPreviewTexWidth * (1 - widthRatio/heightRatio)/2,
+            0);
+        }
 
         mPreviewView.setTransform(transform);
 
