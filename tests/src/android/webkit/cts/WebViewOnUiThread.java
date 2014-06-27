@@ -341,6 +341,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void clearClientCertPreferences(final Runnable onCleared) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                WebView.clearClientCertPreferences(onCleared);
+            }
+        });
+    }
+
     public void resumeTimers() {
         runOnUiThread(new Runnable() {
             @Override

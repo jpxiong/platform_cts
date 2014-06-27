@@ -50,6 +50,7 @@ public class TestHtmlConstants {
     public static final String HTML_URL1 = "webkit/test_firstPage.html";
     public static final String HTML_URL2 = "webkit/test_secondPage.html";
     public static final String HTML_URL3 = "webkit/test_thirdPage.html";
+    public static final String HTML_URL1_TITLE = "First page";
 
     public static final String BLANK_PAGE_URL = "webkit/test_blankPage.html";
     public static final String ADD_JAVA_SCRIPT_INTERFACE_URL = "webkit/test_jsInterface.html";
