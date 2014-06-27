@@ -82,6 +82,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             }
         }, null);
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Configure the print services.
         FirstPrintService.setCallbacks(firstServiceCallbacks);
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
@@ -91,10 +93,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(3)
+                        .setPageCount(100)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -108,6 +111,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, 0, 99);
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -170,8 +174,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             public Void answer(InvocationOnMock invocation) {
                 PrintJob printJob = (PrintJob) invocation.getArguments()[0];
                 PageRange[] pages = printJob.getInfo().getPages();
-                // We always as for the first page for preview and in this
-                // case we write all, i.e. more that needed.
+                // We always ask for some pages for preview and in this
+                // case we write all, i.e. more than needed.
                 assertTrue(pages.length == 1 && pages[0].getStart() == 1
                         && pages[0].getEnd() == 1);
                 printJob.complete();
@@ -179,6 +183,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 return null;
             }
         }, null);
+
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
 
         // Configure the print services.
         FirstPrintService.setCallbacks(firstServiceCallbacks);
@@ -189,10 +195,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(3)
+                        .setPageCount(100)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -203,8 +210,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
+                PageRange[] pages = (PageRange[]) args[0];
+                assertTrue(pages[pages.length - 1].getEnd() < 100);
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, 0, 99);
                 fd.close();
                 callback.onWriteFinished(new PageRange[] {PageRange.ALL_PAGES});
                 // Mark write was called.
@@ -274,8 +284,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 PrintJob printJob = (PrintJob) invocation.getArguments()[0];
                 PrintJobInfo printJobInfo = printJob.getInfo();
                 PageRange[] pages = printJobInfo.getPages();
-                // We asked only for page 3 (index 2) but got 4 and 3 (indices
-                // 2, 3), hence the written document has two pages (3 and 4)
+                // We asked only for page 60 (index 59) but got 60 and 61 (indices
+                // 59, 60), hence the written document has two pages (60 and 61)
                 // and the first one, i.e. 3 should be printed.
                 assertTrue(pages.length == 1 && pages[0].getStart() == 0
                         && pages[0].getEnd() == 0);
@@ -286,6 +296,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             }
         }, null);
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Configure the print services.
         FirstPrintService.setCallbacks(firstServiceCallbacks);
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
@@ -295,10 +307,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(3)
+                        .setPageCount(100)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -312,21 +325,23 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
-                // We expect a single range as it is either the first page
-                // or the page we selected in the UI.
+                // We expect a single range as it is either the pages for
+                // preview or the page we selected in the UI.
                 assertSame(pages.length, 1);
-                fd.close();
 
-                PageRange requestedPages = pages[0];
-                if (requestedPages.getStart() == requestedPages.getEnd()
-                        && requestedPages.getEnd() == 0) {
-                    // If asked for the first page, which is for preview
-                    // then write it...
+                // The first write request for some pages to preview.
+                if (getWriteCallCount() == 0) {
+                    // Write all requested pages.
+                    writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                     callback.onWriteFinished(pages);
                 } else {
-                    // otherwise write a page more that the one we selected.
-                    callback.onWriteFinished(new PageRange[] {new PageRange(2, 3)});
+                    // Otherwise write a page more that the one we selected.
+                    writeBlankPages(printAttributes[0], fd, 59, 60);
+                    callback.onWriteFinished(new PageRange[] {new PageRange(59, 60)});
                 }
+
+                fd.close();
+
                 // Mark write was called.
                 onWriteCalled();
                 return null;
@@ -355,8 +370,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         // Wait for layout as the printer has different capabilities.
         waitForLayoutAdapterCallbackCount(2);
 
-        // Select only the third page.
-        selectPages("3");
+        // Select a page not written for preview.
+        selectPages("60");
 
         // Click the print button.
         clickPrintButton();
@@ -390,6 +405,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             },
             null, null);
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Configure the print services.
         FirstPrintService.setCallbacks(firstServiceCallbacks);
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
@@ -399,10 +416,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(3)
+                        .setPageCount(100)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -417,14 +435,14 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
                 assertSame(pages.length, 1);
-                fd.close();
 
-                // We should be asked for the first page...
+                // We should be asked for some pages...
                 assertSame(pages[0].getStart(), 0);
-                assertSame(pages[0].getEnd(), 0);
+                assertTrue(pages[0].getEnd() == 49);
 
-                // ...just write a the wring page.
-                callback.onWriteFinished(new PageRange[] {new PageRange(1, 1)});
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
+                fd.close();
+                callback.onWriteFinished(new PageRange[]{new PageRange(1, 1)});
 
                 // Mark write was called.
                 onWriteCalled();
@@ -461,6 +479,123 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
 
         // We should not receive a print job callback.
         inOrder.verify(firstServiceCallbacks, never()).onPrintJobQueued(
+                any(PrintJob.class));
+    }
+
+    public void testWantedPagesAlreadyWrittenForPreview() throws Exception {
+        // Create a callback for the target print service.
+        PrintServiceCallbacks firstServiceCallbacks = createMockPrintServiceCallbacks(
+            new Answer<PrinterDiscoverySessionCallbacks>() {
+            @Override
+            public PrinterDiscoverySessionCallbacks answer(InvocationOnMock invocation) {
+                return createMockFirstPrinterDiscoverySessionCallbacks();
+                    }
+            }, new Answer<Void>() {
+            @Override
+                public Void answer(InvocationOnMock invocation) {
+                    PrintJob printJob = (PrintJob) invocation.getArguments()[0];
+                    PrintJobInfo printJobInfo = printJob.getInfo();
+                    PageRange[] pages = printJobInfo.getPages();
+                    // We asked only for page 3 (index 2) but got this page when
+                    // we were getting the pages for preview (indices 0 - 49), hence
+                    // the written document has fifty pages (0 - 49) and the third one,
+                    // i.e. index 2 should be printed.
+                    assertTrue(pages.length == 1 && pages[0].getStart() == 2
+                            && pages[0].getEnd() == 2);
+                    assertSame(printJob.getDocument().getInfo().getPageCount(), 50);
+                    printJob.complete();
+                    onPrintJobQueuedCalled();
+                    return null;
+                }
+            }, null);
+
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
+        // Configure the print services.
+        FirstPrintService.setCallbacks(firstServiceCallbacks);
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
+
+        // Create a mock print adapter.
+        final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
+            new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
+                LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(100)
+                        .build();
+                callback.onLayoutFinished(info, false);
+                // Mark layout was called.
+                onLayoutCalled();
+                return null;
+            }
+        }, new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                PageRange[] pages = (PageRange[]) args[0];
+                ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
+                WriteResultCallback callback = (WriteResultCallback) args[3];
+                // We expect a single range as it is either the pages for
+                // preview or the page we selected in the UI.
+                assertSame(pages.length, 1);
+
+                // Write all requested pages.
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
+                callback.onWriteFinished(pages);
+                fd.close();
+
+                // Mark write was called.
+                onWriteCalled();
+                return null;
+            }
+        }, new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                // Mark finish was called.
+                onFinishCalled();
+                return null;
+            }
+        });
+
+        // Start printing.
+        print(adapter);
+
+        // Wait for write.
+        waitForWriteAdapterCallback();
+
+        // Open the print options.
+        openPrintOptions();
+
+        // Select the first printer.
+        selectPrinter(FIRST_PRINTER);
+
+        // Wait for layout as the printer has different capabilities.
+        waitForLayoutAdapterCallbackCount(2);
+
+        // Select a page not written for preview.
+        selectPages("3");
+
+        // Click the print button.
+        clickPrintButton();
+
+        // Wait for finish.
+        waitForAdapterFinishCallbackCalled();
+
+        // Wait for the print job.
+        waitForServiceOnPrintJobQueuedCallbackCalled();
+
+        // Verify the expected calls.
+        InOrder inOrder = inOrder(firstServiceCallbacks);
+
+        // We create a new session first.
+        inOrder.verify(firstServiceCallbacks)
+                .onCreatePrinterDiscoverySessionCallbacks();
+
+        // Next we wait for a call with the print job.
+        inOrder.verify(firstServiceCallbacks).onPrintJobQueued(
                 any(PrintJob.class));
     }
 
