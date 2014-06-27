@@ -16,17 +16,10 @@
 
 package android.webkit.cts;
 
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.cts.util.PollingCheck;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
-import android.os.Bundle;
-import android.os.CancellationSignal;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.test.ActivityInstrumentationTestCase2;
@@ -39,11 +32,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
-import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Principal;
@@ -57,7 +48,6 @@ import javax.net.ssl.X509TrustManager;
 
 public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewSslTest";
-    private static long TEST_TIMEOUT = 20000L;
 
     /**
      * Taken verbatim from AndroidKeyStoreTest.java. Copying the build notes here for reference.
@@ -559,7 +549,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         }
         // Load the first page. We expect a call to
         // WebViewClient.onReceivedSslError().
-        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient(mOnUiThread);
         startWebServer(true);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.setWebViewClient(webViewClient);
@@ -668,7 +658,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         }
         // Load the first page. We expect a call to
         // WebViewClient.onReceivedSslError().
-        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient(mOnUiThread);
         startWebServer(true);
         final String firstUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
         mOnUiThread.setWebViewClient(webViewClient);
@@ -691,7 +681,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         }
         // Load the first page. We expect a call to
         // WebViewClient.onReceivedSslError().
-        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient(mOnUiThread);
         startWebServer(true);
         final String firstUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
         mOnUiThread.setWebViewClient(webViewClient);
@@ -714,7 +704,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     public void testSecureServerRequestingClientCertDoesNotCancelRequest() throws Throwable {
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.WANTS_CLIENT_AUTH);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         mOnUiThread.clearSslPreferences();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
@@ -727,7 +717,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     public void testSecureServerRequiringClientCertDoesCancelRequest() throws Throwable {
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         mOnUiThread.clearSslPreferences();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
@@ -743,7 +733,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     public void testProceedClientCertRequest() throws Throwable {
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient();
+        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         clearClientCertPreferences();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
@@ -767,7 +757,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     public void testIgnoreClientCertRequest() throws Throwable {
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient();
+        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         clearClientCertPreferences();
         // Ignore the request. Load should fail.
@@ -795,7 +785,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     public void testCancelClientCertRequest() throws Throwable {
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient();
+        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         clearClientCertPreferences();
         // Cancel the request. Load should fail.
@@ -842,12 +832,11 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH,
                 new TrustManager());
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient();
+        final ClientCertWebViewClient webViewClient = new ClientCertWebViewClient(mOnUiThread);
         mOnUiThread.setWebViewClient(webViewClient);
         clearClientCertPreferences();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         // Verify that issuers sent by the server are received correctly
-        // TODO(sgurun) no need to create again, maybe make it a final instance variable.
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
         X509Certificate  cert = (X509Certificate) certFactory.generateCertificate(
                                 new ByteArrayInputStream(FAKE_RSA_CA_1));
@@ -867,7 +856,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         });
         // Wait until clearclientcertpreferences clears the preferences. Generally this is just a
         // thread hopping.
-        new PollingCheck(TEST_TIMEOUT) {
+        new PollingCheck(WebViewTest.TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return cleared.get();
@@ -876,13 +865,13 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     }
 
     // Note that this class is not thread-safe.
-    class SslErrorWebViewClient extends WaitForLoadedClient {
+    static class SslErrorWebViewClient extends WaitForLoadedClient {
         private boolean mWasOnReceivedSslErrorCalled;
         private String mErrorUrl;
         private int mErrorCode;
 
-        public SslErrorWebViewClient() {
-            super(mOnUiThread);
+        public SslErrorWebViewClient(WebViewOnUiThread onUiThread) {
+            super(onUiThread);
         }
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -911,7 +900,7 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
 
     // Modifies the default behavior of SslErrorWebViewClient to accept the request, and provide
     // certs.
-    class ClientCertWebViewClient extends SslErrorWebViewClient {
+    static class ClientCertWebViewClient extends SslErrorWebViewClient {
         // User Actions
         public static final int PROCEED = 1;
         public static final int CANCEL = 2;
@@ -920,6 +909,10 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
         private int mClientCertRequests;
         private int mAction = PROCEED;
         private Principal[] mPrincipals;
+
+        public ClientCertWebViewClient(WebViewOnUiThread onUiThread) {
+            super(onUiThread);
+        }
 
         public int getClientCertRequestCount() {
             return mClientCertRequests;

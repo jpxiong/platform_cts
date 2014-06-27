@@ -48,7 +48,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,9 +96,8 @@ import org.apache.http.util.EncodingUtils;
 import org.apache.http.util.EntityUtils;
 
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
-    private static final String LOGTAG = "WebViewTest";
+    public static final long TEST_TIMEOUT = 20000L;
     private static final int INITIAL_PROGRESS = 100;
-    private static long TEST_TIMEOUT = 20000L;
     private static final String X_REQUESTED_WITH = "X-Requested-With";
     private static final String PRINTER_TEST_FILE = "print.pdf";
     private static final String PDF_PREAMBLE = "%PDF-1";
