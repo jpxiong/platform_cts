@@ -429,6 +429,16 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         }
     }
 
+    public void testGetTextColor() {
+        // TODO: How to get a suitable TypedArray to test this method.
+
+        try {
+            TextView.getTextColor(mActivity, null, -1);
+            fail("There should be a NullPointerException thrown out.");
+        } catch (NullPointerException e) {
+        }
+    }
+
     public void testSetHighlightColor() {
         mTextView = new TextView(mActivity);
 
