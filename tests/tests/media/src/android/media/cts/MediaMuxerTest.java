@@ -56,7 +56,8 @@ public class MediaMuxerTest extends AndroidTestCase {
      */
     public void testVideoAudio() throws Exception {
         int source = R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_128kbps_11025hz;
-        String outputFile = "/sdcard/videoAudio.mp4";
+        String outputFile = File.createTempFile("MediaMuxerTest_testAudioVideo", ".mp4")
+                .getAbsolutePath();
         cloneAndVerify(source, outputFile, 2, 90);
     }
 
@@ -65,7 +66,8 @@ public class MediaMuxerTest extends AndroidTestCase {
      */
     public void testAudioOnly() throws Exception {
         int source = R.raw.sinesweepm4a;
-        String outputFile = "/sdcard/audioOnly.mp4";
+        String outputFile = File.createTempFile("MediaMuxerTest_testAudioOnly", ".mp4")
+                .getAbsolutePath();
         cloneAndVerify(source, outputFile, 1, -1);
     }
 
@@ -74,7 +76,8 @@ public class MediaMuxerTest extends AndroidTestCase {
      */
     public void testVideoOnly() throws Exception {
         int source = R.raw.video_only_176x144_3gp_h263_25fps;
-        String outputFile = "/sdcard/videoOnly.mp4";
+        String outputFile = File.createTempFile("MediaMuxerTest_videoOnly", ".mp4")
+                .getAbsolutePath();
         cloneAndVerify(source, outputFile, 1, 180);
     }
 
@@ -88,7 +91,8 @@ public class MediaMuxerTest extends AndroidTestCase {
      * <br> Throws exception b/c a wrong format.
      */
     public void testIllegalStateExceptions() throws IOException {
-        String outputFile = "/sdcard/muxerExceptions.mp4";
+        String outputFile = File.createTempFile("MediaMuxerTest_testISEs", ".mp4")
+                .getAbsolutePath();
         MediaMuxer muxer;
 
         // Throws exception b/c start() is not called.
@@ -369,25 +373,26 @@ public class MediaMuxerTest extends AndroidTestCase {
         String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
         assertNotNull("No location information found in file " + fileName, location);
 
-        // parsing String location and recover the location inforamtion in floats
+
+        // parsing String location and recover the location information in floats
         // Make sure the tolerance is very small - due to rounding errors.
 
         // Get the position of the -/+ sign in location String, which indicates
-        // the beginning of the longtitude.
-        int index = location.lastIndexOf('-');
-        if (index == -1) {
-            index = location.lastIndexOf('+');
-        }
-        assertTrue("+ or - is not found", index != -1);
-        assertTrue("+ or - is only found at the beginning", index != 0);
+        // the beginning of the longitude.
+        int minusIndex = location.lastIndexOf('-');
+        int plusIndex = location.lastIndexOf('+');
+
+        assertTrue("+ or - is not found or found only at the beginning [" + location + "]",
+                (minusIndex > 0 || plusIndex > 0));
+        int index = Math.max(minusIndex, plusIndex);
+
         float latitude = Float.parseFloat(location.substring(0, index - 1));
         float longitude = Float.parseFloat(location.substring(index));
-        assertTrue("Incorrect latitude: " + latitude,
+        assertTrue("Incorrect latitude: " + latitude + " [" + location + "]",
                 Math.abs(latitude - LATITUDE) <= TOLERANCE);
-        assertTrue("Incorrect longitude: " + longitude,
+        assertTrue("Incorrect longitude: " + longitude + " [" + location + "]",
                 Math.abs(longitude - LONGITUDE) <= TOLERANCE);
         retriever.release();
     }
-
 }
 
