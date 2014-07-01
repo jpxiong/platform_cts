@@ -15,10 +15,8 @@
  */
 package android.uirendering.cts.differencecalculators;
 
-import android.content.res.Resources;
 import android.graphics.Point;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
+import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
@@ -41,15 +39,20 @@ public class SamplePointsCalculator extends DifferenceCalculator {
             int yPos = mTestPoints[i].y;
             int index = indexFromXAndY(xPos, yPos, stride, offset);
             if (ideal[index] != mExpectedColors[i] || given[index] != mExpectedColors[i]) {
+                if (CanvasCompareActivityTest.DEBUG) {
+                    Log.d(CanvasCompareActivityTest.TAG_NAME, "SamplePointsCalculator");
+                    Log.d(CanvasCompareActivityTest.TAG_NAME, "Expected Color : " +
+                            Integer.toHexString(mExpectedColors[i]));
+                    Log.d(CanvasCompareActivityTest.TAG_NAME, "Ideal Color : " +
+                            Integer.toHexString(ideal[i]));
+                    Log.d(CanvasCompareActivityTest.TAG_NAME, "Given Color : " +
+                            Integer.toHexString(given[i]));
+                    Log.d(CanvasCompareActivityTest.TAG_NAME, "Position X =  " + mTestPoints[i].x
+                            + " Y = " + mTestPoints[i].y);
+                }
                 return false;
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal, Allocation given, int offset,
-            int stride, int width, int height, RenderScript renderScript) {
-        return false;
     }
 }

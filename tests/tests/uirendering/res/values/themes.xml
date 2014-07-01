@@ -14,10 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <resources>
-    <style name="WhiteBackgroundTheme" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textColor">#FFF</item>
+    <style name="WhiteBackgroundTheme" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:fadingEdge">none</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <!--This shouldn't be necessary currently a hack for an existing bug with transitions-->
+        <item name="android:windowContentTransitions">false</item>
     </style>
 </resources>

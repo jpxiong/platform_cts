@@ -15,10 +15,7 @@
  */
 package android.uirendering.cts.differencecalculators;
 
-import android.content.res.Resources;
 import android.graphics.Color;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
 import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
@@ -105,16 +102,10 @@ public class WeightedPixelDifference extends DifferenceCalculator {
         totalError /= interestingPixels;
 
         if (CanvasCompareActivityTest.DEBUG) {
-            Log.d("CtsGraphicsHardware", "TOTAL ERROR : " + totalError);
+            Log.d(CanvasCompareActivityTest.TAG_NAME,
+                    "WeightedPixelDifference : Total error = " + totalError);
         }
 
         return totalError < mThreshold;
-    }
-
-    @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal,
-            Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript) {
-        return false;
     }
 }

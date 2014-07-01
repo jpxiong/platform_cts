@@ -31,7 +31,7 @@ import android.uirendering.cts.util.BitmapDumper;
  */
 public abstract class CanvasCompareActivityTest extends
         ActivityInstrumentationTestCase2<DrawActivity> {
-    public static final String TAG_NAME = "CtsGraphicsHardware";
+    public static final String TAG_NAME = "CtsUirendering";
     public static final boolean DEBUG = false;
     public static final boolean USE_RS = false;
     public static final boolean DUMP_BITMAPS = true;
@@ -129,7 +129,7 @@ public abstract class CanvasCompareActivityTest extends
     protected boolean compareBitmaps(Bitmap bitmap1, Bitmap bitmap2, DifferenceCalculator comparer) {
         boolean res;
 
-        if (USE_RS) {
+        if (USE_RS && comparer.supportsRenderScript()) {
             mIdealAllocation = Allocation.createFromBitmap(mRenderScript, bitmap1,
                     Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
             mGivenAllocation = Allocation.createFromBitmap(mRenderScript, bitmap2,

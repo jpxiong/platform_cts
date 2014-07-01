@@ -20,16 +20,15 @@ import com.android.cts.uirendering.ScriptC_MeanSquaredCalculator;
 
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.renderscript.Allocation;
-import android.renderscript.Element;
 import android.renderscript.RenderScript;
+import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
  * Finds the MSE using two images.
  */
-public class MeanSquaredCalculator extends DifferenceCalculator {
+public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
     private ScriptC_MeanSquaredCalculator mScript;
     private float mErrorPerPixel;
 
@@ -45,35 +44,22 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
         float totalError = getMSE(ideal, given, offset, stride, width, height);
-        return (totalError < (mErrorPerPixel * ideal.length));
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(CanvasCompareActivityTest.TAG_NAME,
+                    "MeanSquaredCalculator : MSE = " + totalError);
+        }
+        return (totalError < (mErrorPerPixel));
     }
 
     @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal,
+    public boolean verifySameRowsRS(Resources resources, Allocation ideal,
             Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript) {
+            RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
             mScript = new ScriptC_MeanSquaredCalculator(renderScript, resources,
                     R.raw.meansquaredcalculator);
         }
-        mScript.set_HEIGHT(height);
         mScript.set_WIDTH(width);
-
-        //Create an array with the index of each row
-        int[] inputIndices = new int[CanvasCompareActivityTest.TEST_HEIGHT];
-        for (int i = 0; i < CanvasCompareActivityTest.TEST_HEIGHT; i++) {
-            inputIndices[i] = i;
-        }
-
-        //Create the allocation from that given array
-        Allocation inputAllocation = Allocation.createSized(renderScript, Element.I32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
-        inputAllocation.copyFrom(inputIndices);
-
-        //Create the allocation that will hold the output, the sum of pixels that differ in that
-        //row
-        Allocation outputAllocation = Allocation.createSized(renderScript, Element.F32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
 
         //Set the bitmap allocations
         mScript.set_ideal(ideal);
@@ -82,19 +68,15 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
         //Call the renderscript function on each row
         mScript.forEach_calcMSE(inputAllocation, outputAllocation);
 
-        //Get the values returned from the function
-        float[] returnValue = new float[inputIndices.length];
-        outputAllocation.copyTo(returnValue);
+        float error = sum1DFloatAllocation(outputAllocation);
+        error /= (height * width);
 
-        double error = 0;
-        //If any row had any different pixels, then it fails
-        for (int i = 0; i < inputIndices.length; i++) {
-            error += returnValue[i];
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(CanvasCompareActivityTest.TAG_NAME,
+                    "MeanSquaredCalculator RS : MSE = " + error);
         }
 
-        error /= width * height;
-
-        return (error < mErrorPerPixel * width * height);
+        return (error < mErrorPerPixel);
     }
 
     /**
@@ -107,9 +89,10 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
-                float intensity1 = getIntensity(ideal[index]);
-                float intensity2 = getIntensity(given[index]);
-                totalError += (intensity1 - intensity2) * (intensity1 - intensity2);
+                float idealSum = getColorSum(ideal[index]);
+                float givenSum = getColorSum(given[index]);
+                float difference = idealSum - givenSum;
+                totalError += (difference * difference);
             }
         }
 
@@ -117,17 +100,10 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
         return totalError;
     }
 
-
-    /**
-     * Gets the intensity of a given pixel in RGB using luminosity formula
-     *
-     * l = 0.21R + 0.72G + 0.07B
-     */
-    private static float getIntensity(int pixel) {
-        float l = 0;
-        l += (0.21f * Color.red(pixel));
-        l += (0.72f * Color.green(pixel));
-        l += (0.07f * Color.blue(pixel));
-        return l;
+    private static float getColorSum(int color) {
+        float red = Color.red(color) / 255.0f;
+        float green = Color.green(color) / 255.0f;
+        float blue = Color.blue(color) / 255.0f;
+        return (red + green + blue);
     }
 }
