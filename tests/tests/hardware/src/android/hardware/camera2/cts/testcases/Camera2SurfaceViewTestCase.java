@@ -490,7 +490,8 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     protected void updatePreviewSurface(Size size) {
-        if (size.equals(mPreviewSize)) {
+        if (size.equals(mPreviewSize) && mPreviewSurface != null) {
+            Log.w(TAG, "Skipping update preview surface size...");
             return;
         }
 
@@ -511,6 +512,7 @@ public class Camera2SurfaceViewTestCase extends
         assertTrue("wait for surface change to " + mPreviewSize.toString() + " timed out", res);
         mPreviewSurface = holder.getSurface();
         assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
+        assertNotNull("Preview surface is null", mPreviewSurface);
     }
 
     /**
