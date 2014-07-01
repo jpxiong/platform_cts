@@ -16,13 +16,14 @@
 package android.uirendering.cts;
 
 import android.graphics.Bitmap;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
-import android.test.ActivityInstrumentationTestCase2;
 import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencevisualizers.DifferenceVisualizer;
 import android.uirendering.cts.differencevisualizers.PassFailVisualizer;
 import android.uirendering.cts.util.BitmapDumper;
+import android.renderscript.Allocation;
+import android.renderscript.RenderScript;
+import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 /**
  * This class contains the basis for the graphics hardware test classes. Contained within this class
@@ -62,6 +63,9 @@ public abstract class CanvasCompareActivityTest extends
     public void setUp() {
         mDifferenceVisualizer = new PassFailVisualizer();
         mRenderScript = RenderScript.create(getActivity().getApplicationContext());
+        if (DEBUG) {
+            Log.d(TAG_NAME, "TEST NAME : " + getName());
+        }
     }
 
     /**

@@ -29,23 +29,17 @@ import android.util.Log;
 /**
  * Finds the MSE using two images.
  */
-public class MeanSquaredCalculator extends DifferenceCalculator {
+public class MeanSquaredCalculator implements DifferenceCalculator{
+    private final double MAX_ERROR_PER_PIXEL = .5;
     private ScriptC_MeanSquaredCalculator mScript;
-    private float mErrorPerPixel;
-
-    /**
-     * @param errorPerPixel threshold for which the test will pass/fail. This is the mean-squared
-     *                      error averaged across all of those before comparing.
-     */
-    public MeanSquaredCalculator(float errorPerPixel) {
-        mErrorPerPixel = errorPerPixel;
-    }
 
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
         float totalError = getMSE(ideal, given, offset, stride, width, height);
-        return (totalError < (mErrorPerPixel * ideal.length));
+
+        Log.d("Testing", "TOTAL MSE : " + totalError);
+        return (totalError < (MAX_ERROR_PER_PIXEL * ideal.length));
     }
 
     @Override
@@ -94,7 +88,7 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
 
         error /= width * height;
 
-        return (error < mErrorPerPixel * width * height);
+        return (error < MAX_ERROR_PER_PIXEL * width * height);
     }
 
     /**
@@ -104,9 +98,9 @@ public class MeanSquaredCalculator extends DifferenceCalculator {
             int height) {
         float totalError = 0;
 
-        for (int y = 0 ; y < height ; y++) {
-            for (int x = 0 ; x < width ; x++) {
-                int index = indexFromXAndY(x, y, stride, offset);
+        for (int i = 0 ; i < height ; i++) {
+            for (int j = 0 ; j < width ; j++) {
+                int index = offset + (i * stride) + j;
                 float intensity1 = getIntensity(ideal[index]);
                 float intensity2 = getIntensity(given[index]);
                 totalError += (intensity1 - intensity2) * (intensity1 - intensity2);
