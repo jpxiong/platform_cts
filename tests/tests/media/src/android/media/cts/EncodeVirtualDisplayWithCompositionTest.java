@@ -860,8 +860,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             @Override
             public void run() {
                 try {
-                    mLooper = Looper.myLooper();
                     Looper.prepare();
+                    mLooper = Looper.myLooper();
                     mHandler = new CompositionHandler();
                     initGl();
                     // init done
