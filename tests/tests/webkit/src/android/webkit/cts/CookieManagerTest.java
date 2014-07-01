@@ -81,6 +81,13 @@ public class CookieManagerTest extends
         }
     }
 
+    public void testFlush() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+        mCookieManager.flush();
+    }
+
     public void testAcceptCookie() throws Exception {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
