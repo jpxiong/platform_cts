@@ -48,6 +48,8 @@ import org.mockito.ArgumentMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>Basic test for CameraDevice APIs.</p>
@@ -353,6 +355,198 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
                 } finally {
                     closeDevice(mCameraIds[i], mCameraMockListener);
+                }
+            }
+        }
+    }
+
+    /**
+     * Test to ensure that we can call camera2 API methods inside callbacks.
+     *
+     * Tests:
+     *  onOpened -> createCaptureSession, createCaptureRequest
+     *  onConfigured -> getDevice, abortCaptures,
+     *     createCaptureRequest, capture, setRepeatingRequest, stopRepeating
+     *  onCaptureCompleted -> createCaptureRequest, getDevice, abortCaptures,
+     *     capture, setRepeatingRequest, stopRepeating, session+device.close
+     */
+    public void testChainedOperation() throws Throwable {
+
+        // Set up single dummy target
+        createDefaultImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                /*listener*/ null);
+        final ArrayList<Surface> outputs = new ArrayList<>();
+        outputs.add(mReaderSurface);
+
+        // A queue for the chained listeners to push results to
+        // A success Throwable indicates no errors; other Throwables detail a test failure;
+        // nulls indicate timeouts.
+        final Throwable success = new Throwable("Success");
+        final LinkedBlockingQueue<Throwable> results = new LinkedBlockingQueue<>();
+
+        // Define listeners
+        // A cascade of Device->Session->Capture listeners, each of which invokes at least one
+        // method on the camera device or session.
+
+        class ChainedCaptureListener extends CameraCaptureSession.CaptureListener {
+            public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
+                    TotalCaptureResult result) {
+                try {
+                    CaptureRequest.Builder request2 =
+                            session.getDevice().createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                    request2.addTarget(mReaderSurface);
+
+                    // Some calls to the camera for coverage
+                    session.abortCaptures();
+                    session.capture(request2.build(),
+                            /*listener*/ null, /*handler*/ null);
+                    session.setRepeatingRequest(request2.build(),
+                            /*listener*/ null, /*handler*/ null);
+                    session.stopRepeating();
+
+                    CameraDevice camera = session.getDevice();
+                    session.close();
+                    camera.close();
+
+                    results.offer(success);
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+
+            public void onCaptureFailed(CameraCaptureSession session, CaptureRequest request,
+                    CaptureFailure failure) {
+                try {
+                    CameraDevice camera = session.getDevice();
+                    session.close();
+                    camera.close();
+                    fail("onCaptureFailed invoked with failure reason: " + failure.getReason());
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+        }
+
+        class ChainedSessionListener extends CameraCaptureSession.StateListener {
+            private final ChainedCaptureListener mCaptureListener = new ChainedCaptureListener();
+
+            public void onConfigured(CameraCaptureSession session) {
+                try {
+                    CaptureRequest.Builder request =
+                            session.getDevice().createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                    request.addTarget(mReaderSurface);
+                    // Some calls to the camera for coverage
+                    session.getDevice();
+                    session.abortCaptures();
+                    // The important call for the next level of chaining
+                    session.capture(request.build(), mCaptureListener, mHandler);
+                    // Some more calls
+                    session.setRepeatingRequest(request.build(),
+                            /*listener*/ null, /*handler*/ null);
+                    session.stopRepeating();
+                    results.offer(success);
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+
+            public void onConfigureFailed(CameraCaptureSession session) {
+                try {
+                    CameraDevice camera = session.getDevice();
+                    session.close();
+                    camera.close();
+                    fail("onConfigureFailed was invoked");
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+        }
+
+        class ChainedCameraListener extends CameraDevice.StateListener {
+            private final ChainedSessionListener mSessionListener = new ChainedSessionListener();
+
+            public CameraDevice cameraDevice;
+
+            public void onOpened(CameraDevice camera) {
+
+                cameraDevice = camera;
+                try {
+                    // Some calls for coverage
+                    camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                    // The important call for next level of chaining
+                    camera.createCaptureSession(outputs, mSessionListener, mHandler);
+                    results.offer(success);
+                } catch (Throwable t) {
+                    try {
+                        camera.close();
+                        results.offer(t);
+                    } catch (Throwable t2) {
+                        Log.e(TAG,
+                                "Second failure reached; discarding first exception with trace " +
+                                Log.getStackTraceString(t));
+                        results.offer(t2);
+                    }
+                }
+            }
+
+            public void onDisconnected(CameraDevice camera) {
+                try {
+                    camera.close();
+                    fail("onDisconnected invoked");
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+
+            public void onError(CameraDevice camera, int error) {
+                try {
+                    camera.close();
+                    fail("onError invoked with error code: " + error);
+                } catch (Throwable t) {
+                    results.offer(t);
+                }
+            }
+        }
+
+        // Actual test code
+
+        for (int i = 0; i < mCameraIds.length; i++) {
+            Throwable result;
+
+            // Start chained cascade
+            ChainedCameraListener cameraListener = new ChainedCameraListener();
+            mCameraManager.openCamera(mCameraIds[i], cameraListener, mHandler);
+
+            // Check if open succeeded
+            result = results.poll(CAMERA_OPEN_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (result != success) {
+                if (cameraListener.cameraDevice != null) cameraListener.cameraDevice.close();
+                if (result == null) {
+                    fail("Timeout waiting for camera open");
+                } else {
+                    throw result;
+                }
+            }
+
+            // Check if configure succeeded
+            result = results.poll(SESSION_CONFIGURE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (result != success) {
+                if (cameraListener.cameraDevice != null) cameraListener.cameraDevice.close();
+                if (result == null) {
+                    fail("Timeout waiting for session configure");
+                } else {
+                    throw result;
+                }
+            }
+
+            // Check if capture succeeded
+            result = results.poll(CAPTURE_RESULT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (result != success) {
+                if (cameraListener.cameraDevice != null) cameraListener.cameraDevice.close();
+                if (result == null) {
+                    fail("Timeout waiting for capture completion");
+                } else {
+                    throw result;
                 }
             }
         }
