@@ -39,6 +39,7 @@ public class LayoutTest extends CanvasCompareActivityTest {
 
     @SmallTest
     public void testSimpleRectLayout() {
-        executeLayoutTest(R.layout.simple_rect_layout, mBitmapComparer);
+        executeLayoutTest(R.layout.simple_rect_layout,
+                mBitmapComparer);
     }
 }

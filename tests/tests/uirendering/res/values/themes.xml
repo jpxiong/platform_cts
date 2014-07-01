@@ -18,6 +18,5 @@ limitations under the License.
         <item name="android:textColor">#FFF</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
-        <item name="android:fadingEdge">none</item>
     </style>
 </resources>
