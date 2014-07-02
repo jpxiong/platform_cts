@@ -19,6 +19,7 @@ package android.widget.cts;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.test.UiThreadTest;
 import android.view.View;
 import com.android.cts.stub.R;
 
@@ -211,7 +212,10 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertEquals(keyProgressIncrement + 1, myAbsSeekBar.getKeyProgressIncrement());
     }
 
+    @UiThreadTest
     public void testThumbTint() {
+        mActivity.setContentView(R.layout.seekbar_layout);
+
         SeekBar inflatedView = (SeekBar) mActivity.findViewById(R.id.thumb_tint);
 
         assertEquals("Thumb tint inflated correctly",

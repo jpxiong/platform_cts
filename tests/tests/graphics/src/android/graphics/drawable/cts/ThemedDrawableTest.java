@@ -130,9 +130,9 @@ public class ThemedDrawableTest extends AndroidTestCase {
         RippleDrawable d = (RippleDrawable) mContext.getDrawable(
                 R.drawable.rippledrawable_theme);
 
-        // assertEquals(Color.BLACK, d.getTint());
+        // assertEquals(Color.BLACK, d.getColor());
     }
-    
+
     public void testLayerDrawable() {
         LayerDrawable d = (LayerDrawable) mContext.getDrawable(R.drawable.layerdrawable_theme);
 
