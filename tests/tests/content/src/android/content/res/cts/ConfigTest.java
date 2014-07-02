@@ -16,6 +16,8 @@
 
 package android.content.res.cts;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.content.res.AssetManager;
@@ -1213,5 +1215,69 @@ public class ConfigTest extends AndroidTestCase {
         checkValue(res, R.configVarying.simple, "simple kok VARIANT");
         checkValue(res, R.configVarying.bag,
                 R.styleable.TestConfig, new String[]{"bag kok VARIANT"});
+    }
+
+    @MediumTest
+    public void testTlAndFilConversion() {
+        TotalConfig config = makeClassicConfig();
+
+        // Ensure that "fil" is mapped to "tl" correctly.
+        config.setProperty(Properties.LANGUAGE, "fil");
+        config.setProperty(Properties.COUNTRY, "US");
+        Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple tl");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[] { "bag tl" });
+
+        // Ensure that "fil-PH" is mapped to "tl-PH" correctly.
+        config = makeClassicConfig();
+        config.setProperty(Properties.LANGUAGE, "fil");
+        config.setProperty(Properties.COUNTRY, "PH");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple tl PH");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[] { "bag tl PH" });
+
+        config = makeClassicConfig();
+        config.setProperty(Properties.LANGUAGE, "tgl");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple tgl");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[] { "bag tgl" });
+
+        config = makeClassicConfig();
+        config.setProperty(Properties.LANGUAGE, "tgl");
+        config.setProperty(Properties.COUNTRY, "PH");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple tgl PH");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[] { "bag tgl PH" });
+    }
+
+    @MediumTest
+    public void testGetLocalesConvertsTlToFil() {
+        TotalConfig config = makeClassicConfig();
+
+        // Check that the list of locales doesn't contain any of the
+        // "tl" variants. They should've been converted to "fil"
+        // locales.
+        AssetManager am = config.getResources().getAssets();
+        String[] locales = am.getLocales();
+        final List<String> tlLocales = new ArrayList<String>(4);
+        final List<String> filLocales = new ArrayList<String>(4);
+        for (String locale : locales) {
+            if (locale.startsWith("tl-") || locale.equals("tl")) {
+                tlLocales.add(locale);
+            }
+
+            if (locale.startsWith("fil-") || locale.equals("fil")) {
+                filLocales.add(locale);
+            }
+        }
+
+        assertEquals(0, tlLocales.size());
+        assertEquals(2, filLocales.size());
+        assertTrue(filLocales.contains("fil"));
+        assertTrue(filLocales.contains("fil-PH"));
     }
 }
