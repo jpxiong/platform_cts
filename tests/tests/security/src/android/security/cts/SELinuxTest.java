@@ -70,10 +70,6 @@ public class SELinuxTest extends AndroidTestCase {
         assertTrue(checkSELinuxContext("u:r:zygote:s0"));
     }
 
-    public void testRild() {
-        assertTrue(checkSELinuxAccess("u:r:rild:s0", "u:object_r:rild_prop:s0", "property_service", "set", "ril.ecclist"));
-    }
-
     public void testZygote() {
         assertFalse(checkSELinuxAccess("u:r:zygote:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
         // Also check init, just as a sanity check (init is unconfined, so it should pass)
