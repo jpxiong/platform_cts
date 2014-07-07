@@ -19,6 +19,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
+import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
@@ -26,20 +27,25 @@ import android.util.Log;
  * account the number of pixels that are non-white. Note only use this if the content background is
  * white.
  */
-public class WeightedPixelDifference implements DifferenceCalculator {
-    private static final float THRESHOLD = 0.006f;
+public class WeightedPixelDifference extends DifferenceCalculator {
     private static final int NUM_OF_COLUMNS = 10;
     private static final float TOTAL_ERROR_DIVISOR = 1024.0f;
+
+    private float mThreshold;
+
+    public WeightedPixelDifference(float threshold) {
+        mThreshold = threshold;
+    }
 
     /**
      * Calculates if pixels in a specific line are the same color
      * @return true if the pixels are the same color
      */
-    private static boolean inspectRegions(int[] ideal, int x, int stride, int regionSize) {
-        int regionColor = ideal[x];
-        for (int i = 0 ; i < regionSize ; i++) {
-            for (int j = 0 ; j < regionSize ; j++) {
-                int index = x + (i * stride) + j;
+    private static boolean inspectRegions(int[] ideal, int start, int stride, int regionSize) {
+        int regionColor = ideal[start];
+        for (int y = 0 ; y < regionSize ; y++) {
+            for (int x = 0 ; x < regionSize ; x++) {
+                int index = indexFromXAndY(x, y, stride, start);
                 if (ideal[index] != regionColor) {
                     return true;
                 }
@@ -70,9 +76,9 @@ public class WeightedPixelDifference implements DifferenceCalculator {
         int interestingRegions = 0;
         int regionSize = width / NUM_OF_COLUMNS;
 
-        for (int i = 0 ; i < height ; i += regionSize) {
-            for (int j = 0 ; j < width ; j += regionSize) {
-                int index = offset + (i * stride) + j;
+        for (int y = 0 ; y < height ; y += regionSize) {
+            for (int x = 0 ; x < width ; x += regionSize) {
+                int index = indexFromXAndY(x, y,stride, offset);
                 if (inspectRegions(ideal, index, stride, regionSize)) {
                     interestingRegions++;
                 }
@@ -83,9 +89,9 @@ public class WeightedPixelDifference implements DifferenceCalculator {
 
         float totalError = 0;
 
-        for (int i = 0 ; i < height ; i++) {
-            for (int j = 0 ; j < width ; j++) {
-                int index = offset + (i * stride) + j;
+        for (int y = 0 ; y < height ; y++) {
+            for (int x = 0 ; x < width ; x++) {
+                int index = indexFromXAndY(x, y, stride, offset);
                 int idealColor = ideal[index];
                 int givenColor = given[index];
                 if (idealColor == givenColor) {
@@ -98,9 +104,11 @@ public class WeightedPixelDifference implements DifferenceCalculator {
         totalError /= TOTAL_ERROR_DIVISOR;
         totalError /= interestingPixels;
 
-        Log.d("CtsGraphicsHardware", "TOTAL ERROR : " + totalError);
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d("CtsGraphicsHardware", "TOTAL ERROR : " + totalError);
+        }
 
-        return totalError < THRESHOLD;
+        return totalError < mThreshold;
     }
 
     @Override

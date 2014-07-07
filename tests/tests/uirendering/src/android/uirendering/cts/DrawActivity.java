@@ -30,6 +30,7 @@ import android.view.ViewTreeObserver;
 public class DrawActivity extends Activity {
     private final static long TIME_OUT = 10000;
     private final Object mLock = new Object();
+    public static final int MIN_NUMBER_OF_DRAWS = 5;
 
     private Handler mHandler;
     private View mView;
@@ -92,7 +93,6 @@ public class DrawActivity extends Activity {
     }
 
     private class DrawCounterListener implements ViewTreeObserver.OnPreDrawListener {
-        private static final int MIN_NUMBER_OF_DRAWS = 5;
         private int mCurrentDraws = 0;
 
         @Override

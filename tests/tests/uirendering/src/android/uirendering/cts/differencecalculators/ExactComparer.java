@@ -28,8 +28,7 @@ import android.util.Log;
 /**
  * This class does an exact comparison of the pixels in a bitmap.
  */
-public class ExactComparer implements DifferenceCalculator {
-    private final int REGION_SIZE = 8;
+public class ExactComparer extends DifferenceCalculator {
     private ScriptC_ExactComparer mScript;
 
     /**
@@ -39,9 +38,9 @@ public class ExactComparer implements DifferenceCalculator {
             int height) {
         int count = 0;
 
-        for (int i = 0 ; i < height ; i++) {
-            for (int j = 0 ; j < width ; j++) {
-                int index = offset + (i * stride) + j;
+        for (int y = 0 ; y < height ; y++) {
+            for (int x = 0 ; x < width ; x++) {
+                int index = indexFromXAndY(x, y, stride, offset);
                 if (ideal[index] != given[index]) {
                     if (!CanvasCompareActivityTest.DEBUG) {
                         return false;

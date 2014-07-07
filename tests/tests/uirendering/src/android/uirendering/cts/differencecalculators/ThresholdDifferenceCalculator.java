@@ -31,19 +31,29 @@ import android.util.Log;
 /**
  * Compares two images to see if each pixel is the same, within a certain threshold value
  */
-public class ThresholdDifferenceCalculator implements DifferenceCalculator{
-    public static final int THRESHOLD = 45;
+public class ThresholdDifferenceCalculator extends DifferenceCalculator {
     private ScriptC_ThresholdDifferenceCalculator mScript;
+    private int mThreshold;
+
+    /**
+     * @param threshold Each pixel is compared against each other, in each of the individual
+     *                  channels. If the sum of the errors amongst the channels is greater than some
+     *                  threshold, then this test will fail.
+     */
+    public ThresholdDifferenceCalculator(int threshold) {
+        mThreshold = threshold;
+    }
 
     @Override
-    public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width, int height) {
-        for (int i = 0 ; i < height ; i++) {
-            for (int j = 0 ; j < width ; j++) {
-                int index = offset + (i * stride) + j;
+    public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
+            int height) {
+        for (int y = 0 ; y < height ; y++) {
+            for (int x = 0 ; x < width ; x++) {
+                int index = indexFromXAndY(x, y, stride, offset);
                 int error = Math.abs(Color.red(ideal[index]) - Color.red(given[index]));
                 error += Math.abs(Color.blue(ideal[index]) - Color.blue(given[index]));
                 error += Math.abs(Color.green(ideal[index]) - Color.green(given[index]));
-                if (error > THRESHOLD) {
+                if (error > mThreshold) {
                     return false;
                 }
             }

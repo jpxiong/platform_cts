@@ -17,6 +17,8 @@ package android.uirendering.cts;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.View;
 
 /**
@@ -36,6 +38,13 @@ public class CanvasClientView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+        if (CanvasCompareActivityTest.DEBUG) {
+            String s = canvas.isHardwareAccelerated() ? "HARDWARE" : "SOFTWARE";
+            Paint paint = new Paint();
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(20);
+            canvas.drawText(s, 200, 200, paint);
+        }
         if (mCanvasClient != null) {
             canvas.save();
             canvas.clipRect(0, 0, mWidth, mHeight);
