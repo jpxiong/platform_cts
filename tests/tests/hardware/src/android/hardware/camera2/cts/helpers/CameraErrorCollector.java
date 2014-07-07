@@ -20,6 +20,7 @@ import android.graphics.Rect;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.util.Log;
 import android.util.Size;
 
@@ -51,7 +52,9 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
-     * Adds an unconditional error to the table. Execution continues, but test will fail at the end.
+     * Adds an unconditional error to the table.
+     *
+     * <p>Execution continues, but test will fail at the end.</p>
      *
      * @param message A string containing the failure reason.
      */
@@ -60,7 +63,7 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
-     * Adds a Throwable to the table.  Execution continues, but the test will fail at the end.
+     * Adds a Throwable to the table. <p>Execution continues, but the test will fail at the end.</p>
      */
     @Override
     public void addError(Throwable error) {
@@ -91,7 +94,6 @@ public class CameraErrorCollector extends ErrorCollector {
     @Override
     public <T> void checkThat(final String reason, final T value, final Matcher<T> matcher) {
         super.checkThat(mCameraMsg + reason, value, matcher);
-
     }
 
     /**
@@ -132,6 +134,8 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param expected Expected value to be checked against.
      * @param actual Actual value to be checked.
      * @return {@code true} if the two values are equal, {@code false} otherwise.
+     *
+     * @throws IllegalArgumentException if {@code expected} was {@code null}
      */
     public <T> boolean expectEquals(String msg, T expected, T actual) {
         if (expected == null) {
@@ -159,6 +163,8 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param expected Expected array of values to be checked against.
      * @param actual Actual array of values to be checked.
      * @return {@code true} if the two arrays of values are deeply equal, {@code false} otherwise.
+     *
+     * @throws IllegalArgumentException if {@code expected} was {@code null}
      */
     public <T> boolean expectEquals(String msg, T[] expected, T[] actual) {
         if (expected == null) {
@@ -212,8 +218,7 @@ public class CameraErrorCollector extends ErrorCollector {
      * @return {@code true} if the two values are equal, {@code false} otherwise.
      */
     public <T> boolean expectEquals(String msg, double expected, double actual, double tolerance) {
-        if (expected == actual)
-        {
+        if (expected == actual) {
             return true;
         }
 
@@ -264,51 +269,119 @@ public class CameraErrorCollector extends ErrorCollector {
      * @param value The value to be checked
      * @param min The min value of the range
      * @param max The max value of the range
+     *
+     * @return {@code true} if the value was in range, {@code false} otherwise
      */
-    public <T extends Comparable<? super T>> void expectInRange(String msg, T value,
+    public <T extends Comparable<? super T>> boolean expectInRange(String msg, T value,
             T min, T max) {
-        expectTrue(msg + String.format(", value " + value.toString() + " is out of range [%s, %s]",
+        return expectTrue(msg + String.format(", value " + value.toString()
+                + " is out of range [%s, %s]",
                 min.toString(), max.toString()),
                 value.compareTo(max)<= 0 && value.compareTo(min) >= 0);
+    }
+
+
+    /**
+     * Check that two metering region arrays are similar enough by ensuring that each of their width,
+     * height, and all corners are within {@code errorPercent} of each other.
+     *
+     * <p>Note that the length of the arrays must be the same, and each weight must be the same
+     * as well. We assume the order is also equivalent.</p>
+     *
+     * <p>At most 1 error per each dissimilar metering region is collected.</p>
+     *
+     * @param msg Message to be logged
+     * @param expected The reference 'expected' values to be used to check against
+     * @param actual The actual values that were received
+     * @param errorPercent Within how many percent the components should be
+     *
+     * @return {@code true} if all expects passed, {@code false} otherwise
+     */
+    public boolean expectMeteringRegionsAreSimilar(String msg,
+            MeteringRectangle[] expected, MeteringRectangle[] actual,
+            float errorPercent) {
+        String expectedActualMsg = String.format("expected (%s), actual (%s)",
+                Arrays.deepToString(expected), Arrays.deepToString(actual));
+
+        String differentSizesMsg = String.format(
+                "%s: rect lists are different sizes; %s",
+                msg, expectedActualMsg);
+
+        String differentWeightsMsg = String.format(
+                "%s: rect weights are different; %s",
+                msg, expectedActualMsg);
+
+        if (!expectTrue(differentSizesMsg, actual != null)) {
+            return false;
+        }
+
+        if (!expectEquals(differentSizesMsg, expected.length, actual.length)) return false;
+
+        boolean succ = true;;
+        for (int i = 0; i < expected.length; ++i) {
+            if (i < actual.length) {
+                // Avoid printing multiple errors for the same rectangle
+                if (!expectRectsAreSimilar(
+                        msg, expected[i].getRect(), actual[i].getRect(), errorPercent)) {
+                    succ = false;
+                    continue;
+                }
+                if (!expectEquals(differentWeightsMsg,
+                        expected[i].getMeteringWeight(), actual[i].getMeteringWeight())) {
+                    succ = false;
+                    continue;
+                }
+            }
+        }
+
+        return succ;
     }
 
     /**
      * Check that two rectangles are similar enough by ensuring that their width, height,
      * and all corners are within {@code errorPercent} of each other.
      *
+     * <p>Only the first error is collected, to avoid spamming several error messages when
+     * the rectangle is hugely dissimilar.</p>
+     *
      * @param msg Message to be logged
      * @param expected The reference 'expected' value to be used to check against
      * @param actual The actual value that was received
      * @param errorPercent Within how many percent the components should be
+     *
+     * @return {@code true} if all expects passed, {@code false} otherwise
      */
-    public void expectRectsAreSimilar(String msg, Rect expected, Rect actual, float errorPercent) {
+    public boolean expectRectsAreSimilar(String msg, Rect expected, Rect actual,
+            float errorPercent) {
         String formattedMsg = String.format("%s: rects are not similar enough; expected (%s), " +
                 "actual (%s), error percent (%s), reason: ",
                 msg, expected, actual, errorPercent);
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "too wide", "too narrow", actual.width(), expected.width(),
-                errorPercent);
+                errorPercent)) return false;
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "too tall", "too short", actual.height(), expected.height(),
-                errorPercent);
+                errorPercent)) return false;
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "left pt too right", "left pt too left", actual.left, expected.left,
-                errorPercent);
+                errorPercent)) return false;
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "right pt too right", "right pt too left",
-                actual.right, expected.right, errorPercent);
+                actual.right, expected.right, errorPercent)) return false;
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "top pt too low", "top pt too high", actual.top, expected.top,
-                errorPercent);
+                errorPercent)) return false;
 
-        expectSimilarValues(
+        if (!expectSimilarValues(
                 formattedMsg, "bottom pt too low", "bottom pt too high", actual.top, expected.top,
-                errorPercent);
+                errorPercent)) return false;
+
+        return true;
     }
 
     /**
@@ -338,13 +411,16 @@ public class CameraErrorCollector extends ErrorCollector {
                 errorPercent);
     }
 
-    private void expectSimilarValues(
+    private boolean expectSimilarValues(
             String formattedMsg, String tooSmall, String tooLarge, int actualValue,
             int expectedValue, float errorPercent) {
-        expectTrue(formattedMsg + tooLarge,
-                actualValue <= (expectedValue * (1.0f + errorPercent)));
-        expectTrue(formattedMsg + tooSmall,
-                actualValue >= (expectedValue * (1.0f - errorPercent)));
+        boolean succ = true;
+        succ = expectTrue(formattedMsg + tooLarge,
+                actualValue <= (expectedValue * (1.0f + errorPercent))) && succ;
+        succ = expectTrue(formattedMsg + tooSmall,
+                actualValue >= (expectedValue * (1.0f - errorPercent))) && succ;
+
+        return succ;
     }
 
     public void expectNotNull(String msg, Object obj) {
@@ -432,7 +508,7 @@ public class CameraErrorCollector extends ErrorCollector {
     public <T> void expectKeyValueNotEquals(
             Builder request, CaptureRequest.Key<T> key, T expected) {
         if (request == null || key == null || expected == null) {
-            throw new IllegalArgumentException("request, key and target shouldn't be null");
+            throw new IllegalArgumentException("request, key and expected shouldn't be null");
         }
 
         T value;
@@ -454,7 +530,7 @@ public class CameraErrorCollector extends ErrorCollector {
     public <T> void expectKeyValueNotEquals(
             CaptureResult result, CaptureResult.Key<T> key, T expected) {
         if (result == null || key == null || expected == null) {
-            throw new IllegalArgumentException("result, key and target shouldn't be null");
+            throw new IllegalArgumentException("result, key and expected shouldn't be null");
         }
 
         T value;
@@ -477,7 +553,7 @@ public class CameraErrorCollector extends ErrorCollector {
      */
     public <T> void expectKeyValueEquals(Builder request, CaptureRequest.Key<T> key, T expected) {
         if (request == null || key == null || expected == null) {
-            throw new IllegalArgumentException("request, key and target shouldn't be null");
+            throw new IllegalArgumentException("request, key and expected shouldn't be null");
         }
 
         T value;

@@ -113,6 +113,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 3000;
     private static final double AE_COMPENSATION_ERROR_TOLERANCE = 0.2;
     private static final int NUM_FRAMES_WAITED = 30;
+    private static final int NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY = 8;
+
+    // 5 percent error margin for resulting metering regions
+    private static final float METERING_REGION_ERROR_PERCENT_DELTA = 0.05f;
 
     @Override
     protected void setUp() throws Exception {
@@ -266,10 +270,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing AE compensation for Camera " + id);
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    continue;
-                }
-
                 aeCompensationTestByCamera();
             } finally {
                 closeDevice();
@@ -288,7 +288,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 openDevice(id);
 
                 boolean aeRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
-                if (!mStaticInfo.isPerFrameControlSupported() || !aeRegionsSupported) {
+                if (!aeRegionsSupported) {
                     continue;
                 }
 
@@ -313,7 +313,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 openDevice(id);
 
                 boolean awbRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AWB_INDEX);
-                if (!mStaticInfo.isPerFrameControlSupported() || !awbRegionsSupported) {
+                if (!awbRegionsSupported) {
                     continue;
                 }
 
@@ -338,7 +338,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 openDevice(id);
 
                 boolean afRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
-                if (!mStaticInfo.isPerFrameControlSupported() || !afRegionsSupported) {
+                if (!afRegionsSupported) {
                     continue;
                 }
 
@@ -519,7 +519,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
         mCamera.capture(previewRequest.build(), resultListener, mHandler);
-        waitForAeStable(resultListener);
+        waitForAeStable(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
         // Validate the next result immediately for region and mode.
         result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         mCollector.expectEquals("AE mode in result and request should be same",
@@ -528,8 +529,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         if (canSetAeRegion) {
             MeteringRectangle[] resultAeRegions =
                     getValueNotNull(result, CaptureResult.CONTROL_AE_REGIONS);
-            mCollector.expectEquals("AE regions in result and request should be same",
-                    aeRegions, resultAeRegions);
+
+            mCollector.expectMeteringRegionsAreSimilar(
+                    "AE regions in result and request should be similar",
+                    aeRegions,
+                    resultAeRegions,
+                    METERING_REGION_ERROR_PERCENT_DELTA);
         }
 
         /**
@@ -1123,7 +1128,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             int exposureCompensation = i * stepsPerEv + compensationRange.getLower();
 
             // Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
-            waitForAeStable(resultListener);
+            waitForAeStable(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             CaptureResult result = resultListener.getCaptureResult(NUM_RESULTS_WAIT_TIMEOUT);
 
             // get and check if current exposure value is valid
@@ -1145,6 +1150,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     exposureCompensation);
             previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
             mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             waitForAeLocked(resultListener);
 
             // Issue still capture
@@ -1381,7 +1387,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                             regionHeight,               // height
                             DEFAULT_REGION_WEIGHT)});
 
-        // Bootom left corner
+        // Bottom left corner
         testCases.add(
                 new MeteringRectangle[] {
                     new MeteringRectangle(
@@ -1391,7 +1397,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                             regionHeight,                // height
                             DEFAULT_REGION_WEIGHT)});
 
-        // Bootom right corner
+        // Bottom right corner
         testCases.add(
                 new MeteringRectangle[] {
                     new MeteringRectangle(
