@@ -151,25 +151,44 @@ public class StaticMetadata {
     }
 
     /**
+     * Return the supported hardware level of the device, or {@code -1} if no value is reported.
+     *
+     * @return the supported hardware level as a constant defined for
+     *      {@link CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL}.
+     */
+    private int getHardwareLevelChecked() {
+        Integer hwLevel = getValueFromKeyNonNull(
+                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+        if (hwLevel == null) {
+            return -1;
+        }
+        return hwLevel;
+    }
+
+    /**
      * Whether or not the hardware level reported by android.info.supportedHardwareLevel
      * is {@value CameraMetadata#INFO_SUPPORTED_HARDWARE_LEVEL_FULL}.
      *
-     * <p>If the camera device is incorrectly reporting the hardwareLevel, this
-     * will always return {@code false}.</p>
+     * <p>If the camera device is not reporting the hardwareLevel, this
+     * will cause the test to fail.</p>
      *
-     * @return true if the device is FULL, false otherwise.
+     * @return {@code true} if the device is {@code FULL}, {@code false} otherwise.
      */
     public boolean isHardwareLevelFull() {
-        Integer hwLevel = getValueFromKeyNonNull(
-                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+        return getHardwareLevelChecked() == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
+    }
 
-        if (hwLevel == null) {
-            return false;
-        }
-
-        // Normal. Device could be limited.
-        int hwLevelInt = hwLevel;
-        return hwLevelInt == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
+    /**
+     * Whether or not the hardware level reported by android.info.supportedHardwareLevel
+     * is {@value CameraMetadata#INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY}.
+     *
+     * <p>If the camera device is not reporting the hardwareLevel, this
+     * will cause the test to fail.</p>
+     *
+     * @return {@code true} if the device is {@code LEGACY}, {@code false} otherwise.
+     */
+    public boolean isHardwareLevelLegacy() {
+        return getHardwareLevelChecked() == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     }
 
     /**
@@ -178,13 +197,22 @@ public class StaticMetadata {
      * @return true if per frame control is supported, false otherwise.
      */
     public boolean isPerFrameControlSupported() {
-        Integer perFrameControl = getValueFromKeyNonNull(CameraCharacteristics.SYNC_MAX_LATENCY);
+        return getSyncMaxLatency() == CameraMetadata.SYNC_MAX_LATENCY_PER_FRAME_CONTROL;
+    }
 
-        if (perFrameControl == null) {
-            return false;
+    /**
+     * Get the maximum number of frames to wait for a request settings being applied
+     *
+     * @return CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN for unknown latency
+     *         CameraMetadata.SYNC_MAX_LATENCY_PER_FRAME_CONTROL for per frame control
+     *         a positive int otherwise
+     */
+    public int getSyncMaxLatency() {
+        Integer value = getValueFromKeyNonNull(CameraCharacteristics.SYNC_MAX_LATENCY);
+        if (value == null) {
+            return CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN;
         }
-
-        return perFrameControl == CameraMetadata.SYNC_MAX_LATENCY_PER_FRAME_CONTROL;
+        return value;
     }
 
     /**
@@ -194,10 +222,35 @@ public class StaticMetadata {
      * <p>If the camera device is incorrectly reporting the hardwareLevel, this
      * will always return {@code true}.</p>
      *
-     * @return true if the device is LIMITED, false otherwise.
+     * @return {@code true} if the device is {@code LIMITED}, {@code false} otherwise.
      */
     public boolean isHardwareLevelLimited() {
-        return !isHardwareLevelFull();
+        return getHardwareLevelChecked() == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED;
+    }
+
+    /**
+     * Whether or not the hardware level reported by {@code android.info.supportedHardwareLevel}
+     * is at least {@link CameraMetadata#INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED}.
+     *
+     * <p>If the camera device is incorrectly reporting the hardwareLevel, this
+     * will always return {@code false}.</p>
+     *
+     * @return
+     *          {@code true} if the device is {@code LIMITED} or {@code FULL},
+     *          {@code false} otherwise (i.e. LEGACY).
+     */
+    public boolean isHardwareLevelLimitedOrBetter() {
+        Integer hwLevel = getValueFromKeyNonNull(
+                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+
+        if (hwLevel == null) {
+            return false;
+        }
+
+        // Normal. Device could be limited.
+        int hwLevelInt = hwLevel;
+        return hwLevelInt == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FULL ||
+                hwLevelInt == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED;
     }
 
     /**
