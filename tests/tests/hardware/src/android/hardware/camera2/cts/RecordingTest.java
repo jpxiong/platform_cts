@@ -15,9 +15,11 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Size;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.media.CamcorderProfile;
@@ -116,7 +118,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 basicRecordingTestByCamera();
             } finally {
                 closeDevice();
-                releasRecorder();
+                releaseRecorder();
             }
         }
     }
@@ -145,7 +147,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 recordingSizeTestByCamera();
             } finally {
                 closeDevice();
-                releasRecorder();
+                releaseRecorder();
             }
         }
     }
@@ -216,15 +218,16 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private void basicRecordingTestByCamera() throws Exception {
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
-            if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
+            if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
+                    allowedUnsupported(cameraId, profileId)) {
                 continue;
             }
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
             Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
-            assertTrue("Video size " + videoSz.toString()
-                    + " must be one of the camera device supported video size!",
-                    mSupportedVideoSizes.contains(videoSz));
+            assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
+                            " must be one of the camera device supported video size!",
+                            mSupportedVideoSizes.contains(videoSz));
 
             if (VERBOSE) {
                 Log.v(TAG, "Testing camera recording with video size " + videoSz.toString());
@@ -320,10 +323,33 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     videoSnapshotTestByCamera(videoSnapshotSz, burstTest);
                 } finally {
                     closeDevice();
-                    releasRecorder();
+                    releaseRecorder();
                     closeImageReader();
                 }
             }
+    }
+
+    /**
+     * Returns {@code true} if the {@link CamcorderProfile} ID is allowed to be unsupported.
+     *
+     * <p>This only allows unsupported profiles when using the LEGACY mode of the Camera API.</p>
+     *
+     * @param profileId a {@link CamcorderProfile} ID to check.
+     * @return {@code true} if supported.
+     */
+    private boolean allowedUnsupported(int cameraId, int profileId) {
+        if (!mStaticInfo.isHardwareLevelLegacy()) {
+            return false;
+        }
+
+        switch(profileId) {
+            case CamcorderProfile.QUALITY_2160P:
+            case CamcorderProfile.QUALITY_1080P:
+            case CamcorderProfile.QUALITY_HIGH:
+                return !CamcorderProfile.hasProfile(cameraId, profileId) ||
+                        CamcorderProfile.get(cameraId, profileId).videoFrameWidth >= 1080;
+        }
+        return false;
     }
 
     /**
@@ -335,22 +361,23 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * </p>
      *
      * @param videoSnapshotSz The size of video snapshot image
-     * @param burstTest Perfrom burst capture or single capture. For burst capture
+     * @param burstTest Perform burst capture or single capture. For burst capture
      *                  {@value #BURST_VIDEO_SNAPSHOT_NUM} capture requests will be sent.
      */
     private void videoSnapshotTestByCamera(Size videoSnapshotSz, boolean burstTest)
             throws Exception {
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
-            if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
+            if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
+                    allowedUnsupported(cameraId, profileId)) {
                 continue;
             }
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
             Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
-            assertTrue("Video size " + videoSz.toString()
-                    + " must be one of the camera device supported video size!",
-                    mSupportedVideoSizes.contains(videoSz));
+            assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
+                            " must be one of the camera device supported video size!",
+                            mSupportedVideoSizes.contains(videoSz));
 
             if (VERBOSE) {
                 Log.v(TAG, "Testing camera recording with video size " + videoSz.toString());
@@ -370,10 +397,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
             CaptureRequest.Builder videoSnapshotRequestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
-            prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
 
             // prepare preview surface: preview size is same as video size.
             updatePreviewSurface(videoSz);
+
+            prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
 
             // Start recording
             startRecording(/* useMediaRecorder */true, resultListener);
@@ -433,8 +461,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             ImageReader.OnImageAvailableListener imageListener)
             throws Exception {
         mReader.setOnImageAvailableListener(imageListener, mHandler);
+        assertNotNull("Recording surface must be non-null!", mRecordingSurface);
         requestBuilder.addTarget(mRecordingSurface);
+        assertNotNull("Preview surface must be non-null!", mPreviewSurface);
         requestBuilder.addTarget(mPreviewSurface);
+        assertNotNull("Reader surface must be non-null!", mReaderSurface);
         requestBuilder.addTarget(mReaderSurface);
     }
 
@@ -541,7 +572,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void releasRecorder() {
+    private void releaseRecorder() {
         if (mMediaRecorder != null) {
             mMediaRecorder.release();
             mMediaRecorder = null;
@@ -559,9 +590,13 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             Size videoSz = new Size(mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight());
             assertTrue("Video size doesn't match", videoSz.equals(sz));
             int duration = mediaPlayer.getDuration();
-            assertTrue(String.format(
-                    "Video duration doesn't match: recorded %dms, expected %dms", duration,
-                    durationMs), Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
+
+            // TODO: Don't skip this for video snapshot
+            if (!mStaticInfo.isHardwareLevelLegacy()) {
+                assertTrue(String.format(
+                        "Video duration doesn't match: recorded %dms, expected %dms", duration,
+                        durationMs), Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
+            }
         } finally {
             mediaPlayer.release();
             if (!DEBUG_DUMP) {
@@ -602,21 +637,30 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
                 long nextTS = getValueNotNull(nextResult, CaptureResult.SENSOR_TIMESTAMP);
                 int durationMs = (int) (currentTS - prevTS) / 1000000;
-                mCollector.expectTrue(
-                        String.format(
-                                "Video %dx%d Frame drop detected before video snapshot: " +
-                                "duration %dms (expected %dms)",
-                                mVideoSize.getWidth(), mVideoSize.getHeight(),
-                                durationMs, expectedDurationMs),
-                        durationMs < (expectedDurationMs * 2));
-                durationMs = (int) (nextTS - currentTS) / 1000000;
-                mCollector.expectTrue(
-                        String.format(
-                                "Video %dx%d Frame drop detected after video snapshot: " +
-                                "duration %dms (expected %dms)",
-                                mVideoSize.getWidth(), mVideoSize.getHeight(),
-                                durationMs, expectedDurationMs),
-                        durationMs < (expectedDurationMs * 2));
+
+                // Snapshots in legacy mode pause the preview briefly.  Skip the duration
+                // requirements for legacy mode unless this is fixed.
+                if (!mStaticInfo.isHardwareLevelLegacy()) {
+                    mCollector.expectTrue(
+                            String.format(
+                                    "Video %dx%d Frame drop detected before video snapshot: " +
+                                            "duration %dms (expected %dms)",
+                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                    durationMs, expectedDurationMs
+                            ),
+                            durationMs < (expectedDurationMs * 2)
+                    );
+                    durationMs = (int) (nextTS - currentTS) / 1000000;
+                    mCollector.expectTrue(
+                            String.format(
+                                    "Video %dx%d Frame drop detected after video snapshot: " +
+                                            "duration %dms (expected %dms)",
+                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                    durationMs, expectedDurationMs
+                            ),
+                            durationMs < (expectedDurationMs * 2)
+                    );
+                }
                 return;
             }
             prevTS = currentTS;
@@ -689,29 +733,16 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
     private boolean isSupportedByCamera(Size sz, int frameRate) {
         // Check if camera can support this sz and frame rate combination.
-        // FIXME: enable below code when bug 12957740 is fixed.
-        /*
-        CameraCharacteristics props = mCameraManager.getCameraCharacteristics(mCamera.getId());
-        assertNotNull("CameraCharacteristics shouldn't be null", props);
-        long[] minDurations = props.get(CameraCharacteristics.SCALER_AVAILABLE_MIN_FRAME_DURATIONS);
-        assertNotNull("android.scaler.availableMinFrameDurations shouldn't be null", minDurations);
-        // Layout of this array: (format, width, height, duration).
-        boolean foundSz = false;
-        int maxFrameRate = 0;
-        for (int i = 0; i < minDurations.length; i += 4) {
-            if (sz.getHeight() == minDurations[i + 1] && sz.getWidth() == minDurations[i + 2]) {
-                assertTrue("Min duration should be a positive number", minDurations[i + 3] > 0);
-                foundSz = true;
-                maxFrameRate = (int)(1e9f / minDurations[i + 3]);
-                break;
-            }
-        }
-        if (!foundSz || maxFrameRate < frameRate) {
+        StreamConfigurationMap config = mStaticInfo.
+                getValueFromKeyNonNull(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
+        long minDuration = config.getOutputMinFrameDuration(MediaRecorder.class, sz);
+        if (minDuration == StreamConfigurationMap.NO_MIN_FRAME_DURATION) {
             return false;
         }
-        */
 
-        return true;
+        int maxFrameRate = (int) (1e9f / minDuration);
+        return maxFrameRate >= frameRate;
     }
 
     /**

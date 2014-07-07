@@ -151,21 +151,6 @@ public class StaticMetadata {
     }
 
     /**
-     * Return the supported hardware level of the device, or {@code -1} if no value is reported.
-     *
-     * @return the supported hardware level as a constant defined for
-     *      {@link CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL}.
-     */
-    private int getHardwareLevelChecked() {
-        Integer hwLevel = getValueFromKeyNonNull(
-                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-        if (hwLevel == null) {
-            return -1;
-        }
-        return hwLevel;
-    }
-
-    /**
      * Whether or not the hardware level reported by android.info.supportedHardwareLevel
      * is {@value CameraMetadata#INFO_SUPPORTED_HARDWARE_LEVEL_FULL}.
      *
@@ -176,6 +161,22 @@ public class StaticMetadata {
      */
     public boolean isHardwareLevelFull() {
         return getHardwareLevelChecked() == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
+    }
+
+    /**
+     * Whether or not the hardware level reported by android.info.supportedHardwareLevel
+     * Return the supported hardware level of the device, or fail if no value is reported.
+     *
+     * @return the supported hardware level as a constant defined for
+     *      {@link CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL}.
+     */
+    public int getHardwareLevelChecked() {
+        Integer hwLevel = getValueFromKeyNonNull(
+                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+        if (hwLevel == null) {
+            Assert.fail("No supported hardware level reported.");
+        }
+        return hwLevel;
     }
 
     /**
@@ -1553,7 +1554,7 @@ public class StaticMetadata {
     /**
      * Gets the key, logging warnings for null values.
      */
-    private <T> T getValueFromKeyNonNull(Key<T> key) {
+    public <T> T getValueFromKeyNonNull(Key<T> key) {
         if (key == null) {
             throw new IllegalArgumentException("key was null");
         }
