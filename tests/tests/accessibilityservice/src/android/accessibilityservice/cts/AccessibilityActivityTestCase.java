@@ -37,7 +37,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
     /**
      * The timeout since the last accessibility event to consider the device idle.
      */
-    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 200;
+    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 500;
 
     /**
      * @param activityClass
