@@ -1286,20 +1286,20 @@ public class StaticMetadata {
     }
 
     /**
-     * Get availableMaxDigitalZoom and do the sanity check.
-     *
-     * @return available max digitial zoom, default value (1.0) if it is not available.
+     * Get the scaler's max digital zoom ({@code >= 1.0f}) ratio between crop and active array
+     * @return the max zoom ratio, or {@code 1.0f} if the value is unavailable
      */
     public float getAvailableMaxDigitalZoomChecked() {
         Key<Float> key =
                 CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM;
+
         Float maxZoom = getValueFromKeyNonNull(key);
         if (maxZoom == null) {
             return 1.0f;
         }
 
-        checkTrueForKey(key, " max digitial zoom should be no less than 1",
-                maxZoom > 1.0f && !Float.isNaN(maxZoom));
+        checkTrueForKey(key, " max digital zoom should be no less than 1",
+                maxZoom >= 1.0f && !Float.isNaN(maxZoom) && !Float.isInfinite(maxZoom));
 
         return maxZoom;
     }
@@ -1460,6 +1460,26 @@ public class StaticMetadata {
                 facing >= CameraCharacteristics.LENS_FACING_FRONT &&
                 facing <= CameraCharacteristics.LENS_FACING_BACK);
         return facing;
+    }
+
+    /**
+     * Get the scaler's cropping type (center only or freeform)
+     * @return cropping type, return default value (CENTER_ONLY) if value is unavailable
+     */
+    public int getScalerCroppingTypeChecked() {
+        Key<Integer> key =
+                CameraCharacteristics.SCALER_CROPPING_TYPE;
+        Integer value = getValueFromKeyNonNull(key);
+
+        if (value == null) {
+            return CameraCharacteristics.SCALER_CROPPING_TYPE_CENTER_ONLY;
+        }
+
+        checkTrueForKey(key, " value is out of range ",
+                value >= CameraCharacteristics.SCALER_CROPPING_TYPE_CENTER_ONLY &&
+                value <= CameraCharacteristics.SCALER_CROPPING_TYPE_FREEFORM);
+
+        return value;
     }
 
     /**
