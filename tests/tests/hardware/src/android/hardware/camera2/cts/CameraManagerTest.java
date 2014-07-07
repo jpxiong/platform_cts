@@ -211,14 +211,13 @@ public class CameraManagerTest extends AndroidTestCase {
                     mCameraManager.openCamera(ids[i], mCameraListener, mHandler);
 
                     // Block until unConfigured
-                    mCameraListener.waitForState(BlockingStateListener.STATE_UNCONFIGURED,
+                    mCameraListener.waitForState(BlockingStateListener.STATE_OPENED,
                             CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
                     // Ensure state transitions are in right order:
                     // -- 1) Opened
-                    // -- 2) Unconfigured
                     // Ensure no other state transitions have occurred:
-                    camera = verifyCameraStateOpenedThenUnconfigured(ids[i], mockListener);
+                    camera = verifyCameraStateOpened(ids[i], mockListener);
                 } finally {
                     if (camera != null) {
                         camera.close();
@@ -272,7 +271,7 @@ public class CameraManagerTest extends AndroidTestCase {
                 }
 
                 List<Integer> expectedStates = new ArrayList<Integer>();
-                expectedStates.add(BlockingStateListener.STATE_UNCONFIGURED);
+                expectedStates.add(BlockingStateListener.STATE_OPENED);
                 expectedStates.add(BlockingStateListener.STATE_ERROR);
                 int state = mCameraListener.waitForAnyOfStates(
                         expectedStates, CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
@@ -316,10 +315,10 @@ public class CameraManagerTest extends AndroidTestCase {
                     camera = argument.getValue();
                     assertNotNull("Expected a non-null camera for the error transition for ID: "
                             + ids[i], camera);
-                } else if (state == BlockingStateListener.STATE_UNCONFIGURED) {
+                } else if (state == BlockingStateListener.STATE_OPENED) {
                     // Camera opened successfully.
-                    // => onOpened+onUnconfigured called exactly once with same argument
-                    camera = verifyCameraStateOpenedThenUnconfigured(cameraId,
+                    // => onOpened called exactly once
+                    camera = verifyCameraStateOpened(cameraId,
                             mockListener);
                 } else {
                     fail("Unexpected state " + state);
@@ -373,7 +372,7 @@ public class CameraManagerTest extends AndroidTestCase {
      *
      * @return The camera device (non-{@code null}).
      */
-    private static CameraDevice verifyCameraStateOpenedThenUnconfigured(String cameraId,
+    private static CameraDevice verifyCameraStateOpened(String cameraId,
             MockStateListener listener) {
         ArgumentCaptor<CameraDevice> argument =
                 ArgumentCaptor.forClass(CameraDevice.class);
@@ -382,7 +381,6 @@ public class CameraManagerTest extends AndroidTestCase {
         /**
          * State transitions (in that order):
          *  1) onOpened
-         *  2) onUnconfigured
          *
          * No other transitions must occur for successful #openCamera
          */
@@ -391,16 +389,9 @@ public class CameraManagerTest extends AndroidTestCase {
 
         CameraDevice camera = argument.getValue();
         assertNotNull(
-                String.format("Failed to unconfigure camera device ID: %s", cameraId),
+                String.format("Failed to open camera device ID: %s", cameraId),
                 camera);
 
-        inOrder.verify(listener)
-                .onUnconfigured(argument.capture());
-
-        assertEquals(String.format("Opened camera did not match unconfigured camera " +
-                "for camera device ID: %s", cameraId),
-                camera,
-                argument.getValue());
         // Do not use inOrder here since that would skip anything called before onOpened
         verifyNoMoreInteractions(listener);
 
@@ -450,13 +441,11 @@ public class CameraManagerTest extends AndroidTestCase {
                 ArgumentCaptor<CameraDevice> argument =
                         ArgumentCaptor.forClass(CameraDevice.class);
                 verify(mockSuccessListener, atLeastOnce()).onOpened(argument.capture());
-                successListener.waitForState(BlockingStateListener.STATE_UNCONFIGURED,
-                        CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
                 failListener.waitForState(BlockingStateListener.STATE_ERROR,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
-                successCamera = verifyCameraStateOpenedThenUnconfigured(
+                successCamera = verifyCameraStateOpened(
                         ids[i], mockSuccessListener);
 
                 verify(mockFailListener)
