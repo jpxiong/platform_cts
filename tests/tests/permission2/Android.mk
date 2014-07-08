@@ -19,7 +19,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_JAVA_LIBRARIES := telephony-common mms-common
+LOCAL_JAVA_LIBRARIES := telephony-common
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
