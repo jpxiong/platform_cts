@@ -227,6 +227,21 @@
     <string name="ble_server_reliable_write">Waiting on reliable write from client</string>
     <string name="ble_server_receiving_disconnect">Waiting on disconnection from BLE client</string>
 
+    <!-- BLE advertiser side strings -->
+    <string name="ble_advertiser_test_name">BLE Advertiser Test</string>
+    <string name="ble_advertiser_test_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the advertiser.</string>
+    <string name="ble_advertiser_service_name">Bluetooth LE Advertiser Handler Service</string>
+    <string name="ble_privacy_mac_start">Start</string>
+    <string name="ble_privacy_mac_stop">Stop</string>
+    <string name="ble_privacy_mac_name">BLE Privacy Mac</string>
+    <string name="ble_privacy_mac_info">BLE Advertiser should advertise in non-repeating MAC address.</string>
+
+    <!-- BLE scanner side strings -->
+    <string name="ble_scanner_name">BLE Scanner Test</string>
+    <string name="ble_scanner_service_name">Bluetooth LE Scanner Handler Service</string>
+    <string name="ble_scanner_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
+    <string name="ble_scanner_privacy_mac">Hold for 15 min to see if receive a different MAC address from advertiser.</string>
+
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
     <string name="feature_summary_info">This is a test for...</string>
