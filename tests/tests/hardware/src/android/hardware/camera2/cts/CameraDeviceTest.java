@@ -80,6 +80,15 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     @Override
     public void setContext(Context context) {
         super.setContext(context);
+
+        /**
+         * Workaround for mockito and JB-MR2 incompatibility
+         *
+         * Avoid java.lang.IllegalArgumentException: dexcache == null
+         * https://code.google.com/p/dexmaker/issues/detail?id=2
+         */
+        System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
+
         /**
          * Create error listener in context scope, to catch asynchronous device error.
          * Use spy object here since we want to use the SimpleDeviceListener callback
