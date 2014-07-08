@@ -62,7 +62,7 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
     private void doTest() throws Exception {
         mOnMarkerReachedCalled = false;
         mOnPeriodicNotificationCalled = false;
-        byte[] vai = AudioTrackTest.createSoundDataInByteArray(2 * mMinBuffSize, TEST_SR);
+        byte[] vai = AudioTrackTest.createSoundDataInByteArray(2 * mMinBuffSize, TEST_SR, 1024);
         int markerInFrames = vai.length / 4;
         assertEquals(AudioTrack.SUCCESS, mAudioTrack.setNotificationMarkerPosition(markerInFrames));
         int periodInFrames = vai.length / 2;
