@@ -22,6 +22,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.VectorDrawable;
+import android.graphics.drawable.VectorDrawable;
+import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -200,5 +202,40 @@ public class VectorDrawableTest extends AndroidTestCase {
             fail((filename +": totalDiffPixelCount is " + totalDiffPixelCount));
         }
 
+    }
+
+    public void testGetConstantState() {
+        VectorDrawable vectorDrawable = new VectorDrawable();
+        ConstantState constantState = vectorDrawable.getConstantState();
+        assertNotNull(constantState);
+        assertEquals(0, constantState.getChangingConfigurations());
+
+        vectorDrawable.setChangingConfigurations(1);
+        constantState = vectorDrawable.getConstantState();
+        assertNotNull(constantState);
+        assertEquals(1, constantState.getChangingConfigurations());
+    }
+
+    public void testMutate() {
+        Resources resources = mContext.getResources();
+        VectorDrawable d1 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
+        VectorDrawable d2 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
+        VectorDrawable d3 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
+
+        d1.setAlpha(0x80);
+        assertEquals(0x80, d1.getAlpha());
+        assertEquals(0x80, d2.getAlpha());
+        assertEquals(0x80, d3.getAlpha());
+
+        d1.mutate();
+        d1.setAlpha(0x40);
+        assertEquals(0x40, d1.getAlpha());
+        assertEquals(0x80, d2.getAlpha());
+        assertEquals(0x80, d3.getAlpha());
+
+        d2.setAlpha(0x20);
+        assertEquals(0x40, d1.getAlpha());
+        assertEquals(0x20, d2.getAlpha());
+        assertEquals(0x20, d3.getAlpha());
     }
 }
