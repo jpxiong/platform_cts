@@ -1,6 +1,2 @@
 [
-{
-  name: "android.admin.cts.DevicePolicyManagerTest",
-  bug: 15780858
-}
 ]
