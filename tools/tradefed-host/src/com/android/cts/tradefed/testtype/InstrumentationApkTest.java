@@ -19,6 +19,7 @@ import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.InstrumentationTest;
@@ -30,8 +31,8 @@ import java.util.Collection;
 import junit.framework.Assert;
 
 /**
- * A {@link InstrumentationTest] that will install CTS apks before test execution,
- * and uninstall on execution completion.
+ * A {@link InstrumentationTest} that will install CTS apks 
+ * before test execution, and uninstall on execution completion.
  */
 public class InstrumentationApkTest extends InstrumentationTest implements IBuildReceiver {
 
@@ -68,20 +69,29 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
     @Override
     public void run(final ITestInvocationListener listener)
             throws DeviceNotAvailableException {
-        Assert.assertNotNull("missing device", getDevice());
-        Assert.assertNotNull("missing build", mCtsBuild);
+        ITestDevice mTestDevice = getDevice();
+
+        if (mTestDevice == null) {
+            Log.e(LOG_TAG, String.format("Missing device."));
+            return;
+        }
+        if (mCtsBuild == null) {
+            Log.e(LOG_TAG, String.format("Missing build %s", mCtsBuild));
+            return;
+        }
 
         for (String apkFileName : mInstallFileNames) {
             Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
-                    getDevice().getSerialNumber()));
+                    mTestDevice.getSerialNumber()));
             try {
-                String installCode = getDevice().installPackage(mCtsBuild.getTestApp(apkFileName),
+                String installCode = mTestDevice.installPackage(mCtsBuild.getTestApp(apkFileName),
                         true);
-                Assert.assertNull(String.format("Failed to install %s on %s. Reason: %s",
-                        apkFileName, getDevice().getSerialNumber(), installCode), installCode);
-
+                if (installCode != null) {
+                    Log.e(LOG_TAG, String.format("Failed to install %s on %s. Reason: %s",
+                          apkFileName, mTestDevice.getSerialNumber(), installCode));
+                }
             } catch (FileNotFoundException e) {
-                Assert.fail(String.format("Could not find file %s", apkFileName));
+                Log.e(LOG_TAG, String.format("Could not find file %s", apkFileName));
             }
         }
         super.run(listener);
