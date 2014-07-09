@@ -15,8 +15,6 @@
  */
 package android.uirendering.cts.differencecalculators;
 
-import android.uirendering.cts.CanvasCompareActivityTest;
-
 import com.android.cts.uirendering.R;
 import com.android.cts.uirendering.ScriptC_ThresholdDifferenceCalculator;
 
@@ -55,13 +53,14 @@ public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
                 error += Math.abs(Color.blue(ideal[index]) - Color.blue(given[index]));
                 error += Math.abs(Color.green(ideal[index]) - Color.green(given[index]));
                 if (error > mThreshold) {
+                    Log.d(TAG, "Failure at position x = " + x + " y = " + y);
+                    Log.d(TAG, "Expected color " + Integer.toHexString(ideal[index]) +
+                            " given color " + Integer.toHexString(given[index]));
                     differentPixels++;
                 }
             }
         }
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(TAG, "Number of different pixels : " + differentPixels);
-        }
+        Log.d(TAG, "Number of different pixels : " + differentPixels);
         return (differentPixels == 0);
     }
 
@@ -85,11 +84,7 @@ public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
         mScript.forEach_thresholdCompare(inputAllocation, outputAllocation);
 
         float differentPixels = sum1DFloatAllocation(outputAllocation);
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME,
-                    "ThresholdDifferenceCalculatorRS : Number of different pixels = " +
-                            differentPixels);
-        }
+        Log.d(TAG, "Number of different pixels RS : " + differentPixels);
         return (differentPixels == 0);
     }
 }
