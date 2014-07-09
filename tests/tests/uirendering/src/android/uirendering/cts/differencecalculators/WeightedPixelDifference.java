@@ -16,7 +16,6 @@
 package android.uirendering.cts.differencecalculators;
 
 import android.graphics.Color;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
@@ -25,6 +24,7 @@ import android.util.Log;
  * white.
  */
 public class WeightedPixelDifference extends DifferenceCalculator {
+    private static final String TAG = "WeightedPixel";
     private static final int NUM_OF_COLUMNS = 10;
     private static final float TOTAL_ERROR_DIVISOR = 1024.0f;
 
@@ -101,10 +101,7 @@ public class WeightedPixelDifference extends DifferenceCalculator {
         totalError /= TOTAL_ERROR_DIVISOR;
         totalError /= interestingPixels;
 
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME,
-                    "WeightedPixelDifference : Total error = " + totalError);
-        }
+        Log.d(TAG, "Total error : " + totalError);
 
         return totalError < mThreshold;
     }
