@@ -204,6 +204,29 @@ public class VectorDrawableTest extends AndroidTestCase {
 
     }
 
+    public void testGetChangingConfigurations() {
+        VectorDrawable vectorDrawable = new VectorDrawable();
+        ConstantState constantState = vectorDrawable.getConstantState();
+
+        // default
+        assertEquals(0, constantState.getChangingConfigurations());
+        assertEquals(0, vectorDrawable.getChangingConfigurations());
+
+        // change the drawable's configuration does not affect the state's configuration
+        vectorDrawable.setChangingConfigurations(0xff);
+        assertEquals(0xff, vectorDrawable.getChangingConfigurations());
+        assertEquals(0, constantState.getChangingConfigurations());
+
+        // the state's configuration get refreshed
+        constantState = vectorDrawable.getConstantState();
+        assertEquals(0xff,  constantState.getChangingConfigurations());
+
+        // set a new configuration to drawable
+        vectorDrawable.setChangingConfigurations(0xff00);
+        assertEquals(0xff,  constantState.getChangingConfigurations());
+        assertEquals(0xffff,  vectorDrawable.getChangingConfigurations());
+    }
+
     public void testGetConstantState() {
         VectorDrawable vectorDrawable = new VectorDrawable();
         ConstantState constantState = vectorDrawable.getConstantState();
