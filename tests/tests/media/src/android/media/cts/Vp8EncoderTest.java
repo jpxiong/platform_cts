@@ -111,7 +111,7 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * Checks the PSNR difference between the encoded and decoded output and reference yuv input
      * does not change much for two different ways of the encoder call.
      */
-    public void FIXME_testAsyncEncoding() throws Exception {
+    public void testAsyncEncoding() throws Exception {
         int encodeSeconds = 9;
 
         // First test the encoder running in a looper thread with buffer callbacks enabled.
@@ -126,7 +126,7 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
                 BITRATE_MODE,
                 BITRATE,
                 syncEncoding);
-        ArrayList<MediaCodec.BufferInfo> bufInfos = encode(params);
+        ArrayList<MediaCodec.BufferInfo> bufInfos = encodeAsync(params);
         computeEncodingStatistics(bufInfos);
         decode(params.outputIvfFilename, OUTPUT_YUV, FPS, params.forceSwEncoder);
         Vp8DecodingStatistics statisticsAsync = computeDecodingStatistics(
