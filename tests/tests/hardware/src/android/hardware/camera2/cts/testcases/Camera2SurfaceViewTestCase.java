@@ -35,6 +35,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
@@ -351,7 +352,7 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected static void waitForNumResults(SimpleCaptureListener resultListener,
             int numResultsWait) {
-        if (numResultsWait <= 0 || resultListener == null) {
+        if (numResultsWait < 0 || resultListener == null) {
             throw new IllegalArgumentException(
                     "Input must be positive number and listener must be non-null");
         }
@@ -362,6 +363,24 @@ public class Camera2SurfaceViewTestCase extends
         }
         return;
     }
+
+    /**
+     * Wait for enough results for settings to be applied
+     *
+     * @param resultListener The capture listener to get capture result back.
+     * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
+     *                                       unknown.
+     */
+    protected void waitForSettingsApplied(SimpleCaptureListener resultListener,
+            int numResultWaitForUnknownLatency) {
+        int maxLatency = mStaticInfo.getSyncMaxLatency();
+        if (maxLatency == CameraMetadata.SYNC_FRAME_NUMBER_UNKNOWN) {
+            maxLatency = numResultWaitForUnknownLatency;
+        }
+        // Wait for settings to take effect
+        waitForNumResults(resultListener, maxLatency);
+    }
+
 
     /**
      * Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
