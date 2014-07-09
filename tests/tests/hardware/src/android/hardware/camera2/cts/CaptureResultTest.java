@@ -214,6 +214,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.COLOR_CORRECTION_MODE);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
+        resultKeys.add(CaptureResult.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
         resultKeys.add(CaptureResult.CONTROL_AE_ANTIBANDING_MODE);
         resultKeys.add(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION);
         resultKeys.add(CaptureResult.CONTROL_AE_LOCK);
