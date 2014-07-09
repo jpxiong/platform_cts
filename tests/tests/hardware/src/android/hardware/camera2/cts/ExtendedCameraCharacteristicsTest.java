@@ -22,9 +22,12 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
+import android.hardware.camera2.params.BlackLevelPattern;
+import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.test.AndroidTestCase;
 import android.util.Log;
+import android.util.Rational;
 import android.util.Size;
 
 import java.util.ArrayList;
@@ -44,6 +47,11 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private static final String PREFIX_ANDROID = "android";
     private static final String PREFIX_VENDOR = "com";
 
+    /*
+     * Constants for static RAW metadata.
+     */
+    private static final int MIN_ALLOWABLE_WHITELEVEL = 32; // must have sensor bit depth > 5
+
     private CameraManager mCameraManager;
     private List<CameraCharacteristics> mCharacteristics;
     private String[] mIds;
@@ -57,6 +65,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private static final int LEGACY = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     private static final int LIMITED = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED;
     private static final int FULL = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
+    private static final int OPT = -1;  // For keys that are optional on all hardware levels.
 
     /*
      * Capabilities short hand
@@ -192,6 +201,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AWB                         , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES                       , FULL     ,   NONE                 );
                 expectKeyAvailable(c, CameraCharacteristics.FLASH_INFO_AVAILABLE                            , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES             , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL                   , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES                  , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.LENS_FACING                                     , LEGACY   ,   BC                   );
@@ -212,17 +222,27 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 expectKeyAvailable(c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP                 , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SCALER_CROPPING_TYPE                            , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES             , LEGACY   ,   NONE                 );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN                      , FULL     ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE                   , LEGACY   ,   BC , RAW             );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN                      , FULL     ,   MANUAL_SENSOR, RAW   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM1                   , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM2                   , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_COLOR_TRANSFORM1                         , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_COLOR_TRANSFORM2                         , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_FORWARD_MATRIX1                          , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_FORWARD_MATRIX2                          , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE                   , LEGACY   ,   BC, RAW              );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT            , FULL     ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE                 , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION                  , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE                       , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE                    , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE                   , FULL     ,   MANUAL_SENSOR        );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_WHITE_LEVEL                         , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY                   , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_ORIENTATION                              , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1                    , OPT      ,   RAW                  );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT2                    , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES     , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES   , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT                  , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SYNC_MAX_LATENCY                                , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES                , FULL     ,   MANUAL_SENSOR        );
@@ -233,6 +253,84 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 // TODO: check that no other 'android' keys are listed in #getKeys if they aren't in the above list
             }
 
+            counter++;
+        }
+    }
+
+    /**
+     * Test values for static metadata used by the RAW capability.
+     */
+    public void testStaticRawCharacteristics() {
+        int counter = 0;
+        for (CameraCharacteristics c : mCharacteristics) {
+            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null");
+            if (!arrayContains(actualCapabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                Log.i(TAG, "RAW capability is not supported in camera " + counter++ +
+                        ". Skip the test.");
+                continue;
+            }
+
+            Integer actualHwLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            if (actualHwLevel != null && actualHwLevel == FULL) {
+                mCollector.expectKeyValueContains(c,
+                        CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES,
+                        CameraCharacteristics.HOT_PIXEL_MODE_FAST);
+            }
+            mCollector.expectKeyValueContains(c,
+                    CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES, false);
+            mCollector.expectKeyValueGreaterThan(c, CameraCharacteristics.SENSOR_INFO_WHITE_LEVEL,
+                    MIN_ALLOWABLE_WHITELEVEL);
+
+            mCollector.expectKeyValueIsIn(c,
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT,
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGGB,
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GRBG,
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GBRG,
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_BGGR);
+            // TODO: SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGB isn't supported yet.
+
+            mCollector.expectKeyValueInRange(c, CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1,
+                    CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT,
+                    CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1_ISO_STUDIO_TUNGSTEN);
+            mCollector.expectKeyValueInRange(c, CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT2,
+                    (byte) CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT,
+                    (byte) CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1_ISO_STUDIO_TUNGSTEN);
+
+            Rational[] zeroes = new Rational[9];
+            Arrays.fill(zeroes, Rational.ZERO);
+
+            ColorSpaceTransform zeroed = new ColorSpaceTransform(zeroes);
+            mCollector.expectNotEquals("Forward Matrix1 should not contain all zeroes.", zeroed,
+                    c.get(CameraCharacteristics.SENSOR_FORWARD_MATRIX1));
+            mCollector.expectNotEquals("Forward Matrix2 should not contain all zeroes.", zeroed,
+                    c.get(CameraCharacteristics.SENSOR_FORWARD_MATRIX2));
+            mCollector.expectNotEquals("Calibration Transform1 should not contain all zeroes.",
+                    zeroed, c.get(CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM1));
+            mCollector.expectNotEquals("Calibration Transform2 should not contain all zeroes.",
+                    zeroed, c.get(CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM2));
+            mCollector.expectNotEquals("Color Transform1 should not contain all zeroes.",
+                    zeroed, c.get(CameraCharacteristics.SENSOR_COLOR_TRANSFORM1));
+            mCollector.expectNotEquals("Color Transform2 should not contain all zeroes.",
+                    zeroed, c.get(CameraCharacteristics.SENSOR_COLOR_TRANSFORM2));
+
+            BlackLevelPattern blackLevel = mCollector.expectKeyValueNotNull(c,
+                    CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
+            if (blackLevel != null) {
+                int[] blackLevelPattern = new int[BlackLevelPattern.COUNT];
+                blackLevel.copyTo(blackLevelPattern, /*offset*/0);
+                Integer whitelevel = c.get(CameraCharacteristics.SENSOR_INFO_WHITE_LEVEL);
+                if (whitelevel != null) {
+                    mCollector.expectValuesInRange("BlackLevelPattern", blackLevelPattern, 0,
+                            whitelevel);
+                } else {
+                    mCollector.addMessage(
+                            "No WhiteLevel available, cannot check BlackLevelPattern range.");
+                }
+            }
+
+            // TODO: profileHueSatMap, and profileToneCurve aren't supported yet.
             counter++;
         }
     }
@@ -285,7 +383,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                             Arrays.toString(actualCapabilities)),
                     allKeys.contains(key));
         } else {
-            if (actualHwLevel == LEGACY) {
+            if (actualHwLevel == LEGACY && hwLevel != OPT) {
                 mCollector.expectTrue(
                         String.format("Key (%s) must not be in characteristics for LEGACY devices",
                                 key.getName()),
@@ -376,6 +474,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     /** Remap HW levels worst<->best, 0 = worst, 2 = best */
     private static int remapHardwareLevel(int level) {
         switch (level) {
+            case OPT:
+                return -1;
             case LEGACY:
                 return 0; // lowest
             case LIMITED:
