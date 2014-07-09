@@ -237,9 +237,9 @@
     <string name="ble_privacy_mac_info">BLE Advertiser should advertise in non-repeating MAC address.</string>
 
     <!-- BLE scanner side strings -->
-    <string name="ble_scanner_name">BLE Scanner Test</string>
+    <string name="ble_scanner_test_name">BLE Scanner Test</string>
     <string name="ble_scanner_service_name">Bluetooth LE Scanner Handler Service</string>
-    <string name="ble_scanner_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
+    <string name="ble_scanner_test_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
     <string name="ble_scanner_privacy_mac">Hold for 15 min to see if receive a different MAC address from advertiser.</string>
 
     <!-- Strings for FeatureSummaryActivity -->

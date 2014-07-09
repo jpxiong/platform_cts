@@ -331,8 +331,8 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
 
-        <activity android:name=".bluetooth.BleScannerActivity"
-                android:label="@string/ble_scanner_name"
+        <activity android:name=".bluetooth.BleScannerTestActivity"
+                android:label="@string/ble_scanner_test_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -342,6 +342,16 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
 
+        <activity android:name=".bluetooth.BleScannerPrivacyMacActivity"
+                android:label="@string/ble_privacy_mac_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
+        </activity>
 
         <activity android:name=".bluetooth.BleAdvertiserTestActivity"
                 android:label="@string/ble_advertiser_test_name"
@@ -354,7 +364,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
 
-        <activity android:name=".bluetooth.BlePrivacyMacActivity"
+        <activity android:name=".bluetooth.BleAdvertiserPrivacyMacActivity"
                 android:label="@string/ble_privacy_mac_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>

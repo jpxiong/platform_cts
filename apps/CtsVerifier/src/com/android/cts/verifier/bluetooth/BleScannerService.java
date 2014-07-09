@@ -17,9 +17,7 @@
 package com.android.cts.verifier.bluetooth;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import android.app.Service;
@@ -48,25 +46,30 @@ public class BleScannerService extends Service {
 
     public static final String BLE_PRIVACY_NEW_MAC_RECEIVE =
             "com.android.cts.verifier.bluetooth.BLE_PRIVACY_NEW_MAC_RECEIVE";
+    public static final String BLE_MAC_ADDRESS =
+            "com.android.cts.verifier.bluetooth.BLE_MAC_ADDRESS";
+
+    public static final String EXTRA_MAC_ADDRESS =
+            "com.google.cts.verifier.bluetooth.EXTRA_MAC_ADDRESS";
 
     private static final UUID SERVICE_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
-    private static final byte MANUFACTURER_GOOGLE = (byte)0x07;
+    private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mAdapter;
     private BluetoothLeScanner mScanner;
     private ScanCallback mCallback;
     private Handler mHandler;
-    private Set<String> mAddrDict;
+    private String mOldMac;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mCallback = new BLEScanCallback();
-        mAddrDict = new HashSet<String>();
         mHandler = new Handler();
+        mOldMac = null;
 
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mAdapter = mBluetoothManager.getAdapter();
@@ -78,14 +81,14 @@ public class BleScannerService extends Service {
         if (mScanner != null) {
             List<ScanFilter> filters = new ArrayList<ScanFilter>();
             filters.add(new ScanFilter.Builder()
-                .setManufacturerData(MANUFACTURER_GOOGLE, new byte[]{MANUFACTURER_GOOGLE, 0})
+                .setManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
                 .setServiceData(new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
                 .build());
             ScanSettings setting = new ScanSettings.Builder()
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL)
                 .build();
-            mAddrDict.clear();
+            mOldMac = null;
             mScanner.startScan(filters, setting, mCallback);
         }
         return START_NOT_STICKY;
@@ -114,13 +117,24 @@ public class BleScannerService extends Service {
         @Override
         public void onScanResult(int callBackType, ScanResult result) {
             if (callBackType != ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
+                Log.e(TAG, "onScanResult fail. callBackType is not CALLBACK_TYPE_ALL_MATCHES");
                 return;
             }
-            mAddrDict.add(result.getDevice().getAddress());
 
-            // If a new MAC address received, dict size increases.
-            if (mAddrDict.size() > 1) {
-                sendBroadcast(new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE));
+            // Broadcast MAC address to show on UI.
+            String mac = result.getDevice().getAddress();
+            Intent intent = new Intent(BLE_MAC_ADDRESS);
+            intent.putExtra(EXTRA_MAC_ADDRESS, mac);
+            sendBroadcast(intent);
+
+            if (mOldMac == null) {
+                mOldMac = mac;
+            } else if (!mOldMac.equals(mac)) {
+                // Broadcast new MAC address to update UI and pass the test.
+                mOldMac = mac;
+                Intent newIntent = new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE);
+                newIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
+                sendBroadcast(newIntent);
             }
         }
 

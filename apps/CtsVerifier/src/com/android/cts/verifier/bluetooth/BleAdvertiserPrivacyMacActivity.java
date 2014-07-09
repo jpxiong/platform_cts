@@ -31,7 +31,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class BlePrivacyMacActivity extends PassFailButtons.Activity {
+public class BleAdvertiserPrivacyMacActivity extends PassFailButtons.Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class BlePrivacyMacActivity extends PassFailButtons.Activity {
             .setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(BlePrivacyMacActivity.this,
+                    Intent intent = new Intent(BleAdvertiserPrivacyMacActivity.this,
                                                BleAdvertiserService.class);
                     intent.putExtra(BleAdvertiserService.EXTRA_COMMAND,
                                     BleAdvertiserService.COMMAND_START_ADVERTISE);
@@ -56,7 +56,7 @@ public class BlePrivacyMacActivity extends PassFailButtons.Activity {
             .setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(BlePrivacyMacActivity.this,
+                    Intent intent = new Intent(BleAdvertiserPrivacyMacActivity.this,
                                                BleAdvertiserService.class);
                     intent.putExtra(BleAdvertiserService.EXTRA_COMMAND,
                                     BleAdvertiserService.COMMAND_STOP_ADVERTISE);
