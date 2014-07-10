@@ -374,7 +374,7 @@ public class Camera2SurfaceViewTestCase extends
     protected void waitForSettingsApplied(SimpleCaptureListener resultListener,
             int numResultWaitForUnknownLatency) {
         int maxLatency = mStaticInfo.getSyncMaxLatency();
-        if (maxLatency == CameraMetadata.SYNC_FRAME_NUMBER_UNKNOWN) {
+        if (maxLatency == CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN) {
             maxLatency = numResultWaitForUnknownLatency;
         }
         // Wait for settings to take effect
@@ -385,9 +385,25 @@ public class Camera2SurfaceViewTestCase extends
     /**
      * Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
      *
+     * <p>Waits for {@code android.sync.maxLatency} number of results first, to make sure
+     * that the result is synchronized (or {@code numResultWaitForUnknownLatency} if the latency
+     * is unknown.</p>
+     *
+     * <p>This is a no-op for {@code LEGACY} devices since they don't report
+     * the {@code aeState} result.</p>
+     *
      * @param resultListener The capture listener to get capture result back.
+     * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
+     *                                       unknown.
      */
-    protected static void waitForAeStable(SimpleCaptureListener resultListener) {
+    protected void waitForAeStable(SimpleCaptureListener resultListener,
+            int numResultWaitForUnknownLatency) {
+        waitForSettingsApplied(resultListener, numResultWaitForUnknownLatency);
+
+        if (!mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+            // No-op for metadata
+            return;
+        }
         List<Integer> expectedAeStates = new ArrayList<Integer>();
         expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_CONVERGED));
         expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED));
