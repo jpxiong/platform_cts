@@ -22,7 +22,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.VectorDrawable;
-import android.graphics.drawable.VectorDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
@@ -58,6 +57,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_transformation_4,
             R.drawable.vector_icon_transformation_5,
             R.drawable.vector_icon_transformation_6,
+            R.drawable.vector_icon_render_order_1,
+            R.drawable.vector_icon_render_order_2,
     };
 
     private int[] mGoldenImages = new int[] {
@@ -79,6 +80,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_transformation_4_golden,
             R.drawable.vector_icon_transformation_5_golden,
             R.drawable.vector_icon_transformation_6_golden,
+            R.drawable.vector_icon_render_order_1_golden,
+            R.drawable.vector_icon_render_order_2_golden,
     };
 
     private static final int IMAGE_WIDTH = 64;
