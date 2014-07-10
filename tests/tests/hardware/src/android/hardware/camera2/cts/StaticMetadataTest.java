@@ -50,18 +50,17 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
     public void testHwSupportedLevel() throws Exception {
         for (String id : mCameraIds) {
             initStaticMetadata(id);
-            List<Integer> availabeCaps = mStaticInfo.getAvailableCapabilitiesChecked();
+            List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
 
-            //TODO: Backward compatible key is hidden. Fix that later
-            /*mCollector.expectTrue("All device must contains BACKWARD_COMPATIBLE capability",
-                    availabeCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE));*/
+            mCollector.expectTrue("All device must contains BACKWARD_COMPATIBLE capability",
+                    availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE));
 
             if (mStaticInfo.isHardwareLevelFull()) {
                 // Capability advertisement must be right.
                 mCollector.expectTrue("Full device must contains MANUAL_SENSOR capability",
-                        availabeCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR));
+                        availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR));
                 mCollector.expectTrue("Full device must contains MANUAL_POST_PROCESSING capability",
-                        availabeCaps.contains(
+                        availableCaps.contains(
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING));
 
                 // Max resolution fps must be >= 20.
