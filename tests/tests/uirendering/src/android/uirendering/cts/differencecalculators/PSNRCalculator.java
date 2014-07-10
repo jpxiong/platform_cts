@@ -15,10 +15,9 @@
  */
 package android.uirendering.cts.differencecalculators;
 
-import android.content.res.Resources;
 import android.graphics.Color;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
+import android.uirendering.cts.CanvasCompareActivityTest;
+import android.util.Log;
 
 /**
  * Uses the Peak Signal-to-Noise Ratio approach to determine if two images are considered the same.
@@ -75,6 +74,10 @@ public class PSNRCalculator extends DifferenceCalculator {
         fraction = (float) Math.log(fraction);
         fraction *= 10;
 
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(CanvasCompareActivityTest.TAG_NAME, "PSNRCalculator : PSNR = " + fraction);
+        }
+
         return (fraction > mThreshold);
     }
 
@@ -85,13 +88,6 @@ public class PSNRCalculator extends DifferenceCalculator {
                 return true;
             }
         }
-        return false;
-    }
-
-    @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal,
-            Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript) {
         return false;
     }
 }

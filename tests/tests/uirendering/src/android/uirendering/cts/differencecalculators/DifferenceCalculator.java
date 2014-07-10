@@ -35,17 +35,28 @@ public abstract class DifferenceCalculator{
             int height);
 
     /**
-     * Compare the two bitmaps using RenderScript code.
-     * @return if the method deems the two images are similar enough then the result is true
+     * Compare the two bitmaps using RenderScript, if the comparer
+     * {@link supportsRenderScript() supports it}. If it does not, this method will throw an
+     * UnsupportedOperationException
      */
-    public abstract boolean verifySameRS(Resources resources, Allocation ideal,
+    public boolean verifySameRS(Resources resources, Allocation ideal,
             Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript);
+            RenderScript renderScript) {
+        throw new UnsupportedOperationException("Renderscript not supported for this calculator");
+    }
 
     /**
      * This calculates the position in an array that would represent a bitmap given the parameters.
      */
     protected static int indexFromXAndY(int x, int y, int stride, int offset) {
         return x + (y * stride) + offset;
+    }
+
+    /**
+     * Returns whether the verifySameRS() is implemented, and may be used on a RenderScript enabled
+     * system
+     */
+    public boolean supportsRenderScript() {
+        return false;
     }
 }

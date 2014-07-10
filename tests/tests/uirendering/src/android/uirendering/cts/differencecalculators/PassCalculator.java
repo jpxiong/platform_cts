@@ -15,10 +15,6 @@
  */
 package android.uirendering.cts.differencecalculators;
 
-import android.content.res.Resources;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
-
 /**
  * This class is purely for debug purposes. It will automatically pass any tests.
  */
@@ -26,12 +22,6 @@ public class PassCalculator extends DifferenceCalculator {
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
-        return true;
-    }
-
-    @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal, Allocation given, int offset,
-            int stride, int width, int height, RenderScript renderScript) {
         return true;
     }
 }

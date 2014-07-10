@@ -20,7 +20,6 @@ import com.android.cts.uirendering.ScriptC_ExactComparer;
 
 import android.content.res.Resources;
 import android.renderscript.Allocation;
-import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
@@ -28,7 +27,7 @@ import android.util.Log;
 /**
  * This class does an exact comparison of the pixels in a bitmap.
  */
-public class ExactComparer extends DifferenceCalculator {
+public class ExactComparer extends BaseRenderScriptCalculator {
     private ScriptC_ExactComparer mScript;
 
     /**
@@ -50,37 +49,21 @@ public class ExactComparer extends DifferenceCalculator {
             }
         }
         if (CanvasCompareActivityTest.DEBUG) {
-            Log.d("ExactComparer", "Number of different pixels : " + count);
+            Log.d(CanvasCompareActivityTest.TAG_NAME, "Number of different pixels : " + count);
         }
 
         return (count == 0);
     }
 
     @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal,
+    public boolean verifySameRowsRS(Resources resources, Allocation ideal,
             Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript) {
+            RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
             mScript = new ScriptC_ExactComparer(renderScript, resources, R.raw.exactcomparer);
         }
         mScript.set_WIDTH(width);
         mScript.set_OFFSET(offset);
-
-        //Create an array with the index of each row
-        int[] inputIndices = new int[height];
-        for (int i = 0; i < height; i++) {
-            inputIndices[i] = i;
-        }
-
-        //Create the allocation from that given array
-        Allocation inputAllocation = Allocation.createSized(renderScript, Element.I32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
-        inputAllocation.copyFrom(inputIndices);
-
-        //Create the allocation that will hold the output, the sum of pixels that differ in that
-        //row
-        Allocation outputAllocation = Allocation.createSized(renderScript, Element.I32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
 
         //Set the bitmap allocations
         mScript.set_ideal(ideal);
@@ -89,24 +72,12 @@ public class ExactComparer extends DifferenceCalculator {
         //Call the renderscript function on each row
         mScript.forEach_exactCompare(inputAllocation, outputAllocation);
 
-        //Get the values returned from the function
-        int[] returnValue = new int[inputIndices.length];
-        outputAllocation.copyTo(returnValue);
-
-        int count = 0;
-        //If any row had any different pixels, then it fails
-        for (int i = 0; i < inputIndices.length; i++) {
-            if (returnValue[i] != 0) {
-                if (!CanvasCompareActivityTest.DEBUG) {
-                    return false;
-                } else {
-                    count++;
-                }
-            }
+        float val = sum1DFloatAllocation(outputAllocation);
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(CanvasCompareActivityTest.TAG_NAME,
+                    "ExactComparer RS : number of different pixels : " + val);
         }
 
-        Log.d("ExactComparisonRS", "Number of different pixels : " + count);
-
-        return (count == 0);
+        return val == 0;
     }
 }
