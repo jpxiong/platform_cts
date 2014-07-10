@@ -59,7 +59,7 @@ public class BleScannerActivity extends PassFailButtons.Activity {
         super.onResume();
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BleScannerService.BLE_PRIVACY_MAC);
+        filter.addAction(BleScannerService.BLE_PRIVACY_NEW_MAC_RECEIVE);
         registerReceiver(onBroadcast, filter);
     }
 
