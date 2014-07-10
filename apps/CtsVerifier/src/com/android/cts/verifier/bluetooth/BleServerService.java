@@ -322,6 +322,7 @@ public class BleServerService extends Service {
             if (execute) {
                 notifyExecuteWrite();
                 getCharacteristic(CHARACTERISTIC_UUID).setValue(mReliableWriteValue);
+                mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
             }
         }
     };
