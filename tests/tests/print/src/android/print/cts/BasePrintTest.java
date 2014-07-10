@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
@@ -41,6 +42,7 @@ import android.print.PrinterId;
 import android.print.cts.services.PrintServiceCallbacks;
 import android.print.cts.services.PrinterDiscoverySessionCallbacks;
 import android.print.cts.services.StubbablePrinterDiscoverySession;
+import android.print.pdf.PrintedPdfDocument;
 import android.printservice.PrintJob;
 import android.printservice.PrintService;
 import android.support.test.uiautomator.UiAutomatorTestCase;
@@ -54,6 +56,8 @@ import org.hamcrest.Description;
 import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeoutException;
@@ -153,6 +157,10 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     protected void onLayoutCalled() {
         mLayoutCallCounter.call();
+    }
+
+    protected int getWriteCallCount() {
+        return mWriteCallCounter.getCallCount();
     }
 
     protected void onWriteCalled() {
@@ -367,6 +375,19 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         return service;
     }
 
+    protected void writeBlankPages(PrintAttributes constraints, ParcelFileDescriptor output,
+            int fromIndex, int toIndex) throws IOException {
+        PrintedPdfDocument document = new PrintedPdfDocument(getActivity(), constraints);
+        final int pageCount = toIndex - fromIndex + 1;
+        for (int i = 0; i < pageCount; i++) {
+            PdfDocument.Page page = document.startPage(i);
+            document.finishPage(page);
+        }
+        FileOutputStream fos = new FileOutputStream(output.getFileDescriptor());
+        document.writeTo(fos);
+        document.close();
+    }
+
     protected final class CallCounter {
         private final Object mLock = new Object();
 
@@ -376,6 +397,12 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
             synchronized (mLock) {
                 mCallCount++;
                 mLock.notifyAll();
+            }
+        }
+
+        public int getCallCount() {
+            synchronized (mLock) {
+                return mCallCount;
             }
         }
 
