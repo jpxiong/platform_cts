@@ -1376,10 +1376,9 @@ public class StaticMetadata {
             return new ArrayList<Integer>();
         }
 
-        // TODO: Backward compatible key is hidden. Fix that after we have better enum check
-        /*checkArrayValuesInRange(key, availableCaps,
+        checkArrayValuesInRange(key, availableCaps,
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);*/
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);
         capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
         return capList;
     }
