@@ -67,6 +67,7 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
                 stop();
             }
         };
+
     }
 
     @Override
@@ -79,7 +80,9 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
         registerReceiver(onBroadcast, filter);
 
         if (mMacCount == 0) {
-            startService(new Intent(this, BleScannerService.class));
+            Intent intent = new Intent(this, BleScannerService.class);
+            intent.putExtra(BleScannerService.EXTRA_COMMAND, BleScannerService.COMMAND_PRIVACY_MAC);
+            startService(intent);
         }
     }
 

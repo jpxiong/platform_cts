@@ -18,7 +18,9 @@ package com.android.cts.verifier.bluetooth;
 
 import java.util.UUID;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -44,18 +46,29 @@ public class BleAdvertiserService extends Service {
 
     public static final int COMMAND_START_ADVERTISE = 0;
     public static final int COMMAND_STOP_ADVERTISE = 1;
+    public static final int COMMAND_START_POWER_LEVEL = 2;
+    public static final int COMMAND_STOP_POWER_LEVEL = 3;
 
     public static final String BLE_START_ADVERTISE =
             "com.android.cts.verifier.bluetooth.BLE_START_ADVERTISE";
     public static final String BLE_STOP_ADVERTISE =
             "com.android.cts.verifier.bluetooth.BLE_STOP_ADVERTISE";
+    public static final String BLE_START_POWER_LEVEL =
+            "com.android.cts.verifier.bluetooth.BLE_START_POWER_LEVEL";
+    public static final String BLE_STOP_POWER_LEVEL =
+            "com.android.cts.verifier.bluetooth.BLE_STOP_POWER_LEVEL";
 
     public static final String EXTRA_COMMAND =
             "com.android.cts.verifier.bluetooth.EXTRA_COMMAND";
 
     private static final UUID SERVICE_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
-    private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
+    public static final byte MANUFACTURER_TEST_ID = (byte)0x07;
+    public static final int PRIVACY_MAC_UUID = 0x9999;
+    public static final int POWER_LEVEL_UUID = 0x8888;
+    public static final byte[] PRIVACY_MAC_DATA = new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4};
+    public static final byte[] POWER_LEVEL_DATA = new byte[]{(byte)0x88, (byte)0x88, 15, 0};
+    public static final byte[] POWER_LEVEL_MASK = new byte[]{1, 1, 1, 0};
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -63,6 +76,9 @@ public class BleAdvertiserService extends Service {
     private BluetoothGattServer mGattServer;
     private AdvertiseCallback mCallback;
     private Handler mHandler;
+
+    private int[] mPowerLevel;
+    private Map<Integer, AdvertiseCallback> mPowerCallback;
 
     @Override
     public void onCreate() {
@@ -75,6 +91,16 @@ public class BleAdvertiserService extends Service {
             new BluetoothGattServerCallback() {});
         mCallback = new BLEAdvertiseCallback();
         mHandler = new Handler();
+
+        mPowerLevel = new int[]{
+            AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW,
+            AdvertiseSettings.ADVERTISE_TX_POWER_LOW,
+            AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM,
+            AdvertiseSettings.ADVERTISE_TX_POWER_HIGH};
+        mPowerCallback = new HashMap<Integer, AdvertiseCallback>();
+        for (int x : mPowerLevel) {
+            mPowerCallback.put(x, new BLEAdvertiseCallback());
+        }
     }
 
     @Override
@@ -103,8 +129,7 @@ public class BleAdvertiserService extends Service {
                 serviceUuid.add(new ParcelUuid(SERVICE_UUID));
                 AdvertiseData data = new AdvertiseData.Builder()
                     .setManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
-                    .setServiceData(new ParcelUuid(SERVICE_UUID),
-                        new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
+                    .setServiceData(new ParcelUuid(SERVICE_UUID), PRIVACY_MAC_DATA)
                     .build();
                 AdvertiseSettings setting = new AdvertiseSettings.Builder()
                     .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
@@ -117,6 +142,28 @@ public class BleAdvertiserService extends Service {
             case COMMAND_STOP_ADVERTISE:
                 mAdvertiser.stopAdvertising(mCallback);
                 sendBroadcast(new Intent(BLE_STOP_ADVERTISE));
+                break;
+            case COMMAND_START_POWER_LEVEL:
+                for (int t : mPowerLevel) {
+                    AdvertiseData d = new AdvertiseData.Builder()
+                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                            new byte[]{MANUFACTURER_TEST_ID, 0})
+                        .setServiceData(new ParcelUuid(SERVICE_UUID),
+                            new byte[]{(byte)0x88, (byte)0x88, 15, (byte)t})
+                        .setIncludeTxPowerLevel(true)
+                        .build();
+                    AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                        .setTxPowerLevel(t)
+                        .build();
+                    mAdvertiser.startAdvertising(settings, d, mPowerCallback.get(t));
+                }
+                sendBroadcast(new Intent(BLE_START_POWER_LEVEL));
+                break;
+            case COMMAND_STOP_POWER_LEVEL:
+                for (int t : mPowerLevel) {
+                    mAdvertiser.stopAdvertising(mPowerCallback.get(t));
+                }
+                sendBroadcast(new Intent(BLE_STOP_POWER_LEVEL));
                 break;
             default:
                 showMessage("Unrecognized command: " + command);

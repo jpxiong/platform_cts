@@ -10,3 +10,4 @@
 
 -dontwarn android.hardware.Sensor
 -dontwarn java.util.concurrent.ConcurrentLinkedDeque
+-dontwarn android.cts.util.**
