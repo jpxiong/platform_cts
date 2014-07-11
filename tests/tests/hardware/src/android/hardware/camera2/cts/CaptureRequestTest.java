@@ -277,12 +277,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                // Can only test full capability because test relies on per frame control
-                // and synchronization.
-                if (!mStaticInfo.isHardwareLevelFull()) {
-                    continue;
-                }
-
                 Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
 
                 // Update preview surface with given size for all sub-tests.
@@ -991,8 +985,15 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             throws Exception {
         switch (mode) {
             case CONTROL_AE_MODE_OFF:
-                // Test manual exposure control.
-                aeManualControlTest();
+                if (mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    // Test manual exposure control.
+                    aeManualControlTest();
+                } else {
+                    Log.w(TAG,
+                            "aeModeAndLockTestByMode - can't test AE mode OFF without " +
+                            "manual sensor control");
+                }
                 break;
             case CONTROL_AE_MODE_ON:
             case CONTROL_AE_MODE_ON_AUTO_FLASH:
@@ -1043,30 +1044,59 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         SimpleCaptureListener listener =  new SimpleCaptureListener();
         CaptureResult latestResult = null;
 
+        int requestCountBeforeLock = 0;
+
+        // Reset the AE lock to OFF, since we are reusing this builder many times
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+
         CaptureRequest request = requestBuilder.build();
-        for (int i = 0; i < numCapturesBeforeLock; i++) {
+        for (int i = 0; i < numCapturesBeforeLock - 1; i++) {
             // Fire a capture, auto AE, lock off.
             mCamera.capture(request, listener, mHandler);
+            requestCountBeforeLock++;
         }
-        // Then fire a capture to lock the AE,
-        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
-        mCamera.capture(requestBuilder.build(), listener, mHandler);
+        requestCountBeforeLock += captureRequestsSynchronized(request, listener, mHandler);
 
         // Get the latest exposure values of the last AE lock off requests.
-        for (int i = 0; i < numCapturesBeforeLock; i++) {
-            latestResult = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        latestResult = waitForNumResults(listener, requestCountBeforeLock);
+
+        // Then fire a capture to lock the AE,
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
+
+        int requestCount = captureRequestsSynchronized(requestBuilder.build(), listener, mHandler);
+
+        mCollector.expectEquals("AE lock must be off (numCapturesBeforeLock = "
+                + numCapturesBeforeLock + ")", false,
+                latestResult.get(CaptureResult.CONTROL_AE_LOCK));
+
+        int sensitivity = -1;
+        long expTime = -1L;
+
+        // Can't read manual sensor/exposure settings without manual sensor
+        if (mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            sensitivity = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
+            expTime = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
         }
-        int sensitivity = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
-        long expTime = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
 
         // Get the AE lock on result and validate the exposure values.
-        latestResult = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-        int sensitivityLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
-        long expTimeLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
-        mCollector.expectEquals("Locked exposure time shouldn't be changed for AE auto mode "
-                + aeMode + "after " + numCapturesBeforeLock + " captures", expTime, expTimeLocked);
-        mCollector.expectEquals("Locked sensitivity shouldn't be changed for AE auto mode " + aeMode
-                + "after " + numCapturesBeforeLock + " captures", sensitivity, sensitivityLocked);
+        latestResult = waitForNumResults(listener, requestCount);
+
+        mCollector.expectEquals("AE lock must be on", true,
+                latestResult.get(CaptureResult.CONTROL_AE_LOCK));
+
+        // Can't read manual sensor/exposure settings without manual sensor
+        if (mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            int sensitivityLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
+            long expTimeLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
+            mCollector.expectEquals("Locked exposure time shouldn't be changed for AE auto mode "
+                    + aeMode + "after " + numCapturesBeforeLock + " captures",
+                    expTime, expTimeLocked);
+            mCollector.expectEquals("Locked sensitivity shouldn't be changed for AE auto mode "
+                    + aeMode + "after " + numCapturesBeforeLock + " captures",
+                    sensitivity, sensitivityLocked);
+        }
     }
 
     /**

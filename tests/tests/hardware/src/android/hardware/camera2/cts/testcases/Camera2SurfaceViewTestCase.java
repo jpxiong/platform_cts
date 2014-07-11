@@ -78,6 +78,7 @@ public class Camera2SurfaceViewTestCase extends
     protected static final int WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
     protected static final float FRAME_DURATION_ERROR_MARGIN = 0.005f; // 0.5 percent error margin.
     protected static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
+    protected static final int NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY = 8;
 
     protected Context mContext;
     protected CameraManager mCameraManager;
@@ -97,6 +98,7 @@ public class Camera2SurfaceViewTestCase extends
     protected List<Size> mOrderedVideoSizes; // In descending order.
     protected List<Size> mOrderedStillSizes; // In descending order.
     protected HashMap<Size, Long> mMinPreviewFrameDurationMap;
+
 
     public Camera2SurfaceViewTestCase() {
         super(Camera2SurfaceViewStubActivity.class);
@@ -345,23 +347,65 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
+     * Submit a capture, then submit additional captures in order to ensure that
+     * the camera will be synchronized.
+     *
+     * <p>
+     * The additional capture count is determined by android.sync.maxLatency (or
+     * a fixed {@value #NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY}) captures if maxLatency is unknown).
+     * </p>
+     *
+     * <p>Returns the number of captures that were submitted (at least 1), which is useful
+     * with {@link #waitForNumResults}.</p>
+     *
+     * @param request capture request to forward to {@link CameraDevice#capture}
+     * @param listener request listener to forward to {@link CameraDevice#capture}
+     * @param handler handler to forward to {@link CameraDevice#capture}
+     *
+     * @return the number of captures that were submitted
+     *
+     * @throws CameraAccessException if capturing failed
+     */
+    protected int captureRequestsSynchronized(
+            CaptureRequest request, CaptureListener listener, Handler handler)
+                    throws CameraAccessException {
+        int maxLatency = mStaticInfo.getSyncMaxLatency();
+        if (maxLatency == CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN) {
+            maxLatency = NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY;
+        }
+
+        assertTrue("maxLatency is non-negative", maxLatency >= 0);
+
+        int numCaptures = maxLatency + 1;
+
+        for (int i = 0; i < numCaptures; ++i) {
+            mCamera.capture(request, listener, handler);
+        }
+
+        return numCaptures;
+    }
+
+    /**
      * Wait for numResultWait frames
      *
      * @param resultListener The capture listener to get capture result back.
      * @param numResultsWait Number of frame to wait
+     *
+     * @return the last result, or {@code null} if there was none
      */
-    protected static void waitForNumResults(SimpleCaptureListener resultListener,
+    protected static CaptureResult waitForNumResults(SimpleCaptureListener resultListener,
             int numResultsWait) {
         if (numResultsWait < 0 || resultListener == null) {
             throw new IllegalArgumentException(
                     "Input must be positive number and listener must be non-null");
         }
 
-        CaptureResult result;
+        CaptureResult result = null;
         for (int i = 0; i < numResultsWait; i++) {
             result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         }
-        return;
+
+        return result;
     }
 
     /**
