@@ -687,6 +687,23 @@ public class AccessibilityWindowQueryTest
     }
 
     @MediumTest
+    public void testPerformGlobalActionPowerDialog() throws Exception {
+        // Check whether the action succeeded.
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_POWER_DIALOG));
+
+        // Sleep a bit so the UI is settles.
+        waitForIdle();
+
+        // Clean up.
+        getInstrumentation().getUiAutomation().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_BACK);
+
+        // Sleep a bit so the UI is settles.
+        waitForIdle();
+    }
+
+    @MediumTest
     public void testObjectContract() throws Exception {
         try {
             AccessibilityServiceInfo info = getInstrumentation().getUiAutomation().getServiceInfo();
