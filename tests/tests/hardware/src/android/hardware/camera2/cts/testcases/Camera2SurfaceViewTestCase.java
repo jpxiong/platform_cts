@@ -347,7 +347,7 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
-     * Submit a capture, then submit additional captures in order to ensure that
+     * Submit a capture once, then submit additional captures in order to ensure that
      * the camera will be synchronized.
      *
      * <p>
@@ -369,6 +369,38 @@ public class Camera2SurfaceViewTestCase extends
     protected int captureRequestsSynchronized(
             CaptureRequest request, CaptureListener listener, Handler handler)
                     throws CameraAccessException {
+        return captureRequestsSynchronized(request, /*count*/1, listener, handler);
+    }
+
+    /**
+     * Submit a capture {@code count} times, then submit additional captures in order to ensure that
+     * the camera will be synchronized.
+     *
+     * <p>
+     * The additional capture count is determined by android.sync.maxLatency (or
+     * a fixed {@value #NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY}) captures if maxLatency is unknown).
+     * </p>
+     *
+     * <p>Returns the number of captures that were submitted (at least 1), which is useful
+     * with {@link #waitForNumResults}.</p>
+     *
+     * @param request capture request to forward to {@link CameraDevice#capture}
+     * @param count the number of times to submit the request (minimally), must be at least 1
+     * @param listener request listener to forward to {@link CameraDevice#capture}
+     * @param handler handler to forward to {@link CameraDevice#capture}
+     *
+     * @return the number of captures that were submitted
+     *
+     * @throws IllegalArgumentException if {@code count} was not at least 1
+     * @throws CameraAccessException if capturing failed
+     */
+    protected int captureRequestsSynchronized(
+            CaptureRequest request, int count, CaptureListener listener, Handler handler)
+                    throws CameraAccessException {
+        if (count < 1) {
+            throw new IllegalArgumentException("count must be positive");
+        }
+
         int maxLatency = mStaticInfo.getSyncMaxLatency();
         if (maxLatency == CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN) {
             maxLatency = NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY;
@@ -376,7 +408,7 @@ public class Camera2SurfaceViewTestCase extends
 
         assertTrue("maxLatency is non-negative", maxLatency >= 0);
 
-        int numCaptures = maxLatency + 1;
+        int numCaptures = maxLatency + count;
 
         for (int i = 0; i < numCaptures; ++i) {
             mCamera.capture(request, listener, handler);
