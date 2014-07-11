@@ -75,6 +75,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     };
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
     private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
+    private static final int SLOWMO_SLOW_FACTOR = 4;
 
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
@@ -207,8 +208,169 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         videoSnapshotHelper(/*burstTest*/true);
     }
 
-    public void testTimelapseRecording() {
+    /**
+     * Test timelapse recording, where capture rate is slower than video (playback) frame rate.
+     */
+    public void testTimelapseRecording() throws Exception {
         // TODO. Need implement.
+    }
+
+    public void testSlowMotionRecording() throws Exception {
+        slowMotionRecording();
+    }
+
+    /**
+     * Test slow motion recording where capture rate (camera output) is different with
+     * video (playback) frame rate for each camera if high speed recording is supported
+     * by both camera and encoder.
+     *
+     * <p>
+     * Normal recording use cases make the capture rate (camera output frame
+     * rate) the same as the video (playback) frame rate. This guarantees that
+     * the motions in the scene play at the normal speed. If the capture rate is
+     * faster than video frame rate, for a given time duration, more number of
+     * frames are captured than it can be played in the same time duration. This
+     * generates "slow motion" effect during playback.
+     * </p>
+     */
+    private void slowMotionRecording() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing slow motion recording for camera " + id);
+                // Re-use the MediaRecorder object for the same camera device.
+                mMediaRecorder = new MediaRecorder();
+                openDevice(id);
+
+                if (!mStaticInfo.isHighSpeedVideoSupported()) {
+                    continue;
+                }
+
+                StreamConfigurationMap config =
+                        mStaticInfo.getValueFromKeyNonNull(
+                                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                Size[] highSpeedVideoSizes = config.getHighSpeedVideoSizes();
+                for (Size size : highSpeedVideoSizes) {
+                    Range<Integer> fpsRange = getHighestHighSpeedFixedFpsRangeForSize(config, size);
+                    mCollector.expectNotNull("Unable to find the fixed frame rate fps range for " +
+                            "size " + size, fpsRange);
+                    if (fpsRange == null) {
+                        continue;
+                    }
+
+                    int captureRate = fpsRange.getLower();
+                    int videoFramerate = captureRate / SLOWMO_SLOW_FACTOR;
+                    /**
+                     * Check if encoder support this. TODO: use HIGH_SPEED_720p
+                     * CamCorderProfile to get the performance guarantee. Also
+                     * add the test in StaticMetadataTest to check: 1. Camera
+                     * high speed recording metadata is correctly reported 2.
+                     * Encoder profile/level info is correctly reported. After
+                     * that, we only need check the CamcorderProfile before
+                     * skipping the test.
+                     */
+                    if (!isSupportedByAVCEncoder(size, captureRate)) {
+                        Log.i(TAG, "high speed recording " + size + "@" + captureRate + "fps"
+                                + " is not supported by AVC encoder");
+                        continue;
+                    }
+
+                    mOutMediaFileName = VIDEO_FILE_PATH + "/test_slowMo_video.mp4";
+                    if (DEBUG_DUMP) {
+                        mOutMediaFileName = VIDEO_FILE_PATH + "/test_slowMo_video_" + id + "_"
+                                + size.toString() + ".mp4";
+                    }
+
+                    prepareRecording(size, videoFramerate, captureRate);
+
+                    // prepare preview surface: preview size is same as video size.
+                    updatePreviewSurface(size);
+
+                    // Start recording
+                    startSlowMotionRecording(/*useMediaRecorder*/true, videoFramerate, captureRate,
+                            fpsRange);
+
+                    // Record certain duration.
+                    SystemClock.sleep(RECORDING_DURATION_MS);
+
+                    // Stop recording and preview
+                    stopRecording(/*useMediaRecorder*/true);
+
+                    // Validation.
+                    validateRecording(size, RECORDING_DURATION_MS * SLOWMO_SLOW_FACTOR);
+
+                }
+
+            } finally {
+                closeDevice();
+                releaseRecorder();
+            }
+        }
+    }
+
+    private Range<Integer> getHighestHighSpeedFixedFpsRangeForSize(StreamConfigurationMap config,
+            Size size) {
+        Range<Integer>[] availableFpsRanges = config.getHighSpeedVideoFpsRangesFor(size);
+        Range<Integer> maxRange = availableFpsRanges[0];
+        boolean foundRange = false;
+        for (Range<Integer> range : availableFpsRanges) {
+            if (range.getLower() == range.getUpper() && range.getLower() >= maxRange.getLower()) {
+                foundRange = true;
+                maxRange = range;
+            }
+        }
+
+        if (!foundRange) {
+            return null;
+        }
+        return maxRange;
+    }
+
+    private void startSlowMotionRecording(boolean useMediaRecorder, int videoFrameRate,
+            int captureRate, Range<Integer> fpsRange) throws Exception {
+        List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+        assertTrue("Both preview and recording surfaces should be valid",
+                mPreviewSurface.isValid() && mRecordingSurface.isValid());
+        outputSurfaces.add(mPreviewSurface);
+        outputSurfaces.add(mRecordingSurface);
+        // Video snapshot surface
+        if (mReaderSurface != null) {
+            outputSurfaces.add(mReaderSurface);
+        }
+        mCamera.configureOutputs(outputSurfaces);
+        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
+        mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+
+        CaptureRequest.Builder recordingRequestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        recordingRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
+                CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
+        CaptureRequest.Builder recordingOnlyBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        recordingOnlyBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
+                CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
+        int slowMotionFactor = captureRate / videoFrameRate;
+
+        // Make sure camera output frame rate is set to correct value.
+        recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+        recordingRequestBuilder.addTarget(mRecordingSurface);
+        recordingRequestBuilder.addTarget(mPreviewSurface);
+        recordingOnlyBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+        recordingOnlyBuilder.addTarget(mRecordingSurface);
+
+        List<CaptureRequest> slowMoRequests = new ArrayList<CaptureRequest>();
+        slowMoRequests.add(recordingRequestBuilder.build());// Preview + recording.
+
+        for (int i = 0; i < slowMotionFactor - 1; i++) {
+            slowMoRequests.add(recordingOnlyBuilder.build()); // Recording only.
+        }
+        mCamera.setRepeatingBurst(slowMoRequests, null, null);
+
+        if (useMediaRecorder) {
+            mMediaRecorder.start();
+        } else {
+            // TODO: need implement MediaCodec path.
+        }
+
     }
 
     /**
@@ -281,7 +443,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             }
 
             // Use AVC and AAC a/v compression format.
-            prepareRecording(sz, VIDEO_FRAME_RATE);
+            prepareRecording(sz, VIDEO_FRAME_RATE, VIDEO_FRAME_RATE);
 
             // prepare preview surface: preview size is same as video size.
             updatePreviewSurface(sz);
@@ -492,21 +654,23 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * the recording surface. Use AVC for video compression, AAC for audio compression.
      * Both are required for android devices by android CDD.
      */
-    private void prepareRecording(Size sz, int frameRate) throws Exception {
+    private void prepareRecording(Size sz, int videoFrameRate, int captureRate)
+            throws Exception {
         // Prepare MediaRecorder.
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setOutputFile(mOutMediaFileName);
         mMediaRecorder.setVideoEncodingBitRate(getVideoBitRate(sz));
-        mMediaRecorder.setVideoFrameRate(frameRate);
+        mMediaRecorder.setVideoFrameRate(videoFrameRate);
+        mMediaRecorder.setCaptureRate(captureRate);
         mMediaRecorder.setVideoSize(sz.getWidth(), sz.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         mMediaRecorder.prepare();
         mRecordingSurface = mMediaRecorder.getSurface();
         assertNotNull("Recording surface must be non-null!", mRecordingSurface);
-        mVideoFrameRate = frameRate;
+        mVideoFrameRate = videoFrameRate;
         mVideoSize = sz;
     }
 
