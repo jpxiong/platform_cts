@@ -107,6 +107,7 @@ static jboolean android_security_cts_NativeCodeTest_doPerfEventTest2(JNIEnv* env
  */
 static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject)
 {
+#ifdef __arm__
     ALOGE("Starting doVrootTest");
 
     struct __sysctl_args args;
@@ -121,6 +122,9 @@ static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject
 
     int result = syscall(__NR__sysctl, &args);
     return ((result == -1) && (errno == EFAULT));
+#else
+    return true;
+#endif
 }
 
 static void* mmap_syscall(void* addr, size_t len, int prot, int flags, int fd, off_t offset)
