@@ -114,8 +114,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 3000;
     private static final double AE_COMPENSATION_ERROR_TOLERANCE = 0.2;
     private static final int NUM_FRAMES_WAITED = 30;
-    private static final int NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY = 8;
-
     // 5 percent error margin for resulting metering regions
     private static final float METERING_REGION_ERROR_PERCENT_DELTA = 0.05f;
 
@@ -490,8 +488,13 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             stillRequest.set(CaptureRequest.CONTROL_AWB_REGIONS, awbRegions);
         }
         mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
-        waitForResultValue(resultListener, CaptureResult.CONTROL_AWB_STATE,
-                CaptureResult.CONTROL_AWB_STATE_CONVERGED, NUM_RESULTS_WAIT_TIMEOUT);
+        if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+            waitForResultValue(resultListener, CaptureResult.CONTROL_AWB_STATE,
+                    CaptureResult.CONTROL_AWB_STATE_CONVERGED, NUM_RESULTS_WAIT_TIMEOUT);
+        } else {
+            // LEGACY Devices don't have the AWB_STATE reported in results, so just wait
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+        }
         previewRequest.set(CaptureRequest.CONTROL_AWB_LOCK, true);
         mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         // Validate the next result immediately for region and mode.
