@@ -37,7 +37,6 @@ import android.widget.TextView;
 
 public class BleServerStartActivity extends PassFailButtons.Activity {
 
-    private List<Test> mTestList;
     private TestAdapter mTestAdapter;
     private int mAllPassed;
 
@@ -50,9 +49,7 @@ public class BleServerStartActivity extends PassFailButtons.Activity {
                          R.string.ble_server_start_info, -1);
         getPassButton().setEnabled(false);
 
-        mTestList = setupTestList();
-        mTestAdapter = new TestAdapter(this, mTestList);
-
+        mTestAdapter = new TestAdapter(this, setupTestList());
         ListView listView = (ListView) findViewById(R.id.ble_server_tests);
         listView.setAdapter(mTestAdapter);
 
@@ -88,27 +85,17 @@ public class BleServerStartActivity extends PassFailButtons.Activity {
         stopService(new Intent(this, BleServerService.class));
     }
 
-    private List<Test> setupTestList() {
-        ArrayList<Test> testList = new ArrayList<Test>();
-        testList.add(new Test(R.string.ble_server_add_service));
-        testList.add(new Test(R.string.ble_server_receiving_connect));
-        testList.add(new Test(R.string.ble_server_read_characteristic));
-        testList.add(new Test(R.string.ble_server_write_characteristic));
-        testList.add(new Test(R.string.ble_server_read_descriptor));
-        testList.add(new Test(R.string.ble_server_write_descriptor));
-        testList.add(new Test(R.string.ble_server_reliable_write));
-        testList.add(new Test(R.string.ble_server_receiving_disconnect));
+    private List<Integer> setupTestList() {
+        ArrayList<Integer> testList = new ArrayList<Integer>();
+        testList.add(R.string.ble_server_add_service);
+        testList.add(R.string.ble_server_receiving_connect);
+        testList.add(R.string.ble_server_read_characteristic);
+        testList.add(R.string.ble_server_write_characteristic);
+        testList.add(R.string.ble_server_read_descriptor);
+        testList.add(R.string.ble_server_write_descriptor);
+        testList.add(R.string.ble_server_reliable_write);
+        testList.add(R.string.ble_server_receiving_disconnect);
         return testList;
-    }
-
-    class Test {
-        private boolean passed;
-        private int instructions;
-
-        private Test(int instructions) {
-            passed = false;
-            this.instructions = instructions;
-        }
     }
 
     private BroadcastReceiver onBroadcast = new BroadcastReceiver() {
@@ -116,81 +103,32 @@ public class BleServerStartActivity extends PassFailButtons.Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action == BleServerService.BLE_SERVICE_ADDED) {
-                mTestList.get(0).passed = true;
+                mTestAdapter.setTestPass(0);
                 mAllPassed |= 0x01;
             } else if (action == BleServerService.BLE_SERVER_CONNECTED) {
-                mTestList.get(1).passed = true;
+                mTestAdapter.setTestPass(1);
                 mAllPassed |= 0x02;
             } else if (action == BleServerService.BLE_CHARACTERISTIC_READ_REQUEST) {
-                mTestList.get(2).passed = true;
+                mTestAdapter.setTestPass(2);
                 mAllPassed |= 0x04;
             } else if (action == BleServerService.BLE_CHARACTERISTIC_WRITE_REQUEST) {
-                mTestList.get(3).passed = true;
+                mTestAdapter.setTestPass(3);
                 mAllPassed |= 0x08;
             } else if (action == BleServerService.BLE_DESCRIPTOR_READ_REQUEST) {
-                mTestList.get(4).passed = true;
+                mTestAdapter.setTestPass(4);
                 mAllPassed |= 0x10;
             } else if (action == BleServerService.BLE_DESCRIPTOR_WRITE_REQUEST) {
-                mTestList.get(5).passed = true;
+                mTestAdapter.setTestPass(5);
                 mAllPassed |= 0x20;
             } else if (action == BleServerService.BLE_EXECUTE_WRITE) {
-                mTestList.get(6).passed = true;
+                mTestAdapter.setTestPass(6);
                 mAllPassed |= 0x40;
             } else if (action == BleServerService.BLE_SERVER_DISCONNECTED) {
-                mTestList.get(7).passed = true;
+                mTestAdapter.setTestPass(7);
                 mAllPassed |= 0x80;
             }
             mTestAdapter.notifyDataSetChanged();
             if (mAllPassed == 0xFF) getPassButton().setEnabled(true);
         }
     };
-
-    class TestAdapter extends BaseAdapter {
-        Context context;
-        List<Test> tests;
-        LayoutInflater inflater;
-
-        public TestAdapter(Context context, List<Test> tests) {
-            this.context = context;
-            inflater = LayoutInflater.from(context);
-            this.tests = tests;
-        }
-
-        @Override
-        public int getCount() {
-            return tests.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return tests.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewGroup vg;
-
-            if (convertView != null) {
-                vg = (ViewGroup) convertView;
-            } else {
-                vg = (ViewGroup) inflater.inflate(R.layout.ble_server_start_item, null);
-            }
-
-            Test test = tests.get(position);
-            if (test.passed) {
-                ((ImageView) vg.findViewById(R.id.status)).setImageResource(R.drawable.fs_good);
-            } else {
-                ((ImageView) vg.findViewById(R.id.status)).
-                                setImageResource(R.drawable.fs_indeterminate);
-            }
-            ((TextView) vg.findViewById(R.id.instructions)).setText(test.instructions);
-
-            return vg;
-        }
-    }
 }
