@@ -442,6 +442,9 @@
     <!-- Magnetic Field -->
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
+    <!-- Step Counter and Detector -->
+    <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
+
     <!-- Strings for Sample Test Activities -->
     <string name="share_button_text">Share</string>
     <string name="sample_framework_test">Sample Framework Test</string>
