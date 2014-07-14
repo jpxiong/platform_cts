@@ -24,9 +24,10 @@ import android.graphics.PorterDuff;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencecalculators.ExactComparer;
+import android.uirendering.cts.differencecalculators.MSSIMCalculator;
 
 public class BasicExactTests extends CanvasCompareActivityTest {
-    private final DifferenceCalculator mBitmapComparer = new ExactComparer();
+    private final DifferenceCalculator mExactComparer = new ExactComparer();
 
     @SmallTest
     public void testBlueRect() {
@@ -40,7 +41,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -60,7 +61,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -78,7 +79,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -96,7 +97,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -111,7 +112,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -129,7 +130,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -141,7 +142,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -158,7 +159,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
                 canvas.drawText(testString, 30, 50, p);
             }
         };
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     @SmallTest
@@ -171,7 +172,7 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             }
         };
 
-        executeCanvasTest(canvasClient, mBitmapComparer);
+        executeCanvasTest(canvasClient, mExactComparer);
     }
 
     /**
@@ -181,6 +182,10 @@ public class BasicExactTests extends CanvasCompareActivityTest {
      */
     @SmallTest
     public void testRenderSpecIsolation() {
+        // This is considered a very high threshold and as such, the test should still fail because
+        // they are completely different images.
+        final float threshold = 0.1f;
+        MSSIMCalculator mssimCalculator = new MSSIMCalculator(threshold);
         CanvasClient canvasClient = new CanvasClient() {
             @Override
             public void draw(Canvas canvas, int width, int height) {
@@ -189,6 +194,6 @@ public class BasicExactTests extends CanvasCompareActivityTest {
         };
         Bitmap softwareCapture = captureRenderSpec(0, canvasClient, false);
         Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, true);
-        assertFalse(compareBitmaps(softwareCapture, hardwareCapture, new ExactComparer()));
+        assertFalse(compareBitmaps(softwareCapture, hardwareCapture, mssimCalculator));
     }
 }

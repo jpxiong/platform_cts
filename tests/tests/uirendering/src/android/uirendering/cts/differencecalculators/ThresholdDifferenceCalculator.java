@@ -24,14 +24,14 @@ import android.content.res.Resources;
 import android.graphics.Color;
 
 import android.renderscript.Allocation;
-import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.util.Log;
 
 /**
  * Compares two images to see if each pixel is the same, within a certain threshold value
  */
-public class ThresholdDifferenceCalculator extends DifferenceCalculator {
+public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
+    private static final String TAG = "ThresholdDifference";
     private ScriptC_ThresholdDifferenceCalculator mScript;
     private int mThreshold;
 
@@ -47,6 +47,7 @@ public class ThresholdDifferenceCalculator extends DifferenceCalculator {
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
+        int differentPixels = 0;
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
@@ -54,41 +55,27 @@ public class ThresholdDifferenceCalculator extends DifferenceCalculator {
                 error += Math.abs(Color.blue(ideal[index]) - Color.blue(given[index]));
                 error += Math.abs(Color.green(ideal[index]) - Color.green(given[index]));
                 if (error > mThreshold) {
-                    return false;
+                    differentPixels++;
                 }
             }
         }
-        return true;
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(TAG, "Number of different pixels : " + differentPixels);
+        }
+        return (differentPixels == 0);
     }
 
     @Override
-    public boolean verifySameRS(Resources resources, Allocation ideal,
+    public boolean verifySameRowsRS(Resources resources, Allocation ideal,
             Allocation given, int offset, int stride, int width, int height,
-            RenderScript renderScript) {
+            RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
             mScript = new ScriptC_ThresholdDifferenceCalculator(renderScript, resources,
                     R.raw.thresholddifferencecalculator);
         }
 
-        mScript.set_HEIGHT(height);
+        mScript.set_THRESHOLD(mThreshold);
         mScript.set_WIDTH(width);
-
-
-        //Create an array with the index of each row
-        int[] inputIndices = new int[CanvasCompareActivityTest.TEST_HEIGHT];
-        for (int i = 0; i < CanvasCompareActivityTest.TEST_HEIGHT; i++) {
-            inputIndices[i] = i;
-        }
-
-        //Create the allocation from that given array
-        Allocation inputAllocation = Allocation.createSized(renderScript, Element.I32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
-        inputAllocation.copyFrom(inputIndices);
-
-        //Create the allocation that will hold the output, the sum of pixels that differ in that
-        //row
-        Allocation outputAllocation = Allocation.createSized(renderScript, Element.I32(renderScript),
-                inputIndices.length, Allocation.USAGE_SCRIPT);
 
         //Set the bitmap allocations
         mScript.set_ideal(ideal);
@@ -97,24 +84,12 @@ public class ThresholdDifferenceCalculator extends DifferenceCalculator {
         //Call the renderscript function on each row
         mScript.forEach_thresholdCompare(inputAllocation, outputAllocation);
 
-        //Get the values returned from the function
-        int[] returnValue = new int[inputIndices.length];
-        outputAllocation.copyTo(returnValue);
-
-        int count = 0;
-        //If any row had any different pixels, then it fails
-        for (int i = 0; i < inputIndices.length; i++) {
-            if (returnValue[i] != 0) {
-                if (!CanvasCompareActivityTest.DEBUG) {
-                    return false;
-                } else {
-                    count++;
-                }
-            }
+        float differentPixels = sum1DFloatAllocation(outputAllocation);
+        if (CanvasCompareActivityTest.DEBUG) {
+            Log.d(CanvasCompareActivityTest.TAG_NAME,
+                    "ThresholdDifferenceCalculatorRS : Number of different pixels = " +
+                            differentPixels);
         }
-
-        Log.d("ExactComparisonRS", "Number of different pixels : " + count);
-
-        return (count == 0);
+        return (differentPixels == 0);
     }
 }

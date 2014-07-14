@@ -9,7 +9,7 @@ rs_allocation given;
 
 // This method does a simple comparison of all the values in the given and ideal allocations.
 // If any of the pixels are off, then the test will fail.
-void exactCompare(const int32_t *v_in, int32_t *v_out){
+void exactCompare(const int32_t *v_in, float *v_out){
     int y = v_in[0];
     v_out[0] = 0;
 
