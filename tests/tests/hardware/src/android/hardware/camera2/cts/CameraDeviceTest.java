@@ -1120,6 +1120,14 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
                         CaptureRequest.TONEMAP_MODE_FAST);
             }
+
+            // Still capture template should have android.statistics.lensShadingMapMode ON when
+            // DNG capability is supported.
+            List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
+            if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_DNG)) {
+                mCollector.expectKeyValueEquals(request, STATISTICS_LENS_SHADING_MAP_MODE,
+                        STATISTICS_LENS_SHADING_MAP_MODE_ON);
+            }
         } else {
             mCollector.expectKeyValueNotNull(request, EDGE_MODE);
             mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
