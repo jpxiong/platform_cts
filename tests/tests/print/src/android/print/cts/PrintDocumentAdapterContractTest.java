@@ -63,14 +63,18 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(2)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(2)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -84,6 +88,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -134,8 +139,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
-        PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
+        // We always ask for the the first fifty pages for preview.
+        PageRange[] firstPages = new PageRange[] {new PageRange(0, 1)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
 
@@ -155,10 +160,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // When print is pressed we ask for a layout which is *not* for preview.
         verifyLayoutCall(inOrder, adapter, secondNewAttributes, secondNewAttributes, false);
 
-        // When print is pressed we ask for all selected pages.
-        PageRange[] secondPages = new PageRange[] {PageRange.ALL_PAGES};
-        inOrder.verify(adapter).onWrite(eq(secondPages), any(ParcelFileDescriptor.class),
-                any(CancellationSignal.class), any(WriteResultCallback.class));
+        // When print is pressed we ask for all selected pages but we got
+        // them when asking for the ones for a preview, and the adapter does
+        // not report a content change. Hence, there is nothing to write.
 
         // Finish is always called last.
         inOrder.verify(adapter).onFinish();
@@ -172,11 +176,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
@@ -193,6 +200,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -238,7 +246,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
+        // We always ask for the the first fifty pages for preview.
         PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
@@ -255,11 +263,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
@@ -278,6 +289,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -349,7 +361,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
+        // We always ask for the the first fifty pages for preview.
         PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
@@ -406,10 +418,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // When print is pressed we ask for a layout which is *not* for preview.
         verifyLayoutCall(inOrder, adapter, fifthNewAttributes, fifthNewAttributes, false);
 
-        // When print is pressed we ask for all selected pages.
-        PageRange[] secondPages = new PageRange[] {PageRange.ALL_PAGES};
-        inOrder.verify(adapter).onWrite(eq(secondPages), any(ParcelFileDescriptor.class),
-                any(CancellationSignal.class), any(WriteResultCallback.class));
+        // When print is pressed we ask for all selected pages but we got
+        // them when asking for the ones for a preview, and the adapter does
+        // not report a content change. Hence, there is nothing to write.
 
         // Finish is always called last.
         inOrder.verify(adapter).onFinish();
@@ -423,11 +434,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
@@ -446,6 +460,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -507,11 +522,12 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         PrintAttributes firstNewAttributes = new PrintAttributes.Builder()
                 .setMediaSize(MediaSize.NA_LETTER)
                 .setResolution(new Resolution("PDF resolution", "PDF resolution", 300, 300))
-                .setMinMargins(Margins.NO_MARGINS).setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setMinMargins(Margins.NO_MARGINS)
+                .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
+        // We always ask for the the first fifty pages for preview.
         PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
@@ -528,9 +544,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
-        // We changed the printer and the new printer does not support the
-        // current color in which case the default color for the selected
-        // printer is used resulting in a layout pass.
+        // We changed the color which results in a layout pass.
         PrintAttributes thirdOldAttributes = secondNewAttributes;
         PrintAttributes thirdNewAttributes = new PrintAttributes.Builder()
                 .setMediaSize(MediaSize.ISO_A3)
@@ -555,10 +569,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // When print is pressed we ask for a layout which is *not* for preview.
         verifyLayoutCall(inOrder, adapter, fourthNewAttributes, fourthNewAttributes, false);
 
-        // When print is pressed we ask for all selected pages.
-        PageRange[] secondPages = new PageRange[] {PageRange.ALL_PAGES};
-        inOrder.verify(adapter).onWrite(eq(secondPages), any(ParcelFileDescriptor.class),
-                any(CancellationSignal.class), any(WriteResultCallback.class));
+        // When print is pressed we ask for all selected pages but we got
+        // them when asking for the ones for a preview, and the adapter does
+        // not report a content change. Hence, there is nothing to write.
 
         // Finish is always called last.
         inOrder.verify(adapter).onFinish();
@@ -573,14 +586,18 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(1)
                         .build();
                 // The content changes after every layout.
                 callback.onLayoutFinished(info, true);
@@ -595,6 +612,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
@@ -647,7 +665,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
+        // We always ask for the the first fifty pages for preview.
         PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
@@ -671,8 +689,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // When print is pressed we ask for a layout which is *not* for preview.
         verifyLayoutCall(inOrder, adapter, secondNewAttributes, secondNewAttributes, false);
 
-        // When print is pressed we ask for all selected pages.
-        PageRange[] thirdPages = new PageRange[] {PageRange.ALL_PAGES};
+        // When print is pressed we ask for all selected pages as the adapter
+        // reports that the content changes after every layout pass.
+        PageRange[] thirdPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(thirdPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
 
@@ -688,40 +707,45 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
-                new Answer<Void>() {
-                    @Override
-                    public Void answer(InvocationOnMock invocation) throws Throwable {
-                        LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                        PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                                .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
-                                .build();
-                        // The content changes after every layout.
-                        callback.onLayoutFinished(info, true);
-                        return null;
-                    }
-                }, new Answer<Void>() {
-                    @Override
-                    public Void answer(InvocationOnMock invocation) throws Throwable {
-                        Object[] args = invocation.getArguments();
-                        PageRange[] pages = (PageRange[]) args[0];
-                        ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
-                        WriteResultCallback callback = (WriteResultCallback) args[3];
-                        fd.close();
-                        callback.onWriteFinished(pages);
-                        // Mark write was called.
-                        onWriteCalled();
-                        return null;
-                    }
-                }, new Answer<Void>() {
-                    @Override
-                    public Void answer(InvocationOnMock invocation) throws Throwable {
-                        // Mark finish was called.
-                        onFinishCalled();
-                        return null;
-                    }
-                });
+            new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
+                LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(1)
+                        .build();
+                // The content changes after every layout.
+                callback.onLayoutFinished(info, true);
+                return null;
+            }
+        }, new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                PageRange[] pages = (PageRange[]) args[0];
+                ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
+                WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
+                fd.close();
+                callback.onWriteFinished(pages);
+                // Mark write was called.
+                onWriteCalled();
+                return null;
+            }
+        }, new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                // Mark finish was called.
+                onFinishCalled();
+                return null;
+            }
+        });
 
         // Start printing.
         print(adapter);
@@ -757,7 +781,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
+        // We always ask for the the first fifty pages for preview.
         PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
@@ -766,7 +790,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         verifyLayoutCall(inOrder, adapter, firstNewAttributes, firstNewAttributes, false);
 
         // When print is pressed we ask for all selected pages.
-        PageRange[] thirdPages = new PageRange[] {PageRange.ALL_PAGES};
+        PageRange[] thirdPages = new PageRange[] {new PageRange(0, 0)};
         inOrder.verify(adapter).onWrite(eq(thirdPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
 
@@ -782,14 +806,18 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(3)
+                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(3)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
@@ -802,6 +830,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 Object[] args = invocation.getArguments();
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                PageRange[] pages = (PageRange[]) args[0];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(new PageRange[] {PageRange.ALL_PAGES});
                 // Mark write was called.
@@ -854,8 +884,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .build();
         verifyLayoutCall(inOrder, adapter, firstOldAttributes, firstNewAttributes, true);
 
-        // We always ask for the first page for preview.
-        PageRange[] firstPages = new PageRange[] {new PageRange(0, 0)};
+        // We always ask for the the first fifty pages for preview.
+        PageRange[] firstPages = new PageRange[] {new PageRange(0, 2)};
         inOrder.verify(adapter).onWrite(eq(firstPages), any(ParcelFileDescriptor.class),
                 any(CancellationSignal.class), any(WriteResultCallback.class));
 
@@ -1200,11 +1230,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
         SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                       .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
@@ -1218,6 +1251,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 Object[] args = invocation.getArguments();
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                PageRange[] pages = (PageRange[]) args[0];
+                writeBlankPages(printAttributes[0], fd, Integer.MAX_VALUE, Integer.MAX_VALUE);
                 fd.close();
                 // Write wrong pages.
                 callback.onWriteFinished(new PageRange[] {
