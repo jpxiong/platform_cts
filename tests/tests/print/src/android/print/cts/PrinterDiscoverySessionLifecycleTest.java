@@ -383,10 +383,13 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
     }
 
     public PrintDocumentAdapter createMockPrintDocumentAdapter() {
+        final PrintAttributes[] printAttributes = new PrintAttributes[1];
+
         return createMockPrintDocumentAdapter(
             new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                printAttributes[0] = (PrintAttributes) invocation.getArguments()[1];
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
@@ -404,6 +407,7 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
                 PageRange[] pages = (PageRange[]) args[0];
                 ParcelFileDescriptor fd = (ParcelFileDescriptor) args[1];
                 WriteResultCallback callback = (WriteResultCallback) args[3];
+                writeBlankPages(printAttributes[0], fd, pages[0].getStart(), pages[0].getEnd());
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
