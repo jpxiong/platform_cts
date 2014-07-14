@@ -27,7 +27,7 @@ import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertisementData;
+import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.content.Context;
 import android.content.Intent;
@@ -101,7 +101,7 @@ public class BleAdvertiserService extends Service {
             case COMMAND_START_ADVERTISE:
                 List<ParcelUuid> serviceUuid = new ArrayList<ParcelUuid>();
                 serviceUuid.add(new ParcelUuid(SERVICE_UUID));
-                AdvertisementData data = new AdvertisementData.Builder()
+                AdvertiseData data = new AdvertiseData.Builder()
                     .setManufacturerData(MANUFACTURER_GOOGLE, new byte[]{MANUFACTURER_GOOGLE, 0})
                     .setServiceData(new ParcelUuid(SERVICE_UUID),
                         new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
@@ -109,7 +109,7 @@ public class BleAdvertiserService extends Service {
                 AdvertiseSettings setting = new AdvertiseSettings.Builder()
                     .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
                     .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-                    .setType(AdvertiseSettings.ADVERTISE_TYPE_SCANNABLE)
+                    .setIsConnectable(false)
                     .build();
                 mAdvertiser.startAdvertising(setting, data, mCallback);
                 sendBroadcast(new Intent(BLE_START_ADVERTISE));
@@ -134,12 +134,12 @@ public class BleAdvertiserService extends Service {
 
     private class BLEAdvertiseCallback extends AdvertiseCallback {
         @Override
-        public void onFailure(int errorCode) {
+        public void onStartFailure(int errorCode) {
             Log.e(TAG, "fail. Error code: " + errorCode);
         }
 
         @Override
-        public void onSuccess(AdvertiseSettings setting) {
+        public void onStartSuccess(AdvertiseSettings setting) {
             if (DEBUG) Log.d(TAG, "success.");
         }
     }

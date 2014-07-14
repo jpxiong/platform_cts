@@ -82,7 +82,7 @@ public class BleScannerService extends Service {
                 .setServiceData(new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
                 .build());
             ScanSettings setting = new ScanSettings.Builder()
-                .setCallbackType(ScanSettings.CALLBACK_TYPE_ON_UPDATE)
+                .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL)
                 .build();
             mAddrDict.clear();
@@ -112,7 +112,10 @@ public class BleScannerService extends Service {
 
     private class BLEScanCallback extends ScanCallback {
         @Override
-        public void onAdvertisementUpdate(ScanResult result) {
+        public void onScanResult(int callBackType, ScanResult result) {
+            if (callBackType != ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
+                return;
+            }
             mAddrDict.add(result.getDevice().getAddress());
 
             // If a new MAC address received, dict size increases.
@@ -125,15 +128,6 @@ public class BleScannerService extends Service {
         public void onScanFailed(int errorCode) {
             Log.e(TAG, "Scan fail. Error code: " + new Integer(errorCode).toString());
         }
-
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {}
-
-        @Override
-        public void onAdvertisementLost(ScanResult result) {}
-
-        @Override
-        public void onAdvertisementFound(ScanResult result) {}
 
     }
 }
