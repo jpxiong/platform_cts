@@ -20,6 +20,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -1108,16 +1109,24 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
         stillRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
 
-        // Minimum exposure settings is mostly static while maximum exposure setting depends on
-        // frame rate range which in term depends on capture request.
-        long minExposureValue = mStaticInfo.getSensitivityMinimumOrDefault() *
-                mStaticInfo.getExposureMinimumOrDefault() / 1000;
-        long maxSensitivity = mStaticInfo.getSensitivityMaximumOrDefault();
-        long maxExposureTimeUs = mStaticInfo.getExposureMaximumOrDefault() / 1000;
-        long maxExposureValuePreview = getMaxExposureValue(previewRequest, maxExposureTimeUs,
-                maxSensitivity);
-        long maxExposureValueStill = getMaxExposureValue(stillRequest, maxExposureTimeUs,
-                maxSensitivity);
+        // The following variables should only be read under the MANUAL_SENSOR capability guard:
+        long minExposureValue = -1;
+        long maxExposureTimeUs = -1;
+        long maxExposureValuePreview = -1;
+        long maxExposureValueStill = -1;
+        if (mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            // Minimum exposure settings is mostly static while maximum exposure setting depends on
+            // frame rate range which in term depends on capture request.
+            minExposureValue = mStaticInfo.getSensitivityMinimumOrDefault() *
+                    mStaticInfo.getExposureMinimumOrDefault() / 1000;
+            long maxSensitivity = mStaticInfo.getSensitivityMaximumOrDefault();
+            maxExposureTimeUs = mStaticInfo.getExposureMaximumOrDefault() / 1000;
+            maxExposureValuePreview = getMaxExposureValue(previewRequest, maxExposureTimeUs,
+                    maxSensitivity);
+            maxExposureValueStill = getMaxExposureValue(stillRequest, maxExposureTimeUs,
+                    maxSensitivity);
+        }
 
         // Set the max number of images to be same as the burst count, as the verification
         // could be much slower than producing rate, and we don't want to starve producer.
@@ -1126,22 +1135,26 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
         for (int i = 0; i <= numSteps; i++) {
             int exposureCompensation = i * stepsPerEv + compensationRange.getLower();
+            double expectedRatio = Math.pow(2.0, exposureCompensation / stepsPerEv);
 
             // Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
             waitForAeStable(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-            CaptureResult result = resultListener.getCaptureResult(NUM_RESULTS_WAIT_TIMEOUT);
+            CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
 
-            // get and check if current exposure value is valid
-            long normalExposureValue = getExposureValue(result);
-            mCollector.expectInRange("Exposure setting out of bound", normalExposureValue,
-                    minExposureValue, maxExposureValuePreview);
+            long normalExposureValue = -1;
+            if (mStaticInfo.isCapabilitySupported(
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                // get and check if current exposure value is valid
+                normalExposureValue = getExposureValue(result);
+                mCollector.expectInRange("Exposure setting out of bound", normalExposureValue,
+                        minExposureValue, maxExposureValuePreview);
 
-            // Only run the test if expectedExposureValue is within valid range
-            double expectedRatio = Math.pow(2.0, exposureCompensation / stepsPerEv);
-            long expectedExposureValue = (long) (normalExposureValue * expectedRatio);
-            if (expectedExposureValue < minExposureValue ||
-                expectedExposureValue > maxExposureValueStill) {
-                continue;
+                // Only run the test if expectedExposureValue is within valid range
+                long expectedExposureValue = (long) (normalExposureValue * expectedRatio);
+                if (expectedExposureValue < minExposureValue ||
+                    expectedExposureValue > maxExposureValueStill) {
+                    continue;
+                }
             }
 
             // Now issue exposure compensation and wait for AE locked. AE could take a few
@@ -1150,8 +1163,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     exposureCompensation);
             previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
             mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
-            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-            waitForAeLocked(resultListener);
+            waitForAeLocked(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             // Issue still capture
             if (VERBOSE) {
@@ -1163,28 +1175,29 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             CaptureRequest request = stillRequest.build();
             mCamera.capture(request, resultListener, mHandler);
 
-            result = resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+            result = resultListener.getCaptureResultForRequest(request, WAIT_FOR_RESULT_TIMEOUT_MS);
 
-            // Verify the exposure value compensates as requested
-            long compensatedExposureValue = getExposureValue(result);
-            mCollector.expectInRange("Exposure setting out of bound", compensatedExposureValue,
-                    minExposureValue, maxExposureValueStill);
-            double observedRatio = (double) compensatedExposureValue / normalExposureValue;
-            double error = observedRatio / expectedRatio;
-            mCollector.expectInRange(String.format(
-                    "Exposure compensation ratio exceeds error tolerence:"
-                    + " expected(%f) observed(%f) ", expectedRatio, observedRatio),
-                    error,
-                    1.0 - AE_COMPENSATION_ERROR_TOLERANCE,
-                    1.0 + AE_COMPENSATION_ERROR_TOLERANCE);
+            if (mStaticInfo.isCapabilitySupported(
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                // Verify the exposure value compensates as requested
+                long compensatedExposureValue = getExposureValue(result);
+                mCollector.expectInRange("Exposure setting out of bound", compensatedExposureValue,
+                        minExposureValue, maxExposureValueStill);
+                double observedRatio = (double) compensatedExposureValue / normalExposureValue;
+                double error = observedRatio / expectedRatio;
+                mCollector.expectInRange(String.format(
+                        "Exposure compensation ratio exceeds error tolerence:"
+                        + " expected(%f) observed(%f) ", expectedRatio, observedRatio),
+                        error,
+                        1.0 - AE_COMPENSATION_ERROR_TOLERANCE,
+                        1.0 + AE_COMPENSATION_ERROR_TOLERANCE);
+            }
 
-
-            // TODO: enable below code once bug 14059883 is fixed.
-            /*
             mCollector.expectEquals("Exposure compensation result should match requested value.",
-                    aeCompensationValue,
+                    exposureCompensation,
                     result.get(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION));
-            */
+            mCollector.expectTrue("Exposure lock should be set",
+                    result.get(CaptureResult.CONTROL_AE_LOCK));
 
             Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             validateJpegCapture(image, maxStillSz);

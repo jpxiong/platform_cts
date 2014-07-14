@@ -414,9 +414,27 @@ public class Camera2SurfaceViewTestCase extends
     /**
      * Wait for AE to be: LOCKED
      *
+     * <p>Waits for {@code android.sync.maxLatency} number of results first, to make sure
+     * that the result is synchronized (or {@code numResultWaitForUnknownLatency} if the latency
+     * is unknown.</p>
+     *
+     * <p>This is a no-op for {@code LEGACY} devices since they don't report
+     * the {@code aeState} result.</p>
+     *
      * @param resultListener The capture listener to get capture result back.
+     * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
+     *                                       unknown.
      */
-    protected static void waitForAeLocked(SimpleCaptureListener resultListener) {
+    protected void waitForAeLocked(SimpleCaptureListener resultListener,
+            int numResultWaitForUnknownLatency) {
+
+        waitForSettingsApplied(resultListener, numResultWaitForUnknownLatency);
+
+        if (!mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+            // No-op for legacy devices
+            return;
+        }
+
         List<Integer> expectedAeStates = new ArrayList<Integer>();
         expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_LOCKED));
         waitForAnyResultValue(resultListener, CaptureResult.CONTROL_AE_STATE, expectedAeStates,

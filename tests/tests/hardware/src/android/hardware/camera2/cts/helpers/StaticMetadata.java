@@ -1209,9 +1209,13 @@ public class StaticMetadata {
             return CONTROL_AE_COMPENSATION_STEP_DEFAULT;
         }
 
-        float compensationStepF =
-                (float) compensationStep.getNumerator() / compensationStep.getDenominator();
-        checkTrueForKey(key, " value must be no more than 1/2", compensationStepF < 0.5f);
+        // Legacy devices don't have a minimum step requirement
+        if (isHardwareLevelLimitedOrBetter()) {
+            float compensationStepF =
+                    (float) compensationStep.getNumerator() / compensationStep.getDenominator();
+            checkTrueForKey(key, " value must be no more than 1/2", compensationStepF < 0.5f);
+        }
+
         return compensationStep;
     }
 
@@ -1225,8 +1229,7 @@ public class StaticMetadata {
                 CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE;
         Range<Integer> compensationRange = getValueFromKeyNonNull(key);
         Rational compensationStep = getAeCompensationStepChecked();
-        float compensationStepF =
-                (float) compensationStep.getNumerator() / compensationStep.getDenominator();
+        float compensationStepF = compensationStep.floatValue();
         final Range<Integer> DEFAULT_RANGE = Range.create(
                 (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStepF),
                 (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStepF));
@@ -1234,9 +1237,13 @@ public class StaticMetadata {
             return DEFAULT_RANGE;
         }
 
-        checkTrueForKey(key, " range value must be at least " + DEFAULT_RANGE,
-               compensationRange.getLower() <= DEFAULT_RANGE.getLower() &&
-               compensationRange.getUpper() >= DEFAULT_RANGE.getUpper());
+        // Legacy devices don't have a minimum range requirement
+        if (isHardwareLevelLimitedOrBetter()) {
+            checkTrueForKey(key, " range value must be at least " + DEFAULT_RANGE
+                    + ", actual " + compensationRange + ", compensation step " + compensationStep,
+                   compensationRange.getLower() <= DEFAULT_RANGE.getLower() &&
+                   compensationRange.getUpper() >= DEFAULT_RANGE.getUpper());
+        }
 
         return compensationRange;
     }
