@@ -55,6 +55,15 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz);
     }
 
+    public Iterable<Codec> HEVC(CodecFactory factory) {
+        return factory.createCodecList(
+                mContext,
+                "video/hevc",
+                "OMX.google.hevc.decoder",
+                R.raw.video_480x360_mp4_hevc_325kbps_30fps_aac_stereo_128kbps_48000hz,
+                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz);
+    }
+
     public Iterable<Codec> H263(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
@@ -94,21 +103,22 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     CodecFactory HW  = new HWCodecFactory();
 
     public Iterable<Codec> H264()  { return H264(ALL);  }
+    public Iterable<Codec> HEVC()  { return HEVC(ALL);  }
     public Iterable<Codec> VP8()   { return VP8(ALL);   }
     public Iterable<Codec> VP9()   { return VP9(ALL);   }
     public Iterable<Codec> Mpeg4() { return Mpeg4(ALL); }
     public Iterable<Codec> H263()  { return H263(ALL);  }
 
     public Iterable<Codec> AllCodecs() {
-        return chain(H264(ALL), VP8(ALL), VP9(ALL), Mpeg4(ALL), H263(ALL));
+        return chain(H264(ALL), HEVC(ALL), VP8(ALL), VP9(ALL), Mpeg4(ALL), H263(ALL));
     }
 
     public Iterable<Codec> SWCodecs() {
-        return chain(H264(SW), VP8(SW), VP9(SW), Mpeg4(SW), H263(SW));
+        return chain(H264(SW), HEVC(SW), VP8(SW), VP9(SW), Mpeg4(SW), H263(SW));
     }
 
     public Iterable<Codec> HWCodecs() {
-        return chain(H264(HW), VP8(HW), VP9(HW), Mpeg4(HW), H263(HW));
+        return chain(H264(HW), HEVC(HW), VP8(HW), VP9(HW), Mpeg4(HW), H263(HW));
     }
 
     /* tests for adaptive codecs */
@@ -162,18 +172,21 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public void sanityHW()  { sanity = true; try { runHW();  } finally { sanity = false; } }
 
     public void runH264()  { ex(H264(),  allTests); }
+    public void runHEVC()  { ex(HEVC(),  allTests); }
     public void runVP8()   { ex(VP8(),   allTests); }
     public void runVP9()   { ex(VP9(),   allTests); }
     public void runMpeg4() { ex(Mpeg4(), allTests); }
     public void runH263()  { ex(H263(),  allTests); }
 
     public void onlyH264HW()  { ex(H264(HW),  allTests); }
+    public void onlyHEVCHW()  { ex(HEVC(HW),  allTests); }
     public void onlyVP8HW()   { ex(VP8(HW),   allTests); }
     public void onlyVP9HW()   { ex(VP9(HW),   allTests); }
     public void onlyMpeg4HW() { ex(Mpeg4(HW), allTests); }
     public void onlyH263HW()  { ex(H263(HW),  allTests); }
 
     public void onlyH264SW()  { ex(H264(SW),  allTests); }
+    public void onlyHEVCSW()  { ex(HEVC(SW),  allTests); }
     public void onlyVP8SW()   { ex(VP8(SW),   allTests); }
     public void onlyVP9SW()   { ex(VP9(SW),   allTests); }
     public void onlyMpeg4SW() { ex(Mpeg4(SW), allTests); }
@@ -184,66 +197,78 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
 
     /* inidividual tests */
     public void testH264_adaptiveEarlyEos()  { ex(H264(),  adaptiveEarlyEos); }
+    public void testHEVC_adaptiveEarlyEos()  { ex(HEVC(),  adaptiveEarlyEos); }
     public void testVP8_adaptiveEarlyEos()   { ex(VP8(),   adaptiveEarlyEos); }
     public void testVP9_adaptiveEarlyEos()   { ex(VP9(),   adaptiveEarlyEos); }
     public void testMpeg4_adaptiveEarlyEos() { ex(Mpeg4(), adaptiveEarlyEos); }
     public void testH263_adaptiveEarlyEos()  { ex(H263(),  adaptiveEarlyEos); }
 
     public void testH264_adaptiveEosFlushSeek()  { ex(H264(),  adaptiveEosFlushSeek); }
+    public void testHEVC_adaptiveEosFlushSeek()  { ex(HEVC(),  adaptiveEosFlushSeek); }
     public void testVP8_adaptiveEosFlushSeek()   { ex(VP8(),   adaptiveEosFlushSeek); }
     public void testVP9_adaptiveEosFlushSeek()   { ex(VP9(),   adaptiveEosFlushSeek); }
     public void testMpeg4_adaptiveEosFlushSeek() { ex(Mpeg4(), adaptiveEosFlushSeek); }
     public void testH263_adaptiveEosFlushSeek()  { ex(H263(),  adaptiveEosFlushSeek); }
 
     public void testH264_adaptiveSkipAhead()  { ex(H264(),  adaptiveSkipAhead); }
+    public void testHEVC_adaptiveSkipAhead()  { ex(HEVC(),  adaptiveSkipAhead); }
     public void testVP8_adaptiveSkipAhead()   { ex(VP8(),   adaptiveSkipAhead); }
     public void testVP9_adaptiveSkipAhead()   { ex(VP9(),   adaptiveSkipAhead); }
     public void testMpeg4_adaptiveSkipAhead() { ex(Mpeg4(), adaptiveSkipAhead); }
     public void testH263_adaptiveSkipAhead()  { ex(H263(),  adaptiveSkipAhead); }
 
     public void testH264_adaptiveSkipBack()  { ex(H264(),  adaptiveSkipBack); }
+    public void testHEVC_adaptiveSkipBack()  { ex(HEVC(),  adaptiveSkipBack); }
     public void testVP8_adaptiveSkipBack()   { ex(VP8(),   adaptiveSkipBack); }
     public void testVP9_adaptiveSkipBack()   { ex(VP9(),   adaptiveSkipBack); }
     public void testMpeg4_adaptiveSkipBack() { ex(Mpeg4(), adaptiveSkipBack); }
     public void testH263_adaptiveSkipBack()  { ex(H263(),  adaptiveSkipBack); }
 
     public void testH264_adaptiveReconfigDrc()  { ex(H264(),  adaptiveReconfigDrc); }
+    public void testHEVC_adaptiveReconfigDrc()  { ex(HEVC(),  adaptiveReconfigDrc); }
     public void testVP8_adaptiveReconfigDrc()   { ex(VP8(),   adaptiveReconfigDrc); }
     public void testVP9_adaptiveReconfigDrc()   { ex(VP9(),   adaptiveReconfigDrc); }
     public void testMpeg4_adaptiveReconfigDrc() { ex(Mpeg4(), adaptiveReconfigDrc); }
     public void testH263_adaptiveReconfigDrc()  { ex(H263(),  adaptiveReconfigDrc); }
 
     public void testH264_adaptiveSmallReconfigDrc()  { ex(H264(),  adaptiveSmallReconfigDrc); }
+    public void testHEVC_adaptiveSmallReconfigDrc()  { ex(HEVC(),  adaptiveSmallReconfigDrc); }
     public void testVP8_adaptiveSmallReconfigDrc()   { ex(VP8(),   adaptiveSmallReconfigDrc); }
     public void testVP9_adaptiveSmallReconfigDrc()   { ex(VP9(),   adaptiveSmallReconfigDrc); }
     public void testMpeg4_adaptiveSmallReconfigDrc() { ex(Mpeg4(), adaptiveSmallReconfigDrc); }
     public void testH263_adaptiveSmallReconfigDrc()  { ex(H263(),  adaptiveSmallReconfigDrc); }
 
     public void testH264_adaptiveDrc() { ex(H264(), adaptiveDrc); }
+    public void testHEVC_adaptiveDrc() { ex(HEVC(), adaptiveDrc); }
     public void testVP8_adaptiveDrc()  { ex(VP8(),  adaptiveDrc); }
     public void testVP9_adaptiveDrc()  { ex(VP9(),  adaptiveDrc); }
 
     public void testH264_adaptiveDrcEarlyEos() { ex(H264(), new AdaptiveDrcEarlyEosTest()); }
+    public void testHEVC_adaptiveDrcEarlyEos() { ex(HEVC(), new AdaptiveDrcEarlyEosTest()); }
     public void testVP8_adaptiveDrcEarlyEos()  { ex(VP8(),  new AdaptiveDrcEarlyEosTest()); }
     public void testVP9_adaptiveDrcEarlyEos()  { ex(VP9(),  new AdaptiveDrcEarlyEosTest()); }
 
     public void testH264_adaptiveSmallDrc()  { ex(H264(),  adaptiveSmallDrc); }
+    public void testHEVC_adaptiveSmallDrc()  { ex(HEVC(),  adaptiveSmallDrc); }
     public void testVP8_adaptiveSmallDrc()   { ex(VP8(),   adaptiveSmallDrc); }
     public void testVP9_adaptiveSmallDrc()   { ex(VP9(),   adaptiveSmallDrc); }
 
     public void testH264_earlyEos()  { ex(H264(),  earlyEos); }
+    public void testHEVC_earlyEos()  { ex(HEVC(),  earlyEos); }
     public void testVP8_earlyEos()   { ex(VP8(),   earlyEos); }
     public void testVP9_earlyEos()   { ex(VP9(),   earlyEos); }
     public void testMpeg4_earlyEos() { ex(Mpeg4(), earlyEos); }
     public void testH263_earlyEos()  { ex(H263(),  earlyEos); }
 
     public void testH264_eosFlushSeek()  { ex(H264(),  eosFlushSeek); }
+    public void testHEVC_eosFlushSeek()  { ex(HEVC(),  eosFlushSeek); }
     public void testVP8_eosFlushSeek()   { ex(VP8(),   eosFlushSeek); }
     public void testVP9_eosFlushSeek()   { ex(VP9(),   eosFlushSeek); }
     public void testMpeg4_eosFlushSeek() { ex(Mpeg4(), eosFlushSeek); }
     public void testH263_eosFlushSeek()  { ex(H263(),  eosFlushSeek); }
 
     public void testH264_flushConfigureDrc()  { ex(H264(),  flushConfigureDrc); }
+    public void testHEVC_flushConfigureDrc()  { ex(HEVC(),  flushConfigureDrc); }
     public void testVP8_flushConfigureDrc()   { ex(VP8(),   flushConfigureDrc); }
     public void testVP9_flushConfigureDrc()   { ex(VP9(),   flushConfigureDrc); }
     public void testMpeg4_flushConfigureDrc() { ex(Mpeg4(), flushConfigureDrc); }

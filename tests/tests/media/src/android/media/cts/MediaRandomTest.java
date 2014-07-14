@@ -170,8 +170,13 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
             afd.close();
         }
     }
-
-    public void testPlayerRandomAction() throws Exception {
+    public void testPlayerRandomActionH264() throws Exception {
+        testPlayerRandomAction(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
+    }
+    public void testPlayerRandomActionHEVC() throws Exception {
+        testPlayerRandomAction(R.raw.video_480x360_mp4_hevc_650kbps_30fps_aac_stereo_128kbps_48000hz);
+    }
+    private void testPlayerRandomAction(int resid) throws Exception {
         Watchdog watchdog = new Watchdog(5000);
         try {
             mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -185,7 +190,7 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
                     return true;
                 }
             });
-            loadSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
+            loadSource(resid);
             mPlayer.setDisplay(mSurfaceHolder);
             mPlayer.prepare();
             mPlayer.start();

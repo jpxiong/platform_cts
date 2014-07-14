@@ -132,6 +132,12 @@ public class MediaCodecListTest extends AndroidTestCase {
         assertTrue(checkProfileSupported("video/avc", true, profile));
     }
 
+    // HEVC main profile must be supported
+    public void testIsHEVCMainProfileSupported() {
+        int profile = CodecProfileLevel.HEVCProfileMain;
+        assertTrue(checkProfileSupported("video/hevc", false, profile));
+    }
+
     // MPEG4 simple profile must be supported
     public void testIsM4VSimpleProfileSupported() {
         int profile = CodecProfileLevel.MPEG4ProfileSimple;
@@ -151,6 +157,7 @@ public class MediaCodecListTest extends AndroidTestCase {
 
         int codecCount = MediaCodecList.getCodecCount();
         for (int i = 0; i < codecCount; ++i) {
+
             MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
             String[] types = info.getSupportedTypes();
 
@@ -238,6 +245,7 @@ public class MediaCodecListTest extends AndroidTestCase {
         // Mandatory video codecs
         list.add(new CodecType("video/avc", false));            // avc decoder
         list.add(new CodecType("video/avc", true));             // avc encoder
+        list.add(new CodecType("video/hevc", false));           // hevc decoder
         list.add(new CodecType("video/3gpp", false));           // h263 decoder
         list.add(new CodecType("video/3gpp", true));            // h263 encoder
         list.add(new CodecType("video/mp4v-es", false));        // m4v decoder
