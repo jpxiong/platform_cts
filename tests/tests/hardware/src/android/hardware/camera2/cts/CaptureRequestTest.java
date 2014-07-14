@@ -74,6 +74,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int DEFAULT_NUM_SENSITIVITY_STEPS = 16;
     private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
+    private static final int NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY = 8;
     private static final int NUM_TEST_FOCUS_DISTANCES = 10;
     // 5 percent error margin for calibrated device
     private static final float FOCUS_DISTANCE_ERROR_PERCENT_CALIBRATED = 0.05f;
@@ -83,6 +84,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final float FOCUS_DISTANCE_ERROR_PERCENT_APPROXIMATE = 0.10f;
     private static final int ANTI_FLICKERING_50HZ = 1;
     private static final int ANTI_FLICKERING_60HZ = 2;
+
+    // 5 percent error margin for resulting crop regions
+    private static final float CROP_REGION_ERROR_PERCENT_DELTA = 0.05f;
+    // 1 percent error margin for centering the crop region
+    private static final float CROP_REGION_ERROR_PERCENT_CENTERED = 0.01f;
 
     // Linear tone mapping curve example.
     private static final float[] TONEMAP_CURVE_LINEAR = {0, 0, 1.0f, 1.0f};
@@ -492,10 +498,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
+
                 Size maxPreviewSize = mOrderedPreviewSizes.get(0);
                 digitalZoomTestByCamera(maxPreviewSize);
             } finally {
@@ -577,7 +580,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
-            verifyCaptureResultForKey(CaptureResult.NOISE_REDUCTION_MODE, (int)mode,
+            verifyCaptureResultForKey(CaptureResult.NOISE_REDUCTION_MODE, mode,
                     resultListener, NUM_FRAMES_VERIFIED);
 
             // Test that OFF and FAST mode should not slow down the frame rate.
@@ -696,7 +699,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
-            verifyCaptureResultForKey(CaptureResult.EDGE_MODE, (int)mode, resultListener,
+            verifyCaptureResultForKey(CaptureResult.EDGE_MODE, mode, resultListener,
                     NUM_FRAMES_VERIFIED);
 
             // Test that OFF and FAST mode should not slow down the frame rate.
@@ -1519,7 +1522,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             listener = new SimpleCaptureListener();
             requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            verifyCaptureResultForKey(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE, (int)mode,
+            verifyCaptureResultForKey(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE, mode,
                     listener, NUM_FRAMES_VERIFIED);
         }
 
@@ -1536,13 +1539,33 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
     private void digitalZoomTestByCamera(Size previewSize) throws Exception {
         final int ZOOM_STEPS = 30;
-        final PointF[] TEST_ZOOM_CENTERS = new PointF[] {
+        final PointF[] TEST_ZOOM_CENTERS;
+
+        final int croppingType = mStaticInfo.getScalerCroppingTypeChecked();
+        if (croppingType ==
+                CameraCharacteristics.SCALER_CROPPING_TYPE_FREEFORM) {
+            TEST_ZOOM_CENTERS = new PointF[] {
                 new PointF(0.5f, 0.5f),   // Center point
                 new PointF(0.25f, 0.25f), // top left corner zoom, minimal zoom: 2x
                 new PointF(0.75f, 0.25f), // top right corner zoom, minimal zoom: 2x
                 new PointF(0.25f, 0.75f), // bottom left corner zoom, minimal zoom: 2x
                 new PointF(0.75f, 0.75f), // bottom right corner zoom, minimal zoom: 2x
-        };
+            };
+
+            if (VERBOSE) {
+                Log.v(TAG, "Testing zoom with CROPPING_TYPE = FREEFORM");
+            }
+        } else {
+            // CENTER_ONLY
+            TEST_ZOOM_CENTERS = new PointF[] {
+                    new PointF(0.5f, 0.5f),   // Center point
+            };
+
+            if (VERBOSE) {
+                Log.v(TAG, "Testing zoom with CROPPING_TYPE = CENTER_ONLY");
+            }
+        }
+
         final float maxZoom = mStaticInfo.getAvailableMaxDigitalZoomChecked();
         final Rect activeArraySize = mStaticInfo.getActiveArraySizeChecked();
         Rect[] cropRegions = new Rect[ZOOM_STEPS];
@@ -1557,14 +1580,35 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         // TODO: test more different 3A regions
         final MeteringRectangle[] defaultMeteringRect = new MeteringRectangle[] {
                 new MeteringRectangle (
-                        0, 0, activeArraySize.width(), activeArraySize.height(), 1)};
+                        /*x*/0, /*y*/0, activeArraySize.width(), activeArraySize.height(),
+                        /*meteringWeight*/1)
+        };
 
         for (int algo = 0; algo < NUM_ALGORITHMS; algo++) {
             update3aRegion(requestBuilder, algo,  defaultMeteringRect);
         }
 
+        final int CAPTURE_SUBMIT_REPEAT;
+        {
+            int maxLatency = mStaticInfo.getSyncMaxLatency();
+            if (maxLatency == CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN) {
+                CAPTURE_SUBMIT_REPEAT = NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY + 1;
+            } else {
+                CAPTURE_SUBMIT_REPEAT = maxLatency + 1;
+            }
+        }
+
+        if (VERBOSE) {
+            Log.v(TAG, "Testing zoom with CAPTURE_SUBMIT_REPEAT = " + CAPTURE_SUBMIT_REPEAT);
+        }
+
         for (PointF center : TEST_ZOOM_CENTERS) {
+            Rect previousCrop = null;
+
             for (int i = 0; i < ZOOM_STEPS; i++) {
+                /*
+                 * Submit capture request
+                 */
                 float zoomFactor = (float) (1.0f + (maxZoom - 1.0) * i / ZOOM_STEPS);
                 cropRegions[i] = getCropRegionForZoom(zoomFactor, center, maxZoom, activeArraySize);
                 if (VERBOSE) {
@@ -1574,24 +1618,70 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 }
                 requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRegions[i]);
                 requests[i] = requestBuilder.build();
+                for (int j = 0; j < CAPTURE_SUBMIT_REPEAT; ++j) {
+                    mCamera.capture(requests[i], listener, mHandler);
+                }
+
+                /*
+                 * Validate capture result
+                 */
+                waitForNumResults(listener, CAPTURE_SUBMIT_REPEAT - 1); // Drop first few frames
+                CaptureResult result = listener.getCaptureResultForRequest(
+                        requests[i], NUM_RESULTS_WAIT_TIMEOUT);
+                Rect cropRegion = getValueNotNull(result, CaptureResult.SCALER_CROP_REGION);
+
+                /*
+                 * Validate resulting crop regions
+                 */
+                if (previousCrop != null) {
+                    Rect currentCrop = cropRegion;
+                    mCollector.expectTrue(String.format(
+                            "Crop region should shrink or stay the same " +
+                                    "(previous = %s, current = %s)",
+                                    previousCrop, currentCrop),
+                            previousCrop.equals(currentCrop) ||
+                                (previousCrop.width() > currentCrop.width() &&
+                                 previousCrop.height() > currentCrop.height()));
+                }
+
+                if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                    mCollector.expectRectsAreSimilar(
+                            "Request and result crop region should be similar",
+                            cropRegions[i], cropRegion, CROP_REGION_ERROR_PERCENT_DELTA);
+                }
+
+                if (croppingType == SCALER_CROPPING_TYPE_CENTER_ONLY) {
+                    mCollector.expectRectCentered(
+                            "Result crop region should be centered inside the active array",
+                            new Size(activeArraySize.width(), activeArraySize.height()),
+                            cropRegion, CROP_REGION_ERROR_PERCENT_CENTERED);
+                }
+
+                /*
+                 * Validate resulting metering regions
+                 */
+
+                // Use the actual reported crop region to calculate the resulting metering region
                 expectRegions[i] = getExpectedOutputRegion(
                         /*requestRegion*/defaultMeteringRect,
-                        /*cropRect*/     cropRegions[i]);
-                mCamera.capture(requests[i], listener, mHandler);
+                        /*cropRect*/     cropRegion);
+
+                // Verify Output 3A region is intersection of input 3A region and crop region
+                for (int algo = 0; algo < NUM_ALGORITHMS; algo++) {
+                    validate3aRegion(result, algo, expectRegions[i]);
+                }
+
+                previousCrop = cropRegion;
             }
 
-            // Validate capture result
-            CaptureResult result;
-            for (int i = 0; i < ZOOM_STEPS; i++) {
-                 result = listener.getCaptureResultForRequest(
-                         requests[i], NUM_RESULTS_WAIT_TIMEOUT);
-                 Rect cropRegion = getValueNotNull(result, CaptureResult.SCALER_CROP_REGION);
-                 // Verify Output 3A region is intersection of input 3A region and crop region
-                 for (int algo = 0; algo < NUM_ALGORITHMS; algo++) {
-                     validate3aRegion(result, algo, expectRegions[i]);
-                 }
-                 mCollector.expectEquals(" Request and result crop region should match",
-                         cropRegions[i], cropRegion);
+            if (maxZoom > 1.0f) {
+                mCollector.expectTrue(
+                        String.format("Most zoomed-in crop region should be smaller" +
+                                        "than active array w/h" +
+                                        "(last crop = %s, active array = %s)",
+                                        previousCrop, activeArraySize),
+                            (previousCrop.width() < activeArraySize.width() &&
+                             previousCrop.height() < activeArraySize.height()));
             }
         }
 

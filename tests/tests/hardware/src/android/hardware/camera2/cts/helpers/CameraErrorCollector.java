@@ -16,10 +16,12 @@
 
 package android.hardware.camera2.cts.helpers;
 
+import android.graphics.Rect;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
 import android.util.Log;
+import android.util.Size;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
@@ -268,6 +270,81 @@ public class CameraErrorCollector extends ErrorCollector {
         expectTrue(msg + String.format(", value " + value.toString() + " is out of range [%s, %s]",
                 min.toString(), max.toString()),
                 value.compareTo(max)<= 0 && value.compareTo(min) >= 0);
+    }
+
+    /**
+     * Check that two rectangles are similar enough by ensuring that their width, height,
+     * and all corners are within {@code errorPercent} of each other.
+     *
+     * @param msg Message to be logged
+     * @param expected The reference 'expected' value to be used to check against
+     * @param actual The actual value that was received
+     * @param errorPercent Within how many percent the components should be
+     */
+    public void expectRectsAreSimilar(String msg, Rect expected, Rect actual, float errorPercent) {
+        String formattedMsg = String.format("%s: rects are not similar enough; expected (%s), " +
+                "actual (%s), error percent (%s), reason: ",
+                msg, expected, actual, errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "too wide", "too narrow", actual.width(), expected.width(),
+                errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "too tall", "too short", actual.height(), expected.height(),
+                errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "left pt too right", "left pt too left", actual.left, expected.left,
+                errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "right pt too right", "right pt too left",
+                actual.right, expected.right, errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "top pt too low", "top pt too high", actual.top, expected.top,
+                errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "bottom pt too low", "bottom pt too high", actual.top, expected.top,
+                errorPercent);
+    }
+
+    /**
+     * Check that the rectangle is centered within a certain tolerance of {@code errorPercent},
+     * with respect to the {@code bounds} bounding rectangle.
+     *
+     * @param msg Message to be logged
+     * @param expectedBounds The width/height of the bounding rectangle
+     * @param actual The actual value that was received
+     * @param errorPercent Within how many percent the centering should be
+     */
+    public void expectRectCentered(String msg, Size expectedBounds, Rect actual,
+            float errorPercent) {
+        String formattedMsg = String.format("%s: rect should be centered; expected bounds (%s), " +
+                "actual (%s), error percent (%s), reason: ",
+                msg, expectedBounds, actual, errorPercent);
+
+        int centerBoundX = expectedBounds.getWidth() / 2;
+        int centerBoundY = expectedBounds.getHeight() / 2;
+
+        expectSimilarValues(
+                formattedMsg, "too low", "too high", actual.centerY(), centerBoundY,
+                errorPercent);
+
+        expectSimilarValues(
+                formattedMsg, "too right", "too left", actual.centerX(), centerBoundX,
+                errorPercent);
+    }
+
+    private void expectSimilarValues(
+            String formattedMsg, String tooSmall, String tooLarge, int actualValue,
+            int expectedValue, float errorPercent) {
+        expectTrue(formattedMsg + tooLarge,
+                actualValue <= (expectedValue * (1.0f + errorPercent)));
+        expectTrue(formattedMsg + tooSmall,
+                actualValue >= (expectedValue * (1.0f - errorPercent)));
     }
 
     public void expectNotNull(String msg, Object obj) {
