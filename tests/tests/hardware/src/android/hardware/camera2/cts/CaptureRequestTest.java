@@ -304,12 +304,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                // Can only test full capability because test relies on per frame control
-                // and synchronization.
-                if (!mStaticInfo.isHardwareLevelFull()) {
-                    continue;
-                }
-
                 SimpleCaptureListener listener = new SimpleCaptureListener();
                 CaptureRequest.Builder requestBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -320,7 +314,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 // Flash control can only be used when the AE mode is ON or OFF.
                 flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_ON);
-                flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_OFF);
+
+                // LEGACY won't support AE mode OFF
+                if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                    flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_OFF);
+                }
 
                 stopPreview();
             } finally {
@@ -830,6 +828,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             throw new IllegalArgumentException("This test only works when AE mode is ON or OFF");
         }
 
+        mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+        waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
         // For camera that doesn't have flash unit, flash state should always be UNAVAILABLE.
         if (mStaticInfo.getFlashInfoChecked() == false) {
             for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
@@ -843,13 +844,17 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         // Test flash SINGLE mode control. Wait for flash state to be READY first.
-        waitForResultValue(listener, CaptureResult.FLASH_STATE, CaptureResult.FLASH_STATE_READY,
-                NUM_RESULTS_WAIT_TIMEOUT);
+        if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+            waitForResultValue(listener, CaptureResult.FLASH_STATE, CaptureResult.FLASH_STATE_READY,
+                    NUM_RESULTS_WAIT_TIMEOUT);
+        } // else the settings were already waited on earlier
+
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
         request = requestBuilder.build();
-        mCamera.capture(request, listener, mHandler);
-        result = listener.getCaptureResultForRequest(request,
-                NUM_RESULTS_WAIT_TIMEOUT);
+
+        int flashModeSingleRequests = captureRequestsSynchronized(request, listener, mHandler);
+        result = waitForNumResults(listener, flashModeSingleRequests);
+
         // Result mode must be SINGLE, state must be FIRED.
         mCollector.expectEquals("Flash mode result must be SINGLE",
                 CaptureResult.FLASH_MODE_SINGLE, result.get(CaptureResult.FLASH_MODE));
@@ -857,15 +862,16 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 CaptureResult.FLASH_STATE_FIRED, result.get(CaptureResult.FLASH_STATE));
 
         // Test flash TORCH mode control.
-        CaptureRequest[] requests = new CaptureRequest[NUM_FLASH_REQUESTS_TESTED];
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
-        for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
-            requests[i] = requestBuilder.build();
-            mCamera.capture(requests[i], listener, mHandler);
-        }
+        CaptureRequest torchRequest = requestBuilder.build();
+
+        int flashModeTorchRequests = captureRequestsSynchronized(torchRequest,
+                NUM_FLASH_REQUESTS_TESTED, listener, mHandler);
+        waitForNumResults(listener, flashModeTorchRequests - NUM_FLASH_REQUESTS_TESTED);
+
         // Verify the results
         for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
-            result = listener.getCaptureResultForRequest(requests[i],
+            result = listener.getCaptureResultForRequest(torchRequest,
                     NUM_RESULTS_WAIT_TIMEOUT);
 
             // Result mode must be TORCH, state must be FIRED
@@ -878,9 +884,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         // Test flash OFF mode control
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
         request = requestBuilder.build();
-        mCamera.capture(request, listener, mHandler);
-        result = listener.getCaptureResultForRequest(request,
-                NUM_RESULTS_WAIT_TIMEOUT);
+
+        int flashModeOffRequests = captureRequestsSynchronized(request, listener, mHandler);
+        result = waitForNumResults(listener, flashModeOffRequests);
         mCollector.expectEquals("Flash mode result must be OFF", CaptureResult.FLASH_MODE_OFF,
                 result.get(CaptureResult.FLASH_MODE));
     }
