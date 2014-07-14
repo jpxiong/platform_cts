@@ -704,7 +704,7 @@ public class AllocationTest extends AndroidTestCase {
                 StaticMetadata staticInfo = new StaticMetadata(properties);
                 if (fullHwLevel && !staticInfo.isHardwareLevelFull()) {
                     Log.i(TAG, String.format(
-                            "Skipping this test for camera %d, needs FULL hw level",
+                            "Skipping this test for camera %s, needs FULL hw level",
                             mCameraIds[i]));
                     continue;
                 }
