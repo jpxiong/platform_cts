@@ -19,7 +19,10 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := cts-sensors-tests
+
 LOCAL_MODULE_TAGS := tests
+
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil
 
 # uncomment when b/13281332 is fixed
 # please also uncomment the equivalent code in
@@ -30,7 +33,6 @@ LOCAL_MODULE_TAGS := tests
 LOCAL_SRC_FILES := $(call all-java-files-under, src/android/hardware/cts/helpers)
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
-
 
 # CtsHardwareTestCases package
 
