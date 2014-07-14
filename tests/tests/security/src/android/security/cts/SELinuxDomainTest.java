@@ -160,7 +160,7 @@ public class SELinuxDomainTest extends TestCase {
 
     /* Debuggerd is always there */
     public void testDebuggerdDomain() throws FileNotFoundException {
-        assertDomainOne("u:r:debuggerd:s0", "/system/bin/debuggerd");
+        assertDomainN("u:r:debuggerd:s0", "/system/bin/debuggerd", "/system/bin/debuggerd64");
     }
 
     /* Surface flinger is always there */
@@ -170,7 +170,7 @@ public class SELinuxDomainTest extends TestCase {
 
     /* Zygote is always running */
     public void testZygoteDomain() throws FileNotFoundException {
-        assertDomainOne("u:r:zygote:s0", "zygote");
+        assertDomainN("u:r:zygote:s0", "zygote", "zygote64");
     }
 
     /* drm server is always present */
