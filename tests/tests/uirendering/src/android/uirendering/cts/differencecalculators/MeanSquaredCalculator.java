@@ -22,13 +22,13 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
  * Finds the MSE using two images.
  */
 public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
+    private static final String TAG = "MeanSquared";
     private ScriptC_MeanSquaredCalculator mScript;
     private float mErrorPerPixel;
 
@@ -44,10 +44,7 @@ public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {
         float totalError = getMSE(ideal, given, offset, stride, width, height);
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME,
-                    "MeanSquaredCalculator : MSE = " + totalError);
-        }
+        Log.d(TAG, "Error : " + totalError);
         return (totalError < (mErrorPerPixel));
     }
 
@@ -71,10 +68,7 @@ public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
         float error = sum1DFloatAllocation(outputAllocation);
         error /= (height * width);
 
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME,
-                    "MeanSquaredCalculator RS : MSE = " + error);
-        }
+        Log.d(TAG, "Error RS : " + error);
 
         return (error < mErrorPerPixel);
     }

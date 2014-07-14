@@ -33,7 +33,7 @@ import android.util.Log;
 public class MSSIMCalculator extends BaseRenderScriptCalculator{
     // These values were taken from the publication
     public static final boolean DEBUG = false;
-    public static final String TAG_NAME = "MSSIMCalculator";
+    public static final String TAG = "MSSIM";
     public static final double CONSTANT_L = 254;
     public static final double CONSTANT_K1 = 0.00001;
     public static final double CONSTANT_K2 = 0.00003;
@@ -79,9 +79,7 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
 
         SSIMTotal /= windows;
 
-        if (DEBUG) {
-            Log.d(TAG_NAME, "MSSIM = " + SSIMTotal);
-        }
+        Log.d(TAG, "MSSIM : " + SSIMTotal);
 
         return (SSIMTotal >= mThreshold);
     }
@@ -107,9 +105,7 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
         float MSSIM = sum1DFloatAllocation(outputAllocation);
         MSSIM /= height;
 
-        if (DEBUG) {
-            Log.d(TAG_NAME, "RenderScript MSSIM = " + MSSIM);
-        }
+        Log.d(TAG, "MSSIM RS : " + MSSIM);
 
         return (MSSIM >= mThreshold);
     }
