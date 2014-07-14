@@ -55,7 +55,7 @@ public class BleAdvertiserService extends Service {
 
     private static final UUID SERVICE_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
-    private static final byte MANUFACTURER_GOOGLE = (byte)0x07;
+    private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -102,7 +102,7 @@ public class BleAdvertiserService extends Service {
                 List<ParcelUuid> serviceUuid = new ArrayList<ParcelUuid>();
                 serviceUuid.add(new ParcelUuid(SERVICE_UUID));
                 AdvertiseData data = new AdvertiseData.Builder()
-                    .setManufacturerData(MANUFACTURER_GOOGLE, new byte[]{MANUFACTURER_GOOGLE, 0})
+                    .setManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
                     .setServiceData(new ParcelUuid(SERVICE_UUID),
                         new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
                     .build();
