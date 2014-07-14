@@ -1055,7 +1055,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("different number of frames when using flushed codec", frames1, frames3);
     }
 
-    private MediaCodec createDecoder(String mime) {
+    private static MediaCodec createDecoder(String mime) {
         try {
             if (false) {
                 // change to force testing software codecs
