@@ -19,6 +19,7 @@ package android.media.cts;
 import android.content.Context;
 import android.content.res.Resources;
 import android.media.MediaCodec;
+import android.media.MediaCodec.CodecException;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaCodecInfo;
@@ -60,7 +61,9 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             Environment.getExternalStorageDirectory().getAbsolutePath();
 
     // Default timeout for MediaCodec buffer dequeue - 200 ms.
-    protected static final long DEFAULT_TIMEOUT_US = 200000;
+    protected static final long DEFAULT_DEQUEUE_TIMEOUT_US = 200000;
+    // Default timeout for MediaEncoderAsync - 30 sec.
+    protected static final long DEFAULT_ENCODE_TIMEOUT_MS = 30000;
     // Default sync frame interval in frames (zero means allow the encoder to auto-select
     // key frame interval).
     private static final int SYNC_FRAME_INTERVAL = 0;
@@ -272,12 +275,11 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             params.syncFrameInterval = SYNC_FRAME_INTERVAL;
             params.syncForceFrameInterval = 0;
             if (syncEncoding) {
-                params.timeoutDequeue = DEFAULT_TIMEOUT_US;
+                params.timeoutDequeue = DEFAULT_DEQUEUE_TIMEOUT_US;
                 params.runInLooperThread = false;
             } else {
                 params.timeoutDequeue = 0;
                 params.runInLooperThread = true;
-                continue; // FIXME add support for async
             }
             outputParameters.add(params);
         }
@@ -546,7 +548,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
 
         while (!sawOutputEOS) {
             if (!sawInputEOS) {
-                int inputBufIndex = decoder.dequeueInputBuffer(DEFAULT_TIMEOUT_US);
+                int inputBufIndex = decoder.dequeueInputBuffer(DEFAULT_DEQUEUE_TIMEOUT_US);
                 if (inputBufIndex >= 0) {
                     byte[] frame = ivf.readFrame(inputFrameIndex);
 
@@ -571,7 +573,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                 }
             }
 
-            int result = decoder.dequeueOutputBuffer(bufferInfo, DEFAULT_TIMEOUT_US);
+            int result = decoder.dequeueOutputBuffer(bufferInfo, DEFAULT_DEQUEUE_TIMEOUT_US);
             while (result == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED ||
                     result == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 if (result == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
@@ -600,7 +602,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     Log.d(TAG, "Frame stride and slice height: " + frameStride +
                             " x " + frameSliceHeight);
                 }
-                result = decoder.dequeueOutputBuffer(bufferInfo, DEFAULT_TIMEOUT_US);
+                result = decoder.dequeueOutputBuffer(bufferInfo, DEFAULT_DEQUEUE_TIMEOUT_US);
             }
             if (result >= 0) {
                 int outputBufIndex = result;
@@ -672,6 +674,97 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         public byte[] buffer;
     }
 
+    protected class MediaEncoderAsyncHelper {
+        private final EncoderOutputStreamParameters mStreamParams;
+        private final CodecProperties mProperties;
+        private final ArrayList<MediaCodec.BufferInfo> mBufferInfos;
+        private final IvfWriter mIvf;
+        private final byte[] mSrcFrame;
+
+        private InputStream mYuvStream;
+        private int mInputFrameIndex;
+
+        MediaEncoderAsyncHelper(
+                EncoderOutputStreamParameters streamParams,
+                CodecProperties properties,
+                ArrayList<MediaCodec.BufferInfo> bufferInfos,
+                IvfWriter ivf)
+                throws Exception {
+            mStreamParams = streamParams;
+            mProperties = properties;
+            mBufferInfos = bufferInfos;
+            mIvf = ivf;
+
+            int srcFrameSize = streamParams.frameWidth * streamParams.frameHeight * 3 / 2;
+            mSrcFrame = new byte[srcFrameSize];
+
+            mYuvStream = OpenFileOrResourceId(
+                    streamParams.inputYuvFilename, streamParams.inputResourceId);
+        }
+
+        public byte[] getInputFrame() {
+            // Check EOS
+            if (mStreamParams.frameCount == 0
+                    || (mStreamParams.frameCount > 0
+                            && mInputFrameIndex >= mStreamParams.frameCount)) {
+                Log.d(TAG, "---Sending EOS empty frame for frame # " + mInputFrameIndex);
+                return null;
+            }
+
+            try {
+                int bytesRead = mYuvStream.read(mSrcFrame);
+
+                if (bytesRead == -1) {
+                    // rewind to beginning of file
+                    mYuvStream.close();
+                    mYuvStream = OpenFileOrResourceId(
+                            mStreamParams.inputYuvFilename, mStreamParams.inputResourceId);
+                    bytesRead = mYuvStream.read(mSrcFrame);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to read YUV file.");
+                return null;
+            }
+            mInputFrameIndex++;
+
+            // Convert YUV420 to NV12 if necessary
+            if (mProperties.colorFormat != CodecCapabilities.COLOR_FormatYUV420Planar) {
+                return YUV420ToNV(mStreamParams.frameWidth, mStreamParams.frameHeight,
+                        mSrcFrame, mProperties.isGoogleSwCodec());
+            } else {
+                return mSrcFrame;
+            }
+        }
+
+        public boolean saveOutputFrame(MediaEncoderOutput out) {
+            if (out.outputGenerated) {
+                if (out.buffer.length > 0) {
+                    // Save frame
+                    try {
+                        mIvf.writeFrame(out.buffer, out.outPresentationTimeUs);
+                    } catch (Exception e) {
+                        Log.d(TAG, "Failed to write frame");
+                        return true;
+                    }
+
+                    // Update statistics - store presentation time delay in offset
+                    long presentationTimeUsDelta = out.inPresentationTimeUs -
+                            out.outPresentationTimeUs;
+                    MediaCodec.BufferInfo bufferInfoCopy = new MediaCodec.BufferInfo();
+                    bufferInfoCopy.set((int)presentationTimeUsDelta, out.buffer.length,
+                            out.outPresentationTimeUs, out.flags);
+                    mBufferInfos.add(bufferInfoCopy);
+                }
+                // Detect output EOS
+                if ((out.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.d(TAG, "----Output EOS ");
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     /**
      * Video encoder wrapper class.
      * Allows to run the encoder either in a callee's thread or in a looper thread
@@ -681,7 +774,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
      * is configured to run in async mode the function will run in a looper thread.
      * Encoded frame can be retrieved by calling getOutput() function.
      */
-    protected class MediaEncoderAsync extends Thread /* FIXME implements MediaCodec.NotificationCallback */ {
+    protected class MediaEncoderAsync extends Thread {
         private int mId;
         private MediaCodec mCodec;
         private MediaFormat mFormat;
@@ -708,16 +801,112 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         private final Object mCallbackEvent = new Object();
         private Handler mHandler;
         private boolean mCallbackReceived;
+        private MediaEncoderAsyncHelper mHelper;
+        private final Object mCompletionEvent = new Object();
+        private boolean mCompleted;
 
-        /* FIXME @Override */
-        public void onCodecNotify(MediaCodec codec) {
-            synchronized (mCallbackEvent) {
-                Log.v(TAG, "MediaEncoder " + mId + " Event Callback");
-                mCallbackReceived = true;
-                mCallbackEvent.notify();
+        private MediaCodec.Callback mCallback = new MediaCodec.Callback() {
+            @Override
+            public void onInputBufferAvailable(MediaCodec codec, int index) {
+                if (mHelper == null) {
+                    Log.e(TAG, "async helper not available");
+                    return;
+                }
+
+                byte[] encFrame = mHelper.getInputFrame();
+                boolean inputEOS = (encFrame == null);
+
+                int encFrameLength = 0;
+                int flags = 0;
+                if (inputEOS) {
+                    flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+                } else {
+                    encFrameLength = encFrame.length;
+
+                    mInputBuffers[index].clear();
+                    mInputBuffers[index].put(encFrame);
+                    mInputBuffers[index].rewind();
+
+                    mInPresentationTimeUs = (mInputFrameIndex * 1000000) / mFrameRate;
+
+                    Log.v(TAG, "Enc" + mId + ". Frame in # " + mInputFrameIndex +
+                            ". InTime: " + (mInPresentationTimeUs + 500)/1000);
+
+                    mInputFrameIndex++;
+                }
+
+                mCodec.queueInputBuffer(
+                        index,
+                        0,  // offset
+                        encFrameLength,  // size
+                        mInPresentationTimeUs,
+                        flags);
             }
-            return;
-        }
+
+            @Override
+            public void onOutputBufferAvailable(MediaCodec codec,
+                    int index, MediaCodec.BufferInfo info) {
+                if (mHelper == null) {
+                    Log.e(TAG, "async helper not available");
+                    return;
+                }
+
+                MediaEncoderOutput out = new MediaEncoderOutput();
+
+                out.buffer = new byte[info.size];
+                mOutputBuffers[index].position(info.offset);
+                mOutputBuffers[index].get(out.buffer, 0, info.size);
+                mOutPresentationTimeUs = info.presentationTimeUs;
+
+                String logStr = "Enc" + mId + ". Frame # " + mOutputFrameIndex;
+                if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                    logStr += " CONFIG. ";
+                }
+                if ((info.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) != 0) {
+                    logStr += " KEY. ";
+                }
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    logStr += " EOS. ";
+                }
+                logStr += " Size: " + info.size;
+                logStr += ". InTime: " + (mInPresentationTimeUs + 500)/1000 +
+                        ". OutTime: " + (mOutPresentationTimeUs + 500)/1000;
+                Log.v(TAG, logStr);
+
+                if (mOutputFrameIndex == 0 &&
+                        ((info.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) == 0) ) {
+                    throw new RuntimeException("First frame is not a sync frame.");
+                }
+
+                if (info.size > 0) {
+                    mOutputFrameIndex++;
+                    out.inPresentationTimeUs = mInPresentationTimeUs;
+                    out.outPresentationTimeUs = mOutPresentationTimeUs;
+                }
+                mCodec.releaseOutputBuffer(index, false);
+
+                out.flags = info.flags;
+                out.outputGenerated = true;
+
+                if (mHelper.saveOutputFrame(out)) {
+                    // output EOS
+                    signalCompletion();
+                }
+            }
+
+            @Override
+            public void onError(MediaCodec codec, CodecException e) {
+                Log.e(TAG, "onError: " + e
+                        + ", transient " + e.isTransient()
+                        + ", recoverable " + e.isRecoverable()
+                        + ", error " + e.getErrorCode());
+            }
+
+            @Override
+            public void onOutputFormatChanged(MediaCodec codec, MediaFormat format) {
+                Log.i(TAG, "onOutputFormatChanged: " + format.toString());
+            }
+        };
 
         private synchronized void requestStart() throws Exception {
             mHandler = null;
@@ -728,6 +917,10 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     mThreadEvent.wait();
                 }
             }
+        }
+
+        public void setAsyncHelper(MediaEncoderAsyncHelper helper) {
+            mHelper = helper;
         }
 
         @Override
@@ -793,15 +986,14 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             mOutPresentationTimeUs = 0;
 
             mCodec = MediaCodec.createByCodecName(name);
+            if (mAsync) {
+                mCodec.setCallback(mCallback);
+            }
             mCodec.configure(mFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mCodec.start();
-            if (mAsync) {
-                /* FIXME mCodec.setNotificationCallback(this); */
-            }
             mInputBuffers = mCodec.getInputBuffers();
             mOutputBuffers = mCodec.getOutputBuffers();
         }
-
 
         public void createCodec(int id, final String name, final MediaFormat format,
                 final long timeout, boolean async)  throws Exception {
@@ -980,6 +1172,27 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             Log.v(TAG, "----Waiting for bufferEvent done");
         }
 
+
+        public void waitForCompletion(long timeoutMs) throws Exception {
+            synchronized (mCompletionEvent) {
+                long timeoutExpiredMs = System.currentTimeMillis() + timeoutMs;
+
+                while (!mCompleted) {
+                    mCompletionEvent.wait(timeoutExpiredMs - System.currentTimeMillis());
+                    if (System.currentTimeMillis() >= timeoutExpiredMs) {
+                        throw new RuntimeException("encoding has timed out!");
+                    }
+                }
+            }
+        }
+
+        public void signalCompletion() {
+            synchronized (mCompletionEvent) {
+                mCompleted = true;
+                mCompletionEvent.notify();
+            }
+        }
+
         public void deleteCodec() throws Exception {
             runCallable( new Callable<Void>() {
                 @Override
@@ -994,7 +1207,6 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             }
         }
     }
-
 
     /**
      * Vp8 encoding loop supporting encoding single streams with an option
@@ -1159,6 +1371,79 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         codec.deleteCodec();
         ivf.close();
         yuvStream.close();
+
+        return bufferInfos;
+    }
+
+    /**
+     * Vp8 encoding run in a looper thread and use buffer ready callbacks.
+     *
+     * Output stream is described by encodingParams parameters.
+     *
+     * MediaCodec will raise an IllegalStateException
+     * whenever vp8 encoder fails to encode a frame.
+     *
+     * Color format of input file should be YUV420, and frameWidth,
+     * frameHeight should be supplied correctly as raw input file doesn't
+     * include any header data.
+     *
+     * @param streamParams  Structure with encoder parameters
+     * @return              Returns array of encoded frames information for each frame.
+     */
+    protected ArrayList<MediaCodec.BufferInfo> encodeAsync(
+            EncoderOutputStreamParameters streamParams) throws Exception {
+        if (!streamParams.runInLooperThread) {
+            throw new RuntimeException("encodeAsync should run with a looper thread!");
+        }
+
+        ArrayList<MediaCodec.BufferInfo> bufferInfos = new ArrayList<MediaCodec.BufferInfo>();
+        CodecProperties properties = getVp8CodecProperties(true, streamParams.forceSwEncoder);
+        Log.d(TAG, "Source reslution: " + streamParams.frameWidth + " x " +
+                streamParams.frameHeight);
+        int bitrate = streamParams.bitrateSet[0];
+
+        // Open input/output
+        IvfWriter ivf = new IvfWriter(
+                streamParams.outputIvfFilename, streamParams.frameWidth, streamParams.frameHeight);
+
+        // Create a media format signifying desired output.
+        MediaFormat format = MediaFormat.createVideoFormat(
+                VP8_MIME, streamParams.frameWidth, streamParams.frameHeight);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+        if (streamParams.bitrateType == VIDEO_ControlRateConstant) {
+            format.setInteger("bitrate-mode", VIDEO_ControlRateConstant); // set CBR
+        }
+        if (streamParams.temporalLayers > 0) {
+            format.setInteger("ts-layers", streamParams.temporalLayers); // 1 temporal layer
+        }
+        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, properties.colorFormat);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, streamParams.frameRate);
+        int syncFrameInterval = (streamParams.syncFrameInterval + streamParams.frameRate/2) /
+                streamParams.frameRate;
+        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, syncFrameInterval);
+
+        // Create encoder
+        Log.d(TAG, "Creating encoder " + properties.codecName +
+                ". Color format: 0x" + Integer.toHexString(properties.colorFormat)+ " : " +
+                streamParams.frameWidth + " x " + streamParams.frameHeight +
+                ". Bitrate: " + bitrate + " Bitrate type: " + streamParams.bitrateType +
+                ". Fps:" + streamParams.frameRate + ". TS Layers: " + streamParams.temporalLayers +
+                ". Key frame:" + syncFrameInterval * streamParams.frameRate +
+                ". Force keyFrame: " + streamParams.syncForceFrameInterval);
+        Log.d(TAG, "  Format: " + format);
+        Log.d(TAG, "  Output ivf:" + streamParams.outputIvfFilename);
+
+        MediaEncoderAsync codec = new MediaEncoderAsync();
+        MediaEncoderAsyncHelper helper = new MediaEncoderAsyncHelper(
+                streamParams, properties, bufferInfos, ivf);
+
+        codec.setAsyncHelper(helper);
+        codec.createCodec(0, properties.codecName, format,
+                streamParams.timeoutDequeue, streamParams.runInLooperThread);
+        codec.waitForCompletion(DEFAULT_ENCODE_TIMEOUT_MS);
+
+        codec.deleteCodec();
+        ivf.close();
 
         return bufferInfos;
     }
