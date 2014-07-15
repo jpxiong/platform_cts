@@ -40,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 public class BitmapFactoryTest extends InstrumentationTestCase {
     private Resources mRes;
@@ -57,10 +58,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     private static int[] RES_IDS = new int[] {
             R.drawable.baseline_jpeg, R.drawable.png_test, R.drawable.gif_test,
             R.drawable.bmp_test, R.drawable.webp_test
-    };
-    private static String[] NAMES_TEMP_FILES = new String[] {
-        "baseline_temp.jpg", "png_temp.png", "gif_temp.gif",
-        "bmp_temp.bmp", "webp_temp.webp"
     };
 
     // The width and height of the above image.
@@ -399,6 +396,47 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         byte[] array = obtainArray();
         Bitmap purgeableBitmap = BitmapFactory.decodeByteArray(array, 0, array.length, options);
         assertFalse(purgeableBitmap.getAllocationByteCount() == 0);
+    }
+
+    private int mDefaultCreationDensity;
+    private void verifyScaled(Bitmap b) {
+        assertEquals(b.getWidth(), START_WIDTH * 2);
+        assertEquals(b.getDensity(), 2);
+    }
+
+    private void verifyUnscaled(Bitmap b) {
+        assertEquals(b.getWidth(), START_WIDTH);
+        assertEquals(b.getDensity(), mDefaultCreationDensity);
+    }
+
+    public void testDecodeScaling() {
+        BitmapFactory.Options defaultOpt = new BitmapFactory.Options();
+
+        BitmapFactory.Options unscaledOpt = new BitmapFactory.Options();
+        unscaledOpt.inScaled = false;
+
+        BitmapFactory.Options scaledOpt = new BitmapFactory.Options();
+        scaledOpt.inScaled = true;
+        scaledOpt.inDensity = 1;
+        scaledOpt.inTargetDensity = 2;
+
+        mDefaultCreationDensity = Bitmap.createBitmap(1, 1, Config.ARGB_8888).getDensity();
+
+        byte[] bytes = obtainArray();
+
+        verifyUnscaled(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+        verifyUnscaled(BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null));
+        verifyUnscaled(BitmapFactory.decodeByteArray(bytes, 0, bytes.length, unscaledOpt));
+        verifyUnscaled(BitmapFactory.decodeByteArray(bytes, 0, bytes.length, defaultOpt));
+
+        verifyUnscaled(BitmapFactory.decodeStream(obtainInputStream()));
+        verifyUnscaled(BitmapFactory.decodeStream(obtainInputStream(), null, null));
+        verifyUnscaled(BitmapFactory.decodeStream(obtainInputStream(), null, unscaledOpt));
+        verifyUnscaled(BitmapFactory.decodeStream(obtainInputStream(), null, defaultOpt));
+
+        // scaling should only occur if Options are passed with inScaled=true
+        verifyScaled(BitmapFactory.decodeByteArray(bytes, 0, bytes.length, scaledOpt));
+        verifyScaled(BitmapFactory.decodeStream(obtainInputStream(), null, scaledOpt));
     }
 
     private byte[] obtainArray() {
