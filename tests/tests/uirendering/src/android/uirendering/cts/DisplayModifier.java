@@ -16,11 +16,13 @@
 package android.uirendering.cts;
 
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Xfermode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,9 +41,16 @@ public abstract class DisplayModifier {
     };
     private static final int NUM_PARALLEL_LINES = 24;
     private static final float[] gLinePts = new float[NUM_PARALLEL_LINES * 8 + gTriPts.length];
-    private static final int FILTER_COLOR = 0xFFBB0000;
     protected static final int MODIFIER_WIDTH = 180;
     protected static final int MODIFIER_HEIGHT = 180;
+
+    public static final PorterDuff.Mode[] PORTERDUFF_MODES = new PorterDuff.Mode[] {
+        PorterDuff.Mode.SRC, PorterDuff.Mode.DST, PorterDuff.Mode.SRC_OVER,
+        PorterDuff.Mode.DST_OVER, PorterDuff.Mode.SRC_IN, PorterDuff.Mode.DST_IN,
+        PorterDuff.Mode.SRC_OUT, PorterDuff.Mode.DST_OUT, PorterDuff.Mode.SRC_ATOP,
+        PorterDuff.Mode.DST_ATOP, PorterDuff.Mode.XOR, PorterDuff.Mode.MULTIPLY,
+        PorterDuff.Mode.SCREEN
+    };
 
     static {
         int index;
@@ -314,180 +323,19 @@ public abstract class DisplayModifier {
 
                     put("xfermodes", new LinkedHashMap<String, DisplayModifier>() {
                         {
-                            put("SRC", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-                                }
-                            });
-                            put("DST", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST));
-                                }
-                            });
-                            put("SRC_OVER", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-                                }
-                            });
-                            put("DST_OVER", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
-                                }
-                            });
-                            put("SRC_IN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-                                }
-                            });
-                            put("DST_IN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-                                }
-                            });
-                            put("SRC_OUT", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
-                                }
-                            });
-                            put("DST_OUT", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-                                }
-                            });
-                            put("SRC_ATOP", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-                                }
-                            });
-                            put("DST_ATOP", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP));
-                                }
-                            });
-                            put("XOR", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.XOR));
-                                }
-                            });
-                            put("MULTIPLY", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY));
-                                }
-                            });
-                            put("SCREEN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SCREEN));
-                                }
-                            });
+                            for (int i = 0 ; i < PORTERDUFF_MODES.length ; i++) {
+                                put(PORTERDUFF_MODES[i].toString(),
+                                        new XfermodeModifier(PORTERDUFF_MODES[i]));
+                            }
                         }
                     });
 
                     put("colorfilters", new LinkedHashMap<String, DisplayModifier>() {
                         {
-                            put("SRC", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SRC));
-                                }
-                            });
-                            put("DST", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.DST));
-                                }
-                            });
-                            put("SRC_OVER", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SRC_OVER));
-                                }
-                            });
-                            put("DST_OVER", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.DST_OVER));
-                                }
-                            });
-                            put("SRC_IN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SRC_IN));
-                                }
-                            });
-                            put("DST_IN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.DST_IN));
-                                }
-                            });
-                            put("SRC_OUT", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SRC_OUT));
-                                }
-                            });
-                            put("DST_OUT", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.DST_OUT));
-                                }
-                            });
-                            put("SRC_ATOP", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SRC_ATOP));
-                                }
-                            });
-                            put("DST_ATOP", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.DST_ATOP));
-                                }
-                            });
-                            put("XOR", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.XOR));
-                                }
-                            });
-                            put("MULTIPLY", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.MULTIPLY));
-                                }
-                            });
-                            put("SCREEN", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
-                                            PorterDuff.Mode.SCREEN));
-                                }
-                            });
+                            for (int i = 0 ; i < PORTERDUFF_MODES.length ; i++) {
+                                put(PORTERDUFF_MODES[i].toString(),
+                                        new ColorFilterModifier(PORTERDUFF_MODES[i]));
+                            }
                         }
                     });
 
@@ -688,6 +536,33 @@ public abstract class DisplayModifier {
          */
         private boolean validIndex(int index) {
             return (mMask & (0x1 << index)) != 0;
+        }
+    }
+
+    private static class XfermodeModifier extends DisplayModifier {
+        private Xfermode mXfermode;
+
+        public XfermodeModifier(PorterDuff.Mode mode) {
+            mXfermode = new PorterDuffXfermode(mode);
+        }
+
+        @Override
+        public void modifyDrawing(Paint paint, Canvas canvas) {
+            paint.setXfermode(mXfermode);
+        }
+    }
+
+    private static class ColorFilterModifier extends DisplayModifier {
+        private static final int FILTER_COLOR = 0xFFBB0000;
+        private ColorFilter mColorFilter;
+
+        public ColorFilterModifier(PorterDuff.Mode mode) {
+            mColorFilter = new PorterDuffColorFilter(FILTER_COLOR, mode);
+        }
+
+        @Override
+        public void modifyDrawing(Paint paint, Canvas canvas) {
+            paint.setColorFilter(mColorFilter);
         }
     }
 }
