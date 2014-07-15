@@ -555,7 +555,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         if (matchedSize == null) {
             for (int i = mPreviewSizes.size() - 1; i >= 0; i--) {
                 if (Math.abs((float)mPreviewSizes.get(i).width * recordSize.height /
-                        mPreviewSizes.get(i).height / recordSize.width - 1) < 0.1) {
+                        mPreviewSizes.get(i).height / recordSize.width - 1) < 0.12) {
                     matchedSize = mCamera.new Size(mPreviewSizes.get(i).width,
                             mPreviewSizes.get(i).height);
                     break;
