@@ -318,8 +318,6 @@ public class CookieManagerTest extends
         assertFalse(anyDeleted.get());
     }
 
-    /*
-    TODO: uncomment when acceptThirdPartyCookies implementation lands
     public void testThirdPartyCookie() throws Throwable {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
@@ -376,7 +374,6 @@ public class CookieManagerTest extends
             mOnUiThread.getSettings().setJavaScriptEnabled(false);
         }
     }
-    */
 
     public void testb3167208() throws Exception {
         if (!NullWebViewUtils.isWebViewAvailable()) {
