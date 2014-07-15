@@ -114,6 +114,17 @@ public abstract class CanvasCompareActivityTest extends
     }
 
     /**
+     * Executes a test of a CanvasClient vs an XML layout in either software or hardware.
+     */
+    protected void executeCanvasXMLTest(CanvasClient canvasClient, boolean canvasUseHardware,
+            int layoutResID, boolean layoutUseHardware,
+            DifferenceCalculator differenceCalculator) {
+        Bitmap canvasCapture = captureRenderSpec(0, canvasClient, canvasUseHardware);
+        Bitmap layoutCapture = captureRenderSpec(layoutResID, null, layoutUseHardware);
+        assertTrue(compareBitmaps(layoutCapture, canvasCapture, differenceCalculator));
+    }
+
+    /**
      * Used to execute a specific part of a test and get the resultant bitmap
      */
     protected Bitmap captureRenderSpec(int layoutId, CanvasClient canvasClient,
