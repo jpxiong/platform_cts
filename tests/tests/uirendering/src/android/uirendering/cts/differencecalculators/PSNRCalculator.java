@@ -16,13 +16,13 @@
 package android.uirendering.cts.differencecalculators;
 
 import android.graphics.Color;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
  * Uses the Peak Signal-to-Noise Ratio approach to determine if two images are considered the same.
  */
 public class PSNRCalculator extends DifferenceCalculator {
+    private static final String TAG = "PSNR";
     private final float MAX = 255;
     private final int REGION_SIZE = 10;
 
@@ -74,9 +74,7 @@ public class PSNRCalculator extends DifferenceCalculator {
         fraction = (float) Math.log(fraction);
         fraction *= 10;
 
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME, "PSNRCalculator : PSNR = " + fraction);
-        }
+        Log.d(TAG, "PSNR : " + fraction);
 
         return (fraction > mThreshold);
     }

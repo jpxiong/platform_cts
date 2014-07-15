@@ -21,13 +21,13 @@ import com.android.cts.uirendering.ScriptC_ExactComparer;
 import android.content.res.Resources;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
-import android.uirendering.cts.CanvasCompareActivityTest;
 import android.util.Log;
 
 /**
  * This class does an exact comparison of the pixels in a bitmap.
  */
 public class ExactComparer extends BaseRenderScriptCalculator {
+    private static final String TAG = "ExactComparer";
     private ScriptC_ExactComparer mScript;
 
     /**
@@ -41,16 +41,14 @@ public class ExactComparer extends BaseRenderScriptCalculator {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
                 if (ideal[index] != given[index]) {
-                    if (!CanvasCompareActivityTest.DEBUG) {
-                        return false;
-                    }
+                    Log.d(TAG, "Failure on position x = " + x + " y = " + y);
+                    Log.d(TAG, "Expected color : " + Integer.toHexString(ideal[index]) +
+                            " given color : " + Integer.toHexString(given[index]));
                     count++;
                 }
             }
         }
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME, "Number of different pixels : " + count);
-        }
+        Log.d(TAG, "Number of different pixels : " + count);
 
         return (count == 0);
     }
@@ -73,10 +71,7 @@ public class ExactComparer extends BaseRenderScriptCalculator {
         mScript.forEach_exactCompare(inputAllocation, outputAllocation);
 
         float val = sum1DFloatAllocation(outputAllocation);
-        if (CanvasCompareActivityTest.DEBUG) {
-            Log.d(CanvasCompareActivityTest.TAG_NAME,
-                    "ExactComparer RS : number of different pixels : " + val);
-        }
+        Log.d(TAG, "Number of different pixels RS : " + val);
 
         return val == 0;
     }
