@@ -146,6 +146,17 @@ public class SweepTests extends CanvasCompareActivityTest {
             calculators);
     }
 
+    @SmallTest
+    public void testShaderSweeps() {
+        DifferenceCalculator[] calculators = new DifferenceCalculator[1];
+        calculators[0] = new MSSIMCalculator(HIGH_THRESHOLD);
+        int mask = DisplayModifier.Accessor.AA_MASK |
+                DisplayModifier.Accessor.SHADER_MASK |
+                DisplayModifier.Accessor.XFERMODE_MASK |
+                DisplayModifier.Accessor.SHAPES_MASK;
+        sweepModifiersForMask(mask, null, calculators);
+    }
+
     protected void sweepModifiersForMask(int mask, final DisplayModifier drawOp,
             DifferenceCalculator[] calculators) {
         if ((mask & DisplayModifier.Accessor.ALL_OPTIONS_MASK) == 0) {
