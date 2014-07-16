@@ -19,7 +19,9 @@ package android.admin.cts;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -219,5 +221,199 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         assertFalse(mDevicePolicyManager.resetPassword("123", 0));
         assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
         assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
+    }
+
+    public void testCreateUser_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testCreateUser_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.createUser(mComponent, "user name");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testRemoveUser_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testRemoveUser_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.removeUser(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetApplicationBlocked_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetApplicationBlocked_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setApplicationBlocked(mComponent, "com.google.anything", true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetApplicationsBlocked_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetApplicationsBlocked_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            Intent pdfViewIntent = new Intent(Intent.ACTION_VIEW).setType("application/pdf");
+            mDevicePolicyManager.setApplicationsBlocked(mComponent, pdfViewIntent, true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testIsApplicationBlocked_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testIsApplicationBlocked_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.isApplicationBlocked(mComponent, "com.google.anything");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetGlobalSetting_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetGlobalSetting_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setGlobalSetting(mComponent,
+                    Settings.Global.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON, "1");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetSecureSetting_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetSecureSetting_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setSecureSetting(mComponent,
+                    Settings.Secure.INSTALL_NON_MARKET_APPS, "1");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetMasterVolumeMuted_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetMasterVolumeMuted_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setMasterVolumeMuted(mComponent, true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testIsMasterVolumeMuted_failIfNotDeviceOrProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetMasterVolumeMuted_failIfNotDeviceOrProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.isMasterVolumeMuted(mComponent);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetRecommendedGlobalProxy_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetRecommendedGlobalProxy_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setRecommendedGlobalProxy(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetLockTaskPackages_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetLockTaskPackages_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setLockTaskPackages(new String[] {"package"});
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+        }
+    }
+
+    public void testClearDeviceOwnerApp_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testClearDeviceOwnerApp_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.clearDeviceOwnerApp("android.deviceadmin.cts");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSwitchUser_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSwitchUser_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.switchUser(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testCreateAndInitializeUser_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testCreateAndInitializeUser_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.createAndInitializeUser(mComponent, "name", "admin name",
+                        mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    private void assertDeviceOwnerMessage(String message) {
+        assertTrue("message is: "+ message, message.contains("does not own the device")
+                || message.contains("can only be called by the device owner"));
+    }
+
+    private void assertProfileOwnerMessage(String message) {
+        assertTrue(message.contains("does not own the profile"));
     }
 }
