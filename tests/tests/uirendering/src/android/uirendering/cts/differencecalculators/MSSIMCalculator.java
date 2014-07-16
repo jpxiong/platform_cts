@@ -33,13 +33,13 @@ import android.util.Log;
 public class MSSIMCalculator extends BaseRenderScriptCalculator{
     // These values were taken from the publication
     public static final boolean DEBUG = false;
-    public static final String TAG = "MSSIM";
+    public static final String TAG_NAME = "MSSIM";
     public static final double CONSTANT_L = 254;
     public static final double CONSTANT_K1 = 0.00001;
     public static final double CONSTANT_K2 = 0.00003;
     public static final double CONSTANT_C1 = Math.pow(CONSTANT_L * CONSTANT_K1, 2);
     public static final double CONSTANT_C2 = Math.pow(CONSTANT_L * CONSTANT_K2, 2);
-    public static final int WINDOW_SIZE = 3;
+    public static final int WINDOW_SIZE = 10;
 
     private double mThreshold;
     private ScriptC_MSSIMCalculator mScript;
@@ -73,13 +73,16 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
             }
         }
 
-        if (windows == 0) { //if they were both white screens then we are good
+        if (windows == 0) {
             return true;
         }
 
         SSIMTotal /= windows;
 
-        Log.d(TAG, "MSSIM : " + SSIMTotal);
+        if (DEBUG) {
+            Log.d(TAG_NAME, "MSSIM = " + SSIMTotal);
+            Log.d(TAG_NAME, "Number of Windows : " + windows);
+        }
 
         return (SSIMTotal >= mThreshold);
     }
@@ -105,7 +108,9 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
         float MSSIM = sum1DFloatAllocation(outputAllocation);
         MSSIM /= height;
 
-        Log.d(TAG, "MSSIM RS : " + MSSIM);
+        if (DEBUG) {
+            Log.d(TAG_NAME, "MSSIM RS : " + MSSIM);
+        }
 
         return (MSSIM >= mThreshold);
     }

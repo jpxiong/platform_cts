@@ -61,7 +61,9 @@ public abstract class CanvasCompareActivityTest extends
     @Override
     public void setUp() {
         mDifferenceVisualizer = new PassFailVisualizer();
-        mRenderScript = RenderScript.create(getActivity().getApplicationContext());
+        if (USE_RS) {
+            mRenderScript = RenderScript.create(getActivity().getApplicationContext());
+        }
     }
 
     /**
