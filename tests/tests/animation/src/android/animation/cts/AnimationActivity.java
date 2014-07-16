@@ -145,6 +145,11 @@ public class AnimationActivity extends Activity {
         view.animateBall();
     }
 
+    public void startSingleAnimation(Animator animator) {
+        animator.setTarget(view.newBall);
+        animator.start();
+    }
+
     public void startAnimation(ValueAnimator valueAnimator){
         view.bounceYAnimator = valueAnimator;
         view.startColorAnimator();
