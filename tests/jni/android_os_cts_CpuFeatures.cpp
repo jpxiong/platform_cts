@@ -17,6 +17,7 @@
 #include <cpu-features.h>
 #include <jni.h>
 #include <string.h>
+#include <sys/auxv.h>
 
 jboolean android_os_cts_CpuFeatures_isArmCpu(JNIEnv* env, jobject thiz)
 {
@@ -60,6 +61,11 @@ jboolean android_os_cts_CpuFeatures_isX86_64Cpu(JNIEnv* env, jobject thiz)
     return cpuFamily == ANDROID_CPU_FAMILY_X86_64;
 }
 
+jint android_os_cts_CpuFeatures_getHwCaps(JNIEnv*, jobject)
+{
+    return (jint)getauxval(AT_HWCAP);
+}
+
 static JNINativeMethod gMethods[] = {
     {  "isArmCpu", "()Z",
             (void *) android_os_cts_CpuFeatures_isArmCpu  },
@@ -75,6 +81,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_os_cts_CpuFeatures_isMips64Cpu  },
     {  "isX86_64Cpu", "()Z",
             (void *) android_os_cts_CpuFeatures_isX86_64Cpu  },
+    {  "getHwCaps", "()I",
+            (void *) android_os_cts_CpuFeatures_getHwCaps  },
 };
 
 int register_android_os_cts_CpuFeatures(JNIEnv* env)

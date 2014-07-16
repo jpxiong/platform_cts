@@ -16,6 +16,8 @@
 
 package android.os.cts;
 
+import android.os.Build;
+
 public class CpuFeatures {
 
     public static final String ARMEABI_V7 = "armeabi-v7a";
@@ -25,6 +27,18 @@ public class CpuFeatures {
     public static final String MIPSABI = "mips";
 
     public static final  String X86ABI = "x86";
+
+    public static final int HWCAP_VFP = (1 << 6);
+
+    public static final int HWCAP_NEON = (1 << 12);
+
+    public static final int HWCAP_VFPv3 = (1 << 13);
+
+    public static final int HWCAP_VFPv4 = (1 << 16);
+
+    public static final int HWCAP_IDIVA = (1 << 17);
+
+    public static final int HWCAP_IDIVT = (1 << 18);
 
     static {
         System.loadLibrary("cts_jni");
@@ -43,4 +57,20 @@ public class CpuFeatures {
     public static native boolean isMips64Cpu();
 
     public static native boolean isX86_64Cpu();
+
+    public static native int getHwCaps();
+
+    public static boolean isArm64CpuIn32BitMode() {
+        if (!isArmCpu()) {
+            return false;
+        }
+
+        for (String abi : Build.SUPPORTED_64_BIT_ABIS) {
+            if (abi.equals("arm64-v8a")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
