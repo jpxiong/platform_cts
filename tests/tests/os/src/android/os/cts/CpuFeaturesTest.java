@@ -17,6 +17,14 @@
 
 package android.os.cts;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.os.cts.CpuFeatures;
 
 import junit.framework.TestCase;
@@ -44,5 +52,53 @@ public class CpuFeaturesTest extends TestCase {
         assertHwCap("VFPv4", hwcaps, CpuFeatures.HWCAP_VFPv4);
         assertHwCap("IDIVA", hwcaps, CpuFeatures.HWCAP_IDIVA);
         assertHwCap("IDIVT", hwcaps, CpuFeatures.HWCAP_IDIVT);
+    }
+
+    private static List<String> getFeaturesFromCpuinfo() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("/proc/cpuinfo"));
+        Pattern p = Pattern.compile("Features\\s*:\\s*(.*)");
+
+        try {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Matcher m = p.matcher(line);
+                if (m.matches()) {
+                    String[] features = m.group(1).split("\\s");
+                    return Arrays.asList(features);
+                }
+            }
+       } finally {
+           br.close();
+       }
+
+       return null;
+    }
+
+    private static void assertNotInCpuinfo(List<String> features,
+            String feature) {
+        assertFalse("/proc/cpuinfo advertises required feature " + feature,
+                features.contains(feature));
+    }
+
+    public void testArm64Cpuinfo() throws IOException {
+        if (!CpuFeatures.isArm64Cpu()) {
+            return;
+        }
+
+        List<String> features = getFeaturesFromCpuinfo();
+        assertNotNull("Failed to parse /proc/cpuinfo", features);
+
+        assertNotInCpuinfo(features, "wp");
+        assertNotInCpuinfo(features, "half");
+        assertNotInCpuinfo(features, "thumb");
+        assertNotInCpuinfo(features, "fastmult");
+        assertNotInCpuinfo(features, "vfp");
+        assertNotInCpuinfo(features, "edsp");
+        assertNotInCpuinfo(features, "neon");
+        assertNotInCpuinfo(features, "vfpv3");
+        assertNotInCpuinfo(features, "tls");
+        assertNotInCpuinfo(features, "vfpv4");
+        assertNotInCpuinfo(features, "idiva");
+        assertNotInCpuinfo(features, "idivt");
     }
 }
