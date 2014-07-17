@@ -18,6 +18,7 @@ package android.uirendering.cts;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
@@ -38,6 +39,9 @@ public abstract class DisplayModifier {
     };
     private static final int NUM_PARALLEL_LINES = 24;
     private static final float[] gLinePts = new float[NUM_PARALLEL_LINES * 8 + gTriPts.length];
+    private static final int FILTER_COLOR = 0xFFBB0000;
+    protected static final int MODIFIER_WIDTH = 180;
+    protected static final int MODIFIER_HEIGHT = 180;
 
     static {
         int index;
@@ -256,6 +260,25 @@ public abstract class DisplayModifier {
                                     paint.setShader(ResourceModifier.instance().scaledShader);
                                 }
                             });
+                            put("composeShader", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setShader(ResourceModifier.instance().composeShader);
+                                }
+                            });
+                            put("bad composeShader", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setShader(ResourceModifier.instance().nestedComposeShader);
+                                }
+                            });
+                            put("bad composeShader 2", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setShader(
+                                            ResourceModifier.instance().doubleGradientComposeShader);
+                                }
+                            });
                             put("horGradient", new DisplayModifier() {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {
@@ -284,25 +307,6 @@ public abstract class DisplayModifier {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {
                                     paint.setShader(ResourceModifier.instance().sweepGradient);
-                                }
-                            });
-                            put("composeShader", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setShader(ResourceModifier.instance().composeShader);
-                                }
-                            });
-                            put("bad composeShader", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setShader(ResourceModifier.instance().nestedComposeShader);
-                                }
-                            });
-                            put("bad composeShader 2", new DisplayModifier() {
-                                @Override
-                                public void modifyDrawing(Paint paint, Canvas canvas) {
-                                    paint.setShader(
-                                            ResourceModifier.instance().doubleGradientComposeShader);
                                 }
                             });
                         }
@@ -391,6 +395,102 @@ public abstract class DisplayModifier {
                         }
                     });
 
+                    put("colorfilters", new LinkedHashMap<String, DisplayModifier>() {
+                        {
+                            put("SRC", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SRC));
+                                }
+                            });
+                            put("DST", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.DST));
+                                }
+                            });
+                            put("SRC_OVER", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SRC_OVER));
+                                }
+                            });
+                            put("DST_OVER", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.DST_OVER));
+                                }
+                            });
+                            put("SRC_IN", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SRC_IN));
+                                }
+                            });
+                            put("DST_IN", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.DST_IN));
+                                }
+                            });
+                            put("SRC_OUT", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SRC_OUT));
+                                }
+                            });
+                            put("DST_OUT", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.DST_OUT));
+                                }
+                            });
+                            put("SRC_ATOP", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SRC_ATOP));
+                                }
+                            });
+                            put("DST_ATOP", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.DST_ATOP));
+                                }
+                            });
+                            put("XOR", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.XOR));
+                                }
+                            });
+                            put("MULTIPLY", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.MULTIPLY));
+                                }
+                            });
+                            put("SCREEN", new DisplayModifier() {
+                                @Override
+                                public void modifyDrawing(Paint paint, Canvas canvas) {
+                                    paint.setColorFilter(new PorterDuffColorFilter(FILTER_COLOR,
+                                            PorterDuff.Mode.SCREEN));
+                                }
+                            });
+                        }
+                    });
+
                     // FINAL MAP: DOES ACTUAL DRAWING
                     put("drawing", new LinkedHashMap<String, DisplayModifier>() {
                         {
@@ -474,17 +574,18 @@ public abstract class DisplayModifier {
     abstract public void modifyDrawing(Paint paint, Canvas canvas);
 
     public static class Accessor {
-        public final static int AA_MASK =           0x1 << 0;
-        public final static int STYLE_MASK =        0x1 << 1;
-        public final static int STROKE_WIDTH_MASK = 0x1 << 2;
-        public final static int STROKE_CAP_MASK =   0x1 << 3;
-        public final static int STROKE_JOIN_MASK =  0x1 << 4;
-        public final static int TRANSFORM_MASK =    0x1 << 5;
-        public final static int SHADER_MASK =       0x1 << 6;
-        public final static int XFERMODE_MASK =     0x1 << 7;
-        public final static int SHAPES_MASK =       0x1 << 8;
-        public final static int ALL_OPTIONS_MASK = 0x1FF;
-        public final static int SHAPES_INDEX = 8;
+        public final static int AA_MASK =               0x1 << 0;
+        public final static int STYLE_MASK =            0x1 << 1;
+        public final static int STROKE_WIDTH_MASK =     0x1 << 2;
+        public final static int STROKE_CAP_MASK =       0x1 << 3;
+        public final static int STROKE_JOIN_MASK =      0x1 << 4;
+        public final static int TRANSFORM_MASK =        0x1 << 5;
+        public final static int SHADER_MASK =           0x1 << 6;
+        public final static int XFERMODE_MASK =         0x1 << 7;
+        public final static int COLOR_FILTER_MASK =     0x1 << 8;
+        public final static int SHAPES_MASK =           0x1 << 9;
+        public final static int ALL_OPTIONS_MASK =      (0x1 << 10) - 1;
+        public final static int SHAPES_INDEX = 9;
         public final static int XFERMODE_INDEX = 7;
         private final int mMask;
 
