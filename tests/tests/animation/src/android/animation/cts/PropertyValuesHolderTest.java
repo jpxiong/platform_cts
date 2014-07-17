@@ -16,14 +16,20 @@
 package android.animation.cts;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
+import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.graphics.drawable.ShapeDrawable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Property;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class PropertyValuesHolderTest extends
         ActivityInstrumentationTestCase2<AnimationActivity> {
@@ -84,6 +90,113 @@ public class PropertyValuesHolderTest extends
         assertTrue(objAnimator != null);
         float[] yArray = getYPosition();
         assertResults(yArray, mStartY, mEndY);
+    }
+
+    private ObjectAnimator createAnimator(Keyframe... keyframes) {
+        PropertyValuesHolder pVHolder = PropertyValuesHolder.ofKeyframe(mProperty, keyframes);
+        ObjectAnimator objAnimator = ObjectAnimator.ofPropertyValuesHolder(mObject,pVHolder);
+        objAnimator.setDuration(mDuration);
+        objAnimator.setInterpolator(new AccelerateInterpolator());
+        return objAnimator;
+    }
+
+    private void waitUntilFinished(ObjectAnimator objectAnimator, long timeoutMilliseconds)
+            throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        objectAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                latch.countDown();
+            }
+        });
+        latch.await(timeoutMilliseconds, TimeUnit.MILLISECONDS);
+        getInstrumentation().waitForIdleSync();
+    }
+
+    private void setTarget(final Animator animator, final Object target) throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                animator.setTarget(target);
+            }
+        });
+    }
+
+    private void startSingleAnimation(final Animator animator) throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.startSingleAnimation(animator);
+            }
+        });
+    }
+
+    public void testResetValues() throws Throwable {
+        final float initialY = mActivity.view.newBall.getY();
+        Keyframe emptyKeyframe1 = Keyframe.ofFloat(.0f);
+        ObjectAnimator objAnimator1 = createAnimator(emptyKeyframe1, Keyframe.ofFloat(1f, 100f));
+        startSingleAnimation(objAnimator1);
+        assertTrue("Keyframe should be assigned a value", emptyKeyframe1.hasValue());
+        assertEquals("Keyframe should get the value from the target", emptyKeyframe1.getValue(),
+                initialY);
+        waitUntilFinished(objAnimator1, mDuration * 2);
+        assertEquals(100f, mActivity.view.newBall.getY());
+        startSingleAnimation(objAnimator1);
+        waitUntilFinished(objAnimator1, mDuration * 2);
+
+        // run another ObjectAnimator that will move the Y value to something else
+        Keyframe emptyKeyframe2 = Keyframe.ofFloat(.0f);
+        ObjectAnimator objAnimator2 = createAnimator(emptyKeyframe2, Keyframe.ofFloat(1f, 200f));
+        startSingleAnimation(objAnimator2);
+        assertTrue("Keyframe should be assigned a value", emptyKeyframe2.hasValue());
+        assertEquals("Keyframe should get the value from the target", emptyKeyframe2.getValue(), 100f);
+        waitUntilFinished(objAnimator2, mDuration * 2);
+        assertEquals(200f, mActivity.view.newBall.getY());
+
+        // re-run first object animator. since its target did not change, it should have the same
+        // start value for kf1
+        startSingleAnimation(objAnimator1);
+        assertEquals(emptyKeyframe1.getValue(), initialY);
+        waitUntilFinished(objAnimator1, mDuration * 2);
+
+        Keyframe fullKeyframe = Keyframe.ofFloat(.0f, 333f);
+        ObjectAnimator objAnimator3 = createAnimator(fullKeyframe, Keyframe.ofFloat(1f, 500f));
+        startSingleAnimation(objAnimator3);
+        assertEquals("When keyframe has value, should not be assigned from the target object",
+                fullKeyframe.getValue(), 333f);
+        waitUntilFinished(objAnimator3, mDuration * 2);
+
+        // now, null out the target of the first animator
+        float updatedY = mActivity.view.newBall.getY();
+        setTarget(objAnimator1, null);
+        startSingleAnimation(objAnimator1);
+        assertTrue("Keyframe should get a value", emptyKeyframe1.hasValue());
+        assertEquals("Keyframe should get the updated Y value", emptyKeyframe1.getValue(), updatedY);
+        waitUntilFinished(objAnimator1, mDuration * 2);
+        assertEquals("Animation should run as expected", 100f, mActivity.view.newBall.getY());
+
+        // now, reset the target of the fully defined animation.
+        setTarget(objAnimator3, null);
+        startSingleAnimation(objAnimator3);
+        assertEquals("When keyframe is fully defined, its value should not change when target is"
+                + " reset", fullKeyframe.getValue(), 333f);
+        waitUntilFinished(objAnimator3, mDuration * 2);
+
+        // run the other one to change Y value
+        startSingleAnimation(objAnimator2);
+        waitUntilFinished(objAnimator2, mDuration * 2);
+        // now, set another target w/ the same View type. it should still reset
+        ShapeHolder view = new ShapeHolder(new ShapeDrawable());
+        updatedY = mActivity.view.newBall.getY();
+        setTarget(objAnimator1, view);
+        startSingleAnimation(objAnimator1);
+        assertTrue("Keyframe should get a value when target is set to another view of the same"
+                + " class", emptyKeyframe1.hasValue());
+        assertEquals("Keyframe should get the updated Y value when target is set to another view"
+                + " of the same class", emptyKeyframe1.getValue(), updatedY);
+        waitUntilFinished(objAnimator1, mDuration * 2);
+        assertEquals("Animation should run as expected", 100f, mActivity.view.newBall.getY());
     }
 
     public void testOffloat() throws Throwable {
