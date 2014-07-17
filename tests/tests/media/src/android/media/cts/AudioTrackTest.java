@@ -23,7 +23,10 @@ import android.media.AudioTrack;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
+import java.nio.FloatBuffer;
 
 public class AudioTrackTest extends AndroidTestCase {
     private String TAG = "AudioTrackTest";
@@ -1283,7 +1286,7 @@ public class AudioTrackTest extends AndroidTestCase {
 
         // -------- initialization --------------
         int bufferSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        byte data[] = createSoundDataInByteArray(bufferSize, TEST_SR);
+        byte data[] = createSoundDataInByteArray(bufferSize, TEST_SR, 1024);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
                 bufferSize, TEST_MODE);
         // -------- test --------------
@@ -1301,10 +1304,10 @@ public class AudioTrackTest extends AndroidTestCase {
         track.release();
     }
 
-    public static byte[] createSoundDataInByteArray(int bufferSize, final int sampleRate) {
-        final int frequency = 1024;
+    public static byte[] createSoundDataInByteArray(int bufferSamples, final int sampleRate,
+            final double frequency) {
         final double rad = 2 * Math.PI * frequency / sampleRate;
-        byte[] vai = new byte[bufferSize];
+        byte[] vai = new byte[bufferSamples];
         for (int j = 0; j < vai.length; j++) {
             int unsigned =  (int)(Math.sin(j * rad) * Byte.MAX_VALUE) + Byte.MAX_VALUE & 0xFF;
             vai[j] = (byte) unsigned;
@@ -1312,21 +1315,21 @@ public class AudioTrackTest extends AndroidTestCase {
         return vai;
     }
 
-    public static short[] createSoundDataInShortArray(int bufferSize, final int sampleRate) {
-        final double frequency = 1024;
+    public static short[] createSoundDataInShortArray(int bufferSamples, final int sampleRate,
+            final double frequency) {
         final double rad = 2 * Math.PI * frequency / sampleRate;
-        short[] vai = new short[bufferSize];
+        short[] vai = new short[bufferSamples];
         for (int j = 0; j < vai.length; j++) {
             vai[j] = (short) (Math.sin(j * rad) * Short.MAX_VALUE);
         }
         return vai;
     }
 
-    public static float[] createSoundDataInFloatArray(int bufferSize, final int sampleRate,
-            double frequency) {
+    public static float[] createSoundDataInFloatArray(int bufferSamples, final int sampleRate,
+            final double frequency) {
         final double rad = 2 * Math.PI * frequency / sampleRate;
-        float[] vaf = new float[bufferSize];
-        for (int j = 0; j < vaf.length; j++) {
+        float[] vaf = new float[bufferSamples];
+        for (int j = 0; j < bufferSamples; j++) {
             vaf[j] = (float) (Math.sin(j * rad));
         }
         return vaf;
@@ -1335,43 +1338,11 @@ public class AudioTrackTest extends AndroidTestCase {
     public void testPlayStreamData() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlayStreamData";
-        final int TEST_SR = 22050;
-        final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
-        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
-
-        // -------- initialization --------------
-        int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        int bufferSize = 3 * minBufferSize;
-        short data[] = createSoundDataInShortArray(bufferSize, TEST_SR);
-        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBufferSize, TEST_MODE);
-        // -------- test --------------
-        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
-        boolean hasPlayed = false;
-        int written = 0;
-        while (written < data.length) {
-            if (data.length - written <= minBufferSize) {
-                written += track.write(data, written, data.length - written);
-            } else {
-                written += track.write(data, written, minBufferSize);
-                if (!hasPlayed) {
-                    track.play();
-                    hasPlayed = true;
-                }
-            }
-        }
-        Thread.sleep(WAIT_MSEC);
-        track.stop();
-        Thread.sleep(WAIT_MSEC);
-        // -------- tear down --------------
-        track.release();
-    }
-
-    public void testPlayStreamFloat() throws Exception {
-        // constants for test
-        final String TEST_NAME = "testPlayStreamFloat";
+        final int TEST_FORMAT_ARRAY[] = {  // should hear 6 tones played 3 times
+                AudioFormat.ENCODING_PCM_8BIT,
+                AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.ENCODING_PCM_FLOAT,
+        };
         final int TEST_SR_ARRAY[] = {
                 22050,
                 44100,
@@ -1381,44 +1352,170 @@ public class AudioTrackTest extends AndroidTestCase {
                 AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.CHANNEL_OUT_STEREO,
         };
-        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_FLOAT;
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
-        double frequency = 800; // frequency changes for each test
-        for (int TEST_SR : TEST_SR_ARRAY) {
-            for (int TEST_CONF : TEST_CONF_ARRAY) {
-                // -------- initialization --------------
-                int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-                int bufferSize = 3 * minBufferSize;
-                // Note: stereo will have twice the frequency
-                float data[] = createSoundDataInFloatArray(bufferSize, TEST_SR,
-                        frequency);
-                AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
-                        TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
-                // -------- test --------------
-                assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
-                boolean hasPlayed = false;
-                int written = 0;
-                while (written < data.length) {
-                    if (data.length - written <= minBufferSize) {
-                        written += track.write(data, written, data.length - written,
-                                AudioTrack.WRITE_BLOCKING);
-                    } else {
-                        written += track.write(data, written, minBufferSize,
-                                AudioTrack.WRITE_BLOCKING);
-                        if (!hasPlayed) {
-                            track.play();
-                            hasPlayed = true;
+        for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
+            double frequency = 800; // frequency changes for each test
+            for (int TEST_SR : TEST_SR_ARRAY) {
+                for (int TEST_CONF : TEST_CONF_ARRAY) {
+                    // -------- initialization --------------
+                    int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
+                            TEST_CONF, TEST_FORMAT); // in bytes
+                    int bufferSamples = 12 * minBufferSize
+                            / AudioFormat.getBytesPerSample(TEST_FORMAT);
+                    AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
+                            TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
+                    assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+                    boolean hasPlayed = false;
+                    int written = 0;
+
+                    // -------- test --------------
+                    switch (TEST_FORMAT) {
+                    case AudioFormat.ENCODING_PCM_8BIT: {
+                        byte data[] = createSoundDataInByteArray(
+                                bufferSamples, TEST_SR,
+                                frequency);
+                        while (written < data.length) {
+                            int ret = track.write(data, written,
+                                    Math.min(data.length - written, minBufferSize));
+                            assertTrue(TEST_NAME, ret >= 0);
+                            written += ret;
+                            if (!hasPlayed) {
+                                track.play();
+                                hasPlayed = true;
+                            }
                         }
+                        } break;
+                    case AudioFormat.ENCODING_PCM_16BIT: {
+                        short data[] = createSoundDataInShortArray(
+                                bufferSamples, TEST_SR,
+                                frequency);
+                        while (written < data.length) {
+                            int ret = track.write(data, written,
+                                    Math.min(data.length - written, minBufferSize));
+                            assertTrue(TEST_NAME, ret >= 0);
+                            written += ret;
+                            if (!hasPlayed) {
+                                track.play();
+                                hasPlayed = true;
+                            }
+                        }
+                        } break;
+                    case AudioFormat.ENCODING_PCM_FLOAT: {
+                        float data[] = createSoundDataInFloatArray(
+                                bufferSamples, TEST_SR,
+                                frequency);
+                        while (written < data.length) {
+                            int ret = track.write(data, written,
+                                    Math.min(data.length - written, minBufferSize),
+                                    AudioTrack.WRITE_BLOCKING);
+                            assertTrue(TEST_NAME, ret >= 0);
+                            written += ret;
+                            if (!hasPlayed) {
+                                track.play();
+                                hasPlayed = true;
+                            }
+                        }
+                        } break;
+                    }
+
+                    Thread.sleep(WAIT_MSEC);
+                    track.stop();
+                    Thread.sleep(WAIT_MSEC);
+                    // -------- tear down --------------
+                    track.release();
+                    frequency += 200; // increment test tone frequency
+                }
+            }
+        }
+    }
+
+    public void testPlayStreamByteBuffer() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testPlayStreamByteBuffer";
+        final int TEST_FORMAT_ARRAY[] = {  // should hear 2 tones played 3 times
+                AudioFormat.ENCODING_PCM_8BIT,
+                AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.ENCODING_PCM_FLOAT,
+        };
+        final int TEST_SR_ARRAY[] = {
+                48000,
+        };
+        final int TEST_CONF_ARRAY[] = {
+                AudioFormat.CHANNEL_OUT_STEREO,
+        };
+        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+
+        for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
+            double frequency = 800; // frequency changes for each test
+            for (int TEST_SR : TEST_SR_ARRAY) {
+                for (int TEST_CONF : TEST_CONF_ARRAY) {
+                    for (int useDirect = 0; useDirect < 2; ++useDirect) {
+                        // -------- initialization --------------
+                        int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
+                                TEST_CONF, TEST_FORMAT); // in bytes
+                        int bufferSize = 12 * minBufferSize;
+                        int bufferSamples = bufferSize
+                                / AudioFormat.getBytesPerSample(TEST_FORMAT);
+                        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
+                                TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
+                        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+                        boolean hasPlayed = false;
+                        int written = 0;
+                        ByteBuffer bb = (useDirect == 1)
+                                ? ByteBuffer.allocateDirect(bufferSize)
+                                        : ByteBuffer.allocate(bufferSize);
+                        bb.order(java.nio.ByteOrder.nativeOrder());
+
+                        // -------- test --------------
+                        switch (TEST_FORMAT) {
+                        case AudioFormat.ENCODING_PCM_8BIT: {
+                            byte data[] = createSoundDataInByteArray(
+                                    bufferSamples, TEST_SR,
+                                    frequency);
+                            bb.put(data);
+                            bb.flip();
+                            } break;
+                        case AudioFormat.ENCODING_PCM_16BIT: {
+                            short data[] = createSoundDataInShortArray(
+                                    bufferSamples, TEST_SR,
+                                    frequency);
+                            ShortBuffer sb = bb.asShortBuffer();
+                            sb.put(data);
+                            bb.limit(sb.limit() * 2);
+                            } break;
+                        case AudioFormat.ENCODING_PCM_FLOAT: {
+                            float data[] = createSoundDataInFloatArray(
+                                    bufferSamples, TEST_SR,
+                                    frequency);
+                            FloatBuffer fb = bb.asFloatBuffer();
+                            fb.put(data);
+                            bb.limit(fb.limit() * 4);
+                            } break;
+                        }
+
+                        while (written < bufferSize) {
+                            int ret = track.write(bb,
+                                    Math.min(bufferSize - written, minBufferSize),
+                                    AudioTrack.WRITE_BLOCKING);
+                            assertTrue(TEST_NAME, ret >= 0);
+                            written += ret;
+                            if (!hasPlayed) {
+                                track.play();
+                                hasPlayed = true;
+                            }
+                        }
+
+                        Thread.sleep(WAIT_MSEC);
+                        track.stop();
+                        Thread.sleep(WAIT_MSEC);
+                        // -------- tear down --------------
+                        track.release();
+                        frequency += 200; // increment test tone frequency
                     }
                 }
-                Thread.sleep(WAIT_MSEC);
-                track.stop();
-                Thread.sleep(WAIT_MSEC);
-                // -------- tear down --------------
-                track.release();
-                frequency += 200; // increment test tone frequency
             }
         }
     }
