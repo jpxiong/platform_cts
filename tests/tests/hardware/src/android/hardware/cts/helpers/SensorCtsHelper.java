@@ -138,8 +138,8 @@ public class SensorCtsHelper {
      */
     public static String formatAssertionMessage(Sensor sensor, String label, int rateUs,
             int maxBatchReportLatencyUs) {
-        return String.format("%s | %s, handle: %d", label,
-                SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle());
+        return String.format("%s | %s", label,
+                SensorTestInformation.getSensorName(sensor.getType()));
     }
 
     /**
@@ -155,8 +155,8 @@ public class SensorCtsHelper {
      */
     public static String formatAssertionMessage(Sensor sensor, String label, int rateUs,
             int maxBatchReportLatencyUs, String format, Object ... params) {
-        return String.format("%s | %s, handle: %d, rateUs: %d, maxBatchReportLatencyUs: %d | %s",
-                label, SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle(),
+        return String.format("%s | %s, rateUs: %d, maxBatchReportLatencyUs: %d | %s",
+                label, SensorTestInformation.getSensorName(sensor.getType()),
                 rateUs, maxBatchReportLatencyUs, String.format(format, params));
     }
 

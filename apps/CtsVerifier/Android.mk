@@ -32,15 +32,7 @@ LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni \
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
-# This can't be built against LOCAL_SDK_VERSION := current because
-# it depends on a static library that's built directly against the
-# platform.
-#
-# uncomment when b/13281332 is fixed
-# please also uncomment the equivalent code in
-# cts/tests/tests/hardware/Android.mk
-#
-# LOCAL_SDK_VERSION := current
+LOCAL_SDK_VERSION := current
 
 LOCAL_DEX_PREOPT := false
 
