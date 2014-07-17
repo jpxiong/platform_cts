@@ -311,9 +311,9 @@ public class SweepTests extends CanvasCompareActivityTest {
     @SmallTest
     public void testColorFiltersAlphas() {
         DifferenceCalculator[] calculators =
-                new DifferenceCalculator[COLOR_FILTER_ALPHA_MAP.keySet().size()];
+                new DifferenceCalculator[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
-        for (PorterDuff.Mode mode: COLOR_FILTER_ALPHA_MAP.keySet()) {
+        for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
             calculators[index] = new SamplePointsCalculator(COLOR_FILTER_ALPHA_POINTS,
                     COLOR_FILTER_ALPHA_MAP.get(mode));
             index++;
@@ -325,9 +325,9 @@ public class SweepTests extends CanvasCompareActivityTest {
     @SmallTest
     public void testXfermodes() {
         DifferenceCalculator[] calculators =
-                new DifferenceCalculator[XFERMODE_COLOR_MAP.keySet().size()];
+                new DifferenceCalculator[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
-        for (PorterDuff.Mode mode: XFERMODE_COLOR_MAP.keySet()) {
+        for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
             calculators[index] = new SamplePointsCalculator(XFERMODE_TEST_POINTS,
                     XFERMODE_COLOR_MAP.get(mode));
             index++;
