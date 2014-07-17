@@ -1122,9 +1122,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
 
             // Still capture template should have android.statistics.lensShadingMapMode ON when
-            // DNG capability is supported.
+            // RAW capability is supported.
             List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
-            if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_DNG)) {
+            if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
                 mCollector.expectKeyValueEquals(request, STATISTICS_LENS_SHADING_MAP_MODE,
                         STATISTICS_LENS_SHADING_MAP_MODE_ON);
             }
