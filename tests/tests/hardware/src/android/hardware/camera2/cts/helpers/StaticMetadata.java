@@ -1385,7 +1385,7 @@ public class StaticMetadata {
 
         checkArrayValuesInRange(key, availableCaps,
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DNG);
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW);
         capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
         return capList;
     }
