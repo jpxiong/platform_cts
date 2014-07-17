@@ -3665,6 +3665,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 boolean consumed) {
             return false;
         }
+
+        @Override
+        public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
+            return false;
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {
