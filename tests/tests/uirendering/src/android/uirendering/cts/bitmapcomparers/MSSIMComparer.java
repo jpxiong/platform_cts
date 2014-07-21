@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import com.android.cts.uirendering.R;
-import com.android.cts.uirendering.ScriptC_MSSIMCalculator;
+import com.android.cts.uirendering.ScriptC_MSSIMComparer;
 
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -30,7 +30,7 @@ import android.util.Log;
  *
  * https://ece.uwaterloo.ca/~z70wang/publications/ssim.pdf
  */
-public class MSSIMCalculator extends BaseRenderScriptCalculator{
+public class MSSIMComparer extends BaseRenderScriptComparer {
     // These values were taken from the publication
     public static final boolean DEBUG = false;
     public static final String TAG_NAME = "MSSIM";
@@ -42,9 +42,9 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
     public static final int WINDOW_SIZE = 10;
 
     private double mThreshold;
-    private ScriptC_MSSIMCalculator mScript;
+    private ScriptC_MSSIMComparer mScript;
 
-    public MSSIMCalculator(double threshold) {
+    public MSSIMComparer(double threshold) {
         mThreshold = threshold;
     }
 
@@ -92,8 +92,8 @@ public class MSSIMCalculator extends BaseRenderScriptCalculator{
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_MSSIMCalculator(renderScript, resources,
-                    R.raw.mssimcalculator);
+            mScript = new ScriptC_MSSIMComparer(renderScript, resources,
+                    R.raw.mssimcomparer);
         }
         mScript.set_WIDTH(width);
         mScript.set_HEIGHT(height);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import android.content.res.Resources;
 import android.renderscript.Allocation;
@@ -22,7 +22,7 @@ import android.renderscript.RenderScript;
 /**
  * This abstract class can be used by the tester to implement their own comparison methods
  */
-public abstract class DifferenceCalculator{
+public abstract class BitmapComparer {
     /**
      * Compares the two bitmaps given using Java.
      * @param offset where in the bitmaps to start

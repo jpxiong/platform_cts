@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import com.android.cts.uirendering.R;
-import com.android.cts.uirendering.ScriptC_MeanSquaredCalculator;
+import com.android.cts.uirendering.ScriptC_MeanSquaredComparer;
 
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -27,16 +27,16 @@ import android.util.Log;
 /**
  * Finds the MSE using two images.
  */
-public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
+public class MeanSquaredComparer extends BaseRenderScriptComparer {
     private static final String TAG = "MeanSquared";
-    private ScriptC_MeanSquaredCalculator mScript;
+    private ScriptC_MeanSquaredComparer mScript;
     private float mErrorPerPixel;
 
     /**
      * @param errorPerPixel threshold for which the test will pass/fail. This is the mean-squared
      *                      error averaged across all of those before comparing.
      */
-    public MeanSquaredCalculator(float errorPerPixel) {
+    public MeanSquaredComparer(float errorPerPixel) {
         mErrorPerPixel = errorPerPixel;
     }
 
@@ -53,8 +53,8 @@ public class MeanSquaredCalculator extends BaseRenderScriptCalculator {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_MeanSquaredCalculator(renderScript, resources,
-                    R.raw.meansquaredcalculator);
+            mScript = new ScriptC_MeanSquaredComparer(renderScript, resources,
+                    R.raw.meansquaredcomparer);
         }
         mScript.set_WIDTH(width);
 

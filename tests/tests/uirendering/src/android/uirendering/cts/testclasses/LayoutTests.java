@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts;
+package android.uirendering.cts.testclasses;
 
 import com.android.cts.uirendering.R;
 
-import android.uirendering.cts.differencecalculators.DifferenceCalculator;
-import android.uirendering.cts.differencecalculators.ExactComparer;
+import android.uirendering.cts.bitmapcomparers.BitmapComparer;
+import android.uirendering.cts.bitmapcomparers.ExactComparer;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 
 
 /**
  * Created to see how custom views made with XML and programatic code will work.
  */
-public class LayoutTest extends CanvasCompareActivityTest {
-    private DifferenceCalculator mBitmapComparer;
+public class LayoutTests extends ActivityTestBase {
+    private BitmapComparer mBitmapComparer;
 
-    public LayoutTest() {
+    public LayoutTests() {
         mBitmapComparer = new ExactComparer();
     }
 
@@ -42,3 +43,4 @@ public class LayoutTest extends CanvasCompareActivityTest {
         executeLayoutTest(R.layout.simple_rect_layout, mBitmapComparer);
     }
 }
+

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts;
+package android.uirendering.cts.testinfrastructure;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -38,7 +38,7 @@ public class CanvasClientView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (CanvasCompareActivityTest.DEBUG) {
+        if (ActivityTestBase.DEBUG) {
             String s = canvas.isHardwareAccelerated() ? "HARDWARE" : "SOFTWARE";
             Paint paint = new Paint();
             paint.setColor(Color.BLACK);
