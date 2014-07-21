@@ -33,6 +33,7 @@ public final class BitmapDumper {
     private final static String IDEAL_RENDERING_FILE_NAME = "idealCapture.png";
     private final static String TESTED_RENDERING_FILE_NAME = "testedCapture.png";
     private final static String VISUALIZER_RENDERING_FILE_NAME = "visualizer.png";
+    private final static String SINGULAR_FILE_NAME = "capture.png";
 
     private BitmapDumper(){};
 
@@ -59,6 +60,10 @@ public final class BitmapDumper {
         saveFile(testName, IDEAL_RENDERING_FILE_NAME, idealBitmap);
         saveFile(testName, TESTED_RENDERING_FILE_NAME, testedBitmap);
         saveFile(testName, VISUALIZER_RENDERING_FILE_NAME, visualizerBitmap);
+    }
+
+    public static void dumpBitmap(Bitmap bitmap, String testName) {
+        saveFile(testName, SINGULAR_FILE_NAME, bitmap);
     }
 
     private static File createImageFile(String fileName) {
