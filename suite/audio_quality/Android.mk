@@ -22,7 +22,7 @@ CTS_AUDIO_TOP:= $(call my-dir)
 CTS_AUDIO_INSTALL_DIR := $(HOST_OUT)/cts-audio-quality/android-cts-audio-quality
 CTS_AUDIO_QUALITY_ZIP := $(HOST_OUT)/cts-audio-quality/android-cts-audio-quality.zip
 
-cts_audio_quality_client_apk := $(TARGET_OUT_DATA_APPS)/CtsAudioClient.apk
+cts_audio_quality_client_apk := $(TARGET_OUT_DATA_APPS)/CtsAudioClient/CtsAudioClient.apk
 cts_audio_quality_host_bins := $(HOST_OUT)/bin/cts_audio_quality_test $(HOST_OUT)/bin/cts_audio_quality
 $(CTS_AUDIO_QUALITY_ZIP): PRIVATE_CLIENT_APK := $(cts_audio_quality_client_apk)
 $(CTS_AUDIO_QUALITY_ZIP): PRIVATE_HOST_BINS := $(cts_audio_quality_host_bins)
