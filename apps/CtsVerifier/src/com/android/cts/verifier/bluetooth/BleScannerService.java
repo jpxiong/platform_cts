@@ -82,7 +82,8 @@ public class BleScannerService extends Service {
             List<ScanFilter> filters = new ArrayList<ScanFilter>();
             filters.add(new ScanFilter.Builder()
                 .setManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
-                .setServiceData(new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
+                .setServiceData(new ParcelUuid(SERVICE_UUID),
+                        new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
                 .build());
             ScanSettings setting = new ScanSettings.Builder()
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
