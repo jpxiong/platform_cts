@@ -23,6 +23,7 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.webkit.WebView;
 
 /**
  * A generic activity that uses a view specified by the user.
@@ -46,12 +47,13 @@ public class DrawActivity extends Activity {
         return super.onCreateView(parent, name, context, attrs);
     }
 
-    public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient,
+    public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
             boolean useHardware) {
         int arg2 = (useHardware ? View.LAYER_TYPE_NONE : View.LAYER_TYPE_SOFTWARE);
-
         if (canvasClient != null) {
             mHandler.obtainMessage(RenderSpecHandler.CANVAS_MSG, 0, arg2, canvasClient).sendToTarget();
+        } else if (webViewUrl != null) {
+            mHandler.obtainMessage(RenderSpecHandler.WEB_VIEW_MSG, 0, arg2, webViewUrl).sendToTarget();
         } else {
             mHandler.obtainMessage(RenderSpecHandler.LAYOUT_MSG, layoutId, arg2).sendToTarget();
         }
@@ -68,8 +70,10 @@ public class DrawActivity extends Activity {
     private class RenderSpecHandler extends Handler {
         public static final int LAYOUT_MSG = 1;
         public static final int CANVAS_MSG = 2;
+        public static final int WEB_VIEW_MSG = 3;
 
         public void handleMessage(Message message) {
+            int webViewBuffer = 0;
             switch (message.what) {
                 case LAYOUT_MSG: {
                     setContentView(message.arg1);
@@ -81,10 +85,18 @@ public class DrawActivity extends Activity {
                             CanvasCompareActivityTest.TEST_HEIGHT);
                     setContentView(mView);
                 } break;
+
+                case WEB_VIEW_MSG: {
+                    mView = new WebView(getApplicationContext());
+                    ((WebView) mView).loadUrl((String) message.obj);
+                    ((WebView) mView).setInitialScale(100);
+                    setContentView(mView);
+                    webViewBuffer = 10;
+                } break;
             }
             mView.setLayerType(message.arg2, null);
 
-            DrawCounterListener onDrawListener = new DrawCounterListener();
+            DrawCounterListener onDrawListener = new DrawCounterListener(webViewBuffer);
 
             mView.getViewTreeObserver().addOnPreDrawListener(onDrawListener);
 
@@ -94,11 +106,16 @@ public class DrawActivity extends Activity {
 
     private class DrawCounterListener implements ViewTreeObserver.OnPreDrawListener {
         private int mCurrentDraws = 0;
+        private int mExtraDraws;
+
+        public DrawCounterListener(int extraDraws) {
+            mExtraDraws = extraDraws;
+        }
 
         @Override
         public boolean onPreDraw() {
             mCurrentDraws++;
-            if (mCurrentDraws < MIN_NUMBER_OF_DRAWS) {
+            if (mCurrentDraws < MIN_NUMBER_OF_DRAWS + mExtraDraws) {
                 mView.postInvalidate();
             } else {
                 synchronized (mLock) {

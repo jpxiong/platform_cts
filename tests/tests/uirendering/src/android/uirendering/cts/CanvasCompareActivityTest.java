@@ -19,10 +19,15 @@ import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
 import android.test.ActivityInstrumentationTestCase2;
+import android.uirendering.cts.bitmapverifiers.BitmapVerifier;
 import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencevisualizers.DifferenceVisualizer;
 import android.uirendering.cts.differencevisualizers.PassFailVisualizer;
 import android.uirendering.cts.util.BitmapDumper;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains the basis for the graphics hardware test classes. Contained within this class
@@ -34,7 +39,6 @@ public abstract class CanvasCompareActivityTest extends
     public static final String TAG_NAME = "CtsUirendering";
     public static final boolean DEBUG = false;
     public static final boolean USE_RS = false;
-    public static final boolean DUMP_BITMAPS = true;
     public static final int TEST_WIDTH = 180;
     public static final int TEST_HEIGHT = 180; //The minimum height and width of a device
 
@@ -99,9 +103,9 @@ public abstract class CanvasCompareActivityTest extends
      * test.
      */
     protected void executeLayoutTest(int layoutResID, DifferenceCalculator comparer) {
-        Bitmap softwareCapture = captureRenderSpec(layoutResID, null, false);
-        Bitmap hardwareCapture = captureRenderSpec(layoutResID, null, true);
-        assertTrue(compareBitmaps(softwareCapture, hardwareCapture, comparer));
+        Bitmap softwareCapture = captureRenderSpec(layoutResID, null, null, false);
+        Bitmap hardwareCapture = captureRenderSpec(layoutResID, null, null, true);
+        assertBitmapsAreSimilar(softwareCapture, hardwareCapture, comparer);
     }
 
     /**
@@ -110,28 +114,49 @@ public abstract class CanvasCompareActivityTest extends
      * screen cap, hardware screen cap, and difference map using the test name
      */
     protected void executeCanvasTest(CanvasClient canvasClient, DifferenceCalculator comparer) {
-        Bitmap softwareCapture = captureRenderSpec(0, canvasClient, false);
-        Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, true);
-        assertTrue(compareBitmaps(softwareCapture, hardwareCapture, comparer));
+        Bitmap softwareCapture = captureRenderSpec(0, canvasClient, null, false);
+        Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, null, true);
+        assertBitmapsAreSimilar(softwareCapture, hardwareCapture, comparer);
     }
 
     /**
-     * Executes a test of a CanvasClient vs an XML layout in either software or hardware.
+     * Executes a test that uses a URL to an HTML file and generates a WebView from it.
      */
-    protected void executeCanvasXMLTest(CanvasClient canvasClient, boolean canvasUseHardware,
-            int layoutResID, boolean layoutUseHardware,
-            DifferenceCalculator differenceCalculator) {
-        Bitmap canvasCapture = captureRenderSpec(0, canvasClient, canvasUseHardware);
-        Bitmap layoutCapture = captureRenderSpec(layoutResID, null, layoutUseHardware);
-        assertTrue(compareBitmaps(layoutCapture, canvasCapture, differenceCalculator));
+    protected void executeWebViewTest(String webViewUrl, DifferenceCalculator calculator) {
+        Bitmap softwareCapture = captureRenderSpec(0, null, webViewUrl, false);
+        Bitmap hardwareCapture = captureRenderSpec(0, null, webViewUrl, true);
+        assertBitmapsAreSimilar(softwareCapture, hardwareCapture, calculator);
+    }
+
+    /**
+     * Executes a series of Canvas commands, XML layouts, and WebView draws and tests them using the
+     * verifier passed in.
+     */
+    protected void executeTestBuilderTest(TestCaseBuilder testCaseBuilder,
+            BitmapVerifier verifier) {
+        int[] testArray = new int[TEST_HEIGHT * TEST_WIDTH];
+        int testNumber = 0;
+        while (testCaseBuilder.hasNext()) {
+            TestCase testCase = testCaseBuilder.next();
+            Bitmap currentBitmap = captureRenderSpec(testCase.layoutID, testCase.canvasClient,
+                    testCase.webViewUrl, testCase.useHardware);
+            currentBitmap.getPixels(testArray, 0, TEST_WIDTH, 0, 0, TEST_WIDTH, TEST_HEIGHT);
+            boolean res = verifier.verify(testArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
+            if (!res) {
+                BitmapDumper.dumpBitmap(currentBitmap, getName());
+                Log.d(TAG_NAME, "TestBuilder failed on test number : " + testNumber);
+            }
+            assertTrue(res);
+            testNumber++;
+        }
     }
 
     /**
      * Used to execute a specific part of a test and get the resultant bitmap
      */
-    protected Bitmap captureRenderSpec(int layoutId, CanvasClient canvasClient,
+    protected Bitmap captureRenderSpec(int layoutId, CanvasClient canvasClient, String webViewUrl,
             boolean useHardware) {
-        getActivity().enqueueRenderSpecAndWait(layoutId, canvasClient, useHardware);
+        getActivity().enqueueRenderSpecAndWait(layoutId, canvasClient, webViewUrl, useHardware);
         return takeScreenshot();
     }
 
@@ -139,7 +164,8 @@ public abstract class CanvasCompareActivityTest extends
      * Compares the two bitmaps saved using the given test. If they fail, the files are saved using
      * the test name.
      */
-    protected boolean compareBitmaps(Bitmap bitmap1, Bitmap bitmap2, DifferenceCalculator comparer) {
+    protected void assertBitmapsAreSimilar(Bitmap bitmap1, Bitmap bitmap2,
+            DifferenceCalculator comparer) {
         boolean res;
 
         if (USE_RS && comparer.supportsRenderScript()) {
@@ -157,11 +183,76 @@ public abstract class CanvasCompareActivityTest extends
         }
 
         if (!res) {
-            if (DUMP_BITMAPS) {
-                BitmapDumper.dumpBitmaps(bitmap1, bitmap2, getName(), mDifferenceVisualizer);
-            }
+            BitmapDumper.dumpBitmaps(bitmap1, bitmap2, getName(), mDifferenceVisualizer);
         }
 
-        return res;
+        assertTrue(res);
+    }
+
+    /**
+     * Defines a group of CanvasClients, XML layouts, and WebView html files for testing.
+     */
+    protected class TestCaseBuilder {
+        private List<TestCase> mTestCases;
+        private int mCurrentTestCase;
+
+        public TestCaseBuilder() {
+            mTestCases = new ArrayList<TestCase>();
+            mCurrentTestCase = 0;
+        }
+
+        public TestCaseBuilder addTestCase(String webViewUrl) {
+            return addTestCase(webViewUrl, false).addTestCase(webViewUrl, true);
+        }
+
+        public TestCaseBuilder addTestCase(int layoutId) {
+            return addTestCase(layoutId, false).addTestCase(layoutId, true);
+        }
+
+        public TestCaseBuilder addTestCase(CanvasClient canvasClient) {
+            return addTestCase(canvasClient, false).addTestCase(canvasClient, true);
+        }
+
+        public TestCaseBuilder addTestCase(String webViewUrl, boolean useHardware) {
+            mTestCases.add(new TestCase(null, 0, webViewUrl, useHardware));
+            return this;
+        }
+
+        public TestCaseBuilder addTestCase(int layoutId, boolean useHardware) {
+            mTestCases.add(new TestCase(null, layoutId, null, useHardware));
+            return this;
+        }
+
+        public TestCaseBuilder addTestCase(CanvasClient canvasClient, boolean useHardware) {
+            mTestCases.add(new TestCase(canvasClient, 0, null, useHardware));
+            return this;
+        }
+
+        protected boolean hasNext() {
+            return (mCurrentTestCase != mTestCases.size());
+        }
+
+        protected TestCase next() {
+            if (mCurrentTestCase == mTestCases.size()) {
+                return null;
+            }
+            TestCase testCase = mTestCases.get(mCurrentTestCase);
+            mCurrentTestCase++;
+            return testCase;
+        }
+    }
+
+    protected class TestCase {
+        public int layoutID;
+        public CanvasClient canvasClient;
+        public String webViewUrl;
+        public boolean useHardware;
+
+        public TestCase(CanvasClient client, int id, String viewUrl, boolean useHardware) {
+            this.layoutID = id;
+            this.canvasClient = client;
+            this.webViewUrl = viewUrl;
+            this.useHardware = useHardware;
+        }
     }
 }
