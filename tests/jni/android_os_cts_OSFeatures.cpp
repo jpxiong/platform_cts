@@ -16,6 +16,17 @@
  */
 #include <jni.h>
 #include <sys/prctl.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <linux/filter.h>
+#include <linux/seccomp.h>
+
+#include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 jint android_os_cts_OSFeatures_getNoNewPrivs(JNIEnv* env, jobject thiz)
 {
@@ -27,11 +38,82 @@ jint android_os_cts_OSFeatures_prctlCapBsetRead(JNIEnv* env, jobject thiz, jint 
     return prctl(PR_CAPBSET_READ, i, 0, 0, 0);
 }
 
+#define DENY BPF_STMT(BPF_RET+BPF_K, SECCOMP_RET_KILL)
+
+static void test_seccomp() {
+    if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) {
+        _exit(0);
+    }
+
+    struct sock_filter filter[] = { DENY };
+    struct sock_fprog prog;
+    memset(&prog, 0, sizeof(prog));
+    prog.len = sizeof(filter) / sizeof(filter[0]);
+    prog.filter = filter;
+
+    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog) < 0) {
+        _exit(0);
+    }
+
+    while(1) {
+        _exit(0);  // should crash with SIGSYS
+    }
+}
+
+jboolean android_os_cts_OSFeatures_hasSeccompSupport(JNIEnv* env, jobject)
+{
+    pid_t pid = fork();
+    if (pid == -1) {
+        jclass cls = env->FindClass("java/lang/RuntimeException");
+        env->ThrowNew(cls, "fork failed");
+        return false;
+    }
+    if (pid == 0) {
+        // child
+        test_seccomp();
+        _exit(0);
+    }
+
+    int status;
+    TEMP_FAILURE_RETRY(waitpid(pid, &status, 0));
+    return WIFSIGNALED(status) && (WTERMSIG(status) == SIGSYS);
+}
+
+jboolean android_os_cts_OSFeatures_needsSeccompSupport(JNIEnv*, jobject)
+{
+#if !defined(__arm__) && !defined(__i386__) && !defined(__x86_64__)
+    // Seccomp support is only available for ARM, x86, x86_64.
+    return false;
+#endif
+
+    int major;
+    int minor;
+    struct utsname uts;
+    if (uname(&uts) == -1) {
+        return false;
+    }
+
+    if (sscanf(uts.release, "%d.%d", &major, &minor) != 2) {
+        return false;
+    }
+
+    // Kernels before 3.8 don't have seccomp
+    if ((major < 3) || ((major == 3) && (minor < 8))) {
+        return false;
+    }
+
+    return true;
+}
+
 static JNINativeMethod gMethods[] = {
     {  "getNoNewPrivs", "()I",
             (void *) android_os_cts_OSFeatures_getNoNewPrivs  },
     {  "prctlCapBsetRead", "(I)I",
             (void *) android_os_cts_OSFeatures_prctlCapBsetRead },
+    {  "hasSeccompSupport", "()Z",
+            (void *) android_os_cts_OSFeatures_hasSeccompSupport  },
+    {  "needsSeccompSupport", "()Z",
+            (void *) android_os_cts_OSFeatures_needsSeccompSupport  }
 };
 
 int register_android_os_cts_OSFeatures(JNIEnv* env)
