@@ -55,6 +55,7 @@ class TestPackageDef implements ITestPackageDef {
     public static final String DISPLAY_TEST =
             "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
+    public static final String JUNIT_DEVICE_TEST = "jUnitDeviceTest";
 
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SignatureTest";
@@ -65,6 +66,7 @@ class TestPackageDef implements ITestPackageDef {
     private String mRunner = null;
     private String mTestType = null;
     private String mJarPath = null;
+    private String mRunTimeArgs = null;
     private boolean mIsSignatureTest = false;
     private String mTestPackageName = null;
     private String mDigest = null;
@@ -96,6 +98,14 @@ class TestPackageDef implements ITestPackageDef {
     @Override
     public String getUri() {
         return mUri;
+    }
+
+    void setRunTimeArgs(String runTimeArgs) {
+        mRunTimeArgs = runTimeArgs;
+    }
+
+    String getRunTimeArgs() {
+        return mRunTimeArgs;
     }
 
     void setAppNameSpace(String appNameSpace) {
@@ -261,6 +271,15 @@ class TestPackageDef implements ITestPackageDef {
             instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
             mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
             return instrTest;
+        } else if (JUNIT_DEVICE_TEST.equals(mTestType)){
+            CLog.d("Creating JUnit device test %s", mName);
+            JUnitDeviceTest jUnitDeviceTest = new JUnitDeviceTest();
+            jUnitDeviceTest.setRunName(getUri());
+            jUnitDeviceTest.addTestJarFileName(mJarPath);
+            jUnitDeviceTest.addRunTimeArgs(mRunTimeArgs);
+            jUnitDeviceTest.setTests(mTests);
+            mDigest = generateDigest(testCaseDir, mJarPath);
+            return jUnitDeviceTest;
         } else {
             CLog.d("Creating instrumentation test for %s", mName);
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
