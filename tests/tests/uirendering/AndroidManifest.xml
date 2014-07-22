@@ -21,7 +21,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application>
-        <activity android:name="android.uirendering.cts.DrawActivity"
+        <activity android:name="android.uirendering.cts.testinfrastructure.DrawActivity"
                 android:theme="@style/WhiteBackgroundTheme"></activity>
         <uses-library android:name="android.test.runner" />
     </application>

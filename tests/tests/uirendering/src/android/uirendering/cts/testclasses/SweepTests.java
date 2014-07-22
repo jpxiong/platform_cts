@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package android.uirendering.cts;
+package android.uirendering.cts.testclasses;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -26,9 +26,14 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.uirendering.cts.differencecalculators.DifferenceCalculator;
-import android.uirendering.cts.differencecalculators.MSSIMCalculator;
-import android.uirendering.cts.differencecalculators.SamplePointsCalculator;
+import android.uirendering.cts.bitmapcomparers.BitmapComparer;
+import android.uirendering.cts.bitmapcomparers.MSSIMComparer;
+import android.uirendering.cts.bitmapcomparers.SamplePointsComparer;
+import android.uirendering.cts.testinfrastructure.ActivityTestBase;
+import android.uirendering.cts.testinfrastructure.CanvasClient;
+import android.uirendering.cts.testinfrastructure.DisplayModifier;
+import android.uirendering.cts.testinfrastructure.ResourceModifier;
+import android.util.Log;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,7 +41,9 @@ import java.util.Map;
 /**
  * Test cases of all combination of resource modifications.
  */
-public class SweepTests extends CanvasCompareActivityTest {
+public class SweepTests extends ActivityTestBase {
+    private static final String TAG = "SweepTests";
+
     public static final int BG_COLOR = 0xFFFFFFFF;
     public static final int DST_COLOR = 0xFFFFCC44;
     public static final int SRC_COLOR = 0xFF66AAFF;
@@ -279,42 +286,42 @@ public class SweepTests extends CanvasCompareActivityTest {
     public static final DisplayModifier mCircleDrawModifier = new DisplayModifier() {
         @Override
         public void modifyDrawing(Paint paint, Canvas canvas) {
-            canvas.drawCircle(CanvasCompareActivityTest.TEST_WIDTH / 2,
-                    CanvasCompareActivityTest.TEST_HEIGHT / 2,
-                    CanvasCompareActivityTest.TEST_HEIGHT / 2, paint);
+            canvas.drawCircle(ActivityTestBase.TEST_WIDTH / 2,
+                    ActivityTestBase.TEST_HEIGHT / 2,
+                    ActivityTestBase.TEST_HEIGHT / 2, paint);
         }
     };
 
     @SmallTest
     public void testBasicDraws() {
-        DifferenceCalculator[] calculators = new DifferenceCalculator[1];
-        calculators[0] = new MSSIMCalculator(HIGH_THRESHOLD);
+        BitmapComparer[] calculators = new BitmapComparer[1];
+        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, calculators);
     }
 
     @SmallTest
     public void testBasicShaders() {
-        DifferenceCalculator[] calculators = new DifferenceCalculator[1];
-        calculators[0] = new MSSIMCalculator(HIGH_THRESHOLD);
+        BitmapComparer[] calculators = new BitmapComparer[1];
+        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.SHADER_MASK, mCircleDrawModifier,
                 calculators);
     }
 
     @SmallTest
     public void testColorFilterUsingGradient() {
-        DifferenceCalculator[] calculators = new DifferenceCalculator[1];
-        calculators[0] = new MSSIMCalculator(HIGH_THRESHOLD);
+        BitmapComparer[] calculators = new BitmapComparer[1];
+        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
                 COLOR_FILTER_GRADIENT_MODIFIER, calculators);
     }
 
     @SmallTest
     public void testColorFiltersAlphas() {
-        DifferenceCalculator[] calculators =
-                new DifferenceCalculator[DisplayModifier.PORTERDUFF_MODES.length];
+        BitmapComparer[] calculators =
+                new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            calculators[index] = new SamplePointsCalculator(COLOR_FILTER_ALPHA_POINTS,
+            calculators[index] = new SamplePointsComparer(COLOR_FILTER_ALPHA_POINTS,
                     COLOR_FILTER_ALPHA_MAP.get(mode));
             index++;
         }
@@ -324,11 +331,11 @@ public class SweepTests extends CanvasCompareActivityTest {
 
     @SmallTest
     public void testXfermodes() {
-        DifferenceCalculator[] calculators =
-                new DifferenceCalculator[DisplayModifier.PORTERDUFF_MODES.length];
+        BitmapComparer[] calculators =
+                new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            calculators[index] = new SamplePointsCalculator(XFERMODE_TEST_POINTS,
+            calculators[index] = new SamplePointsComparer(XFERMODE_TEST_POINTS,
                     XFERMODE_COLOR_MAP.get(mode));
             index++;
         }
@@ -338,8 +345,8 @@ public class SweepTests extends CanvasCompareActivityTest {
 
     @SmallTest
     public void testShaderSweeps() {
-        DifferenceCalculator[] calculators = new DifferenceCalculator[1];
-        calculators[0] = new MSSIMCalculator(HIGH_THRESHOLD);
+        BitmapComparer[] calculators = new BitmapComparer[1];
+        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
         int mask = DisplayModifier.Accessor.AA_MASK |
                 DisplayModifier.Accessor.SHADER_MASK |
                 DisplayModifier.Accessor.XFERMODE_MASK |
@@ -348,7 +355,7 @@ public class SweepTests extends CanvasCompareActivityTest {
     }
 
     protected void sweepModifiersForMask(int mask, final DisplayModifier drawOp,
-            DifferenceCalculator[] calculators) {
+            BitmapComparer[] calculators) {
         if ((mask & DisplayModifier.Accessor.ALL_OPTIONS_MASK) == 0) {
             throw new IllegalArgumentException("Attempt to test with a mask that is invalid");
         }
@@ -368,8 +375,10 @@ public class SweepTests extends CanvasCompareActivityTest {
                 }
             }
         };
+        Log.d(TAG, "Starting test : " + getName());
         int index = 0;
         do {
+            Log.d(TAG, "Option at index : " + index);
             int calcIndex = Math.min(index, calculators.length - 1);
             executeCanvasTest(canvasClient, calculators[calcIndex]);
             index++;

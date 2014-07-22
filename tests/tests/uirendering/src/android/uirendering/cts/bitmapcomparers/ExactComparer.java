@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import com.android.cts.uirendering.R;
 import com.android.cts.uirendering.ScriptC_ExactComparer;
@@ -26,7 +26,7 @@ import android.util.Log;
 /**
  * This class does an exact comparison of the pixels in a bitmap.
  */
-public class ExactComparer extends BaseRenderScriptCalculator {
+public class ExactComparer extends BaseRenderScriptComparer {
     private static final String TAG = "ExactComparer";
     private ScriptC_ExactComparer mScript;
 

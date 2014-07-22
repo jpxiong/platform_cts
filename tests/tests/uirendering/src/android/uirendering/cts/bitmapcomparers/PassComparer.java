@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 /**
  * This class is purely for debug purposes. It will automatically pass any tests.
  */
-public class PassCalculator extends DifferenceCalculator {
+public class PassComparer extends BitmapComparer {
     @Override
     public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
             int height) {

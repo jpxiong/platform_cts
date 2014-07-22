@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package android.uirendering.cts;
+package android.uirendering.cts.testclasses;
 
 import com.android.cts.uirendering.R;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -26,14 +25,16 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.NinePatchDrawable;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.uirendering.cts.bitmapcomparers.BitmapComparer;
+import android.uirendering.cts.bitmapcomparers.MSSIMComparer;
 import android.uirendering.cts.bitmapverifiers.BitmapVerifier;
 import android.uirendering.cts.bitmapverifiers.PaddedColorRectVerifier;
-import android.uirendering.cts.differencecalculators.DifferenceCalculator;
-import android.uirendering.cts.differencecalculators.ExactComparer;
-import android.uirendering.cts.differencecalculators.MSSIMCalculator;
+import android.uirendering.cts.bitmapcomparers.ExactComparer;
+import android.uirendering.cts.testinfrastructure.ActivityTestBase;
+import android.uirendering.cts.testinfrastructure.CanvasClient;
 
-public class BasicExactTests extends CanvasCompareActivityTest {
-    private final DifferenceCalculator mExactComparer = new ExactComparer();
+public class ExactCanvasTests extends ActivityTestBase {
+    private final BitmapComparer mExactComparer = new ExactComparer();
 
     @SmallTest
     public void testBlueRect() {
@@ -77,8 +78,8 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             public void draw(Canvas canvas, int width, int height) {
                 Paint p = new Paint();
                 p.setColor(Color.RED);
-                canvas.drawRect(0, 0, CanvasCompareActivityTest.TEST_WIDTH,
-                        CanvasCompareActivityTest.TEST_HEIGHT, p);
+                canvas.drawRect(0, 0, ActivityTestBase.TEST_WIDTH,
+                        ActivityTestBase.TEST_HEIGHT, p);
                 p.setColor(Color.BLACK);
                 p.setStrokeWidth(10);
                 canvas.drawRect(10, 10, 20, 20, p);
@@ -95,8 +96,8 @@ public class BasicExactTests extends CanvasCompareActivityTest {
             public void draw(Canvas canvas, int width, int height) {
                 Paint p = new Paint();
                 p.setColor(Color.GREEN);
-                canvas.drawRect(0, 0, CanvasCompareActivityTest.TEST_WIDTH,
-                        CanvasCompareActivityTest.TEST_HEIGHT, p);
+                canvas.drawRect(0, 0, ActivityTestBase.TEST_WIDTH,
+                        ActivityTestBase.TEST_HEIGHT, p);
                 p.setColor(Color.BLACK);
                 p.setStrokeWidth(10);
                 canvas.drawLine(0, 0, 50, 0, p);
@@ -210,31 +211,5 @@ public class BasicExactTests extends CanvasCompareActivityTest {
                 new Rect(10, 10, 90, 90));
 
         executeTestBuilderTest(testCaseBuilder, verifier);
-    }
-
-    /**
-     * Ensure that both render paths are producing independent output. We do this
-     * by verifying that two paths that should render differently *do* render
-     * differently.
-     */
-    @SmallTest
-    public void testRenderSpecIsolation() {
-        CanvasClient canvasClient = new CanvasClient() {
-            @Override
-            public void draw(Canvas canvas, int width, int height) {
-                canvas.drawColor(canvas.isHardwareAccelerated() ? Color.WHITE : Color.BLACK);
-            }
-        };
-        // This is considered a very high threshold and as such, the test should still fail because
-        // they are completely different images.
-        final float threshold = 0.1f;
-        final MSSIMCalculator mssimCalculator = new MSSIMCalculator(threshold);
-        executeCanvasTest(canvasClient, new DifferenceCalculator() {
-            @Override
-            public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
-                    int height) {
-                return !mssimCalculator.verifySame(ideal, given, offset, stride, width, height);
-            }
-        });
     }
 }
