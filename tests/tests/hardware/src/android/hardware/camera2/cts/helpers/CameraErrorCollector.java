@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts.helpers;
 
 import android.graphics.Rect;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
@@ -450,6 +451,25 @@ public class CameraErrorCollector extends ErrorCollector {
 
         expectTrue("All values of this array are equal: " + array[0].toString(),
                 array[0].compareTo(array[array.length - 1]) != 0);
+    }
+
+    /**
+     * Check if the key value is not null and return the value.
+     *
+     * @param request The {@link CameraCharacteristics} to get the key from.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     *
+     * @return The value of the key.
+     */
+    public <T> T expectKeyValueNotNull(CameraCharacteristics characteristics,
+            CameraCharacteristics.Key<T> key) {
+
+        T value = characteristics.get(key);
+        if (value == null) {
+            addMessage("Key " + key.getName() + " shouldn't be null");
+        }
+
+        return value;
     }
 
     /**
