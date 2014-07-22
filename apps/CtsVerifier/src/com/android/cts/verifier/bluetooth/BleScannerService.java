@@ -16,10 +16,9 @@
 
 package com.android.cts.verifier.bluetooth;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import android.app.Service;
@@ -45,28 +44,44 @@ public class BleScannerService extends Service {
     public static final String TAG = "BleScannerService";
 
     public static final int COMMAND_PRIVACY_MAC = 0;
+    public static final int COMMAND_POWER_LEVEL = 1;
 
     public static final String BLE_PRIVACY_NEW_MAC_RECEIVE =
             "com.android.cts.verifier.bluetooth.BLE_PRIVACY_NEW_MAC_RECEIVE";
+    public static final String BLE_MAC_ADDRESS =
+            "com.android.cts.verifier.bluetooth.BLE_MAC_ADDRESS";
+    public static final String BLE_POWER_LEVEL =
+            "com.android.cts.verifier.bluetooth.BLE_POWER_LEVEL";
+
+    public static final String EXTRA_COMMAND =
+            "com.google.cts.verifier.bluetooth.EXTRA_COMMAND";
+    public static final String EXTRA_MAC_ADDRESS =
+            "com.google.cts.verifier.bluetooth.EXTRA_MAC_ADDRESS";
+    public static final String EXTRA_RSSI =
+            "com.google.cts.verifier.bluetooth.EXTRA_RSSI";
+    public static final String EXTRA_POWER_LEVEL =
+            "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL";
+    public static final String EXTRA_POWER_LEVEL_BIT =
+            "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL_BIT";
 
     private static final UUID SERVICE_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
-    private static final byte MANUFACTURER_GOOGLE = (byte)0x07;
+    private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mAdapter;
     private BluetoothLeScanner mScanner;
     private ScanCallback mCallback;
     private Handler mHandler;
-    private Set<String> mAddrDict;
+    private String mOldMac;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mCallback = new BLEScanCallback();
-        mAddrDict = new HashSet<String>();
         mHandler = new Handler();
+        mOldMac = null;
 
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mAdapter = mBluetoothManager.getAdapter();
@@ -77,16 +92,32 @@ public class BleScannerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mScanner != null) {
             List<ScanFilter> filters = new ArrayList<ScanFilter>();
-            filters.add(new ScanFilter.Builder()
-                .setManufacturerData(MANUFACTURER_GOOGLE, new byte[]{MANUFACTURER_GOOGLE, 0})
-                .setServiceData(new ParcelUuid(SERVICE_UUID),
-                        new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4})
-                .build());
+
+            int command = intent.getIntExtra(EXTRA_COMMAND, -1);
+            switch (command) {
+                case COMMAND_PRIVACY_MAC:
+                    filters.add(new ScanFilter.Builder()
+                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                            new byte[]{MANUFACTURER_TEST_ID, 0})
+                        .setServiceData(new ParcelUuid(SERVICE_UUID),
+                            BleAdvertiserService.PRIVACY_MAC_DATA)
+                        .build());
+                    break;
+                case COMMAND_POWER_LEVEL:
+                    filters.add(new ScanFilter.Builder()
+                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                            new byte[]{MANUFACTURER_TEST_ID, 0})
+                        .setServiceData(new ParcelUuid(SERVICE_UUID),
+                            BleAdvertiserService.POWER_LEVEL_DATA,
+                            BleAdvertiserService.POWER_LEVEL_MASK)
+                        .build());
+                    break;
+            }
             ScanSettings setting = new ScanSettings.Builder()
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL)
                 .build();
-            mAddrDict.clear();
+            mOldMac = null;
             mScanner.startScan(filters, setting, mCallback);
         }
         return START_NOT_STICKY;
@@ -111,21 +142,57 @@ public class BleScannerService extends Service {
         });
     }
 
+    private int getUuid(byte[] data) {
+        if (data.length < 2) {
+            return 0;
+        }
+        return ByteBuffer.wrap(new byte[] {0, 0, data[1], data[0]}).getInt();
+    }
+
     private class BLEScanCallback extends ScanCallback {
         @Override
         public void onScanResult(int callBackType, ScanResult result) {
             if (callBackType != ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
+                Log.e(TAG, "onScanResult fail. callBackType is not CALLBACK_TYPE_ALL_MATCHES");
                 return;
             }
-            mAddrDict.add(result.getDevice().getAddress());
 
-            // If a new MAC address received, dict size increases.
-            if (mAddrDict.size() > 1) {
-                sendBroadcast(new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE));
+            ScanRecord record = result.getScanRecord();
+            String mac = result.getDevice().getAddress();
+
+            // TODO(yichengfan): b/16373687
+            // First 2 bytes of service data will not be UUID.
+            // Need to change how to categorize service data.
+            switch (getUuid(record.getServiceData())) {
+                case BleAdvertiserService.PRIVACY_MAC_UUID:
+                    Intent privacyIntent = new Intent(BLE_MAC_ADDRESS);
+                    privacyIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
+                    sendBroadcast(privacyIntent);
+
+                    if (mOldMac == null) {
+                        mOldMac = mac;
+                    } else if (!mOldMac.equals(mac)) {
+                        mOldMac = mac;
+                        Intent newIntent = new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE);
+                        newIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
+                        sendBroadcast(newIntent);
+                    }
+                    break;
+
+                case BleAdvertiserService.POWER_LEVEL_UUID:
+                    byte[] data = record.getServiceData();
+                    if (data.length == 4) {
+                        Intent powerIntent = new Intent(BLE_POWER_LEVEL);
+                        powerIntent.putExtra(EXTRA_MAC_ADDRESS, result.getDevice().getAddress());
+                        powerIntent.putExtra(EXTRA_POWER_LEVEL, record.getTxPowerLevel());
+                        powerIntent.putExtra(EXTRA_RSSI, new Integer(result.getRssi()).toString());
+                        powerIntent.putExtra(EXTRA_POWER_LEVEL_BIT, (int)data[3]);
+                        sendBroadcast(powerIntent);
+                    }
+                    break;
             }
         }
 
-        @Override
         public void onScanFailed(int errorCode) {
             Log.e(TAG, "Scan fail. Error code: " + new Integer(errorCode).toString());
         }
