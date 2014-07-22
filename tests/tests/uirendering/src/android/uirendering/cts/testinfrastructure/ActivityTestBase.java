@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts;
+package android.uirendering.cts.testinfrastructure;
 
 import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
 import android.test.ActivityInstrumentationTestCase2;
+import android.uirendering.cts.bitmapcomparers.BitmapComparer;
 import android.uirendering.cts.bitmapverifiers.BitmapVerifier;
-import android.uirendering.cts.differencecalculators.DifferenceCalculator;
 import android.uirendering.cts.differencevisualizers.DifferenceVisualizer;
 import android.uirendering.cts.differencevisualizers.PassFailVisualizer;
 import android.uirendering.cts.util.BitmapDumper;
@@ -34,7 +34,7 @@ import java.util.List;
  * are several methods that help with the execution of tests, and should be extended to gain the
  * functionality built in.
  */
-public abstract class CanvasCompareActivityTest extends
+public abstract class ActivityTestBase extends
         ActivityInstrumentationTestCase2<DrawActivity> {
     public static final String TAG_NAME = "CtsUirendering";
     public static final boolean DEBUG = false;
@@ -53,7 +53,7 @@ public abstract class CanvasCompareActivityTest extends
      * The default constructor creates the package name and sets the DrawActivity as the class that
      * we would use.
      */
-    public CanvasCompareActivityTest() {
+    public ActivityTestBase() {
         super("android.graphicshardware.cts", DrawActivity.class);
         mDifferenceVisualizer = new PassFailVisualizer();
     }
@@ -102,7 +102,7 @@ public abstract class CanvasCompareActivityTest extends
      * another screenshot. From there it will compare the files and return the result given the
      * test.
      */
-    protected void executeLayoutTest(int layoutResID, DifferenceCalculator comparer) {
+    protected void executeLayoutTest(int layoutResID, BitmapComparer comparer) {
         Bitmap softwareCapture = captureRenderSpec(layoutResID, null, null, false);
         Bitmap hardwareCapture = captureRenderSpec(layoutResID, null, null, true);
         assertBitmapsAreSimilar(softwareCapture, hardwareCapture, comparer);
@@ -113,7 +113,7 @@ public abstract class CanvasCompareActivityTest extends
      * it to the execute method. If a failure occurs, png files will be saved with the software
      * screen cap, hardware screen cap, and difference map using the test name
      */
-    protected void executeCanvasTest(CanvasClient canvasClient, DifferenceCalculator comparer) {
+    protected void executeCanvasTest(CanvasClient canvasClient, BitmapComparer comparer) {
         Bitmap softwareCapture = captureRenderSpec(0, canvasClient, null, false);
         Bitmap hardwareCapture = captureRenderSpec(0, canvasClient, null, true);
         assertBitmapsAreSimilar(softwareCapture, hardwareCapture, comparer);
@@ -122,7 +122,7 @@ public abstract class CanvasCompareActivityTest extends
     /**
      * Executes a test that uses a URL to an HTML file and generates a WebView from it.
      */
-    protected void executeWebViewTest(String webViewUrl, DifferenceCalculator calculator) {
+    protected void executeWebViewTest(String webViewUrl, BitmapComparer calculator) {
         Bitmap softwareCapture = captureRenderSpec(0, null, webViewUrl, false);
         Bitmap hardwareCapture = captureRenderSpec(0, null, webViewUrl, true);
         assertBitmapsAreSimilar(softwareCapture, hardwareCapture, calculator);
@@ -165,7 +165,7 @@ public abstract class CanvasCompareActivityTest extends
      * the test name.
      */
     protected void assertBitmapsAreSimilar(Bitmap bitmap1, Bitmap bitmap2,
-            DifferenceCalculator comparer) {
+            BitmapComparer comparer) {
         boolean res;
 
         if (USE_RS && comparer.supportsRenderScript()) {

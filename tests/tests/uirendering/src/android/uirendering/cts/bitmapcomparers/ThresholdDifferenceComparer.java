@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import com.android.cts.uirendering.R;
-import com.android.cts.uirendering.ScriptC_ThresholdDifferenceCalculator;
+import com.android.cts.uirendering.ScriptC_ThresholdDifferenceComparer;
 
 import android.content.res.Resources;
 import android.graphics.Color;
-
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
+import android.uirendering.cts.bitmapcomparers.BaseRenderScriptComparer;
 import android.util.Log;
 
 /**
  * Compares two images to see if each pixel is the same, within a certain threshold value
  */
-public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
+public class ThresholdDifferenceComparer extends BaseRenderScriptComparer {
     private static final String TAG = "ThresholdDifference";
-    private ScriptC_ThresholdDifferenceCalculator mScript;
+    private ScriptC_ThresholdDifferenceComparer mScript;
     private int mThreshold;
 
     /**
@@ -38,7 +38,7 @@ public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
      *                  channels. If the sum of the errors amongst the channels is greater than some
      *                  threshold, then this test will fail.
      */
-    public ThresholdDifferenceCalculator(int threshold) {
+    public ThresholdDifferenceComparer(int threshold) {
         mThreshold = threshold;
     }
 
@@ -69,8 +69,8 @@ public class ThresholdDifferenceCalculator extends BaseRenderScriptCalculator {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_ThresholdDifferenceCalculator(renderScript, resources,
-                    R.raw.thresholddifferencecalculator);
+            mScript = new ScriptC_ThresholdDifferenceComparer(renderScript, resources,
+                    R.raw.thresholddifferencecomparer);
         }
 
         mScript.set_THRESHOLD(mThreshold);

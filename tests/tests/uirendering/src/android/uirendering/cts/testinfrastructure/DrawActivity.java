@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts;
+package android.uirendering.cts.testinfrastructure;
 
 import android.app.Activity;
 import android.content.Context;
@@ -81,8 +81,8 @@ public class DrawActivity extends Activity {
 
                 case CANVAS_MSG: {
                     mView = new CanvasClientView(getApplicationContext(),
-                            (CanvasClient) (message.obj), CanvasCompareActivityTest.TEST_WIDTH,
-                            CanvasCompareActivityTest.TEST_HEIGHT);
+                            (CanvasClient) (message.obj), ActivityTestBase.TEST_WIDTH,
+                            ActivityTestBase.TEST_HEIGHT);
                     setContentView(mView);
                 } break;
 

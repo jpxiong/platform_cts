@@ -13,7 +13,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package android.uirendering.cts;
+package android.uirendering.cts.testinfrastructure;
 
 import com.android.cts.uirendering.R;
 
@@ -56,8 +56,8 @@ public class ResourceModifier {
         int texWidth = bitmap.getWidth();
         int texHeight = bitmap.getHeight();
 
-        int drawWidth = CanvasCompareActivityTest.TEST_WIDTH;
-        int drawHeight = CanvasCompareActivityTest.TEST_HEIGHT;
+        int drawWidth = ActivityTestBase.TEST_WIDTH;
+        int drawHeight = ActivityTestBase.TEST_HEIGHT;
 
         repeatShader = new BitmapShader(bitmap, Shader.TileMode.REPEAT,
                 Shader.TileMode.REPEAT);

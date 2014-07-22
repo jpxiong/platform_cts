@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import android.graphics.Point;
 import android.util.Log;
@@ -21,12 +21,12 @@ import android.util.Log;
 /**
  * This class will test specific points, and ensure that they match up perfectly with the input colors
  */
-public class SamplePointsCalculator extends DifferenceCalculator {
+public class SamplePointsComparer extends BitmapComparer {
     private static final String TAG = "SamplePoints";
     private Point[] mTestPoints;
     private int[] mExpectedColors;
 
-    public SamplePointsCalculator(Point[] testPoints, int[] expectedColors) {
+    public SamplePointsComparer(Point[] testPoints, int[] expectedColors) {
         mTestPoints = testPoints;
         mExpectedColors = expectedColors;
     }
