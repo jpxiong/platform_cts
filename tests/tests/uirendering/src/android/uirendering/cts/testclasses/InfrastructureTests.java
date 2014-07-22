@@ -15,13 +15,22 @@
  */
 package android.uirendering.cts.testclasses;
 
+import com.android.cts.uirendering.R;
+
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.bitmapcomparers.BitmapComparer;
+import android.uirendering.cts.bitmapcomparers.ExactComparer;
 import android.uirendering.cts.bitmapcomparers.MSSIMComparer;
+import android.uirendering.cts.bitmapverifiers.RectVerifier;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 import android.uirendering.cts.testinfrastructure.CanvasClient;
+import android.uirendering.cts.testinfrastructure.ViewInitializer;
+import android.util.Log;
+import android.view.View;
 
 public class InfrastructureTests extends ActivityTestBase {
 
@@ -49,13 +58,30 @@ public class InfrastructureTests extends ActivityTestBase {
         // This is considered a very high threshold and as such, the test should still fail because
         // they are completely different images.
         final float threshold = 0.1f;
-        final MSSIMComparer mssimComparer = new MSSIMComparer(threshold);
-        executeCanvasTest(canvasClient, new BitmapComparer() {
+        BitmapComparer inverseComparer = new BitmapComparer() {
             @Override
             public boolean verifySame(int[] ideal, int[] given, int offset, int stride, int width,
                     int height) {
-                return !mssimComparer.verifySame(ideal, given, offset, stride, width, height);
+                return !(new MSSIMComparer(threshold)).verifySame(ideal, given, offset, stride,
+                        width, height);
             }
-        });
+        };
+        createTest()
+                .addCanvasClient(canvasClient)
+                .runWithComparer(inverseComparer);
+    }
+
+    @SmallTest
+    public void testViewInitializer() {
+        final Rect clipRect = new Rect(0, 0, 50, 50);
+        ViewInitializer viewInitializer = new ViewInitializer() {
+            @Override
+            public void intializeView(View view) {
+                view.setClipBounds(clipRect);
+            }
+        };
+        createTest()
+                .addLayout(R.layout.simple_red_layout, viewInitializer)
+                .runWithVerifier(new RectVerifier(Color.WHITE, Color.RED, clipRect));
     }
 }
