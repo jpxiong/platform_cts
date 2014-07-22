@@ -132,6 +132,7 @@
 
     <application android:label="Android TestCase"
                 android:icon="@drawable/size_48x48"
+                android:multiArch="true"
                 android:name="android.app.cts.MockApplication"
                 android:supportsRtl="true">
 
