@@ -235,12 +235,20 @@
     <string name="ble_privacy_mac_stop">Stop</string>
     <string name="ble_privacy_mac_name">BLE Privacy Mac</string>
     <string name="ble_privacy_mac_info">BLE Advertiser should advertise in non-repeating MAC address.</string>
+    <string name="ble_power_level_start">Start</string>
+    <string name="ble_power_level_stop">Stop</string>
+    <string name="ble_power_level_name">BLE Tx Power Level</string>
+    <string name="ble_power_level_info">BLE Advertiser advertises in 4 different power levels. Scanner should receive them in different strength of Rssi, cannot receive weak signals beyond several feet.</string>
 
     <!-- BLE scanner side strings -->
-    <string name="ble_scanner_name">BLE Scanner Test</string>
+    <string name="ble_scanner_test_name">BLE Scanner Test</string>
     <string name="ble_scanner_service_name">Bluetooth LE Scanner Handler Service</string>
-    <string name="ble_scanner_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
+    <string name="ble_scanner_test_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
     <string name="ble_scanner_privacy_mac">Hold for 15 min to see if receive a different MAC address from advertiser.</string>
+    <string name="ble_ultra_low">Ultra low</string>
+    <string name="ble_low">Low</string>
+    <string name="ble_medium">Medium</string>
+    <string name="ble_high">High</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>

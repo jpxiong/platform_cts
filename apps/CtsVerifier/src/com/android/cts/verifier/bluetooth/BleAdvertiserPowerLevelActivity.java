@@ -19,48 +19,43 @@ package com.android.cts.verifier.bluetooth;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class BlePrivacyMacActivity extends PassFailButtons.Activity {
+public class BleAdvertiserPowerLevelActivity extends PassFailButtons.Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ble_privacy_mac);
+        setContentView(R.layout.ble_advertiser_power_level);
         setPassFailButtonClickListeners();
-        setInfoResources(R.string.ble_privacy_mac_name,
-                         R.string.ble_privacy_mac_info, -1);
+        setInfoResources(R.string.ble_power_level_name,
+                         R.string.ble_power_level_info, -1);
 
-        ((Button) findViewById(R.id.ble_privacy_mac_start))
+        ((Button) findViewById(R.id.ble_power_level_start))
             .setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(BlePrivacyMacActivity.this,
+                    Intent intent = new Intent(BleAdvertiserPowerLevelActivity.this,
                                                BleAdvertiserService.class);
                     intent.putExtra(BleAdvertiserService.EXTRA_COMMAND,
-                                    BleAdvertiserService.COMMAND_START_ADVERTISE);
+                                    BleAdvertiserService.COMMAND_START_POWER_LEVEL);
                     startService(intent);
                 }
             });
-        ((Button) findViewById(R.id.ble_privacy_mac_stop))
+        ((Button) findViewById(R.id.ble_power_level_stop))
             .setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(BlePrivacyMacActivity.this,
-                                               BleAdvertiserService.class);
-                    intent.putExtra(BleAdvertiserService.EXTRA_COMMAND,
-                                    BleAdvertiserService.COMMAND_STOP_ADVERTISE);
-                    startService(intent);
+                    stopAdvertising();
                 }
             });
 
@@ -70,8 +65,8 @@ public class BlePrivacyMacActivity extends PassFailButtons.Activity {
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BleAdvertiserService.BLE_START_ADVERTISE);
-        filter.addAction(BleAdvertiserService.BLE_STOP_ADVERTISE);
+        filter.addAction(BleAdvertiserService.BLE_START_POWER_LEVEL);
+        filter.addAction(BleAdvertiserService.BLE_STOP_POWER_LEVEL);
         registerReceiver(onBroadcast, filter);
     }
 
@@ -79,6 +74,20 @@ public class BlePrivacyMacActivity extends PassFailButtons.Activity {
     public void onPause() {
         super.onPause();
         unregisterReceiver(onBroadcast);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopAdvertising();
+    }
+
+    private void stopAdvertising() {
+        Intent intent = new Intent(BleAdvertiserPowerLevelActivity.this,
+                                   BleAdvertiserService.class);
+        intent.putExtra(BleAdvertiserService.EXTRA_COMMAND,
+                        BleAdvertiserService.COMMAND_STOP_POWER_LEVEL);
+        startService(intent);
     }
 
     private void showMessage(String msg) {
@@ -89,10 +98,10 @@ public class BlePrivacyMacActivity extends PassFailButtons.Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case BleAdvertiserService.BLE_START_ADVERTISE:
-                    showMessage("Start advertising, please hold for 15 min");
+                case BleAdvertiserService.BLE_START_POWER_LEVEL:
+                    showMessage("Start advertising, please hold for a while.");
                     break;
-                case BleAdvertiserService.BLE_STOP_ADVERTISE:
+                case BleAdvertiserService.BLE_STOP_POWER_LEVEL:
                     showMessage("Stop advertising");
                     break;
             }
