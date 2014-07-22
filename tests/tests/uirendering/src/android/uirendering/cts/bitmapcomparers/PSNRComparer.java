@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import android.graphics.Color;
 import android.util.Log;
@@ -21,7 +21,7 @@ import android.util.Log;
 /**
  * Uses the Peak Signal-to-Noise Ratio approach to determine if two images are considered the same.
  */
-public class PSNRCalculator extends DifferenceCalculator {
+public class PSNRComparer extends BitmapComparer {
     private static final String TAG = "PSNR";
     private final float MAX = 255;
     private final int REGION_SIZE = 10;
@@ -32,7 +32,7 @@ public class PSNRCalculator extends DifferenceCalculator {
      * @param threshold the PSNR necessary to pass the test, if the calculated PSNR is below this
      *                  value, then the test will fail.
      */
-    public PSNRCalculator(float threshold) {
+    public PSNRComparer(float threshold) {
         mThreshold = threshold;
     }
 

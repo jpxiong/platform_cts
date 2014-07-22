@@ -1,4 +1,4 @@
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import android.content.res.Resources;
 import android.renderscript.Allocation;
@@ -8,7 +8,7 @@ import android.renderscript.RenderScript;
 /**
  * Base class for calculators that want to implement renderscript
  */
-public abstract class BaseRenderScriptCalculator extends DifferenceCalculator{
+public abstract class BaseRenderScriptComparer extends BitmapComparer {
     private Allocation mRowInputs;
     private Allocation mRowOutputs;
     private int mHeight;

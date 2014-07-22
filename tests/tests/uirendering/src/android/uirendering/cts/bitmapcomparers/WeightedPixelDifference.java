@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.uirendering.cts.differencecalculators;
+package android.uirendering.cts.bitmapcomparers;
 
 import android.graphics.Color;
 import android.util.Log;
@@ -23,7 +23,7 @@ import android.util.Log;
  * account the number of pixels that are non-white. Note only use this if the content background is
  * white.
  */
-public class WeightedPixelDifference extends DifferenceCalculator {
+public class WeightedPixelDifference extends BitmapComparer {
     private static final String TAG = "WeightedPixel";
     private static final int NUM_OF_COLUMNS = 10;
     private static final float TOTAL_ERROR_DIVISOR = 1024.0f;
