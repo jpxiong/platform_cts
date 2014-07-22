@@ -249,40 +249,40 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
-    public void testSetApplicationBlocked_failIfNotDeviceOrProfileOwner() {
+    public void testSetApplicationHidden_failIfNotDeviceOrProfileOwner() {
         if (!mDeviceAdmin) {
-            Log.w(TAG, "Skipping testSetApplicationBlocked_failIfNotDeviceOrProfileOwner");
+            Log.w(TAG, "Skipping testSetApplicationHidden_failIfNotDeviceOrProfileOwner");
             return;
         }
         try {
-            mDevicePolicyManager.setApplicationBlocked(mComponent, "com.google.anything", true);
+            mDevicePolicyManager.setApplicationHidden(mComponent, "com.google.anything", true);
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
         }
     }
 
-    public void testSetApplicationsBlocked_failIfNotDeviceOrProfileOwner() {
+    public void testSetApplicationsHidden_failIfNotDeviceOrProfileOwner() {
         if (!mDeviceAdmin) {
-            Log.w(TAG, "Skipping testSetApplicationsBlocked_failIfNotDeviceOrProfileOwner");
+            Log.w(TAG, "Skipping testSetApplicationsHidden_failIfNotDeviceOrProfileOwner");
             return;
         }
         try {
             Intent pdfViewIntent = new Intent(Intent.ACTION_VIEW).setType("application/pdf");
-            mDevicePolicyManager.setApplicationsBlocked(mComponent, pdfViewIntent, true);
+            mDevicePolicyManager.setApplicationsHidden(mComponent, pdfViewIntent, true);
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
         }
     }
 
-    public void testIsApplicationBlocked_failIfNotDeviceOrProfileOwner() {
+    public void testIsApplicationHidden_failIfNotDeviceOrProfileOwner() {
         if (!mDeviceAdmin) {
-            Log.w(TAG, "Skipping testIsApplicationBlocked_failIfNotDeviceOrProfileOwner");
+            Log.w(TAG, "Skipping testIsApplicationHidden_failIfNotDeviceOrProfileOwner");
             return;
         }
         try {
-            mDevicePolicyManager.isApplicationBlocked(mComponent, "com.google.anything");
+            mDevicePolicyManager.isApplicationHidden(mComponent, "com.google.anything");
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
