@@ -893,6 +893,66 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         jsResult.run();
     }
 
+    public void testJavascriptInterfaceForClientPopup() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        mOnUiThread.getSettings().setSupportMultipleWindows(true);
+
+        class DummyJavaScriptInterface {
+            @JavascriptInterface
+            public int test() {
+                return 42;
+            }
+        }
+        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+
+        final WebView childWebView = mOnUiThread.createWebView();
+        WebViewOnUiThread childOnUiThread = new WebViewOnUiThread(this, childWebView);
+        childOnUiThread.getSettings().setJavaScriptEnabled(true);
+        childOnUiThread.addJavascriptInterface(obj, "dummy");
+
+        final boolean[] hadOnCreateWindow = new boolean[1];
+        hadOnCreateWindow[0] = false;
+        mOnUiThread.setWebChromeClient(new WebViewOnUiThread.WaitForProgressClient(mOnUiThread) {
+            @Override
+            public boolean onCreateWindow(
+                WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                getActivity().addContentView(childWebView, new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.FILL_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(childWebView);
+                resultMsg.sendToTarget();
+                hadOnCreateWindow[0] = true;
+                return true;
+            }
+        });
+
+        startWebServer(false);
+        mOnUiThread.loadUrlAndWaitForCompletion(mWebServer.
+                getAssetUrl(TestHtmlConstants.POPUP_URL));
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return hadOnCreateWindow[0];
+            }
+        }.run();
+
+        childOnUiThread.loadUrlAndWaitForCompletion("about:blank");
+        EvaluateJsResultPollingCheck jsResult;
+        jsResult = new EvaluateJsResultPollingCheck("true");
+        childOnUiThread.evaluateJavascript("'dummy' in window", jsResult);
+        jsResult.run();
+        // Verify that the injected object is functional.
+        jsResult = new EvaluateJsResultPollingCheck("42");
+        childOnUiThread.evaluateJavascript("dummy.test()", jsResult);
+        jsResult.run();
+    }
+
     private final class TestPictureListener implements PictureListener {
         public int callCount;
 
