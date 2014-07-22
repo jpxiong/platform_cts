@@ -105,59 +105,47 @@ class CtsBuilder(object):
 
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
-    # Temporarily exclude jdwp tests until framework to run them is available.
-    # b/15860343
-    plan.Exclude('android\.jdwp.*')
     self.__WritePlan(plan, 'CTS')
     self.__WritePlan(plan, 'CTS-TF')
 
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
-    plan.Exclude('android\.jdwp.*')
     plan.Exclude('android\.media\.cts\.StreamingMediaPlayerTest.*')
     # Test plan to not include media streaming tests
     self.__WritePlan(plan, 'CTS-No-Media-Stream')
 
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
-    plan.Exclude('android\.jdwp.*')
     self.__WritePlan(plan, 'SDK')
 
     plan.Exclude(r'android\.tests\.sigtest')
-    plan.Exclude('android\.jdwp.*')
     plan.Exclude(r'android\.core.*')
     self.__WritePlan(plan, 'Android')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.core\.tests.*')
     plan.Exclude(r'android\.core\.tests\.libcore.\package.\harmony*')
     self.__WritePlan(plan, 'Java')
 
     # TODO: remove this once the tests are fixed and merged into Java plan above.
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.core\.tests\.libcore.\package.\harmony*')
     self.__WritePlan(plan, 'Harmony')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.core\.vm-tests-tf')
     self.__WritePlan(plan, 'VM-TF')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.tests\.sigtest')
     self.__WritePlan(plan, 'Signature')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.tests\.appsecurity')
     self.__WritePlan(plan, 'AppSecurity')
 
     # hard-coded white list for PDK plan
     plan.Exclude('.*')
-    plan.Exclude('android\.jdwp.*')
     plan.Include('android\.aadb')
     plan.Include('android\.bluetooth')
     plan.Include('android\.graphics.*')
@@ -176,7 +164,6 @@ class CtsBuilder(object):
 
     # CTS Stable plan
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.jdwp.*')
     plan.Exclude(r'android\.display')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
@@ -185,7 +172,6 @@ class CtsBuilder(object):
     # CTS Flaky plan - inversion of CTS Stable
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
-    plan.Exclude('android\.jdwp.*')
     plan.Include(r'android\.display')
     for package, test_list in flaky_tests.iteritems():
       plan.Include(package)
