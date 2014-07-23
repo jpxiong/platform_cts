@@ -229,7 +229,9 @@ public class CoreMathVerifier {
                                           new Floaty(point2[i], ulpFactor, ulpRelaxedFactor));
             sum.add(Floaty.multiply(diff, diff));
         }
-        return Floaty.sqrt(sum);
+        Floaty d = Floaty.sqrt(sum);
+        d.setMinimumError(ulpFactor, ulpRelaxedFactor);
+        return d;
     }
 
     // Returns the length of the n-dimensional vector.
@@ -239,7 +241,9 @@ public class CoreMathVerifier {
             Floaty f = new Floaty(array[i], ulpFactor, ulpRelaxedFactor);
             sum.add(Floaty.multiply(f, f));
         }
-        return Floaty.sqrt(sum);
+        Floaty l = Floaty.sqrt(sum);
+        l.setMinimumError(ulpFactor, ulpRelaxedFactor);
+        return l;
     }
 
     // Normalizes the n-dimensional vector, i.e. makes it length 1.
@@ -255,7 +259,8 @@ public class CoreMathVerifier {
     }
 
     // Computes the cross product of two 3D vectors.
-    static private void cross(float[] v1, float[] v2, Floaty[] out) {
+    static private void cross(float[] v1, float[] v2, Floaty[] out, int ulpFactor,
+                              int ulpRelaxedFactor) {
         Floaty a12 = Floaty.multiply(new Floaty(v1[1]), new Floaty(v2[2]));
         Floaty a21 = Floaty.multiply(new Floaty(v1[2]), new Floaty(v2[1]));
         out[0] = Floaty.subtract(a12, a21);
@@ -267,6 +272,14 @@ public class CoreMathVerifier {
         out[2] = Floaty.subtract(a01, a10);
         if (out.length == 4) {
             out[3] = new Floaty(0f);
+        }
+        setMinimumError(out, ulpFactor, ulpRelaxedFactor);
+    }
+
+    // Set a minimum error for every entry of out.
+    static void setMinimumError(Floaty[] out, int ulpFactor, int ulpRelaxedFactor) {
+        for (int i = 0; i < out.length; i++) {
+            out[i].setMinimumError(ulpFactor, ulpRelaxedFactor);
         }
     }
 
@@ -722,11 +735,14 @@ public class CoreMathVerifier {
     }
 
     static public void computeCospi(TestCospi.ArgumentsFloatFloat args) {
-        args.out = new Floaty(cos(args.in * (float) Math.PI), 4, 128);
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.cos(ip.getDoubleMin()),
+            (float) Math.cos(ip.getDoubleMax()), 4, 128);
     }
 
     static public void computeCross(TestCross.ArgumentsFloatNFloatNFloatN args) {
-        cross(args.inLhs, args.inRhs, args.out);
+        cross(args.inLhs, args.inRhs, args.out, 1, 4);
     }
 
     static public void computeDegrees(TestDegrees.ArgumentsFloatFloat args) {
@@ -743,6 +759,7 @@ public class CoreMathVerifier {
 
     static public void computeDot(TestDot.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(args.inLhs * args.inRhs);
+        args.out.setMinimumError(1, 4);
     }
 
     static public void computeDot(TestDot.ArgumentsFloatNFloatNFloat args) {
@@ -753,6 +770,7 @@ public class CoreMathVerifier {
             sum.add(Floaty.multiply(a, b));
         }
         args.out = sum;
+        args.out.setMinimumError(1, 4);
     }
 
     static public void computeErf(TestErf.ArgumentsFloatFloat args) {
@@ -813,7 +831,7 @@ public class CoreMathVerifier {
     }
 
     static public void computeFdim(TestFdim.ArgumentsFloatFloatFloat args) {
-        args.out = new Floaty(Math.max(0f, args.inA - args.inB), 0, 0);
+        args.out = new Floaty(Math.max(0f, args.inA - args.inB), 0, 1);
     }
 
     static public void computeFloor(TestFloor.ArgumentsFloatFloat args) {
@@ -926,6 +944,7 @@ public class CoreMathVerifier {
 
     static public void computeMad(TestMad.ArgumentsFloatFloatFloatFloat args) {
         args.out = Floaty.add(new Floaty(args.inA * args.inB), new Floaty(args.inC));
+        args.out.setMinimumError(1, 4);
     }
 
     static public void computeMax(TestMax.ArgumentsCharCharChar args) {
@@ -1005,6 +1024,7 @@ public class CoreMathVerifier {
         Floaty stop = new Floaty(args.inStop);
         Floaty diff = Floaty.subtract(stop, start);
         args.out = Floaty.add(start, Floaty.multiply(diff, new Floaty(args.inAmount)));
+        args.out.setMinimumError(1, 4);
     }
 
     static public void computeModf(TestModf.ArgumentsFloatFloatFloat args) {
@@ -1168,7 +1188,10 @@ public class CoreMathVerifier {
     }
 
     static public void computeSinpi(TestSinpi.ArgumentsFloatFloat args) {
-        args.out = new Floaty(sin(args.in * (float) Math.PI), 4, 128);
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.sin(ip.getDoubleMin()),
+            (float) Math.sin(ip.getDoubleMax()), 4, 128);
     }
 
     static public void computeSqrt(TestSqrt.ArgumentsFloatFloat args) {
@@ -1188,7 +1211,10 @@ public class CoreMathVerifier {
     }
 
     static public void computeTanpi(TestTanpi.ArgumentsFloatFloat args) {
-        args.out = new Floaty(tan(args.in * (float) Math.PI), 6, 128);
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.tan(ip.getDoubleMin()),
+            (float) Math.tan(ip.getDoubleMax()), 4, 128);
     }
 
     static public void computeTgamma(TestTgamma.ArgumentsFloatFloat args) {
