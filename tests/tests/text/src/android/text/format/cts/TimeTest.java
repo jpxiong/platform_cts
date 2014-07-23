@@ -825,11 +825,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%x", "1 June 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%Z", "BST");
+        assertFormatEquals(t, "%Z", "BST");
         assertFormatEquals(t, "%z", "+0100");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%+", "Wed Jun  1 12:30:15 BST 2005");
         assertFormatEquals(t, "%%", "%");
 
         // Modifiers
@@ -837,12 +835,11 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%EC", "20");
         assertFormatEquals(t, "%OC", "20");
 
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%_+", "Wed Jun  1 12:30:15 BST 2005");
-        // assertFormatEquals(t, "%-+", "Wed Jun  1 12:30:15 BST 2005");
-        // assertFormatEquals(t, "%0+", "Wed Jun  1 12:30:15 BST 2005");
-        // assertFormatEquals(t, "%^+", "Wed Jun  1 12:30:15 BST 2005");
-        // assertFormatEquals(t, "%#+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%_+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%-+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%0+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%^+", "Wed Jun  1 12:30:15 BST 2005");
+        assertFormatEquals(t, "%#+", "Wed Jun  1 12:30:15 BST 2005");
 
         assertFormatEquals(t, "%_A", "Wednesday");
         assertFormatEquals(t, "%-A", "Wednesday");
@@ -920,11 +917,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%x", "1 June 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%Z", "EDT");
+        assertFormatEquals(t, "%Z", "EDT");
         assertFormatEquals(t, "%z", "-0400");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%+", "Wed Jun  1 12:30:15 EDT 2005");
         assertFormatEquals(t, "%%", "%");
 
         // Modifiers
@@ -932,12 +927,11 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%EC", "20");
         assertFormatEquals(t, "%OC", "20");
 
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%_+", "Wed Jun  1 12:30:15 EDT 2005");
-        // assertFormatEquals(t, "%-+", "Wed Jun  1 12:30:15 EDT 2005");
-        // assertFormatEquals(t, "%0+", "Wed Jun  1 12:30:15 EDT 2005");
-        // assertFormatEquals(t, "%^+", "Wed Jun  1 12:30:15 EDT 2005");
-        // assertFormatEquals(t, "%#+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%_+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%-+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%0+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%^+", "Wed Jun  1 12:30:15 EDT 2005");
+        assertFormatEquals(t, "%#+", "Wed Jun  1 12:30:15 EDT 2005");
 
         assertFormatEquals(t, "%_A", "Wednesday");
         assertFormatEquals(t, "%-A", "Wednesday");
@@ -1015,11 +1009,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%x", "1 juin 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%Z", "GMT+01:00");
+        assertFormatEquals(t, "%Z", "GMT+01:00");
         assertFormatEquals(t, "%z", "+0200");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%+", "mer. juin  1 12:30:15 GMT+01:00 2005");
         assertFormatEquals(t, "%%", "%");
 
         // Modifiers
@@ -1027,12 +1019,11 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%EC", "20");
         assertFormatEquals(t, "%OC", "20");
 
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%_+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        // assertFormatEquals(t, "%-+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        // assertFormatEquals(t, "%0+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        // assertFormatEquals(t, "%^+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        // assertFormatEquals(t, "%#+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%_+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%-+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%0+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%^+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%#+", "mer. juin  1 12:30:15 GMT+01:00 2005");
 
         assertFormatEquals(t, "%_A", "mercredi");
         assertFormatEquals(t, "%-A", "mercredi");
@@ -1109,11 +1100,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%x", "1 6月 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%Z", "JST");
+        assertFormatEquals(t, "%Z", "JST");
         assertFormatEquals(t, "%z", "+0900");
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%+", "水 6月  1 12:30:15 JST 2005");
         assertFormatEquals(t, "%%", "%");
 
         // Modifiers
@@ -1121,12 +1110,11 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%EC", "20");
         assertFormatEquals(t, "%OC", "20");
 
-        // This crashes in the original C implementation.
-        // assertFormatEquals(t, "%_+", "水 6月  1 12:30:15 JST 2005");
-        // assertFormatEquals(t, "%-+", "水 6月  1 12:30:15 JST 2005");
-        // assertFormatEquals(t, "%0+", "水 6月  1 12:30:15 JST 2005");
-        // assertFormatEquals(t, "%^+", "水 6月  1 12:30:15 JST 2005");
-        // assertFormatEquals(t, "%#+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%_+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%-+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%0+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%^+", "水 6月  1 12:30:15 JST 2005");
+        assertFormatEquals(t, "%#+", "水 6月  1 12:30:15 JST 2005");
 
         assertFormatEquals(t, "%_A", "水曜日");
         assertFormatEquals(t, "%-A", "水曜日");
@@ -1150,11 +1138,12 @@ public class TimeTest extends AndroidTestCase {
     public void testFormat2445() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         Fields.setDateTime(t, 2005, 5, 1, 12, 30, 15);
-        // Behavior does not follow the docs, which state it should be the same as
-        // format("%Y%m%dT%H%M%S"). For UTC that is not the case.
-        String expected = t.format("%Y%m%dT%H%M%S") + "Z";
+
+        // UTC behavior is to add a trailing Z.
+        String expected = t.format("%Y%m%dT%H%M%SZ");
         assertEquals(expected, t.format2445());
 
+        // Only UTC includes the Z.
         t.timezone = "America/Los_Angeles";
         expected = t.format("%Y%m%dT%H%M%S");
         assertEquals(expected, t.format2445());
