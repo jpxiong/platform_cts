@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class AccountManagerTest extends AndroidTestCase {
 
     public static final String ACCOUNT_NAME = "android.accounts.cts.account.name";
+    public static final String ACCOUNT_NEW_NAME = "android.accounts.cts.account.name.rename";
     public static final String ACCOUNT_NAME_OTHER = "android.accounts.cts.account.name.other";
 
     public static final String ACCOUNT_TYPE = "android.accounts.cts.account.type";
@@ -194,6 +195,16 @@ public class AccountManagerTest extends AndroidTestCase {
         assertNotNull(resultBundle);
 
         return resultBundle;
+    }
+
+    private Account renameAccount(AccountManager am, Account account, String newName)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        AccountManagerFuture<Account> futureAccount = am.renameAccount(
+                account, newName, null /* callback */, null /* handler */);
+        Account renamedAccount = futureAccount.getResult();
+        assertTrue(futureAccount.isDone());
+        assertNotNull(renamedAccount);
+        return renamedAccount;
     }
 
     private boolean removeAccount(AccountManager am, Account account,
@@ -345,35 +356,78 @@ public class AccountManagerTest extends AndroidTestCase {
     }
 
     /**
-     * Test addAccountExplicitly() and removeAccount()
+     * Test addAccountExplicitly(), renameAccount() and removeAccount().
      */
     public void testAddAccountExplicitlyAndRemoveAccount() throws IOException,
             AuthenticatorException, OperationCanceledException {
 
-        final int accountsCount = getAccountsCount();
+        final int expectedAccountsCount = getAccountsCount();
 
         addAccountExplicitly(ACCOUNT, ACCOUNT_PASSWORD, null /* userData */);
 
         // Assert that we have one more account
         Account[] accounts = am.getAccounts();
         assertNotNull(accounts);
-        assertEquals(1 + accountsCount, accounts.length);
+        assertEquals(1 + expectedAccountsCount, accounts.length);
         assertTrue(isAccountPresent(am.getAccounts(), ACCOUNT));
-
         // Need to clean up
         assertTrue(removeAccount(am, ACCOUNT, null /* callback */));
 
         // and verify that we go back to the initial state
         accounts = am.getAccounts();
         assertNotNull(accounts);
-        assertEquals(accountsCount, accounts.length);
+        assertEquals(expectedAccountsCount, accounts.length);
+    }
+
+    /**
+     * Test setUserData() and getUserData().
+     */
+    public void testAccountRenameAndGetPreviousName()
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        // Add a first account
+        boolean result = am.addAccountExplicitly(ACCOUNT,
+                                ACCOUNT_PASSWORD,
+                                USERDATA_BUNDLE);
+        assertTrue(result);
+
+        // Prior to a renmae, the previous name should be null.
+        String nullName = am.getPreviousName(ACCOUNT);
+        assertNull(nullName);
+
+        final int expectedAccountsCount = getAccountsCount();
+
+        Account renamedAccount = renameAccount(am, ACCOUNT, ACCOUNT_NEW_NAME);
+
+        /*
+         *  Make sure that the resultant renamed account has the correct name
+         *  and is associated with the correct account type.
+         */
+        assertEquals(ACCOUNT_NEW_NAME, renamedAccount.name);
+        assertEquals(ACCOUNT.type, renamedAccount.type);
+
+        // Make sure the total number of accounts is the same.
+        Account[] accounts = am.getAccounts();
+        assertEquals(expectedAccountsCount, accounts.length);
+
+        // Make sure the old account isn't present.
+        assertFalse(isAccountPresent(am.getAccounts(), ACCOUNT));
+
+        // But that the new one is.
+        assertTrue(isAccountPresent(am.getAccounts(), renamedAccount));
+
+        // Check that the UserData is still present.
+        assertEquals(USERDATA_VALUE_1, am.getUserData(renamedAccount, USERDATA_NAME_1));
+
+        assertEquals(ACCOUNT.name, am.getPreviousName(renamedAccount));
+
+       // Need to clean up
+        assertTrue(removeAccount(am, renamedAccount, null /* callback */));
     }
 
     /**
      * Test getAccounts() and getAccountsByType()
      */
-    public void testGetAccountsAndGetAccountsByType() throws IOException, AuthenticatorException,
-            OperationCanceledException {
+    public void testGetAccountsAndGetAccountsByType() {
 
         assertEquals(false, isAccountPresent(am.getAccounts(), ACCOUNT));
         assertEquals(false, isAccountPresent(am.getAccounts(), ACCOUNT_SAME_TYPE));
