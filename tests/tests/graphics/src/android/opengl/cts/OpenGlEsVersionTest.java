@@ -103,16 +103,33 @@ public class OpenGlEsVersionTest
     }
 
     public void testExtensionPack() throws InterruptedException {
+        // Requirements:
+        // 1. If the device claims support for the system feature, the extension must be available.
+        // 2. If the extension is available, it must be correct:
+        //    - ES 3.1 must be supported
+        //    - All included extensions must be available
+        //
+        // Supporting the extension but not claiming support for the system feature is allowed,
+        // just like the ES context version can be higher than the ro.opengles.version property.
+
         int reportedVersion = getVersionFromActivityManager(mActivity);
-        // We only have the extension pack on ES3.1
-        if (getMajorVersion(reportedVersion) != 3 || getMinorVersion(reportedVersion) != 1)
+        boolean hasAepFeature = mActivity.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_OPENGLES_EXTENSION_PACK);
+
+        if (getMajorVersion(reportedVersion) != 3 || getMinorVersion(reportedVersion) != 1) {
+            assertFalse("FEATURE_OPENGLES_EXTENSION_PACK is available without OpenGL ES 3.1",
+                    hasAepFeature);
             return;
+        }
 
         restartActivityWithClientVersion(3);
 
         String extensions = mActivity.getExtensionsString();
-        if (!hasExtension(extensions, "ANDROID_extension_pack_es31a"))
+        if (!hasExtension(extensions, "ANDROID_extension_pack_es31a")) {
+            assertFalse("FEATURE_OPENGLES_EXTENSION_PACK is available but ANDROID_extension_pack_es31a isn't in the extension list",
+                    hasAepFeature);
             return;
+        }
 
         assertTrue("ANDROID_extension_pack_es31a is present, but support is incomplete",
                 mActivity.getAepEs31Support());
