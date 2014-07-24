@@ -1065,6 +1065,29 @@ public class CoreMathVerifier {
         args.out = new Floaty(log2(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
     }
 
+    static public void computeNativeLength(TestNativeLength.ArgumentsFloatFloat args) {
+        args.out = length(new float[] {args.inV}, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeLength(TestNativeLength.ArgumentsFloatNFloat args) {
+        args.out = length(args.inV, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeNormalize(TestNativeNormalize.ArgumentsFloatFloat args) {
+        Floaty[] out = new Floaty[1];
+        normalize(new float[] {args.inV}, out, NATIVE_PRECISION, NATIVE_PRECISION);
+        args.out = out[0];
+    }
+
+    static public void computeNativeNormalize(TestNativeNormalize.ArgumentsFloatNFloatN args) {
+        normalize(args.inV, args.out, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeRecip(TestNativeRecip.ArgumentsFloatFloat args) {
+        args.out = new Floaty(1.0f / args.inV, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+
     /* TODO enable once fixed handling of v = 0
     static public void computeNativePowr(TestNativePowr.ArgumentsFloatFloatFloat args) {
         // TODO we would like to use NATIVE_PRECISION, NATIVE_PRECISION
