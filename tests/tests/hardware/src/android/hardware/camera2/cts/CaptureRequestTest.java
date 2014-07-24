@@ -376,8 +376,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                if (!mStaticInfo.getCharacteristics().getKeys().
+                        contains(CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES)) {
+                    Log.i(TAG, "Camera " + id + " doesn't support EDGE_MODE controls.");
                     continue;
                 }
 
@@ -395,9 +396,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported() || !mStaticInfo.hasFocuser()) {
-                    Log.i(TAG, "Camera " + id
-                            + "Doesn't support per frame control or has no focuser");
+                if (!mStaticInfo.hasFocuser()) {
+                    Log.i(TAG, "Camera " + id + " has no focuser");
                     continue;
                 }
 
@@ -412,8 +412,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                if (!mStaticInfo.getCharacteristics().getKeys().contains(
+                        CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES)) {
+                    Log.i(TAG, "Camera " + id + " doesn't support noise reduction mode");
                     continue;
                 }
 
@@ -470,8 +471,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                List<Key<?>> keys = mStaticInfo.getCharacteristics().getKeys();
+                if (!(keys.contains(
+                        CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES) ||
+                        keys.contains(
+                                CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION))) {
+                    Log.i(TAG, "Camera " + id + " doesn't support any stabilization modes");
                     continue;
                 }
 
@@ -571,6 +576,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE, mode);
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             verifyCaptureResultForKey(CaptureResult.NOISE_REDUCTION_MODE, mode,
                     resultListener, NUM_FRAMES_VERIFIED);
@@ -601,6 +607,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             request = requestBuilder.build();
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(request, resultListener, mHandler);
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             resultDistances[i] = verifyFocusDistanceControl(testDistances[i], request,
                     resultListener);
             if (VERBOSE) {
@@ -613,33 +620,39 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         mCollector.checkArrayMonotonicityAndNotAllEqual(CameraTestUtils.toObject(resultDistances),
                 /*ascendingOrder*/true);
 
-        // Test hyperfocal distance optionally
-        float hyperFocalDistance = mStaticInfo.getHyperfocalDistanceChecked();
-        if (hyperFocalDistance > 0) {
-            requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, hyperFocalDistance);
-            request = requestBuilder.build();
-            resultListener = new SimpleCaptureListener();
-            mCamera.setRepeatingRequest(request, resultListener, mHandler);
+        if (mStaticInfo.getCharacteristics().getKeys().
+                contains(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE)) {
 
-            // Then wait for the lens.state to be stationary.
-            waitForResultValue(resultListener, CaptureResult.LENS_STATE,
-                    CaptureResult.LENS_STATE_STATIONARY, NUM_RESULTS_WAIT_TIMEOUT);
-            // Need get reasonably accurate value.
-            CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-            Float focusDistance = getValueNotNull(result, CaptureResult.LENS_FOCUS_DISTANCE);
-            float errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_UNCALIBRATED;
-            int calibrationStatus = mStaticInfo.getFocusDistanceCalibrationChecked();
-            if (calibrationStatus ==
-                    CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED) {
-                errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_CALIBRATED;
-            } else if (calibrationStatus ==
-                    CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_APPROXIMATE) {
-                errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_APPROXIMATE;
+            // Test hyperfocal distance optionally
+            float hyperFocalDistance = mStaticInfo.getHyperfocalDistanceChecked();
+            if (hyperFocalDistance > 0) {
+                requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, hyperFocalDistance);
+                request = requestBuilder.build();
+                resultListener = new SimpleCaptureListener();
+                mCamera.setRepeatingRequest(request, resultListener, mHandler);
+                waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
+                // Then wait for the lens.state to be stationary.
+                waitForResultValue(resultListener, CaptureResult.LENS_STATE,
+                        CaptureResult.LENS_STATE_STATIONARY, NUM_RESULTS_WAIT_TIMEOUT);
+                // Need get reasonably accurate value.
+                CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                Float focusDistance = getValueNotNull(result, CaptureResult.LENS_FOCUS_DISTANCE);
+                float errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_UNCALIBRATED;
+                int calibrationStatus = mStaticInfo.getFocusDistanceCalibrationChecked();
+                if (calibrationStatus ==
+                        CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED) {
+                    errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_CALIBRATED;
+                } else if (calibrationStatus ==
+                        CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_APPROXIMATE) {
+                    errorMargin = FOCUS_DISTANCE_ERROR_PERCENT_APPROXIMATE;
+                }
+                mCollector.expectInRange("Focus distance for hyper focal should be close enough to" +
+                                "requested value", focusDistance,
+                        hyperFocalDistance * (1.0f - errorMargin),
+                        hyperFocalDistance * (1.0f + errorMargin)
+                );
             }
-            mCollector.expectInRange("Focus distance for hyper focal should be close enough to" +
-                    "requested value", focusDistance,
-                    hyperFocalDistance * (1.0f - errorMargin),
-                    hyperFocalDistance * (1.0f + errorMargin));
         }
     }
 
@@ -690,6 +703,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.EDGE_MODE, mode);
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             verifyCaptureResultForKey(CaptureResult.EDGE_MODE, mode, resultListener,
                     NUM_FRAMES_VERIFIED);
@@ -1546,8 +1560,15 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void stabilizationTestByCamera() throws Exception {
         // video stabilization test.
-        int[] videoStabModes = mStaticInfo.getAvailableVideoStabilizationModesChecked();
-        int[] opticalStabModes = mStaticInfo.getAvailableOpticalStabilizationChecked();
+        List<Key<?>> keys = mStaticInfo.getCharacteristics().getKeys();
+
+        int[] videoStabModes = (keys.contains(CameraCharacteristics.
+                CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES)) ?
+                mStaticInfo.getAvailableVideoStabilizationModesChecked() : new int[0];
+        int[] opticalStabModes = (keys.contains(
+                CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)) ?
+                mStaticInfo.getAvailableOpticalStabilizationChecked() : new int[0];
+
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -1558,6 +1579,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             listener = new SimpleCaptureListener();
             requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             verifyCaptureResultForKey(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE, mode,
                     listener, NUM_FRAMES_VERIFIED);
         }
@@ -1566,6 +1588,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             listener = new SimpleCaptureListener();
             requestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, mode);
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             verifyCaptureResultForKey(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE, mode,
                     listener, NUM_FRAMES_VERIFIED);
         }
