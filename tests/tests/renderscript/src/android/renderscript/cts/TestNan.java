@@ -70,7 +70,7 @@ public class TestNan extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeNan(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;

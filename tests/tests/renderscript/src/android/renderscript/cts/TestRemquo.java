@@ -84,7 +84,7 @@ public class TestRemquo extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeRemquo(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outD != arrayOutD[i * 1 + j] && args.out.isNaN()) {
                     valid = false;
@@ -171,7 +171,7 @@ public class TestRemquo extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeRemquo(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outD != arrayOutD[i * 2 + j] && args.out.isNaN()) {
                     valid = false;
@@ -258,7 +258,7 @@ public class TestRemquo extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeRemquo(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
                     valid = false;
@@ -345,7 +345,7 @@ public class TestRemquo extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeRemquo(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
                     valid = false;

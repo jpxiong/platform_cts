@@ -1038,6 +1038,84 @@ public class CoreMathVerifier {
         args.out = new Floaty(Float.NaN, 0, 0);
     }
 
+    static public void computeNativeAcos(TestNativeAcos.ArgumentsFloatFloat args) {
+        args.out = new Floaty(acos(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAcosh(TestNativeAcosh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(acosh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAcospi(TestNativeAcospi.ArgumentsFloatFloat args) {
+        args.out = new Floaty(acos(args.inV) / (float) Math.PI, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAsin(TestNativeAsin.ArgumentsFloatFloat args) {
+        args.out = new Floaty(asin(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAsinh(TestNativeAsinh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(asinh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAsinpi(TestNativeAsinpi.ArgumentsFloatFloat args) {
+        args.out = new Floaty(asin(args.inV) / (float) Math.PI, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAtan(TestNativeAtan.ArgumentsFloatFloat args) {
+        args.out = new Floaty(atan(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAtanh(TestNativeAtanh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(atanh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAtanpi(TestNativeAtanpi.ArgumentsFloatFloat args) {
+        args.out = new Floaty(atan(args.inV) / (float) Math.PI, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAtan2(TestNativeAtan2.ArgumentsFloatFloatFloat args) {
+        args.out = new Floaty(atan2(args.inY, args.inX), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeAtan2pi(TestNativeAtan2pi.ArgumentsFloatFloatFloat args) {
+        args.out = new Floaty(atan2(args.inY, args.inX) / (float)Math.PI, NATIVE_PRECISION,
+                              NATIVE_PRECISION);
+    }
+
+    static public void computeNativeCbrt(TestNativeCbrt.ArgumentsFloatFloat args) {
+        args.out = new Floaty(cbrt(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeCos(TestNativeCos.ArgumentsFloatFloat args) {
+        args.out = new Floaty(cos(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeCosh(TestNativeCosh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(cosh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeCospi(TestNativeCospi.ArgumentsFloatFloat args) {
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.cos(ip.getDoubleMin()),
+            (float) Math.cos(ip.getDoubleMax()), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeDistance(TestNativeDistance.ArgumentsFloatFloatFloat args) {
+        args.out = distance(new float[]{args.inLhs}, new float[]{args.inRhs}, NATIVE_PRECISION,
+                            NATIVE_PRECISION);
+    }
+
+    static public void computeNativeDistance(TestNativeDistance.ArgumentsFloatNFloatNFloat args) {
+        args.out = distance(args.inLhs, args.inRhs, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeDivide(TestNativeDivide.ArgumentsFloatFloatFloat args) {
+        args.out = Floaty.divide(new Floaty(args.inLhs), new Floaty(args.inRhs));
+        args.out.setMinimumError(NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
     static public void computeNativeExp(TestNativeExp.ArgumentsFloatFloat args) {
         // TODO we would like to use NATIVE_PRECISION, NATIVE_PRECISION
         args.out = new Floaty(exp(args.inV), 9500, 9500);
@@ -1053,12 +1131,24 @@ public class CoreMathVerifier {
         args.out = new Floaty(exp2(args.inV), 13000, 13000);
     }
 
+    static public void computeNativeExpm1(TestNativeExpm1.ArgumentsFloatFloat args) {
+        args.out = new Floaty(expm1(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeHypot(TestNativeHypot.ArgumentsFloatFloatFloat args) {
+        args.out = new Floaty(hypot(args.inX, args.inY), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
     static public void computeNativeLog(TestNativeLog.ArgumentsFloatFloat args) {
         args.out = new Floaty(log(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
     }
 
     static public void computeNativeLog10(TestNativeLog10.ArgumentsFloatFloat args) {
         args.out = new Floaty(log10(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeLog1p(TestNativeLog1p.ArgumentsFloatFloat args) {
+        args.out = new Floaty(log1p(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
     }
 
     static public void computeNativeLog2(TestNativeLog2.ArgumentsFloatFloat args) {
@@ -1083,17 +1173,59 @@ public class CoreMathVerifier {
         normalize(args.inV, args.out, NATIVE_PRECISION, NATIVE_PRECISION);
     }
 
-    static public void computeNativeRecip(TestNativeRecip.ArgumentsFloatFloat args) {
-        args.out = new Floaty(1.0f / args.inV, NATIVE_PRECISION, NATIVE_PRECISION);
-    }
-
-
     /* TODO enable once fixed handling of v = 0
     static public void computeNativePowr(TestNativePowr.ArgumentsFloatFloatFloat args) {
         // TODO we would like to use NATIVE_PRECISION, NATIVE_PRECISION
         args.out = new Floaty(pow(args.inV, args.inY), 32000, 32000);
     }
     */
+
+    static public void computeNativeRecip(TestNativeRecip.ArgumentsFloatFloat args) {
+        args.out = new Floaty(1.0f / args.inV, NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeRsqrt(TestNativeRsqrt.ArgumentsFloatFloat args) {
+        args.out = new Floaty(1f / sqrt(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeSin(TestNativeSin.ArgumentsFloatFloat args) {
+        args.out = new Floaty(sin(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeSincos(TestNativeSincos.ArgumentsFloatFloatFloat args) {
+        args.outCosptr = new Floaty(cos(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+        args.out = new Floaty(sin(args.inV), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeSinh(TestNativeSinh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(sinh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeSinpi(TestNativeSinpi.ArgumentsFloatFloat args) {
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.sin(ip.getDoubleMin()),
+            (float) Math.sin(ip.getDoubleMax()), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeSqrt(TestNativeSqrt.ArgumentsFloatFloat args) {
+        args.out = new Floaty(sqrt(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeTan(TestNativeTan.ArgumentsFloatFloat args) {
+        args.out = new Floaty(tan(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeTanh(TestNativeTanh.ArgumentsFloatFloat args) {
+        args.out = new Floaty(tanh(args.in), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
+
+    static public void computeNativeTanpi(TestNativeTanpi.ArgumentsFloatFloat args) {
+        Floaty ip = new Floaty((float) ((double)args.in * Math.PI), 1, 1);
+        args.out = Floaty.FloatyFromRange(
+            (float) Math.tan(ip.getDoubleMin()),
+            (float) Math.tan(ip.getDoubleMax()), NATIVE_PRECISION, NATIVE_PRECISION);
+    }
 
     static public void computeNextafter(TestNextafter.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.nextAfter(args.inX, args.inY), 0, 0);
