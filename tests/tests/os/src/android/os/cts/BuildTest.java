@@ -83,7 +83,7 @@ public class BuildTest extends TestCase {
     /**
      * @param property name passed to getprop
      */
-    private String getProperty(String property)
+    static String getProperty(String property)
             throws IOException {
         Process process = new ProcessBuilder("getprop", property).start();
         Scanner scanner = null;
@@ -198,7 +198,7 @@ public class BuildTest extends TestCase {
         assertNotEmpty(Build.USER);
     }
 
-    private static final String RO_DEBUGGABLE = "ro.debuggable";
+    static final String RO_DEBUGGABLE = "ro.debuggable";
     private static final String RO_SECURE = "ro.secure";
 
     /**

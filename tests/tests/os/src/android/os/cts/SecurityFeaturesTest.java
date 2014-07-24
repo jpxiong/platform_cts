@@ -16,6 +16,9 @@
 
 package android.os.cts;
 
+import android.system.Os;
+import static android.system.OsConstants.PR_GET_DUMPABLE;
+
 import junit.framework.TestCase;
 
 public class SecurityFeaturesTest extends TestCase {
@@ -48,5 +51,34 @@ public class SecurityFeaturesTest extends TestCase {
                          0, result);
             i++;
         }
+    }
+
+    /**
+     * Verifies that prctl(PR_GET_DUMPABLE) == ro.debuggable
+     *
+     * When PR_SET_DUMPABLE is 0, an application will not generate a
+     * coredump, and PTRACE_ATTACH is disallowed. It's a security best
+     * practice to ensure that PR_SET_DUMPABLE is 0, to prevent an app
+     * from leaking the contents of its memory to persistent storage,
+     * other processes, or logs.
+     *
+     * By default, PR_SET_DUMPABLE is 0 for zygote spawned apps, except
+     * in the following circumstances:
+     *
+     * 1) ro.debuggable=1 (global debuggable enabled, i.e., userdebug or
+     * eng builds).
+     *
+     * 2) android:debuggable="true" in the manifest for an individual
+     * application.
+     *
+     * 3) An app which explicitly calls prctl(PR_SET_DUMPABLE, 1).
+     *
+     * For this test, neither #2 nor #3 are true, so we expect ro.debuggable
+     * to exactly equal prctl(PR_GET_DUMPABLE).
+     */
+    public void testPrctlDumpable() throws Exception {
+        int ro_debuggable = Integer.parseInt(BuildTest.getProperty(BuildTest.RO_DEBUGGABLE));
+        int prctl_dumpable = Os.prctl(PR_GET_DUMPABLE, 0, 0, 0, 0);
+        assertEquals(ro_debuggable, prctl_dumpable);
     }
 }
