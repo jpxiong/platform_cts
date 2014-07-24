@@ -261,6 +261,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
         resultKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
+        resultKeys.add(CaptureResult.SENSOR_NOISE_PROFILE);
         resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
