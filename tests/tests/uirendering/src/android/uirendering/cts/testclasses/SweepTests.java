@@ -278,12 +278,6 @@ public class SweepTests extends ActivityTestBase {
         }
     };
 
-    /**
-     * In this case, a lower number would mean it is easier to pass the test. In terms of MSSIM,
-     * a 1 would indicate that the images are exactly the same, where as 0.1 is vastly different.
-     */
-    private final float HIGH_THRESHOLD = 0.1f;
-
     public static final DisplayModifier mCircleDrawModifier = new DisplayModifier() {
         @Override
         public void modifyDrawing(Paint paint, Canvas canvas) {
@@ -293,27 +287,31 @@ public class SweepTests extends ActivityTestBase {
         }
     };
 
+    /**
+     * 0.5 defines minimum similarity as 50%
+     */
+    private static final float HIGH_THRESHOLD = 0.5f;
+
+    private static final BitmapComparer[] DEFAULT_MSSIM_COMPARER = new BitmapComparer[] {
+            new MSSIMComparer(HIGH_THRESHOLD)
+    };
+
     @SmallTest
     public void testBasicDraws() {
-        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
-        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
-        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, bitmapComparers, null);
+        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, DEFAULT_MSSIM_COMPARER,
+                null);
     }
 
     @SmallTest
     public void testBasicShaders() {
-        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
-        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.SHADER_MASK, mCircleDrawModifier,
-                bitmapComparers, null);
+                DEFAULT_MSSIM_COMPARER, null);
     }
 
     @SmallTest
     public void testColorFilterUsingGradient() {
-        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
-        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
-                COLOR_FILTER_GRADIENT_MODIFIER, bitmapComparers, null);
+                COLOR_FILTER_GRADIENT_MODIFIER, DEFAULT_MSSIM_COMPARER, null);
     }
 
     @SmallTest
@@ -346,13 +344,11 @@ public class SweepTests extends ActivityTestBase {
 
     @SmallTest
     public void testShaderSweeps() {
-        BitmapComparer[] calculators = new BitmapComparer[1];
-        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
         int mask = DisplayModifier.Accessor.AA_MASK |
                 DisplayModifier.Accessor.SHADER_MASK |
                 DisplayModifier.Accessor.XFERMODE_MASK |
                 DisplayModifier.Accessor.SHAPES_MASK;
-        sweepModifiersForMask(mask, null, calculators, null);
+        sweepModifiersForMask(mask, null, DEFAULT_MSSIM_COMPARER, null);
     }
 
     protected void sweepModifiersForMask(int mask, final DisplayModifier drawOp,
