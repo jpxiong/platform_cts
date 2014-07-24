@@ -24,8 +24,12 @@ import android.util.Log;
  * compute the correct error of the result.
  */
 public class Floaty {
-    private double mValue;  // The value this instance represent.
-    private double mError;  // The real value should be between mValue - mError and mValue + mError.
+    // The value this instance represents.
+    private double mValue;
+    /* The real value should be between mValue - mError and mValue + mError.
+     * mError should be positive.
+     */
+    private double mError;
     /* The number of bits the value should have, either 32 or 64.  It would have been nice to
      * use generics, e.g. Floaty<float> and Floaty<double> but Java does not support generics
      * of float and double.  Also, Java does not have a f16 type.  This can simulate it, although
@@ -57,6 +61,30 @@ public class Floaty {
         setErrorFromValue(1, 1);
     }
 
+    /** Creates a Floaty for which any value between a and b are legal, expanded by the specified factor. */
+    public static Floaty FloatyFromRange(float a, float b, float ulpFactor, float ulpRelaxedFactor) {
+        // Order the edges of the range.
+        float min, max;
+        if (a < b) {
+            min = a;
+            max = b;
+        } else {
+            min = b;
+            max = a;
+        }
+        // Expand the edges by the specified factor.
+        float factor = relaxed ? ulpRelaxedFactor : ulpFactor;
+        min = min + (Math.nextAfter(min, -Float.MAX_VALUE) - min) * factor;
+        max = max + (Math.nextAfter(max, Float.MAX_VALUE) - max) * factor;
+
+        // Convert a [range] to a (mid +- error)
+        float delta = Math.abs(a - b);
+        float mid = (min + max) / 2.f;
+        Floaty fl = new Floaty(mid);
+        fl.mError = Math.max(mid - min, max - mid);
+        return fl;
+    }
+
     /** Sets the value and the error based on whether we're doing relaxed computations or not. */
     public Floaty(float v, int ulpFactor, int ulpRelaxedFactor) {
         mValue = v;
@@ -76,12 +104,17 @@ public class Floaty {
     public float getFloatError() { return (float) mError; }
     public double getDoubleError() { return mError; }
 
+    public double getDoubleMin() { return mValue - mError; }
+    public double getDoubleMax() { return mValue + mError; }
+
     /** Returns the number we would need to multiply the ulp to get the current error. */
     public int getUlf() {
-        return (int) Math.abs(mError / getUlp());
+        return (int) (mError / getUlp() + 0.5);
     }
 
-    /** Returns the unit of least precision for the number we handle. */
+    /** Returns the unit of least precision for the number we handle. This is
+     * always a positive number.
+     */
     private double getUlp() {
         if (mNumberOfBits == 64) {
             return Math.ulp(mValue);
@@ -112,7 +145,7 @@ public class Floaty {
         mError *= relaxed ? ulpRelaxedFactor : ulpFactor;
         mNumberOfBits = numberOfBits;
     }
-    
+
     /** If needed, increases the error so that the provided value is covered by the error range. */
     private void expandError(double valueWithError) {
         // We disregard NaN values that can be produced when testing close to a cliff.
@@ -125,6 +158,14 @@ public class Floaty {
         }
     }
 
+    /** Makes sure the allowed error is at least ulp{Relaxed}Factor. */
+    public void setMinimumError(int ulpFactor, int ulpRelaxedFactor) {
+        double minError = getUlp() * (relaxed ? ulpRelaxedFactor : ulpFactor);
+        if (mError < minError) {
+            mError = minError;
+        }
+    }
+
     /** Returns true if the number passed is within mError of our value. */
     public boolean couldBe(double a) {
         return couldBe(a, 0.0);
@@ -133,7 +174,7 @@ public class Floaty {
     /**
      * Returns true if the number passed is within mError of our value, or if it's whithin
      * minimumError of the value.
-     */ 
+     */
     public boolean couldBe(double a, double minimumError) {
         if (a != a && mValue != mValue) {
             return true;  // Both are NaN
@@ -146,11 +187,40 @@ public class Floaty {
         double error = Math.max(mError, minimumError);
         boolean inRange = mValue - error <= a && a <= mValue + error;
 
+        /* For relaxed precision, some implementations don't return denormalized values for very
+         * subnormal values.  Two examples:
+         * a) nextafter(0.0, 1.0):  When denormalized are allowed, 1.40129846e-45 (0x00000001) is
+         *    expected.  If only normalized values are returned, 1.1754944e-38 (0x00800000) is
+         *    expected.
+         * b) powr(1600.4, -11.9):  With denormalized, 7.4076481e-39 is returned.  For normalized,
+         *    0.0 can be returned.
+         */
+        if (!inRange && relaxed) {
+            boolean isSubnormal = false;
+            double normalized = 0.0;
+            // Check if we have a subnormal value.
+            if (mNumberOfBits == 32 && Math.abs(mValue) < Float.MIN_NORMAL) {
+                isSubnormal = true;
+                normalized = Math.copySign(Float.MIN_NORMAL, (float) mValue);
+            } else if (Math.abs(mValue) < Double.MIN_NORMAL) {
+                isSubnormal = true;
+                normalized = Math.copySign(Double.MIN_NORMAL, mValue);
+            }
+            if (isSubnormal) {
+                // First try replacing the expected value with the larger MIN_NORMAL
+                inRange = (normalized - error) <= a && a <= (normalized + error);
+                // Second try replacing the expected value with 0.
+                if (!inRange) {
+                    inRange = -error <= a && a <= error;
+                }
+            }
+        }
+
         /* This is useful for debugging:
         if (!inRange) {
-            int ulfNeeded = (int) Math.abs(Math.round((a - mValue) / Math.ulp(mValue)));
-            Log.e("Floaty.couldBe", "Comparing " + Float.toString(a) +
-                    " against " + Float.toString(mValue) + " +- " + Float.toString(error) +
+            int ulfNeeded = (int) Math.abs(Math.round((a - mValue) / getUlp()));
+            Log.e("Floaty.couldBe", "Comparing " + Double.toString(a) +
+                    " against " + Double.toString(mValue) + " +- " + Double.toString(error) +
                     " relaxed " + Boolean.toString(relaxed) +
                     " ulfNeeded " + Integer.toString(ulfNeeded) +
                     ", off by " + Integer.toString(ulfNeeded - getUlf()));
