@@ -19,6 +19,8 @@
 
 extern int register_android_os_cts_CpuFeatures(JNIEnv*);
 
+extern int register_android_os_cts_CpuInstructions(JNIEnv*);
+
 extern int register_android_os_cts_TaggedPointer(JNIEnv*);
 
 extern int register_android_os_cts_OSFeatures(JNIEnv*);
@@ -33,6 +35,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_os_cts_CpuFeatures(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_os_cts_CpuInstructions(env)) {
         return JNI_ERR;
     }
 
