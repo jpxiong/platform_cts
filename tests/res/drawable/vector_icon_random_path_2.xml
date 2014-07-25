@@ -13,18 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <size
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
         android:height="64dp"
-        android:width="64dp" />
-
-    <viewport
+        android:width="64dp"
         android:viewportHeight="128"
-        android:viewportWidth="128" />
+        android:viewportWidth="128" >
 
     <path
-        android:fill="#FF00FF00"
+        android:fillColor="#FF00FF00"
         android:pathData="
                  m 0.0 0.0
                  q 4.7088394 36.956432 3.0 3.0
@@ -47,7 +43,7 @@ limitations under the License.
                  s 46.258068 32.12831 54.0 54.0
                  A 22.962704 55.05604 42.912285 1 1 57.0 57.0
                  S 36.47731 54.216763 60.0 60.0 "
-        android:stroke="#FF0000FF"
+        android:strokeColor="#FF0000FF"
         android:strokeWidth="1" />
 
 </vector>
