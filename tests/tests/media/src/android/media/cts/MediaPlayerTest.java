@@ -1063,7 +1063,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             if (trackInfos[i].getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
                 String trackLanguage = trackInfos[i].getLanguage();
                 assertTrue(trackLanguage != null);
-                trackLanguage.trim();
+                trackLanguage = trackLanguage.trim();
                 Log.d(LOG_TAG, "track info lang: " + trackLanguage);
                 assertTrue("Should not see empty track language with our test data.",
                            trackLanguage.length() > 0);
