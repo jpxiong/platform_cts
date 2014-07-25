@@ -28,7 +28,8 @@ import android.graphics.Shader;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.bitmapcomparers.BitmapComparer;
 import android.uirendering.cts.bitmapcomparers.MSSIMComparer;
-import android.uirendering.cts.bitmapcomparers.SamplePointsComparer;
+import android.uirendering.cts.bitmapverifiers.BitmapVerifier;
+import android.uirendering.cts.bitmapverifiers.SamplePointVerifier;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 import android.uirendering.cts.testinfrastructure.CanvasClient;
 import android.uirendering.cts.testinfrastructure.DisplayModifier;
@@ -296,7 +297,7 @@ public class SweepTests extends ActivityTestBase {
     public void testBasicDraws() {
         BitmapComparer[] bitmapComparers = new BitmapComparer[1];
         bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
-        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, bitmapComparers);
+        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, bitmapComparers, null);
     }
 
     @SmallTest
@@ -304,7 +305,7 @@ public class SweepTests extends ActivityTestBase {
         BitmapComparer[] bitmapComparers = new BitmapComparer[1];
         bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.SHADER_MASK, mCircleDrawModifier,
-                bitmapComparers);
+                bitmapComparers, null);
     }
 
     @SmallTest
@@ -312,35 +313,35 @@ public class SweepTests extends ActivityTestBase {
         BitmapComparer[] bitmapComparers = new BitmapComparer[1];
         bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
-                COLOR_FILTER_GRADIENT_MODIFIER, bitmapComparers);
+                COLOR_FILTER_GRADIENT_MODIFIER, bitmapComparers, null);
     }
 
     @SmallTest
     public void testColorFiltersAlphas() {
-        BitmapComparer[] bitmapComparers =
-                new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
+        BitmapVerifier[] bitmapVerifiers =
+                new BitmapVerifier[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            bitmapComparers[index] = new SamplePointsComparer(COLOR_FILTER_ALPHA_POINTS,
+            bitmapVerifiers[index] = new SamplePointVerifier(COLOR_FILTER_ALPHA_POINTS,
                     COLOR_FILTER_ALPHA_MAP.get(mode));
             index++;
         }
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
-                COLOR_FILTER_ALPHA_MODIFIER, bitmapComparers);
+                COLOR_FILTER_ALPHA_MODIFIER, null, bitmapVerifiers);
     }
 
     @SmallTest
     public void testXfermodes() {
-        BitmapComparer[] bitmapComparers =
-                new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
+        BitmapVerifier[] bitmapVerifiers =
+                new BitmapVerifier[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            bitmapComparers[index] = new SamplePointsComparer(XFERMODE_TEST_POINTS,
+            bitmapVerifiers[index] = new SamplePointVerifier(XFERMODE_TEST_POINTS,
                     XFERMODE_COLOR_MAP.get(mode));
             index++;
         }
         sweepModifiersForMask(DisplayModifier.Accessor.XFERMODE_MASK, XFERMODE_MODIFIER,
-                bitmapComparers);
+                null, bitmapVerifiers);
     }
 
     @SmallTest
@@ -351,11 +352,11 @@ public class SweepTests extends ActivityTestBase {
                 DisplayModifier.Accessor.SHADER_MASK |
                 DisplayModifier.Accessor.XFERMODE_MASK |
                 DisplayModifier.Accessor.SHAPES_MASK;
-        sweepModifiersForMask(mask, null, calculators);
+        sweepModifiersForMask(mask, null, calculators, null);
     }
 
     protected void sweepModifiersForMask(int mask, final DisplayModifier drawOp,
-            BitmapComparer[] bitmapComparers) {
+            BitmapComparer[] bitmapComparers, BitmapVerifier[] bitmapVerifiers) {
         if ((mask & DisplayModifier.Accessor.ALL_OPTIONS_MASK) == 0) {
             throw new IllegalArgumentException("Attempt to test with a mask that is invalid");
         }
