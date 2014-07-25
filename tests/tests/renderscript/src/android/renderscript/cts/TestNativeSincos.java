@@ -34,6 +34,12 @@ public class TestNativeSincos extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNativeSincosRelaxed(mRS);
     }
 
+    public class ArgumentsFloatFloatFloat {
+        public float inV;
+        public Floaty outCosptr;
+        public Floaty out;
+    }
+
     private void checkNativeSincosFloatFloatFloat() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe15df2366436cc13l, false);
         try {
@@ -41,6 +47,7 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testNativeSincosFloatFloatFloat(inV, out);
+            verifyResultsNativeSincosFloatFloatFloat(inV, outCosptr, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloatFloatFloat: " + e.toString());
         }
@@ -49,8 +56,65 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testNativeSincosFloatFloatFloat(inV, out);
+            verifyResultsNativeSincosFloatFloatFloat(inV, outCosptr, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloatFloatFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeSincosFloatFloatFloat(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
+        float[] arrayOutCosptr = new float[INPUTSIZE * 1];
+        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inV = arrayInV[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeSincos(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
+                    message.append("\n");
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOutCosptr[i * 1 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeSincosFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -61,6 +125,7 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testNativeSincosFloat2Float2Float2(inV, out);
+            verifyResultsNativeSincosFloat2Float2Float2(inV, outCosptr, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat2Float2Float2: " + e.toString());
         }
@@ -69,8 +134,65 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testNativeSincosFloat2Float2Float2(inV, out);
+            verifyResultsNativeSincosFloat2Float2Float2(inV, outCosptr, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat2Float2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeSincosFloat2Float2Float2(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOutCosptr = new float[INPUTSIZE * 2];
+        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeSincos(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
+                    message.append("\n");
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOutCosptr[i * 2 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeSincosFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -81,6 +203,7 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testNativeSincosFloat3Float3Float3(inV, out);
+            verifyResultsNativeSincosFloat3Float3Float3(inV, outCosptr, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat3Float3Float3: " + e.toString());
         }
@@ -89,8 +212,65 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testNativeSincosFloat3Float3Float3(inV, out);
+            verifyResultsNativeSincosFloat3Float3Float3(inV, outCosptr, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat3Float3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeSincosFloat3Float3Float3(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOutCosptr = new float[INPUTSIZE * 4];
+        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeSincos(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
+                    message.append("\n");
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeSincosFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -101,6 +281,7 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testNativeSincosFloat4Float4Float4(inV, out);
+            verifyResultsNativeSincosFloat4Float4Float4(inV, outCosptr, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat4Float4Float4: " + e.toString());
         }
@@ -109,8 +290,65 @@ public class TestNativeSincos extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testNativeSincosFloat4Float4Float4(inV, out);
+            verifyResultsNativeSincosFloat4Float4Float4(inV, outCosptr, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat4Float4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeSincosFloat4Float4Float4(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOutCosptr = new float[INPUTSIZE * 4];
+        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeSincos(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
+                    message.append("\n");
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeSincosFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

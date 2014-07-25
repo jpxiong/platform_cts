@@ -34,6 +34,12 @@ public class TestNativeDivide extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNativeDivideRelaxed(mRS);
     }
 
+    public class ArgumentsFloatFloatFloat {
+        public float inLhs;
+        public float inRhs;
+        public Floaty out;
+    }
+
     private void checkNativeDivideFloatFloatFloat() {
         Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe2845ef0c23d02del, false);
         Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe2845ef0c23d2e34l, false);
@@ -41,6 +47,7 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testNativeDivideFloatFloatFloat(inLhs, out);
+            verifyResultsNativeDivideFloatFloatFloat(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloatFloatFloat: " + e.toString());
         }
@@ -48,8 +55,57 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testNativeDivideFloatFloatFloat(inLhs, out);
+            verifyResultsNativeDivideFloatFloatFloat(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloatFloatFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeDivideFloatFloatFloat(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 1];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 1];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inLhs = arrayInLhs[i];
+                args.inRhs = arrayInRhs[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeDivide(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                    message.append("\n");
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeDivideFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -60,6 +116,7 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testNativeDivideFloat2Float2Float2(inLhs, out);
+            verifyResultsNativeDivideFloat2Float2Float2(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat2Float2Float2: " + e.toString());
         }
@@ -67,8 +124,57 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testNativeDivideFloat2Float2Float2(inLhs, out);
+            verifyResultsNativeDivideFloat2Float2Float2(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat2Float2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeDivideFloat2Float2Float2(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 2];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 2];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inLhs = arrayInLhs[i * 2 + j];
+                args.inRhs = arrayInRhs[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeDivide(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                    message.append("\n");
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeDivideFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -79,6 +185,7 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testNativeDivideFloat3Float3Float3(inLhs, out);
+            verifyResultsNativeDivideFloat3Float3Float3(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat3Float3Float3: " + e.toString());
         }
@@ -86,8 +193,57 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testNativeDivideFloat3Float3Float3(inLhs, out);
+            verifyResultsNativeDivideFloat3Float3Float3(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat3Float3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeDivideFloat3Float3Float3(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 4];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 4];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inLhs = arrayInLhs[i * 4 + j];
+                args.inRhs = arrayInRhs[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeDivide(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                    message.append("\n");
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeDivideFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -98,6 +254,7 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testNativeDivideFloat4Float4Float4(inLhs, out);
+            verifyResultsNativeDivideFloat4Float4Float4(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat4Float4Float4: " + e.toString());
         }
@@ -105,8 +262,57 @@ public class TestNativeDivide extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testNativeDivideFloat4Float4Float4(inLhs, out);
+            verifyResultsNativeDivideFloat4Float4Float4(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat4Float4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeDivideFloat4Float4Float4(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 4];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 4];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inLhs = arrayInLhs[i * 4 + j];
+                args.inRhs = arrayInRhs[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeDivide(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                    message.append("\n");
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeDivideFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
