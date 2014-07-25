@@ -77,7 +77,7 @@ public class TestSincos extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
                     valid = false;
@@ -155,7 +155,7 @@ public class TestSincos extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
                     valid = false;
@@ -233,7 +233,7 @@ public class TestSincos extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                     valid = false;
@@ -311,7 +311,7 @@ public class TestSincos extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                     valid = false;

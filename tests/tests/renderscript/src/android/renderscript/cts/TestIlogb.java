@@ -67,29 +67,22 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.in = arrayIn[i];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.out = arrayOut[i * 1 + j];
+                // Ask the CoreMathVerifier to validate.
                 Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeIlogb(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 1 + j]) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
                     message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append("Expected output out: ");
+                    message.append("Output out: ");
                     message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloatInt" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -125,29 +118,22 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.in = arrayIn[i * 2 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.out = arrayOut[i * 2 + j];
+                // Ask the CoreMathVerifier to validate.
                 Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeIlogb(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
                     message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append("Expected output out: ");
+                    message.append("Output out: ");
                     message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat2Int2" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -183,29 +169,22 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
                 Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeIlogb(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
                     message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append("Expected output out: ");
+                    message.append("Output out: ");
                     message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat3Int3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -241,29 +220,22 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
                 Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeIlogb(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
                     message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append("Expected output out: ");
+                    message.append("Output out: ");
                     message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat4Int4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }

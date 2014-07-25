@@ -70,7 +70,7 @@ public class TestNativeLog10 extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeNativeLog10(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j], 0.00005)) {
                     valid = false;
@@ -129,7 +129,7 @@ public class TestNativeLog10 extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeNativeLog10(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j], 0.00005)) {
                     valid = false;
@@ -188,7 +188,7 @@ public class TestNativeLog10 extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeNativeLog10(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
                     valid = false;
@@ -247,7 +247,7 @@ public class TestNativeLog10 extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeNativeLog10(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
                     valid = false;

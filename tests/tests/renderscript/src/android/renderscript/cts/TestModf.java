@@ -77,7 +77,7 @@ public class TestModf extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 1 + j])) {
                     valid = false;
@@ -155,7 +155,7 @@ public class TestModf extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 2 + j])) {
                     valid = false;
@@ -233,7 +233,7 @@ public class TestModf extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                     valid = false;
@@ -311,7 +311,7 @@ public class TestModf extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                     valid = false;
