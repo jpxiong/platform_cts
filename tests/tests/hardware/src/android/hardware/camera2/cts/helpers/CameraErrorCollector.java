@@ -149,8 +149,8 @@ public class CameraErrorCollector extends ErrorCollector {
                 return false;
             }
 
-            addMessage(String.format("%s (expected = %s, actual = %s) ", msg, expected.toString(),
-                    actual.toString()));
+            addMessage(String.format("%s (expected = %s, actual = %s) ", msg, expected,
+                    actual));
             return false;
         }
 
@@ -184,6 +184,34 @@ public class CameraErrorCollector extends ErrorCollector {
         }
 
         return true;
+    }
+
+    /**
+     * Check that the {@code actual} value is greater than the {@code expected} value.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected The expected value to check that the actual value is larger than.
+     * @param actual Actual value to check.
+     * @return {@code true} if {@code actual} is greater than {@code expected}.
+     */
+    public <T extends Comparable<? super T>> boolean expectGreater(String msg, T expected,
+            T actual) {
+        return expectTrue(String.format("%s: (expected = %s was not greater than actual = %s) ",
+                msg, expected, actual), actual.compareTo(expected) > 0);
+    }
+
+    /**
+     * Check that the {@code actual} value is greater than or equal to the {@code expected} value.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected The expected value to check that the actual value is larger than or equal to.
+     * @param actual Actual value to check.
+     * @return {@code true} if {@code actual} is greater than or equal to {@code expected}.
+     */
+    public <T extends Comparable<? super T>> boolean expectGreaterOrEqual(String msg, T expected,
+                                                                       T actual) {
+        return expectTrue(String.format("%s: (expected = %s was not greater than actual = %s) ",
+                msg, expected, actual), actual.compareTo(expected) >= 0);
     }
 
     /**
@@ -543,7 +571,7 @@ public class CameraErrorCollector extends ErrorCollector {
     /**
      * Check if the key is non-null and the value is not equal to target.
      *
-     * @param result The The {@link CaptureResult} to get the key from.
+     * @param result The {@link CaptureResult} to get the key from.
      * @param key The {@link CaptureResult} key to be checked.
      * @param expected The expected value of the CaptureResult key.
      */
@@ -560,6 +588,29 @@ public class CameraErrorCollector extends ErrorCollector {
 
         String reason = "Key " + key.getName() + " shouldn't have value " + value.toString();
         checkThat(reason, value, CoreMatchers.not(expected));
+    }
+
+    /**
+     * Check if the value is non-null and the value is equal to target.
+     *
+     * @param result The  {@link CaptureResult} to lookup the value in.
+     * @param key The {@link CaptureResult} key to be checked.
+     * @param expected The expected value of the {@link CaptureResult} key.
+     */
+    public <T> void expectKeyValueEquals(CaptureResult result, CaptureResult.Key<T> key,
+            T expected) {
+        if (result == null || key == null || expected == null) {
+            throw new IllegalArgumentException("request, key and expected shouldn't be null");
+        }
+
+        T value;
+        if ((value = expectKeyValueNotNull(result, key)) == null) {
+            return;
+        }
+
+        String reason = "Key " + key.getName() + " value " + value.toString()
+                + " doesn't match the expected value " + expected.toString();
+        checkThat(reason, value, CoreMatchers.equalTo(expected));
     }
 
     /**

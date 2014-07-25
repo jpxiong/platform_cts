@@ -85,6 +85,37 @@ public class CameraTestUtils extends Assert {
     public static final int SESSION_CLOSE_TIMEOUT_MS = 2000;
     public static final int SESSION_READY_TIMEOUT_MS = 2000;
     public static final int SESSION_ACTIVE_TIMEOUT_MS = 1000;
+
+    public static final int MAX_READER_IMAGES = 5;
+
+    /**
+     * Create an {@link android.media.ImageReader} object and get the surface.
+     *
+     * @param size The size of this ImageReader to be created.
+     * @param format The format of this ImageReader to be created
+     * @param maxNumImages The max number of images that can be acquired simultaneously.
+     * @param listener The listener used by this ImageReader to notify callbacks.
+     * @param handler The handler to use for any listener callbacks.
+     */
+    public static ImageReader makeImageReader(Size size, int format, int maxNumImages,
+            ImageReader.OnImageAvailableListener listener, Handler handler) {
+        ImageReader reader =  ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
+                maxNumImages);
+        reader.setOnImageAvailableListener(listener, handler);
+        if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size);
+        return reader;
+    }
+
+    /**
+     * Close pending images and clean up an {@link android.media.ImageReader} object.
+     * @param reader an {@link android.media.ImageReader} to close.
+     */
+    public static void closeImageReader(ImageReader reader) {
+        if (reader != null) {
+            reader.close();
+        }
+    }
+
     /**
      * Dummy listener that release the image immediately once it is available.
      *

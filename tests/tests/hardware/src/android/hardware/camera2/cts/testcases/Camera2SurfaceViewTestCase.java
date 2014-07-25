@@ -20,7 +20,6 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED;
 
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.Image;
 import android.media.ImageReader;
 import android.os.Environment;
 import android.os.Handler;
@@ -70,7 +69,6 @@ public class Camera2SurfaceViewTestCase extends
     private static final String TAG = "SurfaceViewTestCase";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
-    protected static final int MAX_READER_IMAGES = 5;
 
     // TODO: Use internal storage for this to make sure the file is only visible to test.
     protected static final String DEBUG_FILE_NAME_BASE =
@@ -536,51 +534,12 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
-     * Create an {@link ImageReader} object and get the surface.
-     *
-     * @param size The size of this ImageReader to be created.
-     * @param format The format of this ImageReader to be created
-     * @param maxNumImages The max number of images that can be acquired simultaneously.
-     * @param listener The listener used by this ImageReader to notify callbacks.
-     * @param handler The handler to use for any listener callbacks.
-     */
-    protected static ImageReader makeImageReader(Size size, int format,
-                                                             int maxNumImages,
-                                                             ImageReader.OnImageAvailableListener
-                                                                     listener,
-                                                             Handler handler) {
-        ImageReader reader =  ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
-                maxNumImages);
-        reader.setOnImageAvailableListener(listener, handler);
-        if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
-        return reader;
-    }
-
-    /**
      * Close the pending images then close current active {@link ImageReader} object.
      */
     protected void closeImageReader() {
-        closeImageReader(mReader);
+        CameraTestUtils.closeImageReader(mReader);
         mReader = null;
         mReaderSurface = null;
-    }
-
-    /**
-     * Close pending images and clean up an {@link ImageReader} object.
-     * @param reader an {@link ImageReader} to close.
-     */
-    public static void closeImageReader(ImageReader reader) {
-        if (reader != null) {
-            try {
-                // Close all possible pending images first.
-                Image image = reader.acquireLatestImage();
-                if (image != null) {
-                    image.close();
-                }
-            } finally {
-                reader.close();
-            }
-        }
     }
 
     /**
