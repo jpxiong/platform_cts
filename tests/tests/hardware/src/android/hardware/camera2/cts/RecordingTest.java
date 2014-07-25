@@ -682,7 +682,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             long currentTS = getValueNotNull(currentResult, CaptureResult.SENSOR_TIMESTAMP);
             int durationMs = (int) (currentTS - prevTS) / 1000000;
             int durationError = Math.abs(durationMs - expectedDurationMs);
-            int frameNumber = currentResult.getFrameNumber();
+            long frameNumber = currentResult.getFrameNumber();
             mCollector.expectTrue(
                     String.format(
                             "Resolution %dx%d Frame %d: jittering (%dms) exceeds bound [%dms,%dms]",
