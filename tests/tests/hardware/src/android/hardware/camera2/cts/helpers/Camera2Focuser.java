@@ -51,7 +51,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
     private final AutoFocusListener mAutoFocusListener;
     private final CameraDevice mCamera;
     private final Surface mRequestSurface;
-    private final CameraCharacteristics mStaticInfo;
+    private final StaticMetadata mStaticInfo;
 
     private int mAfRun = 0;
     private MeteringRectangle[] mAfRegions;
@@ -104,16 +104,17 @@ public class Camera2Focuser implements AutoFocusStateListener {
         if (staticInfo == null) {
             throw new IllegalArgumentException("staticInfo must not be null");
         }
-        Float minFocusDist = staticInfo.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
-        if (minFocusDist == null || minFocusDist == 0) {
-            throw new IllegalArgumentException("this camera doesn't have a focuser");
-        }
 
         mCamera = camera;
         mRequestSurface = requestSurface;
         mAutoFocusListener = listener;
-        mStaticInfo = staticInfo;
+        mStaticInfo = new StaticMetadata(staticInfo,
+                StaticMetadata.CheckLevel.ASSERT, /*collector*/null);
         mHandler = handler;
+
+        if (!mStaticInfo.hasFocuser()) {
+            throw new IllegalArgumentException("this camera doesn't have a focuser");
+        }
 
         /**
          * Begin by always being in passive auto focus.
@@ -318,15 +319,10 @@ public class Camera2Focuser implements AutoFocusStateListener {
      * Set default AF region to full active array size.
      */
     private void setDefaultAfRegions() {
-        Rect activeArraySize = mStaticInfo.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
-        if (activeArraySize == null) {
-            throw new AssertionError("Active array size shouldn't be null");
-        }
-
         // Initialize AF regions with all zeros, meaning that it is up to camera device to device
         // the regions used by AF.
         mAfRegions = new MeteringRectangle[] {
-                new MeteringRectangle(0, 0, 0, 0, 0)};
+                new MeteringRectangle(0, 0, 0, 0, MeteringRectangle.METERING_WEIGHT_DONT_CARE)};
     }
     private CaptureListener createCaptureListener() {
 
@@ -365,7 +361,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
                 int afRun;
                 synchronized (Camera2Focuser.this) {
                     // In case of partial results, don't send AF update twice
-                    int frameCount = result.get(CaptureResult.REQUEST_FRAME_COUNT);
+                    int frameCount = result.getFrameNumber();
                     if (frameCount <= mLatestFrameCount) return;
                     mLatestFrameCount = frameCount;
 

@@ -21,6 +21,8 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.util.Range;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
@@ -287,7 +289,33 @@ public class StaticMetadata {
      * @return true if camera device support focuser, false otherwise.
      */
     public boolean hasFocuser() {
-        return (getMinimumFocusDistanceChecked() > 0);
+        if (areKeysAvailable(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE)) {
+            // LEGACY devices don't have lens.info.minimumFocusDistance, so guard this query
+            return (getMinimumFocusDistanceChecked() > 0);
+        } else {
+            // Check available AF modes
+            int[] availableAfModes = mCharacteristics.get(
+                    CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+
+            if (availableAfModes == null) {
+                return false;
+            }
+
+            // Assume that if we have an AF mode which doesn't ignore AF trigger, we have a focuser
+            boolean hasFocuser = false;
+            loop: for (int mode : availableAfModes) {
+                switch (mode) {
+                    case CameraMetadata.CONTROL_AF_MODE_AUTO:
+                    case CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE:
+                    case CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_VIDEO:
+                    case CameraMetadata.CONTROL_AF_MODE_MACRO:
+                        hasFocuser = true;
+                        break loop;
+                }
+            }
+
+            return hasFocuser;
+        }
     }
 
     /**
@@ -1409,6 +1437,58 @@ public class StaticMetadata {
         List<Integer> availableCapabilities = getAvailableCapabilitiesChecked();
 
         return availableCapabilities.contains(capability);
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available characteristics keys
+     * (as in {@link CameraCharacteristics#getKeys}.
+     *
+     * <p>If this returns {@code true}, then querying for this key from a characteristics
+     * object will always return a non-{@code null} value.</p>
+     *
+     * @param keys one or more camera characteristic keys
+     * @return whether or not all characteristics keys are available
+     */
+    @SafeVarargs
+    public final <T> boolean areKeysAvailable(CameraCharacteristics.Key<T>... keys) {
+        return mCharacteristics.getKeys().containsAll(Arrays.asList(keys));
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available result keys
+     * (as in {@link CameraCharacteristics#getAvailableCaptureResultKeys}.
+     *
+     * <p>If this returns {@code true}, then querying for this key from a result
+     * object will almost always return a non-{@code null} value.</p>
+     *
+     * <p>In some cases (e.g. lens shading map), the request must have additional settings
+     * configured in order for the key to correspond to a value.</p>
+     *
+     * @param keys one or more capture result keys
+     * @return whether or not all result keys are available
+     */
+    @SafeVarargs
+    public final <T> boolean areKeysAvailable(CaptureResult.Key<T>... keys) {
+        return mCharacteristics.getAvailableCaptureResultKeys().containsAll(Arrays.asList(keys));
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available request keys
+     * (as in {@link CameraCharacteristics#getAvailableCaptureRequestKeys}.
+     *
+     * <p>If this returns {@code true}, then setting this key in the request builder
+     * may have some effect (and if it's {@code false}, then the camera device will
+     * definitely ignore it).</p>
+     *
+     * <p>In some cases (e.g. manual control of exposure), other keys must be also be set
+     * in order for a key to take effect (e.g. control.mode set to OFF).</p>
+     *
+     * @param keys one or more capture request keys
+     * @return whether or not all result keys are available
+     */
+    @SafeVarargs
+    public final <T> boolean areKeysAvailable(CaptureRequest.Key<T>... keys) {
+        return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(Arrays.asList(keys));
     }
 
     /**

@@ -333,7 +333,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     public void testAfRegions() throws Exception {
         for (String id : mCameraIds) {
             try {
-                Log.i(TAG, "Testing AE regions for Camera " + id);
+                Log.i(TAG, "Testing AF regions for Camera " + id);
                 openDevice(id);
 
                 boolean afRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
