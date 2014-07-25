@@ -19,15 +19,15 @@ import android.graphics.Rect;
 import android.util.Log;
 
 /**
- * This will test to see if the bitmap has a square with border around it of a certain color
+ * Tests to see if there is rectangle of a certain color, with a background given
  */
-public class PaddedColorRectVerifier extends BitmapVerifier {
-    private static final String TAG = "PaddedColorRectVerifier";
+public class RectVerifier extends BitmapVerifier {
+    private static final String TAG = "RectVerifier";
     private int mOuterColor;
     private int mInnerColor;
     private Rect mInnerRect;
 
-    public PaddedColorRectVerifier(int outerColor, int innerColor, Rect innerRect) {
+    public RectVerifier(int outerColor, int innerColor, Rect innerRect) {
         mOuterColor = outerColor;
         mInnerColor = innerColor;
         mInnerRect = innerRect;
@@ -43,6 +43,7 @@ public class PaddedColorRectVerifier extends BitmapVerifier {
                     Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor) +
                             " Received : " + Integer.toHexString(bitmap[index]) +
                             " x : "  + x + " y : " + y);
+                    return false;
                 }
             }
         }

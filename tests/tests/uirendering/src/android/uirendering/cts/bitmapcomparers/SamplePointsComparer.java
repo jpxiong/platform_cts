@@ -41,9 +41,9 @@ public class SamplePointsComparer extends BitmapComparer {
             int index = indexFromXAndY(xPos, yPos, stride, offset);
             if (ideal[index] != mExpectedColors[i] || given[index] != mExpectedColors[i]) {
                 Log.d(TAG, "Position X = " + xPos + " Y = " + yPos);
-                Log.d(TAG, "Expected color : " + mExpectedColors[i]);
-                Log.d(TAG, "Hardware color : " + given[index]);
-                Log.d(TAG, "Software color : " + ideal[index]);
+                Log.d(TAG, "Expected color : " + Integer.toHexString(mExpectedColors[i]));
+                Log.d(TAG, "Hardware color : " + Integer.toHexString(given[index]));
+                Log.d(TAG, "Software color : " + Integer.toHexString(ideal[index]));
                 pass = false;
             }
         }
