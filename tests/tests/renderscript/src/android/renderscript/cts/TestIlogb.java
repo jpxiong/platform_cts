@@ -70,13 +70,12 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the outputs.
                 args.out = arrayOut[i * 1 + j];
                 // Ask the CoreMathVerifier to validate.
-                Floaty.setRelaxed(relaxed);
-                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
                     message.append("Output out: ");
@@ -121,13 +120,12 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the outputs.
                 args.out = arrayOut[i * 2 + j];
                 // Ask the CoreMathVerifier to validate.
-                Floaty.setRelaxed(relaxed);
-                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
                     message.append("Output out: ");
@@ -172,13 +170,12 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the outputs.
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
-                Floaty.setRelaxed(relaxed);
-                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
                     message.append("Output out: ");
@@ -223,13 +220,12 @@ public class TestIlogb extends RSBaseCompute {
                 // Extract the outputs.
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
-                Floaty.setRelaxed(relaxed);
-                String errorMessage = CoreMathVerifier.verifyIlogb(args, relaxed);
+                String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input in: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
                     message.append("Output out: ");

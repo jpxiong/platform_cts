@@ -37,7 +37,7 @@ public class TestNativeDistance extends RSBaseCompute {
     public class ArgumentsFloatFloatFloat {
         public float inLhs;
         public float inRhs;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeDistanceFloatFloatFloat() {
@@ -74,8 +74,8 @@ public class TestNativeDistance extends RSBaseCompute {
             // Fill args with the input values
             args.inLhs = arrayInLhs[i];
             args.inRhs = arrayInRhs[i];
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeDistance(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeDistance(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -85,18 +85,18 @@ public class TestNativeDistance extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 message.append("Input inLhs: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayInLhs[i], Float.floatToRawIntBits(arrayInLhs[i]), arrayInLhs[i]));
                 message.append("\n");
                 message.append("Input inRhs: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayInRhs[i], Float.floatToRawIntBits(arrayInRhs[i]), arrayInRhs[i]));
                 message.append("\n");
                 message.append("Expected output out: ");
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -111,7 +111,7 @@ public class TestNativeDistance extends RSBaseCompute {
     public class ArgumentsFloatNFloatNFloat {
         public float[] inLhs;
         public float[] inRhs;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeDistanceFloat2Float2Float() {
@@ -154,8 +154,8 @@ public class TestNativeDistance extends RSBaseCompute {
             for (int j = 0; j < 2 ; j++) {
                 args.inRhs[j] = arrayInRhs[i * 2 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeDistance(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeDistance(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -166,13 +166,13 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInLhs[i * 2 + j], Float.floatToRawIntBits(arrayInLhs[i * 2 + j]), arrayInLhs[i * 2 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInRhs[i * 2 + j], Float.floatToRawIntBits(arrayInRhs[i * 2 + j]), arrayInRhs[i * 2 + j]));
                     message.append("\n");
                 }
@@ -180,7 +180,7 @@ public class TestNativeDistance extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -232,8 +232,8 @@ public class TestNativeDistance extends RSBaseCompute {
             for (int j = 0; j < 3 ; j++) {
                 args.inRhs[j] = arrayInRhs[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeDistance(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeDistance(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -244,13 +244,13 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
                     message.append("\n");
                 }
@@ -258,7 +258,7 @@ public class TestNativeDistance extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -310,8 +310,8 @@ public class TestNativeDistance extends RSBaseCompute {
             for (int j = 0; j < 4 ; j++) {
                 args.inRhs[j] = arrayInRhs[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeDistance(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeDistance(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -322,13 +322,13 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
                     message.append("\n");
                 }
@@ -336,7 +336,7 @@ public class TestNativeDistance extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");

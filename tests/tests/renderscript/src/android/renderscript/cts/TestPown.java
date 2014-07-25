@@ -37,7 +37,7 @@ public class TestPown extends RSBaseCompute {
     public class ArgumentsFloatIntFloat {
         public float inX;
         public int inY;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkPownFloatIntFloat() {
@@ -75,8 +75,8 @@ public class TestPown extends RSBaseCompute {
                 args.inX = arrayInX[i];
                 args.inY = arrayInY[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computePown(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computePown(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -85,7 +85,7 @@ public class TestPown extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Input inY: ");
@@ -95,7 +95,7 @@ public class TestPown extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -143,8 +143,8 @@ public class TestPown extends RSBaseCompute {
                 args.inX = arrayInX[i * 2 + j];
                 args.inY = arrayInY[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computePown(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computePown(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -153,7 +153,7 @@ public class TestPown extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Input inY: ");
@@ -163,7 +163,7 @@ public class TestPown extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -211,8 +211,8 @@ public class TestPown extends RSBaseCompute {
                 args.inX = arrayInX[i * 4 + j];
                 args.inY = arrayInY[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computePown(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computePown(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -221,7 +221,7 @@ public class TestPown extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Input inY: ");
@@ -231,7 +231,7 @@ public class TestPown extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -279,8 +279,8 @@ public class TestPown extends RSBaseCompute {
                 args.inX = arrayInX[i * 4 + j];
                 args.inY = arrayInY[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computePown(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computePown(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -289,7 +289,7 @@ public class TestPown extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Input inY: ");
@@ -299,7 +299,7 @@ public class TestPown extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

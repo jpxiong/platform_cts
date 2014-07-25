@@ -36,7 +36,7 @@ public class TestNativeLog10 extends RSBaseCompute {
 
     public class ArgumentsFloatFloat {
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeLog10FloatFloat() {
@@ -68,26 +68,26 @@ public class TestNativeLog10 extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeLog10(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeLog10(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 1 + j], 0.00005)) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 1 + j], 0.00005)) {
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -127,26 +127,26 @@ public class TestNativeLog10 extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeLog10(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeLog10(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 2 + j], 0.00005)) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 2 + j], 0.00005)) {
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -186,26 +186,26 @@ public class TestNativeLog10 extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeLog10(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeLog10(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -245,26 +245,26 @@ public class TestNativeLog10 extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeLog10(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeLog10(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.00005)) {
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
                     message.append("\n");

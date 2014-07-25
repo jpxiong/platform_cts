@@ -36,7 +36,7 @@ public class TestNativeLength extends RSBaseCompute {
 
     public class ArgumentsFloatFloat {
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeLengthFloatFloat() {
@@ -67,8 +67,8 @@ public class TestNativeLength extends RSBaseCompute {
             // Create the appropriate sized arrays in args
             // Fill args with the input values
             args.inV = arrayInV[i];
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeLength(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeLength(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -78,14 +78,14 @@ public class TestNativeLength extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 message.append("Input inV: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayInV[i], Float.floatToRawIntBits(arrayInV[i]), arrayInV[i]));
                 message.append("\n");
                 message.append("Expected output out: ");
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -99,7 +99,7 @@ public class TestNativeLength extends RSBaseCompute {
 
     public class ArgumentsFloatNFloat {
         public float[] inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeLengthFloat2Float() {
@@ -133,8 +133,8 @@ public class TestNativeLength extends RSBaseCompute {
             for (int j = 0; j < 2 ; j++) {
                 args.inV[j] = arrayInV[i * 2 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeLength(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeLength(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -145,7 +145,7 @@ public class TestNativeLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInV[i * 2 + j], Float.floatToRawIntBits(arrayInV[i * 2 + j]), arrayInV[i * 2 + j]));
                     message.append("\n");
                 }
@@ -153,7 +153,7 @@ public class TestNativeLength extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -196,8 +196,8 @@ public class TestNativeLength extends RSBaseCompute {
             for (int j = 0; j < 3 ; j++) {
                 args.inV[j] = arrayInV[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeLength(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeLength(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -208,7 +208,7 @@ public class TestNativeLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInV[i * 4 + j], Float.floatToRawIntBits(arrayInV[i * 4 + j]), arrayInV[i * 4 + j]));
                     message.append("\n");
                 }
@@ -216,7 +216,7 @@ public class TestNativeLength extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
@@ -259,8 +259,8 @@ public class TestNativeLength extends RSBaseCompute {
             for (int j = 0; j < 4 ; j++) {
                 args.inV[j] = arrayInV[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeNativeLength(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeNativeLength(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -271,7 +271,7 @@ public class TestNativeLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInV[i * 4 + j], Float.floatToRawIntBits(arrayInV[i * 4 + j]), arrayInV[i * 4 + j]));
                     message.append("\n");
                 }
@@ -279,7 +279,7 @@ public class TestNativeLength extends RSBaseCompute {
                 message.append(args.out.toString());
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g %8x %15a",
+                message.append(String.format("%14.8g {%8x} %15a",
                         arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
