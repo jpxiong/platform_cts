@@ -16,7 +16,9 @@
 package android.uirendering.cts.bitmapverifiers;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
+import android.uirendering.cts.util.CompareUtils;
 import android.util.Log;
 
 /**
@@ -24,8 +26,16 @@ import android.util.Log;
  */
 public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
     private static final String TAG = "PerPixelBitmapVerifer";
+    private int mTolerance;
 
-    protected abstract int getExpectedColor(int x, int y);
+    public PerPixelBitmapVerifier(int tolerance) {
+        mTolerance = tolerance;
+    }
+
+    protected int getExpectedColor(int x, int y) {
+        return Color.WHITE;
+    }
+
 
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
         boolean res = true;
@@ -35,9 +45,9 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
                 int index = indexFromXAndY(x, y, stride, offset);
                 int expectedColor = getExpectedColor(x, y);
                 if (!verifyPixel(bitmap[index], expectedColor)) {
-                    Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor) + " received : "
-                            + Integer.toHexString(bitmap[index]) + " at position (" + x + "," + y +
-                            ")");
+                    Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor)
+                            + " received : " + Integer.toHexString(bitmap[index])
+                            + " at position (" + x + "," + y + ")");
                     res = false;
                     differenceMap[index] = FAIL_COLOR;
                 } else {
@@ -55,6 +65,6 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
     }
 
     protected boolean verifyPixel(int color, int expectedColor) {
-        return color == expectedColor;
+        return CompareUtils.verifyPixelWithThreshold(color, expectedColor, mTolerance);
     }
 }

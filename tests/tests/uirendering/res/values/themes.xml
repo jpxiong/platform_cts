@@ -21,5 +21,6 @@ limitations under the License.
         <item name="android:windowBackground">@android:color/white</item>
         <!--This shouldn't be necessary currently a hack for an existing bug with transitions-->
         <item name="android:windowContentTransitions">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
     </style>
 </resources>
