@@ -376,6 +376,7 @@ public class SweepTests extends ActivityTestBase {
         int index = 0;
         // Create the test cases with each combination
         do {
+            canvasClient.setDebugString(modifierAccessor.getDebugString());
             if (bitmapComparers != null) {
                 int arrIndex = Math.min(index, bitmapComparers.length - 1);
                 createTest().addCanvasClient(canvasClient).runWithComparer(bitmapComparers[arrIndex]);

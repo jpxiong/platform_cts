@@ -39,6 +39,7 @@ public class ExactCanvasTests extends ActivityTestBase {
 
     @SmallTest
     public void testBlueRect() {
+        final Rect rect = new Rect(10, 10, 100, 100);
         createTest()
                 .addCanvasClient(new CanvasClient() {
                     @Override
@@ -46,10 +47,10 @@ public class ExactCanvasTests extends ActivityTestBase {
                         Paint p = new Paint();
                         p.setAntiAlias(false);
                         p.setColor(Color.BLUE);
-                        canvas.drawRect(0, 0, 100, 100, p);
+                        canvas.drawRect(rect, p);
                     }
                 })
-                .runWithComparer(mExactComparer);
+                .runWithVerifier(new RectVerifier(Color.WHITE, Color.BLUE, rect));
     }
 
     @SmallTest
