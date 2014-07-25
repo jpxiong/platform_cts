@@ -34,6 +34,12 @@ public class TestNativeAtan2pi extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNativeAtan2piRelaxed(mRS);
     }
 
+    public class ArgumentsFloatFloatFloat {
+        public float inY;
+        public float inX;
+        public Floaty out;
+    }
+
     private void checkNativeAtan2piFloatFloatFloat() {
         Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x39c4f8fd35fc5dc8l, false);
         Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x39c4f8fd35fc5dc7l, false);
@@ -41,6 +47,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInX(inX);
             script.forEach_testNativeAtan2piFloatFloatFloat(inY, out);
+            verifyResultsNativeAtan2piFloatFloatFloat(inY, inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloatFloatFloat: " + e.toString());
         }
@@ -48,8 +55,57 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInX(inX);
             scriptRelaxed.forEach_testNativeAtan2piFloatFloatFloat(inY, out);
+            verifyResultsNativeAtan2piFloatFloatFloat(inY, inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloatFloatFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeAtan2piFloatFloatFloat(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInY = new float[INPUTSIZE * 1];
+        inY.copyTo(arrayInY);
+        float[] arrayInX = new float[INPUTSIZE * 1];
+        inX.copyTo(arrayInX);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inY = arrayInY[i];
+                args.inX = arrayInX[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeAtan2pi(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append("\n");
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeAtan2piFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -60,6 +116,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInX(inX);
             script.forEach_testNativeAtan2piFloat2Float2Float2(inY, out);
+            verifyResultsNativeAtan2piFloat2Float2Float2(inY, inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat2Float2Float2: " + e.toString());
         }
@@ -67,8 +124,57 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInX(inX);
             scriptRelaxed.forEach_testNativeAtan2piFloat2Float2Float2(inY, out);
+            verifyResultsNativeAtan2piFloat2Float2Float2(inY, inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat2Float2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeAtan2piFloat2Float2Float2(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInY = new float[INPUTSIZE * 2];
+        inY.copyTo(arrayInY);
+        float[] arrayInX = new float[INPUTSIZE * 2];
+        inX.copyTo(arrayInX);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inY = arrayInY[i * 2 + j];
+                args.inX = arrayInX[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeAtan2pi(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append("\n");
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeAtan2piFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -79,6 +185,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInX(inX);
             script.forEach_testNativeAtan2piFloat3Float3Float3(inY, out);
+            verifyResultsNativeAtan2piFloat3Float3Float3(inY, inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat3Float3Float3: " + e.toString());
         }
@@ -86,8 +193,57 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInX(inX);
             scriptRelaxed.forEach_testNativeAtan2piFloat3Float3Float3(inY, out);
+            verifyResultsNativeAtan2piFloat3Float3Float3(inY, inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat3Float3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeAtan2piFloat3Float3Float3(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInY = new float[INPUTSIZE * 4];
+        inY.copyTo(arrayInY);
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inY = arrayInY[i * 4 + j];
+                args.inX = arrayInX[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeAtan2pi(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append("\n");
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeAtan2piFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -98,6 +254,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInX(inX);
             script.forEach_testNativeAtan2piFloat4Float4Float4(inY, out);
+            verifyResultsNativeAtan2piFloat4Float4Float4(inY, inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat4Float4Float4: " + e.toString());
         }
@@ -105,8 +262,57 @@ public class TestNativeAtan2pi extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInX(inX);
             scriptRelaxed.forEach_testNativeAtan2piFloat4Float4Float4(inY, out);
+            verifyResultsNativeAtan2piFloat4Float4Float4(inY, inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtan2piFloat4Float4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeAtan2piFloat4Float4Float4(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInY = new float[INPUTSIZE * 4];
+        inY.copyTo(arrayInY);
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inY = arrayInY[i * 4 + j];
+                args.inX = arrayInX[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeAtan2pi(args);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append("\n");
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeAtan2piFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
