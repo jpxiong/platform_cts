@@ -16,15 +16,11 @@
  * the License.
  */
 -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <size
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
         android:height="64dp"
-        android:width="64dp" />
-
-    <viewport
+        android:width="64dp"
         android:viewportHeight="24"
-        android:viewportWidth="24" />
+        android:viewportWidth="24" >
 
     <path
         android:fillOpacity="0.9"
