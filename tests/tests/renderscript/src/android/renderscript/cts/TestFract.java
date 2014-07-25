@@ -77,7 +77,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 1 + j])) {
                     valid = false;
@@ -155,7 +155,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 2 + j])) {
                     valid = false;
@@ -233,7 +233,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
                     valid = false;
@@ -311,7 +311,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
                     valid = false;
@@ -388,7 +388,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
@@ -447,7 +447,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
@@ -506,7 +506,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
@@ -565,7 +565,7 @@ public class TestFract extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFract(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
