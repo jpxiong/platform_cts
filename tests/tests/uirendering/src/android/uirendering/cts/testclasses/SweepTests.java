@@ -376,8 +376,13 @@ public class SweepTests extends ActivityTestBase {
         int index = 0;
         // Create the test cases with each combination
         do {
-            int arrIndex = Math.min(index, bitmapComparers.length - 1);
-            createTest().addCanvasClient(canvasClient).runWithComparer(bitmapComparers[arrIndex]);
+            if (bitmapComparers != null) {
+                int arrIndex = Math.min(index, bitmapComparers.length - 1);
+                createTest().addCanvasClient(canvasClient).runWithComparer(bitmapComparers[arrIndex]);
+            } else {
+                int arrIndex = Math.min(index, bitmapVerifiers.length - 1);
+                createTest().addCanvasClient(canvasClient).runWithVerifier(bitmapVerifiers[arrIndex]);
+            }
             index++;
         } while (modifierAccessor.step());
     }
