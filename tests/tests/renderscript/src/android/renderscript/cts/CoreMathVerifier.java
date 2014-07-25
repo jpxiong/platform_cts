@@ -894,8 +894,20 @@ public class CoreMathVerifier {
         args.out = new Floaty(hypot(args.inX, args.inY), 4, 4);
     }
 
-    static public void computeIlogb(TestIlogb.ArgumentsFloatInt args) {
-        args.out = ilogb(args.in);
+    static public String verifyIlogb(TestIlogb.ArgumentsFloatInt args, boolean relaxed) {
+        // Special case when the input is 0.  We accept two different answers.
+        if (args.in == 0.0f) {
+            if (args.out != -Integer.MAX_VALUE && args.out != Integer.MIN_VALUE) {
+                return "Expected " + Integer.toString(-Integer.MAX_VALUE) + " or " +
+                    Integer.toString(Integer.MIN_VALUE);
+            }
+        } else {
+            int result = ilogb(args.in);
+            if (args.out != result) {
+                return "Expected " + Integer.toString(result);
+            }
+        }
+        return null;
     }
 
     static public void computeLdexp(TestLdexp.ArgumentsFloatIntFloat args) {

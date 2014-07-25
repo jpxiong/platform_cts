@@ -77,7 +77,7 @@ public class TestFrexp extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFrexp(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outIptr != arrayOutIptr[i * 1 + j]) {
                     valid = false;
@@ -154,7 +154,7 @@ public class TestFrexp extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFrexp(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outIptr != arrayOutIptr[i * 2 + j]) {
                     valid = false;
@@ -231,7 +231,7 @@ public class TestFrexp extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFrexp(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outIptr != arrayOutIptr[i * 4 + j]) {
                     valid = false;
@@ -308,7 +308,7 @@ public class TestFrexp extends RSBaseCompute {
                 // Figure out what the outputs should have been.
                 Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeFrexp(args);
-                // Figure out what the outputs should have been.
+                // Validate the outputs.
                 boolean valid = true;
                 if (args.outIptr != arrayOutIptr[i * 4 + j]) {
                     valid = false;
