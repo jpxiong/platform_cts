@@ -18,25 +18,34 @@ package android.hardware.camera2.cts;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.cts.helpers.CameraSessionUtils;
+import android.media.Image;
+import android.media.ImageReader;
+import android.os.SystemClock;
+import android.util.Pair;
 import android.util.Size;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
+import static android.hardware.camera2.cts.helpers.CameraSessionUtils.*;
 
 import android.util.Log;
 import android.view.Surface;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CaptureResultTest extends Camera2AndroidTestCase {
     private static final String TAG = "CaptureResultTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final int MAX_NUM_IMAGES = 5;
+    private static final int MAX_NUM_IMAGES = MAX_READER_IMAGES;
     private static final int NUM_FRAMES_VERIFIED = 30;
     private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
 
@@ -49,6 +58,14 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
     public void setContext(Context context) {
         mAllKeys = getAllCaptureResultKeys();
         super.setContext(context);
+
+        /**
+         * Workaround for mockito and JB-MR2 incompatibility
+         *
+         * Avoid java.lang.IllegalArgumentException: dexcache == null
+         * https://code.google.com/p/dexmaker/issues/detail?id=2
+         */
+        System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
     }
 
     @Override
@@ -139,6 +156,108 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 closeDefaultImageReader();
             }
         }
+    }
+
+    /**
+     * Check that the timestamps passed in the results, buffers, and capture callbacks match for
+     * a single request, and increase monotonically
+     */
+    public void testResultTimestamps() throws Exception {
+        for (String id : mCameraIds) {
+            ImageReader previewReader = null;
+            ImageReader jpegReader = null;
+
+            SimpleImageReaderListener jpegListener = new SimpleImageReaderListener();
+            SimpleImageReaderListener prevListener = new SimpleImageReaderListener();
+            try {
+                openDevice(id);
+
+                CaptureRequest.Builder previewBuilder =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                CaptureRequest.Builder multiBuilder =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+
+                // Create image reader and surface.
+                Size previewSize = mOrderedPreviewSizes.get(0);
+                Size jpegSize = mOrderedStillSizes.get(0);
+
+                // Create ImageReaders.
+                previewReader = makeImageReader(previewSize, ImageFormat.YUV_420_888,
+                        MAX_NUM_IMAGES, prevListener, mHandler);
+                jpegReader = makeImageReader(jpegSize, ImageFormat.JPEG,
+                        MAX_NUM_IMAGES, jpegListener, mHandler);
+
+                // Configure output streams with preview and jpeg streams.
+                List<Surface> outputSurfaces = new ArrayList<>(Arrays.asList(
+                        previewReader.getSurface(), jpegReader.getSurface()));
+
+                SessionListener mockSessionListener = getMockSessionListener();
+
+                CameraCaptureSession session = configureAndVerifySession(mockSessionListener,
+                        mCamera, outputSurfaces, mHandler);
+
+                // Configure the requests.
+                previewBuilder.addTarget(previewReader.getSurface());
+                multiBuilder.addTarget(previewReader.getSurface());
+                multiBuilder.addTarget(jpegReader.getSurface());
+
+                CaptureListener mockCaptureListener = getMockCaptureListener();
+
+                // Capture targeting only preview
+                Pair<TotalCaptureResult, Long> result = captureAndVerifyResult(mockCaptureListener,
+                        session, previewBuilder.build(), mHandler);
+
+                // Check if all timestamps are the same
+                validateTimestamps("Result 1", result.first,
+                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result.second);
+
+                // Capture targeting both jpeg and preview
+                Pair<TotalCaptureResult, Long> result2 = captureAndVerifyResult(mockCaptureListener,
+                        session, multiBuilder.build(), mHandler);
+
+                // Check if all timestamps are the same
+                validateTimestamps("Result 2 Preview", result2.first,
+                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result2.second);
+                validateTimestamps("Result 2 Jpeg", result2.first,
+                        jpegListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result2.second);
+
+                // Check if timestamps are increasing
+                mCollector.expectGreater("Timestamps must be increasing.", result.second,
+                        result2.second);
+
+                // Capture two preview frames
+                long startTime = SystemClock.elapsedRealtimeNanos();
+                Pair<TotalCaptureResult, Long> result3 = captureAndVerifyResult(mockCaptureListener,
+                        session, previewBuilder.build(), mHandler);
+                Pair<TotalCaptureResult, Long> result4 = captureAndVerifyResult(mockCaptureListener,
+                        session, previewBuilder.build(), mHandler);
+                long clockDiff = SystemClock.elapsedRealtimeNanos() - startTime;
+                long resultDiff = result4.second - result3.second;
+
+                // Check if all timestamps are the same
+                validateTimestamps("Result 3", result3.first,
+                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result3.second);
+                validateTimestamps("Result 4", result4.first,
+                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result4.second);
+
+                // Check that the timestamps monotonically increase at a reasonable rate
+                mCollector.expectGreaterOrEqual("Timestamps increase faster than system clock.",
+                        resultDiff, clockDiff);
+                mCollector.expectGreater("Timestamps must be increasing.", result3.second,
+                        result4.second);
+            } finally {
+                closeDevice(id);
+                closeImageReader(previewReader);
+                closeImageReader(jpegReader);
+            }
+        }
+    }
+
+    private void validateTimestamps(String msg, TotalCaptureResult result, Image resultImage,
+                                    long captureTime) {
+        mCollector.expectKeyValueEquals(result, CaptureResult.SENSOR_TIMESTAMP, captureTime);
+        mCollector.expectEquals(msg + ": Capture timestamp must be same as resultImage timestamp",
+                resultImage.getTimestamp(), captureTime);
     }
 
     private void validateCaptureResult(SimpleCaptureListener captureListener,

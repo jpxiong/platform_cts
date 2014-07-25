@@ -748,8 +748,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
                 stopPreview();
             } finally {
-                closeImageReader(rawReader);
-                closeImageReader(jpegReader);
+                CameraTestUtils.closeImageReader(rawReader);
+                CameraTestUtils.closeImageReader(jpegReader);
                 rawReader = null;
                 jpegReader = null;
             }
