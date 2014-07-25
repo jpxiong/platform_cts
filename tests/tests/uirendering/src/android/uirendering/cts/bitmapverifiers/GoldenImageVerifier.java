@@ -17,6 +17,7 @@ package android.uirendering.cts.bitmapverifiers;
 
 import android.graphics.Bitmap;
 import android.uirendering.cts.bitmapcomparers.BitmapComparer;
+import android.uirendering.cts.differencevisualizers.PassFailVisualizer;
 
 public class GoldenImageVerifier extends BitmapVerifier {
     private BitmapComparer mBitmapComparer;
@@ -31,7 +32,13 @@ public class GoldenImageVerifier extends BitmapVerifier {
 
     @Override
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
-        return mBitmapComparer.verifySame(mGoldenBitmapArray, bitmap, offset, stride,
+        boolean success = mBitmapComparer.verifySame(mGoldenBitmapArray, bitmap, offset, stride,
                 width, height);
+        if (!success) {
+            mDifferenceBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            int[] differences = new PassFailVisualizer().getDifferences(mGoldenBitmapArray, bitmap);
+            mDifferenceBitmap.setPixels(differences, 0, width, 0, 0, width, height);
+        }
+        return success;
     }
 }

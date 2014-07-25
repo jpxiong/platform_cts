@@ -15,10 +15,17 @@
  */
 package android.uirendering.cts.bitmapverifiers;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+
 /**
  * Checks to see if a Bitmap follows the algorithm provided by the verifier
  */
 public abstract class BitmapVerifier {
+    protected static final int PASS_COLOR = Color.WHITE;
+    protected static final int FAIL_COLOR = Color.RED;
+
+    protected Bitmap mDifferenceBitmap;
 
     /**
      * This will test if the bitmap is good or not.
@@ -30,5 +37,9 @@ public abstract class BitmapVerifier {
      */
     protected static int indexFromXAndY(int x, int y, int stride, int offset) {
         return x + (y * stride) + offset;
+    }
+
+    public Bitmap getDifferenceBitmap() {
+        return mDifferenceBitmap;
     }
 }
