@@ -17,9 +17,9 @@ package android.uirendering.cts.testclasses;
 
 import com.android.cts.uirendering.R;
 
+import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.bitmapcomparers.BitmapComparer;
 import android.uirendering.cts.bitmapcomparers.ExactComparer;
-import android.test.suitebuilder.annotation.SmallTest;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 
 
@@ -35,12 +35,12 @@ public class LayoutTests extends ActivityTestBase {
 
     @SmallTest
     public void testSimpleRedLayout() {
-        executeLayoutTest(R.layout.simple_red_layout, mBitmapComparer);
+        createTest().addLayout(R.layout.simple_red_layout, null).runWithComparer(mBitmapComparer);
     }
 
     @SmallTest
     public void testSimpleRectLayout() {
-        executeLayoutTest(R.layout.simple_rect_layout, mBitmapComparer);
+        createTest().addLayout(R.layout.simple_rect_layout, null).runWithComparer(mBitmapComparer);
     }
 }
 

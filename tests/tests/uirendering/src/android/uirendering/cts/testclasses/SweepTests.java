@@ -33,7 +33,6 @@ import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 import android.uirendering.cts.testinfrastructure.CanvasClient;
 import android.uirendering.cts.testinfrastructure.DisplayModifier;
 import android.uirendering.cts.testinfrastructure.ResourceModifier;
-import android.util.Log;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -135,11 +134,12 @@ public class SweepTests extends ActivityTestBase {
 
         @Override
         public void modifyDrawing(Paint paint, Canvas canvas) {
-            // Draw the background
-            canvas.drawColor(Color.WHITE);
+            int sc = canvas.saveLayer(0, 0, TEST_WIDTH, TEST_HEIGHT, null);
 
             canvas.drawBitmap(mDstBitmap, 0, 0, null);
             canvas.drawBitmap(mSrcBitmap, 0, 0, paint);
+
+            canvas.restoreToCount(sc);
         }
 
         private Bitmap createSrc() {
@@ -294,53 +294,53 @@ public class SweepTests extends ActivityTestBase {
 
     @SmallTest
     public void testBasicDraws() {
-        BitmapComparer[] calculators = new BitmapComparer[1];
-        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
-        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, calculators);
+        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
+        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
+        sweepModifiersForMask(DisplayModifier.Accessor.SHAPES_MASK, null, bitmapComparers);
     }
 
     @SmallTest
     public void testBasicShaders() {
-        BitmapComparer[] calculators = new BitmapComparer[1];
-        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
+        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
+        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.SHADER_MASK, mCircleDrawModifier,
-                calculators);
+                bitmapComparers);
     }
 
     @SmallTest
     public void testColorFilterUsingGradient() {
-        BitmapComparer[] calculators = new BitmapComparer[1];
-        calculators[0] = new MSSIMComparer(HIGH_THRESHOLD);
+        BitmapComparer[] bitmapComparers = new BitmapComparer[1];
+        bitmapComparers[0] = new MSSIMComparer(HIGH_THRESHOLD);
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
-                COLOR_FILTER_GRADIENT_MODIFIER, calculators);
+                COLOR_FILTER_GRADIENT_MODIFIER, bitmapComparers);
     }
 
     @SmallTest
     public void testColorFiltersAlphas() {
-        BitmapComparer[] calculators =
+        BitmapComparer[] bitmapComparers =
                 new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            calculators[index] = new SamplePointsComparer(COLOR_FILTER_ALPHA_POINTS,
+            bitmapComparers[index] = new SamplePointsComparer(COLOR_FILTER_ALPHA_POINTS,
                     COLOR_FILTER_ALPHA_MAP.get(mode));
             index++;
         }
         sweepModifiersForMask(DisplayModifier.Accessor.COLOR_FILTER_MASK,
-                COLOR_FILTER_ALPHA_MODIFIER, calculators);
+                COLOR_FILTER_ALPHA_MODIFIER, bitmapComparers);
     }
 
     @SmallTest
     public void testXfermodes() {
-        BitmapComparer[] calculators =
+        BitmapComparer[] bitmapComparers =
                 new BitmapComparer[DisplayModifier.PORTERDUFF_MODES.length];
         int index = 0;
         for (PorterDuff.Mode mode : DisplayModifier.PORTERDUFF_MODES) {
-            calculators[index] = new SamplePointsComparer(XFERMODE_TEST_POINTS,
+            bitmapComparers[index] = new SamplePointsComparer(XFERMODE_TEST_POINTS,
                     XFERMODE_COLOR_MAP.get(mode));
             index++;
         }
         sweepModifiersForMask(DisplayModifier.Accessor.XFERMODE_MASK, XFERMODE_MODIFIER,
-            calculators);
+                bitmapComparers);
     }
 
     @SmallTest
@@ -355,7 +355,7 @@ public class SweepTests extends ActivityTestBase {
     }
 
     protected void sweepModifiersForMask(int mask, final DisplayModifier drawOp,
-            BitmapComparer[] calculators) {
+            BitmapComparer[] bitmapComparers) {
         if ((mask & DisplayModifier.Accessor.ALL_OPTIONS_MASK) == 0) {
             throw new IllegalArgumentException("Attempt to test with a mask that is invalid");
         }
@@ -375,12 +375,12 @@ public class SweepTests extends ActivityTestBase {
                 }
             }
         };
-        Log.d(TAG, "Starting test : " + getName());
+
         int index = 0;
+        // Create the test cases with each combination
         do {
-            Log.d(TAG, "Option at index : " + index);
-            int calcIndex = Math.min(index, calculators.length - 1);
-            executeCanvasTest(canvasClient, calculators[calcIndex]);
+            int arrIndex = Math.min(index, bitmapComparers.length - 1);
+            createTest().addCanvasClient(canvasClient).runWithComparer(bitmapComparers[arrIndex]);
             index++;
         } while (modifierAccessor.step());
     }

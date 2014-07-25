@@ -15,6 +15,7 @@
  */
 package android.uirendering.cts.testinfrastructure;
 
+import android.annotation.Nullable;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -48,7 +49,8 @@ public class DrawActivity extends Activity {
     }
 
     public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
-            boolean useHardware) {
+            @Nullable ViewInitializer viewInitializer, boolean useHardware) {
+        ((RenderSpecHandler) mHandler).setViewInitializer(viewInitializer);
         int arg2 = (useHardware ? View.LAYER_TYPE_NONE : View.LAYER_TYPE_SOFTWARE);
         if (canvasClient != null) {
             mHandler.obtainMessage(RenderSpecHandler.CANVAS_MSG, 0, arg2, canvasClient).sendToTarget();
@@ -72,6 +74,12 @@ public class DrawActivity extends Activity {
         public static final int CANVAS_MSG = 2;
         public static final int WEB_VIEW_MSG = 3;
 
+        private ViewInitializer mViewInitializer;
+
+        public void setViewInitializer(ViewInitializer viewInitializer) {
+            mViewInitializer = viewInitializer;
+        }
+
         public void handleMessage(Message message) {
             int webViewBuffer = 0;
             switch (message.what) {
@@ -94,6 +102,11 @@ public class DrawActivity extends Activity {
                     webViewBuffer = 10;
                 } break;
             }
+
+            if (mViewInitializer != null) {
+                mViewInitializer.intializeView(mView);
+            }
+
             mView.setLayerType(message.arg2, null);
 
             DrawCounterListener onDrawListener = new DrawCounterListener(webViewBuffer);
