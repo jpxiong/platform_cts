@@ -18,7 +18,7 @@ package android.uirendering.cts.bitmapverifiers;
 /**
  * Checks to see if a bitmap is entirely a single color
  */
-public class ColorVerifier extends BitmapVerifier {
+public class ColorVerifier extends PerPixelBitmapVerifier {
     private int mColor;
 
     public ColorVerifier(int color) {
@@ -26,14 +26,7 @@ public class ColorVerifier extends BitmapVerifier {
     }
 
     @Override
-    public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
-        for (int y = 0 ; y < height ; y++) {
-            for (int x = 0 ; x < width ; x++) {
-                if (bitmap[indexFromXAndY(x, y, stride, offset)] != mColor) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    protected boolean verifyPixel(int x, int y, int color) {
+        return color == mColor;
     }
 }

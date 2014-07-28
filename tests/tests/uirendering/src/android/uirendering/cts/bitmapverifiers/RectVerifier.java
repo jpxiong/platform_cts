@@ -16,12 +16,11 @@
 package android.uirendering.cts.bitmapverifiers;
 
 import android.graphics.Rect;
-import android.util.Log;
 
 /**
  * Tests to see if there is rectangle of a certain color, with a background given
  */
-public class RectVerifier extends BitmapVerifier {
+public class RectVerifier extends PerPixelBitmapVerifier {
     private static final String TAG = "RectVerifier";
     private int mOuterColor;
     private int mInnerColor;
@@ -34,19 +33,8 @@ public class RectVerifier extends BitmapVerifier {
     }
 
     @Override
-    public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
-        for (int y = 0 ; y < width ; y++) {
-            for (int x = 0 ; x < width ; x++) {
-                int index = indexFromXAndY(x, y, stride, offset);
-                int expectedColor = mInnerRect.contains(x, y) ? mInnerColor : mOuterColor;
-                if (bitmap[index] != expectedColor) {
-                    Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor) +
-                            " Received : " + Integer.toHexString(bitmap[index]) +
-                            " x : "  + x + " y : " + y);
-                    return false;
-                }
-            }
-        }
-        return true;
+    protected boolean verifyPixel(int x, int y, int color) {
+        int expectedColor = mInnerRect.contains(x, y) ? mInnerColor : mOuterColor;
+        return color == expectedColor;
     }
 }
