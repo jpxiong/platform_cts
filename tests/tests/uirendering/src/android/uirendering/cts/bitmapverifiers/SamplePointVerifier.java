@@ -15,8 +15,12 @@
  */
 package android.uirendering.cts.bitmapverifiers;
 
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * This class will test specific points, and ensure that they match up perfectly with the input colors
@@ -33,6 +37,9 @@ public class SamplePointVerifier extends BitmapVerifier {
 
     @Override
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
+        boolean success = true;
+        int[] differenceMap = new int[bitmap.length];
+        Arrays.fill(differenceMap, PASS_COLOR);
         for (int i = 0 ; i < mTestPoints.length ; i++) {
             int x = mTestPoints[i].x;
             int y = mTestPoints[i].y;
@@ -41,9 +48,18 @@ public class SamplePointVerifier extends BitmapVerifier {
                 Log.d(TAG, "Expected : " + Integer.toHexString(mExpectedColors[i]) +
                         " at position x = " + x + " y = " + y + " , tested color : " +
                         Integer.toHexString(bitmap[index]));
-                return false;
+                differenceMap[index] = FAIL_COLOR;
+                success = false;
+            } else {
+                differenceMap[index] = PASS_COLOR;
             }
         }
-        return true;
+        if (!success) {
+            mDifferenceBitmap = Bitmap.createBitmap(ActivityTestBase.TEST_WIDTH,
+                    ActivityTestBase.TEST_HEIGHT, Bitmap.Config.ARGB_8888);
+            mDifferenceBitmap.setPixels(differenceMap, offset, stride, 0, 0,
+                    ActivityTestBase.TEST_WIDTH, ActivityTestBase.TEST_HEIGHT);
+        }
+        return success;
     }
 }
