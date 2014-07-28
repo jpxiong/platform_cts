@@ -56,8 +56,16 @@ public abstract class ActivityTestBase extends
      * we would use.
      */
     public ActivityTestBase() {
-        super("android.graphicshardware.cts", DrawActivity.class);
+        super(DrawActivity.class);
         mDifferenceVisualizer = new PassFailVisualizer();
+
+        // Create a location for the files to be held, if it doesn't exist already
+        BitmapDumper.createSubDirectory(this.getClass().getSimpleName());
+
+        // If we have a test currently, let's remove the older files if they exist
+        if (getName() != null) {
+            BitmapDumper.deleteFileInClassFolder(this.getClass().getSimpleName(), getName());
+        }
     }
 
     /**
@@ -147,7 +155,8 @@ public abstract class ActivityTestBase extends
         }
 
         if (!success) {
-            BitmapDumper.dumpBitmaps(bitmap1, bitmap2, getName(), mDifferenceVisualizer);
+            BitmapDumper.dumpBitmaps(bitmap1, bitmap2, getName(), this.getClass().getSimpleName(),
+                    mDifferenceVisualizer);
         }
 
         assertTrue(debugMessage, success);
@@ -163,8 +172,9 @@ public abstract class ActivityTestBase extends
                 TEST_WIDTH, TEST_HEIGHT);
         boolean success = bitmapVerifier.verify(mSoftwareArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
         if (!success) {
-            BitmapDumper.dumpBitmap(bitmap, getName());
-            BitmapDumper.dumpBitmap(bitmapVerifier.getDifferenceBitmap(), getName() + "_verifier");
+            BitmapDumper.dumpBitmap(bitmap, getName(), this.getClass().getSimpleName());
+            BitmapDumper.dumpBitmap(bitmapVerifier.getDifferenceBitmap(), getName() + "_verifier",
+                    this.getClass().getSimpleName());
         }
         assertTrue(debugMessage, success);
     }
