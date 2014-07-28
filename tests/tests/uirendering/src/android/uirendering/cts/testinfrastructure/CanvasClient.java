@@ -20,6 +20,16 @@ import android.graphics.Canvas;
 /**
  * A class that the tester will implement and create a set of drawing calls the tests would use
  */
-public interface CanvasClient {
+public abstract class CanvasClient {
+    private String mDebugString;
+
     public abstract void draw(Canvas canvas, int width, int height);
+
+    public String getDebugString() {
+        return mDebugString;
+    }
+
+    public void setDebugString(String debugString) {
+        mDebugString = debugString;
+    }
 }
