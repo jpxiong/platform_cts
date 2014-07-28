@@ -1337,7 +1337,7 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidSensorInfoTimestampCalibration() throws Exception {
+    public void testCameraCharacteristicsAndroidSensorInfoTimestampSource() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
@@ -1346,13 +1346,13 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
 
             {
 
-                assertNotNull("Invalid property: android.sensor.info.timestampCalibration",
-                        props.get(CameraCharacteristics.SENSOR_INFO_TIMESTAMP_CALIBRATION));
+                assertNotNull("Invalid property: android.sensor.info.timestampSource",
+                        props.get(CameraCharacteristics.SENSOR_INFO_TIMESTAMP_SOURCE));
                 List<Key<?>> allKeys = props.getKeys();
                 assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
                         ids[i]), allKeys);
-                assertTrue("Key not in keys list: android.sensor.info.timestampCalibration", allKeys.contains(
-                        CameraCharacteristics.SENSOR_INFO_TIMESTAMP_CALIBRATION));
+                assertTrue("Key not in keys list: android.sensor.info.timestampSource", allKeys.contains(
+                        CameraCharacteristics.SENSOR_INFO_TIMESTAMP_SOURCE));
 
             }
 
