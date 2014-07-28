@@ -594,6 +594,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
 
+        <activity android:name="android.hardware.camera2.cts.Camera2MultiViewStubActivity"
+            android:label="Camera2MultiViewStubActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+
         <activity android:name="android.view.inputmethod.cts.InputMethodStubActivity"
             android:label="InputMethodStubActivity">
             <intent-filter>
