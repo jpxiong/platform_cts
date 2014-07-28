@@ -22,7 +22,7 @@ import android.graphics.Color;
  */
 public class PassFailVisualizer extends DifferenceVisualizer {
     /**
-     * This method will return a bitmap where white is same black is different
+     * This method will return a bitmap where white is same red is different
      * @param ideal the desired result
      * @param given the produced result
      */
@@ -33,7 +33,7 @@ public class PassFailVisualizer extends DifferenceVisualizer {
             if (ideal[y] == given[y]) {
                 output[y] = Color.WHITE;
             } else {
-                output[y] = Color.BLACK;
+                output[y] = Color.RED;
             }
         }
         return output;

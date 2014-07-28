@@ -163,6 +163,7 @@ public abstract class ActivityTestBase extends
         boolean res = bitmapVerifier.verify(mSoftwareArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
         if (!res) {
             BitmapDumper.dumpBitmap(bitmap, getName());
+            BitmapDumper.dumpBitmap(bitmapVerifier.getDifferenceBitmap(), getName() + "_verifier");
         }
         assertTrue(res);
     }
