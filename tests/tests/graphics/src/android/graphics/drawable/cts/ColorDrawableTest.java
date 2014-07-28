@@ -131,7 +131,8 @@ public class ColorDrawableTest extends AndroidTestCase {
         final ColorDrawable d = new ColorDrawable(Color.WHITE);
         assertEquals(Color.WHITE, DrawableTestingUtils.getPixel(d, 0, 0));
 
-        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        d.setTint(Color.BLACK);
+        d.setTintMode(Mode.SRC_OVER);
         assertEquals(Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
     }
 }

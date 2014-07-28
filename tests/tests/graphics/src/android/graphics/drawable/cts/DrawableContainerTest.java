@@ -212,7 +212,8 @@ public class DrawableContainerTest extends TestCase {
         assertNull(mDrawableContainer.getCurrent());
 
         mDrawableContainer.setConstantState(mDrawableContainerState);
-        mDrawableContainer.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        mDrawableContainer.setTint(Color.BLACK);
+        mDrawableContainer.setTintMode(Mode.SRC_OVER);
 
         MockDrawable dr = new MockDrawable();
         addAndSelectDrawable(dr);
@@ -220,8 +221,9 @@ public class DrawableContainerTest extends TestCase {
         assertEquals("Initial tint propagates", Mode.SRC_OVER, dr.getTintMode());
 
         dr.reset();
-        mDrawableContainer.setTint(null, null);
-        assertTrue("setTint() propagates", dr.hasSetTintCalled());
+        mDrawableContainer.setTintList(null);
+        mDrawableContainer.setTintMode(null);
+        assertTrue("setImageTintList() propagates", dr.hasSetTintCalled());
     }
 
     public void testOnBoundsChange() {
@@ -857,7 +859,7 @@ public class DrawableContainerTest extends TestCase {
         }
 
         @Override
-        public void setTint(ColorStateList tint, Mode tintMode) {
+        public void setTintMode(Mode tintMode) {
             mTintMode = tintMode;
             mHasCalledSetTint = true;
         }
