@@ -53,15 +53,8 @@ public class StaticMetadata {
     private static final String TAG = "StaticMetadata";
     private static final int IGNORE_SIZE_CHECK = -1;
 
-    // TODO: don't hardcode, generate from metadata XML
-    private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_SIZE = 2;
-    private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN = 0;
-    private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX = 1;
     private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST = 100000L; // 100us
     private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST = 100000000; // 100ms
-    private static final int SENSOR_INFO_SENSITIVITY_RANGE_SIZE = 2;
-    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN = 0;
-    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX = 1;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST = 100;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
     private static final int STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST = 4;
@@ -1567,6 +1560,39 @@ public class StaticMetadata {
                 value <= CameraCharacteristics.SCALER_CROPPING_TYPE_FREEFORM);
 
         return value;
+    }
+
+    /**
+     * Check if high speed video is supported (HIGH_SPEED_VIDEO scene mode is
+     * supported, supported high speed fps ranges and sizes are valid).
+     *
+     * @return true if high speed video is supported.
+     */
+    public boolean isHighSpeedVideoSupported() {
+        List<Integer> sceneModes =
+                Arrays.asList(CameraTestUtils.toObject(getAvailableSceneModesChecked()));
+        if (sceneModes.contains(CameraCharacteristics.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO)) {
+            StreamConfigurationMap config =
+                    getValueFromKeyNonNull(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            if (config == null) {
+                return false;
+            }
+            Size[] availableSizes = config.getHighSpeedVideoSizes();
+            if (availableSizes.length == 0) {
+                return false;
+            }
+
+            for (Size size : availableSizes) {
+                Range<Integer>[] availableFpsRanges = config.getHighSpeedVideoFpsRangesFor(size);
+                if (availableFpsRanges.length == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
