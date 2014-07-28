@@ -17,7 +17,7 @@ package android.uirendering.cts.util;
 
 import android.graphics.Bitmap;
 import android.uirendering.cts.differencevisualizers.DifferenceVisualizer;
-import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,12 +30,40 @@ import libcore.io.IoUtils;
  * A utility class that will allow the user to save bitmaps to the sdcard on the device.
  */
 public final class BitmapDumper {
+    private final static String TAG = "BitmapDumper";
     private final static String IDEAL_RENDERING_FILE_NAME = "idealCapture.png";
     private final static String TESTED_RENDERING_FILE_NAME = "testedCapture.png";
     private final static String VISUALIZER_RENDERING_FILE_NAME = "visualizer.png";
     private final static String SINGULAR_FILE_NAME = "capture.png";
+    private final static String CAPTURE_SUB_DIRECTORY = "/sdcard/UiRenderingCaptures/";
 
     private BitmapDumper(){};
+
+    /**
+     * Deletes the specific files for the given test in a given class.
+     */
+    public static void deleteFileInClassFolder(String className, String testName) {
+        File directory = new File(CAPTURE_SUB_DIRECTORY + className);
+
+        String[] children = directory.list();
+        if (children == null) {
+            return;
+        }
+        for (String file : children) {
+            if (file.startsWith(testName)) {
+                new File(directory, file).delete();
+            }
+        }
+    }
+
+    public static void createSubDirectory(String className) {
+        File saveDirectory = new File(CAPTURE_SUB_DIRECTORY + className);
+        if (saveDirectory.exists()) {
+            return;
+        }
+        // Create the directory if it isn't already created.
+        saveDirectory.mkdirs();
+    }
 
     /**
      * Saves two files, one the capture of an ideal drawing, and one the capture of the tested
@@ -44,7 +72,7 @@ public final class BitmapDumper {
      * The files are saved to the sdcard directory
      */
     public static void dumpBitmaps(Bitmap idealBitmap, Bitmap testedBitmap, String testName,
-            DifferenceVisualizer differenceVisualizer) {
+            String className, DifferenceVisualizer differenceVisualizer) {
         Bitmap visualizerBitmap;
 
         int width = idealBitmap.getWidth();
@@ -57,21 +85,18 @@ public final class BitmapDumper {
         visualizerBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         visualizerBitmap.setPixels(visualizerArray, 0, width, 0, 0, width, height);
 
-        saveFile(testName, IDEAL_RENDERING_FILE_NAME, idealBitmap);
-        saveFile(testName, TESTED_RENDERING_FILE_NAME, testedBitmap);
-        saveFile(testName, VISUALIZER_RENDERING_FILE_NAME, visualizerBitmap);
+        saveFile(className, testName, IDEAL_RENDERING_FILE_NAME, idealBitmap);
+        saveFile(className, testName, TESTED_RENDERING_FILE_NAME, testedBitmap);
+        saveFile(className, testName, VISUALIZER_RENDERING_FILE_NAME, visualizerBitmap);
     }
 
-    public static void dumpBitmap(Bitmap bitmap, String testName) {
-        saveFile(testName, SINGULAR_FILE_NAME, bitmap);
+    public static void dumpBitmap(Bitmap bitmap, String testName, String className) {
+        saveFile(className, testName, SINGULAR_FILE_NAME, bitmap);
     }
 
-    private static File createImageFile(String fileName) {
-        return new File(Environment.getExternalStorageDirectory(), fileName);
-    }
-
-    private static void saveFile(String testName, String fileName, Bitmap bitmap) {
-        File file = createImageFile(testName + "_" + fileName);
+    private static void saveFile(String className, String testName, String fileName, Bitmap bitmap) {
+        Log.d(TAG, "Saving file : " + testName + "_" + fileName + " in directory : " + className);
+        File file = new File(CAPTURE_SUB_DIRECTORY + className, testName + "_" + fileName);
         FileOutputStream fileStream = null;
         try {
             fileStream = new FileOutputStream(file);
