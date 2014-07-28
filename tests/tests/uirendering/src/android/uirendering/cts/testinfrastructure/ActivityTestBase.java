@@ -85,7 +85,7 @@ public abstract class ActivityTestBase extends
 
         for (TestCase testCase : testCases) {
             if (!testCase.wasTestRan) {
-                Log.w(TAG_NAME, "Not all of the tests were ran");
+                Log.w(TAG_NAME, getName() + " not all of the tests were ran");
                 break;
             }
         }
@@ -129,43 +129,44 @@ public abstract class ActivityTestBase extends
      * the test name.
      */
     protected void assertBitmapsAreSimilar(Bitmap bitmap1, Bitmap bitmap2,
-            BitmapComparer comparer) {
-        boolean res;
+            BitmapComparer comparer, String debugMessage) {
+        boolean success;
 
         if (USE_RS && comparer.supportsRenderScript()) {
             mIdealAllocation = Allocation.createFromBitmap(mRenderScript, bitmap1,
                     Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
             mGivenAllocation = Allocation.createFromBitmap(mRenderScript, bitmap2,
                     Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
-            res = comparer.verifySameRS(getActivity().getResources(), mIdealAllocation,
+            success = comparer.verifySameRS(getActivity().getResources(), mIdealAllocation,
                     mGivenAllocation, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT, mRenderScript);
         } else {
             bitmap1.getPixels(mSoftwareArray, 0, TEST_WIDTH, 0, 0, TEST_WIDTH, TEST_HEIGHT);
             bitmap2.getPixels(mHardwareArray, 0, TEST_WIDTH, 0, 0, TEST_WIDTH, TEST_HEIGHT);
-            res = comparer.verifySame(mSoftwareArray, mHardwareArray, 0, TEST_WIDTH, TEST_WIDTH,
+            success = comparer.verifySame(mSoftwareArray, mHardwareArray, 0, TEST_WIDTH, TEST_WIDTH,
                     TEST_HEIGHT);
         }
 
-        if (!res) {
+        if (!success) {
             BitmapDumper.dumpBitmaps(bitmap1, bitmap2, getName(), mDifferenceVisualizer);
         }
 
-        assertTrue(res);
+        assertTrue(debugMessage, success);
     }
 
     /**
      * Tests to see if a bitmap passes a verifier's test. If it doesn't the bitmap is saved to the
      * sdcard.
      */
-    protected void assertBitmapIsVerified(Bitmap bitmap, BitmapVerifier bitmapVerifier) {
+    protected void assertBitmapIsVerified(Bitmap bitmap, BitmapVerifier bitmapVerifier,
+            String debugMessage) {
         bitmap.getPixels(mSoftwareArray, 0, TEST_WIDTH, 0, 0,
                 TEST_WIDTH, TEST_HEIGHT);
-        boolean res = bitmapVerifier.verify(mSoftwareArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
-        if (!res) {
+        boolean success = bitmapVerifier.verify(mSoftwareArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
+        if (!success) {
             BitmapDumper.dumpBitmap(bitmap, getName());
             BitmapDumper.dumpBitmap(bitmapVerifier.getDifferenceBitmap(), getName() + "_verifier");
         }
-        assertTrue(res);
+        assertTrue(debugMessage, success);
     }
 
     protected TestCaseBuilder createTest() {
@@ -196,7 +197,8 @@ public abstract class ActivityTestBase extends
 
             for (TestCase testCase : mTestCases) {
                 Bitmap testCaseBitmap = captureRenderSpec(testCase);
-                assertBitmapsAreSimilar(idealBitmap, testCaseBitmap, bitmapComparer);
+                assertBitmapsAreSimilar(idealBitmap, testCaseBitmap, bitmapComparer,
+                        testCase.getDebugString());
             }
         }
 
@@ -211,7 +213,7 @@ public abstract class ActivityTestBase extends
 
             for (TestCase testCase : mTestCases) {
                 Bitmap testCaseBitmap = captureRenderSpec(testCase);
-                assertBitmapIsVerified(testCaseBitmap, bitmapVerifier);
+                assertBitmapIsVerified(testCaseBitmap, bitmapVerifier, testCase.getDebugString());
             }
         }
 
@@ -275,6 +277,25 @@ public abstract class ActivityTestBase extends
             this.viewInitializer = viewInitializer;
             this.useHardware = useHardware;
             this.wasTestRan = false;
+        }
+
+        public String getDebugString() {
+            String debug = "";
+            if (canvasClient != null) {
+                debug += "CanvasClient : ";
+                if (canvasClient.getDebugString() != null) {
+                    debug += canvasClient.getDebugString();
+                } else {
+                    debug += "no debug string given";
+                }
+            } else if (webViewUrl != null) {
+                debug += "WebView URL : " + webViewUrl;
+            } else {
+                debug += "Layout resource : " +
+                        getActivity().getResources().getResourceName(layoutID);
+            }
+            debug += "\nTest ran in " + (useHardware ? "hardware" : "software") + "\n";
+            return debug;
         }
     }
 }

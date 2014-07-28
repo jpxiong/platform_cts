@@ -437,6 +437,7 @@ public abstract class DisplayModifier {
         public final static int XFERMODE_INDEX = 7;
         private final int mMask;
 
+        private String mDebugString;
         private int[] mIndices;
         private LinkedHashMap<String, LinkedHashMap<String, DisplayModifier>> mDisplayMap;
 
@@ -453,6 +454,7 @@ public abstract class DisplayModifier {
                 }
                 index++;
             }
+            mDebugString = "";
         }
 
         private LinkedHashMap<String, DisplayModifier> getMapAtIndex(int index) {
@@ -512,15 +514,20 @@ public abstract class DisplayModifier {
         private ArrayList<DisplayModifier> getModifierList() {
             ArrayList<DisplayModifier> modifierArrayList = new ArrayList<DisplayModifier>();
             int mapIndex = 0;
+            mDebugString = "";
 
             // Through each possible category of modification
-            for (LinkedHashMap<String, DisplayModifier> map : mDisplayMap.values()) {
+            for (Map.Entry<String, LinkedHashMap<String, DisplayModifier>> entry :
+                    mDisplayMap.entrySet()) {
                 int displayModifierIndex = mIndices[mapIndex];
+                mDebugString += "Modification : " + entry.getKey();
                 // Loop until we find the modification we are going to use
-                for (Map.Entry<String, DisplayModifier> modifierEntry : map.entrySet()) {
+                for (Map.Entry<String, DisplayModifier> modifierEntry :
+                        entry.getValue().entrySet()) {
                     // Once we find the modification we want, then we will add it to the list,
                     // and the last applied modifications
                     if (displayModifierIndex == 0) {
+                        mDebugString += " value : " + modifierEntry.getKey() + " ";
                         modifierArrayList.add(modifierEntry.getValue());
                         break;
                     }
@@ -529,6 +536,10 @@ public abstract class DisplayModifier {
                 mapIndex++;
             }
             return modifierArrayList;
+        }
+
+        public String getDebugString() {
+            return mDebugString;
         }
 
         /**
