@@ -342,6 +342,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
         CaptureRequest.Builder recordingRequestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        recordingRequestBuilder.set(CaptureRequest.CONTROL_MODE,
+                CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
         recordingRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
                 CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
         CaptureRequest.Builder recordingOnlyBuilder =
