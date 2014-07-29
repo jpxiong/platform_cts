@@ -572,12 +572,12 @@ public class AllocationTest extends AndroidTestCase {
         final long EXPOSURE_TIME_NS = 2000000; // 2 seconds
         final int RGB_CHANNELS = 3;
 
-        final List<float[]> rgbMeans = new ArrayList<float[]>();
-
         mCameraIterable.forEachCamera(/*fullHwLevel*/true, new CameraBlock() {
+
+
             @Override
             public void run(CameraDevice camera) throws CameraAccessException {
-
+                final List<float[]> rgbMeans = new ArrayList<float[]>();
                 final Size maxSize = getMaxSize(
                         getSupportedSizeForFormat(YUV_420_888, camera.getId(), mCameraManager));
                 final StaticMetadata staticInfo =
@@ -706,17 +706,6 @@ public class AllocationTest extends AndroidTestCase {
                     Log.i(TAG, String.format(
                             "Skipping this test for camera %s, needs FULL hw level",
                             mCameraIds[i]));
-                    continue;
-                }
-
-                // FIXME: hammerhead FFC thinks its FULL but doesnt have per-frame-control
-                if (fullHwLevel &&
-                        staticInfo.getCharacteristics().get(CameraCharacteristics.LENS_FACING)
-                        != CameraMetadata.LENS_FACING_BACK
-                        && "hammerhead".equals(android.os.Build.PRODUCT)) {
-                    Log.w(TAG,
-                            "FIXME: Front facing camera claims to support per-frame-control " +
-                            "but doesn't for product " + android.os.Build.PRODUCT);
                     continue;
                 }
 
