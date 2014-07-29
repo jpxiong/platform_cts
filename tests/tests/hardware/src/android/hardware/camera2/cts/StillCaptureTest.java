@@ -57,7 +57,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "StillCaptureTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
-    private static final String JPEG_FILE_NAME = DEBUG_FILE_NAME_BASE + "/test.jpeg";
     // 60 second to accommodate the possible long exposure time.
     private static final int EXIF_DATETIME_ERROR_MARGIN_SEC = 60;
     private static final float EXIF_FOCAL_LENGTH_ERROR_MARGIN = 0.001f;
@@ -847,8 +846,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             byte[] jpegBuffer = getDataFromImage(image);
             // Have to dump into a file to be able to use ExifInterface
-            dumpFile(JPEG_FILE_NAME, jpegBuffer);
-            ExifInterface exif = new ExifInterface(JPEG_FILE_NAME);
+            String jpegFileName =
+                    DEBUG_FILE_NAME_BASE + "/Camera_" + mCamera.getId() + "_test.jpeg";
+            dumpFile(jpegFileName, jpegBuffer);
+            ExifInterface exif = new ExifInterface(jpegFileName);
 
             if (testThumbnailSizes[i].equals(new Size(0,0))) {
                 mCollector.expectTrue(
