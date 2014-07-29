@@ -26,7 +26,7 @@ public class ColorVerifier extends PerPixelBitmapVerifier {
     }
 
     @Override
-    protected boolean verifyPixel(int x, int y, int color) {
-        return color == mColor;
+    protected int getExpectedColor(int x, int y) {
+        return mColor;
     }
 }
