@@ -17,13 +17,15 @@ package android.uirendering.cts.bitmapverifiers;
 
 import android.graphics.Bitmap;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
+import android.util.Log;
 
 /**
  * This class looks at every pixel in a given bitmap and verifies that it is correct.
  */
 public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
+    private static final String TAG = "PerPixelBitmapVerifer";
 
-    protected abstract boolean verifyPixel(int x, int y, int color);
+    protected abstract int getExpectedColor(int x, int y);
 
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
         boolean res = true;
@@ -31,7 +33,11 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
-                if (!verifyPixel(x, y, bitmap[index])) {
+                int expectedColor = getExpectedColor(x, y);
+                if (bitmap[index] != expectedColor) {
+                    Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor) + " received : "
+                            + Integer.toHexString(bitmap[index]) + " at position (" + x + "," + y +
+                            ")");
                     res = false;
                     differenceMap[index] = FAIL_COLOR;
                 } else {
