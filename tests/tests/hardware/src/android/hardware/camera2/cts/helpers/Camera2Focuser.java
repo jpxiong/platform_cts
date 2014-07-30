@@ -334,7 +334,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
         final int finalAfRun = thisAfRun;
 
         return new CaptureListener() {
-            private int mLatestFrameCount = -1;
+            private long mLatestFrameCount = -1;
 
             @Override
             public void onCaptureProgressed(CameraDevice camera, CaptureRequest request,
@@ -361,7 +361,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
                 int afRun;
                 synchronized (Camera2Focuser.this) {
                     // In case of partial results, don't send AF update twice
-                    int frameCount = result.getFrameNumber();
+                    long frameCount = result.getFrameNumber();
                     if (frameCount <= mLatestFrameCount) return;
                     mLatestFrameCount = frameCount;
 
