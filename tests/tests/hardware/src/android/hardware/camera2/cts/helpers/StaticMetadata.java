@@ -1344,7 +1344,8 @@ public class StaticMetadata {
 
         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         // FACE_PRIORITY must be included if face detection is supported.
-        if (getMaxFaceCountChecked() > 0) {
+        if (areKeysAvailable(CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT) &&
+                getMaxFaceCountChecked() > 0) {
             checkTrueForKey(key, " FACE_PRIORITY must be included if face detection is supported",
                     modeList.contains(CameraMetadata.CONTROL_SCENE_MODE_FACE_PRIORITY));
         }
