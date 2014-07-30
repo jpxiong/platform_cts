@@ -190,7 +190,7 @@ public class StaticMetadata {
     /**
      * Whether or not the per frame control is supported by the camera device.
      *
-     * @return true if per frame control is supported, false otherwise.
+     * @return {@code true} if per frame control is supported, {@code false} otherwise.
      */
     public boolean isPerFrameControlSupported() {
         return getSyncMaxLatency() == CameraMetadata.SYNC_MAX_LATENCY_PER_FRAME_CONTROL;

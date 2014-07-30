@@ -70,7 +70,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     private StateWaiter mSessionWaiter;
     private int mLatestSessionState = -1; // uninitialized
 
-    private static int[] mTemplates = new int[] {
+    private static int[] sTemplates = new int[] {
             CameraDevice.TEMPLATE_PREVIEW,
             CameraDevice.TEMPLATE_RECORD,
             CameraDevice.TEMPLATE_STILL_CAPTURE,
@@ -256,13 +256,21 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                  * Test: that each template type is supported, and that its required fields are
                  * present.
                  */
-                for (int j = 0; j < mTemplates.length; j++) {
-                    CaptureRequest.Builder capReq = mCamera.createCaptureRequest(mTemplates[j]);
+                for (int j = 0; j < sTemplates.length; j++) {
+                    // Skip video snapshots for LEGACY mode
+                    if (sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
+                        continue;
+                    }
+                    CaptureRequest.Builder capReq = mCamera.createCaptureRequest(sTemplates[j]);
                     assertNotNull("Failed to create capture request", capReq);
-                    assertNotNull("Missing field: SENSOR_EXPOSURE_TIME",
-                            capReq.get(CaptureRequest.SENSOR_EXPOSURE_TIME));
-                    assertNotNull("Missing field: SENSOR_SENSITIVITY",
-                            capReq.get(CaptureRequest.SENSOR_SENSITIVITY));
+                    if (mStaticInfo.areKeysAvailable(CaptureRequest.SENSOR_EXPOSURE_TIME)) {
+                        assertNotNull("Missing field: SENSOR_EXPOSURE_TIME",
+                                capReq.get(CaptureRequest.SENSOR_EXPOSURE_TIME));
+                    }
+                    if (mStaticInfo.areKeysAvailable(CaptureRequest.SENSOR_SENSITIVITY)) {
+                        assertNotNull("Missing field: SENSOR_SENSITIVITY",
+                                capReq.get(CaptureRequest.SENSOR_SENSITIVITY));
+                    }
                 }
             }
             finally {
@@ -703,13 +711,13 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
                 if (!burst) {
                     // Test: that a single capture of each template type succeeds.
-                    for (int j = 0; j < mTemplates.length; j++) {
-                        captureSingleShot(mCameraIds[i], mTemplates[j], repeating, flush);
+                    for (int j = 0; j < sTemplates.length; j++) {
+                        captureSingleShot(mCameraIds[i], sTemplates[j], repeating, flush);
                     }
                 }
                 else {
                     // Test: burst of one shot
-                    captureBurstShot(mCameraIds[i], mTemplates, 1, repeating, flush);
+                    captureBurstShot(mCameraIds[i], sTemplates, 1, repeating, flush);
 
                     int[] templates = new int[] {
                             CameraDevice.TEMPLATE_STILL_CAPTURE,
@@ -724,7 +732,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
                     // Test: burst of 5 shots of different template types
                     captureBurstShot(
-                            mCameraIds[i], mTemplates, mTemplates.length, repeating, flush);
+                            mCameraIds[i], sTemplates, sTemplates.length, repeating, flush);
                 }
                 verify(mCameraMockListener, never())
                         .onError(
@@ -918,6 +926,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             return;
         }
 
+
         if (template != CameraDevice.TEMPLATE_MANUAL &&
                 template != CameraDevice.TEMPLATE_STILL_CAPTURE) {
             if (maxFps < MIN_FPS_REQUIRED_FOR_STREAMING) {
@@ -926,10 +935,13 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 return;
             }
 
-            // Need give fixed frame rate for video recording template.
-            if (template == CameraDevice.TEMPLATE_RECORD) {
-                if (maxFps != minFps) {
-                    mCollector.addMessage("Video recording frame rate should be fixed");
+            // Relax framerate constraints on legacy mode
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                // Need give fixed frame rate for video recording template.
+                if (template == CameraDevice.TEMPLATE_RECORD) {
+                    if (maxFps != minFps) {
+                        mCollector.addMessage("Video recording frame rate should be fixed");
+                    }
                 }
             }
         }
@@ -937,7 +949,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     private void checkAfMode(CaptureRequest.Builder request, int template,
             CameraCharacteristics props) {
-        boolean hasFocuser =
+        boolean hasFocuser = !props.getKeys().contains(CameraCharacteristics.
+                LENS_INFO_MINIMUM_FOCUS_DISTANCE) ||
                 props.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE) > 0f;
 
         if (!hasFocuser) {
@@ -970,7 +983,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         mCollector.expectKeyValueEquals(request, CONTROL_AF_MODE, targetAfMode);
-        mCollector.expectKeyValueNotNull(request, LENS_FOCUS_DISTANCE);
+        if (mStaticInfo.areKeysAvailable(CaptureRequest.LENS_FOCUS_DISTANCE)) {
+            mCollector.expectKeyValueNotNull(request, LENS_FOCUS_DISTANCE);
+        }
     }
 
     /**
@@ -1039,16 +1054,31 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         // Sensor settings.
-        float[] availableApertures =
-                props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
-        if (availableApertures.length > 1) {
-            mCollector.expectKeyValueNotNull(request, LENS_APERTURE);
+
+        mCollector.expectEquals("Lens aperture must be present in request if available apertures " +
+                        "are present in metadata, and vice-versa.",
+                mStaticInfo.areKeysAvailable(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES),
+                mStaticInfo.areKeysAvailable(CaptureRequest.LENS_APERTURE));
+        if (mStaticInfo.areKeysAvailable(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES)) {
+            float[] availableApertures =
+                    props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
+            if (availableApertures.length > 1) {
+                mCollector.expectKeyValueNotNull(request, LENS_APERTURE);
+            }
         }
 
-        float[] availableFilters =
-                props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES);
-        if (availableFilters.length > 1) {
-            mCollector.expectKeyValueNotNull(request, LENS_FILTER_DENSITY);
+        mCollector.expectEquals("Lens filter density must be present in request if available " +
+                        "filter densities are present in metadata, and vice-versa.",
+                mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                        LENS_INFO_AVAILABLE_FILTER_DENSITIES),
+                mStaticInfo.areKeysAvailable(CaptureRequest.LENS_FILTER_DENSITY));
+        if (mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                LENS_INFO_AVAILABLE_FILTER_DENSITIES)) {
+            float[] availableFilters =
+                    props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES);
+            if (availableFilters.length > 1) {
+                mCollector.expectKeyValueNotNull(request, LENS_FILTER_DENSITY);
+            }
         }
 
         float[] availableFocalLen =
@@ -1057,68 +1087,117 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             mCollector.expectKeyValueNotNull(request, LENS_FOCAL_LENGTH);
         }
 
-        int[] availableOIS =
-                props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION);
-        if (availableOIS.length > 1) {
-            mCollector.expectKeyValueNotNull(request, LENS_OPTICAL_STABILIZATION_MODE);
+        mCollector.expectEquals("Lens optical stabilization must be present in request if " +
+                        "available optical stabilizations are present in metadata, and vice-versa.",
+                mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                        LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION),
+                mStaticInfo.areKeysAvailable(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE));
+        if (mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)) {
+            int[] availableOIS =
+                    props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION);
+            if (availableOIS.length > 1) {
+                mCollector.expectKeyValueNotNull(request, LENS_OPTICAL_STABILIZATION_MODE);
+            }
         }
 
-        mCollector.expectKeyValueEquals(request, BLACK_LEVEL_LOCK, false);
-        mCollector.expectKeyValueNotNull(request, SENSOR_FRAME_DURATION);
-        mCollector.expectKeyValueNotNull(request, SENSOR_EXPOSURE_TIME);
-        mCollector.expectKeyValueNotNull(request, SENSOR_SENSITIVITY);
+        if (mStaticInfo.areKeysAvailable(BLACK_LEVEL_LOCK)) {
+            mCollector.expectKeyValueEquals(request, BLACK_LEVEL_LOCK, false);
+        }
+
+        if (mStaticInfo.areKeysAvailable(SENSOR_FRAME_DURATION)) {
+            mCollector.expectKeyValueNotNull(request, SENSOR_FRAME_DURATION);
+        }
+
+        if (mStaticInfo.areKeysAvailable(SENSOR_EXPOSURE_TIME)) {
+            mCollector.expectKeyValueNotNull(request, SENSOR_EXPOSURE_TIME);
+        }
+
+        if (mStaticInfo.areKeysAvailable(SENSOR_SENSITIVITY)) {
+            mCollector.expectKeyValueNotNull(request, SENSOR_SENSITIVITY);
+        }
 
         // ISP-processing settings.
         mCollector.expectKeyValueEquals(
                 request, STATISTICS_FACE_DETECT_MODE,
                 CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF);
         mCollector.expectKeyValueEquals(request, FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
-        mCollector.expectKeyValueEquals(
-                request, STATISTICS_LENS_SHADING_MAP_MODE,
-                CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_OFF);
+
+        if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE)) {
+            mCollector.expectKeyValueEquals(
+                    request, STATISTICS_LENS_SHADING_MAP_MODE,
+                    CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_OFF);
+        }
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
             // Not enforce high quality here, as some devices may not effectively have high quality
             // mode.
-            mCollector.expectKeyValueNotEquals(
-                    request, COLOR_CORRECTION_MODE,
-                    CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
-
-            List<Integer> availableEdgeModes =
-                    Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
-            if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_HIGH_QUALITY)) {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE,
-                        CaptureRequest.EDGE_MODE_HIGH_QUALITY);
-            } else if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_FAST)) {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_FAST);
-            } else {
-                mCollector.expectKeyValueEquals(request, EDGE_MODE, CaptureRequest.EDGE_MODE_OFF);
+            if (mStaticInfo.areKeysAvailable(COLOR_CORRECTION_MODE)) {
+                mCollector.expectKeyValueNotEquals(
+                        request, COLOR_CORRECTION_MODE,
+                        CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
             }
 
-            List<Integer> availableNoiseReductionModes =
-                    Arrays.asList(toObject(mStaticInfo.getAvailableNoiseReductionModesChecked()));
-            if (availableNoiseReductionModes
-                    .contains(CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
-                mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE,
-                        CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY);
-            } else if (availableNoiseReductionModes
-                    .contains(CaptureRequest.NOISE_REDUCTION_MODE_FAST)) {
-                mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_FAST);
-            } else {
-                mCollector.expectKeyValueEquals(
-                        request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_OFF);
+            mCollector.expectEquals("Edge mode must be present in request if " +
+                            "available edge modes are present in metadata, and vice-versa.",
+                    mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                            EDGE_AVAILABLE_EDGE_MODES),
+                    mStaticInfo.areKeysAvailable(CaptureRequest.EDGE_MODE));
+            if (mStaticInfo.areKeysAvailable(EDGE_MODE)) {
+                List<Integer> availableEdgeModes =
+                        Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
+                if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_HIGH_QUALITY)) {
+                    mCollector.expectKeyValueEquals(request, EDGE_MODE,
+                            CaptureRequest.EDGE_MODE_HIGH_QUALITY);
+                } else if (availableEdgeModes.contains(CaptureRequest.EDGE_MODE_FAST)) {
+                    mCollector.expectKeyValueEquals(request, EDGE_MODE,
+                            CaptureRequest.EDGE_MODE_FAST);
+                } else {
+                    mCollector.expectKeyValueEquals(request, EDGE_MODE,
+                            CaptureRequest.EDGE_MODE_OFF);
+                }
             }
 
-            List<Integer> availableToneMapModes =
-                    Arrays.asList(toObject(mStaticInfo.getAvailableToneMapModesChecked()));
-            if (availableToneMapModes.contains(CaptureRequest.TONEMAP_MODE_HIGH_QUALITY)) {
-                mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
-                        CaptureRequest.TONEMAP_MODE_HIGH_QUALITY);
-            } else {
-                mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
-                        CaptureRequest.TONEMAP_MODE_FAST);
+            mCollector.expectEquals("Noise reduction mode must be present in request if " +
+                            "available noise reductions are present in metadata, and vice-versa.",
+                    mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                            NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES),
+                    mStaticInfo.areKeysAvailable(CaptureRequest.NOISE_REDUCTION_MODE));
+            if (mStaticInfo.areKeysAvailable(
+                    CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES)) {
+                List<Integer> availableNoiseReductionModes =
+                        Arrays.asList(toObject(mStaticInfo.getAvailableNoiseReductionModesChecked()));
+                if (availableNoiseReductionModes
+                        .contains(CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
+                    mCollector.expectKeyValueEquals(
+                            request, NOISE_REDUCTION_MODE,
+                            CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY);
+                } else if (availableNoiseReductionModes
+                        .contains(CaptureRequest.NOISE_REDUCTION_MODE_FAST)) {
+                    mCollector.expectKeyValueEquals(
+                            request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_FAST);
+                } else {
+                    mCollector.expectKeyValueEquals(
+                            request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_OFF);
+                }
+            }
+
+            mCollector.expectEquals("Tonemap mode must be present in request if " +
+                            "available tonemap modes are present in metadata, and vice-versa.",
+                    mStaticInfo.areKeysAvailable(CameraCharacteristics.
+                            TONEMAP_AVAILABLE_TONE_MAP_MODES),
+                    mStaticInfo.areKeysAvailable(CaptureRequest.TONEMAP_MODE));
+            if (mStaticInfo.areKeysAvailable(
+                    CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES)) {
+                List<Integer> availableToneMapModes =
+                        Arrays.asList(toObject(mStaticInfo.getAvailableToneMapModesChecked()));
+                if (availableToneMapModes.contains(CaptureRequest.TONEMAP_MODE_HIGH_QUALITY)) {
+                    mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
+                            CaptureRequest.TONEMAP_MODE_HIGH_QUALITY);
+                } else {
+                    mCollector.expectKeyValueEquals(request, TONEMAP_MODE,
+                            CaptureRequest.TONEMAP_MODE_FAST);
+                }
             }
 
             // Still capture template should have android.statistics.lensShadingMapMode ON when
@@ -1129,10 +1208,18 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         STATISTICS_LENS_SHADING_MAP_MODE_ON);
             }
         } else {
-            mCollector.expectKeyValueNotNull(request, EDGE_MODE);
-            mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
-            mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
-                    CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
+            if (mStaticInfo.areKeysAvailable(EDGE_MODE)) {
+                mCollector.expectKeyValueNotNull(request, EDGE_MODE);
+            }
+
+            if (mStaticInfo.areKeysAvailable(NOISE_REDUCTION_MODE)) {
+                mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
+            }
+
+            if (mStaticInfo.areKeysAvailable(TONEMAP_MODE)) {
+                mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
+            }
         }
 
         mCollector.expectKeyValueEquals(request, CONTROL_CAPTURE_INTENT, template);
@@ -1150,11 +1237,29 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                             && template <= CameraDevice.TEMPLATE_MANUAL);
 
             mCollector.setCameraId(cameraId);
-            CaptureRequest.Builder request = mCamera.createCaptureRequest(template);
-            assertNotNull("Failed to create capture request for template " + template, request);
 
-            CameraCharacteristics props = mStaticInfo.getCharacteristics();
-            checkRequestForTemplate(request, template, props);
+            try {
+                CaptureRequest.Builder request = mCamera.createCaptureRequest(template);
+                assertNotNull("Failed to create capture request for template " + template, request);
+
+                CameraCharacteristics props = mStaticInfo.getCharacteristics();
+                checkRequestForTemplate(request, template, props);
+            } catch (IllegalArgumentException e) {
+                if (template == CameraDevice.TEMPLATE_MANUAL &&
+                        !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
+                                REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    // OK
+                } else if (template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG &&
+                        !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
+                                REQUEST_AVAILABLE_CAPABILITIES_ZSL)) {
+                    // OK
+                } else if (template == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT &&
+                        mStaticInfo.isHardwareLevelLegacy()) {
+                    // OK
+                } else {
+                    throw e; // rethrow
+                }
+            }
         }
         finally {
             try {
