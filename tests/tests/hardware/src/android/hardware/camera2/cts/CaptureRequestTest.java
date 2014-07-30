@@ -524,10 +524,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
 
                 sceneModeTestByCamera();
             } finally {
@@ -543,10 +539,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
 
                 effectModeTestByCamera();
             } finally {
@@ -1775,6 +1767,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
             verifyCaptureResultForKey(CaptureResult.CONTROL_SCENE_MODE,
                     mode, listener, NUM_FRAMES_VERIFIED);
             // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
@@ -1796,6 +1790,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
             verifyCaptureResultForKey(CaptureResult.CONTROL_EFFECT_MODE,
                     mode, listener, NUM_FRAMES_VERIFIED);
             // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
