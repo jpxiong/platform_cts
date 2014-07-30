@@ -903,7 +903,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 getValueFromKeyNonNull(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
         long minDuration = config.getOutputMinFrameDuration(MediaRecorder.class, sz);
-        if (minDuration == StreamConfigurationMap.NO_MIN_FRAME_DURATION) {
+        if (minDuration == 0) {
             return false;
         }
 
