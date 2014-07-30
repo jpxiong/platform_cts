@@ -426,17 +426,14 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
-     * Test AWB lock control. The color correction gain and transform shouldn't be changed
-     * when AWB is locked.
+     * Test AWB lock control.
+     *
+     * <p>The color correction gain and transform shouldn't be changed when AWB is locked.</p>
      */
     public void testAwbModeAndLock() throws Exception {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
 
                 awbModeAndLockTestByCamera();
             } finally {
@@ -452,10 +449,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
 
                 afModeTestByCamera();
             } finally {
@@ -1476,6 +1469,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             // Verify AWB mode in capture result.
             verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, mode, listener,
@@ -1485,14 +1479,27 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            waitForResultValue(listener, CaptureResult.CONTROL_AWB_STATE,
-                    CaptureResult.CONTROL_AWB_STATE_LOCKED, NUM_RESULTS_WAIT_TIMEOUT);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
+            if (mStaticInfo.areKeysAvailable(CaptureResult.CONTROL_AWB_STATE)) {
+                waitForResultValue(listener, CaptureResult.CONTROL_AWB_STATE,
+                        CaptureResult.CONTROL_AWB_STATE_LOCKED, NUM_RESULTS_WAIT_TIMEOUT);
+            }
+
             verifyAwbCaptureResultUnchanged(listener, NUM_FRAMES_VERIFIED);
         }
     }
 
     private void verifyAwbCaptureResultUnchanged(SimpleCaptureListener listener,
             int numFramesVerified) {
+        // Skip check if cc gains/transform/mode are not available
+        if (!mStaticInfo.areKeysAvailable(
+                CaptureResult.COLOR_CORRECTION_GAINS,
+                CaptureResult.COLOR_CORRECTION_TRANSFORM,
+                CaptureResult.COLOR_CORRECTION_MODE)) {
+            return;
+        }
+
         CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         RggbChannelVector lockedGains =
                 getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
@@ -1535,6 +1542,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, mode);
             listener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             // Verify AF mode in capture result.
             verifyCaptureResultForKey(CaptureResult.CONTROL_AF_MODE, mode, listener,
