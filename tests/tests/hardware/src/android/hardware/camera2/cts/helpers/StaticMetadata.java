@@ -1443,7 +1443,7 @@ public class StaticMetadata {
      * @return whether or not all characteristics keys are available
      */
     @SafeVarargs
-    public final <T> boolean areKeysAvailable(CameraCharacteristics.Key<T>... keys) {
+    public final boolean areKeysAvailable(CameraCharacteristics.Key<?>... keys) {
         return mCharacteristics.getKeys().containsAll(Arrays.asList(keys));
     }
 
@@ -1461,7 +1461,7 @@ public class StaticMetadata {
      * @return whether or not all result keys are available
      */
     @SafeVarargs
-    public final <T> boolean areKeysAvailable(CaptureResult.Key<T>... keys) {
+    public final boolean areKeysAvailable(CaptureResult.Key<?>... keys) {
         return mCharacteristics.getAvailableCaptureResultKeys().containsAll(Arrays.asList(keys));
     }
 
@@ -1480,7 +1480,7 @@ public class StaticMetadata {
      * @return whether or not all result keys are available
      */
     @SafeVarargs
-    public final <T> boolean areKeysAvailable(CaptureRequest.Key<T>... keys) {
+    public final boolean areKeysAvailable(CaptureRequest.Key<?>... keys) {
         return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(Arrays.asList(keys));
     }
 
