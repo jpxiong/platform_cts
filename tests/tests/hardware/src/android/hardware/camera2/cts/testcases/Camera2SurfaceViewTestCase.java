@@ -665,7 +665,7 @@ public class Camera2SurfaceViewTestCase extends
         for (Size size : mOrderedPreviewSizes) {
             Long minDuration = mMinPreviewFrameDurationMap.get(size);
             if (minDuration == null ||
-                    minDuration == StreamConfigurationMap.NO_MIN_FRAME_DURATION) {
+                    minDuration == 0) {
                 throw new IllegalArgumentException(
                         "No min frame duration available for the selected format.");
             }

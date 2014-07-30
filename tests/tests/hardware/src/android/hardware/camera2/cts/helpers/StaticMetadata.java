@@ -1168,7 +1168,7 @@ public class StaticMetadata {
         for (android.util.Size size : config.getOutputSizes(format)) {
             long minFrameDuration = config.getOutputMinFrameDuration(format, size);
 
-            if (minFrameDuration != StreamConfigurationMap.NO_MIN_FRAME_DURATION) {
+            if (minFrameDuration != 0) {
                 minDurationMap.put(new Size(size.getWidth(), size.getHeight()), minFrameDuration);
             }
         }
