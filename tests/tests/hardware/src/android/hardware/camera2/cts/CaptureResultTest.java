@@ -372,7 +372,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.LENS_FOCUS_RANGE);
         resultKeys.add(CaptureResult.LENS_STATE);
         resultKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
-        resultKeys.add(CaptureResult.REQUEST_FRAME_COUNT);
         resultKeys.add(CaptureResult.REQUEST_PIPELINE_DEPTH);
         resultKeys.add(CaptureResult.SCALER_CROP_REGION);
         resultKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
