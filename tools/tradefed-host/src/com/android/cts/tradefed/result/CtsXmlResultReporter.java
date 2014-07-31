@@ -29,6 +29,7 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.result.ITestSummaryListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.LogFileSaver;
@@ -45,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +58,7 @@ import java.util.regex.Pattern;
  * <p/>
  * Outputs xml in format governed by the cts_result.xsd
  */
-public class CtsXmlResultReporter implements ITestInvocationListener {
+public class CtsXmlResultReporter implements ITestInvocationListener, ITestSummaryListener {
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
@@ -100,6 +102,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private ResultReporter mReporter;
     private File mLogDir;
     private String mSuiteName;
+    private String mReferenceUrl;
 
     private static final Pattern mCtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
 
@@ -313,7 +316,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         zipResults(mReportDir);
 
         try {
-            mReporter.reportResult(reportFile);
+            mReporter.reportResult(reportFile, mReferenceUrl);
         } catch (IOException e) {
             CLog.e(e);
         }
@@ -472,4 +475,17 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     public TestSummary getSummary() {
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+     @Override
+     public void putSummary(List<TestSummary> summaries) {
+         // By convention, only store the first summary that we see as the summary URL.
+         if (summaries.isEmpty()) {
+             return;
+         }
+
+         mReferenceUrl = summaries.get(0).getSummary().getString();
+     }
 }

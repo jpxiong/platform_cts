@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 /**
  * Class that sends a HTTP POST multipart/form-data request containing
  * the test result XML.
@@ -37,7 +39,7 @@ class ResultReporter {
         mSuiteName = suiteName;
     }
 
-    public void reportResult(File reportFile) throws IOException {
+    public void reportResult(File reportFile, @Nullable String referenceUrl) throws IOException {
         if (isEmpty(mServerUrl)) {
             return;
         }
@@ -45,16 +47,19 @@ class ResultReporter {
         InputStream input = new FileInputStream(reportFile);
         try {
             byte[] data = IssueReporter.getBytes(input, RESULT_XML_BYTES);
-            new MultipartForm(mServerUrl)
+            MultipartForm multipartForm = new MultipartForm(mServerUrl)
                     .addFormValue("suite", mSuiteName)
-                    .addFormFile("resultXml", "testResult.xml.gz", data)
-                    .submit();
+                    .addFormFile("resultXml", "testResult.xml.gz", data);
+            if (!isEmpty(referenceUrl)) {
+                multipartForm.addFormValue("referenceUrl", referenceUrl);
+            }
+            multipartForm.submit();
         } finally {
             input.close();
         }
     }
 
-    private boolean isEmpty(String value) {
+    private static boolean isEmpty(String value) {
         return value == null || value.trim().isEmpty();
     }
 }
