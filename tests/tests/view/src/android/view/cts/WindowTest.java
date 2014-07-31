@@ -286,8 +286,8 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         int screenWidth = dm.widthPixels;
         int screenHeight = dm.heightPixels;
-        assertEquals(screenWidth, decor.getWidth());
-        assertEquals(screenHeight, decor.getHeight());
+        assertTrue(decor.getWidth() >= screenWidth);
+        assertTrue(decor.getHeight() >= screenHeight);
         assertSame(mWindow.getContext(), decor.getContext());
     }
 
