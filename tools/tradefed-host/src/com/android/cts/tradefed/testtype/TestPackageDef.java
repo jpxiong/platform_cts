@@ -320,9 +320,9 @@ class TestPackageDef implements ITestPackageDef {
         instrTest.setTestPackageName(mTestPackageName);
         instrTest.setClassName(mClassName);
         instrTest.setMethodName(mMethodName);
-        instrTest.setTestsToRun(mTests,
-                !mExcludedTestFilter.hasExclusion()
-                /* only force batch mode if no tests are excluded */);
+        instrTest.setTestsToRun(mTests, false
+            /* force batch mode off to always run using testFile */);
+        instrTest.setReRunUsingTestFile(true);
         // mName means 'apk file name' for instrumentation tests
         instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
         mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
