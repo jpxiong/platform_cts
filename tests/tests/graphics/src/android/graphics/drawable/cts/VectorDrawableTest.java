@@ -31,6 +31,7 @@ import android.util.Xml;
 import com.android.cts.stub.R;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -120,12 +121,20 @@ public class VectorDrawableTest extends AndroidTestCase {
     private void verifyVectorDrawables(int[] resIds, int[] goldenImages, float fraction) throws Exception {
         for (int i = 0; i < resIds.length; i++) {
             // Setup VectorDrawable from xml file and draw into the bitmap.
-            // TODO: use the VectorDrawable.create() function if it is
-            // publicized.
-            XmlPullParser xpp = mResources.getXml(resIds[i]);
-            AttributeSet attrs = Xml.asAttributeSet(xpp);
+            XmlPullParser parser = mResources.getXml(resIds[i]);
+            AttributeSet attrs = Xml.asAttributeSet(parser);
 
-            mVectorDrawable.inflate(mResources, xpp, attrs);
+            int type;
+            while ((type=parser.next()) != XmlPullParser.START_TAG &&
+                    type != XmlPullParser.END_DOCUMENT) {
+                // Empty loop
+            }
+
+            if (type != XmlPullParser.START_TAG) {
+                throw new XmlPullParserException("No start tag found");
+            }
+
+            mVectorDrawable.inflate(mResources, parser, attrs);
 
             mBitmap.eraseColor(0);
             mVectorDrawable.draw(mCanvas);
@@ -244,9 +253,11 @@ public class VectorDrawableTest extends AndroidTestCase {
 
     public void testMutate() {
         Resources resources = mContext.getResources();
+        // d1 will be mutated, while d2 / d3 will not.
         VectorDrawable d1 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
         VectorDrawable d2 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
         VectorDrawable d3 = (VectorDrawable) resources.getDrawable(R.drawable.vector_icon_create);
+        int originalAlpha = d2.getAlpha();
 
         d1.setAlpha(0x80);
         assertEquals(0x80, d1.getAlpha());
@@ -263,5 +274,7 @@ public class VectorDrawableTest extends AndroidTestCase {
         assertEquals(0x40, d1.getAlpha());
         assertEquals(0x20, d2.getAlpha());
         assertEquals(0x20, d3.getAlpha());
+
+        d2.setAlpha(originalAlpha);
     }
 }
