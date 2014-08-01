@@ -32,7 +32,6 @@ import android.util.Log;
  */
 public class MSSIMComparer extends BaseRenderScriptComparer {
     // These values were taken from the publication
-    public static final boolean DEBUG = false;
     public static final String TAG_NAME = "MSSIM";
     public static final double CONSTANT_L = 254;
     public static final double CONSTANT_K1 = 0.00001;
@@ -79,10 +78,7 @@ public class MSSIMComparer extends BaseRenderScriptComparer {
 
         SSIMTotal /= windows;
 
-        if (DEBUG) {
-            Log.d(TAG_NAME, "MSSIM = " + SSIMTotal);
-            Log.d(TAG_NAME, "Number of Windows : " + windows);
-        }
+        Log.d(TAG_NAME, "MSSIM = " + SSIMTotal);
 
         return (SSIMTotal >= mThreshold);
     }
