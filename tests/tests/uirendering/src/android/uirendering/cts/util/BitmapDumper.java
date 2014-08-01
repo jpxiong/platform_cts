@@ -91,6 +91,10 @@ public final class BitmapDumper {
     }
 
     public static void dumpBitmap(Bitmap bitmap, String testName, String className) {
+        if (bitmap == null) {
+            Log.d(TAG, "File not saved, bitmap was null for test : " + testName);
+            return;
+        }
         saveFile(className, testName, SINGULAR_FILE_NAME, bitmap);
     }
 
