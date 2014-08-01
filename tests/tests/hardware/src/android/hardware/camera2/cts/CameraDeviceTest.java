@@ -1123,10 +1123,14 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF);
         mCollector.expectKeyValueEquals(request, FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 
+        List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
         if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE)) {
-            mCollector.expectKeyValueEquals(
-                    request, STATISTICS_LENS_SHADING_MAP_MODE,
-                    CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_OFF);
+            // If the device doesn't support RAW, all template should have OFF as default.
+            if (!availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                mCollector.expectKeyValueEquals(
+                        request, STATISTICS_LENS_SHADING_MAP_MODE,
+                        CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_OFF);
+            }
         }
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
@@ -1202,10 +1206,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
             // Still capture template should have android.statistics.lensShadingMapMode ON when
             // RAW capability is supported.
-            List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
-            if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
-                mCollector.expectKeyValueEquals(request, STATISTICS_LENS_SHADING_MAP_MODE,
-                        STATISTICS_LENS_SHADING_MAP_MODE_ON);
+            if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE) &&
+                    availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                    mCollector.expectKeyValueEquals(request, STATISTICS_LENS_SHADING_MAP_MODE,
+                            STATISTICS_LENS_SHADING_MAP_MODE_ON);
             }
         } else {
             if (mStaticInfo.areKeysAvailable(EDGE_MODE)) {
@@ -1219,6 +1223,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             if (mStaticInfo.areKeysAvailable(TONEMAP_MODE)) {
                 mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
                         CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
+            }
+            if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE)) {
+                mCollector.expectKeyValueNotNull(request, STATISTICS_LENS_SHADING_MAP_MODE);
             }
         }
 
