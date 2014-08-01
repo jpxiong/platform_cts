@@ -35,6 +35,7 @@ import android.hardware.TriggerEventListener;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -184,6 +185,89 @@ public class SensorTest extends AndroidTestCase {
                     SensorManager.SENSOR_DELAY_NORMAL);
             assertFalse(result);
         }
+    }
+
+    class SensorEventTimeStampListener implements SensorEventListener {
+        SensorEventTimeStampListener(long samplingPeriod, CountDownLatch latch) {
+            mSamplingPeriodNs = samplingPeriod;
+            mPrevTimeStampNs = -1;
+            mLatch = latch;
+            numErrors = 0;
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (mPrevTimeStampNs == -1) {
+                mPrevTimeStampNs = event.timestamp;
+                return;
+            }
+            long currTimeStampNs = event.timestamp;
+            if (currTimeStampNs <= mPrevTimeStampNs) {
+                Log.w(TAG, "Timestamps not monotonically increasing curr_ts=" +
+                        event.timestamp + " prev_ts=" + mPrevTimeStampNs);
+                numErrors++;
+                return;
+            }
+            mLatch.countDown();
+            if ((double)(currTimeStampNs - mPrevTimeStampNs - mSamplingPeriodNs)/mSamplingPeriodNs
+                    > INTERVAL_ERROR) {
+                Log.w(TAG, "Timestamp Interval error curr=" + currTimeStampNs + " prev_ts="
+                        + mPrevTimeStampNs + " rateNs=" + mSamplingPeriodNs +
+                        " diffNs=" + (currTimeStampNs - mPrevTimeStampNs));
+                numErrors++;
+            }
+
+            final long elapsedRealtimeNs = SystemClock.elapsedRealtimeNanos();
+            if (elapsedRealtimeNs - currTimeStampNs > SYNC_TOLERANCE) {
+                Log.w(TAG, "Timestamp sync error elapsedRealTimeNs=" + elapsedRealtimeNs +
+                        " curr_ts=" + currTimeStampNs +
+                        " diff=" + (elapsedRealtimeNs - currTimeStampNs)/1000 + "Us");
+                numErrors++;
+            }
+            mPrevTimeStampNs = currTimeStampNs;
+        }
+
+        public int getNumErrors() {
+            return numErrors;
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        private int numErrors;
+        private long mSamplingPeriodNs;
+        private long mPrevTimeStampNs;
+        private final double INTERVAL_ERROR = 0.01; // 1% tolerance for interval_error.
+        private final CountDownLatch mLatch;
+        private final long SYNC_TOLERANCE = 3000000000L; // 3 seconds approx.
+    }
+
+    public void testSensorTimeStamps() throws Exception {
+        final CountDownLatch eventReceived = new CountDownLatch(10000);
+
+        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (sensor == null) {
+            return;
+        }
+        // SENSOR_DELAY_GAME in nanoseconds
+        final long samplingPeriodNs = 20000000;
+        SensorEventTimeStampListener listener = new SensorEventTimeStampListener(samplingPeriodNs,
+                eventReceived);
+
+        boolean result = mSensorManager.registerListener(listener, sensor,
+                SensorManager.SENSOR_DELAY_GAME);
+        assertTrue("Sensor registerListener failed ", result);
+
+        // Wait for 300 seconds.
+        boolean countZero = eventReceived.await(300, TimeUnit.SECONDS);
+        if (!countZero) {
+            fail("Timed out waiting for events from " + sensor.getName());
+        }
+        if (listener.getNumErrors() > 5) {
+            fail("Timestamp test failed. " + listener.getNumErrors());
+        }
+        mSensorManager.unregisterListener(listener);
     }
 
     // Register for updates from each continuous mode sensor, wait for 25 events, call flush and
