@@ -16,11 +16,6 @@
 
 package com.android.cts.verifier.bluetooth;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -37,6 +32,12 @@ import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class BleScannerService extends Service {
 
@@ -64,8 +65,10 @@ public class BleScannerService extends Service {
     public static final String EXTRA_POWER_LEVEL_BIT =
             "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL_BIT";
 
-    private static final UUID SERVICE_UUID =
-            UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
+    private static final String PRIVACY_MAC_UUID =
+            "00009999-0000-1000-8000-00805f9b34fb";
+    private static final String POWER_LEVEL_UUID =
+            "00008888-0000-1000-8000-00805f9b34fb";
     private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
     private BluetoothManager mBluetoothManager;
@@ -92,6 +95,8 @@ public class BleScannerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mScanner != null) {
             List<ScanFilter> filters = new ArrayList<ScanFilter>();
+            ScanSettings.Builder settingBuilder = new ScanSettings.Builder()
+                    .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
 
             int command = intent.getIntExtra(EXTRA_COMMAND, -1);
             switch (command) {
@@ -99,26 +104,24 @@ public class BleScannerService extends Service {
                     filters.add(new ScanFilter.Builder()
                         .setManufacturerData(MANUFACTURER_TEST_ID,
                             new byte[]{MANUFACTURER_TEST_ID, 0})
-                        .setServiceData(new ParcelUuid(SERVICE_UUID),
+                        .setServiceData(new ParcelUuid(BleAdvertiserService.PRIVACY_MAC_UUID),
                             BleAdvertiserService.PRIVACY_MAC_DATA)
                         .build());
+                    settingBuilder.setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL);
                     break;
                 case COMMAND_POWER_LEVEL:
                     filters.add(new ScanFilter.Builder()
                         .setManufacturerData(MANUFACTURER_TEST_ID,
                             new byte[]{MANUFACTURER_TEST_ID, 0})
-                        .setServiceData(new ParcelUuid(SERVICE_UUID),
+                        .setServiceData(new ParcelUuid(BleAdvertiserService.POWER_LEVEL_UUID),
                             BleAdvertiserService.POWER_LEVEL_DATA,
                             BleAdvertiserService.POWER_LEVEL_MASK)
                         .build());
+                    settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
                     break;
             }
-            ScanSettings setting = new ScanSettings.Builder()
-                .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-                .setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL)
-                .build();
             mOldMac = null;
-            mScanner.startScan(filters, setting, mCallback);
+            mScanner.startScan(filters, settingBuilder.build(), mCallback);
         }
         return START_NOT_STICKY;
     }
@@ -142,13 +145,6 @@ public class BleScannerService extends Service {
         });
     }
 
-    private int getUuid(byte[] data) {
-        if (data.length < 2) {
-            return 0;
-        }
-        return ByteBuffer.wrap(new byte[] {0, 0, data[1], data[0]}).getInt();
-    }
-
     private class BLEScanCallback extends ScanCallback {
         @Override
         public void onScanResult(int callBackType, ScanResult result) {
@@ -160,36 +156,32 @@ public class BleScannerService extends Service {
             ScanRecord record = result.getScanRecord();
             String mac = result.getDevice().getAddress();
 
-            // TODO(yichengfan): b/16373687
-            // First 2 bytes of service data will not be UUID.
-            // Need to change how to categorize service data.
-            switch (getUuid(record.getServiceData())) {
-                case BleAdvertiserService.PRIVACY_MAC_UUID:
-                    Intent privacyIntent = new Intent(BLE_MAC_ADDRESS);
-                    privacyIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
-                    sendBroadcast(privacyIntent);
+            Map<ParcelUuid, byte[]> serviceData = record.getServiceData();
+            if (serviceData.get(PRIVACY_MAC_UUID) != null) {
+                Intent privacyIntent = new Intent(BLE_MAC_ADDRESS);
+                privacyIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
+                sendBroadcast(privacyIntent);
 
-                    if (mOldMac == null) {
-                        mOldMac = mac;
-                    } else if (!mOldMac.equals(mac)) {
-                        mOldMac = mac;
-                        Intent newIntent = new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE);
-                        newIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
-                        sendBroadcast(newIntent);
-                    }
-                    break;
+                if (mOldMac == null) {
+                    mOldMac = mac;
+                } else if (!mOldMac.equals(mac)) {
+                    mOldMac = mac;
+                    Intent newIntent = new Intent(BLE_PRIVACY_NEW_MAC_RECEIVE);
+                    newIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
+                    sendBroadcast(newIntent);
+                }
+            }
 
-                case BleAdvertiserService.POWER_LEVEL_UUID:
-                    byte[] data = record.getServiceData();
-                    if (data.length == 4) {
-                        Intent powerIntent = new Intent(BLE_POWER_LEVEL);
-                        powerIntent.putExtra(EXTRA_MAC_ADDRESS, result.getDevice().getAddress());
-                        powerIntent.putExtra(EXTRA_POWER_LEVEL, record.getTxPowerLevel());
-                        powerIntent.putExtra(EXTRA_RSSI, new Integer(result.getRssi()).toString());
-                        powerIntent.putExtra(EXTRA_POWER_LEVEL_BIT, (int)data[3]);
-                        sendBroadcast(powerIntent);
-                    }
-                    break;
+            if (serviceData.get(POWER_LEVEL_UUID) != null) {
+                byte[] data = serviceData.get(POWER_LEVEL_UUID);
+                if (data.length == 3) {
+                    Intent powerIntent = new Intent(BLE_POWER_LEVEL);
+                    powerIntent.putExtra(EXTRA_MAC_ADDRESS, result.getDevice().getAddress());
+                    powerIntent.putExtra(EXTRA_POWER_LEVEL, record.getTxPowerLevel());
+                    powerIntent.putExtra(EXTRA_RSSI, new Integer(result.getRssi()).toString());
+                    powerIntent.putExtra(EXTRA_POWER_LEVEL_BIT, (int)data[2]);
+                    sendBroadcast(powerIntent);
+                }
             }
         }
 

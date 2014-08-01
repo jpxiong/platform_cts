@@ -61,14 +61,14 @@ public class BleAdvertiserService extends Service {
     public static final String EXTRA_COMMAND =
             "com.android.cts.verifier.bluetooth.EXTRA_COMMAND";
 
-    private static final UUID SERVICE_UUID =
+    protected static final UUID PRIVACY_MAC_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
+    protected static final UUID POWER_LEVEL_UUID =
+            UUID.fromString("00008888-0000-1000-8000-00805f9b34fb");
     public static final byte MANUFACTURER_TEST_ID = (byte)0x07;
-    public static final int PRIVACY_MAC_UUID = 0x9999;
-    public static final int POWER_LEVEL_UUID = 0x8888;
-    public static final byte[] PRIVACY_MAC_DATA = new byte[]{(byte)0x99, (byte)0x99, 3, 1, 4};
-    public static final byte[] POWER_LEVEL_DATA = new byte[]{(byte)0x88, (byte)0x88, 15, 0};
-    public static final byte[] POWER_LEVEL_MASK = new byte[]{1, 1, 1, 0};
+    public static final byte[] PRIVACY_MAC_DATA = new byte[]{3, 1, 4};
+    public static final byte[] POWER_LEVEL_DATA = new byte[]{1, 5, 0};
+    public static final byte[] POWER_LEVEL_MASK = new byte[]{1, 1, 0};
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -125,14 +125,12 @@ public class BleAdvertiserService extends Service {
 
         switch (command) {
             case COMMAND_START_ADVERTISE:
-                List<ParcelUuid> serviceUuid = new ArrayList<ParcelUuid>();
-                serviceUuid.add(new ParcelUuid(SERVICE_UUID));
                 AdvertiseData data = new AdvertiseData.Builder()
-                    .setManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
-                    .setServiceData(new ParcelUuid(SERVICE_UUID), PRIVACY_MAC_DATA)
+                    .addManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
+                    .addServiceData(new ParcelUuid(PRIVACY_MAC_UUID), PRIVACY_MAC_DATA)
                     .build();
                 AdvertiseSettings setting = new AdvertiseSettings.Builder()
-                    .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
+                    .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
                     .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
                     .setIsConnectable(false)
                     .build();
@@ -146,13 +144,14 @@ public class BleAdvertiserService extends Service {
             case COMMAND_START_POWER_LEVEL:
                 for (int t : mPowerLevel) {
                     AdvertiseData d = new AdvertiseData.Builder()
-                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                        .addManufacturerData(MANUFACTURER_TEST_ID,
                             new byte[]{MANUFACTURER_TEST_ID, 0})
-                        .setServiceData(new ParcelUuid(SERVICE_UUID),
-                            new byte[]{(byte)0x88, (byte)0x88, 15, (byte)t})
+                        .addServiceData(new ParcelUuid(POWER_LEVEL_UUID),
+                            new byte[]{1, 5, (byte)t})
                         .setIncludeTxPowerLevel(true)
                         .build();
                     AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                        .setTxPowerLevel(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
                         .setTxPowerLevel(t)
                         .build();
                     mAdvertiser.startAdvertising(settings, d, mPowerCallback.get(t));
