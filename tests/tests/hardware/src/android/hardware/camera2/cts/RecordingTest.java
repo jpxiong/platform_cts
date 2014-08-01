@@ -346,8 +346,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
         recordingRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
                 CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
+
         CaptureRequest.Builder recordingOnlyBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        recordingOnlyBuilder.set(CaptureRequest.CONTROL_MODE,
+                CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
         recordingOnlyBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
                 CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
         int slowMotionFactor = captureRate / videoFrameRate;
