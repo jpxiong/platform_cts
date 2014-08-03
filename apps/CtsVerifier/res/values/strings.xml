@@ -448,6 +448,16 @@
     <!-- Magnetic Field -->
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
+    <!-- Sensor Value Accuracy -->
+    <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
+    <string name="snsr_rot_vec_test">Rotation Vector Accuracy Test</string>
+
+    <!-- Sensor Batching -->
+    <string name="snsr_batch_test">Sensor Batching Tests</string>
+
+    <!-- Sensor Synchronization -->
+    <string name="snsr_synch_test">Sensor Synchronization Test</string>
+
     <!-- Step Counter and Detector -->
     <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
 
@@ -1003,5 +1013,18 @@
     <string name="pta_info">This tests whether multitouch works.\n
         Touching the screen should render a dot at the location you touched.\n
         Touching with additional fingers will render additoinal dots and you should be able to drag them around.</string>
+
+    <!-- Strings for RotationVectorTest and GameRotationVectorTest -->
+    <string name="rotation_vector_test">Rotation Vector Accuracy Test</string>
+    <string name="game_rotation_vector_test">Game Rotation Vector Accuracy Test</string>
+    <string name="rotation_vector_test_info">
+        This test verifies that mobile device can detect its orientation in space quickly and repeatably.\n\n
+        Instructions:\n
+        \n
+        1. Place the mobile device in a reference position and note the arrow orientation.\n
+        2. Move, shake, and rotate the device for about 30 seconds.\n
+        3. Place the mobile device back to the reference position.\n
+        4. Pass if it returns to the original arrow orientation within one second.\n
+    </string>
 
 </resources>

@@ -32,13 +32,14 @@ import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 
 import com.android.cts.verifier.R;
 
-public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, SensorEventListener {
+public class GLArrowSensorTestRenderer implements GLSurfaceView.Renderer, SensorEventListener {
 
     /**
      * A representation of a 3D triangular wedge or arrowhead shape, suitable
@@ -85,16 +86,31 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
              * centered on the origin separated by 0.25 units, with elongated
              * ends pointing down the negative Z axis.
              */
-            float[] coords = {
-                    // X, Y, Z
-                    -0.125f, -0.25f, -0.25f,
-                    -0.125f,  0.25f, -0.25f,
-                    -0.125f,  0.0f,   0.559016994f,
-                     0.125f, -0.25f, -0.25f,
-                     0.125f,  0.25f, -0.25f,
-                     0.125f,  0.0f,   0.559016994f,
-            };
-
+            float[] coords;
+            if (GLArrowSensorTestRenderer.mSensorType == Sensor.TYPE_ACCELEROMETER) {
+                float[] verts = {
+                        // X, Y, Z
+                        -0.125f, -0.25f, -0.25f,
+                        -0.125f, 0.25f, -0.25f,
+                        -0.125f, 0.0f, 0.559016994f,
+                        0.125f, -0.25f, -0.25f,
+                        0.125f, 0.25f, -0.25f,
+                        0.125f, 0.0f, 0.559016994f,
+                };
+                coords = verts.clone();
+            } else {
+                float[] verts = {
+                        // X, Y, Z
+                        -0.25f, -0.25f, -0.125f,
+                        -0.25f, 0.25f, -0.125f,
+                        0.559016994f, 0.0f, -0.125f,
+                        -0.25f, -0.25f, 0.125f,
+                        -0.25f, 0.25f, 0.125f,
+                        0.559016994f, 0.0f, 0.125f,
+                };
+                coords = verts.clone();
+            }
+            
             for (int i = 0; i < VERTS; i++) {
                 for (int j = 0; j < 3; j++) {
                     mFVertexBuffer.put(coords[i * 3 + j] * 2.0f);
@@ -215,6 +231,7 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
     protected float[] mCrossProd = new float[3];
 
     private int mTextureID;
+    private static int mSensorType;
 
     private Wedge mWedge;
 
@@ -222,9 +239,12 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
      * It's a constructor. Can you dig it?
      * 
      * @param context the Android Context that owns this renderer
+     * @param type of arrow. Possible values: 0 = points towards gravity. 1 =
+     *            points towards reference North
      */
-    public AccelerometerTestRenderer(Context context) {
+    public GLArrowSensorTestRenderer(Context context, int type) {
         mContext = context;
+        mSensorType = type;
         mWedge = new Wedge();
     }
 
@@ -249,11 +269,18 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-        gl.glRotatef(-mAngle * 180 / (float) Math.PI, mCrossProd[0], mCrossProd[1], mCrossProd[2]);
+        if(mSensorType==Sensor.TYPE_ACCELEROMETER) {
+            gl.glRotatef(-mAngle * 180 / (float) Math.PI, mCrossProd[0], mCrossProd[1], mCrossProd[2]);
+        } else {
+            gl.glMultMatrixf(mRotationMatrix, 0);
+        }
         mWedge.draw(gl);
     }
 
+    private final float[] mRotationMatrix = new float[16];
+
     public void onSensorChanged(SensorEvent event) {
+        int type = event.sensor.getType();
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             /*
              * For this test we want *only* accelerometer data, so we can't use
@@ -262,15 +289,24 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
             normalize(event.values);
 
             /*
-             * Because we need to invert gravity (because the accelerometer vector
-             * actually points up), that constitutes a 180-degree rotation around X,
-             * which means we need to invert Y.
+             * Because we need to invert gravity (because the accelerometer
+             * vector actually points up), that constitutes a 180-degree
+             * rotation around X, which means we need to invert Y.
              */
             event.values[1] *= -1;
 
             crossProduct(event.values, Z_AXIS, mCrossProd);
             mAngle = (float) Math.acos(dotProduct(event.values, Z_AXIS));
+        } else if (type == Sensor.TYPE_ROTATION_VECTOR
+                || type == Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR
+                || type == Sensor.TYPE_GAME_ROTATION_VECTOR) {
+            float[] rotationMatrixTmp = new float[16];
+
+            SensorManager.getRotationMatrixFromVector(rotationMatrixTmp, event.values);
+            SensorManager.remapCoordinateSystem(rotationMatrixTmp,
+                    SensorManager.AXIS_MINUS_X, SensorManager.AXIS_Y, mRotationMatrix);
         }
+
     }
 
     public void onSurfaceChanged(GL10 gl, int w, int h) {
@@ -293,7 +329,7 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
         int[] textures = new int[1];
         gl.glGenTextures(1, textures, 0);
         mTextureID = textures[0];
-        
+
         gl.glBindTexture(GL10.GL_TEXTURE_2D, mTextureID);
         gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
         gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
