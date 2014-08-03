@@ -34,7 +34,7 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
                 int expectedColor = getExpectedColor(x, y);
-                if (bitmap[index] != expectedColor) {
+                if (!verifyPixel(bitmap[index], expectedColor)) {
                     Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor) + " received : "
                             + Integer.toHexString(bitmap[index]) + " at position (" + x + "," + y +
                             ")");
@@ -52,5 +52,9 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
                     ActivityTestBase.TEST_WIDTH, ActivityTestBase.TEST_HEIGHT);
         }
         return res;
+    }
+
+    protected boolean verifyPixel(int color, int expectedColor) {
+        return color == expectedColor;
     }
 }

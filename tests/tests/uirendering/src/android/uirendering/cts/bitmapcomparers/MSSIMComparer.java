@@ -104,9 +104,7 @@ public class MSSIMComparer extends BaseRenderScriptComparer {
         float MSSIM = sum1DFloatAllocation(outputAllocation);
         MSSIM /= height;
 
-        if (DEBUG) {
-            Log.d(TAG_NAME, "MSSIM RS : " + MSSIM);
-        }
+        Log.d(TAG_NAME, "MSSIM RS : " + MSSIM);
 
         return (MSSIM >= mThreshold);
     }
