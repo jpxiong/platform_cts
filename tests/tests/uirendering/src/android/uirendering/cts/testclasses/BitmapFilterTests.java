@@ -45,13 +45,19 @@ public class BitmapFilterTests extends ActivityTestBase {
      */
     private static BitmapVerifier mBlackWhiteVerifier = new PerPixelBitmapVerifier() {
         @Override
-        protected boolean verifyPixel(int x, int y, int color) {
+        protected boolean verifyPixel(int color, int expectedColor) {
             int weight = Color.red(color) + Color.blue(color) + Color.green(color);
 
             if (weight > THRESHOLD && WHITE_WEIGHT - THRESHOLD > weight) {
                 return false;
             }
             return true;
+        }
+
+        @Override
+        protected int getExpectedColor(int x, int y) {
+            // Expected color is ignored. See {@code verifyPixel}.
+            return -1;
         }
     };
 
