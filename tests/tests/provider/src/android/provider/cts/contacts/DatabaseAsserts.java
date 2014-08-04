@@ -142,7 +142,7 @@ public class DatabaseAsserts {
      */
     public static void assertStoredValuesInUriMatchExactly(ContentResolver resolver, Uri uri,
             ContentValues... expectedValues) {
-        assertStoredValuesInUriMatchExactly(resolver, uri, null, null, null, null, expectedValues);
+        assertStoredValuesInUriMatchExactly(resolver, uri, null, null, null, null, false, expectedValues);
     }
 
     /**
@@ -156,15 +156,21 @@ public class DatabaseAsserts {
      * @param selection - Selection string to use for the query.
      * @param selectionArgs - Selection arguments to use for the query.
      * @param sortOrder - Sort order to use for the query.
+     * @param inOrder Whether or not the returned rows in the cursor should correspond to the
+     * order of the provided ContentValues
      * @param expectedValues - Array of {@link ContentValues} which the cursor returned from the
      * query should contain.
      */
-    public static void assertStoredValuesInUriMatchExactly(ContentResolver resolver, Uri uri, String[] projection,
-            String selection, String[] selectionArgs, String sortOrder,
-            ContentValues... expectedValues) {
+    public static void assertStoredValuesInUriMatchExactly(ContentResolver resolver, Uri uri,
+            String[] projection, String selection, String[] selectionArgs, String sortOrder,
+            boolean inOrder, ContentValues... expectedValues) {
         final Cursor cursor = resolver.query(uri, projection, selection, selectionArgs, sortOrder);
         try {
-            assertCursorValuesMatchExactly(cursor, expectedValues);
+            if (inOrder) {
+                assertCursorValuesMatchExactlyInOrder(cursor, expectedValues);
+            } else {
+                assertCursorValuesMatchExactly(cursor, expectedValues);
+            }
         } finally {
             cursor.close();
         }
@@ -204,6 +210,29 @@ public class DatabaseAsserts {
                     found);
         }
     }
+
+    /**
+     * Ensures that the rows in the cursor match the rows in the expected values exactly. Requires
+     * that the rows in the cursor are ordered the same way as those in the expected values.
+     *
+     * @param cursor - Cursor containing the values to check for
+     * @param expectedValues - Array of ContentValues that the cursor should be expected to
+     * contain.
+     */
+    public static void assertCursorValuesMatchExactlyInOrder(Cursor cursor,
+            ContentValues... expectedValues) {
+        Assert.assertEquals("Cursor does not contain the number of expected rows",
+                expectedValues.length, cursor.getCount());
+        StringBuilder message = new StringBuilder();
+
+        cursor.moveToPosition(-1);
+        for (ContentValues v : expectedValues) {
+            cursor.moveToNext();
+            Assert.assertTrue("Expected values can not be found " + v + "," + message.toString(),
+                    equalsWithExpectedValues(cursor, v, message));
+        }
+    }
+
 
     private static boolean equalsWithExpectedValues(Cursor cursor, ContentValues expectedValues,
             StringBuilder msgBuffer) {
