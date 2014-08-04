@@ -191,7 +191,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
             // Contactables Uri should return only email and phone data items.
             DatabaseAsserts.assertStoredValuesInUriMatchExactly(mResolver, contentUri, null,
                     Data.RAW_CONTACT_ID + "=?", new String[] {String.valueOf(rawContact.getId())},
-                    null, cv, cv2);
+                    null, false, cv, cv2);
         } finally {
             // Clean up
             rawContact.delete();
@@ -404,7 +404,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         }
         sb.append(")");
         DatabaseAsserts.assertStoredValuesInUriMatchExactly(mResolver, uri, null, sb.toString(),
-                null, null, expected);
+                null, null, false, expected);
     }
 
 

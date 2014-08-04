@@ -39,10 +39,11 @@ import android.test.InstrumentationTestCase;
 import java.util.ArrayList;
 
 /**
- * CTS tests for {@link android.provider.ContactsContract.Contacts#CONTENT_STREQUENT_URI} and
+ * CTS tests for {@link android.provider.ContactsContract.Contacts#CONTENT_FREQUENT_URI},
+ * {@link android.provider.ContactsContract.Contacts#CONTENT_STREQUENT_URI} and
  * {@link android.provider.ContactsContract.Contacts#CONTENT_STREQUENT_FILTER_URI} apis.
  */
-public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
+public class ContactsContract_FrequentsStrequentsTest extends InstrumentationTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
 
@@ -84,7 +85,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
      */
     public void testStrequents_noStarredOrFrequents() throws Exception {
         long[] ids = setupTestData();
-        assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_STREQUENT_URI, ids);
+        assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_STREQUENT_URI, ids, false);
     }
 
     /**
@@ -101,7 +102,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
 
         // Only the starred contacts should be returned, ordered alphabetically by name
         assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_STREQUENT_URI, ids,
-                sContentValues[1], sContentValues[0]);
+                false, sContentValues[1], sContentValues[0]);
     }
 
     /**
@@ -124,7 +125,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
         // The strequents uri should now return contact 2, 3, 1 in order due to ranking by
         // data usage.
         assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_STREQUENT_URI, ids,
-                sContentValues[1], sContentValues[2], sContentValues[0]);
+                false, sContentValues[1], sContentValues[2], sContentValues[0]);
     }
 
     /**
@@ -150,7 +151,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
         // Note that contact 3 is only returned once (as a starred contact) even though it is also
         // a frequently contacted contact.
         assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_STREQUENT_URI, ids,
-                sContentValues[2], sContentValues[1], sContentValues[0]);
+                false, sContentValues[2], sContentValues[1], sContentValues[0]);
     }
 
     /**
@@ -170,7 +171,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
 
         // Only contact 1 and 2 should be returned (sorted in alphabetical order) due to the
         // filtered query.
-        assertCursorStoredValuesWithContactsFilter(uri, ids, sContentValues[1], sContentValues[0]);
+        assertCursorStoredValuesWithContactsFilter(uri, ids, false, sContentValues[1], sContentValues[0]);
     }
 
     public void testStrequents_phoneOnly() throws Exception {
@@ -187,8 +188,8 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
 
         // Only the contacts with phone numbers are returned, in alphabetical order. Filtering
         // is done with data ids instead of contact ids since each row contains a single data item.
-        assertCursorStoredValuesWithContactsFilter(uri, mDataIds, sContentValues[0],
-                sContentValues[2]);
+        assertCursorStoredValuesWithContactsFilter(uri, mDataIds, false,
+                sContentValues[0], sContentValues[2]);
     }
 
     public void testStrequents_phoneOnlyFrequentsOrder() throws Exception {
@@ -208,8 +209,31 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
                 appendQueryParameter(ContactsContract.STREQUENT_PHONE_ONLY, "true").build();
 
         // Only the contacts with phone numbers are returned, in frequency ranking order.
-        assertCursorStoredValuesWithContactsFilter(uri, mDataIds, sContentValues[2],
-                sContentValues[0]);
+        assertCursorStoredValuesWithContactsFilter(uri, mDataIds, false,
+                sContentValues[2], sContentValues[0]);
+    }
+
+    public void testFrequents_noFrequentsReturnsEmptyCursor() throws Exception {
+        long[] ids = setupTestData();
+        assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_FREQUENT_URI, ids, false);
+    }
+
+    public void testFrequents_CorrectOrder() throws Exception {
+        long[] ids = setupTestData();
+
+        // Contact the first contact once.
+        markDataAsUsed(mDataIds[0], 1);
+
+        // Contact the second contact thrice.
+        markDataAsUsed(mDataIds[1], 3);
+
+        // Contact the third contact twice.
+        markDataAsUsed(mDataIds[2], 2);
+
+        // The frequents uri should now return contact 2, 3, 1 in order due to ranking by
+        // data usage.
+        assertCursorStoredValuesWithContactsFilter(Contacts.CONTENT_FREQUENT_URI, ids,
+                true /* inOrder */, sContentValues[1], sContentValues[2], sContentValues[0]);
     }
 
     /**
@@ -221,10 +245,12 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
      * set. This is needed to limit the output to temporary test contacts that were created for
      * purposes of the test, so that the tests do not fail on devices with existing contacts on
      * them
+     * @param inOrder Whether or not the returned rows in the cursor should correspond to the
+     * order of the provided ContentValues
      * @param expected An array of ContentValues corresponding to the expected output of the query
      */
     private void assertCursorStoredValuesWithContactsFilter(Uri uri, long[] contactsId,
-            ContentValues... expected) {
+            boolean inOrder, ContentValues... expected) {
         // We need this helper function to add a filter for specific contacts because
         // otherwise tests will fail if performed on a device with existing contacts data
         StringBuilder sb = new StringBuilder();
@@ -236,7 +262,7 @@ public class ContactsContract_StrequentsTest extends InstrumentationTestCase {
         }
         sb.append(")");
         DatabaseAsserts.assertStoredValuesInUriMatchExactly(mResolver, uri, null, sb.toString(),
-                null, null, expected);
+                null, null, inOrder, expected);
     }
 
     /**
