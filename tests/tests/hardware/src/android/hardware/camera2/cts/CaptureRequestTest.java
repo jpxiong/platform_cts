@@ -1221,9 +1221,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void faceDetectionTestByCamera() throws Exception {
         // Can only test full capability because test relies on per frame control
         // and synchronization.
-        if (!mStaticInfo.isHardwareLevelFull()) {
-            return;
-        }
         int[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
 
         SimpleCaptureListener listener;
@@ -1241,6 +1238,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             // into another run.
             listener = new SimpleCaptureListener();
             startPreview(requestBuilder, maxPreviewSz, listener);
+            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             verifyFaceDetectionResults(listener, NUM_FACE_DETECTION_FRAMES_VERIFIED, mode);
         }
 
@@ -1280,7 +1278,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 }
 
                 for (Face face : faces) {
-                    Rect faceBound = null;
+                    Rect faceBound;
                     boolean faceRectAvailable =  mCollector.expectTrue("Face rectangle "
                             + "shouldn't be null", face.getBounds() != null);
                     if (!faceRectAvailable) {
@@ -1305,20 +1303,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     // Eyes/mouth position should be inside of the face rect.
                     if (leftEyeAvailable) {
                         Point leftEye = face.getLeftEyePosition();
-                        mCollector.expectTrue("Left eye " + leftEye.toString() + "should be"
-                                + "inside of face rect " + faceBound.toString(),
+                        mCollector.expectTrue("Left eye " + leftEye + "should be"
+                                + "inside of face rect " + faceBound,
                                 faceBound.contains(leftEye.x, leftEye.y));
                     }
                     if (rightEyeAvailable) {
                         Point rightEye = face.getRightEyePosition();
-                        mCollector.expectTrue("Right eye " + rightEye.toString() + "should be"
-                                + "inside of face rect " + faceBound.toString(),
+                        mCollector.expectTrue("Right eye " + rightEye + "should be"
+                                + "inside of face rect " + faceBound,
                                 faceBound.contains(rightEye.x, rightEye.y));
                     }
                     if (mouthAvailable) {
                         Point mouth = face.getMouthPosition();
-                        mCollector.expectTrue("Mouth " + mouth.toString() +  " should be inside of"
-                                + " face rect " + faceBound.toString(),
+                        mCollector.expectTrue("Mouth " + mouth +  " should be inside of"
+                                + " face rect " + faceBound,
                                 faceBound.contains(mouth.x, mouth.y));
                     }
                 }
