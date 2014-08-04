@@ -441,9 +441,9 @@
     <string name="snsr_on_complete_return">After completing the task, go back to this test.</string>
     <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
     <string name="snsr_sensor_feature_deactivation">Additionally, turn off any other features installed in the device, that register for sensors. Once you are done, you can continue the test.</string>
-    <string name="snsr_setting_mode_request">You will be redirected to set \'%1$s\' to: %2$b.</string>
-    <string name="snsr_setting_mode_set">\'%1$s\' set to: %2$b.</string>
-    <string name="snsr_setting_mode_not_set">\'%1$s\' not set to: %2$b.</string>
+    <string name="snsr_setting_mode_request">You will be redirected to set \'%1$s\' to: %2$s.</string>
+    <string name="snsr_setting_mode_set">\'%1$s\' set to: %2$s.</string>
+    <string name="snsr_setting_mode_not_set">\'%1$s\' not set to: %2$s.</string>
     <string name="snsr_setting_airplane_mode">Airplane mode</string>
     <string name="snsr_setting_screen_brightness_mode">Adaptive Brightness</string>
     <string name="snsr_setting_auto_rotate_screen_mode">Auto-rotate screen</string>
