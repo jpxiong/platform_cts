@@ -294,34 +294,32 @@ public class ContactsContract_PinnedPositionsTest extends AndroidTestCase {
         // Pin contact 1 and demote contact 2
         final ArrayList<ContentProviderOperation> operations =
                 new ArrayList<ContentProviderOperation>();
-        operations.add(newPinningOperation(i1.mContactId, 0, true));
+        operations.add(newPinningOperation(i1.mContactId, 1, true));
         operations.add(newPinningOperation(i2.mContactId, PinnedPositions.DEMOTED, false));
         applyBatch(mResolver, operations);
 
         assertValuesForContact(i1.mContactId,
-                newContentValues(Contacts.PINNED, 0, Contacts.STARRED, 1));
+                newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 1));
         assertValuesForContact(i2.mContactId,
                 newContentValues(Contacts.PINNED, PinnedPositions.DEMOTED, Contacts.STARRED, 0));
 
         assertValuesForRawContact(i1.mRawContactId,
-                newContentValues(RawContacts.PINNED, 0, RawContacts.STARRED, 1));
+                newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 1));
         assertValuesForRawContact(i2.mRawContactId,
                 newContentValues(RawContacts.PINNED, PinnedPositions.DEMOTED, RawContacts.STARRED, 0));
 
         // Now undemote both contacts.
-        mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
-                String.valueOf(i1.mContactId), null);
-        mResolver.call(ContactsContract.AUTHORITY_URI, PinnedPositions.UNDEMOTE_METHOD,
-                String.valueOf(i2.mContactId), null);
+        PinnedPositions.undemote(mResolver, i1.mContactId);
+        PinnedPositions.undemote(mResolver, i2.mContactId);
 
         // Contact 1 remains pinned at 0, while contact 2 becomes unpinned.
         assertValuesForContact(i1.mContactId,
-                newContentValues(Contacts.PINNED, 0, Contacts.STARRED, 1));
+                newContentValues(Contacts.PINNED, 1, Contacts.STARRED, 1));
         assertValuesForContact(i2.mContactId,
                 newContentValues(Contacts.PINNED, PinnedPositions.UNPINNED, Contacts.STARRED, 0));
 
         assertValuesForRawContact(i1.mRawContactId,
-                newContentValues(RawContacts.PINNED, 0, RawContacts.STARRED, 1));
+                newContentValues(RawContacts.PINNED, 1, RawContacts.STARRED, 1));
         assertValuesForRawContact(i2.mRawContactId,
                 newContentValues(RawContacts.PINNED, PinnedPositions.UNPINNED, RawContacts.STARRED,
                         0));
