@@ -133,5 +133,5 @@ public class ContactUtil {
         // single row was updated.
         Assert.assertEquals(1, resolver.update(AggregationExceptions.CONTENT_URI, values, null,
                   null));
-  }
+    }
 }
