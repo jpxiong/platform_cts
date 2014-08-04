@@ -30,6 +30,7 @@ import java.util.List;
 public class CamcorderProfileTest extends AndroidTestCase {
 
     private static final String TAG = "CamcorderProfileTest";
+    private static final int MIN_HIGH_SPEED_FPS = 100;
 
     // Uses get without id if cameraId == -1 and get with id otherwise.
     private CamcorderProfile getWithOptionalId(int quality, int cameraId) {
@@ -73,7 +74,12 @@ public class CamcorderProfileTest extends AndroidTestCase {
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_480P ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_720P ||
                    profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_1080P ||
-                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_2160P);
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_2160P ||
+                   profile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_LOW ||
+                   profile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_HIGH ||
+                   profile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_480P ||
+                   profile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_720P ||
+                   profile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_1080P);
         assertTrue(profile.videoBitRate > 0);
         assertTrue(profile.videoFrameRate > 0);
         assertTrue(profile.videoFrameWidth > 0);
@@ -144,6 +150,25 @@ public class CamcorderProfileTest extends AndroidTestCase {
                 assertEquals(3840, profile.videoFrameWidth);
                 assertEquals(2160, profile.videoFrameHeight);
                 break;
+            case CamcorderProfile.QUALITY_HIGH_SPEED_480P:
+                assertTrue(720 == profile.videoFrameWidth ||  // SMPTE 293M/ITU-R Rec. 601
+                640 == profile.videoFrameWidth ||  // ATSC/NTSC (square sampling)
+                704 == profile.videoFrameWidth);   // ATSC/NTSC (non-square sampling)
+                assertEquals(480, profile.videoFrameHeight);
+                assertTrue(profile.videoFrameRate >= MIN_HIGH_SPEED_FPS);
+                break;
+            case CamcorderProfile.QUALITY_HIGH_SPEED_720P:
+                assertEquals(1280, profile.videoFrameWidth);
+                assertEquals(720, profile.videoFrameHeight);
+                assertTrue(profile.videoFrameRate >= MIN_HIGH_SPEED_FPS);
+                break;
+            case CamcorderProfile.QUALITY_HIGH_SPEED_1080P:
+                // 1080p could be either 1920x1088 or 1920x1080.
+                assertEquals(1920, profile.videoFrameWidth);
+                assertTrue(1088 == profile.videoFrameHeight ||
+                           1080 == profile.videoFrameHeight);
+                assertTrue(profile.videoFrameRate >= MIN_HIGH_SPEED_FPS);
+                break;
         }
     }
 
@@ -156,6 +181,16 @@ public class CamcorderProfileTest extends AndroidTestCase {
             CamcorderProfile high,
             int[] specificQualities,
             List<Size> videoSizes) {
+
+        // For high speed levels, low and high quality are optional,skip the test if
+        // they are missing.
+        if (low == null && high == null) {
+            // No profile should be available if low and high are unavailable.
+            for (int quality : specificQualities) {
+                assertFalse(CamcorderProfile.hasProfile(cameraId, quality));
+            }
+            return;
+        }
 
         CamcorderProfile minProfile = null;
         CamcorderProfile maxProfile = null;
@@ -212,6 +247,29 @@ public class CamcorderProfileTest extends AndroidTestCase {
         checkProfile(lowTimeLapseProfile, null);
         checkProfile(highTimeLapseProfile, null);
 
+        // High speed low and high profile are optional,
+        // but they should be both present or missing.
+        CamcorderProfile lowHighSpeedProfile = null;
+        CamcorderProfile highHighSpeedProfile = null;
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH_SPEED_LOW)) {
+            lowHighSpeedProfile =
+                    getWithOptionalId(CamcorderProfile.QUALITY_HIGH_SPEED_LOW, cameraId);
+        }
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH_SPEED_HIGH)) {
+            highHighSpeedProfile =
+                    getWithOptionalId(CamcorderProfile.QUALITY_HIGH_SPEED_HIGH, cameraId);
+        }
+        if (lowHighSpeedProfile != null) {
+            assertNotNull("high speed high quality profile should be supported if low" +
+                    " is supported ",
+                    highHighSpeedProfile);
+            checkProfile(lowHighSpeedProfile, null);
+            checkProfile(highHighSpeedProfile, null);
+        } else {
+            assertNull("high speed high quality profile shouldn't be supported if " +
+                    "low is unsupported ", highHighSpeedProfile);
+        }
+
         int[] specificProfileQualities = {CamcorderProfile.QUALITY_QCIF,
                                           CamcorderProfile.QUALITY_QVGA,
                                           CamcorderProfile.QUALITY_CIF,
@@ -228,10 +286,16 @@ public class CamcorderProfileTest extends AndroidTestCase {
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_1080P,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_2160P};
 
+        int[] specificHighSpeedProfileQualities = {CamcorderProfile.QUALITY_HIGH_SPEED_480P,
+                                                   CamcorderProfile.QUALITY_HIGH_SPEED_720P,
+                                                   CamcorderProfile.QUALITY_HIGH_SPEED_1080P};
+
         checkSpecificProfiles(cameraId, lowProfile, highProfile,
                 specificProfileQualities, videoSizes);
         checkSpecificProfiles(cameraId, lowTimeLapseProfile, highTimeLapseProfile,
                 specificTimeLapseProfileQualities, null);
+        checkSpecificProfiles(cameraId, lowHighSpeedProfile, highHighSpeedProfile,
+                specificHighSpeedProfileQualities, null);
     }
 
     public void testGet() {
