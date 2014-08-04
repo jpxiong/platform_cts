@@ -849,11 +849,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         } // else the settings were already waited on earlier
 
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
-        request = requestBuilder.build();
+        CaptureRequest flashSinglerequest = requestBuilder.build();
 
-        int flashModeSingleRequests = captureRequestsSynchronized(request, listener, mHandler);
-        result = waitForNumResults(listener, flashModeSingleRequests);
-
+        int flashModeSingleRequests = captureRequestsSynchronized(flashSinglerequest, listener, mHandler);
+        waitForNumResults(listener, flashModeSingleRequests - 1);
+        result = listener.getCaptureResultForRequest(flashSinglerequest, NUM_RESULTS_WAIT_TIMEOUT);
         // Result mode must be SINGLE, state must be FIRED.
         mCollector.expectEquals("Flash mode result must be SINGLE",
                 CaptureResult.FLASH_MODE_SINGLE, result.get(CaptureResult.FLASH_MODE));
@@ -882,10 +882,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         // Test flash OFF mode control
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
-        request = requestBuilder.build();
+        CaptureRequest flashOffrequest = requestBuilder.build();
 
-        int flashModeOffRequests = captureRequestsSynchronized(request, listener, mHandler);
-        result = waitForNumResults(listener, flashModeOffRequests);
+        int flashModeOffRequests = captureRequestsSynchronized(flashOffrequest, listener, mHandler);
+        waitForNumResults(listener, flashModeOffRequests - 1);
+        result = listener.getCaptureResultForRequest(flashOffrequest, NUM_RESULTS_WAIT_TIMEOUT);
         mCollector.expectEquals("Flash mode result must be OFF", CaptureResult.FLASH_MODE_OFF,
                 result.get(CaptureResult.FLASH_MODE));
     }
