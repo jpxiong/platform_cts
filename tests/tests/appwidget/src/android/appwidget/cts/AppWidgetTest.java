@@ -104,8 +104,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
 
     public void testGetAppInstalledProvidersForCurrentUserNewCurrentProfile() throws Exception {
         // We ask only for providers for the current user.
-        List<AppWidgetProviderInfo> providers = getAppWidgetManager().getInstalledProviders(
-                new UserHandle[] {Process.myUserHandle()});
+        List<AppWidgetProviderInfo> providers = getAppWidgetManager()
+                .getInstalledProvidersForProfiles(new UserHandle[]{Process.myUserHandle()});
 
         // Make sure we have our two providers in the list.
         assertExpectedInstalledProviders(providers);
@@ -120,8 +120,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
         UserHandle[] profilesArray = new UserHandle[profilesList.size()];
         profilesList.toArray(profilesArray);
 
-        List<AppWidgetProviderInfo> providers = getAppWidgetManager().getInstalledProviders(
-                profilesArray);
+        List<AppWidgetProviderInfo> providers = getAppWidgetManager()
+                .getInstalledProvidersForProfiles(profilesArray);
 
         // Make sure we have our two providers in the list.
         assertExpectedInstalledProviders(providers);
