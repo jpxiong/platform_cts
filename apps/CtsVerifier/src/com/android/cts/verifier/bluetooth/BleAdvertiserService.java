@@ -65,8 +65,11 @@ public class BleAdvertiserService extends Service {
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
     protected static final UUID POWER_LEVEL_UUID =
             UUID.fromString("00008888-0000-1000-8000-00805f9b34fb");
+    protected static final UUID SCAN_RESP_UUID =
+            UUID.fromString("00007777-0000-1000-8000-00805f9b34fb");
     public static final byte MANUFACTURER_TEST_ID = (byte)0x07;
     public static final byte[] PRIVACY_MAC_DATA = new byte[]{3, 1, 4};
+    public static final byte[] PRIVACY_RESPONSE = new byte[]{9, 2, 6};
     public static final byte[] POWER_LEVEL_DATA = new byte[]{1, 5, 0};
     public static final byte[] POWER_LEVEL_MASK = new byte[]{1, 1, 0};
 
@@ -129,12 +132,17 @@ public class BleAdvertiserService extends Service {
                     .addManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
                     .addServiceData(new ParcelUuid(PRIVACY_MAC_UUID), PRIVACY_MAC_DATA)
                     .build();
+                AdvertiseData response = new AdvertiseData.Builder()
+                    .addManufacturerData(MANUFACTURER_TEST_ID, new byte[]{MANUFACTURER_TEST_ID, 0})
+                    .addServiceData(new ParcelUuid(SCAN_RESP_UUID), PRIVACY_RESPONSE)
+                    .build();
+
                 AdvertiseSettings setting = new AdvertiseSettings.Builder()
                     .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
                     .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
                     .setIsConnectable(false)
                     .build();
-                mAdvertiser.startAdvertising(setting, data, mCallback);
+                mAdvertiser.startAdvertising(setting, data, response, mCallback);
                 sendBroadcast(new Intent(BLE_START_ADVERTISE));
                 break;
             case COMMAND_STOP_ADVERTISE:

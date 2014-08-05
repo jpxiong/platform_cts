@@ -53,6 +53,8 @@ public class BleScannerService extends Service {
             "com.android.cts.verifier.bluetooth.BLE_MAC_ADDRESS";
     public static final String BLE_POWER_LEVEL =
             "com.android.cts.verifier.bluetooth.BLE_POWER_LEVEL";
+    public static final String BLE_SCAN_RESP =
+            "com.android.cts.verifier.bluetooth.BLE_SCAN_RESP";
 
     public static final String EXTRA_COMMAND =
             "com.google.cts.verifier.bluetooth.EXTRA_COMMAND";
@@ -65,10 +67,6 @@ public class BleScannerService extends Service {
     public static final String EXTRA_POWER_LEVEL_BIT =
             "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL_BIT";
 
-    private static final String PRIVACY_MAC_UUID =
-            "00009999-0000-1000-8000-00805f9b34fb";
-    private static final String POWER_LEVEL_UUID =
-            "00008888-0000-1000-8000-00805f9b34fb";
     private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
     private BluetoothManager mBluetoothManager;
@@ -106,6 +104,12 @@ public class BleScannerService extends Service {
                             new byte[]{MANUFACTURER_TEST_ID, 0})
                         .setServiceData(new ParcelUuid(BleAdvertiserService.PRIVACY_MAC_UUID),
                             BleAdvertiserService.PRIVACY_MAC_DATA)
+                        .build());
+                    filters.add(new ScanFilter.Builder()
+                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                            new byte[]{MANUFACTURER_TEST_ID, 0})
+                        .setServiceData(new ParcelUuid(BleAdvertiserService.SCAN_RESP_UUID),
+                            BleAdvertiserService.PRIVACY_RESPONSE)
                         .build());
                     settingBuilder.setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL);
                     break;
@@ -155,9 +159,9 @@ public class BleScannerService extends Service {
 
             ScanRecord record = result.getScanRecord();
             String mac = result.getDevice().getAddress();
-
             Map<ParcelUuid, byte[]> serviceData = record.getServiceData();
-            if (serviceData.get(PRIVACY_MAC_UUID) != null) {
+
+            if (serviceData.get(new ParcelUuid(BleAdvertiserService.PRIVACY_MAC_UUID)) != null) {
                 Intent privacyIntent = new Intent(BLE_MAC_ADDRESS);
                 privacyIntent.putExtra(EXTRA_MAC_ADDRESS, mac);
                 sendBroadcast(privacyIntent);
@@ -172,8 +176,9 @@ public class BleScannerService extends Service {
                 }
             }
 
-            if (serviceData.get(POWER_LEVEL_UUID) != null) {
-                byte[] data = serviceData.get(POWER_LEVEL_UUID);
+            if (serviceData.get(new ParcelUuid(BleAdvertiserService.POWER_LEVEL_UUID)) != null) {
+                byte[] data =
+                        serviceData.get(new ParcelUuid(BleAdvertiserService.POWER_LEVEL_UUID));
                 if (data.length == 3) {
                     Intent powerIntent = new Intent(BLE_POWER_LEVEL);
                     powerIntent.putExtra(EXTRA_MAC_ADDRESS, result.getDevice().getAddress());
@@ -182,6 +187,11 @@ public class BleScannerService extends Service {
                     powerIntent.putExtra(EXTRA_POWER_LEVEL_BIT, (int)data[2]);
                     sendBroadcast(powerIntent);
                 }
+            }
+
+            if (serviceData.get(new ParcelUuid(BleAdvertiserService.SCAN_RESP_UUID)) != null) {
+                Intent responseIntent = new Intent(BLE_SCAN_RESP);
+                sendBroadcast(responseIntent);
             }
         }
 

@@ -49,6 +49,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
             />
+            <TextView android:id="@+id/ble_resp_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ble_mac_count"
+            />
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                 android:layout_width="match_parent"
