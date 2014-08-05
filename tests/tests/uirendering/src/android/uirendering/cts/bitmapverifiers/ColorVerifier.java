@@ -22,6 +22,11 @@ public class ColorVerifier extends PerPixelBitmapVerifier {
     private int mColor;
 
     public ColorVerifier(int color) {
+        this(color, 0);
+    }
+
+    public ColorVerifier(int color, int threshold) {
+        super(threshold);
         mColor = color;
     }
 

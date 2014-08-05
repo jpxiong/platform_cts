@@ -37,7 +37,7 @@ public final class BitmapDumper {
     private final static String SINGULAR_FILE_NAME = "capture.png";
     private final static String CAPTURE_SUB_DIRECTORY = "/sdcard/UiRenderingCaptures/";
 
-    private BitmapDumper(){};
+    private BitmapDumper() {}
 
     /**
      * Deletes the specific files for the given test in a given class.
