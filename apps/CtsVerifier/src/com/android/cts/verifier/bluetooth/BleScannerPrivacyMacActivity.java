@@ -33,8 +33,10 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
     private static final String TAG = "BleScannerPrivacyMac";
 
     private int mMacCount;
+    private int mRespCount;
     private TextView mMacText;
     private TextView mCountText;
+    private TextView mRespText;
     private TextView mTimerText;
     private CountDownTimer mTimer;
     private static final long REFRESH_MAC_TIME = 930000; // 15.5 min
@@ -48,8 +50,10 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
                          R.string.ble_privacy_mac_info, -1);
         getPassButton().setEnabled(false);
         mMacCount = 0;
+        mRespCount = 0;
         mMacText = (TextView)findViewById(R.id.ble_mac_address);
         mCountText = (TextView)findViewById(R.id.ble_mac_count);
+        mRespText = (TextView)findViewById(R.id.ble_resp_count);
         mTimerText = (TextView)findViewById(R.id.ble_timer);
 
         mTimer = new CountDownTimer(REFRESH_MAC_TIME, 1000) {
@@ -77,6 +81,7 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BleScannerService.BLE_PRIVACY_NEW_MAC_RECEIVE);
         filter.addAction(BleScannerService.BLE_MAC_ADDRESS);
+        filter.addAction(BleScannerService.BLE_SCAN_RESP);
         registerReceiver(onBroadcast, filter);
 
         if (mMacCount == 0) {
@@ -106,6 +111,10 @@ public class BleScannerPrivacyMacActivity extends PassFailButtons.Activity {
                     }
                     mMacCount++;
                     mCountText.setText("Count: " + mMacCount);
+                    break;
+                case BleScannerService.BLE_SCAN_RESP:
+                    mRespCount++;
+                    mRespText.setText("Response: " + mRespCount);
                     break;
             }
         }
