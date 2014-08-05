@@ -23,10 +23,10 @@ import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.util.Range;
-import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.util.Range;
+import android.util.Size;
 import android.util.Log;
 import android.util.Rational;
 
@@ -547,6 +547,31 @@ public class StaticMetadata {
     }
 
     /**
+     * Get and check the available hot pixel map modes.
+     *
+     * @return the available hot pixel map modes
+     */
+    public int[] getAvailableHotPixelMapModesChecked() {
+        Key<int[]> key = CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new int[0];
+        }
+
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        if (isHardwareLevelFull()) {
+            checkTrueForKey(key, "Full-capability camera devices must support FAST mode",
+                    modeList.contains(CameraMetadata.HOT_PIXEL_MODE_FAST));
+        }
+        checkElementDistinct(key, modeList);
+        checkArrayValuesInRange(key, modes, CameraMetadata.HOT_PIXEL_MODE_OFF,
+                CameraMetadata.HOT_PIXEL_MODE_HIGH_QUALITY);
+
+        return modes;
+    }
+
+    /**
      * Get and check available face detection modes.
      *
      * @return The non-null array of available face detection modes
@@ -601,7 +626,7 @@ public class StaticMetadata {
     /**
      * Get and check the available tone map modes.
      *
-     * @return the availalbe tone map modes
+     * @return the available tone map modes
      */
     public int[] getAvailableToneMapModesChecked() {
         Key<int[]> key = CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES;
@@ -1371,6 +1396,31 @@ public class StaticMetadata {
     }
 
     /**
+     * Get and check the available color aberration modes
+     *
+     * @return the available color aberration modes
+     */
+    public int[] getAvailableColorAberrationModesChecked() {
+        Key<int[]> key =
+                CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_CORRECTION_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new int[0];
+        }
+
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        checkTrueForKey(key, " Camera devices must always support OFF mode",
+                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_OFF));
+        checkElementDistinct(key, modeList);
+        checkArrayValuesInRange(key, modes,
+                CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_OFF,
+                CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_HIGH_QUALITY);
+
+        return modes;
+    }
+
+    /**
      * Get max pipeline depth and do the sanity check.
      *
      * @return max pipeline depth, default value if it is not available.
@@ -1483,6 +1533,69 @@ public class StaticMetadata {
     @SafeVarargs
     public final boolean areKeysAvailable(CaptureRequest.Key<?>... keys) {
         return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(Arrays.asList(keys));
+    }
+
+    /*
+     * Determine if camera device support manual lens shading map control
+     *
+     * @return {@code true} if manual lens shading map control is supported
+     */
+    public boolean isManualLensShadingMapSupported() {
+        return areKeysAvailable(CaptureRequest.SHADING_MODE);
+    }
+
+    /**
+     * Determine if camera device support manual color correction control
+     *
+     * @return {@code true} if manual color correction control is supported
+     */
+    public boolean isManualColorCorrectionSupported() {
+        return areKeysAvailable(CaptureRequest.COLOR_CORRECTION_MODE);
+    }
+
+    /**
+     * Determine if camera device support manual tone mapping control
+     *
+     * @return {@code true} if manual tone mapping control is supported
+     */
+    public boolean isManualToneMapSupported() {
+        return areKeysAvailable(CaptureRequest.TONEMAP_MODE);
+    }
+
+    /**
+     * Determine if camera device support manual color aberration control
+     *
+     * @return {@code true} if manual color aberration control is supported
+     */
+    public boolean isManualColorAberrationControlSupported() {
+        return areKeysAvailable(CaptureRequest.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
+    }
+
+    /**
+     * Determine if camera device support edge mode control
+     *
+     * @return {@code true} if edge mode control is supported
+     */
+    public boolean isEdgeModeControlSupported() {
+        return areKeysAvailable(CaptureRequest.EDGE_MODE);
+    }
+
+    /**
+     * Determine if camera device support hot pixel mode control
+     *
+     * @return {@code true} if hot pixel mode control is supported
+     */
+    public boolean isHotPixelMapModeControlSupported() {
+        return areKeysAvailable(CaptureRequest.HOT_PIXEL_MODE);
+    }
+
+    /**
+     * Determine if camera device support noise reduction mode control
+     *
+     * @return {@code true} if noise reduction mode control is supported
+     */
+    public boolean isNoiseReductionModeControlSupported() {
+        return areKeysAvailable(CaptureRequest.NOISE_REDUCTION_MODE);
     }
 
     /**

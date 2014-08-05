@@ -19,6 +19,7 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
@@ -90,26 +91,9 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
      * </p>
      */
     public void testCameraCaptureResultAllKeys() throws Exception {
-        /**
-         * Hardcode a key waiver list for the keys that are allowed to be null.
-         * FIXME: We need get ride of this list, see bug 11116270.
-         */
-        List<CaptureResult.Key<?>> waiverkeys = new ArrayList<CaptureResult.Key<?>>();
-        waiverkeys.add(CaptureResult.JPEG_GPS_LOCATION);
-        waiverkeys.add(CaptureResult.JPEG_ORIENTATION);
-        waiverkeys.add(CaptureResult.JPEG_QUALITY);
-        waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
-        waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_SIZE);
-
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isHardwareLevelFull()) {
-                    Log.i(TAG, "Camera " + id + " is not a full mode device, skip the test");
-                    continue;
-                }
-                // TODO: check for LIMITED keys
-
                 // Create image reader and surface.
                 Size size = mOrderedPreviewSizes.get(0);
                 createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
@@ -125,26 +109,12 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 assertNotNull("Failed to create capture request", requestBuilder);
                 requestBuilder.addTarget(mReaderSurface);
 
-                // Enable face detection if supported
-                int[] faceModes = mStaticInfo.getAvailableFaceDetectModesChecked();
-                for (int i = 0; i < faceModes.length; i++) {
-                    if (faceModes[i] == CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL) {
-                        if (VERBOSE) {
-                            Log.v(TAG, "testCameraCaptureResultAllKeys - " +
-                                    "setting facedetection mode to full");
-                        }
-                        requestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE,
-                                (int)faceModes[i]);
-                    }
-                }
-
-                // Enable lensShading mode, it should be supported by full mode device.
-                requestBuilder.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
-                        CameraMetadata.STATISTICS_LENS_SHADING_MAP_MODE_ON);
-
                 // Start capture
                 SimpleCaptureListener captureListener = new SimpleCaptureListener();
                 startCapture(requestBuilder.build(), /*repeating*/true, captureListener, mHandler);
+
+                // Get the waived keys for current camera device
+                List<CaptureResult.Key<?>> waiverkeys = getWaiverKeysForCamera();
 
                 // Verify results
                 validateCaptureResult(captureListener, waiverkeys, requestBuilder,
@@ -314,6 +284,113 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 }
             }
         }
+    }
+
+    /*
+     * Add waiver keys per camera device hardware level and capability.
+     *
+     * Must be called after camera device is opened.
+     */
+    private List<CaptureResult.Key<?>> getWaiverKeysForCamera() {
+        List<CaptureResult.Key<?>> waiverKeys = new ArrayList<>();
+
+        // Global waiver keys
+        waiverKeys.add(CaptureResult.JPEG_GPS_LOCATION);
+        waiverKeys.add(CaptureResult.JPEG_ORIENTATION);
+        waiverKeys.add(CaptureResult.JPEG_QUALITY);
+        waiverKeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
+        waiverKeys.add(CaptureResult.JPEG_THUMBNAIL_SIZE);
+
+        // Keys only present when corresponding control is on are being
+        // verified in its own functional test
+        // Only present when tone mapping mode is CONTRAST_CURVE
+        waiverKeys.add(CaptureResult.TONEMAP_CURVE);
+        // Only present when test pattern mode is SOLID_COLOR.
+        // TODO: verify this key in test pattern test later
+        waiverKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
+        // Only present when STATISTICS_LENS_SHADING_MAP_MODE is ON
+        waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
+        //  Only present when STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES is ON
+        waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
+        //  Only present when face detection is on
+        waiverKeys.add(CaptureResult.STATISTICS_FACES);
+
+        //Keys not required if RAW is not supported
+        if (!mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+            waiverKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
+            waiverKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
+            waiverKeys.add(CaptureResult.SENSOR_NOISE_PROFILE);
+        }
+
+        if (mStaticInfo.isHardwareLevelFull()) {
+            return waiverKeys;
+        }
+
+        /*
+         * Hardware Level = LIMITED or LEGACY
+         */
+        // Key not present if certain control is not supported
+        if (!mStaticInfo.isManualColorCorrectionSupported()) {
+            waiverKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
+            waiverKeys.add(CaptureResult.COLOR_CORRECTION_MODE);
+            waiverKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);
+        }
+
+        if (!mStaticInfo.isManualColorAberrationControlSupported()) {
+            waiverKeys.add(CaptureResult.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
+        }
+
+        if (!mStaticInfo.isManualToneMapSupported()) {
+            waiverKeys.add(CaptureResult.TONEMAP_MODE);
+        }
+
+        if (!mStaticInfo.isEdgeModeControlSupported()) {
+            waiverKeys.add(CaptureResult.EDGE_MODE);
+        }
+
+        if (!mStaticInfo.isHotPixelMapModeControlSupported()) {
+            waiverKeys.add(CaptureResult.HOT_PIXEL_MODE);
+        }
+
+        if (!mStaticInfo.isNoiseReductionModeControlSupported()) {
+            waiverKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
+        }
+
+        //Keys not required if manual sensor control is not supported
+        if (!mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+            waiverKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
+            waiverKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
+            waiverKeys.add(CaptureResult.SENSOR_SENSITIVITY);
+            waiverKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
+        }
+
+        if (mStaticInfo.isHardwareLevelLimited()) {
+            return waiverKeys;
+        }
+
+        /*
+         * Hardware Level = LEGACY
+         */
+        waiverKeys.add(CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER);
+        waiverKeys.add(CaptureResult.CONTROL_AE_STATE);
+        waiverKeys.add(CaptureResult.CONTROL_AWB_STATE);
+        waiverKeys.add(CaptureResult.CONTROL_AWB_REGIONS);
+        waiverKeys.add(CaptureResult.FLASH_STATE);
+        waiverKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
+        waiverKeys.add(CaptureResult.LENS_FOCUS_RANGE);
+        waiverKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
+        waiverKeys.add(CaptureResult.LENS_STATE);
+        waiverKeys.add(CaptureResult.LENS_APERTURE);
+        waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
+        waiverKeys.add(CaptureResult.SENSOR_ROLLING_SHUTTER_SKEW);
+        waiverKeys.add(CaptureResult.SHADING_MODE);
+        waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
+        waiverKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
+        waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
+
+        return waiverKeys;
     }
 
     /**
