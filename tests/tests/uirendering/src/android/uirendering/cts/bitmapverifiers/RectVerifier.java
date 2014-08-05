@@ -26,6 +26,11 @@ public class RectVerifier extends PerPixelBitmapVerifier {
     private Rect mInnerRect;
 
     public RectVerifier(int outerColor, int innerColor, Rect innerRect) {
+        this(outerColor, innerColor, innerRect, 0);
+    }
+
+    public RectVerifier(int outerColor, int innerColor, Rect innerRect, int tolerance) {
+        super(tolerance);
         mOuterColor = outerColor;
         mInnerColor = innerColor;
         mInnerRect = innerRect;
