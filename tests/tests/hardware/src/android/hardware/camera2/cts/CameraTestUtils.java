@@ -23,6 +23,7 @@ import android.graphics.ImageFormat;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraCharacteristics;
@@ -42,6 +43,7 @@ import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
+import com.android.ex.camera2.blocking.BlockingSessionListener;
 import com.android.ex.camera2.blocking.BlockingStateListener;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
@@ -131,6 +133,32 @@ public class CameraTestUtils extends Assert {
                 image = reader.acquireNextImage();
             } finally {
                 if (image != null) {
+                    image.close();
+                }
+            }
+        }
+    }
+
+    /**
+     * Image listener that release the image immediately after validating the image
+     */
+    public static class ImageVerifierListener implements ImageReader.OnImageAvailableListener {
+        private Size mSize;
+        private int mFormat;
+
+        public ImageVerifierListener(Size sz, int format) {
+            mSize = sz;
+            mFormat = format;
+        }
+
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            Image image = null;
+            try {
+                image = reader.acquireNextImage();
+            } finally {
+                if (image != null) {
+                    validateImage(image, mSize.getWidth(), mSize.getHeight(), mFormat, null);
                     image.close();
                 }
             }
@@ -315,6 +343,23 @@ public class CameraTestUtils extends Assert {
         } else {
             listener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
         }
+    }
+
+    /**
+     * Configure a new camera session with output surfaces.
+     *
+     * @param camera The CameraDevice to be configured.
+     * @param outputSurfaces The surface list that used for camera output.
+     * @param listener The callback camera session will notify when capture results are available.
+     */
+    public static CameraCaptureSession configureCameraSession(CameraDevice camera,
+            List<Surface> outputSurfaces,
+            CameraCaptureSession.StateListener listener, Handler handler)
+            throws CameraAccessException {
+        BlockingSessionListener sessionListener = new BlockingSessionListener(listener);
+        camera.createCaptureSession(outputSurfaces, sessionListener, handler);
+
+        return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
     }
 
     public static <T> void assertArrayNotEmpty(T arr, String message) {
