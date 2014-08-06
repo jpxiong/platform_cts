@@ -21,7 +21,6 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
-import android.widget.SeekBar;
 import android.widget.ToggleButton;
 import com.android.cts.stub.R;
 
@@ -334,7 +333,7 @@ public class CompoundButtonTest extends AndroidTestCase {
         CompoundButton inflatedView = (CompoundButton) layout.findViewById(R.id.button_tint);
 
         assertEquals("Button tint inflated correctly",
-                Color.WHITE, inflatedView.getButtonTint().getDefaultColor());
+                Color.WHITE, inflatedView.getButtonTintList().getDefaultColor());
         assertEquals("Button tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getButtonTintMode());
 
@@ -344,14 +343,14 @@ public class CompoundButtonTest extends AndroidTestCase {
         view.setButtonDrawable(button);
         assertFalse("No button tint applied by default", button.hasCalledSetTint());
 
-        view.setButtonTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Button tint applied when setButtonTint() called after setButton()",
+        view.setButtonTintList(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Button tint applied when setButtonTintList() called after setButton()",
                 button.hasCalledSetTint());
 
         button.reset();
         view.setButtonDrawable(null);
         view.setButtonDrawable(button);
-        assertTrue("Button tint applied when setButtonTint() called before setButton()",
+        assertTrue("Button tint applied when setButtonTintList() called before setButton()",
                 button.hasCalledSetTint());
     }
 
@@ -368,8 +367,8 @@ public class CompoundButtonTest extends AndroidTestCase {
         public void setColorFilter(ColorFilter cf) {}
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 

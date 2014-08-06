@@ -183,11 +183,13 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     }
 
     public void testSetTint() {
-        mNinePatchDrawable.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        mNinePatchDrawable.setTint(Color.BLACK);
+        mNinePatchDrawable.setTintMode(Mode.SRC_OVER);
         assertEquals("Nine-patch is tinted", Color.BLACK,
                 DrawableTestingUtils.getPixel(mNinePatchDrawable, 0, 0));
 
-        mNinePatchDrawable.setTint(null, null);
+        mNinePatchDrawable.setTintList(null);
+        mNinePatchDrawable.setTintMode(null);
     }
 
     public void testSetDither() {

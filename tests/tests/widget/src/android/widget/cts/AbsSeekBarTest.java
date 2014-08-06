@@ -20,7 +20,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.test.UiThreadTest;
-import android.view.View;
+
 import com.android.cts.stub.R;
 
 
@@ -34,7 +34,6 @@ import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.widget.AbsSeekBar;
 import android.widget.SeekBar;
 
@@ -219,7 +218,7 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         SeekBar inflatedView = (SeekBar) mActivity.findViewById(R.id.thumb_tint);
 
         assertEquals("Thumb tint inflated correctly",
-                Color.WHITE, inflatedView.getThumbTint().getDefaultColor());
+                Color.WHITE, inflatedView.getThumbTintList().getDefaultColor());
         assertEquals("Thumb tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getThumbTintMode());
 
@@ -229,14 +228,14 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         view.setThumb(thumb);
         assertFalse("No thumb tint applied by default", thumb.hasCalledSetTint());
 
-        view.setThumbTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Thumb tint applied when setThumbTint() called after setThumb()",
+        view.setThumbTintList(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Thumb tint applied when setThumbTintList() called after setThumb()",
                 thumb.hasCalledSetTint());
 
         thumb.reset();
         view.setThumb(null);
         view.setThumb(thumb);
-        assertTrue("Thumb tint applied when setThumbTint() called before setThumb()",
+        assertTrue("Thumb tint applied when setThumbTintList() called before setThumb()",
                 thumb.hasCalledSetTint());
     }
 
@@ -307,8 +306,8 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         public void setColorFilter(ColorFilter cf) { }
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 
