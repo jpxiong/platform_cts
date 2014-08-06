@@ -12,10 +12,11 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
 
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -37,6 +38,8 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.util.Range;
 import android.view.Surface;
+
+import com.android.ex.camera2.blocking.BlockingSessionListener;
 
 import junit.framework.AssertionFailedError;
 
@@ -336,9 +339,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         if (mReaderSurface != null) {
             outputSurfaces.add(mReaderSurface);
         }
-        mCamera.configureOutputs(outputSurfaces);
-        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+        mSessionListener = new BlockingSessionListener();
+        mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         CaptureRequest.Builder recordingRequestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
@@ -368,7 +370,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < slowMotionFactor - 1; i++) {
             slowMoRequests.add(recordingOnlyBuilder.build()); // Recording only.
         }
-        mCamera.setRepeatingBurst(slowMoRequests, null, null);
+        mSession.setRepeatingBurst(slowMoRequests, null, null);
 
         if (useMediaRecorder) {
             mMediaRecorder.start();
@@ -584,9 +586,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
                     requests.add(request);
                 }
-                mCamera.captureBurst(requests, resultListener, mHandler);
+                mSession.captureBurst(requests, resultListener, mHandler);
             } else {
-                mCamera.capture(request, resultListener, mHandler);
+                mSession.capture(request, resultListener, mHandler);
             }
 
             // make sure recording is still going after video snapshot
@@ -679,8 +681,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mVideoSize = sz;
     }
 
-    private void startRecording(boolean useMediaRecorder, CameraDevice.CaptureListener listener)
-            throws Exception {
+    private void startRecording(boolean useMediaRecorder,
+            CameraCaptureSession.CaptureListener listener) throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(2);
         assertTrue("Both preview and recording surfaces should be valid",
                 mPreviewSurface.isValid() && mRecordingSurface.isValid());
@@ -690,9 +692,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         if (mReaderSurface != null) {
             outputSurfaces.add(mReaderSurface);
         }
-        mCamera.configureOutputs(outputSurfaces);
-        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+        mSessionListener = new BlockingSessionListener();
+        mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         CaptureRequest.Builder recordingRequestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
@@ -701,7 +702,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
         recordingRequestBuilder.addTarget(mRecordingSurface);
         recordingRequestBuilder.addTarget(mPreviewSurface);
-        mCamera.setRepeatingRequest(recordingRequestBuilder.build(), listener, mHandler);
+        mSession.setRepeatingRequest(recordingRequestBuilder.build(), listener, mHandler);
 
         if (useMediaRecorder) {
             mMediaRecorder.start();
@@ -720,9 +721,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         }
         // Stop repeating, wait for captures to complete, and disconnect from
         // surfaces
-        mCamera.configureOutputs(/* outputs */null);
-        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_IDLE_TIMEOUT_MS);
+        mSession.close();
+        mSessionListener.getStateWaiter().waitForState(SESSION_CLOSED, SESSION_CLOSE_TIMEOUT_MS);
     }
 
     private void stopRecording(boolean useMediaRecorder) throws Exception {
@@ -757,7 +757,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             mediaPlayer.setDataSource(mOutMediaFileName);
             mediaPlayer.prepare();
             Size videoSz = new Size(mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight());
-            assertTrue("Video size doesn't match", videoSz.equals(sz));
+            assertTrue("Video size doesn't match, expected " + sz.toString() +
+                    " got " + videoSz.toString(), videoSz.equals(sz));
             int duration = mediaPlayer.getDuration();
 
             // TODO: Don't skip this for video snapshot

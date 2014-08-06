@@ -43,6 +43,7 @@ import android.util.Range;
 import android.util.Rational;
 import android.view.Surface;
 
+import com.android.ex.camera2.blocking.BlockingSessionListener;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.io.ByteArrayOutputStream;
@@ -389,7 +390,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
         // take a picture
         CaptureRequest request = stillRequest.build();
-        mCamera.capture(request, stillResultListener, mHandler);
+        mSession.capture(request, stillResultListener, mHandler);
         stillResultListener.getCaptureResultForRequest(request,
                 WAIT_FOR_RESULT_TIMEOUT_MS);
 
@@ -451,7 +452,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
         if (hasFocuser) {
             SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
-            focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
+            focuser = new Camera2Focuser(mCamera, mSession, mPreviewSurface, afListener,
                     mStaticInfo.getCharacteristics(), mHandler);
             if (canSetAfRegion) {
                 stillRequest.set(CaptureRequest.CONTROL_AF_REGIONS, afRegions);
@@ -486,7 +487,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             previewRequest.set(CaptureRequest.CONTROL_AWB_REGIONS, awbRegions);
             stillRequest.set(CaptureRequest.CONTROL_AWB_REGIONS, awbRegions);
         }
-        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
             waitForResultValue(resultListener, CaptureResult.CONTROL_AWB_STATE,
                     CaptureResult.CONTROL_AWB_STATE_CONVERGED, NUM_RESULTS_WAIT_TIMEOUT);
@@ -495,7 +496,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         }
         previewRequest.set(CaptureRequest.CONTROL_AWB_LOCK, true);
-        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         // Validate the next result immediately for region and mode.
         result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         mCollector.expectEquals("AWB mode in result and request should be same",
@@ -518,10 +519,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             previewRequest.set(CaptureRequest.CONTROL_AE_REGIONS, aeRegions);
             stillRequest.set(CaptureRequest.CONTROL_AE_REGIONS, aeRegions);
         }
-        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
-        mCamera.capture(previewRequest.build(), resultListener, mHandler);
+        mSession.capture(previewRequest.build(), resultListener, mHandler);
         waitForAeStable(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
         // Validate the next result immediately for region and mode.
@@ -545,7 +546,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
          */
         resultListener = new SimpleCaptureListener();
         CaptureRequest request = stillRequest.build();
-        mCamera.capture(request, resultListener, mHandler);
+        mSession.capture(request, resultListener, mHandler);
         // Validate the next result immediately for region and mode.
         result = resultListener.getCaptureResultForRequest(request, WAIT_FOR_RESULT_TIMEOUT_MS);
         mCollector.expectEquals("AF mode in result and request should be same",
@@ -581,7 +582,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         startPreview(requestBuilder, maxPreviewSz, listener);
 
         SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
-        Camera2Focuser focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
+        Camera2Focuser focuser = new Camera2Focuser(mCamera, mSession, mPreviewSurface, afListener,
                 mStaticInfo.getCharacteristics(), mHandler);
         ArrayList<MeteringRectangle[]> testAfRegions = get3ARegionTestCasesForCamera();
 
@@ -609,7 +610,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
                 prepareStillCaptureAndStartPreview(previewRequest, stillRequest, previewSz,
                         stillSz, resultListener, imageListener);
-                mCamera.capture(stillRequest.build(), resultListener, mHandler);
+                mSession.capture(stillRequest.build(), resultListener, mHandler);
                 Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateJpegCapture(image, stillSz);
                 // stopPreview must be called here to make sure next time a preview stream
@@ -641,7 +642,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     resultListener, imageListener);
 
             CaptureRequest rawRequest = rawBuilder.build();
-            mCamera.capture(rawRequest, resultListener, mHandler);
+            mSession.capture(rawRequest, resultListener, mHandler);
 
             Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             validateRaw16Image(image, size);
@@ -696,7 +697,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 outputSurfaces.add(rawReader.getSurface());
                 outputSurfaces.add(jpegReader.getSurface());
                 outputSurfaces.add(mPreviewSurface);
-                configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+                mSessionListener = new BlockingSessionListener();
+                mSession = configureCameraSession(mCamera, outputSurfaces,
+                        mSessionListener, mHandler);
 
                 // Configure the requests.
                 previewBuilder.addTarget(mPreviewSurface);
@@ -705,7 +708,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 multiBuilder.addTarget(jpegReader.getSurface());
 
                 // Start preview.
-                mCamera.setRepeatingRequest(previewBuilder.build(), null, mHandler);
+                mSession.setRepeatingRequest(previewBuilder.build(), null, mHandler);
 
                 // Poor man's 3A, wait 2 seconds for AE/AF (if any) to settle.
                 // TODO: Do proper 3A trigger and lock (see testTakePictureTest).
@@ -715,7 +718,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                         CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
                 CaptureRequest multiRequest = multiBuilder.build();
 
-                mCamera.capture(multiRequest, resultListener, mHandler);
+                mSession.capture(multiRequest, resultListener, mHandler);
 
                 CaptureResult result = resultListener.getCaptureResultForRequest(multiRequest,
                         NUM_RESULTS_WAIT_TIMEOUT);
@@ -838,7 +841,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             // Capture a jpeg image.
             CaptureRequest request = stillBuilder.build();
-            mCamera.capture(request, resultListener, mHandler);
+            mSession.capture(request, resultListener, mHandler);
             CaptureResult stillResult =
                     resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
             Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
@@ -1166,7 +1169,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             previewRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,
                     exposureCompensation);
             previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
-            mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+            mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
             waitForAeLocked(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
             // Issue still capture
@@ -1177,7 +1180,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             stillRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, exposureCompensation);
             CaptureRequest request = stillRequest.build();
-            mCamera.capture(request, resultListener, mHandler);
+            mSession.capture(request, resultListener, mHandler);
 
             result = resultListener.getCaptureResultForRequest(request, WAIT_FOR_RESULT_TIMEOUT_MS);
 
@@ -1210,7 +1213,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             // Recover AE compensation and lock
             previewRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 0);
             previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, false);
-            mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+            mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         }
     }
 
