@@ -32,6 +32,8 @@ import android.view.SurfaceHolder;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCaptureSession.CaptureListener;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
@@ -39,7 +41,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
 import android.util.Range;
-import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
@@ -47,6 +48,7 @@ import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 
+import com.android.ex.camera2.blocking.BlockingSessionListener;
 import com.android.ex.camera2.blocking.BlockingStateListener;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
@@ -84,10 +86,12 @@ public class Camera2SurfaceViewTestCase extends
     protected HandlerThread mHandlerThread;
     protected Handler mHandler;
     protected BlockingStateListener mCameraListener;
+    protected BlockingSessionListener mSessionListener;
     protected CameraErrorCollector mCollector;
     // Per device fields:
     protected StaticMetadata mStaticInfo;
     protected CameraDevice mCamera;
+    protected CameraCaptureSession mSession;
     protected ImageReader mReader;
     protected Surface mReaderSurface;
     protected Surface mPreviewSurface;
@@ -169,7 +173,7 @@ public class Camera2SurfaceViewTestCase extends
 
         configurePreviewOutput(request);
 
-        mCamera.setRepeatingRequest(request.build(), listener, mHandler);
+        mSession.setRepeatingRequest(request.build(), listener, mHandler);
     }
 
     /**
@@ -181,7 +185,8 @@ public class Camera2SurfaceViewTestCase extends
             throws CameraAccessException {
         List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
         outputSurfaces.add(mPreviewSurface);
-        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+        mSessionListener = new BlockingSessionListener();
+        mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         request.addTarget(mPreviewSurface);
     }
@@ -210,7 +215,7 @@ public class Camera2SurfaceViewTestCase extends
     protected void stopPreview() throws Exception {
         if (VERBOSE) Log.v(TAG, "Stopping preview and waiting for idle");
         // Stop repeat, wait for captures to complete, and disconnect from surfaces
-        configureCameraOutputs(mCamera, /*outputSurfaces*/null, mCameraListener);
+        mSession.close();
     }
 
     /**
@@ -409,7 +414,7 @@ public class Camera2SurfaceViewTestCase extends
         int numCaptures = maxLatency + count;
 
         for (int i = 0; i < numCaptures; ++i) {
-            mCamera.capture(request, listener, handler);
+            mSession.capture(request, listener, handler);
         }
 
         return numCaptures;
@@ -570,6 +575,8 @@ public class Camera2SurfaceViewTestCase extends
             mCamera.close();
             mCameraListener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
             mCamera = null;
+            mSession = null;
+            mSessionListener = null;
             mStaticInfo = null;
             mOrderedPreviewSizes = null;
             mOrderedVideoSizes = null;
@@ -634,7 +641,8 @@ public class Camera2SurfaceViewTestCase extends
         List<Surface> outputSurfaces = new ArrayList<Surface>();
         outputSurfaces.add(mPreviewSurface);
         outputSurfaces.add(mReaderSurface);
-        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+        mSessionListener = new BlockingSessionListener();
+        mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         // Configure the requests.
         previewRequest.addTarget(mPreviewSurface);
@@ -642,7 +650,7 @@ public class Camera2SurfaceViewTestCase extends
         stillRequest.addTarget(mReaderSurface);
 
         // Start preview.
-        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
     }
 
     /**

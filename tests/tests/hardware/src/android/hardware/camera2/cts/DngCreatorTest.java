@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts;
 
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
@@ -36,7 +37,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.hardware.camera2.cts.CameraTestUtils.configureCameraOutputs;
+import static android.hardware.camera2.cts.CameraTestUtils.configureCameraSession;
 
 /**
  * Tests for the DngCreator API.
@@ -189,7 +190,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
 
     private CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces)
             throws Exception {
-        configureCameraOutputs(mCamera, surfaces, mCameraListener);
+        createSession(surfaces);
 
         CaptureRequest.Builder captureBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);

@@ -193,17 +193,17 @@ public class CameraTestUtils extends Assert {
         }
     }
 
-    public static class SimpleCaptureListener extends CameraDevice.CaptureListener {
+    public static class SimpleCaptureListener extends CameraCaptureSession.CaptureListener {
         private final LinkedBlockingQueue<CaptureResult> mQueue =
                 new LinkedBlockingQueue<CaptureResult>();
 
         @Override
-        public void onCaptureStarted(CameraDevice camera, CaptureRequest request, long timestamp)
+        public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request, long timestamp)
         {
         }
 
         @Override
-        public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
+        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
                 TotalCaptureResult result) {
             try {
                 mQueue.put(result);
@@ -214,12 +214,12 @@ public class CameraTestUtils extends Assert {
         }
 
         @Override
-        public void onCaptureFailed(CameraDevice camera, CaptureRequest request,
+        public void onCaptureFailed(CameraCaptureSession session, CaptureRequest request,
                 CaptureFailure failure) {
         }
 
         @Override
-        public void onCaptureSequenceCompleted(CameraDevice camera, int sequenceId,
+        public void onCaptureSequenceCompleted(CameraCaptureSession session, int sequenceId,
                 long frameNumber) {
         }
 
@@ -328,29 +328,11 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
-     * Configure camera output surfaces.
-     *
-     * @param camera The CameraDevice to be configured.
-     * @param outputSurfaces The surface list that used for camera output.
-     * @param listener The callback CameraDevice will notify when capture results are available.
-     */
-    public static void configureCameraOutputs(CameraDevice camera, List<Surface> outputSurfaces,
-            BlockingStateListener listener) throws CameraAccessException {
-        camera.configureOutputs(outputSurfaces);
-        listener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        if (outputSurfaces == null || outputSurfaces.size() == 0) {
-            listener.waitForState(STATE_UNCONFIGURED, CAMERA_UNCONFIGURED_TIMEOUT_MS);
-        } else {
-            listener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
-        }
-    }
-
-    /**
      * Configure a new camera session with output surfaces.
      *
      * @param camera The CameraDevice to be configured.
      * @param outputSurfaces The surface list that used for camera output.
-     * @param listener The callback camera session will notify when capture results are available.
+     * @param listener The callback CameraDevice will notify when capture results are available.
      */
     public static CameraCaptureSession configureCameraSession(CameraDevice camera,
             List<Surface> outputSurfaces,
