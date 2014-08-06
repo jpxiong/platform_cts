@@ -43,21 +43,12 @@ public class BitmapFilterTests extends ActivityTestBase {
     /**
      * Verifies that a Bitmap only contains white and black, within a certain threshold
      */
-    private static BitmapVerifier mBlackWhiteVerifier = new PerPixelBitmapVerifier() {
+    private static BitmapVerifier mBlackWhiteVerifier = new PerPixelBitmapVerifier(THRESHOLD) {
         @Override
         protected boolean verifyPixel(int color, int expectedColor) {
             int weight = Color.red(color) + Color.blue(color) + Color.green(color);
-
-            if (weight > THRESHOLD && WHITE_WEIGHT - THRESHOLD > weight) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected int getExpectedColor(int x, int y) {
-            // Expected color is ignored. See {@code verifyPixel}.
-            return -1;
+            return weight < THRESHOLD // is approx Color.BLACK
+                    || weight > WHITE_WEIGHT - THRESHOLD; // is approx Color.WHITE
         }
     };
 
