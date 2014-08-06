@@ -65,7 +65,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int RGGB_COLOR_CHANNEL_COUNT = 4;
     private static final int MAX_SHADING_MAP_SIZE = 64 * 64 * RGGB_COLOR_CHANNEL_COUNT;
     private static final int MIN_SHADING_MAP_SIZE = 1 * 1 * RGGB_COLOR_CHANNEL_COUNT;
-    private static final long IGORE_REQUESTED_EXPOSURE_TIME_CHECK = -1L;
+    private static final long IGNORE_REQUESTED_EXPOSURE_TIME_CHECK = -1L;
     private static final long EXPOSURE_TIME_BOUNDARY_50HZ_NS = 10000000L; // 10ms
     private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8333333L; // 8.3ms, Approximation.
     private static final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000L; // 100us, Approximation.
@@ -133,7 +133,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                if (!mStaticInfo.isHardwareLevelFull()) {
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
                     continue;
                 }
 
@@ -147,15 +148,17 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
-                startPreview(requestBuilder, previewSz, listener);
 
+                startPreview(requestBuilder, previewSz, listener);
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 // No lock OFF state is allowed as the exposure is not changed.
                 verifyBlackLevelLockResults(listener, NUM_FRAMES_VERIFIED, /*maxLockOffCnt*/0);
 
                 // Double the exposure time and gain, with black level still being locked.
                 changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS * 2, DEFAULT_SENSITIVITY * 2);
+                listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
-
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 // Allow at most one lock OFF state as the exposure is changed once.
                 verifyBlackLevelLockResults(listener, NUM_FRAMES_VERIFIED, /*maxLockOffCnt*/1);
 
@@ -184,7 +187,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                if (!mStaticInfo.isHardwareLevelFull()) {
+                if (!mStaticInfo.isManualLensShadingMapSupported()) {
                     continue;
                 }
 
@@ -203,7 +206,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
-
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_OFF);
 
                 // Shading map mode FAST, lensShadingMapMode ON, camera device
@@ -212,7 +215,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
-
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 // Allow at most one lock OFF state as the exposure is changed once.
                 verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_FAST);
 
@@ -222,7 +225,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, previewSz, listener);
-
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_HIGH_QUALITY);
 
                 stopPreview();
@@ -244,8 +247,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                if (!mStaticInfo.isHardwareLevelFull()) {
-                    continue;
+                // Without manual sensor control, exposure time cannot be verified
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    return;
                 }
 
                 int[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
@@ -814,7 +819,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param aeMode The AE mode for flash to test with
      */
     private void flashTestByAeMode(SimpleCaptureListener listener, int aeMode) throws Exception {
-        CaptureRequest request;
         CaptureResult result;
         final int NUM_FLASH_REQUESTS_TESTED = 10;
         CaptureRequest.Builder requestBuilder = createRequestForPreview();
@@ -851,7 +855,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
         CaptureRequest flashSinglerequest = requestBuilder.build();
 
-        int flashModeSingleRequests = captureRequestsSynchronized(flashSinglerequest, listener, mHandler);
+        int flashModeSingleRequests = captureRequestsSynchronized(
+                flashSinglerequest, listener, mHandler);
         waitForNumResults(listener, flashModeSingleRequests - 1);
         result = listener.getCaptureResultForRequest(flashSinglerequest, NUM_RESULTS_WAIT_TIMEOUT);
         // Result mode must be SINGLE, state must be FIRED.
@@ -960,8 +965,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         // Test auto AE mode anti-banding behavior
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         startPreview(requestBuilder, size, resultListener);
+        waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/false,
-                IGORE_REQUESTED_EXPOSURE_TIME_CHECK);
+                IGNORE_REQUESTED_EXPOSURE_TIME_CHECK);
 
         // Test manual AE mode anti-banding behavior
         // 65ms, must be supported by full capability devices.
@@ -970,6 +976,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         changeExposure(requestBuilder, manualExpTime);
         resultListener = new SimpleCaptureListener();
         startPreview(requestBuilder, size, resultListener);
+        waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/true,
                 manualExpTime);
 
@@ -1179,7 +1186,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             mCollector.expectEquals("Shading mode result doesn't match request",
                     shadingMode, result.get(CaptureResult.SHADING_MODE));
-            LensShadingMap mapObj = result.get(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
+            LensShadingMap mapObj = result.get(
+                    CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
             assertNotNull("Map object must not be null", mapObj);
             int numElementsInMap = mapObj.getGainFactorCount();
             float[] map = new float[numElementsInMap];
@@ -1331,9 +1339,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * Test tone map mode and result by camera
      */
     private void toneMapTestByCamera() throws Exception {
-        // Can only test full capability because test relies on per frame control
-        // and synchronization.
-        if (!mStaticInfo.isHardwareLevelFull()) {
+        if (!mStaticInfo.isManualToneMapSupported()) {
             return;
         }
 
@@ -1358,6 +1364,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // into another run.
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, maxPreviewSz, listener);
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
                         TONEMAP_CURVE_LINEAR);
 
@@ -1368,6 +1375,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // into another run.
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, maxPreviewSz, listener);
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
                         TONEMAP_CURVE_SRGB);
             } else {
@@ -1375,6 +1383,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // into another run.
                 listener = new SimpleCaptureListener();
                 startPreview(requestBuilder, maxPreviewSz, listener);
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
                         /*inputToneCurve*/null);
             }

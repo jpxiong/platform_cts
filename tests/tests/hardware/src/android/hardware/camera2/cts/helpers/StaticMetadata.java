@@ -745,19 +745,18 @@ public class StaticMetadata {
      * @return maxAnalogSensitivity, 0 if it is not available.
      */
     public int getMaxAnalogSensitivityChecked() {
-        if (!isHardwareLevelFull()) {
-            return 0;
-        }
 
         Key<Integer> key = CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY;
-        Integer maxAnalogsensitivity = getValueFromKeyNonNull(key);
-        int minSensitivity = getSensitivityMinimumOrDefault();
-        int maxSensitivity = getSensitivityMaximumOrDefault();
-
+        Integer maxAnalogsensitivity = mCharacteristics.get(key);
         if (maxAnalogsensitivity == null) {
+            if (isHardwareLevelFull()) {
+                Assert.fail("Full device should report max analog sensitivity");
+            }
             return 0;
         }
 
+        int minSensitivity = getSensitivityMinimumOrDefault();
+        int maxSensitivity = getSensitivityMaximumOrDefault();
         checkTrueForKey(key, " Max analog sensitivity " + maxAnalogsensitivity
                 + " should be no larger than max sensitivity " + maxSensitivity,
                 maxAnalogsensitivity <= maxSensitivity);
