@@ -1320,7 +1320,7 @@ public class AudioTrackTest extends AndroidTestCase {
         final double rad = 2 * Math.PI * frequency / sampleRate;
         short[] vai = new short[bufferSamples];
         for (int j = 0; j < vai.length; j++) {
-            vai[j] = (short) (Math.sin(j * rad) * Short.MAX_VALUE);
+            vai[j] = (short)(Math.sin(j * rad) * Short.MAX_VALUE);
         }
         return vai;
     }
@@ -1329,8 +1329,8 @@ public class AudioTrackTest extends AndroidTestCase {
             final double frequency) {
         final double rad = 2 * Math.PI * frequency / sampleRate;
         float[] vaf = new float[bufferSamples];
-        for (int j = 0; j < bufferSamples; j++) {
-            vaf[j] = (float) (Math.sin(j * rad));
+        for (int j = 0; j < vaf.length; j++) {
+            vaf[j] = (float)(Math.sin(j * rad));
         }
         return vaf;
     }
@@ -1338,12 +1338,13 @@ public class AudioTrackTest extends AndroidTestCase {
     public void testPlayStreamData() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlayStreamData";
-        final int TEST_FORMAT_ARRAY[] = {  // should hear 6 tones played 3 times
+        final int TEST_FORMAT_ARRAY[] = {  // should hear 8 increasing frequency tones, 3 times
                 AudioFormat.ENCODING_PCM_8BIT,
                 AudioFormat.ENCODING_PCM_16BIT,
                 AudioFormat.ENCODING_PCM_FLOAT,
         };
         final int TEST_SR_ARRAY[] = {
+                4000,
                 22050,
                 44100,
                 48000,
@@ -1356,14 +1357,16 @@ public class AudioTrackTest extends AndroidTestCase {
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
         for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
-            double frequency = 800; // frequency changes for each test
+            double frequency = 400; // frequency changes for each test
             for (int TEST_SR : TEST_SR_ARRAY) {
                 for (int TEST_CONF : TEST_CONF_ARRAY) {
                     // -------- initialization --------------
-                    int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
+                    final int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
                             TEST_CONF, TEST_FORMAT); // in bytes
-                    int bufferSamples = 12 * minBufferSize
+                    final int bufferSamples = 12 * minBufferSize
                             / AudioFormat.getBytesPerSample(TEST_FORMAT);
+                    final int channelCount = Integer.bitCount(TEST_CONF);
+                    final double testFrequency = frequency / channelCount;
                     AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
                             TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
                     assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
@@ -1375,7 +1378,7 @@ public class AudioTrackTest extends AndroidTestCase {
                     case AudioFormat.ENCODING_PCM_8BIT: {
                         byte data[] = createSoundDataInByteArray(
                                 bufferSamples, TEST_SR,
-                                frequency);
+                                testFrequency);
                         while (written < data.length) {
                             int ret = track.write(data, written,
                                     Math.min(data.length - written, minBufferSize));
@@ -1390,7 +1393,7 @@ public class AudioTrackTest extends AndroidTestCase {
                     case AudioFormat.ENCODING_PCM_16BIT: {
                         short data[] = createSoundDataInShortArray(
                                 bufferSamples, TEST_SR,
-                                frequency);
+                                testFrequency);
                         while (written < data.length) {
                             int ret = track.write(data, written,
                                     Math.min(data.length - written, minBufferSize));
@@ -1405,7 +1408,7 @@ public class AudioTrackTest extends AndroidTestCase {
                     case AudioFormat.ENCODING_PCM_FLOAT: {
                         float data[] = createSoundDataInFloatArray(
                                 bufferSamples, TEST_SR,
-                                frequency);
+                                testFrequency);
                         while (written < data.length) {
                             int ret = track.write(data, written,
                                     Math.min(data.length - written, minBufferSize),
@@ -1425,7 +1428,7 @@ public class AudioTrackTest extends AndroidTestCase {
                     Thread.sleep(WAIT_MSEC);
                     // -------- tear down --------------
                     track.release();
-                    frequency += 200; // increment test tone frequency
+                    frequency += 100; // increment test tone frequency
                 }
             }
         }
