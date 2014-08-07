@@ -17,41 +17,40 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
+
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.cts.CameraTestUtils.ImageVerifierListener;
 import android.hardware.camera2.cts.testcases.Camera2MultiViewTestCase;
 import android.hardware.camera2.cts.testcases.Camera2MultiViewTestCase.CameraPreviewListener;
 import android.media.ImageReader;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 
+import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * CameraDevice test by using combination of SurfaceView, TextureView and ImageReader
  */
 public class MultiViewTest extends Camera2MultiViewTestCase {
-
+    private static final String TAG = "MultiViewTest";
     private final static long WAIT_FOR_COMMAND_TO_COMPLETE = 2000;
     private final static long PREVIEW_TIME_MS = 2000;
-
-    private enum NumberOfPreview {
-        ONE(1), TWO(2);
-
-        private final int mValue;
-        private NumberOfPreview(int value) { mValue = value; }
-        public int getValue() { return mValue; }
-    }
 
     public void testTextureViewPreview() throws Exception {
         for (String cameraId : mCameraIds) {
             openCamera(cameraId);
-            textureViewPreview(NumberOfPreview.ONE, /*testImagerReader*/false);
-            closeCamera();
+            List<TextureView> views = Arrays.asList(mTextureView[0]);
+            textureViewPreview(cameraId, views, /*withImagerReader*/false);
+            closeCamera(cameraId);
         }
     }
 
@@ -59,13 +58,15 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
         for (String cameraId : mCameraIds) {
             try {
                 openCamera(cameraId);
-                int maxNumStreamsProc = mStaticInfo.getMaxNumOutputStreamsProcessedChecked();
+                int maxNumStreamsProc =
+                        getStaticInfo(cameraId).getMaxNumOutputStreamsProcessedChecked();
                 if (maxNumStreamsProc < 2) {
                     continue;
                 }
-                textureViewPreview(NumberOfPreview.ONE, /*testImagerReader*/true);
+                List<TextureView> views = Arrays.asList(mTextureView[0]);
+                textureViewPreview(cameraId, views, /*withImagerReader*/true);
             } finally {
-                closeCamera();
+                closeCamera(cameraId);
             }
         }
     }
@@ -74,13 +75,15 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
         for (String cameraId : mCameraIds) {
             try {
                 openCamera(cameraId);
-                int maxNumStreamsProc = mStaticInfo.getMaxNumOutputStreamsProcessedChecked();
+                int maxNumStreamsProc =
+                        getStaticInfo(cameraId).getMaxNumOutputStreamsProcessedChecked();
                 if (maxNumStreamsProc < 2) {
                     continue;
                 }
-                textureViewPreview(NumberOfPreview.TWO, /*testImagerReader*/false);
+                List<TextureView> views = Arrays.asList(mTextureView[0], mTextureView[1]);
+                textureViewPreview(cameraId, views, /*withImagerReader*/false);
             } finally {
-                closeCamera();
+                closeCamera(cameraId);
             }
         }
     }
@@ -89,32 +92,65 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
         for (String cameraId : mCameraIds) {
             try {
                 openCamera(cameraId);
-                int maxNumStreamsProc = mStaticInfo.getMaxNumOutputStreamsProcessedChecked();
+                int maxNumStreamsProc =
+                        getStaticInfo(cameraId).getMaxNumOutputStreamsProcessedChecked();
                 if (maxNumStreamsProc < 3) {
                     continue;
                 }
-                textureViewPreview(NumberOfPreview.TWO, /*testImagerReader*/true);
+                List<TextureView> views = Arrays.asList(mTextureView[0], mTextureView[1]);
+                textureViewPreview(cameraId, views, /*withImagerReader*/true);
             } finally {
-                closeCamera();
+                closeCamera(cameraId);
+            }
+        }
+    }
+
+    public void testDualCameraPreview() throws Exception {
+        final int NUM_CAMERAS_TESTED = 2;
+        if (mCameraIds.length < NUM_CAMERAS_TESTED) {
+            return;
+        }
+
+        try {
+            for (int i = 0; i < NUM_CAMERAS_TESTED; i++) {
+                openCamera(mCameraIds[i]);
+                List<TextureView> views = Arrays.asList(mTextureView[i]);
+                startTextureViewPreview(mCameraIds[i], views, /*withImagerReader*/false);
+            }
+            // TODO: check the framerate is correct
+            SystemClock.sleep(PREVIEW_TIME_MS);
+            for (int i = 0; i < NUM_CAMERAS_TESTED; i++) {
+                stopPreview(mCameraIds[i]);
+            }
+        } catch (BlockingOpenException e) {
+            // The only error accepted is ERROR_MAX_CAMERAS_IN_USE, which means HAL doesn't support
+            // concurrent camera streaming
+            assertEquals("Camera device open failed",
+                    CameraDevice.StateListener.ERROR_MAX_CAMERAS_IN_USE, e.getCode());
+            Log.i(TAG, "Camera HAL does not support dual camera preview. Skip the test");
+        } finally {
+            for (int i = 0; i < NUM_CAMERAS_TESTED; i++) {
+                closeCamera(mCameraIds[i]);
             }
         }
     }
 
     /**
-     * Test camera Preview using one texture view
+     * Start camera preview using input texture views and/or one image reader
      */
-    private void textureViewPreview(NumberOfPreview n, boolean testImagerReader)
+    private void startTextureViewPreview(
+            String cameraId, List<TextureView> views, boolean withImagerReader)
             throws Exception {
-        int numPreview = n.getValue();
-        Size previewSize = mOrderedPreviewSizes.get(0);
+        int numPreview = views.size();
+        Size previewSize = getOrderedPreviewSizes(cameraId).get(0);
         CameraPreviewListener[] previewListener =
                 new CameraPreviewListener[numPreview];
         SurfaceTexture[] previewTexture = new SurfaceTexture[numPreview];
         List<Surface> surfaces = new ArrayList<Surface>();
 
         // Prepare preview surface.
-        for (int i = 0; i < numPreview; i++) {
-            TextureView view = mTextureView[i];
+        int i = 0;
+        for (TextureView view : views) {
             previewListener[i] = new CameraPreviewListener();
             view.setSurfaceTextureListener(previewListener[i]);
             previewTexture[i] = getAvailableSurfaceTexture(WAIT_FOR_COMMAND_TO_COMPLETE, view);
@@ -123,9 +159,10 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
             // Correct the preview display rotation.
             updatePreviewDisplayRotation(previewSize, view);
             surfaces.add(new Surface(previewTexture[i]));
+            i++;
         }
 
-        if (testImagerReader) {
+        if (withImagerReader) {
             ImageVerifierListener yuvListener =
                     new ImageVerifierListener(previewSize, ImageFormat.YUV_420_888);
             ImageReader yuvReader = makeImageReader(previewSize,
@@ -133,19 +170,29 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
             surfaces.add(yuvReader.getSurface());
         }
 
-        startPreview(surfaces, null);
+        startPreview(cameraId, surfaces, null);
 
-        for (int i = 0; i < numPreview; i++) {
-            TextureView view = mTextureView[i];
+        i = 0;
+        for (TextureView view : views) {
             boolean previewDone =
                     previewListener[i].waitForPreviewDone(WAIT_FOR_COMMAND_TO_COMPLETE);
             assertTrue("Unable to start preview " + i, previewDone);
             view.setSurfaceTextureListener(null);
+            i++;
         }
+    }
+
+    /**
+     * Test camera preview using input texture views and/or one image reader
+     */
+    private void textureViewPreview(
+            String cameraId, List<TextureView> views, boolean testImagerReader)
+            throws Exception {
+        startTextureViewPreview(cameraId, views, testImagerReader);
 
         // TODO: check the framerate is correct
         SystemClock.sleep(PREVIEW_TIME_MS);
 
-        stopPreview();
+        stopPreview(cameraId);
     }
 }
