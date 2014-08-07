@@ -246,10 +246,12 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         final InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         final BitmapDrawable d = new BitmapDrawable(source);
 
-        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        d.setTint(Color.BLACK);
+        d.setTintMode(Mode.SRC_OVER);
         assertEquals("Nine-patch is tinted", Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
 
-        d.setTint(null, null);
+        d.setTintList(null);
+        d.setTintMode(null);
     }
 
     public void testGetOpacity() {

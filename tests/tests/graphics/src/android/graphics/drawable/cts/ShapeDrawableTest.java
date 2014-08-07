@@ -318,7 +318,8 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     public void testSetTint() {
         final ShapeDrawable d = new ShapeDrawable(new RectShape());
-        d.setTint(ColorStateList.valueOf(Color.BLACK), Mode.SRC_OVER);
+        d.setTint(Color.BLACK);
+        d.setTintMode(Mode.SRC_OVER);
         assertEquals("Shape is tinted", Color.BLACK, DrawableTestingUtils.getPixel(d, 0, 0));
     }
 

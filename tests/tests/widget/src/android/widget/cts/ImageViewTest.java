@@ -24,7 +24,7 @@ import java.io.OutputStream;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.widget.FrameLayout;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
@@ -444,9 +444,9 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         ImageView inflatedView = (ImageView) mActivity.findViewById(R.id.image_tint);
 
         assertEquals("Image tint inflated correctly",
-                Color.WHITE, inflatedView.getTint().getDefaultColor());
+                Color.WHITE, inflatedView.getImageTintList().getDefaultColor());
         assertEquals("Image tint mode inflated correctly",
-                PorterDuff.Mode.SRC_OVER, inflatedView.getTintMode());
+                PorterDuff.Mode.SRC_OVER, inflatedView.getImageTintMode());
 
         MockDrawable image = new MockDrawable();
         ImageView view = new ImageView(mActivity);
@@ -454,14 +454,14 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         view.setImageDrawable(image);
         assertFalse("No image tint applied by default", image.hasCalledSetTint());
 
-        view.setTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Image tint applied when setTint() called after set()",
+        view.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Image tint applied when setImageTintList() called after set()",
                 image.hasCalledSetTint());
 
         image.reset();
         view.setImageDrawable(null);
         view.setImageDrawable(image);
-        assertTrue("Image tint applied when setTint() called before set()",
+        assertTrue("Image tint applied when setImageTintList() called before set()",
                 image.hasCalledSetTint());
     }
 
@@ -568,8 +568,8 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         }
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 

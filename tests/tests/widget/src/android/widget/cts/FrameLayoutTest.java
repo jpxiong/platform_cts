@@ -21,7 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
-import android.widget.SeekBar;
+
 import com.android.cts.stub.R;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -278,7 +278,7 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         FrameLayout inflatedView = (FrameLayout) mActivity.findViewById(R.id.foreground_tint);
 
         assertEquals("Foreground tint inflated correctly",
-                Color.WHITE, inflatedView.getForegroundTint().getDefaultColor());
+                Color.WHITE, inflatedView.getForegroundTintList().getDefaultColor());
         assertEquals("Foreground tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getForegroundTintMode());
 
@@ -288,14 +288,14 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         view.setForeground(foreground);
         assertFalse("No foreground tint applied by default", foreground.hasCalledSetTint());
 
-        view.setForegroundTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Foreground tint applied when setForegroundTint() called after setForeground()",
+        view.setForegroundTintList(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Foreground tint applied when setForegroundTintList() called after setForeground()",
                 foreground.hasCalledSetTint());
 
         foreground.reset();
         view.setForeground(null);
         view.setForeground(foreground);
-        assertTrue("Foreground tint applied when setForegroundTint() called before setForeground()",
+        assertTrue("Foreground tint applied when setForegroundTintList() called before setForeground()",
                 foreground.hasCalledSetTint());
     }
 
@@ -329,8 +329,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         public void setColorFilter(ColorFilter cf) {}
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 

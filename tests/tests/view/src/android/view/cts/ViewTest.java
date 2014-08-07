@@ -21,12 +21,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
-import android.view.LayoutInflater;
+
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 import com.google.android.collect.Lists;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
@@ -60,7 +59,6 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
 import android.view.View;
-import android.view.MotionEvent.PointerProperties;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -3348,7 +3346,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         View inflatedView = mActivity.findViewById(R.id.background_tint);
 
         assertEquals("Background tint inflated correctly",
-                Color.WHITE, inflatedView.getBackgroundTint().getDefaultColor());
+                Color.WHITE, inflatedView.getBackgroundTintList().getDefaultColor());
         assertEquals("Background tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getBackgroundTintMode());
 
@@ -3358,14 +3356,14 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setBackground(bg);
         assertFalse("No background tint applied by default", bg.hasCalledSetTint());
 
-        view.setBackgroundTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Background tint applied when setBackgroundTint() called after setBackground()",
+        view.setBackgroundTints(ColorStateList.valueOf(Color.WHITE));
+        assertTrue("Background tint applied when setBackgroundTints() called after setBackground()",
                 bg.hasCalledSetTint());
 
         bg.reset();
         view.setBackground(null);
         view.setBackground(bg);
-        assertTrue("Background tint applied when setBackgroundTint() called before setBackground()",
+        assertTrue("Background tint applied when setBackgroundTints() called before setBackground()",
                 bg.hasCalledSetTint());
     }
 
@@ -3387,8 +3385,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 

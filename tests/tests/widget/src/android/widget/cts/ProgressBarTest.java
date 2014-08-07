@@ -20,8 +20,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
+
 import com.android.cts.stub.R;
 
 
@@ -331,7 +330,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
                 PorterDuff.Mode.SRC_OVER, inflatedView.getProgressTintMode());
 
         assertEquals("Progress background tint inflated correctly",
-                Color.WHITE, inflatedView.getProgressBackgroundTint().getDefaultColor());
+                Color.WHITE, inflatedView.getProgressBackgroundTintList().getDefaultColor());
         assertEquals("Progress background tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getProgressBackgroundTintMode());
 
@@ -355,13 +354,13 @@ public class ProgressBarTest extends InstrumentationTestCase {
                 progress.hasCalledSetTint());
 
         view.setProgressTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Progress tint applied when setProgressTint() called after setProgress()",
+        assertTrue("Progress tint applied when setProgressTintList() called after setProgress()",
                 progress.hasCalledSetTint());
 
         progress.reset();
         view.setProgressDrawable(null);
         view.setProgressDrawable(progress);
-        assertTrue("Progress tint applied when setProgressTint() called before setProgress()",
+        assertTrue("Progress tint applied when setProgressTintList() called before setProgress()",
                 progress.hasCalledSetTint());
     }
 
@@ -382,13 +381,13 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertFalse("No indeterminate tint applied by default", indeterminate.hasCalledSetTint());
 
         view.setIndeterminateTint(ColorStateList.valueOf(Color.WHITE));
-        assertTrue("Indeterminate tint applied when setIndeterminateTint() called after "
+        assertTrue("Indeterminate tint applied when setIndeterminateTintList() called after "
                 + "setIndeterminate()", indeterminate.hasCalledSetTint());
 
         indeterminate.reset();
         view.setIndeterminateDrawable(null);
         view.setIndeterminateDrawable(indeterminate);
-        assertTrue("Indeterminate tint applied when setIndeterminateTint() called before "
+        assertTrue("Indeterminate tint applied when setIndeterminateTintList() called before "
                 + "setIndeterminate()", indeterminate.hasCalledSetTint());
     }
 
@@ -415,8 +414,8 @@ public class ProgressBarTest extends InstrumentationTestCase {
         }
 
         @Override
-        public void setTint(ColorStateList tint, PorterDuff.Mode tintMode) {
-            super.setTint(tint, tintMode);
+        public void setTints(ColorStateList tint) {
+            super.setTints(tint);
             mCalledSetTint = true;
         }
 
