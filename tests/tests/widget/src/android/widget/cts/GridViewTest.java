@@ -234,7 +234,21 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     public void testSetHorizontalSpacing() {
+        testSetHorizontalSpacing(View.LAYOUT_DIRECTION_LTR);
+    }
+
+    public void testSetHorizontalSpacingRTL() {
+        testSetHorizontalSpacing(View.LAYOUT_DIRECTION_RTL);
+    }
+
+    public void testSetHorizontalSpacing(final int layoutDir) {
         mGridView = findGridViewById(R.id.gridview);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mGridView.setLayoutDirection(layoutDir);
+            }
+        });
         mGridView.setStretchMode(GridView.NO_STRETCH);
         // Number of columns should be big enough, otherwise the
         // horizontal spacing cannot be correctly verified.
@@ -252,7 +266,11 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
         View child0 = mGridView.getChildAt(0);
         View child1 = mGridView.getChildAt(1);
-        assertEquals(0, child1.getLeft() - child0.getRight());
+        if (layoutDir == View.LAYOUT_DIRECTION_LTR) {
+            assertEquals(0, child1.getLeft() - child0.getRight());
+        } else {
+            assertEquals(0, child0.getLeft() - child1.getRight());
+        }
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -263,7 +281,11 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
         child0 = mGridView.getChildAt(0);
         child1 = mGridView.getChildAt(1);
-        assertEquals(5, child1.getLeft() - child0.getRight());
+        if (layoutDir == View.LAYOUT_DIRECTION_LTR) {
+            assertEquals(5, child1.getLeft() - child0.getRight());
+        } else {
+            assertEquals(5, child0.getLeft() - child1.getRight());
+        }
     }
 
     public void testSetVerticalSpacing() {
