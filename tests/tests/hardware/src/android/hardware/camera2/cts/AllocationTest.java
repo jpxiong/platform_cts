@@ -525,14 +525,21 @@ public class AllocationTest extends AndroidTestCase {
         /** high iso + high exposure (second shot) */
         final float THRESHOLD_HIGH = 0.975f;
 
-        mCameraIterable.forEachCamera(/*fullHwLevel*/true, new CameraBlock() {
+        mCameraIterable.forEachCamera(/*fullHwLevel*/false, new CameraBlock() {
             @Override
             public void run(CameraDevice camera) throws CameraAccessException {
+                final StaticMetadata staticInfo =
+                        new StaticMetadata(mCameraManager.getCameraCharacteristics(camera.getId()));
+
+                // This test requires PFC and manual sensor control
+                if (!staticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR) ||
+                        !staticInfo.isPerFrameControlSupported()) {
+                    return;
+                }
 
                 final Size maxSize = getMaxSize(
                         getSupportedSizeForFormat(YUV_420_888, camera.getId(), mCameraManager));
-                final StaticMetadata staticInfo =
-                        new StaticMetadata(mCameraManager.getCameraCharacteristics(camera.getId()));
 
                 ScriptGraph scriptGraph = createGraphForYuvCroppedMeans(maxSize);
 
@@ -578,16 +585,23 @@ public class AllocationTest extends AndroidTestCase {
         final long EXPOSURE_TIME_NS = 2000000; // 2 seconds
         final int RGB_CHANNELS = 3;
 
-        mCameraIterable.forEachCamera(/*fullHwLevel*/true, new CameraBlock() {
+        mCameraIterable.forEachCamera(/*fullHwLevel*/false, new CameraBlock() {
 
 
             @Override
             public void run(CameraDevice camera) throws CameraAccessException {
+                final StaticMetadata staticInfo =
+                        new StaticMetadata(mCameraManager.getCameraCharacteristics(camera.getId()));
+                // This test requires PFC and manual sensor control
+                if (!staticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR) ||
+                        !staticInfo.isPerFrameControlSupported()) {
+                    return;
+                }
+
                 final List<float[]> rgbMeans = new ArrayList<float[]>();
                 final Size maxSize = getMaxSize(
                         getSupportedSizeForFormat(YUV_420_888, camera.getId(), mCameraManager));
-                final StaticMetadata staticInfo =
-                        new StaticMetadata(mCameraManager.getCameraCharacteristics(camera.getId()));
 
                 final int sensitivityMin = staticInfo.getSensitivityMinimumOrDefault();
                 final int sensitivityMax = staticInfo.getSensitivityMaximumOrDefault();
