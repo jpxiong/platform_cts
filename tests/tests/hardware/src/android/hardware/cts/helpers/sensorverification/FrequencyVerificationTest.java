@@ -33,22 +33,22 @@ public class FrequencyVerificationTest extends TestCase {
         long[] timestamps = {0, 1000000, 2000000, 3000000, 4000000};  // 1000Hz
 
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(1000.0, 1.0, 1.0, timestamps);
+        ISensorVerification verification = getVerification(1000.0, 999.0, 1001.0, timestamps);
         verification.verify(stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(950.0, 100.0, 100.0, timestamps);
+        verification = getVerification(950.0, 850.0, 1050.0, timestamps);
         verification.verify(stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(1050.0, 100.0, 100.0, timestamps);
+        verification = getVerification(1050.0, 950.0, 1150.0, timestamps);
         verification.verify(stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(950.0, 100.0, 25.0, timestamps);
+        verification = getVerification(950.0, 850.0, 975.0, timestamps);
         try {
             verification.verify(stats);
             fail("Expected an AssertionError");
@@ -58,7 +58,7 @@ public class FrequencyVerificationTest extends TestCase {
         verifyStats(stats, false, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(1050.0, 25.0, 100.0, timestamps);
+        verification = getVerification(1050.0, 1025.0, 1150.0, timestamps);
         try {
             verification.verify(stats);
             fail("Expected an AssertionError");
@@ -71,7 +71,7 @@ public class FrequencyVerificationTest extends TestCase {
     private ISensorVerification getVerification(double expected, double lowerThreshold,
             double upperThreshold, long ... timestamps) {
         ISensorVerification verification = new FrequencyVerification(expected, lowerThreshold,
-                upperThreshold);
+                upperThreshold, "Test sensor");
         for (long timestamp : timestamps) {
             verification.addSensorEvent(new TestSensorEvent(null, timestamp, 0, null));
         }
