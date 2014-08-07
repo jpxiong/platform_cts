@@ -568,8 +568,8 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         }
 
         @Override
-        public void setTints(ColorStateList tint) {
-            super.setTints(tint);
+        public void setTintList(ColorStateList tint) {
+            super.setTintList(tint);
             mCalledSetTint = true;
         }
 
