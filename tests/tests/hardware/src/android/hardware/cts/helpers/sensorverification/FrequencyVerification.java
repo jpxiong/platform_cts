@@ -22,6 +22,7 @@ import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestInformation.SensorReportingMode;
 import android.hardware.cts.helpers.TestSensorEvent;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -33,15 +34,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class FrequencyVerification extends AbstractSensorVerification {
     public static final String PASSED_KEY = "frequency_passed";
+    private static final String LOG_TAG = FrequencyVerification.class.getSimpleName();
 
-    // lower threshold is (100 - 10)% expected
-    private static final int DEFAULT_LOWER_THRESHOLD = 10;
-    // upper threshold is (100 + 110)% expected
-    private static final int DEFAULT_UPPER_THRESHOLD = 110;
+    // Lowest acceptable frequency, as percentage of the requested one.
+    private static final int DEFAULT_LOWER_THRESHOLD = 90;
+    // Highest acceptable frequency, as percentage of the requested one.
+    private static final int DEFAULT_UPPER_THRESHOLD = 220;
 
-    private final double mExpected;
-    private final double mLowerThreshold;
-    private final double mUpperThreshold;
+    private final double mRequestedFrequencyHz;
+    private final double mLowerThresholdHz;
+    private final double mUpperThresholdHz;
+    private final String mSensorName;
 
     private long mMinTimestamp = 0;
     private long mMaxTimestamp = 0;
@@ -51,15 +54,15 @@ public class FrequencyVerification extends AbstractSensorVerification {
      * Construct a {@link FrequencyVerification}.
      *
      * @param expected the expected frequency in Hz.
-     * @param lowerTheshold the lower threshold in Hz. {@code expected - lower} should be the
-     * slowest acceptable frequency of the sensor.
-     * @param upperThreshold the upper threshold in Hz. {@code expected + upper} should be the
-     * fastest acceptable frequency of the sensor.
+     * @param lowerTheshold Lowest acceptable frequency Hz.
+     * @param upperThreshold Highest acceptable frequency Hz.
      */
-    public FrequencyVerification(double expected, double lowerTheshold, double upperThreshold) {
-        mExpected = expected;
-        mLowerThreshold = lowerTheshold;
-        mUpperThreshold = upperThreshold;
+    public FrequencyVerification(double expected, double lowerTheshold, double upperThreshold,
+        String sensorName) {
+        mRequestedFrequencyHz = expected;
+        mLowerThresholdHz = lowerTheshold;
+        mUpperThresholdHz = upperThreshold;
+        mSensorName = sensorName;
     }
 
     /**
@@ -75,13 +78,38 @@ public class FrequencyVerification extends AbstractSensorVerification {
             return null;
         }
 
-        // Expected frequency in Hz
-        double expected = SensorCtsHelper.getFrequency(SensorCtsHelper.getDelay(sensor, rateUs),
-                TimeUnit.MICROSECONDS);
-        // Expected frequency * threshold percentage
-        double lowerThreshold = expected * DEFAULT_LOWER_THRESHOLD / 100;
-        double upperThreshold = expected * DEFAULT_UPPER_THRESHOLD / 100;
-        return new FrequencyVerification(expected, lowerThreshold, upperThreshold);
+        Log.i(LOG_TAG, String.format("Preparing frequency test for \"%s\" for which "
+                + "minDelay=%dus and maxDelay=%dus",
+                sensor.getName(), sensor.getMinDelay(), sensor.getMaxDelay()));
+        double maxDelayUs = sensor.getMaxDelay();
+        if (maxDelayUs <= 0) {
+            // This sensor didn't report its maxDelay.
+            // It might be only capable of producing its max rate.
+            // Do as if it reported its minDelay as its maxDelay.
+            Log.w(LOG_TAG, "This sensor (" + sensor.getName() + ") didn't report its maxDelay."
+                    + "Please update it in the sensor HAL to avoid failures in coming "
+                    + "android releases.");
+            maxDelayUs = sensor.getMinDelay();
+        }
+
+        // Convert the rateUs parameter into a delay in microseconds and rate in Hz.
+        double delayUs = SensorCtsHelper.getDelay(sensor, rateUs);
+        double requestedFrequencyHz = SensorCtsHelper.getFrequency(
+            delayUs, TimeUnit.MICROSECONDS);
+
+        // When rateUs > maxDelay, the sensor can do as if we requested maxDelay.
+        double upperExpectedHz = SensorCtsHelper.getFrequency(
+                Math.min(delayUs, maxDelayUs), TimeUnit.MICROSECONDS);
+        // When rateUs < minDelay, the sensor can do as if we requested minDelay
+        double lowerExpectedHz = SensorCtsHelper.getFrequency(
+                Math.max(delayUs, sensor.getMinDelay()), TimeUnit.MICROSECONDS);
+
+        // Set the pass thresholds based on default multipliers.
+        double lowerThresholdHz = lowerExpectedHz * DEFAULT_LOWER_THRESHOLD / 100;
+        double upperThresholdHz = upperExpectedHz * DEFAULT_UPPER_THRESHOLD / 100;
+
+        return new FrequencyVerification(requestedFrequencyHz, lowerThresholdHz, upperThresholdHz,
+            sensor.getName());
     }
 
     /**
@@ -97,18 +125,22 @@ public class FrequencyVerification extends AbstractSensorVerification {
             return;
         }
 
-        double frequency = SensorCtsHelper.getFrequency(
+        double measuredFrequencyHz = SensorCtsHelper.getFrequency(
                 ((double) (mMaxTimestamp - mMinTimestamp)) / (mCount - 1), TimeUnit.NANOSECONDS);
-        boolean failed = (frequency <= mExpected - mLowerThreshold
-                || frequency >= mExpected + mUpperThreshold);
+        boolean failed = (measuredFrequencyHz <= mLowerThresholdHz
+                || measuredFrequencyHz >= mUpperThresholdHz);
 
-        stats.addValue(SensorStats.FREQUENCY_KEY, frequency);
+        stats.addValue(SensorStats.FREQUENCY_KEY, measuredFrequencyHz);
         stats.addValue(PASSED_KEY, !failed);
+        String resultString = String.format("Requested \"" + mSensorName + "\" at %.2fHz "
+                + "(expecting between %.2fHz and %.2fHz, measured %.2fHz)",
+                mRequestedFrequencyHz, mLowerThresholdHz, mUpperThresholdHz, measuredFrequencyHz);
 
         if (failed) {
-            Assert.fail(String.format("Frequency out of range: frequency=%.2fHz "
-                    + "(expected (%.2f-%.2fHz, %.2f+%.2fHz))", frequency, mExpected,
-                    mLowerThreshold, mExpected, mUpperThreshold));
+            Log.e(LOG_TAG, "Frequency test FAIL: " + resultString);
+            Assert.fail(String.format("Frequency out of range: " + resultString));
+        } else {
+            Log.i(LOG_TAG, "Frequency test pass: " + resultString);
         }
     }
 
@@ -117,7 +149,8 @@ public class FrequencyVerification extends AbstractSensorVerification {
      */
     @Override
     public FrequencyVerification clone() {
-        return new FrequencyVerification(mExpected, mLowerThreshold, mUpperThreshold);
+        return new FrequencyVerification(mRequestedFrequencyHz, mLowerThresholdHz,
+            mUpperThresholdHz, mSensorName);
     }
 
     /**
