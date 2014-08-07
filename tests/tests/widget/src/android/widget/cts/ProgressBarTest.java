@@ -325,7 +325,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
         ProgressBar inflatedView = (ProgressBar) layout.findViewById(R.id.progress_tint);
 
         assertEquals("Progress tint inflated correctly",
-                Color.WHITE, inflatedView.getProgressTint().getDefaultColor());
+                Color.WHITE, inflatedView.getProgressTintList().getDefaultColor());
         assertEquals("Progress tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getProgressTintMode());
 
@@ -335,7 +335,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
                 PorterDuff.Mode.SRC_OVER, inflatedView.getProgressBackgroundTintMode());
 
         assertEquals("Secondary progress tint inflated correctly",
-                Color.WHITE, inflatedView.getSecondaryProgressTint().getDefaultColor());
+                Color.WHITE, inflatedView.getSecondaryProgressTintList().getDefaultColor());
         assertEquals("Secondary progress tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getSecondaryProgressTintMode());
 
@@ -345,15 +345,15 @@ public class ProgressBarTest extends InstrumentationTestCase {
         view.setProgressDrawable(progress);
         assertFalse("No progress tint applied by default", progress.hasCalledSetTint());
 
-        view.setProgressBackgroundTint(ColorStateList.valueOf(Color.WHITE));
+        view.setProgressBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         assertFalse("Progress background tint not applied when layer missing",
                 progress.hasCalledSetTint());
 
-        view.setSecondaryProgressTint(ColorStateList.valueOf(Color.WHITE));
+        view.setSecondaryProgressTintList(ColorStateList.valueOf(Color.WHITE));
         assertFalse("Secondary progress tint not applied when layer missing",
                 progress.hasCalledSetTint());
 
-        view.setProgressTint(ColorStateList.valueOf(Color.WHITE));
+        view.setProgressTintList(ColorStateList.valueOf(Color.WHITE));
         assertTrue("Progress tint applied when setProgressTintList() called after setProgress()",
                 progress.hasCalledSetTint());
 
@@ -370,7 +370,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
         ProgressBar inflatedView = (ProgressBar) layout.findViewById(R.id.indeterminate_tint);
 
         assertEquals("Indeterminate tint inflated correctly",
-                Color.WHITE, inflatedView.getIndeterminateTint().getDefaultColor());
+                Color.WHITE, inflatedView.getIndeterminateTintList().getDefaultColor());
         assertEquals("Indeterminate tint mode inflated correctly",
                 PorterDuff.Mode.SRC_OVER, inflatedView.getIndeterminateTintMode());
 
@@ -380,7 +380,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
         view.setIndeterminateDrawable(indeterminate);
         assertFalse("No indeterminate tint applied by default", indeterminate.hasCalledSetTint());
 
-        view.setIndeterminateTint(ColorStateList.valueOf(Color.WHITE));
+        view.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
         assertTrue("Indeterminate tint applied when setIndeterminateTintList() called after "
                 + "setIndeterminate()", indeterminate.hasCalledSetTint());
 
@@ -414,8 +414,8 @@ public class ProgressBarTest extends InstrumentationTestCase {
         }
 
         @Override
-        public void setTints(ColorStateList tint) {
-            super.setTints(tint);
+        public void setTintList(ColorStateList tint) {
+            super.setTintList(tint);
             mCalledSetTint = true;
         }
 
