@@ -17,29 +17,36 @@
  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="android.tv.cts">
+        package="android.media.tv.cts">
 
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
-        <uses-library android:name="android.test.runner"/>
-        <service android:name="android.tv.cts.TvInputManagerTest$MockTvInputInternalService"
-                android:permission="android.permission.BIND_TV_INPUT">
+        <activity android:name="android.media.tv.cts.TvInputSetupActivityStub">
             <intent-filter>
-                <action android:name="android.tv.TvInputService" />
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-        </service>
-        <service android:name="android.tv.cts.TvInputManagerTest$MockTvInputRemoteService"
-                android:permission="android.permission.BIND_TV_INPUT"
-                android:process=":remoteTvInputForTest"
-                android:isolatedProcess="true">
+        </activity>
+
+        <activity android:name="android.media.tv.cts.TvInputSettingsActivityStub">
             <intent-filter>
-                <action android:name="android.tv.TvInputService" />
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+        </activity>
+
+        <service android:name="android.media.tv.cts.StubTvInputService"
+                 android:permission="android.permission.BIND_TV_INPUT"
+                 android:label="TV input stub"
+                 android:icon="@drawable/robot"
+                 android:process=":tvInputStub">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.input"
+                       android:resource="@xml/stub_tv_input_service" />
         </service>
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-            android:targetPackage="android.tv.cts"
+            android:targetPackage="android.media.tv.cts"
             android:label="Tests for the TV APIs.">
         <meta-data android:name="listener"
                 android:value="com.android.cts.runner.CtsTestRunListener" />
