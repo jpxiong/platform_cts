@@ -367,8 +367,8 @@ public class CompoundButtonTest extends AndroidTestCase {
         public void setColorFilter(ColorFilter cf) {}
 
         @Override
-        public void setTints(ColorStateList tint) {
-            super.setTints(tint);
+        public void setTintList(ColorStateList tint) {
+            super.setTintList(tint);
             mCalledSetTint = true;
         }
 
