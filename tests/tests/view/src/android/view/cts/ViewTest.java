@@ -3356,7 +3356,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setBackground(bg);
         assertFalse("No background tint applied by default", bg.hasCalledSetTint());
 
-        view.setBackgroundTints(ColorStateList.valueOf(Color.WHITE));
+        view.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         assertTrue("Background tint applied when setBackgroundTints() called after setBackground()",
                 bg.hasCalledSetTint());
 
@@ -3385,8 +3385,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
 
         @Override
-        public void setTints(ColorStateList tint) {
-            super.setTints(tint);
+        public void setTintList(ColorStateList tint) {
+            super.setTintList(tint);
             mCalledSetTint = true;
         }
 
