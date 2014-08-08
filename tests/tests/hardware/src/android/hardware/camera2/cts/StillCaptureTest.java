@@ -199,6 +199,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing raw capture for Camera " + mCameraIds[i]);
                 openDevice(mCameraIds[i]);
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                    Log.i(TAG, "RAW capability is not supported in camera " + mCameraIds[i] +
+                            ". Skip the test.");
+                    continue;
+                }
 
                 fullRawCaptureTestByCamera();
             } finally {
@@ -728,9 +734,11 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 validateRaw16Image(rawImage, size);
 
 
-                DngCreator dngCreator = new DngCreator(mStaticInfo.getCharacteristics(), result);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                dngCreator.writeImage(outputStream, rawImage);
+                try (DngCreator dngCreator =
+                        new DngCreator(mStaticInfo.getCharacteristics(), result)) {
+                    dngCreator.writeImage(outputStream, rawImage);
+                }
 
                 if (DEBUG) {
                     byte[] rawBuffer = outputStream.toByteArray();
