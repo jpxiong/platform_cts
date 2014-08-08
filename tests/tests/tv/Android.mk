@@ -24,7 +24,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsTvTestCases
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
 LOCAL_SDK_VERSION := current
 
