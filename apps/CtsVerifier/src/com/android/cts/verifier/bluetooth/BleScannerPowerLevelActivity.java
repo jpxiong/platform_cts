@@ -44,6 +44,8 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
     private Map<Integer, Integer> mCount;
     private int[] mPowerLevel;
 
+    private static final int[] POWER_DBM = {-21, -15, -7, 1, 9};
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,13 +148,11 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
                         .setText(intent.getStringExtra(BleScannerService.EXTRA_MAC_ADDRESS));
                     mRssiText.get(powerLevelBit)
                         .setText(intent.getStringExtra(BleScannerService.EXTRA_RSSI));
-                    if (powerLevelBit == powerLevel) {
+                    if (POWER_DBM[powerLevelBit] == powerLevel) {
                         mSetPowerText.get(powerLevelBit).setText("Valid power level");
-                    } else if (powerLevel < 0) {
-                        mSetPowerText.get(powerLevelBit).setText("Power level not set");
                     } else {
                         mSetPowerText.get(powerLevelBit)
-                            .setText("Invalid power level: " + powerLevel);
+                            .setText("Unknown BLe advertise tx power: " + powerLevel);
                     }
                     break;
             }
