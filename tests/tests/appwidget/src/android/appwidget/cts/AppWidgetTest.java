@@ -40,6 +40,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.UserInfo;
 import android.cts.appwidget.R;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -64,6 +65,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -105,7 +107,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
     public void testGetAppInstalledProvidersForCurrentUserNewCurrentProfile() throws Exception {
         // We ask only for providers for the current user.
         List<AppWidgetProviderInfo> providers = getAppWidgetManager()
-                .getInstalledProvidersForProfiles(new UserHandle[]{Process.myUserHandle()});
+                .getInstalledProvidersForProfile(Process.myUserHandle());
 
         // Make sure we have our two providers in the list.
         assertExpectedInstalledProviders(providers);
@@ -116,15 +118,19 @@ public class AppWidgetTest extends InstrumentationTestCase {
         UserManager userManager = (UserManager) getInstrumentation()
                 .getTargetContext().getSystemService(Context.USER_SERVICE);
 
-        List<UserHandle> profilesList = userManager.getUserProfiles();
-        UserHandle[] profilesArray = new UserHandle[profilesList.size()];
-        profilesList.toArray(profilesArray);
+        List<AppWidgetProviderInfo> allProviders = new ArrayList<>();
 
-        List<AppWidgetProviderInfo> providers = getAppWidgetManager()
-                .getInstalledProvidersForProfiles(profilesArray);
+        List<UserHandle> profiles = userManager.getUserProfiles();
+        final int profileCount = profiles.size();
+        for (int i = 0; i < profileCount; i++) {
+            UserHandle profile = profiles.get(i);
+            List<AppWidgetProviderInfo> providers = getAppWidgetManager()
+                    .getInstalledProvidersForProfile(profile);
+            allProviders.addAll(providers);
+        }
 
         // Make sure we have our two providers in the list.
-        assertExpectedInstalledProviders(providers);
+        assertExpectedInstalledProviders(allProviders);
     }
 
     public void testBindAppWidget() throws Exception {
@@ -758,7 +764,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
             InOrder inOrder = inOrder(appHostViewListener);
             inOrder.verify(appHostViewListener).onUpdateAppWidget(argThat(
                     new RemoteViewsMatcher(content.getLayoutId(),
-                            provider.provider.getPackageName())));
+                            provider.provider.getPackageName())
+            ));
         } finally {
             // Clean up.
             host.deleteHost();
@@ -843,7 +850,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
             InOrder secondInOrder = inOrder(secondAppHostViewListener);
             secondInOrder.verify(secondAppHostViewListener).onUpdateAppWidget(
                     argThat(new RemoteViewsMatcher(content.getLayoutId(),
-                            provider.provider.getPackageName())));
+                            provider.provider.getPackageName()))
+            );
         } finally {
             // Clean up.
             host.deleteHost();
