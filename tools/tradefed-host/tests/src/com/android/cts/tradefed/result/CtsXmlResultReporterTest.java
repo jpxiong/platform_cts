@@ -21,6 +21,7 @@ import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.log.LogUtil.CLog;
+import com.android.tradefed.result.TestSummary;
 import com.android.tradefed.result.XmlResultReporter;
 import com.android.tradefed.util.FileUtil;
 
@@ -32,7 +33,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +44,8 @@ import java.util.Map;
  */
 public class CtsXmlResultReporterTest extends TestCase {
 
+    private static final List<TestSummary> SUMMARY_LIST =
+            new ArrayList<>(Arrays.asList(new TestSummary("TEST_SUMMARY_URL")));
     private CtsXmlResultReporter mResultReporter;
     private ByteArrayOutputStream mOutputStream;
     private File mReportDir;
@@ -116,6 +122,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         mResultReporter.testEnded(testId, emptyMap);
         mResultReporter.testRunEnded(3000, emptyMap);
         mResultReporter.invocationEnded(1);
+        mResultReporter.putSummary(SUMMARY_LIST);
         String output =  getOutput();
         CLog.d("Actual output: %s", output);
         System.out.println(output);
