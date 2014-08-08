@@ -396,80 +396,6 @@ public class StaticLayoutLineBreakingTest extends AndroidTestCase {
         return string.replaceAll(String.valueOf(c), String.valueOf(r));
     }
 
-    public void testClassIS() {
-        char[] classISCharacters = new char[] {'.', ',', ':', ';'};
-        char[] digitCharacters = new char[] {'0', '\u0660', '\u06F0', '\u0966', '\uFF10'};
-
-        for (char c : classISCharacters) {
-            // .,:; are class IS breakpoints... (but still shouldn't break alphabetic chars)
-            //              01234567
-            layout(replace("L XXX#X", '#', c), new int[] {2});
-            layout(replace("L XXXX#X", '#', c), new int[] {2});
-
-            // ...except when adjacent to digits
-            for (char d : digitCharacters) {
-                //                      01234567
-                layout(replace(replace("L XX0#X", '#', c), '0', d), new int[] {2});
-                layout(replace(replace("L XXX#0", '#', c), '0', d), new int[] {2});
-                layout(replace(replace("L XXX0#X", '#', c), '0', d), new int[] {2});
-                layout(replace(replace("L XXXX#0", '#', c), '0', d), new int[] {2});
-            }
-        }
-    }
-
-    public void testClassSYandHY() {
-        char[] classSYorHYCharacters = new char[] {'/', '-'};
-        char[] digitCharacters = new char[] {'0', '\u0660', '\u06F0', '\u0966', '\uFF10'};
-
-        for (char c : classSYorHYCharacters) {
-            // / is a class SY breakpoint, - a class HY...
-            //              01234567
-            layout(replace("L XXX#X", '#', c), new int[] {6});
-            layout(replace("L XXXX#X", '#', c), new int[] {2});
-
-            // ...except when followed by a digits
-            for (char d : digitCharacters) {
-                //                      01234567
-                layout(replace(replace("L XX0#X", '#', c), '0', d), new int[] {6});
-                layout(replace(replace("L XXX#0", '#', c), '0', d), new int[] {2});
-                layout(replace(replace("L XXX0#X", '#', c), '0', d), new int[] {2});
-                layout(replace(replace("L XXXX#0", '#', c), '0', d), new int[] {2});
-            }
-        }
-    }
-
-    public void testClassID() {
-        char ideographic = '\u8a9e'; // regular ideographic character
-        char hyphen = '\u30A0'; // KATAKANA-HIRAGANA DOUBLE HYPHEN, ideographic but non starter
-
-        // Single ideographs are normal characters
-        layout("L XXX" + ideographic, NO_BREAK);
-        layout("L XXX" + ideographic + "X", new int[] {2});
-        layout("L XXXX" + ideographic, new int[] {2});
-        layout("L XXXX" + ideographic + "X", new int[] {2});
-
-        // Two adjacent ideographs create a possible breakpoint
-        layout("L X" + ideographic + ideographic + "X", NO_BREAK);
-        layout("L X" + ideographic + ideographic + "XX", new int[] {4});
-        layout("L XX" + ideographic + ideographic + "XX", new int[] {5});
-        layout("L XXX" + ideographic + ideographic + "X", new int[] {6});
-        layout("L XXXX" + ideographic + ideographic + "X", new int[] {2});
-
-        // Except when the second one is a non starter
-        layout("L X" + ideographic + hyphen + "X", NO_BREAK);
-        layout("L X" + ideographic + hyphen + "XX", new int[] {2});
-        layout("L XX" + ideographic + hyphen + "XX", new int[] {2});
-        layout("L XXX" + ideographic + hyphen + "X", new int[] {2});
-        layout("L XXXX" + ideographic + hyphen + "X", new int[] {2});
-
-        // When the non-starter is first, a pair of ideographic characters is a line break
-        layout("L X" + hyphen + ideographic + "X", NO_BREAK);
-        layout("L X" + hyphen + ideographic + "XX", new int[] {4});
-        layout("L XX" + hyphen + ideographic + "XX", new int[] {5});
-        layout("L XXX" + hyphen + ideographic + "X", new int[] {6});
-        layout("L XXXX" + hyphen + ideographic + "X", new int[] {2});
-    }
-
     public void testReplacementSpan() {
         // Add ReplacementSpan to the string
     }
@@ -511,37 +437,19 @@ public class StaticLayoutLineBreakingTest extends AndroidTestCase {
         }
     }
 
-    public void testNarrowWidthWithSpace() {
-        int[] widths = new int[] { 0, 4 };
-        for (int width: widths) {
-            layout("X ", new int[] {1}, width);
-            layout("X  ", new int[] {1}, width);
-            layout("XX ", new int[] {1, 2}, width);
-            layout("XX  ", new int[] {1, 2}, width);
-            layout("X  X", new int[] {1, 3}, width);
-            layout("X X", new int[] {1, 2}, width);
-
-            layout(" ", NO_BREAK, width);
-            layout(" X", new int[] {1}, width);
-            layout("  ", NO_BREAK, width);
-            layout(" X X", new int[] {1, 2, 3}, width);
-            layout("  X", new int[] {2}, width);
-        }
-    }
-
     public void testNarrowWidthZeroWidth() {
-        int[] widths = new int[] { 0, 4 };
+        int[] widths = new int[] { 1, 4 };
         for (int width: widths) {
             layout("X.", new int[] {1}, width);
-            layout("X__", new int[] {1}, width);
-            layout("X__X", new int[] {1, 3}, width); // Could be {1}
-            layout("X__X_", new int[] {1, 3, 4}, width); // Could be {1, 4}
+            layout("X__", NO_BREAK, width);
+            layout("X__X", new int[] {3}, width);
+            layout("X__X_", new int[] {3}, width);
 
             layout("_", NO_BREAK, width);
             layout("__", NO_BREAK, width);
-            layout("_X", new int[] {1}, width); // Could be NO_BREAK
-            layout("_X_", new int[] {1, 2}, width); // Could be {2}
-            layout("_X__", new int[] {1, 2}, width); // Could be {2}
+            layout("_X", new int[] {1}, width);
+            layout("_X_", new int[] {1}, width);
+            layout("__X__", new int[] {2}, width);
         }
     }
 
