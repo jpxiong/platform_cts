@@ -72,6 +72,201 @@ public class MediaCodecTest extends AndroidTestCase {
 
     /**
      * Tests:
+     * <br> Exceptions for MediaCodec factory methods
+     * <br> Exceptions for MediaCodec methods when called in the incorrect state.
+     *
+     * A selective test to ensure proper exceptions are thrown from MediaCodec
+     * methods when called in incorrect operational states.
+     */
+    public void testException() throws Exception {
+        MediaFormat[] formatList = new MediaFormat[2];
+
+        // use audio format
+        formatList[0] = new MediaFormat();
+        formatList[0].setString(MediaFormat.KEY_MIME, "audio/amr-wb");
+        formatList[0].setInteger(MediaFormat.KEY_SAMPLE_RATE, 16000);
+        formatList[0].setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+        formatList[0].setInteger(MediaFormat.KEY_BIT_RATE, 19850);
+
+        // use video format
+        formatList[1] = createMediaFormat();
+
+        for (MediaFormat format : formatList) {
+            verifyIllegalStateException(format, false);
+            verifyIllegalStateException(format, true);
+        }
+    }
+
+    // wrap MediaCodec encoder and decoder creation
+    private static MediaCodec createCodecByType(String type, boolean isEncoder)
+            throws IOException {
+        if (isEncoder) {
+            return MediaCodec.createEncoderByType(type);
+        }
+        return MediaCodec.createDecoderByType(type);
+    }
+
+    private static void logMediaCodecException(MediaCodec.CodecException ex) {
+        if (ex.isRecoverable()) {
+            Log.w(TAG, "CodecException Recoverable: " + ex.getErrorCode());
+        } else if (ex.isTransient()) {
+            Log.w(TAG, "CodecException Transient: " + ex.getErrorCode());
+        } else {
+            Log.w(TAG, "CodecException Fatal: " + ex.getErrorCode());
+        }
+    }
+
+    private static void verifyIllegalStateException(MediaFormat format, boolean isEncoder)
+            throws IOException {
+        MediaCodec codec;
+
+        // create codec (enter Initialized State)
+
+        // create improperly
+        final String methodName = isEncoder ? "createEncoderByType" : "createDecoderByType";
+        try {
+            codec = createCodecByType(null, isEncoder);
+            fail(methodName + " should return NullPointerException on null");
+        } catch (NullPointerException e) { // expected
+        }
+        try {
+            codec = createCodecByType("foobarplan9", isEncoder); // invalid type
+            fail(methodName + " should return IllegalArgumentException on invalid type");
+        } catch (IllegalArgumentException e) { // expected
+        }
+        try {
+            codec = MediaCodec.createByCodecName("foobarplan9"); // invalid name
+            fail(methodName + " should return IllegalArgumentException on invalid name");
+        } catch (IllegalArgumentException e) { // expected
+        }
+        // correct
+        codec = createCodecByType(format.getString(MediaFormat.KEY_MIME), isEncoder);
+
+        // test a few commands
+        try {
+            codec.start();
+            fail("start should return IllegalStateException when in Initialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("start should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+        try {
+            codec.flush();
+            fail("flush should return IllegalStateException when in Initialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("flush should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+        MediaCodecInfo codecInfo = codec.getCodecInfo(); // obtaining the codec info now is fine.
+        try {
+            int bufIndex = codec.dequeueInputBuffer(0);
+            fail("dequeueInputBuffer should return IllegalStateException"
+                    + " when in the Initialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("dequeueInputBuffer should not return MediaCodec.CodecException"
+                    + " on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+        try {
+            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+            int bufIndex = codec.dequeueOutputBuffer(info, 0);
+            fail("dequeueOutputBuffer should return IllegalStateException"
+                    + " when in the Initialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("dequeueOutputBuffer should not return MediaCodec.CodecException"
+                    + " on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+
+        // configure (enter Configured State)
+
+        // configure improperly
+        try {
+            codec.configure(format, null /* surface */, null /* crypto */,
+                    isEncoder ? 0 : MediaCodec.CONFIGURE_FLAG_ENCODE /* flags */);
+            fail("configure needs MediaCodec.CONFIGURE_FLAG_ENCODE for encoders only");
+        } catch (MediaCodec.CodecException e) { // expected
+            logMediaCodecException(e);
+        } catch (IllegalStateException e) {
+            fail("configure should not return IllegalStateException when improperly configured");
+        }
+        // correct
+        codec.configure(format, null /* surface */, null /* crypto */,
+                isEncoder ? MediaCodec.CONFIGURE_FLAG_ENCODE : 0 /* flags */);
+
+        // test a few commands
+        try {
+            codec.flush();
+            fail("flush should return IllegalStateException when in Configured state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("flush should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+        try {
+            Surface surface = codec.createInputSurface();
+            if (!isEncoder) {
+                fail("createInputSurface should not work on a decoder");
+            }
+        } catch (IllegalStateException e) { // expected for decoder and audio encoder
+            if (isEncoder && format.getString(MediaFormat.KEY_MIME).startsWith("video/")) {
+                throw e;
+            }
+        }
+
+        // start codec (enter Executing state)
+        codec.start();
+
+        // test a few commands
+        try {
+            codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+            fail("configure should return IllegalStateException when in Executing state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            // TODO: consider configuring after a flush.
+            fail("configure should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+
+        // two flushes should be fine.
+        codec.flush();
+        codec.flush();
+
+        // stop codec (enter Initialized state)
+        // two stops should be fine.
+        codec.stop();
+        codec.stop();
+
+        // release codec (enter Uninitialized state)
+        // two releases should be fine.
+        codec.release();
+        codec.release();
+
+        try {
+            codecInfo = codec.getCodecInfo();
+            fail("getCodecInfo should should return IllegalStateException" +
+                    " when in Uninitialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("getCodecInfo should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+        try {
+            codec.stop();
+            fail("stop should return IllegalStateException when in Uninitialized state");
+        } catch (MediaCodec.CodecException e) {
+            logMediaCodecException(e);
+            fail("stop should not return MediaCodec.CodecException on wrong state");
+        } catch (IllegalStateException e) { // expected
+        }
+    }
+
+    /**
+     * Tests:
      * <br> calling createInputSurface() before configure() throws exception
      * <br> calling createInputSurface() after start() throws exception
      * <br> calling createInputSurface() with a non-Surface color format throws exception
