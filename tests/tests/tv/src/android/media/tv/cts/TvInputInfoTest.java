@@ -38,7 +38,7 @@ public class TvInputInfoTest extends AndroidTestCase {
                 (TvInputManager) mContext.getSystemService(Context.TV_INPUT_SERVICE);
         for (TvInputInfo info : manager.getTvInputList()) {
             if (info.getServiceInfo().name.equals(
-                    StubTvInputService.class.getName())) {
+                    StubTunerTvInputService.class.getName())) {
                 mStubInfo = info;
                 break;
             }
@@ -49,9 +49,8 @@ public class TvInputInfoTest extends AndroidTestCase {
     public void testGetIntentForSettingsActivity() throws Exception {
         Intent intent = mStubInfo.getIntentForSettingsActivity();
 
-        assertEquals(intent.getComponent(), new ComponentName(
-                TvInputSettingsActivityStub.class.getPackage().getName(),
-                TvInputSettingsActivityStub.class.getName()));
+        assertEquals(intent.getComponent(), new ComponentName(mContext,
+                TvInputSettingsActivityStub.class));
         String inputId = intent.getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
         assertEquals(mStubInfo.getId(), inputId);
     }
@@ -59,9 +58,8 @@ public class TvInputInfoTest extends AndroidTestCase {
     public void testGetIntentForSetupActivity() throws Exception {
         Intent intent = mStubInfo.getIntentForSetupActivity();
 
-        assertEquals(intent.getComponent(), new ComponentName(
-                TvInputSetupActivityStub.class.getPackage().getName(),
-                TvInputSetupActivityStub.class.getName()));
+        assertEquals(intent.getComponent(), new ComponentName(mContext,
+                TvInputSetupActivityStub.class));
         String inputId = intent.getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
         assertEquals(mStubInfo.getId(), inputId);
     }
