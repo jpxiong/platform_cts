@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Test {@link TvView}.
+ * Test {@link android.media.tv.TvView}.
  */
 public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActivity> {
     /** The maximum time to wait for an operation. */
