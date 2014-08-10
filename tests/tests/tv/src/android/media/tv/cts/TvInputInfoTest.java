@@ -20,10 +20,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.test.AndroidTestCase;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.media.tv.TvInputService;
+import android.test.AndroidTestCase;
 
 /**
  * Test for {@link android.media.tv.TvInputInfo}.
@@ -34,6 +33,9 @@ public class TvInputInfoTest extends AndroidTestCase {
 
     @Override
     public void setUp() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         TvInputManager manager =
                 (TvInputManager) getContext().getSystemService(Context.TV_INPUT_SERVICE);
         for (TvInputInfo info : manager.getTvInputList()) {
@@ -47,6 +49,9 @@ public class TvInputInfoTest extends AndroidTestCase {
     }
 
     public void testGetIntentForSettingsActivity() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         Intent intent = mStubInfo.getIntentForSettingsActivity();
 
         assertEquals(intent.getComponent(), new ComponentName(getContext(),
@@ -56,6 +61,9 @@ public class TvInputInfoTest extends AndroidTestCase {
     }
 
     public void testGetIntentForSetupActivity() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         Intent intent = mStubInfo.getIntentForSetupActivity();
 
         assertEquals(intent.getComponent(), new ComponentName(getContext(),
@@ -65,23 +73,38 @@ public class TvInputInfoTest extends AndroidTestCase {
     }
 
     public void testTunerHasNoParentId() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertNull(mStubInfo.getParentId());
     }
 
     public void testGetTypeForTuner() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertEquals(mStubInfo.getType(), TvInputInfo.TYPE_TUNER);
     }
 
     public void testTunerIsNotPassthroughInput() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertFalse(mStubInfo.isPassthroughInputType());
     }
 
     public void testLoadIcon() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertEquals(mStubInfo.loadIcon(getContext()).getConstantState(),
                 mStubInfo.getServiceInfo().loadIcon(mPackageManager).getConstantState());
     }
 
     public void testLoadLabel() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertEquals(mStubInfo.loadLabel(getContext()),
                 mStubInfo.getServiceInfo().loadLabel(mPackageManager));
     }
