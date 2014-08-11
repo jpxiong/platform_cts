@@ -28,6 +28,7 @@ import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
+import android.media.tv.cts.Utils;
 import android.net.Uri;
 import android.util.ArrayMap;
 import android.util.SparseIntArray;
@@ -141,6 +142,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         mInstrumentation = getInstrumentation();
         mTvView = findTvViewById(R.id.tvview);
         mManager = (TvInputManager) mActivity.getSystemService(Context.TV_INPUT_SERVICE);
@@ -203,6 +207,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     }
 
     public void testSimpleTune() throws Throwable {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         tryTuneAllChannels(null);
     }
 
@@ -221,6 +228,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     }
 
     public void testTrackChange() throws Throwable {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         tryTuneAllChannels(new Runnable() {
             @Override
             public void run() {
