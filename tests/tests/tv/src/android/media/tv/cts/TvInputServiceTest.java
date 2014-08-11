@@ -19,6 +19,7 @@ package android.media.tv.cts;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.test.ActivityInstrumentationTestCase2;
@@ -31,6 +32,7 @@ import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
 import android.media.tv.TvInputService.Session;
 import android.media.tv.cts.TvInputServiceTest.CountingTvInputService.CountingSession;
+import android.media.tv.cts.Utils;
 import android.net.Uri;
 import android.util.ArrayMap;
 import android.util.SparseIntArray;
@@ -110,6 +112,9 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
         mTvView = (TvView) mActivity.findViewById(R.id.tvview);
@@ -127,6 +132,9 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     }
 
     public void testTvInputService() throws Throwable {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         verifyCommandTune();
         verifyCommandSetStreamVolume();
         verifyCommandSetCaptionEnabled();

@@ -24,6 +24,7 @@ import android.test.AndroidTestCase;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
+import android.media.tv.cts.Utils;
 
 import java.util.List;
 
@@ -52,21 +53,33 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     @Override
     public void setUp() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         mManager = (TvInputManager) mContext.getSystemService(Context.TV_INPUT_SERVICE);
         mStubId = getInfoForClassName(
                 mManager.getTvInputList(), StubTunerTvInputService.class.getName()).getId();
     }
 
     public void testGetInputState() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertEquals(mManager.getInputState(mStubId), TvInputManager.INPUT_STATE_CONNECTED);
     }
 
     public void testGetTvInputInfo() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         assertEquals(mManager.getTvInputInfo(mStubId), getInfoForClassName(
                 mManager.getTvInputList(), StubTunerTvInputService.class.getName()));
     }
 
     public void testGetTvInputList() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         List<TvInputInfo> list = mManager.getTvInputList();
         for (String name : VALID_TV_INPUT_SERVICES) {
             assertNotNull("getTvInputList() doesn't contain valid input: " + name,
