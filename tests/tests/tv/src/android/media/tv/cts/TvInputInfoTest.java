@@ -35,7 +35,7 @@ public class TvInputInfoTest extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         TvInputManager manager =
-                (TvInputManager) mContext.getSystemService(Context.TV_INPUT_SERVICE);
+                (TvInputManager) getContext().getSystemService(Context.TV_INPUT_SERVICE);
         for (TvInputInfo info : manager.getTvInputList()) {
             if (info.getServiceInfo().name.equals(
                     StubTunerTvInputService.class.getName())) {
@@ -43,13 +43,13 @@ public class TvInputInfoTest extends AndroidTestCase {
                 break;
             }
         }
-        mPackageManager = mContext.getPackageManager();
+        mPackageManager = getContext().getPackageManager();
     }
 
     public void testGetIntentForSettingsActivity() throws Exception {
         Intent intent = mStubInfo.getIntentForSettingsActivity();
 
-        assertEquals(intent.getComponent(), new ComponentName(mContext,
+        assertEquals(intent.getComponent(), new ComponentName(getContext(),
                 TvInputSettingsActivityStub.class));
         String inputId = intent.getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
         assertEquals(mStubInfo.getId(), inputId);
@@ -58,7 +58,7 @@ public class TvInputInfoTest extends AndroidTestCase {
     public void testGetIntentForSetupActivity() throws Exception {
         Intent intent = mStubInfo.getIntentForSetupActivity();
 
-        assertEquals(intent.getComponent(), new ComponentName(mContext,
+        assertEquals(intent.getComponent(), new ComponentName(getContext(),
                 TvInputSetupActivityStub.class));
         String inputId = intent.getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
         assertEquals(mStubInfo.getId(), inputId);
@@ -77,12 +77,12 @@ public class TvInputInfoTest extends AndroidTestCase {
     }
 
     public void testLoadIcon() throws Exception {
-        assertEquals(mStubInfo.loadIcon(mContext).getConstantState(),
+        assertEquals(mStubInfo.loadIcon(getContext()).getConstantState(),
                 mStubInfo.getServiceInfo().loadIcon(mPackageManager).getConstantState());
     }
 
     public void testLoadLabel() throws Exception {
-        assertEquals(mStubInfo.loadLabel(mContext),
+        assertEquals(mStubInfo.loadLabel(getContext()),
                 mStubInfo.getServiceInfo().loadLabel(mPackageManager));
     }
 }
