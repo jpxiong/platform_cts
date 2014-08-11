@@ -481,19 +481,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     openDevice(id);
                     mSupportedVideoSizes =
                             getSupportedVideoSizes(id, mCameraManager, VIDEO_SIZE_BOUND);
-                    // Use largest still size for video snapshot
-                    Size videoSnapshotSz = mOrderedStillSizes.get(0);
-                    // Image reader is shared for all tested profile, but listener is different
-                    // per profile and will be set later
-                    createImageReader(
-                            videoSnapshotSz, ImageFormat.JPEG,
-                            MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
 
-                    videoSnapshotTestByCamera(videoSnapshotSz, burstTest);
+                    videoSnapshotTestByCamera(burstTest);
                 } finally {
                     closeDevice();
                     releaseRecorder();
-                    closeImageReader();
                 }
             }
     }
@@ -529,11 +521,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * is not checked.
      * </p>
      *
-     * @param videoSnapshotSz The size of video snapshot image
      * @param burstTest Perform burst capture or single capture. For burst capture
      *                  {@value #BURST_VIDEO_SNAPSHOT_NUM} capture requests will be sent.
      */
-    private void videoSnapshotTestByCamera(Size videoSnapshotSz, boolean burstTest)
+    private void videoSnapshotTestByCamera(boolean burstTest)
             throws Exception {
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
@@ -547,6 +538,13 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
                             " must be one of the camera device supported video size!",
                             mSupportedVideoSizes.contains(videoSz));
+
+            Size videoSnapshotSz = mStaticInfo.isHardwareLevelFull() ?
+                    mOrderedStillSizes.get(0) : // Full device tests largest jpeg size
+                    videoSz;                    // Non-full device tests video size
+            createImageReader(
+                    videoSnapshotSz, ImageFormat.JPEG,
+                    MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
 
             if (VERBOSE) {
                 Log.v(TAG, "Testing camera recording with video size " + videoSz.toString());
@@ -619,6 +617,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                 image.close();
             }
+
+            closeImageReader();
         }
     }
 
