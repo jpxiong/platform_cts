@@ -87,9 +87,9 @@ public class StubTunerTvInputService extends TvInputService {
             super(context);
             mContext = context;
             mVideoTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-HD")
-                    .setVideoHeight(1920).setVideoHeight(1080).build();
+                    .setVideoHeight(1920).setVideoWidth(1080).build();
             mVideoTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-SD")
-                    .setVideoHeight(640).setVideoHeight(360).build();
+                    .setVideoHeight(640).setVideoWidth(360).build();
             mAudioTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-stereo-eng")
                     .setLanguage("eng").setAudioChannelCount(2).setAudioSampleRate(48000).build();
             mAudioTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-mono-esp")
