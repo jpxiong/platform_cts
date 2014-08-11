@@ -31,9 +31,20 @@ import android.net.Uri;
 import android.view.Surface;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StubTunerTvInputService extends TvInputService {
+    private static final List<TvTrackInfo> mTrackList = new ArrayList<>();
+
+    public static void clearTracks() {
+        mTrackList.clear();
+    }
+
+    public static void injectTrack(TvTrackInfo... tracks) {
+        mTrackList.addAll(Arrays.asList(tracks));
+    }
+
     public static void insertChannels(ContentResolver resolver, TvInputInfo info) {
         if (!info.getServiceInfo().name.equals(StubTunerTvInputService.class.getName())) {
             throw new IllegalArgumentException("info mismatch");
@@ -69,41 +80,16 @@ public class StubTunerTvInputService extends TvInputService {
         return new StubSessionImpl(this);
     }
 
-    private static class StubSessionImpl extends Session {
+    static class StubSessionImpl extends Session {
         private static final int[] COLORS = { Color.RED, Color.GREEN, Color.BLUE };
         private Surface mSurface;
         private Object mLock = new Object();
         private int mCurrentIndex = -1;
         private Context mContext;
-        private final List<TvTrackInfo> mTrackList = new ArrayList<>();
-        private final TvTrackInfo mVideoTrack1;
-        private final TvTrackInfo mVideoTrack2;
-        private final TvTrackInfo mAudioTrack1;
-        private final TvTrackInfo mAudioTrack2;
-        private final TvTrackInfo mSubtitleTrack1;
-        private final TvTrackInfo mSubtitleTrack2;
 
         StubSessionImpl(Context context) {
             super(context);
             mContext = context;
-            mVideoTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-HD")
-                    .setVideoHeight(1920).setVideoWidth(1080).build();
-            mVideoTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-SD")
-                    .setVideoHeight(640).setVideoWidth(360).build();
-            mAudioTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-stereo-eng")
-                    .setLanguage("eng").setAudioChannelCount(2).setAudioSampleRate(48000).build();
-            mAudioTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-mono-esp")
-                    .setLanguage("esp").setAudioChannelCount(1).setAudioSampleRate(48000).build();
-            mSubtitleTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-eng")
-                    .setLanguage("eng").build();
-            mSubtitleTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-esp")
-                    .setLanguage("esp").build();
-            mTrackList.add(mVideoTrack1);
-            mTrackList.add(mVideoTrack2);
-            mTrackList.add(mAudioTrack1);
-            mTrackList.add(mAudioTrack2);
-            mTrackList.add(mSubtitleTrack1);
-            mTrackList.add(mSubtitleTrack2);
         }
 
         @Override
@@ -153,9 +139,18 @@ public class StubTunerTvInputService extends TvInputService {
                 // Notify tracks
                 if (mCurrentIndex == 0) {
                     notifyTracksChanged(mTrackList);
-                    notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, mVideoTrack1.getId());
-                    notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, mAudioTrack1.getId());
-                    notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, null);
+                    for (TvTrackInfo track : mTrackList) {
+                        if (track.getType() == TvTrackInfo.TYPE_VIDEO) {
+                            notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, track.getId());
+                            break;
+                        }
+                    }
+                    for (TvTrackInfo track : mTrackList) {
+                        if (track.getType() == TvTrackInfo.TYPE_AUDIO) {
+                            notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, track.getId());
+                            break;
+                        }
+                    }
                 }
                 notifyVideoAvailable();
                 return true;
