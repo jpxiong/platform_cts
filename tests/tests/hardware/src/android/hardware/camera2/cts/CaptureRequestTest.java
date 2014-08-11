@@ -1227,8 +1227,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * Test face detection for a camera.
      */
     private void faceDetectionTestByCamera() throws Exception {
-        // Can only test full capability because test relies on per frame control
-        // and synchronization.
         int[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
 
         SimpleCaptureListener listener;
