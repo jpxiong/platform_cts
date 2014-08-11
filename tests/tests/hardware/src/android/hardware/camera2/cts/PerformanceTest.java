@@ -156,7 +156,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                 mReportLog.printArray("Camera " + id
                         + ": Camera launch time", cameraLaunchTimes,
                         ResultType.LOWER_BETTER, ResultUnit.MS);
-                mReportLog.printSummary("Camera " + id, Stat.getAverage(cameraLaunchTimes),
+                mReportLog.printSummary("Camera launch average time for Camera " + id,
+                        Stat.getAverage(cameraLaunchTimes),
                         ResultType.LOWER_BETTER, ResultUnit.MS);
             }
             finally {
@@ -208,9 +209,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
     private void initializeImageReader(String cameraId, int format) throws Exception {
         mOrderedPreviewSizes = CameraTestUtils.getSupportedPreviewSizes(
                 cameraId, mCameraManager, CameraTestUtils.PREVIEW_SIZE_BOUND);
-        mPreviewSize = mOrderedPreviewSizes.get(0);
-        createImageReader(mPreviewSize, format, NUM_MAX_IMAGES, /*listener*/null);
-        updatePreviewSurface(mPreviewSize);
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        createImageReader(maxPreviewSize, format, NUM_MAX_IMAGES, /*listener*/null);
+        updatePreviewSurface(maxPreviewSize);
     }
 
     private void simpleOpenCamera(String cameraId) throws Exception {
