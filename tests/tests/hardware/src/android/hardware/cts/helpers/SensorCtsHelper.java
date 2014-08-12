@@ -17,7 +17,10 @@ package android.hardware.cts.helpers;
 
 import android.content.Context;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -183,5 +186,46 @@ public class SensorCtsHelper {
             throw new IllegalStateException("SensorService is not present in the system.");
         }
         return sensorManager;
+    }
+
+    public static void beep(int tone) {
+	ToneGenerator mToneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+	mToneGenerator.startTone(tone);
+    }
+
+    private final static float mAccelerationThresholdForMoveDetection = 4.0f;
+    private static float[] mGravity = {0.0f, 0.0f, 0.0f};
+    public static boolean checkMovementDetection(SensorEvent event) {
+        // Alpha is calculated as t / (t + dT),
+        // where t is the low-pass filter's time-constant and
+        // dT is the event delivery rate.
+	boolean mMoveDetected = false;
+        final float alpha = 0.8f;
+        float[] linear_acceleration = {0.0f, 0.0f, 0.0f};
+
+        if (mGravity[0] == 0f && mGravity[2] == 0f) {
+            mGravity[0] = event.values[0];
+            mGravity[1] = event.values[1];
+            mGravity[2] = event.values[2];
+        } else {
+            // Isolate the force of gravity with the low-pass filter.
+            mGravity[0] = alpha * mGravity[0] + (1 - alpha) * event.values[0];
+            mGravity[1] = alpha * mGravity[1] + (1 - alpha) * event.values[1];
+            mGravity[2] = alpha * mGravity[2] + (1 - alpha) * event.values[2];
+        }
+
+        // Remove the gravity contribution with the high-pass filter.
+        linear_acceleration[0] = event.values[0] - mGravity[0];
+        linear_acceleration[1] = event.values[1] - mGravity[1];
+        linear_acceleration[2] = event.values[2] - mGravity[2];
+
+        float totalAcceleration = Math.abs(linear_acceleration[0])
+	    + Math.abs(linear_acceleration[1])
+	    + Math.abs(linear_acceleration[2]);
+
+        if (totalAcceleration > mAccelerationThresholdForMoveDetection) {
+            mMoveDetected = true;
+        }
+	return mMoveDetected;
     }
 }
