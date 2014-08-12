@@ -76,7 +76,7 @@ public class SimpleCpuTest extends CtsAndroidTestCase {
     }
 
     // will exceed L2
-    @TimeoutReq(minutes = 20)
+    @TimeoutReq(minutes = 30)
     public void testMatrixMultiplication600() {
         doMatrixMultiplication(NUMBER_REPEAT, 600);
     }
