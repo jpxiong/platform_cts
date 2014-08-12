@@ -941,6 +941,55 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
 
+        <activity android:name=".projection.cube.ProjectionCubeActivity"
+                  android:label="@string/pca_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
+        <activity android:name=".projection.widgets.ProjectionWidgetActivity"
+                  android:label="@string/pwa_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
+        <activity android:name=".projection.list.ProjectionListActivity"
+                  android:label="@string/pla_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
+        <activity android:name=".projection.video.ProjectionVideoActivity"
+                  android:label="@string/pva_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
+        <activity android:name=".projection.touch.ProjectionTouchActivity"
+                  android:label="@string/pta_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
+        <service android:name=".projection.ProjectionService"
+                 android:label="@string/projection_service_name"
+                 android:process=":projectionservice" />
+
    </application>
 
 </manifest>
