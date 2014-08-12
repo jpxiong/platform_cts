@@ -35,6 +35,8 @@ import android.util.SparseIntArray;
 
 import com.android.cts.tv.R;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -156,6 +158,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         }
         assertNotNull(mStubInfo);
         mTvView.setTvInputListener(mListener);
+        StubTunerTvInputService.clearTracks();
     }
 
     public void testConstructor() throws Exception {
@@ -213,7 +216,8 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         tryTuneAllChannels(null);
     }
 
-    private void selectTrackAndVerify(final int type, final TvTrackInfo track) {
+    private void selectTrackAndVerify(final int type, final TvTrackInfo track,
+            List<TvTrackInfo> tracks) {
         final int previousGeneration = mListener.getSelectedTrackGeneration(
                 mStubInfo.getId(), type);
         mTvView.selectTrack(type, track == null ? null : track.getId());
@@ -224,13 +228,65 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                         mStubInfo.getId(), type) > previousGeneration;
             }
         }.run();
-        assertEquals(mTvView.getSelectedTrack(type), track == null ? null : track.getId());
+        String selectedTrackId = mTvView.getSelectedTrack(type);
+        assertEquals(selectedTrackId, track == null ? null : track.getId());
+        if (selectedTrackId != null) {
+            TvTrackInfo selectedTrack = null;
+            for (TvTrackInfo item : tracks) {
+                if (item.getId().equals(selectedTrackId)) {
+                    selectedTrack = item;
+                    break;
+                }
+            }
+            assertNotNull(selectedTrack);
+            assertEquals(track.getType(), selectedTrack.getType());
+            assertEquals(track.getExtra(), selectedTrack.getExtra());
+            switch (track.getType()) {
+                case TvTrackInfo.TYPE_VIDEO:
+                    assertEquals(track.getVideoHeight(), selectedTrack.getVideoHeight());
+                    assertEquals(track.getVideoWidth(), selectedTrack.getVideoWidth());
+                    break;
+                case TvTrackInfo.TYPE_AUDIO:
+                    assertEquals(track.getAudioChannelCount(),
+                            selectedTrack.getAudioChannelCount());
+                    assertEquals(track.getAudioSampleRate(), selectedTrack.getAudioSampleRate());
+                    assertEquals(track.getLanguage(), selectedTrack.getLanguage());
+                    break;
+                case TvTrackInfo.TYPE_SUBTITLE:
+                    assertEquals(track.getLanguage(), selectedTrack.getLanguage());
+                    break;
+                default:
+                    fail("Unrecognized type: " + track.getType());
+            }
+        }
     }
 
     public void testTrackChange() throws Throwable {
         if (!Utils.hasTvInputFramework(getActivity())) {
             return;
         }
+        TvTrackInfo videoTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-HD")
+                .setVideoHeight(1920).setVideoWidth(1080).build();
+        TvTrackInfo videoTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-SD")
+                .setVideoHeight(640).setVideoWidth(360).build();
+        TvTrackInfo audioTrack1 =
+                new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-stereo-eng")
+                .setLanguage("eng").setAudioChannelCount(2).setAudioSampleRate(48000).build();
+        TvTrackInfo audioTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-mono-esp")
+                .setLanguage("esp").setAudioChannelCount(1).setAudioSampleRate(48000).build();
+        TvTrackInfo subtitleTrack1 =
+                new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-eng")
+                .setLanguage("eng").build();
+        TvTrackInfo subtitleTrack2 =
+                new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-esp")
+                .setLanguage("esp").build();
+
+        StubTunerTvInputService.injectTrack(videoTrack1, videoTrack2, audioTrack1, audioTrack2,
+                subtitleTrack1, subtitleTrack2);
+
+        final List<TvTrackInfo> tracks = new ArrayList<TvTrackInfo>();
+        Collections.addAll(tracks, videoTrack1, videoTrack2, audioTrack1, audioTrack2,
+                subtitleTrack1, subtitleTrack2);
         tryTuneAllChannels(new Runnable() {
             @Override
             public void run() {
@@ -245,9 +301,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 for (int type : types) {
                     final int typeF = type;
                     for (TvTrackInfo track : mTvView.getTracks(type)) {
-                        selectTrackAndVerify(type, track);
+                        selectTrackAndVerify(type, track, tracks);
                     }
-                    selectTrackAndVerify(TvTrackInfo.TYPE_SUBTITLE, null);
+                    selectTrackAndVerify(TvTrackInfo.TYPE_SUBTITLE, null, tracks);
                 }
             }
         });
