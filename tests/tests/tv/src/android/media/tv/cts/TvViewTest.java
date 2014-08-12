@@ -32,6 +32,8 @@ import android.media.tv.cts.Utils;
 import android.net.Uri;
 import android.util.ArrayMap;
 import android.util.SparseIntArray;
+import android.view.InputEvent;
+import android.view.KeyEvent;
 
 import com.android.cts.tv.R;
 
@@ -63,7 +65,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         public boolean isVideoAvailable(String inputId) {
             synchronized (mLock) {
                 Boolean available = mVideoAvailableMap.get(inputId);
-                return available == null ? true : available.booleanValue();
+                return available == null ? false : available.booleanValue();
             }
         }
 
@@ -158,7 +160,24 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         }
         assertNotNull(mStubInfo);
         mTvView.setTvInputListener(mListener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        StubTunerTvInputService.deleteChannels(mActivity.getContentResolver(), mStubInfo);
         StubTunerTvInputService.clearTracks();
+        try {
+            runTestOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvView.reset();
+                }
+            });
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+        mInstrumentation.waitForIdleSync();
+        super.tearDown();
     }
 
     public void testConstructor() throws Exception {
@@ -174,9 +193,8 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
 
         Uri uri = TvContract.buildChannelsUriForInput(mStubInfo.getId());
         String[] projection = { TvContract.Channels._ID };
-        Cursor cursor = mActivity.getContentResolver().query(
-                uri, projection, null, null, null);
-        try {
+        try (Cursor cursor = mActivity.getContentResolver().query(
+                uri, projection, null, null, null)) {
             while (cursor != null && cursor.moveToNext()) {
                 long channelId = cursor.getLong(0);
                 Uri channelUri = TvContract.buildChannelUri(channelId);
@@ -193,20 +211,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                     runOnEachChannel.run();
                 }
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
-        runTestOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mTvView.reset();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-
-        StubTunerTvInputService.deleteChannels(mActivity.getContentResolver(), mStubInfo);
     }
 
     public void testSimpleTune() throws Throwable {
@@ -307,5 +312,64 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 }
             }
         });
+    }
+
+    private void verifyKeyEvent(final KeyEvent keyEvent, final InputEvent[] unhandledEvent) {
+        unhandledEvent[0] = null;
+        mInstrumentation.sendKeySync(keyEvent);
+        mInstrumentation.waitForIdleSync();
+        new PollingCheck(TIME_OUT) {
+            @Override
+            protected boolean check() {
+                return unhandledEvent[0] != null;
+            }
+        }.run();
+        assertTrue(unhandledEvent[0] instanceof KeyEvent);
+        KeyEvent unhandled = (KeyEvent) unhandledEvent[0];
+        assertEquals(unhandled.getAction(), keyEvent.getAction());
+        assertEquals(unhandled.getKeyCode(), keyEvent.getKeyCode());
+    }
+
+    public void testOnUnhandledInputEventListener() throws Throwable {
+        final InputEvent[] unhandledEvent = { null };
+        mTvView.setOnUnhandledInputEventListener(new TvView.OnUnhandledInputEventListener() {
+            @Override
+            public boolean onUnhandledInputEvent(InputEvent event) {
+                unhandledEvent[0] = event;
+                return true;
+            }
+        });
+
+        StubTunerTvInputService.insertChannels(mActivity.getContentResolver(), mStubInfo);
+
+        Uri uri = TvContract.buildChannelsUriForInput(mStubInfo.getId());
+        String[] projection = { TvContract.Channels._ID };
+        try (Cursor cursor = mActivity.getContentResolver().query(
+                uri, projection, null, null, null)) {
+            assertNotNull(cursor);
+            assertTrue(cursor.moveToNext());
+            long channelId = cursor.getLong(0);
+            Uri channelUri = TvContract.buildChannelUri(channelId);
+            mTvView.tune(mStubInfo.getId(), channelUri);
+            mInstrumentation.waitForIdleSync();
+            new PollingCheck(TIME_OUT) {
+                @Override
+                protected boolean check() {
+                    return mListener.isVideoAvailable(mStubInfo.getId());
+                }
+            }.run();
+        }
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTvView.setFocusable(true);
+                mTvView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertTrue(mTvView.isFocused());
+
+        verifyKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_GUIDE), unhandledEvent);
+        verifyKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_GUIDE), unhandledEvent);
     }
 }
