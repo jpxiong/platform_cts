@@ -98,9 +98,13 @@ public class StubTunerTvInputService extends TvInputService {
 
         private void updateSurfaceLocked() {
             if (mCurrentIndex >= 0 && mSurface != null) {
-                Canvas c = mSurface.lockCanvas(null);
-                c.drawColor(COLORS[mCurrentIndex]);
-                mSurface.unlockCanvasAndPost(c);
+                try {
+                    Canvas c = mSurface.lockCanvas(null);
+                    c.drawColor(COLORS[mCurrentIndex]);
+                    mSurface.unlockCanvasAndPost(c);
+                } catch (IllegalArgumentException e) {
+                    mSurface = null;
+                }
             }
         }
 
@@ -119,8 +123,8 @@ public class StubTunerTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(Uri channelUri) {
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
             synchronized (mLock) {
-                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
                 String[] projection = { TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA };
                 Cursor cursor = mContext.getContentResolver().query(
                         channelUri, projection, null, null, null);
@@ -152,9 +156,9 @@ public class StubTunerTvInputService extends TvInputService {
                         }
                     }
                 }
-                notifyVideoAvailable();
-                return true;
             }
+            notifyVideoAvailable();
+            return true;
         }
 
         @Override
