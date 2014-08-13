@@ -961,7 +961,6 @@
         2. Verify that a timer is started  and the timers UI is shown with a timer named "Start Timer Test".\n
         3. Verify that the timer rings after 30 seconds.\n
     </string>
-    
     <!-- Strings for LockConfirmBypassTest -->
     <string name="lock_confirm_test_title">Keyguard Password Verification</string>
     <string name="lock_set_button_text">Set password</string>
@@ -971,5 +970,32 @@
         \nClick the \"Set password\" button if you currently don\'t have a password set.\n
         \nThen click the \"Change password\" button to change it. You should be prompted for the current password first. If you are not, then mark the test as failed.
     </string>
+
+    <!-- String for Projection Tests -->
+    <string name="test_category_projection">Projection Tests</string>
+    <string name="projection_service_name">Projection Service</string>
+    <string name="pca_info">This tests whether or not OpenGL projection works.\n
+        You should see two "tumbling cubes." Tapping the screen should case the cubes to explode.</string>
+    <string name="pca_test">Projection Cube Test</string>
+    <string name="pwa_info">This tests whether or displaying widets and keyfocus navigation works.\n
+        You should see four buttons on the bottom of the screen.\n
+        Pressing the "up" and "down" buttons should highlight different buttons.\n
+        Further, you should also be able to touch them and they should highlight as ususual.</string>
+    <string name="pwa_test">Projection Widget Test</string>
+    <string name="pwa_button_up">Up</string>
+    <string name="pwa_button_down">Down</string>
+    <string name="pwa_button_left">Left</string>
+    <string name="pwa_button_right">Right</string>
+    <string name="pwa_button">Button</string>
+    <string name="pla_test">Projection Scrolling List Test</string>
+    <string name="pla_info">This tests whether a projected list view will scroll properly\n
+        You should see 50 list items and be able to scroll up and down the list</string>
+    <string name="pva_test">Projection Video Playback Test</string>
+    <string name="pva_info">This tests whether video playback works when projected.\n
+        You should see a blinking white box and here a beep that is synchronized with each blink</string>
+    <string name="pta_test">Projection Multitouch Test</string>
+    <string name="pta_info">This tests whether multitouch works.\n
+        Touching the screen should render a dot at the location you touched.\n
+        Touching with additional fingers will render additoinal dots and you should be able to drag them around.</string>
 
 </resources>
