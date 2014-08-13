@@ -23,6 +23,8 @@ import android.test.AndroidTestCase;
 import android.util.ArrayMap;
 import android.util.Log;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -457,5 +459,42 @@ public class ArrayMapTest extends AndroidTestCase {
             fail("ArrayMap equals failure for map contents " + map1 + ", " +
                     map2 + ", " + map3);
         }
+    }
+
+    /**
+     * Test creating a malformed array map with duplicated keys and that we will catch this
+     * when unparcelling.
+     */
+    public void testDuplicateKeys() throws NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+        ArrayMap<String, Object> map1 = new ArrayMap(2);
+
+        Method appendMethod = ArrayMap.class.getMethod("append", Object.class, Object.class);
+        appendMethod.invoke(map1, Integer.toString(100000), "foo");
+        appendMethod.invoke(map1, Integer.toString(100000), "bar");
+
+        // Now parcel/unparcel, and verify we get the expected error.
+        Parcel parcel = Parcel.obtain();
+        Method writeArrayMapMethod = Parcel.class.getMethod("writeArrayMap", ArrayMap.class);
+        writeArrayMapMethod.invoke(parcel, map1);
+        parcel.setDataPosition(0);
+        ArrayMap<String, Object> map2 = new ArrayMap(2);
+
+        try {
+            Parcel.class.getMethod("readArrayMap", ArrayMap.class, ClassLoader.class).invoke(
+                    parcel, map2, null);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof IllegalArgumentException) {
+                // Good!
+                return;
+            }
+            throw e;
+        }
+
+        String msg = "Didn't throw expected IllegalArgumentException";
+        Log.e("test", msg);
+        dump(map1, map2);
+        fail(msg);
     }
 }
