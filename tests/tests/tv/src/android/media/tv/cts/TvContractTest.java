@@ -259,10 +259,20 @@ public class TvContractTest extends AndroidTestCase {
         }
     }
 
+    private void verifyLogoIsReadable(Uri logoUri) throws Exception {
+        try (AssetFileDescriptor fd = mContentResolver.openAssetFileDescriptor(logoUri, "r")) {
+            try (InputStream is = fd.createInputStream()) {
+                // Assure that the stream is decodable as a Bitmap.
+                BitmapFactory.decodeStream(is);
+            }
+        }
+    }
+
     public void testChannelLogo() throws Exception {
         // Set-up: add a channel.
         ContentValues values = createDummyChannelValues(mInputId);
-        Uri logoUri = TvContract.buildChannelLogoUri(mContentResolver.insert(mChannelsUri, values));
+        Uri channelUri = mContentResolver.insert(mChannelsUri, values);
+        Uri logoUri = TvContract.buildChannelLogoUri(channelUri);
         Bitmap logo = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.robot);
 
         // Write
@@ -276,22 +286,15 @@ public class TvContractTest extends AndroidTestCase {
         Thread.sleep(OPERATION_TIME);
 
         // Read and verify
-        try (AssetFileDescriptor fd = mContentResolver.openAssetFileDescriptor(logoUri, "r")) {
-            try (InputStream is = fd.createInputStream()) {
-                // Assure that the stream is decodable as a Bitmap.
-                BitmapFactory.decodeStream(is);
-            }
-        }
+        verifyLogoIsReadable(logoUri);
+
+        // Read and verify using alternative logo URI.
+        verifyLogoIsReadable(TvContract.buildChannelLogoUri(ContentUris.parseId(channelUri)));
     }
 
-    public void testProgramsTable() throws Exception {
-        // Set-up: add a channel.
-        ContentValues values = createDummyChannelValues(mInputId);
-        long channelId = ContentUris.parseId(mContentResolver.insert(mChannelsUri, values));
-        Uri programsUri = TvContract.buildProgramsUriForChannel(channelId);
-
+    public void verifyProgramsTable(Uri programsUri, long channelId) {
         // Test: insert
-        values = createDummyProgramValues(channelId);
+        ContentValues values = createDummyProgramValues(channelId);
 
         Uri rowUri = mContentResolver.insert(programsUri, values);
         long programId = ContentUris.parseId(rowUri);
@@ -314,56 +317,62 @@ public class TvContractTest extends AndroidTestCase {
         }
     }
 
+    public void testProgramsTable() throws Exception {
+        // Set-up: add a channel.
+        ContentValues values = createDummyChannelValues(mInputId);
+        Uri channelUri = mContentResolver.insert(mChannelsUri, values);
+        long channelId = ContentUris.parseId(channelUri);
+
+        verifyProgramsTable(TvContract.buildProgramsUriForChannel(channelId), channelId);
+        verifyProgramsTable(TvContract.buildProgramsUriForChannel(channelUri), channelId);
+    }
+
+    private void verifyOverlap(long startMillis, long endMillis, int expectedCount,
+            long channelId, Uri channelUri) {
+        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(
+                channelId, startMillis, endMillis), PROGRAMS_PROJECTION, null, null, null)) {
+            assertEquals(expectedCount, cursor.getCount());
+        }
+        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(
+                channelUri, startMillis, endMillis), PROGRAMS_PROJECTION, null, null, null)) {
+            assertEquals(expectedCount, cursor.getCount());
+        }
+    }
+
     public void testProgramsScheduleOverlap() throws Exception {
-        final long startMillis = 1403712000000l;  // Jun 25 2014 16:00 UTC
-        final long endMillis = 1403719200000l;  // Jun 25 2014 18:00 UTC
+        final long programStartMillis = 1403712000000l;  // Jun 25 2014 16:00 UTC
+        final long programEndMillis = 1403719200000l;  // Jun 25 2014 18:00 UTC
         final long hour = 3600000l;
 
         // Set-up: add a channel and program.
         ContentValues values = createDummyChannelValues(mInputId);
-        long channelId = ContentUris.parseId(mContentResolver.insert(mChannelsUri, values));
+        Uri channelUri = mContentResolver.insert(mChannelsUri, values);
+        long channelId = ContentUris.parseId(channelUri);
         Uri programsUri = TvContract.buildProgramsUriForChannel(channelId);
         values = createDummyProgramValues(channelId);
-        values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startMillis);
-        values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endMillis);
+        values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, programStartMillis);
+        values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, programEndMillis);
         mContentResolver.insert(programsUri, values);
 
         // Overlap 1: starts early, ends early.
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                startMillis - hour, endMillis - hour), PROGRAMS_PROJECTION, null, null, null)) {
-            assertEquals(1, cursor.getCount());
-        }
+        verifyOverlap(programStartMillis - hour, programEndMillis - hour, 1, channelId, channelUri);
 
         // Overlap 2: starts early, ends late.
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                startMillis - hour, endMillis + hour), PROGRAMS_PROJECTION, null, null, null)) {
-            assertEquals(1, cursor.getCount());
-        }
+        verifyOverlap(programStartMillis - hour, programEndMillis + hour, 1, channelId, channelUri);
 
         // Overlap 3: starts early, ends late.
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                startMillis + hour / 2, endMillis - hour / 2), PROGRAMS_PROJECTION,
-                null, null, null)) {
-            assertEquals(1, cursor.getCount());
-        }
+        verifyOverlap(programStartMillis + hour / 2, programEndMillis - hour / 2, 1,
+                channelId, channelUri);
 
         // Overlap 4: starts late, ends late.
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                startMillis + hour, endMillis + hour), PROGRAMS_PROJECTION, null, null, null)) {
-            assertEquals(1, cursor.getCount());
-        }
+        verifyOverlap(programStartMillis + hour, programEndMillis + hour, 1, channelId, channelUri);
 
         // Non-overlap 1: ends too early.
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                startMillis - hour, startMillis - hour / 2), PROGRAMS_PROJECTION,
-                null, null, null)) {
-            assertEquals(0, cursor.getCount());
-        }
+        verifyOverlap(programStartMillis - hour, programStartMillis - hour / 2, 0,
+                channelId, channelUri);
 
         // Non-overlap 2: starts too late
-        try (Cursor cursor = mContentResolver.query(TvContract.buildProgramsUriForChannel(channelId,
-                endMillis + hour, endMillis + hour * 2), PROGRAMS_PROJECTION, null, null, null)) {
-            assertEquals(0, cursor.getCount());
-        }
+        verifyOverlap(programEndMillis + hour, programEndMillis + hour * 2, 0,
+                channelId, channelUri);
     }
 }
