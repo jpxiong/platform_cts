@@ -110,6 +110,7 @@ public class AudioManagerTest extends AndroidTestCase {
 
     public void testMusicActive() throws Exception {
         MediaPlayer mp = MediaPlayer.create(mContext, MP3_TO_PLAY);
+        assertNotNull(mp);
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
         Thread.sleep(TIME_TO_PLAY);
@@ -393,6 +394,7 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
 
         MediaPlayer mp = MediaPlayer.create(mContext, MP3_TO_PLAY);
+        assertNotNull(mp);
         mp.setAudioStreamType(STREAM_MUSIC);
         mp.setLooping(true);
         mp.start();
