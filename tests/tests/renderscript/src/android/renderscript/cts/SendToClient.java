@@ -15,6 +15,7 @@
  */
 package android.renderscript.cts;
 
+import java.util.concurrent.Semaphore;
 import java.util.Random;
 
 import android.renderscript.Allocation;
@@ -24,10 +25,11 @@ import com.android.cts.stub.R;
 
 public class SendToClient extends RSBaseCompute {
     private Allocation mInAllocation;
+    private static final Semaphore mSync = new Semaphore(0);
     private static Random random = new Random();
 
     int outArray[] = new int[4];
-    RSMessageHandlerForTest mRsMessage = new RSMessageHandlerForTest() {
+    RSMessageHandler mRsMessage = new RSMessageHandler() {
         public void run() {
             switch (mID) {
                 default:
@@ -36,7 +38,7 @@ public class SendToClient extends RSBaseCompute {
                     outArray[2] = mData[1];
                     outArray[3] = mData[2];
                     try {
-                        releaseForTest();
+                        mSync.release();
                     } catch (Exception e) {
                         //TODO: handle exception
                     }
@@ -57,10 +59,10 @@ public class SendToClient extends RSBaseCompute {
         mInAllocation.copyFrom(inArray);
         ScriptC_send_to_client mScript;
         mRS.setMessageHandler(mRsMessage);
-        mScript = new ScriptC_send_to_client(mRS,mRes,R.raw.send_to_client);
+        mScript = new ScriptC_send_to_client(mRS);
         mScript.forEach_root(mInAllocation);
         try {
-            mRsMessage.waitForTest();
+            mSync.acquire();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -79,10 +81,10 @@ public class SendToClient extends RSBaseCompute {
         int Id = random.nextInt(100);
         mRS.setMessageHandler(mRsMessage);
         ScriptC_send_to_client_1 mScript;
-        mScript = new ScriptC_send_to_client_1(mRS,mRes,R.raw.send_to_client_1);
+        mScript = new ScriptC_send_to_client_1(mRS);
         mScript.invoke_callback(Id);
         try {
-            mRsMessage.waitForTest();
+            mSync.acquire();
         } catch (InterruptedException e) {
         // TODO Auto-generated catch block
             e.printStackTrace();
@@ -97,14 +99,5 @@ public class SendToClient extends RSBaseCompute {
         bf.append("; InValue = " + in);
         bf.append("; exceptValue = " + temp);
         return bf.toString();
-    }
-
-    class RSMessageHandlerForTest extends RSMessageHandler {
-        public synchronized void waitForTest() throws InterruptedException {
-            wait();
-        }
-        public synchronized void releaseForTest() throws InterruptedException {
-            notify();
-        }
     }
 }
