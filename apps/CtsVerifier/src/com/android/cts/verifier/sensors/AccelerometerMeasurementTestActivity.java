@@ -26,30 +26,43 @@ import java.util.concurrent.TimeUnit;
 /**
  * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
  */
-public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomatedTestActivity {
-    @Override
-    protected void onRun() throws Throwable {
-        verifyMeasurements(
+public class AccelerometerMeasurementTestActivity extends BaseSensorTestActivity {
+    public AccelerometerMeasurementTestActivity() {
+        super(AccelerometerMeasurementTestActivity.class);
+    }
+
+    public String testFaceUp() throws Throwable {
+        return verifyMeasurements(
                 "Place the device in a flat surface with the screen facing the ceiling",
                 0, 0, SensorManager.STANDARD_GRAVITY);
+    }
 
-        delayedVerifyMeasurements(
+    public String testFaceDown() throws Throwable {
+        return delayedVerifyMeasurements(
                 "Press 'Next' and place the device in a flat surface with the screen facing it",
                 0, 0, -SensorManager.STANDARD_GRAVITY);
+    }
 
-        verifyMeasurements(
+    public String testRightSide() throws Throwable {
+        return verifyMeasurements(
                 "Place the device in a flat surface resting vertically on its right side",
                 -SensorManager.STANDARD_GRAVITY, 0, 0);
+    }
 
-        verifyMeasurements(
+    public String testLeftSide() throws Throwable {
+        return verifyMeasurements(
                 "Place the device in a flat surface resting vertically on its left side",
                 SensorManager.STANDARD_GRAVITY, 0, 0);
+    }
 
-        verifyMeasurements(
+    public String testTopSide() throws Throwable {
+        return verifyMeasurements(
                 "Place the device in a flat surface resting vertically on its top side",
                 0, -SensorManager.STANDARD_GRAVITY, 0);
+    }
 
-        verifyMeasurements(
+    public String testBottomSide() throws Throwable {
+        return verifyMeasurements(
                 "Place the device in a flat surface resting vertically on its bottom side",
                 0, SensorManager.STANDARD_GRAVITY, 0);
     }
@@ -73,7 +86,7 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
      * - the values representing the expectation of the test
      * - the mean of values sampled from the sensor
      */
-    private void verifyMeasurements(float ... expectations) throws Throwable {
+    private String verifyMeasurements(float ... expectations) throws Throwable {
         Thread.sleep(500 /*ms*/);
         TestSensorOperation verifyMeasurements = new TestSensorOperation(
                 getApplicationContext(),
@@ -85,10 +98,10 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
                 expectations,
                 new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */));
         verifyMeasurements.execute();
-        logSuccess();
+        return null;
     }
 
-    private void delayedVerifyMeasurements(
+    private String delayedVerifyMeasurements(
             String message,
             float ... expectations) throws Throwable {
         appendText(String.format("\n%s.", message));
@@ -97,17 +110,17 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
         Thread.sleep(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS));
 
         try {
-            verifyMeasurements(expectations);
+            return verifyMeasurements(expectations);
         } finally {
             playSound();
         }
     }
 
-    private void verifyMeasurements(String message, float ... expectations) throws Throwable {
+    private String verifyMeasurements(String message, float ... expectations) throws Throwable {
         appendText(String.format("\n%s.", message));
         appendText("Press 'Next' when ready and keep the device steady.");
         waitForUser();
 
-        verifyMeasurements(expectations);
+        return verifyMeasurements(expectations);
     }
 }

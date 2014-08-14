@@ -16,64 +16,20 @@
 
 package com.android.cts.verifier.sensors;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.hardware.cts.helpers.SensorNotSupportedException;
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.method.ScrollingMovementMethod;
-import android.text.style.ForegroundColorSpan;
-import android.view.View;
-import android.widget.TextView;
-
-import com.android.cts.verifier.R;
-import com.android.cts.verifier.TestResult;
-
-import java.security.InvalidParameterException;
-import java.util.concurrent.Semaphore;
 
 /**
  * Base class to author Sensor semi-automated test cases.
  * These tests can only wait for operators to notify at some intervals, but the test needs to be
  * autonomous to verify the data collected.
+ *
+ * @deprecated use {@link BaseSensorTestActivity} instead.
  */
-public abstract class BaseSensorSemiAutomatedTestActivity
-        extends Activity
-        implements View.OnClickListener, Runnable {
-    protected final String LOG_TAG = "TestRunner";
-
-    private final Semaphore mSemaphore = new Semaphore(0);
-
-    private TextView mLogView;
-    private View mNextView;
-    private Thread mWorkerThread;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.snsr_semi_auto_test);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        mLogView = (TextView) this.findViewById(R.id.log_text);
-        mNextView = this.findViewById(R.id.next_button);
-        mNextView.setOnClickListener(this);
-        mLogView.setMovementMethod(new ScrollingMovementMethod());
-
-        updateButton(false /*enabled*/);
-        mWorkerThread = new Thread(this);
-        mWorkerThread.start();
-    }
-
-    @Override
-    public void onClick(View target) {
-        mSemaphore.release();
+@Deprecated
+public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTestActivity {
+    public BaseSensorSemiAutomatedTestActivity() {
+        super(BaseSensorSemiAutomatedTestActivity.class);
     }
 
     @Override
@@ -90,7 +46,7 @@ public abstract class BaseSensorSemiAutomatedTestActivity
             testResult = SensorTestResult.FAIL;
             message = e.getMessage();
         }
-        setTestResult(testResult, message);
+        setTestResult(getTestId(), testResult, message);
         appendText("\nTest completed. Press 'Next' to finish.\n");
         waitForUser();
         finish();
@@ -106,125 +62,11 @@ public abstract class BaseSensorSemiAutomatedTestActivity
      */
     protected abstract void onRun() throws Throwable;
 
-    /**
-     * Helper methods for subclasses to interact with the UI and the operator.
-     */
-    protected void appendText(String text, int textColor) {
-        this.runOnUiThread(new TextAppender(mLogView, text, textColor));
-    }
-
-    protected void appendText(String text) {
-        this.runOnUiThread(new TextAppender(mLogView, text));
-    }
-
-    protected void clearText() {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mLogView.setText("");
-            }
-        });
-    }
-
-    protected void updateButton(boolean enabled) {
-        this.runOnUiThread(new ButtonEnabler(this.mNextView, enabled));
-    }
-
-    protected void waitForUser() {
-        updateButton(true);
-        try {
-            mSemaphore.acquire();
-        } catch(InterruptedException e) {}
-        updateButton(false);
-    }
-
     protected void logSuccess() {
-        appendText("PASS", Color.GREEN);
+        appendText("SUCCESS", Color.GREEN);
     }
 
-    protected void playSound() {
-        MediaPlayer player = MediaPlayer.create(this, Settings.System.DEFAULT_NOTIFICATION_URI);
-        player.start();
-        try {
-            Thread.sleep(500);
-        } catch(InterruptedException e) {
-        } finally {
-            player.stop();
-        }
-    }
-
-    /**
-     * Private methods.
-     */
     private String getTestId() {
         return this.getClass().getName();
-    }
-
-    private void setTestResult(SensorTestResult testResult, String message) {
-        int textColor;
-        switch(testResult) {
-            case SKIPPED:
-                textColor = Color.YELLOW;
-                TestResult.setPassedResult(this, this.getTestId(), message);
-                break;
-            case PASS:
-                textColor = Color.GREEN;
-                TestResult.setPassedResult(this, this.getTestId(), message);
-                break;
-            case FAIL:
-                textColor = Color.RED;
-                TestResult.setFailedResult(this, this.getTestId(), message);
-                break;
-            default:
-                throw new InvalidParameterException("Unrecognized testResult.");
-        }
-        appendText(message, textColor);
-    }
-
-    private enum SensorTestResult {
-        SKIPPED,
-        PASS,
-        FAIL
-    }
-
-    private class TextAppender implements Runnable {
-        private final TextView mTextView;
-        private final SpannableStringBuilder mMessageBuilder;
-
-        public TextAppender(TextView textView, String message, int textColor) {
-            mTextView = textView;
-            mMessageBuilder = new SpannableStringBuilder(message + "\n");
-
-            ForegroundColorSpan colorSpan = new ForegroundColorSpan(textColor);
-            mMessageBuilder.setSpan(
-                    colorSpan,
-                    0 /*start*/,
-                    message.length(),
-                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        }
-
-        public TextAppender(TextView textView, String message) {
-            this(textView, message, textView.getCurrentTextColor());
-        }
-
-        @Override
-        public void run() {
-            mTextView.append(mMessageBuilder);
-        }
-    }
-
-    private class ButtonEnabler implements Runnable {
-        private final View mButtonView;
-        private final boolean mButtonEnabled;
-
-        public ButtonEnabler(View buttonView, boolean buttonEnabled) {
-            mButtonView = buttonView;
-            mButtonEnabled = buttonEnabled;
-        }
-
-        @Override
-        public void run() {
-            mButtonView.setEnabled(mButtonEnabled);
-        }
     }
 }
