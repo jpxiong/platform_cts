@@ -19,27 +19,33 @@
         android:orientation="vertical"
         android:padding="10dip"
         >
-
-    <LinearLayout android:orientation="horizontal"
+    <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             >
-        <Button android:id="@+id/ble_power_level_start"
-                android:layout_width="wrap_content"
+        <LinearLayout android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_advertiser_start"
-                />
-        <Button android:id="@+id/ble_power_level_stop"
-                android:layout_width="wrap_content"
+                >
+            <Button android:id="@+id/ble_scan_with_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ble_scan_with_filter"
+                    />
+            <Button android:id="@+id/ble_scan_without_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ble_scan_without_filter"
+                    />
+        </LinearLayout>
+        <ListView android:id="@+id/ble_scan_result_list"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_advertiser_stop"
-                />
+                android:layout_width="match_parent">
+        </ListView>
     </LinearLayout>
-
     <include android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             layout="@layout/pass_fail_buttons"
-            />
+    />
 </RelativeLayout>
