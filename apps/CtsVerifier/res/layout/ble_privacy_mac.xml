@@ -28,12 +28,12 @@
         <Button android:id="@+id/ble_privacy_mac_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_privacy_mac_start"
+                android:text="@string/ble_advertiser_start"
                 />
         <Button android:id="@+id/ble_privacy_mac_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_privacy_mac_stop"
+                android:text="@string/ble_advertiser_stop"
                 />
     </LinearLayout>
 
