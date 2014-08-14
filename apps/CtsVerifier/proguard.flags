@@ -6,6 +6,11 @@
     private <fields>;
 }
 
+# ensure we keep public sensor test methods, these are needed at runtime
+-keepclassmembers class * extends com.android.cts.verifier.sensors.BaseSensorTestActivity {
+    public <methods>;
+}
+
 -keepclasseswithmembers class * extends com.android.cts.verifier.location.LocationModeTestActivity
 
 -dontwarn android.hardware.Sensor
