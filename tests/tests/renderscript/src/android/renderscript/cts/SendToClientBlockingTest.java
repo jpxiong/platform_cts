@@ -18,11 +18,13 @@ package android.renderscript.cts;
 
 import android.renderscript.RenderScript.RSMessageHandler;
 
+import java.util.concurrent.Semaphore;
 import java.util.Random;
 
 import com.android.cts.stub.R;
 
 public class SendToClientBlockingTest extends RSBaseCompute {
+    private static final Semaphore mSync = new Semaphore(0);
 
     private ScriptC_sendToClientBlocking mScript;
     private Random random;
@@ -36,14 +38,14 @@ public class SendToClientBlockingTest extends RSBaseCompute {
         random = new Random();
     }
 
-    RSMessageHandlerForTest mRsMessageForTest = new RSMessageHandlerForTest() {
+    RSMessageHandler mRsMessageForTest = new RSMessageHandler() {
         public void run() {
             switch (mID) {
             default:
                 resultId = mID;
                 resultData = mData[0];
                 try {
-                    releaseForTest();
+                    mSync.release();
                 } catch (Exception e) {
                     // TODO: handle exception
                 }
@@ -56,13 +58,12 @@ public class SendToClientBlockingTest extends RSBaseCompute {
 
         int id = random.nextInt(10);
         mRS.setMessageHandler(mRsMessageForTest);
-        mScript = new ScriptC_sendToClientBlocking(mRS, mRes,
-                R.raw.sendtoclientblocking);
+        mScript = new ScriptC_sendToClientBlocking(mRS);
         mScript.set_ID(id);
         // Log.i("testSendToClientBlocking1Params", "==" + id);
         mScript.invoke_callBack1Params();
         try {
-            mRsMessageForTest.waitForTest();
+            mSync.acquire();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -76,14 +77,13 @@ public class SendToClientBlockingTest extends RSBaseCompute {
         int id = random.nextInt(10);
         int data = random.nextInt();
         mRS.setMessageHandler(mRsMessageForTest);
-        mScript = new ScriptC_sendToClientBlocking(mRS, mRes,
-                R.raw.sendtoclientblocking);
+        mScript = new ScriptC_sendToClientBlocking(mRS);
         mScript.set_ID(id);
         mScript.set_data(data);
         // Log.i("testSendToClientBlocking3Params", data + "==" + id);
         mScript.invoke_callBack3Params();
         try {
-            mRsMessageForTest.waitForTest();
+            mSync.acquire();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -92,16 +92,4 @@ public class SendToClientBlockingTest extends RSBaseCompute {
                 "The data is:" + data, resultId == id && resultData == data);
     }
 
-}
-
-/** This class is used to wait callback. */
-class RSMessageHandlerForTest extends RSMessageHandler {
-
-    public synchronized void waitForTest() throws InterruptedException {
-        wait();
-    }
-
-    public synchronized void releaseForTest() throws InterruptedException {
-        notify();
-    }
 }
