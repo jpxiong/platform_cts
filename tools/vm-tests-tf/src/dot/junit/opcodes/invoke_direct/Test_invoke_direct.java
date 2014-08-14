@@ -111,8 +111,9 @@ public class Test_invoke_direct extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_direct.TSuper
         try {
             new T_invoke_direct_6();
-            fail("expected NoSuchMethodError");
-        } catch (NoSuchMethodError t) {
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -241,14 +242,22 @@ public class Test_invoke_direct extends DxTestCase {
     /**
      * @constraint n/a
      * @title Attempt to invoke static method. Java throws IncompatibleClassChangeError
-     * on first access but Dalvik throws VerifyError on class loading.
+     * on first access. Dalvik threw VerifyError on class loading.
      */
     public void testVFE15() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_11");
-            fail("expected a verification exception");
+            Class<?> c = Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_11");
+            // Attempt to instantiate and run.
+            Object o = c.newInstance();
+            java.lang.reflect.Method m = c.getDeclaredMethod("run");
+            m.invoke(o);
+            fail("expected an invocation target exception with an incompatible class change error");
+        } catch (java.lang.reflect.InvocationTargetException ite) {
+            if (!(ite.getCause() instanceof IncompatibleClassChangeError)) {
+                fail("expected an incompatible class change error");
+            }
         } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            throw new RuntimeException(t);
         }
     }
 
@@ -277,8 +286,7 @@ public class Test_invoke_direct extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_direct.TAbstract
         try {
             new T_invoke_direct_13().run();
-            fail("expected NoSuchMethodError or verification exception");
-        } catch (NoSuchMethodError t) {
+            fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
