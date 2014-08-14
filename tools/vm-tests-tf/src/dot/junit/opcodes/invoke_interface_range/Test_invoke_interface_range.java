@@ -143,8 +143,7 @@ public class Test_invoke_interface_range extends DxTestCase {
     public void testVFE2() {
         try {
             new T_invoke_interface_range_4().run();
-            fail("expected NoSuchMethodError or IncompatibleClassChangeError");
-        } catch (NoSuchMethodError t) {
+            fail("expected an IncompatibleClassChangeError");
         } catch (IncompatibleClassChangeError e) {
         }
     }
@@ -197,8 +196,7 @@ public class Test_invoke_interface_range extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_18
         try {
             new T_invoke_interface_range_18().run(new ITestImpl());
-            fail("expected NoSuchMethodError or verification exception");
-        } catch (NoSuchMethodError t) {
+            fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
@@ -213,8 +211,7 @@ public class Test_invoke_interface_range extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
         try {
             new T_invoke_interface_range_20().run(new ITestImpl());
-            fail("expected NoSuchMethodError or verification exception");
-        } catch (NoSuchMethodError t) {
+            fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }

@@ -27,7 +27,7 @@
 .method public run()I
 .limit regs 3
 
-       invoke-direct/range {v1}, dot/junit/opcodes/invoke_direct_range/d/T_invoke_direct_range_7/toInt()I
+       invoke-direct/range {v2}, dot/junit/opcodes/invoke_direct_range/d/T_invoke_direct_range_7/toInt()I
        const v0, 0
        return v0
 .end method
