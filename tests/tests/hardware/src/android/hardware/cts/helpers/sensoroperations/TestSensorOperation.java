@@ -140,7 +140,6 @@ public class TestSensorOperation extends AbstractSensorOperation {
     @Override
     public void execute() {
         getStats().addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
-        getStats().addValue("sensor_handle", mSensorManager.getSensor().getHandle());
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
         listener.setLogEvents(mLogEvents);
