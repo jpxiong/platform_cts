@@ -16,6 +16,7 @@
 
 package android.hardware.camera2.cts.helpers;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
