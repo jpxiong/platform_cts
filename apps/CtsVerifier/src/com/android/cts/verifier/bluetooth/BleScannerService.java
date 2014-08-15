@@ -46,6 +46,8 @@ public class BleScannerService extends Service {
 
     public static final int COMMAND_PRIVACY_MAC = 0;
     public static final int COMMAND_POWER_LEVEL = 1;
+    public static final int COMMAND_SCAN_WITH_FILTER = 2;
+    public static final int COMMAND_SCAN_WITHOUT_FILTER = 3;
 
     public static final String BLE_PRIVACY_NEW_MAC_RECEIVE =
             "com.android.cts.verifier.bluetooth.BLE_PRIVACY_NEW_MAC_RECEIVE";
@@ -55,6 +57,8 @@ public class BleScannerService extends Service {
             "com.android.cts.verifier.bluetooth.BLE_POWER_LEVEL";
     public static final String BLE_SCAN_RESP =
             "com.android.cts.verifier.bluetooth.BLE_SCAN_RESP";
+    public static final String BLE_SCAN_RESULT =
+            "com.android.cts.verifier.bluetooth.BLE_SCAN_RESULT";
 
     public static final String EXTRA_COMMAND =
             "com.google.cts.verifier.bluetooth.EXTRA_COMMAND";
@@ -66,6 +70,10 @@ public class BleScannerService extends Service {
             "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL";
     public static final String EXTRA_POWER_LEVEL_BIT =
             "com.google.cts.verifier.bluetooth.EXTRA_POWER_LEVEL_BIT";
+    public static final String EXTRA_UUID =
+            "com.google.cts.verifier.bluetooth.EXTRA_UUID";
+    public static final String EXTRA_DATA =
+            "com.google.cts.verifier.bluetooth.EXTRA_DATA";
 
     private static final byte MANUFACTURER_TEST_ID = (byte)0x07;
 
@@ -121,6 +129,20 @@ public class BleScannerService extends Service {
                             BleAdvertiserService.POWER_LEVEL_DATA,
                             BleAdvertiserService.POWER_LEVEL_MASK)
                         .build());
+                    settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+                    break;
+                case COMMAND_SCAN_WITH_FILTER:
+                    mScanner.stopScan(mCallback);
+                    filters.add(new ScanFilter.Builder()
+                        .setManufacturerData(MANUFACTURER_TEST_ID,
+                            new byte[]{MANUFACTURER_TEST_ID, 0})
+                        .setServiceData(new ParcelUuid(BleAdvertiserService.SCANNABLE_UUID),
+                            BleAdvertiserService.SCANNABLE_DATA)
+                        .build());
+                    settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+                    break;
+                case COMMAND_SCAN_WITHOUT_FILTER:
+                    mScanner.stopScan(mCallback);
                     settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
                     break;
             }
@@ -192,6 +214,28 @@ public class BleScannerService extends Service {
             if (serviceData.get(new ParcelUuid(BleAdvertiserService.SCAN_RESP_UUID)) != null) {
                 Intent responseIntent = new Intent(BLE_SCAN_RESP);
                 sendBroadcast(responseIntent);
+            }
+
+            byte[] data = null;
+            String uuid = "";
+            if (serviceData.containsKey(new ParcelUuid(BleAdvertiserService.SCANNABLE_UUID))) {
+                uuid = BleAdvertiserService.SCANNABLE_UUID.toString();
+                data = serviceData.get(new ParcelUuid(BleAdvertiserService.SCANNABLE_UUID));
+            }
+            if (serviceData.containsKey(new ParcelUuid(BleAdvertiserService.UNSCANNABLE_UUID))) {
+                uuid = BleAdvertiserService.UNSCANNABLE_UUID.toString();
+                data = serviceData.get(new ParcelUuid(BleAdvertiserService.UNSCANNABLE_UUID));
+            }
+            if (uuid.length() > 0) {
+                Intent scanIntent = new Intent(BLE_SCAN_RESULT);
+                scanIntent.putExtra(EXTRA_UUID, uuid);
+                String dataStr = "{";
+                for (byte x : data) {
+                    dataStr = dataStr + " " + x;
+                }
+                dataStr = dataStr + "}";
+                scanIntent.putExtra(EXTRA_DATA, dataStr);
+                sendBroadcast(scanIntent);
             }
         }
 
