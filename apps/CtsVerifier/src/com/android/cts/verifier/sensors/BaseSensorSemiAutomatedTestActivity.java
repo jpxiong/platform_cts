@@ -16,6 +16,8 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
 import android.graphics.Color;
 import android.hardware.cts.helpers.SensorNotSupportedException;
 
@@ -47,7 +49,7 @@ public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTest
             message = e.getMessage();
         }
         setTestResult(getTestId(), testResult, message);
-        appendText("\nTest completed. Press 'Next' to finish.\n");
+        appendText(R.string.snsr_test_complete);
         waitForUser();
         finish();
     }
@@ -63,7 +65,7 @@ public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTest
     protected abstract void onRun() throws Throwable;
 
     protected void logSuccess() {
-        appendText("SUCCESS", Color.GREEN);
+        appendText(R.string.snsr_test_pass, Color.GREEN);
     }
 
     private String getTestId() {

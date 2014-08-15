@@ -71,6 +71,10 @@ public abstract class BaseSensorTestActivity
     private Thread mWorkerThread;
     private CountDownLatch mCountDownLatch;
 
+    private volatile int mTestPassedCounter;
+    private volatile int mTestSkippedCounter;
+    private volatile int mTestFailedCounter;
+
     protected BaseSensorTestActivity(Class testClass) {
         mTestClass = testClass;
     }
@@ -97,58 +101,39 @@ public abstract class BaseSensorTestActivity
 
     @Override
     public void run() {
-        String testClassName = mTestClass.getName();
-
         try {
             activitySetUp();
         } catch (Throwable e) {
-            setTestResult(testClassName, SensorTestResult.SKIPPED, e.getMessage());
+            SensorTestResult testSkipped = SensorTestResult.SKIPPED;
+            String testSummary = e.getMessage();
+            setTestResult(getTestClassName(), testSkipped, testSummary);
+            logTestDetails(testSkipped, testSummary);
             return;
         }
 
         // TODO: it might be necessary to implement fall through so passed tests do not need to
         //       be re-executed
-        int testPassedCounter = 0;
-        int testSkippedCounter = 0;
-        int testFailedCounter = 0;
+        StringBuilder overallTestResults = new StringBuilder();
         for (Method testMethod : findTestMethods()) {
-            String testName = String.format("%s.%s", testClassName, testMethod.getName());
-            try {
-                appendText("\nExecuting test case '" + testName + "'...");
-                String testDetails = (String) testMethod.invoke(this);
-                setTestResult(testName, SensorTestResult.PASS, testDetails);
-                ++testPassedCounter;
-            } catch (InvocationTargetException e) {
-                // get the inner exception, because we use reflection APIs to execute the test
-                Throwable cause = e.getCause();
-                SensorTestResult testResult;
-                if (cause instanceof SensorNotSupportedException) {
-                    testResult = SensorTestResult.SKIPPED;
-                    ++testSkippedCounter;
-                } else {
-                    testResult = SensorTestResult.FAIL;
-                    ++testFailedCounter;
-                }
-                setTestResult(testName, testResult, cause.getMessage());
-            } catch (Throwable e) {
-                setTestResult(testName, SensorTestResult.FAIL, e.getMessage());
-                ++testFailedCounter;
-            }
+            SensorTestDetails testDetails = executeTest(testMethod);
+            setTestResult(testDetails.name, testDetails.result, testDetails.summary);
+            logTestDetails(testDetails.result, testDetails.summary);
+            overallTestResults.append(testDetails.toString() + "\n");
         }
-        setOverallTestResult(
-                testClassName,
-                testPassedCounter,
-                testSkippedCounter,
-                testFailedCounter);
+        // log to screen and save the overall test summary (activity level)
+        SensorTestDetails testDetails = getOverallTestDetails();
+        logTestDetails(testDetails.result, testDetails.summary);
+        overallTestResults.append(testDetails.summary);
+        setTestResult(testDetails.name, testDetails.result, overallTestResults.toString());
 
         try {
             activityCleanUp();
         } catch (Throwable e) {
-            appendText("An error occurred on Activity CleanUp.");
-            appendText(e.getLocalizedMessage(), Color.RED);
+            appendText(e.getMessage(), Color.RED);
+            Log.e(LOG_TAG, "An error occurred on Activity CleanUp.", e);
         }
 
-        appendText("\nTest completed. Press 'Next' to finish.\n");
+        appendText(R.string.snsr_test_complete);
         waitForUser();
         finish();
     }
@@ -156,6 +141,17 @@ public abstract class BaseSensorTestActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCountDownLatch.countDown();
+    }
+
+    private static class SensorTestDetails {
+        public SensorTestResult result;
+        public String name;
+        public String summary;
+
+        @Override
+        public String toString() {
+            return String.format("%s|%s|%s", name, result.name(), summary);
+        }
     }
 
     protected enum SensorTestResult {
@@ -168,6 +164,22 @@ public abstract class BaseSensorTestActivity
      * For use only by {@link BaseSensorSemiAutomatedTestActivity} and other base classes.
      */
     protected void setTestResult(String testId, SensorTestResult testResult, String testDetails) {
+        switch(testResult) {
+            case SKIPPED:
+                TestResult.setPassedResult(this, testId, testDetails);
+                break;
+            case PASS:
+                TestResult.setPassedResult(this, testId, testDetails);
+                break;
+            case FAIL:
+                TestResult.setFailedResult(this, testId, testDetails);
+                break;
+            default:
+                throw new InvalidParameterException("Unrecognized testResult.");
+        }
+    }
+
+    private void logTestDetails(SensorTestResult testResult, String testSummary) {
         int textColor;
         int logPriority;
         String testResultString;
@@ -175,29 +187,26 @@ public abstract class BaseSensorTestActivity
             case SKIPPED:
                 textColor = Color.YELLOW;
                 logPriority = Log.INFO;
-                testResultString = "SKIPPED";
-                TestResult.setPassedResult(this, testId, testDetails);
+                testResultString = getString(R.string.snsr_test_skipped);
                 break;
             case PASS:
                 textColor = Color.GREEN;
                 logPriority = Log.DEBUG;
-                testResultString = "PASS";
-                TestResult.setPassedResult(this, testId, testDetails);
+                testResultString = getString(R.string.snsr_test_pass);
                 break;
             case FAIL:
                 textColor = Color.RED;
                 logPriority = Log.ERROR;
-                testResultString = "FAIL";
-                TestResult.setFailedResult(this, testId, testDetails);
+                testResultString = getString(R.string.snsr_test_fail);
                 break;
             default:
                 throw new InvalidParameterException("Unrecognized testResult.");
         }
-        if (TextUtils.isEmpty(testDetails)) {
-            testDetails = testResultString;
+        if (TextUtils.isEmpty(testSummary)) {
+            testSummary = testResultString;
         }
-        appendText(testDetails, textColor);
-        Log.println(logPriority, LOG_TAG, testDetails);
+        appendText("\n" + testSummary, textColor);
+        Log.println(logPriority, LOG_TAG, testSummary);
     }
 
     /**
@@ -216,10 +225,20 @@ public abstract class BaseSensorTestActivity
      */
     protected void activityCleanUp() throws Throwable {}
 
+    protected void appendText(int resId, int textColor) {
+        appendText(getString(resId), textColor);
+    }
+
+    @Deprecated
     protected void appendText(String text, int textColor) {
         this.runOnUiThread(new TextAppender(mLogView, text, textColor));
     }
 
+    protected void appendText(int resId) {
+        appendText(getString(resId));
+    }
+
+    @Deprecated
     protected void appendText(String text) {
         this.runOnUiThread(new TextAppender(mLogView, text));
     }
@@ -238,6 +257,7 @@ public abstract class BaseSensorTestActivity
     }
 
     protected void waitForUser() {
+        appendText(R.string.snsr_wait_for_user);
         updateButton(true);
         try {
             mSemaphore.acquire();
@@ -269,24 +289,60 @@ public abstract class BaseSensorTestActivity
         return testMethods;
     }
 
-    private void setOverallTestResult(
-            String testClassName,
-            int testPassedCount,
-            int testSkippedCount,
-            int testFailedCount) {
-        SensorTestResult overallTestResult = SensorTestResult.PASS;
-        if (testFailedCount > 0) {
-            overallTestResult = SensorTestResult.FAIL;
-        } else if (testSkippedCount > 0 || testPassedCount == 0) {
-            overallTestResult = SensorTestResult.SKIPPED;
+    private SensorTestDetails executeTest(Method testMethod) {
+        SensorTestDetails testDetails = new SensorTestDetails();
+        testDetails.name = String.format("%s.%s", getTestClassName(), testMethod.getName());
+
+        try {
+            appendText(getString(R.string.snsr_executing_test, testDetails.name));
+            testDetails.summary = (String) testMethod.invoke(this);
+            testDetails.result = SensorTestResult.PASS;
+            ++mTestPassedCounter;
+        } catch (InvocationTargetException e) {
+            // get the inner exception, because we use reflection APIs to execute the test
+            Throwable cause = e.getCause();
+            testDetails.summary = cause.getMessage();
+            if (cause instanceof SensorNotSupportedException) {
+                testDetails.result = SensorTestResult.SKIPPED;
+                ++mTestSkippedCounter;
+            } else {
+                testDetails.result = SensorTestResult.FAIL;
+                ++mTestFailedCounter;
+            }
+        } catch (Throwable e) {
+            testDetails.summary = e.getMessage();
+            testDetails.result = SensorTestResult.FAIL;
+            ++mTestFailedCounter;
         }
 
-        String testSummary = String.format(
-                "\n\nTestsPassed=%d, TestsSkipped=%d, TestFailed=%d",
-                testPassedCount,
-                testSkippedCount,
-                testFailedCount);
-        setTestResult(testClassName, overallTestResult, testSummary);
+        return testDetails;
+    }
+
+    private SensorTestDetails getOverallTestDetails() {
+        SensorTestDetails testDetails = new SensorTestDetails();
+        testDetails.name = getTestClassName();
+
+        testDetails.result = SensorTestResult.PASS;
+        if (mTestFailedCounter > 0) {
+            testDetails.result = SensorTestResult.FAIL;
+        } else if (mTestSkippedCounter > 0 || mTestPassedCounter == 0) {
+            testDetails.result = SensorTestResult.SKIPPED;
+        }
+
+        testDetails.summary = getString(
+                R.string.snsr_test_summary,
+                mTestPassedCounter,
+                mTestSkippedCounter,
+                mTestFailedCounter);
+
+        return testDetails;
+    }
+
+    private String getTestClassName() {
+        if (mTestClass == null) {
+            return "<unknown>";
+        }
+        return mTestClass.getName();
     }
 
     private class TextAppender implements Runnable {
@@ -335,12 +391,12 @@ public abstract class BaseSensorTestActivity
 
     protected void askToSetAirplaneMode() throws InterruptedException {
         if (isAirplaneModeOn()) {
-            appendText("Airplane mode set.");
+            appendText(R.string.snsr_airplane_mode_set);
+            appendText(R.string.snsr_on_complete_return);
             return;
         }
 
-        appendText("You will be redirected to set 'Airplane Mode' ON, after doing so, go back to " +
-                "this App. Press Next to continue.\n");
+        appendText(R.string.snsr_airplane_mode_request);
         waitForUser();
         launchAndWaitForSubactivity(Settings.ACTION_WIRELESS_SETTINGS);
 
@@ -352,12 +408,11 @@ public abstract class BaseSensorTestActivity
     protected void askToSetScreenOffTimeout(int timeoutInSec) throws InterruptedException {
         long timeoutInMs = TimeUnit.SECONDS.toMillis(timeoutInSec);
         if (isScreenOffTimeout(timeoutInMs)) {
-            appendText("Screen Off Timeout set to: " + timeoutInSec + " seconds.");
+            appendText(getString(R.string.snsr_screen_off_timeout, timeoutInSec));
             return;
         }
 
-        appendText("You will be redirected to set 'Display Sleep' to " + timeoutInSec + " seconds" +
-                ", after doing so, go back to this App. Press Next to continue.\n");
+        appendText(getString(R.string.snsr_screen_off_request, timeoutInSec));
         waitForUser();
         launchAndWaitForSubactivity(Settings.ACTION_DISPLAY_SETTINGS);
 

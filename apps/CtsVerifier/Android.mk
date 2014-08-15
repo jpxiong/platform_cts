@@ -41,7 +41,7 @@ include $(BUILD_PACKAGE)
 # Builds and launches CTS Verifier on a device.
 .PHONY: cts-verifier
 cts-verifier: CtsVerifier adb
-	adb install -r $(PRODUCT_OUT)/data/app/CtsVerifier.apk \
+	adb install -r $(PRODUCT_OUT)/data/app/CtsVerifier/CtsVerifier.apk \
 		&& adb shell "am start -n com.android.cts.verifier/.CtsVerifierActivity"
 
 #
