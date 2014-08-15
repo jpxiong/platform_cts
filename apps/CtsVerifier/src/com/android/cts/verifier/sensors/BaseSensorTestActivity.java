@@ -19,7 +19,6 @@ package com.android.cts.verifier.sensors;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestResult;
 
-import android.annotation.NonNull;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -257,7 +256,6 @@ public abstract class BaseSensorTestActivity
         }
     }
 
-    @NonNull
     private List<Method> findTestMethods() {
         ArrayList<Method> testMethods = new ArrayList<Method>();
         for (Method method : mTestClass.getDeclaredMethods()) {
