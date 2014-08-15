@@ -129,6 +129,17 @@
     <permission-group android:name="android.permission-group.COST_MONEY"/>
     <!-- Used for PackageManager test, don't delete! -->
     <uses-configuration/>
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:glEsVersion="0x00020000" />
+    <feature-group/>
+    <feature-group>
+        <uses-feature android:glEsVersion="0x00030000" />
+        <uses-feature android:name="android.hardware.location" />
+    </feature-group>
+    <feature-group>
+        <uses-feature android:glEsVersion="0x00010001" />
+        <uses-feature android:name="android.hardware.camera" />
+    </feature-group>
 
     <application android:label="Android TestCase"
                 android:icon="@drawable/size_48x48"
