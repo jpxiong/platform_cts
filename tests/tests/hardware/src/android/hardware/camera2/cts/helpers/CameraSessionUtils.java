@@ -38,7 +38,7 @@ import org.mockito.internal.util.MockUtil;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.android.internal.util.Preconditions.*;
+import static android.hardware.camera2.cts.helpers.Preconditions.*;
 import static org.mockito.Mockito.*;
 
 /**
