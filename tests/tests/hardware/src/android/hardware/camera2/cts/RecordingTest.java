@@ -56,7 +56,6 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "RecordingTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG_DUMP = false;
-    private static final Size VIDEO_SIZE_BOUND = new Size(1920, 1080);
     private static final int RECORDING_DURATION_MS = 2000;
     private static final int DURATION_MARGIN_MS = 400;
     private static final int FRAME_DURATION_ERROR_TOLERANCE_MS = 3;
@@ -116,8 +115,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Re-use the MediaRecorder object for the same camera device.
                 mMediaRecorder = new MediaRecorder();
                 openDevice(mCameraIds[i]);
-                mSupportedVideoSizes = getSupportedVideoSizes(mCamera.getId(), mCameraManager,
-                        VIDEO_SIZE_BOUND);
+
+                initSupportedVideoSize(mCameraIds[i]);
 
                 basicRecordingTestByCamera();
             } finally {
@@ -145,8 +144,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 mMediaRecorder = new MediaRecorder();
                 openDevice(mCameraIds[i]);
 
-                mSupportedVideoSizes = getSupportedVideoSizes(mCamera.getId(), mCameraManager,
-                        VIDEO_SIZE_BOUND);
+                initSupportedVideoSize(mCameraIds[i]);
 
                 recordingSizeTestByCamera();
             } finally {
@@ -470,6 +468,18 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Initialize the supported video sizes.
+     */
+    private void initSupportedVideoSize(String cameraId)  throws Exception {
+        Size maxVideoSize = SIZE_BOUND_1080P;
+        if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_2160P)) {
+            maxVideoSize = SIZE_BOUND_2160P;
+        }
+        mSupportedVideoSizes =
+                getSupportedVideoSizes(cameraId, mCameraManager, maxVideoSize);
+    }
+
+    /**
      * Simple wrapper to wrap normal/burst video snapshot tests
      */
     private void videoSnapshotHelper(boolean burstTest) throws Exception {
@@ -478,9 +488,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     Log.i(TAG, "Testing video snapshot for camera " + id);
                     // Re-use the MediaRecorder object for the same camera device.
                     mMediaRecorder = new MediaRecorder();
+
                     openDevice(id);
-                    mSupportedVideoSizes =
-                            getSupportedVideoSizes(id, mCameraManager, VIDEO_SIZE_BOUND);
+
+                    initSupportedVideoSize(id);
 
                     videoSnapshotTestByCamera(burstTest);
                 } finally {
