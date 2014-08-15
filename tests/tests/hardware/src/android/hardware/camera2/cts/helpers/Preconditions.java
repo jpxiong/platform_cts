@@ -90,6 +90,22 @@ public final class Preconditions {
     }
 
     /**
+     * Checks that the value is not {@code null}.
+     *
+     * <p>
+     * Returns the value directly, so you can use {@code checkNotNull("value", value)} inline.
+     * </p>
+     *
+     * @param arg Argument to check
+     * @return arg
+     *
+     * @throws NullPointerException if arg was {@code null}
+     */
+    public static <T> T checkNotNull(T arg) {
+        return checkNotNull("", arg);
+    }
+
+    /**
      * Checks that the state is currently {@link true}.
      *
      * @param message Message to raise an exception with if the state checking fails.
