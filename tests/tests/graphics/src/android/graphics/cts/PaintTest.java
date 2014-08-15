@@ -19,6 +19,7 @@ package android.graphics.cts;
 
 import android.graphics.ColorFilter;
 import android.graphics.MaskFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Cap;
@@ -28,6 +29,8 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rasterizer;
 import android.graphics.Shader;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Typeface;
 import android.graphics.Xfermode;
 import android.os.Build;
@@ -190,7 +193,7 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(m, p2.getMaskFilter());
         assertEquals(e, p2.getPathEffect());
         assertEquals(r, p2.getRasterizer());
-        assertNotSame(s, p2.getShader());
+        assertEquals(s, p2.getShader());
         assertEquals(t, p2.getTypeface());
         assertEquals(x, p2.getXfermode());
 
@@ -199,7 +202,7 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(m, p2.getMaskFilter());
         assertEquals(e, p2.getPathEffect());
         assertEquals(r, p2.getRasterizer());
-        assertNotSame(s, p2.getShader());
+        assertEquals(s, p2.getShader());
         assertEquals(t, p2.getTypeface());
         assertEquals(x, p2.getXfermode());
 
@@ -269,6 +272,35 @@ public class PaintTest extends AndroidTestCase {
 
         assertNull(p.setShader(null));
         assertNull(p.getShader());
+    }
+
+    public void testShaderLocalMatrix() {
+        int width = 80;
+        int height = 120;
+        int[] color = new int[width * height];
+        Bitmap bitmap = Bitmap.createBitmap(color, width, height, Bitmap.Config.RGB_565);
+
+        Paint p = new Paint();
+        Matrix m = new Matrix();
+        Shader s = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+
+        // set the shaders matrix to a non identity value and attach to paint
+        m.setScale(10, 0);
+        s.setLocalMatrix(m);
+        p.setShader(s);
+
+        Matrix m2 = new Matrix();
+        assertTrue(p.getShader().getLocalMatrix(m2));
+        assertEquals(m, m2);
+
+        // updated the matrix again and set it on the shader but NOT the paint
+        m.setScale(0, 10);
+        s.setLocalMatrix(m);
+
+        // assert that the matrix on the paint's shader also changed
+        Matrix m3 = new Matrix();
+        assertTrue(p.getShader().getLocalMatrix(m3));
+        assertEquals(m, m3);
     }
 
     public void testSetAntiAlias() {
