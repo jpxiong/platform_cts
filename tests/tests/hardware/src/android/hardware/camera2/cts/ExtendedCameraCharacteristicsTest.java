@@ -68,8 +68,6 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR;
     private static final int RAW =
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW;
-    private static final int ZSL =
-            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_ZSL;
 
     @Override
     public void setContext(Context context) {
