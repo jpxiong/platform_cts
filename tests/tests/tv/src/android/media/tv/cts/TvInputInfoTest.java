@@ -90,7 +90,7 @@ public class TvInputInfoTest extends AndroidTestCase {
         if (!Utils.hasTvInputFramework(getContext())) {
             return;
         }
-        assertFalse(mStubInfo.isPassthroughInputType());
+        assertFalse(mStubInfo.isPassthroughInput());
     }
 
     public void testLoadIcon() throws Exception {
