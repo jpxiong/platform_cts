@@ -989,27 +989,31 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         // ExifInterface API gives exposure time value in the form of float instead of rational
         String exposureTime = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
         mCollector.expectNotNull("Exif TAG_EXPOSURE_TIME shouldn't be null", exposureTime);
-        if (exposureTime != null) {
-            double exposureTimeValue = Double.parseDouble(exposureTime);
-            long  expTimeResult = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
-            double expected = expTimeResult / 1e9;
-            mCollector.expectEquals("Exif exposure time doesn't match", expected,
-                    exposureTimeValue, EXIF_EXPOSURE_TIME_ERROR_MARGIN_SEC);
+        if (mStaticInfo.areKeysAvailable(CaptureResult.SENSOR_EXPOSURE_TIME)) {
+            if (exposureTime != null) {
+                double exposureTimeValue = Double.parseDouble(exposureTime);
+                long expTimeResult = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
+                double expected = expTimeResult / 1e9;
+                mCollector.expectEquals("Exif exposure time doesn't match", expected,
+                        exposureTimeValue, EXIF_EXPOSURE_TIME_ERROR_MARGIN_SEC);
+            }
         }
 
         // TAG_APERTURE
         // ExifInterface API gives aperture value in the form of float instead of rational
         String exifAperture = exif.getAttribute(ExifInterface.TAG_APERTURE);
-        float[] apertures = mStaticInfo.getAvailableAperturesChecked();
         mCollector.expectNotNull("Exif TAG_APERTURE shouldn't be null", exifAperture);
-        if (exifAperture != null) {
-            float apertureValue = Float.parseFloat(exifAperture);
-            mCollector.expectEquals("Aperture value should match",
-                    getClosestValueInArray(apertures, apertureValue),
-                    apertureValue, EXIF_APERTURE_ERROR_MARGIN);
-            // More checks for aperture.
-            mCollector.expectEquals("Exif aperture length should match capture result",
-                    validateAperture(result), apertureValue);
+        if (mStaticInfo.areKeysAvailable(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES)) {
+            float[] apertures = mStaticInfo.getAvailableAperturesChecked();
+            if (exifAperture != null) {
+                float apertureValue = Float.parseFloat(exifAperture);
+                mCollector.expectEquals("Aperture value should match",
+                        getClosestValueInArray(apertures, apertureValue),
+                        apertureValue, EXIF_APERTURE_ERROR_MARGIN);
+                // More checks for aperture.
+                mCollector.expectEquals("Exif aperture length should match capture result",
+                        validateAperture(result), apertureValue);
+            }
         }
 
         /**
@@ -1037,8 +1041,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
         // TAG_ISO
         int iso = exif.getAttributeInt(ExifInterface.TAG_ISO, /*defaultValue*/-1);
-        int expectedIso = result.get(CaptureResult.SENSOR_SENSITIVITY);
-        mCollector.expectEquals("Exif TAG_ISO is incorrect", expectedIso, iso);
+        if (mStaticInfo.areKeysAvailable(CaptureResult.SENSOR_SENSITIVITY)) {
+            int expectedIso = result.get(CaptureResult.SENSOR_SENSITIVITY);
+            mCollector.expectEquals("Exif TAG_ISO is incorrect", expectedIso, iso);
+        }
 
         // TAG_DATETIME_DIGITIZED (a.k.a Create time for digital cameras).
         String digitizedTime = exif.getAttribute(TAG_DATETIME_DIGITIZED);
