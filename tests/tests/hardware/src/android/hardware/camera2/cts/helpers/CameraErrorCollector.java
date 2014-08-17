@@ -215,6 +215,34 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Check that the {@code actual} value is less than the {@code expected} value.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected The expected value to check that the actual value is less than.
+     * @param actual Actual value to check.
+     * @return {@code true} if {@code actual} is less than {@code expected}.
+     */
+    public <T extends Comparable<? super T>> boolean expectLess(String msg, T expected,
+            T actual) {
+        return expectTrue(String.format("%s: (expected = %s was not greater than actual = %s) ",
+                msg, expected, actual), actual.compareTo(expected) < 0);
+    }
+
+    /**
+     * Check that the {@code actual} value is less than or equal to the {@code expected} value.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected The expected value to check that the actual value is less than or equal to.
+     * @param actual Actual value to check.
+     * @return {@code true} if {@code actual} is less than or equal to {@code expected}.
+     */
+    public <T extends Comparable<? super T>> boolean expectLessOrEqual(String msg, T expected,
+            T actual) {
+        return expectTrue(String.format("%s: (expected = %s was not greater than actual = %s) ",
+                msg, expected, actual), actual.compareTo(expected) <= 0);
+    }
+
+    /**
      * Check if the two float values are equal with given error tolerance.
      *
      * @param msg Message to be logged when check fails.
@@ -645,6 +673,6 @@ public class CameraErrorCollector extends ErrorCollector {
      */
     public <T> void expectValuesUnique(String msg, List<T> list) {
         Set<T> sizeSet = new HashSet<T>(list);
-        expectTrue(msg + " each size must be distinct", sizeSet.size() == list.size());
+        expectTrue(msg + " each element must be distinct", sizeSet.size() == list.size());
     }
 }

@@ -156,6 +156,8 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
                     waitForState(BlockingSessionListener.SESSION_READY, CAMERA_IDLE_TIMEOUT_MS);
         } else {
             mCameraSession.close();
+            mCameraSessionListener.getStateWaiter().
+                    waitForState(BlockingSessionListener.SESSION_CLOSED, CAMERA_IDLE_TIMEOUT_MS);
         }
     }
 
