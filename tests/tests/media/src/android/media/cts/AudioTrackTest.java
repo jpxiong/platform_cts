@@ -1338,7 +1338,7 @@ public class AudioTrackTest extends AndroidTestCase {
     public void testPlayStreamData() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlayStreamData";
-        final int TEST_FORMAT_ARRAY[] = {  // should hear 28 increasing frequency tones, 3 times
+        final int TEST_FORMAT_ARRAY[] = {  // should hear 40 increasing frequency tones, 3 times
                 AudioFormat.ENCODING_PCM_8BIT,
                 AudioFormat.ENCODING_PCM_16BIT,
                 AudioFormat.ENCODING_PCM_FLOAT,
@@ -1348,6 +1348,7 @@ public class AudioTrackTest extends AndroidTestCase {
                 22050,
                 44100,
                 48000,
+                96000,
         };
         final int TEST_CONF_ARRAY[] = {
                 AudioFormat.CHANNEL_OUT_MONO,    // 1.0
@@ -1357,9 +1358,7 @@ public class AudioTrackTest extends AndroidTestCase {
                 AudioFormat.CHANNEL_OUT_QUAD | AudioFormat.CHANNEL_OUT_FRONT_CENTER,   // 5.0
                 AudioFormat.CHANNEL_OUT_5POINT1, // 5.1
                 AudioFormat.CHANNEL_OUT_5POINT1 | AudioFormat.CHANNEL_OUT_BACK_CENTER, // 6.1
-                // unsupported masks
-                // AudioFormat.CHANNEL_OUT_7POINT1_SURROUND, // 7.1
-                // AudioFormat.CHANNEL_OUT_7POINT1_SURROUND | AudioFormat.CHANNEL_OUT_BACK_CENTER,
+                AudioFormat.CHANNEL_OUT_7POINT1_SURROUND, // 7.1
         };
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
@@ -1436,7 +1435,7 @@ public class AudioTrackTest extends AndroidTestCase {
                     Thread.sleep(WAIT_MSEC);
                     // -------- tear down --------------
                     track.release();
-                    frequency += 100; // increment test tone frequency
+                    frequency += 70; // increment test tone frequency
                 }
             }
         }
