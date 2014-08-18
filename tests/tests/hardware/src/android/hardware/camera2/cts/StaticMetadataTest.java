@@ -20,12 +20,17 @@ import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.util.Log;
 import android.util.Size;
 
+import junit.framework.Assert;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +48,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
     private static final String TAG = "StaticMetadataTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final float MIN_FPS_FOR_FULL_DEVICE = 20.0f;
+    private String mCameraId;
 
     /**
      * Test the available capability for different hardware support level devices.
@@ -105,6 +111,120 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
     }
 
     /**
+     * Test advertised capability does match available keys and vice versa
+     */
+    public void testCapabilities() throws Exception {
+        for (String id : mCameraIds) {
+            initStaticMetadata(id);
+            List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
+
+            for (Integer capability = REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE;
+                    capability <= REQUEST_AVAILABLE_CAPABILITIES_RAW; capability++) {
+                boolean isCapabilityAvailable = availableCaps.contains(capability);
+                validateCapability(capability, isCapabilityAvailable);
+            }
+        }
+    }
+
+    private void validateRequestKeysPresence(
+            String capabilityName,
+            List<CaptureRequest.Key<?>> requestKeys, boolean expectedPresence) {
+        boolean actualPresence = mStaticInfo.areRequestKeysAvailable(requestKeys);
+        if (expectedPresence != actualPresence) {
+            if (expectedPresence) {
+                for (CaptureRequest.Key<?> key : requestKeys) {
+                    if (!mStaticInfo.areKeysAvailable(key)) {
+                        mCollector.addMessage(String.format(
+                                "Camera %s list capability %s but doesn't contain key %s",
+                                mCameraId, capabilityName, key.getName()));
+                    }
+                }
+            } else {
+                mCollector.addMessage(String.format(
+                        "Camera %s doesn't list capability %s but contain all required keys",
+                        mCameraId, capabilityName));
+            }
+        }
+    }
+
+    private void validateCapability(Integer capability, boolean isCapabilityAvailable) {
+        List<CaptureRequest.Key<?>> requestKeys = new ArrayList<>();
+        /* Only test request keys in this test
+           Characteristics keys are tested in CameraCharacteristicsTest
+           Result keys are tested in CaptureResultTest */
+        String capabilityName;
+        switch (capability) {
+            case REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE:
+                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE";
+                requestKeys.add(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION);
+                requestKeys.add(CaptureRequest.CONTROL_AE_LOCK);
+                requestKeys.add(CaptureRequest.CONTROL_AE_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_AE_REGIONS);
+                requestKeys.add(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
+                requestKeys.add(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER);
+                requestKeys.add(CaptureRequest.CONTROL_AF_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_AF_REGIONS);
+                requestKeys.add(CaptureRequest.CONTROL_AF_TRIGGER);
+                requestKeys.add(CaptureRequest.CONTROL_AWB_LOCK);
+                requestKeys.add(CaptureRequest.CONTROL_AWB_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_AWB_REGIONS);
+                requestKeys.add(CaptureRequest.CONTROL_CAPTURE_INTENT);
+                requestKeys.add(CaptureRequest.CONTROL_EFFECT_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_SCENE_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE);
+                requestKeys.add(CaptureRequest.FLASH_MODE);
+                requestKeys.add(CaptureRequest.JPEG_GPS_LOCATION);
+                requestKeys.add(CaptureRequest.JPEG_ORIENTATION);
+                requestKeys.add(CaptureRequest.JPEG_QUALITY);
+                requestKeys.add(CaptureRequest.JPEG_THUMBNAIL_QUALITY);
+                requestKeys.add(CaptureRequest.JPEG_THUMBNAIL_SIZE);
+                requestKeys.add(CaptureRequest.LENS_FOCUS_DISTANCE);
+                requestKeys.add(CaptureRequest.SCALER_CROP_REGION);
+                requestKeys.add(CaptureRequest.STATISTICS_FACE_DETECT_MODE);
+                break;
+            case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING:
+                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING";
+                requestKeys.add(CaptureRequest.TONEMAP_MODE);
+                requestKeys.add(CaptureRequest.COLOR_CORRECTION_GAINS);
+                requestKeys.add(CaptureRequest.COLOR_CORRECTION_TRANSFORM);
+                requestKeys.add(CaptureRequest.SHADING_MODE);
+                requestKeys.add(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE);
+                if (mStaticInfo.isHardwareLevelFull()) {
+                    requestKeys.add(CaptureRequest.TONEMAP_CURVE);
+                    requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
+                }
+
+                break;
+            case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR:
+                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR";
+                requestKeys.add(CaptureRequest.SENSOR_FRAME_DURATION);
+                requestKeys.add(CaptureRequest.SENSOR_EXPOSURE_TIME);
+                requestKeys.add(CaptureRequest.SENSOR_SENSITIVITY);
+                if (mStaticInfo.hasFocuser()) {
+                    requestKeys.add(CaptureRequest.LENS_APERTURE);
+                    requestKeys.add(CaptureRequest.LENS_FILTER_DENSITY);
+                    requestKeys.add(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE);
+                }
+                requestKeys.add(CaptureRequest.BLACK_LEVEL_LOCK);
+                break;
+            case REQUEST_AVAILABLE_CAPABILITIES_RAW:
+                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_RAW";
+                mCollector.expectGreater(
+                        "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
+                        /*expected*/0, mStaticInfo.getRawOutputSizesChecked().length);
+                requestKeys.add(CaptureRequest.HOT_PIXEL_MODE);
+                requestKeys.add(CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
+                break;
+            default:
+                capabilityName = "Unknown";
+                Assert.fail(String.format("Unknown capability: %d", capability));
+        }
+        validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+    }
+
+    /**
      * Test lens facing.
      */
     public void testLensFacing() throws Exception {
@@ -135,6 +255,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
      * Initialize static metadata for a given camera id.
      */
     private void initStaticMetadata(String cameraId) throws Exception {
+        mCameraId = cameraId;
         mCollector.setCameraId(cameraId);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.COLLECT, /* collector */mCollector);
