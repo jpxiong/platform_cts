@@ -1489,12 +1489,61 @@ public class StaticMetadata {
      * <p>If this returns {@code true}, then querying for this key from a characteristics
      * object will always return a non-{@code null} value.</p>
      *
+     * @param keys list of camera characteristics keys
+     * @return whether or not all characteristics keys are available
+     */
+    public final boolean areCharacteristicsKeysAvailable(List<CameraCharacteristics.Key<?>> keys) {
+        return mCharacteristics.getKeys().containsAll(keys);
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available result keys
+     * (as in {@link CameraCharacteristics#getAvailableCaptureResultKeys}.
+     *
+     * <p>If this returns {@code true}, then querying for this key from a result
+     * object will almost always return a non-{@code null} value.</p>
+     *
+     * <p>In some cases (e.g. lens shading map), the request must have additional settings
+     * configured in order for the key to correspond to a value.</p>
+     *
+     * @param keys list of capture result keys
+     * @return whether or not all result keys are available
+     */
+    public final boolean areResultKeysAvailable(List<CaptureResult.Key<?>> keys) {
+        return mCharacteristics.getAvailableCaptureResultKeys().containsAll(keys);
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available request keys
+     * (as in {@link CameraCharacteristics#getAvailableCaptureRequestKeys}.
+     *
+     * <p>If this returns {@code true}, then setting this key in the request builder
+     * may have some effect (and if it's {@code false}, then the camera device will
+     * definitely ignore it).</p>
+     *
+     * <p>In some cases (e.g. manual control of exposure), other keys must be also be set
+     * in order for a key to take effect (e.g. control.mode set to OFF).</p>
+     *
+     * @param keys list of capture request keys
+     * @return whether or not all result keys are available
+     */
+    public final boolean areRequestKeysAvailable(List<CaptureRequest.Key<?>> keys) {
+        return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(keys);
+    }
+
+    /**
+     * Determine whether or not all the {@code keys} are available characteristics keys
+     * (as in {@link CameraCharacteristics#getKeys}.
+     *
+     * <p>If this returns {@code true}, then querying for this key from a characteristics
+     * object will always return a non-{@code null} value.</p>
+     *
      * @param keys one or more camera characteristic keys
      * @return whether or not all characteristics keys are available
      */
     @SafeVarargs
     public final boolean areKeysAvailable(CameraCharacteristics.Key<?>... keys) {
-        return mCharacteristics.getKeys().containsAll(Arrays.asList(keys));
+        return areCharacteristicsKeysAvailable(Arrays.asList(keys));
     }
 
     /**
@@ -1512,7 +1561,7 @@ public class StaticMetadata {
      */
     @SafeVarargs
     public final boolean areKeysAvailable(CaptureResult.Key<?>... keys) {
-        return mCharacteristics.getAvailableCaptureResultKeys().containsAll(Arrays.asList(keys));
+        return areResultKeysAvailable(Arrays.asList(keys));
     }
 
     /**
@@ -1531,7 +1580,7 @@ public class StaticMetadata {
      */
     @SafeVarargs
     public final boolean areKeysAvailable(CaptureRequest.Key<?>... keys) {
-        return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(Arrays.asList(keys));
+        return areRequestKeysAvailable(Arrays.asList(keys));
     }
 
     /*
