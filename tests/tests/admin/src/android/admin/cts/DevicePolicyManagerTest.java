@@ -362,7 +362,7 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             return;
         }
         try {
-            mDevicePolicyManager.setLockTaskPackages(new String[] {"package"});
+            mDevicePolicyManager.setLockTaskPackages(mComponent, new String[] {"package"});
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
         }
