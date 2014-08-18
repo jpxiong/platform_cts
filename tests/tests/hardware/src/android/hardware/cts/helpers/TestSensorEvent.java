@@ -38,9 +38,7 @@ public class TestSensorEvent {
      * {@link SensorEventListener2#onSensorChanged(SensorEvent)} was called, in nanoseconds.
      */
     public TestSensorEvent(SensorEvent event, long receivedTimestamp) {
-        values = new float[event.values.length];
-        System.arraycopy(event.values, 0, values, 0, values.length);
-
+        values = event.values.clone();
         sensor = event.sensor;
         timestamp = event.timestamp;
         accuracy = event.accuracy;
