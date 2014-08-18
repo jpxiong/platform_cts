@@ -44,7 +44,7 @@ public class AccelerometerTestActivity extends PassFailButtons.Activity {
 
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
-        AccelerometerTestRenderer renderer = new AccelerometerTestRenderer(this);
+        GLArrowSensorTestRenderer renderer = new GLArrowSensorTestRenderer(this, Sensor.TYPE_ACCELEROMETER);
         mListener = renderer;
 
         setContentView(R.layout.pass_fail_gl);
