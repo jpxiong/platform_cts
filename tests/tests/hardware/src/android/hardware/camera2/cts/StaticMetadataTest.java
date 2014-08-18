@@ -126,8 +126,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
         }
     }
 
-    private void validateRequestKeysPresence(
-            String capabilityName,
+    private void validateRequestKeysPresence(String capabilityName,
             List<CaptureRequest.Key<?>> requestKeys, boolean expectedPresence) {
         boolean actualPresence = mStaticInfo.areRequestKeysAvailable(requestKeys);
         if (expectedPresence != actualPresence) {
