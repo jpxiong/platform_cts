@@ -16,6 +16,8 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
@@ -24,45 +26,61 @@ import android.hardware.cts.helpers.sensorverification.SigNumVerification;
 /**
  * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
  */
-public class GyroscopeMeasurementTestActivity extends BaseSensorSemiAutomatedTestActivity {
-    @Override
-    protected void onRun() throws Throwable {
-        appendText("Place the device in a flat surface with the screen facing the ceiling, make "
-                + "sure the device aligns with the orientation specified for each scenario. Then "
-                + "follow the instructions for each scenario:");
+public class GyroscopeMeasurementTestActivity extends BaseSensorTestActivity {
+    public GyroscopeMeasurementTestActivity() {
+        super(GyroscopeMeasurementTestActivity.class);
+    }
 
-        verifyMeasurements(
-                "leave the device static",
+    @Override
+    protected void activitySetUp() {
+        appendText(R.string.snsr_gyro_device_placement);
+    }
+
+    public String testDeviceStatic() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_device_static,
                 true /*portrait*/,
                 0, 0, 0);
+    }
 
-        verifyMeasurements(
-                "rotate the device clockwise",
+    public String testRotateClockwise() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_clockwise,
                 true /*portrait*/,
                 0, 0, -1);
+    }
 
-        verifyMeasurements(
-                "rotate the device counter-clockwise",
+    public String testRotateCounterClockwise() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_counter_clockwise,
                 true /*portrait*/,
                 0, 0, +1);
+    }
 
-        verifyMeasurements(
-                "rotate the device on its right until it stands on its side",
+    public String testRotateRightSide() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_right_side,
                 true /*portrait*/,
                 0, +1, 0);
+    }
 
-        verifyMeasurements(
-                "rotate the device on its left until it stands on its side",
+    public String testRotateLeftSide() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_left_side,
                 true /*portrait*/,
                 0, -1, 0);
+    }
 
-        verifyMeasurements(
-                "rotate the device on its top until it stands perpendicular",
+    public String testRotateTopSide() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_top_side,
                 false /*portrait*/,
                 -1, 0, 0);
+    }
 
-        verifyMeasurements(
-                "rotate the device on its bottom until it stands perpendicular",
+    public String testRotateBottomSide() throws Throwable {
+        return verifyMeasurements(
+                R.string.snsr_gyro_rotate_bottom_side,
                 false /*portrait*/,
                 +1, 0, 0);
     }
@@ -87,13 +105,16 @@ public class GyroscopeMeasurementTestActivity extends BaseSensorSemiAutomatedTes
      * - the values representing the expectation of the test
      * - the mean of values sampled from the sensor
      */
-    private void verifyMeasurements(
-            String scenarioInstructions,
+    private String verifyMeasurements(
+            int scenarioInstructionsResId,
             boolean usePortraitOrientation,
             int ... expectations) throws Throwable {
-        final String orientation = usePortraitOrientation ? "Portrait": "Landscape";
-        appendText(String.format("\n[Device orientation]: %s", orientation));
-        appendText(String.format("Press 'Next' and %s.", scenarioInstructions));
+        if (usePortraitOrientation) {
+            appendText(R.string.snsr_orientation_portrait);
+        } else {
+            appendText(R.string.snsr_orientation_landscape);
+        }
+        appendText(scenarioInstructionsResId);
         waitForUser();
 
         Thread.sleep(500 /*ms*/);
@@ -107,6 +128,6 @@ public class GyroscopeMeasurementTestActivity extends BaseSensorSemiAutomatedTes
                 expectations,
                 new float[]{0.2f, 0.2f, 0.2f} /*noiseThreshold*/));
         verifySignum.execute();
-        logSuccess();
+        return null;
     }
 }

@@ -16,6 +16,8 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -33,16 +35,24 @@ import android.hardware.cts.helpers.sensorverification.StandardDeviationVerifica
  * Also, it is recommended to execute these tests outdoors, or at least far from magnetic
  * disturbances.
  */
-public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomatedTestActivity {
+public class MagneticFieldMeasurementTestActivity extends BaseSensorTestActivity {
+    public MagneticFieldMeasurementTestActivity() {
+        super(MagneticFieldMeasurementTestActivity.class);
+    }
+
     @Override
-    protected void onRun() throws Throwable {
+    public void activitySetUp() {
         calibrateMagnetometer();
+    }
 
-        appendText("Verifying the Norm...");
-        verifyNorm();
+    public String testNorm() throws Throwable {
+        appendText(R.string.snsr_mag_verify_norm);
+        return verifyNorm();
+    }
 
-        appendText("\nVerifying the Standard Deviation...");
-        verifyStandardDeviation();
+    public String testStandardDeviation() throws Throwable {
+        appendText(R.string.snsr_mag_verify_std_dev);
+        return verifyStandardDeviation();
     }
 
     private void calibrateMagnetometer() {
@@ -51,11 +61,12 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
             public void onSensorChanged(SensorEvent event) {
                 float values[] = event.values;
                 clearText();
-                appendText("Please calibrate the Magnetometer by moving it in 8 shapes in "
-                        + "different orientations.");
+                appendText(R.string.snsr_mag_calibration_description);
                 appendText(String.format("->  (%.2f, %.2f, %.2f) uT", values[0], values[1],
                         values[2]), Color.GRAY);
-                appendText("Then leave the device in a flat surface and press Next...\n");
+
+                // TODO: automate finding out when the magnetometer is calibrated
+                appendText(R.string.snsr_mag_calibration_complete);
             }
 
             @Override
@@ -96,7 +107,7 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
      * - the values representing the expectation of the test
      * - the values sampled from the sensor
      */
-    private void verifyNorm() throws Throwable {
+    private String verifyNorm() throws Throwable {
         float expectedMagneticFieldEarth =
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
         float magneticFieldEarthThreshold =
@@ -111,7 +122,7 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
                 expectedMagneticFieldEarth,
                 magneticFieldEarthThreshold));
         verifyNorm.execute();
-        logSuccess();
+        return null;
     }
 
     /**
@@ -137,7 +148,7 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
      * Additionally, the device's debug output (adb logcat) dumps the set of values associated with
      * the failure to help track down the issue.
      */
-    private void verifyStandardDeviation() throws Throwable {
+    private String verifyStandardDeviation() throws Throwable {
         TestSensorOperation verifyStdDev = new TestSensorOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
@@ -147,6 +158,6 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
         verifyStdDev.addVerification(new StandardDeviationVerification(
                 new float[]{2f, 2f, 2f} /* uT */));
         verifyStdDev.execute();
-        logSuccess();
+        return null;
     }
 }
