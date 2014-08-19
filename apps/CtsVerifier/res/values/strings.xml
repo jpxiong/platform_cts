@@ -612,6 +612,7 @@
 
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
+    <string name="sensor_power_test">Sensor Power Test</string>
     <string name="usb_accessory_test_info">
         1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program
         included with the CTS Verifier bundle.
