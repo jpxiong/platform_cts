@@ -158,7 +158,9 @@ public abstract class BaseSensorTestActivity
         mCountDownLatch.countDown();
     }
 
-    protected enum SensorTestResult {
+    // TODO: this should be protected currently it is used by power tests, but the result should
+    // only be available in this class
+    public enum SensorTestResult {
         SKIPPED,
         PASS,
         FAIL
