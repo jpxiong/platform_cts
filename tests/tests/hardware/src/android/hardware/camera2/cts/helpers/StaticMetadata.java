@@ -35,6 +35,7 @@ import junit.framework.Assert;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1489,10 +1490,11 @@ public class StaticMetadata {
      * <p>If this returns {@code true}, then querying for this key from a characteristics
      * object will always return a non-{@code null} value.</p>
      *
-     * @param keys list of camera characteristics keys
+     * @param keys collection of camera characteristics keys
      * @return whether or not all characteristics keys are available
      */
-    public final boolean areCharacteristicsKeysAvailable(List<CameraCharacteristics.Key<?>> keys) {
+    public final boolean areCharacteristicsKeysAvailable(
+            Collection<CameraCharacteristics.Key<?>> keys) {
         return mCharacteristics.getKeys().containsAll(keys);
     }
 
@@ -1506,10 +1508,10 @@ public class StaticMetadata {
      * <p>In some cases (e.g. lens shading map), the request must have additional settings
      * configured in order for the key to correspond to a value.</p>
      *
-     * @param keys list of capture result keys
+     * @param keys collection of capture result keys
      * @return whether or not all result keys are available
      */
-    public final boolean areResultKeysAvailable(List<CaptureResult.Key<?>> keys) {
+    public final boolean areResultKeysAvailable(Collection<CaptureResult.Key<?>> keys) {
         return mCharacteristics.getAvailableCaptureResultKeys().containsAll(keys);
     }
 
@@ -1524,10 +1526,10 @@ public class StaticMetadata {
      * <p>In some cases (e.g. manual control of exposure), other keys must be also be set
      * in order for a key to take effect (e.g. control.mode set to OFF).</p>
      *
-     * @param keys list of capture request keys
+     * @param keys collection of capture request keys
      * @return whether or not all result keys are available
      */
-    public final boolean areRequestKeysAvailable(List<CaptureRequest.Key<?>> keys) {
+    public final boolean areRequestKeysAvailable(Collection<CaptureRequest.Key<?>> keys) {
         return mCharacteristics.getAvailableCaptureRequestKeys().containsAll(keys);
     }
 
