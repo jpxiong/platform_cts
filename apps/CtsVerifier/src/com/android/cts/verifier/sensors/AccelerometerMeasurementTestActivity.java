@@ -16,6 +16,8 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
@@ -33,37 +35,37 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorTestActivity
 
     public String testFaceUp() throws Throwable {
         return verifyMeasurements(
-                "Place the device in a flat surface with the screen facing the ceiling",
+                R.string.snsr_accel_test_face_up,
                 0, 0, SensorManager.STANDARD_GRAVITY);
     }
 
     public String testFaceDown() throws Throwable {
         return delayedVerifyMeasurements(
-                "Press 'Next' and place the device in a flat surface with the screen facing it",
+                R.string.snsr_accel_test_face_down,
                 0, 0, -SensorManager.STANDARD_GRAVITY);
     }
 
     public String testRightSide() throws Throwable {
         return verifyMeasurements(
-                "Place the device in a flat surface resting vertically on its right side",
+                R.string.snsr_accel_test_right_side,
                 -SensorManager.STANDARD_GRAVITY, 0, 0);
     }
 
     public String testLeftSide() throws Throwable {
         return verifyMeasurements(
-                "Place the device in a flat surface resting vertically on its left side",
+                R.string.snsr_accel_test_left_side,
                 SensorManager.STANDARD_GRAVITY, 0, 0);
     }
 
     public String testTopSide() throws Throwable {
         return verifyMeasurements(
-                "Place the device in a flat surface resting vertically on its top side",
+                R.string.snsr_accel_test_top_side,
                 0, -SensorManager.STANDARD_GRAVITY, 0);
     }
 
     public String testBottomSide() throws Throwable {
         return verifyMeasurements(
-                "Place the device in a flat surface resting vertically on its bottom side",
+                R.string.snsr_accel_test_bottom_side,
                 0, SensorManager.STANDARD_GRAVITY, 0);
     }
 
@@ -101,11 +103,10 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorTestActivity
         return null;
     }
 
-    private String delayedVerifyMeasurements(
-            String message,
-            float ... expectations) throws Throwable {
-        appendText(String.format("\n%s.", message));
-        appendText("A sound will be played once the verification is complete...");
+    private String delayedVerifyMeasurements(int descriptionResId, float ... expectations)
+            throws Throwable {
+        appendText(descriptionResId);
+        appendText(R.string.snsr_test_play_sound);
         waitForUser();
         Thread.sleep(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS));
 
@@ -116,9 +117,10 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorTestActivity
         }
     }
 
-    private String verifyMeasurements(String message, float ... expectations) throws Throwable {
-        appendText(String.format("\n%s.", message));
-        appendText("Press 'Next' when ready and keep the device steady.");
+    private String verifyMeasurements(int descriptionResId, float ... expectations)
+            throws Throwable {
+        appendText(descriptionResId);
+        appendText(R.string.snsr_device_steady);
         waitForUser();
 
         return verifyMeasurements(expectations);
