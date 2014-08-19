@@ -98,7 +98,7 @@ public class SensorIntegrationTests extends SensorTestCase {
             TestSensorOperation continuousOperation = new TestSensorOperation(
                     context,
                     sensorType,
-                    SensorManager.SENSOR_DELAY_NORMAL,
+                    SensorManager.SENSOR_DELAY_FASTEST,
                     0 /* reportLatencyInUs */,
                     100 /* event count */);
             continuousOperation.addVerification(new EventOrderingVerification());
@@ -220,7 +220,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         TestSensorOperation tester = new TestSensorOperation(
                 context,
                 mSensorTypeTester,
-                SensorManager.SENSOR_DELAY_NORMAL,
+                SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
         tester.addVerification(new EventOrderingVerification());
@@ -228,7 +228,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         TestSensorOperation testee = new TestSensorOperation(
                 context,
                 mSensorTypeTestee,
-                SensorManager.SENSOR_DELAY_UI,
+                SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
         testee.addVerification(new EventOrderingVerification());
@@ -254,16 +254,6 @@ public class SensorIntegrationTests extends SensorTestCase {
             case 0:
                 rate = SensorManager.SENSOR_DELAY_FASTEST;
                 break;
-            case 1:
-                rate = SensorManager.SENSOR_DELAY_GAME;
-                break;
-            case 2:
-                rate = SensorManager.SENSOR_DELAY_NORMAL;
-                break;
-            case 3:
-                rate = SensorManager.SENSOR_DELAY_UI;
-                break;
-            case 4:
             default:
                 int maxSamplingRate = SensorCtsHelper.getSensor(getContext(), sensorType)
                         .getMinDelay();
