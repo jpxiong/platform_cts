@@ -21,6 +21,8 @@ LOCAL_MODULE := libcoremathtestcpp_jni
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := CoreMathTestJni.cpp
 
+LOCAL_CFLAGS := -std=c++11
+
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 LOCAL_C_INCLUDES += frameworks/rs/cpp
 LOCAL_C_INCLUDES += frameworks/rs
