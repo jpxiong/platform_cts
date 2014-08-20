@@ -16,95 +16,174 @@
 
 package com.android.cts.verifier.sensors;
 
-import java.util.concurrent.CountDownLatch;
+import com.android.cts.verifier.R;
 
 import junit.framework.Assert;
-import android.annotation.TargetApi;
+
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
-import com.android.cts.verifier.R;
+import java.util.concurrent.TimeUnit;
 
 /**
- * This test verifies that mobile device can detect it's orientation in space
- * and after device movement in space it correctly detects original (reference)
- * position. All three rotation vectors are tested: ROTATION_VECTOR,
- * GEOMAGNETIC_ROTATION_VECTOR, and GAME_ROTATION_VECTOR.
+ * This test verifies that mobile device can detect it's orientation in space and after device
+ * movement in space it correctly detects original (reference) position.
+ * All three rotation vectors are tested:
+ * - ROTATION_VECTOR,
+ * - GEOMAGNETIC_ROTATION_VECTOR,
+ * - GAME_ROTATION_VECTOR.
  */
-@TargetApi(Build.VERSION_CODES.KITKAT)
-public class RotationVectorTestActivity extends BaseSensorSemiAutomatedTestActivity implements
-        SensorEventListener {
-    private final int[] MAX_RV_DEVIATION_DEG = {
-            10, 10, 40
-    };
-    private GLSurfaceView mGLSurfaceView = null;
-    private SensorManager mSensorManager = null;
-    private SensorEventListener mListener;
-    private TextView mInitialView, mFinalView;
-    private float[] mVecFinal;
-    private float[][] mVec, mVecInitial;
-    private float[][] mAngChange;
+public class RotationVectorTestActivity
+        extends BaseSensorTestActivity
+        implements SensorEventListener {
+    public RotationVectorTestActivity() {
+        super(RotationVectorTestActivity.class, R.layout.snsr_rotvec);
+    }
 
-    private CountDownLatch mFinalPositionSet;
+    private GLSurfaceView mGLSurfaceView;
+    private SensorManager mSensorManager;
+    private SensorEventListener mListener;
+
+    /**
+     * Defines the thresholds for each rotation vector in degrees.
+     */
+    private static final double[] MAX_DEVIATION_DEGREES = {
+        10.0, // ROTATION_VECTOR
+        10.0, // GEOMAGNETIC ROTATION_VECTOR
+        40.0, // GAME_ROTATION_VECTOR
+    };
+
+    private static final int MAX_SENSORS_AVAILABLE = 3;
+    private static final int ROTATION_VECTOR_INDEX = 0;
+    private static final int GEOMAGNETIC_ROTATION_VECTOR_INDEX = 1;
+    private static final int GAME_ROTATION_VECTOR_INDEX = 2;
+
+    private float[][] mLastEvent = new float[3][5];
+    private final float[][] mReference = new float[3][16];
+    private final float[][] mAngularChange = new float[3][3];
+    private final Sensor[] mSensor = new Sensor[3];
+
+    /**
+     * The activity setup collects all the required data for test cases.
+     * This approach allows to test all sensors at once.
+     */
+    @Override
+    protected void activitySetUp() throws InterruptedException {
+        if (mSensor[ROTATION_VECTOR_INDEX] == null
+                && mSensor[GEOMAGNETIC_ROTATION_VECTOR_INDEX] == null
+                && mSensor[GAME_ROTATION_VECTOR_INDEX] == null) {
+            // if none of the sensors is supported, skip the test by throwing an exception
+            throw new IllegalStateException("Rotation vectors are not supported.");
+        }
+
+        // TODO: take reference value automatically when device is 'still'
+        appendText(R.string.snsr_rotation_vector_set_reference);
+        waitForUser();
+
+        clearText();
+        for (int i = 0; i < MAX_SENSORS_AVAILABLE; ++i) {
+            SensorManager.getRotationMatrixFromVector(mReference[i], mLastEvent[i].clone());
+        }
+
+        // TODO: check the user actually moved the device during the test
+        appendText(R.string.snsr_rotation_vector_reference_set);
+        appendText(R.string.snsr_rotation_vector_move_info);
+        appendText(R.string.snsr_test_play_sound);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+        playSound();
+
+        // TODO: take final value automatically when device becomes 'still' at the end
+        clearText();
+        appendText(R.string.snsr_rotation_vector_set_final);
+        waitForUser();
+
+        clearText();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mGLSurfaceView.setVisibility(View.GONE);
+            }
+        });
+
+        float[] finalVector = new float[16];
+        for (int i = 0; i < MAX_SENSORS_AVAILABLE; ++i) {
+            SensorManager.getRotationMatrixFromVector(finalVector, mLastEvent[i].clone());
+            SensorManager.getAngleChange(mAngularChange[i], mReference[i], finalVector);
+        }
+    }
+
+    /**
+     * Verifies that a given 'Rotation Vector' sensor does not drift over time.
+     * The test takes in consideration a reference measurement, and a final measurement. It then
+     * calculates its angular change.
+     */
+    private String verifyVector(int sensorIndex, int sensorType)
+            throws Throwable {
+        Sensor sensor = mSensor[sensorIndex];
+        if (sensor == null) {
+            throw new SensorNotSupportedException(sensorType);
+        }
+
+        float[] angularChange = mAngularChange[sensorIndex];
+        double maxDeviationDegrees = MAX_DEVIATION_DEGREES[sensorIndex];
+        double maxComponentDegrees = findMaxComponentDegrees(angularChange);
+        String message = getString(
+                R.string.snsr_rotation_vector_verification,
+                Math.toDegrees(angularChange[0]),
+                Math.toDegrees(angularChange[1]),
+                Math.toDegrees(angularChange[2]),
+                maxComponentDegrees,
+                maxDeviationDegrees);
+
+        Assert.assertEquals(message, 0, maxComponentDegrees, maxDeviationDegrees);
+        return message;
+    }
+
+    /**
+     * Test cases.
+     */
+    public String testRotationVector() throws Throwable {
+        return verifyVector(ROTATION_VECTOR_INDEX, Sensor.TYPE_ROTATION_VECTOR);
+    }
+
+    public String testGeomagneticRotationVector() throws Throwable {
+        return verifyVector(
+                GEOMAGNETIC_ROTATION_VECTOR_INDEX,
+                Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+    }
+
+    public String testGameRotationVector() throws Throwable {
+        return verifyVector(GAME_ROTATION_VECTOR_INDEX, Sensor.TYPE_GAME_ROTATION_VECTOR);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.snsr_rotvec);
-        setInitialFinalTextClickListeners();
-
+        // set up sensors first, so activitySetUp has the state in place
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
-        GLArrowSensorTestRenderer renderer = new GLArrowSensorTestRenderer(this,
-                Sensor.TYPE_ROTATION_VECTOR);
+        mSensor[ROTATION_VECTOR_INDEX] =
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        mSensor[GEOMAGNETIC_ROTATION_VECTOR_INDEX] =
+                mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+        mSensor[GAME_ROTATION_VECTOR_INDEX] =
+                mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+
+        super.onCreate(savedInstanceState);
+
+        GLArrowSensorTestRenderer renderer =
+                new GLArrowSensorTestRenderer(this, Sensor.TYPE_ROTATION_VECTOR);
         mListener = renderer;
 
         mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
         mGLSurfaceView.setRenderer(renderer);
-        mVecInitial = new float[3][16];
-        mVecFinal = new float[16];
-        mVec = new float[3][5];
-        mAngChange = new float[3][3];
-    }
-
-    void setInitialFinalTextClickListeners() {
-        mInitialView = (TextView) findViewById(R.id.progress);
-        mInitialView.setText("Click to set reference");
-        mInitialView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mInitialView.setText("Reference position set");
-                for (int i = 0; i < 3; i++) {
-                    SensorManager.getRotationMatrixFromVector(mVecInitial[i], mVec[i].clone());
-                }
-            }
-        });
-        mFinalView = (TextView) findViewById(R.id.sensor_value);
-        mFinalView.setText("Click to set final result");
-        mFinalView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mFinalView.setText("RV, Geo, and Game:");
-                for (int i = 0; i < 3; i++) {
-                    SensorManager.getRotationMatrixFromVector(mVecFinal, mVec[i].clone());
-                    SensorManager.getAngleChange(mAngChange[i], mVecInitial[i], mVecFinal);
-                    mFinalView.append(String.format("\n%4.1f %4.1f %4.1f deg",
-                            Math.toDegrees(mAngChange[i][0]),
-                            Math.toDegrees(mAngChange[i][1]),
-                            Math.toDegrees(mAngChange[i][2])));
-                }
-                mFinalPositionSet.countDown();
-            }
-        });
-
     }
 
     @Override
@@ -119,28 +198,34 @@ public class RotationVectorTestActivity extends BaseSensorSemiAutomatedTestActiv
     protected void onResume() {
         super.onResume();
         mGLSurfaceView.onResume();
+
         // listener for rendering
-        mSensorManager.registerListener(mListener, mSensorManager.getDefaultSensor(
-                Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_GAME);
-        // listener for testing
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(
-                Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(
-                Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(
-                Sensor.TYPE_GAME_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_GAME);
+        boolean renderListenerRegistered = false;
+        for (int i = 0; (!renderListenerRegistered && i < MAX_SENSORS_AVAILABLE); ++i) {
+            Sensor sensor = mSensor[i];
+            if (sensor != null) {
+                renderListenerRegistered = mSensorManager
+                        .registerListener(mListener, sensor, SensorManager.SENSOR_DELAY_GAME);
+                Log.v(LOG_TAG, "Renderer using sensor: " + sensor.getName());
+            }
+        }
+
+        // listeners for testing
+        for (int i = 0; i < MAX_SENSORS_AVAILABLE; ++i) {
+            mSensorManager.registerListener(this, mSensor[i], SensorManager.SENSOR_DELAY_GAME);
+        }
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            mVec[0] = event.values.clone();
+            mLastEvent[ROTATION_VECTOR_INDEX] = event.values.clone();
         }
         if (event.sensor.getType() == Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR) {
-            mVec[1] = event.values.clone();
+            mLastEvent[GEOMAGNETIC_ROTATION_VECTOR_INDEX] = event.values.clone();
         }
         if (event.sensor.getType() == Sensor.TYPE_GAME_ROTATION_VECTOR) {
-            mVec[2] = event.values.clone();
+            mLastEvent[GAME_ROTATION_VECTOR_INDEX] = event.values.clone();
         }
     }
 
@@ -148,36 +233,7 @@ public class RotationVectorTestActivity extends BaseSensorSemiAutomatedTestActiv
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    @Override
-    protected void onRun() throws Throwable {
-        mFinalPositionSet = new CountDownLatch(1);
-
-        appendText("INSTRUCTIONS:\n"
-                + "Place device still and click to set reference position.\n"
-                + "Move for 30 seconds then return to reference position.\n"
-                + "Click to set final position.");
-        mFinalPositionSet.await();
-        clearText();
-        // TODO: check the user actually moved the device during the test, and
-        // stillness check at start and end of the test
-        Assert.assertEquals(String.format(
-                "ROTATION_VECTOR Angular deviation more than %d degrees",
-                MAX_RV_DEVIATION_DEG[0]), 0, findMaxComponentDegrees(mAngChange[0]),
-                MAX_RV_DEVIATION_DEG[0]);
-        appendText("ROTATION_VECTOR passed", Color.GREEN);
-        Assert.assertEquals(String.format(
-                "GEOMAGNETIC_ROTATION_VECTOR Angular deviation more than %d degrees",
-                MAX_RV_DEVIATION_DEG[1]), 0, findMaxComponentDegrees(mAngChange[1]),
-                MAX_RV_DEVIATION_DEG[1]);
-        appendText("GEOMAGNETIC_ROTATION_VECTOR passed", Color.GREEN);
-        Assert.assertEquals(String.format(
-                "GAME_ROTATION_VECTOR Angular deviation more than %d degrees",
-                MAX_RV_DEVIATION_DEG[2]), 0, findMaxComponentDegrees(mAngChange[2]),
-                MAX_RV_DEVIATION_DEG[2]);
-        appendText("GAME_ROTATION_VECTOR passed", Color.GREEN);
-    }
-
-    double findMaxComponentDegrees(float[] vec) {
+    private static double findMaxComponentDegrees(float[] vec) {
         float maxComponent = 0;
         for (int i = 0; i < vec.length; i++) {
             float absComp = Math.abs(vec[i]);
