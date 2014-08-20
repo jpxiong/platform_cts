@@ -19,20 +19,25 @@ package android.hardware.camera2.cts;
 import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
 
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureListener;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
+import android.util.Pair;
 import android.util.Size;
 import android.view.Surface;
 import android.cts.util.DeviceReportLog;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.ConditionVariable;
+import android.os.SystemClock;
 
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
@@ -43,13 +48,15 @@ import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test camera2 API use case performance KPIs, such as camera open time, session creation time,
  * shutter lag etc. The KPI data will be reported in cts results.
  */
 public class PerformanceTest extends Camera2SurfaceViewTestCase {
-    private static final String TAG = "SurfaceViewPreviewTest";
+    private static final String TAG = "PerformanceTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int NUM_TEST_LOOPS = 5;
     private static final int NUM_MAX_IMAGES = 4;
@@ -101,23 +108,23 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                         // for the first image comes out.
                         imageListener = new SimpleImageListener();
                         mReader.setOnImageAvailableListener(imageListener, mHandler);
-                        startTimeMs = System.currentTimeMillis();
+                        startTimeMs = SystemClock.elapsedRealtime();
 
                         // Blocking open camera
                         simpleOpenCamera(id);
-                        openTimeMs = System.currentTimeMillis();
+                        openTimeMs = SystemClock.elapsedRealtime();
                         cameraOpenTimes[i] = openTimeMs - startTimeMs;
 
                         // Blocking configure outputs.
                         configureReaderAndPreviewOutputs();
-                        configureTimeMs = System.currentTimeMillis();
+                        configureTimeMs = SystemClock.elapsedRealtime();
                         configureStreamTimes[i] = configureTimeMs - openTimeMs;
 
                         // Blocking start preview (start preview to first image arrives)
                         CameraTestUtils.SimpleCaptureListener resultListener =
                                 new CameraTestUtils.SimpleCaptureListener();
                         blockingStartPreview(resultListener, imageListener);
-                        previewStartedTimeMs = System.currentTimeMillis();
+                        previewStartedTimeMs = SystemClock.elapsedRealtime();
                         startPreviewTimes[i] = previewStartedTimeMs - configureTimeMs;
                         cameraLaunchTimes[i] = previewStartedTimeMs - startTimeMs;
 
@@ -125,15 +132,15 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                         waitForNumResults(resultListener, NUM_RESULTS_WAIT);
 
                         // Blocking stop preview
-                        startTimeMs = System.currentTimeMillis();
+                        startTimeMs = SystemClock.elapsedRealtime();
                         blockingStopPreview();
-                        stopPreviewTimes[i] = System.currentTimeMillis() - startTimeMs;
+                        stopPreviewTimes[i] = SystemClock.elapsedRealtime() - startTimeMs;
                     }
                     finally {
                         // Blocking camera close
-                        startTimeMs = System.currentTimeMillis();
+                        startTimeMs = SystemClock.elapsedRealtime();
                         closeDevice();
-                        cameraCloseTimes[i] = System.currentTimeMillis() - startTimeMs;
+                        cameraCloseTimes[i] = SystemClock.elapsedRealtime() - startTimeMs;
                     }
                 }
 
@@ -166,6 +173,94 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test camera capture KPI for YUV_420_888 format: the time duration between
+     * sending out a single image capture request and receiving image data and
+     * capture result.
+     * <p>
+     * It enumerates the following metrics: capture latency, computed by
+     * measuring the time between sending out the capture request and getting
+     * the image data; partial result latency, computed by measuring the time
+     * between sending out the capture request and getting the partial result;
+     * capture result latency, computed by measuring the time between sending
+     * out the capture request and getting the full capture result.
+     * </p>
+     */
+    public void testSingleCapture() throws Exception {
+        double[] captureTimes = new double[NUM_TEST_LOOPS];
+        double[] getPartialTimes = new double[NUM_TEST_LOOPS];
+        double[] getResultTimes = new double[NUM_TEST_LOOPS];
+
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                long startTimeMs;
+                boolean isPartialTimingValid = true;
+                for (int i = 0; i < NUM_TEST_LOOPS; i++) {
+
+                    // setup builders and listeners
+                    CaptureRequest.Builder previewBuilder =
+                            mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                    CaptureRequest.Builder captureBuilder =
+                            mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                    CameraTestUtils.SimpleCaptureListener previewResultListener =
+                            new CameraTestUtils.SimpleCaptureListener();
+                    SimpleTimingResultListener captureResultListener =
+                            new SimpleTimingResultListener();
+                    SimpleImageListener imageListener = new SimpleImageListener();
+
+                    prepareCaptureAndStartPreview(previewBuilder, captureBuilder,
+                            mOrderedPreviewSizes.get(0), mOrderedStillSizes.get(0),
+                            ImageFormat.YUV_420_888, previewResultListener,
+                            NUM_MAX_IMAGES, imageListener);
+
+                    // Capture an image and get image data
+                    startTimeMs = SystemClock.elapsedRealtime();
+                    CaptureRequest request = captureBuilder.build();
+                    mSession.capture(request, captureResultListener, mHandler);
+
+                    Pair<CaptureResult, Long> partialResultNTime =
+                            captureResultListener.getPartialResultNTimeForRequest(
+                                    request, NUM_RESULTS_WAIT);
+                    Pair<CaptureResult, Long> captureResultNTime =
+                            captureResultListener.getCaptureResultNTimeForRequest(
+                                    request, NUM_RESULTS_WAIT);
+                    imageListener.waitForImageAvailable(
+                            CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
+
+                    captureTimes[i] = imageListener.getTimeReceivedImage() - startTimeMs;
+                    getPartialTimes[i] = partialResultNTime.second - startTimeMs;
+                    if (getPartialTimes[i] < 0) {
+                        isPartialTimingValid = false;
+                    }
+                    getResultTimes[i] = captureResultNTime.second - startTimeMs;
+
+                    // simulate real scenario (preview runs a bit)
+                    waitForNumResults(previewResultListener, NUM_RESULTS_WAIT);
+
+                    stopPreview();
+
+                }
+                mReportLog.printArray("Camera " + id
+                        + ": Camera capture latency", captureTimes,
+                        ResultType.LOWER_BETTER, ResultUnit.MS);
+                // If any of the partial results do not contain AE and AF state, then no report
+                if (isPartialTimingValid) {
+                    mReportLog.printArray("Camera " + id
+                            + ": Camera partial result latency", getPartialTimes,
+                            ResultType.LOWER_BETTER, ResultUnit.MS);
+                }
+                mReportLog.printArray("Camera " + id
+                        + ": Camera capture result latency", getResultTimes,
+                        ResultType.LOWER_BETTER, ResultUnit.MS);
+            }
+            finally {
+                closeImageReader();
+                closeDevice();
+            }
+        }
+    }
+
     private void blockingStopPreview() throws Exception {
         stopPreview();
         mSessionListener.getStateWaiter().waitForState(SESSION_CLOSED,
@@ -183,6 +278,19 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         previewBuilder.addTarget(mPreviewSurface);
         previewBuilder.addTarget(mReaderSurface);
         mSession.setRepeatingRequest(previewBuilder.build(), listener, mHandler);
+        imageListener.waitForImageAvailable(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
+    }
+
+    private void blockingCaptureImage(CaptureListener listener,
+            SimpleImageListener imageListener) throws Exception {
+        if (mReaderSurface == null) {
+            throw new IllegalStateException("reader surface must be initialized first");
+        }
+
+        CaptureRequest.Builder captureBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+        captureBuilder.addTarget(mReaderSurface);
+        mSession.capture(captureBuilder.build(), listener, mHandler);
         imageListener.waitForImageAvailable(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
     }
 
@@ -231,6 +339,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
     private static class SimpleImageListener implements ImageReader.OnImageAvailableListener {
         private ConditionVariable imageAvailable = new ConditionVariable();
         private boolean imageReceived = false;
+        private long mTimeReceivedImage = 0;
 
         @Override
         public void onImageAvailable(ImageReader reader) {
@@ -240,6 +349,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                     Log.v(TAG, "First image arrives");
                 }
                 imageReceived = true;
+                mTimeReceivedImage = SystemClock.elapsedRealtime();
                 imageAvailable.open();
             }
             image = reader.acquireNextImage();
@@ -266,5 +376,107 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                         + CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS + "ms");
             }
         }
+
+        public long getTimeReceivedImage() {
+            return mTimeReceivedImage;
+        }
+    }
+
+    private static class SimpleTimingResultListener
+            extends CameraCaptureSession.CaptureListener {
+        private final LinkedBlockingQueue<Pair<CaptureResult, Long> > mPartialResultQueue =
+                new LinkedBlockingQueue<Pair<CaptureResult, Long> >();
+        private final LinkedBlockingQueue<Pair<CaptureResult, Long> > mResultQueue =
+                new LinkedBlockingQueue<Pair<CaptureResult, Long> > ();
+
+        @Override
+        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
+                TotalCaptureResult result) {
+            try {
+                Long time = SystemClock.elapsedRealtime();
+                mResultQueue.put(new Pair<CaptureResult, Long>(result, time));
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureCompleted");
+            }
+        }
+
+        @Override
+        public void onCaptureProgressed(CameraCaptureSession session, CaptureRequest request,
+                CaptureResult partialResult) {
+            try {
+                // check if AE and AF state exists
+                Long time = -1L;
+                if (partialResult.get(CaptureResult.CONTROL_AE_STATE) != null &&
+                        partialResult.get(CaptureResult.CONTROL_AF_STATE) != null) {
+                    time = SystemClock.elapsedRealtime();
+                }
+                mPartialResultQueue.put(new Pair<CaptureResult, Long>(partialResult, time));
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureProgressed");
+            }
+        }
+
+        public Pair<CaptureResult, Long> getPartialResultNTime(long timeout) {
+            try {
+                Pair<CaptureResult, Long> result =
+                        mPartialResultQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                assertNotNull("Wait for a partial result timed out in " + timeout + "ms", result);
+                return result;
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
+        }
+
+        public Pair<CaptureResult, Long> getCaptureResultNTime(long timeout) {
+            try {
+                Pair<CaptureResult, Long> result =
+                        mResultQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
+                return result;
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
+        }
+
+        public Pair<CaptureResult, Long> getPartialResultNTimeForRequest(CaptureRequest myRequest,
+                int numResultsWait) {
+            if (numResultsWait < 0) {
+                throw new IllegalArgumentException("numResultsWait must be no less than 0");
+            }
+
+            Pair<CaptureResult, Long> result;
+            int i = 0;
+            do {
+                result = getPartialResultNTime(CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                if (result.first.getRequest().equals(myRequest)) {
+                    return result;
+                }
+            } while (i++ < numResultsWait);
+
+            throw new TimeoutRuntimeException("Unable to get the expected capture result after "
+                    + "waiting for " + numResultsWait + " results");
+        }
+
+        public Pair<CaptureResult, Long> getCaptureResultNTimeForRequest(CaptureRequest myRequest,
+                int numResultsWait) {
+            if (numResultsWait < 0) {
+                throw new IllegalArgumentException("numResultsWait must be no less than 0");
+            }
+
+            Pair<CaptureResult, Long> result;
+            int i = 0;
+            do {
+                result = getCaptureResultNTime(CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                if (result.first.getRequest().equals(myRequest)) {
+                    return result;
+                }
+            } while (i++ < numResultsWait);
+
+            throw new TimeoutRuntimeException("Unable to get the expected capture result after "
+                    + "waiting for " + numResultsWait + " results");
+        }
+
     }
 }
