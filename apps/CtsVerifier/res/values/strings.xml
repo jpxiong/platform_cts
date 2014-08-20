@@ -1054,6 +1054,10 @@
     <string name="pta_info">This tests whether multitouch works.\n
         Touching the screen should render a dot at the location you touched.\n
         Touching with additional fingers will render additoinal dots and you should be able to drag them around.</string>
+    <string name="poa_test">Projection Offscreen Activity</string>
+    <string name="poa_info">This tests whether a virtual display will continue to respond to and render even when the screen is off.\n
+        Simply follow the instructions and the test will detect the pass conditions.\n
+        Note that turning on the screen too early will result in a failure.</string>
 
     <!-- Strings for RotationVectorTest and GameRotationVectorTest -->
     <string name="rotation_vector_test">Rotation Vector Accuracy Test</string>
@@ -1067,5 +1071,4 @@
         3. Place the mobile device back to the reference position.\n
         4. Pass if it returns to the original arrow orientation within one second.\n
     </string>
-
 </resources>
