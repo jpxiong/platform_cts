@@ -622,7 +622,7 @@ public class Camera2SurfaceViewTestCase extends
      * @param maxNumImages The max number of images set to the image reader
      * @param imageListener The single capture capture image listener
      */
-    private void prepareCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
+    protected void prepareCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size captureSz, int format,
             CaptureListener resultListener, int maxNumImages,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
