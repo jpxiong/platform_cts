@@ -21,6 +21,7 @@ import android.renderscript.RenderScript;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.Type;
+import android.renderscript.Script;
 
 public class IntrinsicBase extends RSBaseCompute {
     protected final String TAG = "Img";
@@ -59,12 +60,24 @@ public class IntrinsicBase extends RSBaseCompute {
         return e;
     }
 
-    protected Allocation makeAllocation(int w, int h, Element e) {
+    protected Allocation makeAllocation(int w, int h, Element e, boolean clear) {
         Type.Builder tb = new Type.Builder(mRS, e);
         tb.setX(w);
         tb.setY(h);
         Type t = tb.create();
-        return Allocation.createTyped(mRS, t);
+        Allocation a = Allocation.createTyped(mRS, t);
+
+        if (clear) {
+            final int s = a.getBytesSize();
+            byte[] b = new byte[s];
+            a.copyFromUnchecked(b);
+        }
+
+        return a;
+    }
+
+    protected Allocation makeAllocation(int w, int h, Element e) {
+        return makeAllocation(w, h, e, true);
     }
 
     protected void makeSource(int w, int h, Element e) {
@@ -121,6 +134,13 @@ public class IntrinsicBase extends RSBaseCompute {
         mVerify.invoke_checkError();
         waitForMessage();
         checkForErrors();
+    }
+
+    protected Script.LaunchOptions makeClipper(int x, int y, int x2, int y2) {
+        Script.LaunchOptions lo = new Script.LaunchOptions();
+        lo.setX(x, x2);
+        lo.setY(y, y2);
+        return lo;
     }
 
 }

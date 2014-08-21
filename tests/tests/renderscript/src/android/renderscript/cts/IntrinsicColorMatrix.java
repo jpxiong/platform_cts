@@ -25,7 +25,8 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
 
     private void subtest(int w, int h, Matrix4f mat, Float4 add,
                          Element.DataType dtIn, int vsIn,
-                         Element.DataType dtOut, int vsOut) {
+                         Element.DataType dtOut, int vsOut,
+                         boolean clip) {
 
 
         if (mat == null) {
@@ -42,21 +43,34 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
 
 
         makeSource(w, h, ein);
-        mAllocRef = makeAllocation(w, h, eout);
-        mAllocDst = makeAllocation(w, h, eout);
+        mAllocRef = makeAllocation(w, h, eout, true);
+        mAllocDst = makeAllocation(w, h, eout, true);
+
+        int x1 = 0, y1 = 0, x2 = w, y2 = h;
+        if (clip) {
+            x1 = 11;
+            y1 = 11;
+            x2 = w - 11;
+            y2 = h - 11;
+        }
 
         mSi.setColorMatrix(mat);
         mSi.setAdd(add);
-        mSi.forEach(mAllocSrc, mAllocDst);
-        mSr.invoke_reference(mat, add, mAllocSrc, mAllocRef);
+        if (clip) {
+            mSi.forEach(mAllocSrc, mAllocDst, makeClipper(x1, y1, x2, y2));
+        } else {
+            mSi.forEach(mAllocSrc, mAllocDst);
+        }
+        mSr.invoke_reference(mat, add, mAllocSrc, mAllocRef, x1, y1, x2, y2);
 
-        android.util.Log.e("RSI test", "test ColorMatrix  vsin=" + vsIn + ", vsout=" + vsOut + ",  dim " + w + ", " + h);
+        //android.util.Log.e("RSI test", "test ColorMatrix  vsin=" + vsIn + ", vsout=" + vsOut + ",  dim " + w + ", " + h);
         mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
         mRS.finish();
     }
 
 
-    private void test(Element.DataType dtin, Element.DataType dtout, int subtest) {
+    private void test(Element.DataType dtin, Element.DataType dtout, int subtest,
+                      boolean clip) {
         Float4 add = new Float4();
         Matrix4f mat = new Matrix4f();
         java.util.Random r = new java.util.Random(100);
@@ -99,52 +113,84 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
                     add.w = r.nextFloat() * (subtest - 1);
                 }
             }
-            android.util.Log.v("rs", "Mat [" + f[0] + ", " + f[4] + ", " + f[8] + ", " + f[12] + "]");
-            android.util.Log.v("rs", "    [" + f[1] + ", " + f[5] + ", " + f[9] + ", " + f[13] + "]");
-            android.util.Log.v("rs", "    [" + f[2] + ", " + f[6] + ", " + f[10] + ", " + f[14] + "]");
-            android.util.Log.v("rs", "    [" + f[3] + ", " + f[7] + ", " + f[11] + ", " + f[15] + "]");
+            //android.util.Log.v("rs", "Mat [" + f[0] + ", " + f[4] + ", " + f[8] + ", " + f[12] + "]");
+            //android.util.Log.v("rs", "    [" + f[1] + ", " + f[5] + ", " + f[9] + ", " + f[13] + "]");
+            //android.util.Log.v("rs", "    [" + f[2] + ", " + f[6] + ", " + f[10] + ", " + f[14] + "]");
+            //android.util.Log.v("rs", "    [" + f[3] + ", " + f[7] + ", " + f[11] + ", " + f[15] + "]");
         }
 
         for (int i=1; i <= 4; i++) {
             for (int j=1; j <=4; j++) {
                 subtest(101, 101, mat, add,
-                        dtin, i,
-                        dtout, j);
+                        dtin, i, dtout, j, clip);
             }
         }
         checkError();
     }
 
     public void test_U8_U8_Ident() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 0);
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 0, false);
     }
 
     public void test_F32_F32_Ident() {
-        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 0);
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 0, false);
     }
 
     public void test_U8_F32_Ident() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 0);
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 0, false);
     }
 
     public void test_F32_U8_Ident() {
-        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 0);
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 0, false);
     }
 
     public void test_U8_U8_Rand() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 2);
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 2, false);
     }
 
     public void test_F32_F32_Rand() {
-        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 10);
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 10, false);
     }
 
     public void test_U8_F32_Rand() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 10);
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 10, false);
     }
 
     public void test_F32_U8_Rand() {
-        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 10);
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 10, false);
     }
 
+
+
+    public void test_U8_U8_IdentC() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 0, true);
+    }
+
+    public void test_F32_F32_IdentC() {
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 0, true);
+    }
+
+    public void test_U8_F32_IdentC() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 0, true);
+    }
+
+    public void test_F32_U8_IdentC() {
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 0, true);
+    }
+
+    public void test_U8_U8_RandC() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 2, true);
+    }
+
+    public void test_F32_F32_RandC() {
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 10, true);
+    }
+
+    public void test_U8_F32_RandC() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 10, true);
+    }
+
+    public void test_F32_U8_RandC() {
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 10, true);
+    }
 }
