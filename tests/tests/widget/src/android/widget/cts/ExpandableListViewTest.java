@@ -390,7 +390,7 @@ public class ExpandableListViewTest extends AndroidTestCase {
 
     public void testDispatchDraw() {
         MockExpandableListView expandableListView = new MockExpandableListView(mContext);
-        expandableListView.dispatchDraw(null);
+        expandableListView.dispatchDraw(new Canvas());
     }
 
     private class MockExpandableListAdapter implements ExpandableListAdapter {
