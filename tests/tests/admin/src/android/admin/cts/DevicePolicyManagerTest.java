@@ -262,20 +262,6 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
-    public void testSetApplicationsHidden_failIfNotDeviceOrProfileOwner() {
-        if (!mDeviceAdmin) {
-            Log.w(TAG, "Skipping testSetApplicationsHidden_failIfNotDeviceOrProfileOwner");
-            return;
-        }
-        try {
-            Intent pdfViewIntent = new Intent(Intent.ACTION_VIEW).setType("application/pdf");
-            mDevicePolicyManager.setApplicationsHidden(mComponent, pdfViewIntent, true);
-            fail("did not throw expected SecurityException");
-        } catch (SecurityException e) {
-            assertProfileOwnerMessage(e.getMessage());
-        }
-    }
-
     public void testIsApplicationHidden_failIfNotDeviceOrProfileOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testIsApplicationHidden_failIfNotDeviceOrProfileOwner");
