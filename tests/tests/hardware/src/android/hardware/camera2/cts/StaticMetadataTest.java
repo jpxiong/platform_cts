@@ -192,7 +192,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE);
                 if (mStaticInfo.isHardwareLevelFull()) {
                     requestKeys.add(CaptureRequest.TONEMAP_CURVE);
-                    requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
+                    requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
                 }
 
                 break;
