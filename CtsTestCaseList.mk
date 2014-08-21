@@ -135,6 +135,7 @@ cts_host_libraries := \
     CtsHostUi \
     CtsMonkeyTestCases \
     CtsSampleHostTestCases \
+    CtsSecurityHostTestCases \
     CtsUsbTests
 
 # Native test executables that need to have associated test XMLs.
