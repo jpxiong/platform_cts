@@ -1402,7 +1402,7 @@ public class StaticMetadata {
      */
     public int[] getAvailableColorAberrationModesChecked() {
         Key<int[]> key =
-                CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_CORRECTION_MODES;
+                CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES;
         int[] modes = getValueFromKeyNonNull(key);
 
         if (modes == null) {
@@ -1411,11 +1411,11 @@ public class StaticMetadata {
 
         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, " Camera devices must always support OFF mode",
-                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_OFF));
+                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF));
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes,
-                CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_OFF,
-                CameraMetadata.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE_HIGH_QUALITY);
+                CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF,
+                CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY);
 
         return modes;
     }
@@ -1618,7 +1618,7 @@ public class StaticMetadata {
      * @return {@code true} if manual color aberration control is supported
      */
     public boolean isManualColorAberrationControlSupported() {
-        return areKeysAvailable(CaptureRequest.COLOR_CORRECTION_ABERRATION_CORRECTION_MODE);
+        return areKeysAvailable(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
     }
 
     /**
