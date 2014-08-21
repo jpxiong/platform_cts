@@ -1091,6 +1091,16 @@
             <meta-data android:name="test_category" android:value="@string/test_category_projection" />
         </activity>
 
+
+        <activity android:name=".projection.offscreen.ProjectionOffscreenActivity"
+                  android:label="@string/poa_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+        </activity>
+
         <service android:name=".projection.ProjectionService"
                  android:label="@string/projection_service_name"
                  android:process=":projectionservice" />

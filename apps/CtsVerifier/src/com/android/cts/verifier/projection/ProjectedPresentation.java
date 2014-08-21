@@ -47,5 +47,4 @@ public abstract class ProjectedPresentation extends Presentation {
         getWindow().setLocalFocus(true, false);
         getWindow().injectInputEvent(event);
     }
-
 }

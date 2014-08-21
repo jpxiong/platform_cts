@@ -31,6 +31,7 @@ import android.view.Surface;
 
 import com.android.cts.verifier.projection.cube.CubePresentation;
 import com.android.cts.verifier.projection.list.ListPresentation;
+import com.android.cts.verifier.projection.offscreen.OffscreenPresentation;
 import com.android.cts.verifier.projection.touch.TouchPresentation;
 import com.android.cts.verifier.projection.video.VideoPresentation;
 import com.android.cts.verifier.projection.widgets.WidgetPresentation;
@@ -62,6 +63,9 @@ public class ProjectionService extends Service {
 
             case MULTI_TOUCH:
                 return new TouchPresentation(ProjectionService.this, mDisplay.getDisplay());
+
+            case OFFSCREEN:
+                return new OffscreenPresentation(ProjectionService.this, mDisplay.getDisplay());
         }
 
         return null;

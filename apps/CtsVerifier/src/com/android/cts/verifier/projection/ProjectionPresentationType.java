@@ -21,5 +21,6 @@ public enum ProjectionPresentationType {
     BASIC_WIDGETS,
     MULTI_TOUCH,
     SCROLLING_LIST,
-    VIDEO_PLAYBACK
+    VIDEO_PLAYBACK,
+    OFFSCREEN
 }
