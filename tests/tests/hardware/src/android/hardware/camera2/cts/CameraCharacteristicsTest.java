@@ -57,7 +57,7 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    public void testCameraCharacteristicsAndroidColorCorrectionAvailableAberrationCorrectionModes() throws Exception {
+    public void testCameraCharacteristicsAndroidColorCorrectionAvailableAberrationModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
@@ -66,13 +66,13 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
 
             {
 
-                assertNotNull("Invalid property: android.colorCorrection.availableAberrationCorrectionModes",
-                        props.get(CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_CORRECTION_MODES));
+                assertNotNull("Invalid property: android.colorCorrection.availableAberrationModes",
+                        props.get(CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES));
                 List<Key<?>> allKeys = props.getKeys();
                 assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
                         ids[i]), allKeys);
-                assertTrue("Key not in keys list: android.colorCorrection.availableAberrationCorrectionModes", allKeys.contains(
-                        CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_CORRECTION_MODES));
+                assertTrue("Key not in keys list: android.colorCorrection.availableAberrationModes", allKeys.contains(
+                        CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES));
 
             }
 
