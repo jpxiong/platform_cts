@@ -105,5 +105,36 @@ public class Intrinsic3DLut extends IntrinsicBase {
         checkError();
     }
 
+    public void test1C() {
+        initCube();
+        makeBuffers(97, 97, Element.U8_4(mRS));
+
+        Script.LaunchOptions lo = makeClipper(11, 11, 87, 87);
+
+        mIntrinsic.forEach(mAllocSrc, mAllocDst, lo);
+        mScript.forEach_root(mAllocSrc, mAllocRef, lo);
+
+        mVerify.set_gAllowedIntError(1);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
+        mRS.finish();
+        checkError();
+    }
+
+    public void test2C() {
+        initCube();
+        makeBuffers(97, 97, Element.U8_4(mRS));
+        genCubeRand();
+
+        Script.LaunchOptions lo = makeClipper(11, 11, 87, 87);
+
+        mIntrinsic.forEach(mAllocSrc, mAllocDst, lo);
+        mScript.forEach_root(mAllocSrc, mAllocRef, lo);
+
+        mVerify.set_gAllowedIntError(2);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
+        mRS.finish();
+        checkError();
+    }
+
 
 }
