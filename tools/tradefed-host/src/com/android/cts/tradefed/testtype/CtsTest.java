@@ -42,6 +42,7 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
+import com.android.tradefed.testtype.InstrumentationTest;
 import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
@@ -476,6 +477,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 }
                 if (test instanceof IBuildReceiver) {
                     ((IBuildReceiver) test).setBuild(mBuildInfo);
+                }
+                // setForceAbi should be exposed on device test.
+                // This is not the best fix, but works.
+                if (test instanceof InstrumentationTest) {
+                    ((InstrumentationTest)test).setForceAbi(mForceAbi);
                 }
 
                 forwardPackageDetails(knownTests.getPackageDef(), listener);
