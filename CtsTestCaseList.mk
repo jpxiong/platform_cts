@@ -29,6 +29,22 @@ cts_security_apps_list := \
     CtsWriteExternalStorageApp \
     CtsMultiUserStorageApp
 
+cts_security_keysets_list := \
+    CtsKeySetTestApp \
+    CtsKeySetPermDefSigningA \
+    CtsKeySetPermDefSigningB\
+    CtsKeySetPermUseSigningA \
+    CtsKeySetPermUseSigningB \
+    CtsKeySetSigningAUpgradeA \
+    CtsKeySetSigningBUpgradeA \
+    CtsKeySetSigningAUpgradeAAndB \
+    CtsKeySetSigningAUpgradeAOrB \
+    CtsKeySetSigningAUpgradeB \
+    CtsKeySetSigningBUpgradeB \
+    CtsKeySetSigningAAndBUpgradeA \
+    CtsKeySetSigningAAndCUpgradeB \
+    CtsKeySetSigningAUpgradeNone
+
 cts_support_packages := \
     CtsAccelerationTestStubs \
     CtsAppTestStubs \
@@ -48,7 +64,8 @@ cts_support_packages := \
     TestDeviceSetup \
     CtsUiAutomatorApp \
     CtsUsbSerialTestApp \
-    $(cts_security_apps_list)
+    $(cts_security_apps_list) \
+    $(cts_security_keysets_list)
 
 cts_external_packages := \
     com.replica.replicaisland \
