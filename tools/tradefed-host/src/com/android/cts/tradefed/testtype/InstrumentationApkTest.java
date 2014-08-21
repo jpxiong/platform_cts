@@ -48,11 +48,6 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
 
     private CtsBuildHelper mCtsBuild = null;
 
-    @Option(name = AbiFormatter.FORCE_ABI_STRING,
-            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
-            importance = Importance.IF_UNSET)
-    private String mForceAbi = null;
-
     /**
      * {@inheritDoc}
      */
@@ -96,12 +91,14 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
                 File apkFile = mCtsBuild.getTestApp(apkFileName);
                 String errorCode = null;
                 String[] options = {};
-                if (mForceAbi != null) {
+                String forceAbi = getForceAbi();
+                if (forceAbi != null) {
                     String abi = AbiFormatter.getDefaultAbi(mTestDevice, mForceAbi);
                     if (abi != null) {
                         options = new String[]{String.format("--abi %s ", abi)};
                     }
                 }
+                Log.d(LOG_TAG, "installPackage options: " + options);
                 errorCode = mTestDevice.installPackage(apkFile, true, options);
                 if (errorCode != null) {
                     Log.e(LOG_TAG, String.format("Failed to install %s on %s. Reason: %s",
