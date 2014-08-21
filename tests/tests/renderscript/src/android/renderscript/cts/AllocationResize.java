@@ -34,7 +34,7 @@ public class AllocationResize extends RSBaseCompute {
     }
 
     public void testResize() {
-        mScript = new ScriptC_allocation_resize(mRS, mRes, R.raw.allocation_resize);
+        mScript = new ScriptC_allocation_resize(mRS);
         mIn = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE/2);
         mOut = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE*2);
         mIn.resize(INPUTSIZE);

@@ -61,7 +61,7 @@ public class ForEachTest extends RSBaseCompute {
         Type t = new Type.Builder(mRS, Element.I8(mRS)).setX(x).create();
         Allocation badOut = Allocation.createTyped(mRS, t);
 
-        ScriptC_fe_all fe_all = new ScriptC_fe_all(mRS, mRes, R.raw.fe_all);
+        ScriptC_fe_all fe_all = new ScriptC_fe_all(mRS);
 
         // I8
         Allocation in = Allocation.createTyped(mRS, t);
@@ -461,7 +461,7 @@ public class ForEachTest extends RSBaseCompute {
 
 
     public void testMultipleForEach() {
-        ScriptC_foreach s = new ScriptC_foreach(mRS, mRes, R.raw.foreach);
+        ScriptC_foreach s = new ScriptC_foreach(mRS);
         Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
 
         int X = 5;
@@ -482,7 +482,7 @@ public class ForEachTest extends RSBaseCompute {
     }
 
     public void testNoRoot() {
-        ScriptC_noroot s = new ScriptC_noroot(mRS, mRes, R.raw.noroot);
+        ScriptC_noroot s = new ScriptC_noroot(mRS);
         Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
 
         int X = 5;

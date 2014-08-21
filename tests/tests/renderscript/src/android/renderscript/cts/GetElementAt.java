@@ -56,7 +56,7 @@ public class GetElementAt extends RSBaseCompute {
 
     public void testX () {
         setupArrays(INPUTSIZE);
-        script_x = new ScriptC_get_element_at_x(mRS, mRes, R.raw.get_element_at_x);
+        script_x = new ScriptC_get_element_at_x(mRS);
         gIn = Allocation.createSized(mRS, Element.U32(mRS), INPUTSIZE);
         gIn.copyFrom(in);
         mOut = Allocation.createTyped(mRS, gIn.getType());
@@ -73,7 +73,7 @@ public class GetElementAt extends RSBaseCompute {
 
     public void testXY () {
         setupArrays(INPUTSIZE*INPUTSIZE);
-        script_xy = new ScriptC_get_element_at_x_y(mRS, mRes, R.raw.get_element_at_x_y);
+        script_xy = new ScriptC_get_element_at_x_y(mRS);
         Type.Builder builder = new Type.Builder(mRS, Element.U32(mRS));
         builder.setX(INPUTSIZE);
         builder.setY(INPUTSIZE);
