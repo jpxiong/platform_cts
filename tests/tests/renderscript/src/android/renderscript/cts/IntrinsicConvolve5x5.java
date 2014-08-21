@@ -21,10 +21,16 @@ import android.util.Log;
 
 public class IntrinsicConvolve5x5 extends IntrinsicBase {
     private void test5(ScriptC_intrinsic_convolve5x5 sr, ScriptIntrinsicConvolve5x5 si,
-                        Element e, float cf[], String name, int num, int w, int h) {
+                       Element e, float cf[], String name, int num, int w, int h,
+                       Script.LaunchOptions sc) {
         si.setCoefficients(cf);
         si.setInput(mAllocSrc);
-        si.forEach(mAllocRef);
+
+        if (sc != null) {
+            mAllocRef.copyFrom(mAllocSrc);
+            mAllocDst.copyFrom(mAllocSrc);
+        }
+        si.forEach(mAllocRef, sc);
 
         sr.set_gWidth(w);
         sr.set_gHeight(h);
@@ -33,41 +39,41 @@ public class IntrinsicConvolve5x5 extends IntrinsicBase {
         if (e.getDataType() == Element.DataType.UNSIGNED_8) {
             switch(e.getVectorSize()) {
             case 4:
-                sr.forEach_convolve_U4(mAllocDst);
+                sr.forEach_convolve_U4(mAllocDst, sc);
                 break;
             case 3:
-                sr.forEach_convolve_U3(mAllocDst);
+                sr.forEach_convolve_U3(mAllocDst, sc);
                 break;
             case 2:
-                sr.forEach_convolve_U2(mAllocDst);
+                sr.forEach_convolve_U2(mAllocDst, sc);
                 break;
             case 1:
-                sr.forEach_convolve_U1(mAllocDst);
+                sr.forEach_convolve_U1(mAllocDst, sc);
                 break;
             }
         } else {
             switch(e.getVectorSize()) {
             case 4:
-                sr.forEach_convolve_F4(mAllocDst);
+                sr.forEach_convolve_F4(mAllocDst, sc);
                 break;
             case 3:
-                sr.forEach_convolve_F3(mAllocDst);
+                sr.forEach_convolve_F3(mAllocDst, sc);
                 break;
             case 2:
-                sr.forEach_convolve_F2(mAllocDst);
+                sr.forEach_convolve_F2(mAllocDst, sc);
                 break;
             case 1:
-                sr.forEach_convolve_F1(mAllocDst);
+                sr.forEach_convolve_F1(mAllocDst, sc);
                 break;
             }
         }
 
-        android.util.Log.e("RSI test", name + "  " + e.getVectorSize() + " " + num + " " + w + ", " + h);
+        //android.util.Log.e("RSI test", name + "  " + e.getVectorSize() + " " + num + " " + w + ", " + h);
         mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
         mRS.finish();
     }
 
-    private void testConvolve5(int w, int h, Element.DataType dt, int vecSize) {
+    private void testConvolve5(int w, int h, Element.DataType dt, int vecSize, Script.LaunchOptions sc) {
         float cf1[] = { 0.f,  0.f,  0.f,  0.f,  0.f,
                         0.f,  0.f,  0.f,  0.f,  0.f,
                         0.f,  0.f,  1.f,  0.f,  0.f,
@@ -84,43 +90,87 @@ public class IntrinsicConvolve5x5 extends IntrinsicBase {
 
         ScriptIntrinsicConvolve5x5 si = ScriptIntrinsicConvolve5x5.create(mRS, e);
         ScriptC_intrinsic_convolve5x5 sr = new ScriptC_intrinsic_convolve5x5(mRS);
-        test5(sr, si, e, cf1, "test convolve", 1, w, h);
-        test5(sr, si, e, cf2, "test convolve", 2, w, h);
+        test5(sr, si, e, cf1, "test convolve", 1, w, h, sc);
+        test5(sr, si, e, cf2, "test convolve", 2, w, h, sc);
     }
 
     public void test_U8_4() {
-        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 4);
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 4, null);
         checkError();
     }
     public void test_U8_3() {
-        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 3);
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 3, null);
         checkError();
     }
     public void test_U8_2() {
-        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 2);
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 2, null);
         checkError();
     }
     public void test_U8_1() {
-        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 1);
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 1, null);
         checkError();
     }
 
     public void test_F32_4() {
-        testConvolve5(100, 100, Element.DataType.FLOAT_32, 4);
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 4, null);
         checkError();
     }
     public void test_F32_3() {
-        testConvolve5(100, 100, Element.DataType.FLOAT_32, 3);
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 3, null);
         checkError();
     }
     public void test_F32_2() {
-        testConvolve5(100, 100, Element.DataType.FLOAT_32, 2);
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 2, null);
         checkError();
     }
     public void test_F32_1() {
-        testConvolve5(100, 100, Element.DataType.FLOAT_32, 1);
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 1, null);
         checkError();
     }
 
+    public void test_U8_4C() {
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 4,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+    public void test_U8_3C() {
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 3,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+    public void test_U8_2C() {
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 2,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+    public void test_U8_1C() {
+        testConvolve5(100, 100, Element.DataType.UNSIGNED_8, 1,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+
+    public void test_F32_4C() {
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 4,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+
+    public void test_F32_3C() {
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 3,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+
+    public void test_F32_2C() {
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 2,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
+
+    public void test_F32_1C() {
+        testConvolve5(100, 100, Element.DataType.FLOAT_32, 1,
+                      makeClipper(11, 11, 90, 90));
+        checkError();
+    }
 
 }

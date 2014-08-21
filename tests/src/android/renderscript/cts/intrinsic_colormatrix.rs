@@ -17,10 +17,8 @@
 #include "shared.rsh"
 
 
-void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out) {
-    uint32_t w = rsAllocationGetDimX(in);
-    uint32_t h = rsAllocationGetDimY(in);
-
+void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out,
+               int x1, int y1, int x2, int y2) {
     rs_element ein = rsAllocationGetElement(in);
     rs_element eout = rsAllocationGetElement(out);
     rs_data_type dtin = rsElementGetDataType(ein);
@@ -28,8 +26,8 @@ void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out) 
     uint32_t vsin = rsElementGetVectorSize(ein);
     uint32_t vsout = rsElementGetVectorSize(eout);
 
-    for (uint32_t y = 0; y < h; y++) {
-        for (uint32_t x = 0; x < w; x++) {
+    for (uint32_t y = y1; y < y2; y++) {
+        for (uint32_t x = x1; x < x2; x++) {
             float4 pin = 0.f;
 
             if (dtin == RS_TYPE_FLOAT_32) {
