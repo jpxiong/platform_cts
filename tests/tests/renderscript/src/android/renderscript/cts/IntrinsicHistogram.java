@@ -48,7 +48,7 @@ public class IntrinsicHistogram extends IntrinsicBase {
         mAout = Allocation.createSized(mRS, e2, 256);
     }
 
-    private void testNorm(int inVSize, int outVSize, int w, int h) {
+    private void testNorm(int inVSize, int outVSize, int w, int h, boolean clip) {
         createAllocations(inVSize, outVSize, w, h);
 
         int invs2 = (inVSize != 3) ? inVSize : 4;
@@ -61,11 +61,23 @@ public class IntrinsicHistogram extends IntrinsicBase {
         java.util.Random r = new java.util.Random();
         r.nextBytes(i);
 
-        for (int ct=0; ct < i.length; ct++) {
-            int t = i[ct];
-            if (t < 0) t = 256 + t;
-            if ((ct % invs2) < outVSize) {
-                ref[(t * outvs2) + (ct % invs2)] ++;
+        int x1 = 0, y1 = 0, x2 = w, y2 = h;
+        if (clip) {
+            x1 = 11;
+            y1 = 11;
+            x2 = w - 11;
+            y2 = h - 11;
+        }
+
+        for (int y = y1; y < y2; y++) {
+            for (int x = x1; x < x2; x++) {
+                int ct = (y * w + x) * invs2;
+
+                int t = i[ct];
+                if (t < 0) t = 256 + t;
+                if ((ct % invs2) < outVSize) {
+                    ref[(t * outvs2) + (ct % invs2)] ++;
+                }
             }
         }
 
@@ -73,7 +85,7 @@ public class IntrinsicHistogram extends IntrinsicBase {
         ScriptIntrinsicHistogram hist =
                 ScriptIntrinsicHistogram.create(mRS, mAin.getType().getElement());
         hist.setOutput(mAout);
-        hist.forEach(mAin);
+        hist.forEach(mAin, makeClipper(x1, y1, x2, y2));
 
         mAin.copyFrom(i);
         mAout.copyTo(res);
@@ -83,42 +95,77 @@ public class IntrinsicHistogram extends IntrinsicBase {
     }
 
     public void test_norm_4_4() {
-        testNorm(4, 4, 101, 101);
+        testNorm(4, 4, 101, 101, false);
     }
     public void test_norm_4_3() {
-        testNorm(4, 3, 101, 101);
+        testNorm(4, 3, 101, 101, false);
     }
     public void test_norm_4_2() {
-        testNorm(4, 2, 101, 101);
+        testNorm(4, 2, 101, 101, false);
     }
     public void test_norm_4_1() {
-        testNorm(4, 1, 101, 101);
+        testNorm(4, 1, 101, 101, false);
     }
 
     public void test_norm_3_3() {
-        testNorm(3, 3, 101, 101);
+        testNorm(3, 3, 101, 101, false);
     }
     public void test_norm_3_2() {
-        testNorm(3, 2, 101, 101);
+        testNorm(3, 2, 101, 101, false);
     }
     public void test_norm_3_1() {
-        testNorm(3, 1, 101, 101);
+        testNorm(3, 1, 101, 101, false);
     }
 
     public void test_norm_2_2() {
-        testNorm(2, 2, 101, 101);
+        testNorm(2, 2, 101, 101, false);
     }
     public void test_norm_2_1() {
-        testNorm(2, 1, 101, 101);
+        testNorm(2, 1, 101, 101, false);
     }
 
     public void test_norm_1_1() {
-        testNorm(1, 1, 101, 101);
+        testNorm(1, 1, 101, 101, false);
+    }
+
+
+    public void test_norm_4_4C() {
+        testNorm(4, 4, 101, 101, true);
+    }
+    public void test_norm_4_3C() {
+        testNorm(4, 3, 101, 101, true);
+    }
+    public void test_norm_4_2C() {
+        testNorm(4, 2, 101, 101, true);
+    }
+    public void test_norm_4_1C() {
+        testNorm(4, 1, 101, 101, true);
+    }
+
+    public void test_norm_3_3C() {
+        testNorm(3, 3, 101, 101, true);
+    }
+    public void test_norm_3_2C() {
+        testNorm(3, 2, 101, 101, true);
+    }
+    public void test_norm_3_1C() {
+        testNorm(3, 1, 101, 101, true);
+    }
+
+    public void test_norm_2_2C() {
+        testNorm(2, 2, 101, 101, true);
+    }
+    public void test_norm_2_1C() {
+        testNorm(2, 1, 101, 101, true);
+    }
+
+    public void test_norm_1_1C() {
+        testNorm(1, 1, 101, 101, true);
     }
 
 
 
-    private void testDot(int inVSize, int w, int h) {
+    private void testDot(int inVSize, int w, int h, boolean clip) {
         createAllocations(inVSize, 1, w, h);
 
         int invs2 = (inVSize != 3) ? inVSize : 4;
@@ -136,14 +183,26 @@ public class IntrinsicHistogram extends IntrinsicBase {
             doti[ct] = (int)((dotVals[ct] * 256.f) + 0.5f);
         }
 
-        for (int ct=0; ct < i.length; ct+=invs2) {
-            int v = 0;
-            for (int c = 0; c < inVSize; c++) {
-                int t = i[ct + c];
-                if (t < 0) t = 256 + t;
-                v += doti[c] * t;
+        int x1 = 0, y1 = 0, x2 = w, y2 = h;
+        if (clip) {
+            x1 = 11;
+            y1 = 11;
+            x2 = w - 11;
+            y2 = h - 11;
+        }
+
+        for (int y = y1; y < y2; y++) {
+            for (int x = x1; x < x2; x++) {
+                int ct = (y * w + x) * invs2;
+
+                int v = 0;
+                for (int c = 0; c < inVSize; c++) {
+                    int t = i[ct + c];
+                    if (t < 0) t = 256 + t;
+                    v += doti[c] * t;
+                }
+                ref[(v + 0x7f) >> 8] ++;
             }
-            ref[(v + 0x7f) >> 8] ++;
         }
 
         mAin.copyFrom(i);
@@ -151,7 +210,7 @@ public class IntrinsicHistogram extends IntrinsicBase {
                 ScriptIntrinsicHistogram.create(mRS, mAin.getType().getElement());
         hist.setOutput(mAout);
         hist.setDotCoefficients(dotVals[0], dotVals[1], dotVals[2], dotVals[3]);
-        hist.forEach_Dot(mAin);
+        hist.forEach_Dot(mAin, makeClipper(x1, y1, x2, y2));
 
         mAin.copyFrom(i);
         mAout.copyTo(res);
@@ -161,16 +220,30 @@ public class IntrinsicHistogram extends IntrinsicBase {
     }
 
     public void test_dot_1() {
-        testDot(1, 101, 101);
+        testDot(1, 101, 101, false);
     }
     public void test_dot_2() {
-        testDot(2, 101, 101);
+        testDot(2, 101, 101, false);
     }
     public void test_dot_3() {
-        testDot(3, 101, 101);
+        testDot(3, 101, 101, false);
     }
     public void test_dot_4() {
-        testDot(4, 101, 101);
+        testDot(4, 101, 101, false);
+    }
+
+
+    public void test_dot_1C() {
+        testDot(1, 101, 101, true);
+    }
+    public void test_dot_2C() {
+        testDot(2, 101, 101, true);
+    }
+    public void test_dot_3C() {
+        testDot(3, 101, 101, true);
+    }
+    public void test_dot_4C() {
+        testDot(4, 101, 101, true);
     }
 
 }
