@@ -63,6 +63,7 @@ public abstract class BaseSensorTestActivity
     protected final String LOG_TAG = "TestRunner";
 
     protected final Class mTestClass;
+    private final int mLayoutId;
 
     private final Semaphore mSemaphore = new Semaphore(0);
 
@@ -76,13 +77,18 @@ public abstract class BaseSensorTestActivity
     private volatile int mTestFailedCounter;
 
     protected BaseSensorTestActivity(Class testClass) {
+        this(testClass, R.layout.snsr_semi_auto_test);
+    }
+
+    protected BaseSensorTestActivity(Class testClass, int layoutId) {
         mTestClass = testClass;
+        mLayoutId = layoutId;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.snsr_semi_auto_test);
+        setContentView(mLayoutId);
 
         mLogView = (TextView) this.findViewById(R.id.log_text);
         mNextView = this.findViewById(R.id.next_button);

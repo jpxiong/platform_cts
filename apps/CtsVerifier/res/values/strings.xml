@@ -1061,14 +1061,12 @@
 
     <!-- Strings for RotationVectorTest and GameRotationVectorTest -->
     <string name="rotation_vector_test">Rotation Vector Accuracy Test</string>
-    <string name="game_rotation_vector_test">Game Rotation Vector Accuracy Test</string>
-    <string name="rotation_vector_test_info">
-        This test verifies that mobile device can detect its orientation in space quickly and repeatably.\n\n
-        Instructions:\n
-        \n
-        1. Place the mobile device in a reference position and note the arrow orientation.\n
-        2. Move, shake, and rotate the device for about 30 seconds.\n
-        3. Place the mobile device back to the reference position.\n
-        4. Pass if it returns to the original arrow orientation within one second.\n
-    </string>
+    <string name="snsr_rotation_vector_set_reference">
+        Place the mobile device in a reference position. Note: to provide an accurate reference,
+        align the device along one edge of a notebook laying on a table.</string>
+    <string name="snsr_rotation_vector_reference_set">Reference position set.</string>
+    <string name="snsr_rotation_vector_move_info">Move, shake, and rotate the device.</string>
+    <string name="snsr_rotation_vector_set_final">Place the device back to the reference position.</string>
+    <string name="snsr_rotation_vector_verification">Angular deviation [%1$4.1f %2$4.1f %3$4.1f]. Current: %4$f deg. Max tolerated: %5$f.</string>
+
 </resources>
