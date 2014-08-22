@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.CorrectionInfo;
-import android.view.inputmethod.CursorAnchorInfoRequest;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -85,10 +84,9 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         assertTrue(inputConnection.isGetSelectedTextCalled);
         wrapper.setComposingRegion(0, 3);
         assertTrue(inputConnection.isSetComposingRegionCalled);
-        wrapper.requestCursorAnchorInfo(new CursorAnchorInfoRequest(
-                CursorAnchorInfoRequest.TYPE_CURSOR_ANCHOR_INFO,
-                CursorAnchorInfoRequest.FLAG_CURSOR_ANCHOR_INFO_MONITOR));
-        assertTrue(inputConnection.isRequestCursorAnchorInfoCalled);
+        wrapper.requestUpdateCursorAnchorInfo(
+                InputConnection.REQUEST_UPDATE_CURSOR_ANCHOR_INFO_IMMEDIATE);
+        assertTrue(inputConnection.isRequestUpdateCursorAnchorInfoCalled);
     }
 
     private class MockInputConnection implements InputConnection {
@@ -113,7 +111,7 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         public boolean isSetComposingTextCalled;
         public boolean isSetComposingRegionCalled;
         public boolean isSetSelectionCalled;
-        public boolean isRequestCursorAnchorInfoCalled;
+        public boolean isRequestUpdateCursorAnchorInfoCalled;
 
         public boolean beginBatchEdit() {
             isBeginBatchEditCalled = true;
@@ -220,9 +218,9 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             return false;
         }
 
-        public int requestCursorAnchorInfo(CursorAnchorInfoRequest request) {
-            isRequestCursorAnchorInfoCalled = true;
-            return CursorAnchorInfoRequest.RESULT_NOT_HANDLED;
+        public boolean requestUpdateCursorAnchorInfo(int cursorUpdateMode) {
+            isRequestUpdateCursorAnchorInfoCalled = true;
+            return false;
         }
     }
 }
