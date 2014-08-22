@@ -30,7 +30,7 @@ public class IntrinsicBlur extends IntrinsicBase {
 
 
 
-    private void initTest(int w, int h, Element e) {
+    private void initTest(int w, int h, Element e, Script.LaunchOptions lo) {
         makeBuffers(w, h, e);
 
         Type.Builder tb = new Type.Builder(mRS, Element.F32_4(mRS));
@@ -55,7 +55,7 @@ public class IntrinsicBlur extends IntrinsicBase {
         copyInput();
         mScript.forEach_horz(mScratchPixelsAllocation2);
         mScript.forEach_vert(mScratchPixelsAllocation1);
-        copyOutput();
+        copyOutput(lo);
     }
 
     private void copyInput() {
@@ -70,13 +70,13 @@ public class IntrinsicBlur extends IntrinsicBase {
         throw new IllegalArgumentException("bad type");
     }
 
-    private void copyOutput() {
+    private void copyOutput(Script.LaunchOptions lo) {
         if (mAllocSrc.getType().getElement().isCompatible(Element.U8(mRS))) {
-            mScript.forEach_convert1_fToU(mScratchPixelsAllocation1, mAllocRef);
+            mScript.forEach_convert1_fToU(mScratchPixelsAllocation1, mAllocRef, lo);
             return;
         }
         if (mAllocSrc.getType().getElement().isCompatible(Element.U8_4(mRS))) {
-            mScript.forEach_convert4_fToU(mScratchPixelsAllocation1, mAllocRef);
+            mScript.forEach_convert4_fToU(mScratchPixelsAllocation1, mAllocRef, lo);
             return;
         }
         throw new IllegalArgumentException("bad type");
@@ -86,7 +86,7 @@ public class IntrinsicBlur extends IntrinsicBase {
         final int w = 97;
         final int h = 97;
         Element e = Element.U8(mRS);
-        initTest(w, h, e);
+        initTest(w, h, e, null);
 
         mIntrinsic.forEach(mAllocDst);
 
@@ -100,7 +100,7 @@ public class IntrinsicBlur extends IntrinsicBase {
         final int w = 97;
         final int h = 97;
         Element e = Element.U8_4(mRS);
-        initTest(w, h, e);
+        initTest(w, h, e, null);
 
         mIntrinsic.forEach(mAllocDst);
 
@@ -109,5 +109,37 @@ public class IntrinsicBlur extends IntrinsicBase {
         mRS.finish();
         checkError();
     }
+
+
+    public void testU8_1C() {
+        final int w = 97;
+        final int h = 97;
+        Element e = Element.U8(mRS);
+        Script.LaunchOptions lo = makeClipper(11, 11, w - 11, h - 11);
+
+        initTest(w, h, e, lo);
+        mIntrinsic.forEach(mAllocDst, lo);
+
+        mVerify.set_gAllowedIntError(1);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
+        mRS.finish();
+        checkError();
+    }
+
+    public void testU8_4C() {
+        final int w = 97;
+        final int h = 97;
+        Element e = Element.U8_4(mRS);
+        Script.LaunchOptions lo = makeClipper(11, 11, w - 11, h - 11);
+
+        initTest(w, h, e, lo);
+        mIntrinsic.forEach(mAllocDst, lo);
+
+        mVerify.set_gAllowedIntError(1);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
+        mRS.finish();
+        checkError();
+    }
+
 
 }
