@@ -53,7 +53,7 @@ import java.util.concurrent.CountDownLatch;
 public class Vp8CodecTestBase extends AndroidTestCase {
 
     protected static final String TAG = "VP8CodecTestBase";
-    private static final String VP8_MIME = "video/x-vnd.on2.vp8";
+    protected static final String VP8_MIME = "video/x-vnd.on2.vp8";
     private static final String VPX_SW_DECODER_NAME = "OMX.google.vp8.decoder";
     private static final String VPX_SW_ENCODER_NAME = "OMX.google.vp8.encoder";
     private static final String OMX_SW_CODEC_PREFIX = "OMX.google";
@@ -90,6 +90,29 @@ public class Vp8CodecTestBase extends AndroidTestCase {
     public void setContext(Context context) {
         super.setContext(context);
         mResources = mContext.getResources();
+    }
+
+    /**
+     * Returns the first codec capable of encoding the specified MIME type, or null if no
+     * match was found.
+     */
+    protected static MediaCodecInfo selectCodec(String mimeType) {
+        int numCodecs = MediaCodecList.getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+                if (types[j].equalsIgnoreCase(mimeType)) {
+                    return codecInfo;
+                }
+            }
+        }
+        return null;
     }
 
     /**

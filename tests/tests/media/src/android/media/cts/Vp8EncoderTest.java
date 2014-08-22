@@ -17,6 +17,7 @@
 package android.media.cts;
 
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.util.Log;
 import com.android.cts.media.R;
 
@@ -79,6 +80,12 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * Also checks the average bitrate is within MAX_BITRATE_VARIATION of the target value.
      */
     public void testBasic() throws Exception {
+        MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+        if (codecInfo == null) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testBasic.");
+            return;
+        }
+
         int encodeSeconds = 9;
 
         for (int targetBitrate : TEST_BITRATES_SET) {
@@ -112,6 +119,12 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * does not change much for two different ways of the encoder call.
      */
     public void testAsyncEncoding() throws Exception {
+        MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+        if (codecInfo == null) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testAsyncEncoding.");
+            return;
+        }
+
         int encodeSeconds = 9;
 
         // First test the encoder running in a looper thread with buffer callbacks enabled.
@@ -173,6 +186,12 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * The test does not verify the output stream.
      */
     public void testSyncFrame() throws Exception {
+        MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+        if (codecInfo == null) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testSyncFrame.");
+            return;
+        }
+
         int encodeSeconds = 9;
 
         EncoderOutputStreamParameters params = getDefaultEncodingParameters(
@@ -216,7 +235,13 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * Run the the encoder for 12 seconds. Request changes to the
      * bitrate after 6 seconds and ensure the encoder responds.
      */
-     public void testDynamicBitrateChange() throws Exception {
+    public void testDynamicBitrateChange() throws Exception {
+        MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+        if (codecInfo == null) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testDynamicBitrateChange.");
+            return;
+        }
+
         int encodeSeconds = 12;    // Encoding sequence duration in seconds.
         int[] bitrateTargetValues = { 400000, 800000 };  // List of bitrates to test.
 
@@ -280,6 +305,12 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
      * Also compares average and minimum PSNR of HW codec with PSNR values of reference SW codec.
      */
     public void testEncoderQuality() throws Exception {
+        MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+        if (codecInfo == null) {
+            Log.w(TAG, "Codec " + VP8_MIME + " not supported. Return from testEncoderQuality.");
+            return;
+        }
+
         int encodeSeconds = 9;      // Encoding sequence duration in seconds for each bitrate.
         double[] psnrPlatformCodecAverage = new double[TEST_BITRATES_SET.length];
         double[] psnrPlatformCodecMin = new double[TEST_BITRATES_SET.length];
