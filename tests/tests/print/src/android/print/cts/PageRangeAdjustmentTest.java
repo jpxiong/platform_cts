@@ -604,12 +604,15 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 "com.android.printspooler:id/range_options_spinner"));
         pagesSpinner.click();
 
-        UiObject rangeOption = getUiDevice().findObject(new UiSelector().text("Range"));
+        UiObject rangeOption = getUiDevice().findObject(new UiSelector().textContains("Range"));
         rangeOption.click();
 
         UiObject pagesEditText = getUiDevice().findObject(new UiSelector().resourceId(
                 "com.android.printspooler:id/page_range_edittext"));
         pagesEditText.setText(pages);
+
+        // Hide the keyboard.
+        getUiDevice().pressBack();
     }
 
     private PrinterDiscoverySessionCallbacks createMockFirstPrinterDiscoverySessionCallbacks() {
