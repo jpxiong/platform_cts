@@ -21,11 +21,9 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
-import android.hardware.camera2.cts.helpers.CameraSessionUtils;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.SystemClock;
@@ -41,7 +39,12 @@ import android.view.Surface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class CaptureResultTest extends Camera2AndroidTestCase {
     private static final String TAG = "CaptureResultTest";
@@ -119,6 +122,106 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 // Verify results
                 validateCaptureResult(captureListener, waiverkeys, requestBuilder,
                         NUM_FRAMES_VERIFIED);
+
+                stopCapture(/*fast*/false);
+            } finally {
+                closeDevice(id);
+                closeDefaultImageReader();
+            }
+        }
+    }
+
+    /**
+     * Check partial results conform to its specification.
+     * <p>
+     * The test is skipped if partial result is not supported on device. </p>
+     * <p>Test summary:<ul>
+     * <li>1. Number of partial results is less than or equal to
+     * {@link CameraCharacteristics#REQUEST_PARTIAL_RESULT_COUNT}.
+     * <li>2. Each key appeared in partial results must be unique across all partial results.
+     * <li>3. All keys appeared in partial results must be present in TotalCaptureResult
+     * <li>4. Also test onCaptureComplete callback always happen after onCaptureStart or
+     * onCaptureProgressed callbacks.
+     * </ul></p>
+     */
+    public void testPartialResult() throws Exception {
+        final int NUM_FRAMES_TESTED = 30;
+        final int WAIT_FOR_RESULT_TIMOUT_MS = 2000;
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+
+                // Skip the test if partial result is not supported
+                int partialResultCount = mStaticInfo.getPartialResultCount();
+                if (partialResultCount == 1) {
+                    continue;
+                }
+
+                // Create image reader and surface.
+                Size size = mOrderedPreviewSizes.get(0);
+                createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                        new ImageDropperListener());
+
+                // Configure output streams.
+                List<Surface> outputSurfaces = new ArrayList<Surface>(1);
+                outputSurfaces.add(mReaderSurface);
+                createSession(outputSurfaces);
+
+                CaptureRequest.Builder requestBuilder =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                assertNotNull("Failed to create capture request", requestBuilder);
+                requestBuilder.addTarget(mReaderSurface);
+                TotalAndPartialResultListener listener =
+                        new TotalAndPartialResultListener();
+
+                // Start capture
+                for (Integer frame = 0; frame < NUM_FRAMES_TESTED; frame++) {
+                    // Set a different tag for each request so the listener can group
+                    // partial results by each request
+                    requestBuilder.setTag(frame);
+                    startCapture(
+                            requestBuilder.build(), /*repeating*/false,
+                            listener, mHandler);
+                }
+
+                // Verify capture results
+                for (int frame = 0; frame < NUM_FRAMES_TESTED; frame++) {
+                    Pair<TotalCaptureResult, List<CaptureResult>> resultPair =
+                            listener.getCaptureResultPairs(WAIT_FOR_RESULT_TIMOUT_MS);
+                    if (resultPair.second == null) {
+                        // HAL only sends total result is legal
+                        continue;
+                    }
+                    mCollector.expectLessOrEqual("Too many partial results",
+                            partialResultCount, resultPair.second.size());
+                    Set<CaptureResult.Key<?>> appearedPartialKeys =
+                            new HashSet<CaptureResult.Key<?>>();
+                    for (CaptureResult partialResult : resultPair.second) {
+                        List<CaptureResult.Key<?>> partialKeys = partialResult.getKeys();
+                        mCollector.expectValuesUnique("Partial result keys: ", partialKeys);
+                        for (CaptureResult.Key<?> key : partialKeys) {
+                            mCollector.expectTrue(
+                                    String.format("Key %s appears in multiple partial results",
+                                            key.getName()),
+                                    !appearedPartialKeys.contains(key));
+                        }
+                        appearedPartialKeys.addAll(partialKeys);
+                    }
+                    List<CaptureResult.Key<?>> totalResultKeys = resultPair.first.getKeys();
+                    mCollector.expectTrue(
+                            "TotalCaptureResult should be a super set of partial capture results",
+                            totalResultKeys.containsAll(appearedPartialKeys));
+                }
+
+                int errorCode = listener.getErrorCode();
+                if ((errorCode & TotalAndPartialResultListener.ERROR_DUPLICATED_REQUEST) != 0) {
+                    mCollector.addMessage("Listener received multiple onCaptureComplete" +
+                            " callback for the same request");
+                }
+                if ((errorCode & TotalAndPartialResultListener.ERROR_WRONG_CALLBACK_ORDER) != 0) {
+                    mCollector.addMessage("Listener received onCaptureStart or" +
+                            " onCaptureProgressed after onCaptureComplete");
+                }
 
                 stopCapture(/*fast*/false);
             } finally {
@@ -391,6 +494,96 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
 
         return waiverKeys;
+    }
+
+    /**
+     * A capture listener implementation for collecting both partial and total results.
+     *
+     * <p> This is not a full-blown class and has some implicit assumptions. The class groups
+     * capture results by capture request, so the user must guarantee each request this listener
+     * is listening is unique. This class is not thread safe, so don't attach an instance object
+     * with multiple handlers.</p>
+     * */
+    private static class TotalAndPartialResultListener
+            extends CameraCaptureSession.CaptureListener {
+        static final int ERROR_DUPLICATED_REQUEST = 1 << 0;
+        static final int ERROR_WRONG_CALLBACK_ORDER = 1 << 1;
+
+        private final LinkedBlockingQueue<Pair<TotalCaptureResult, List<CaptureResult>> > mQueue =
+                new LinkedBlockingQueue<>();
+        private HashMap<CaptureRequest, List<CaptureResult>> mPartialResultsMap =
+                new HashMap<CaptureRequest, List<CaptureResult>>();
+        private HashSet<CaptureRequest> completedRequests = new HashSet<>();
+        private int errorCode = 0;
+
+        @Override
+        public void onCaptureStarted(
+                CameraCaptureSession session, CaptureRequest request, long timestamp)
+        {
+            checkCallbackOrder(request);
+            createMapEntryIfNecessary(request);
+        }
+
+        @Override
+        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
+                TotalCaptureResult result) {
+            try {
+                List<CaptureResult> partialResultsList = mPartialResultsMap.get(request);
+                if (partialResultsList == null) {
+                    Log.w(TAG, "onCaptureCompleted: unknown request");
+                }
+                mQueue.put(new Pair<TotalCaptureResult, List<CaptureResult>>(
+                        result, partialResultsList));
+                mPartialResultsMap.remove(request);
+                boolean newEntryAdded = completedRequests.add(request);
+                if (!newEntryAdded) {
+                    Integer frame = (Integer) request.getTag();
+                    Log.e(TAG, "Frame " + frame + "ERROR_DUPLICATED_REQUEST");
+                    errorCode |= ERROR_DUPLICATED_REQUEST;
+                }
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureCompleted");
+            }
+        }
+
+        @Override
+        public void onCaptureProgressed(CameraCaptureSession session, CaptureRequest request,
+                CaptureResult partialResult) {
+            createMapEntryIfNecessary(request);
+            List<CaptureResult> partialResultsList = mPartialResultsMap.get(request);
+            partialResultsList.add(partialResult);
+        }
+
+        private void createMapEntryIfNecessary(CaptureRequest request) {
+            if (!mPartialResultsMap.containsKey(request)) {
+                // create a new entry in the map
+                mPartialResultsMap.put(request, new ArrayList<CaptureResult>());
+            }
+        }
+
+        private void checkCallbackOrder(CaptureRequest request) {
+            if (completedRequests.contains(request)) {
+                Integer frame = (Integer) request.getTag();
+                Log.e(TAG, "Frame " + frame + "ERROR_WRONG_CALLBACK_ORDER");
+                errorCode |= ERROR_WRONG_CALLBACK_ORDER;
+            }
+        }
+
+        public Pair<TotalCaptureResult, List<CaptureResult>> getCaptureResultPairs(long timeout) {
+            try {
+                Pair<TotalCaptureResult, List<CaptureResult>> result =
+                        mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
+                return result;
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
+        }
+
+        public int getErrorCode() {
+            return errorCode;
+        }
     }
 
     /**

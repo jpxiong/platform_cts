@@ -251,6 +251,21 @@ public class StaticMetadata {
     }
 
     /**
+     * Get the maximum number of partial result a request can expect
+     *
+     * @return 1 if partial result is not supported.
+     *         a integer value larger than 1 if partial result is supported.
+     */
+    public int getPartialResultCount() {
+        Integer value = mCharacteristics.get(CameraCharacteristics.REQUEST_PARTIAL_RESULT_COUNT);
+        if (value == null) {
+            // Optional key. Default value is 1 if key is missing.
+            return 1;
+        }
+        return value;
+    }
+
+    /**
      * Get the exposure time value and clamp to the range if needed.
      *
      * @param exposure Input exposure time value to check.
