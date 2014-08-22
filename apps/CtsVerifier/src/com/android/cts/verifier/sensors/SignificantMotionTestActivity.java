@@ -16,120 +16,112 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
 import junit.framework.Assert;
-import android.annotation.TargetApi;
-import android.app.Activity;
+
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
+import android.os.SystemClock;
 
-@TargetApi(Build.VERSION_CODES.KITKAT)
-class TriggerListener extends TriggerEventListener {
-    // how much difference between system time and event time considered to be
-    // acceptable [msec]
-    private final long MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS = 500;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-    // state used for internal recording of the event detection
-    private boolean mEventDetected = false;
-
-    public void onTrigger(TriggerEvent event) {
-        final long NANOS_PER_MS = 1000000L;
-
-        Assert.assertEquals("values should be of length 1 for significant motion event", 1,
-                event.values.length);
-        Assert.assertEquals("values[0] should be 1.0 for significant motion event", 1.0f,
-                event.values[0]);
-
-        // Check that timestamp is within MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS
-        // It might take time to determine Significant Motion, but then that
-        // event should be reported to the host in a timely fashion.
-        long timeReportedMillis = event.timestamp / NANOS_PER_MS;
-        long timeActualMillis = System.currentTimeMillis();
-        Assert.assertEquals("Incorrect time reported in the event",
-                timeReportedMillis, timeActualMillis, MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS);
-
-        // Verify event type is truly Significant Motion
-        Assert.assertEquals("Triggered event type is not Significant Motion",
-                event.sensor.getType(), Sensor.TYPE_SIGNIFICANT_MOTION);
-
-        // Event detected flag should be false if indeed only one event per
-        // request
-        Assert.assertFalse("Significant Motion sensor did not automatically "
-                + "disable itself from subsequent detection", mEventDetected);
-
-        // audible cue to indicate Significant Motion occurred
-        beep();
-        mEventDetected = true;
+/**
+ * Test cases for Significant Motion sensor.
+ * They use walking motion to change the location and trigger Significant Motion.
+ */
+public class SignificantMotionTestActivity extends BaseSensorTestActivity {
+    public SignificantMotionTestActivity() {
+        super(SignificantMotionTestActivity.class);
     }
 
-    public boolean wasEventTriggered() {
-        return mEventDetected;
-    }
+    // acceptable time difference between event time and system time
+    private static final long MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS = 500;
 
-    public void reset() {
-        mEventDetected = false;
-    }
+    // time for the test to wait for a trigger
+    private static final int TRIGGER_MAX_DELAY_SECONDS = 30;
+    private static final int VIBRATE_DURATION_MILLIS = 10000;
 
-    private void beep() {
-        final ToneGenerator tg = new ToneGenerator(
-                AudioManager.STREAM_NOTIFICATION, 100);
-        tg.startTone(ToneGenerator.TONE_PROP_BEEP);
-    }
-}
-
-@TargetApi(Build.VERSION_CODES.KITKAT)
-public class SignificantMotionTestActivity extends BaseSensorSemiAutomatedTestActivity {
-    // minimum time for test to consider valid [msec]
-    private final int MIN_TEST_TIME_MILLIS = 20000;
-    private final int VIBRATE_DURATION_MILLIS = 10000;
+    private static final int EVENT_VALUES_LENGTH = 1;
+    private static final float EXPECTED_EVENT_VALUE = 1.0f;
 
     private SensorManager mSensorManager;
     private Sensor mSensorSignificantMotion;
-    private final TriggerListener mTriggeredListener = new TriggerListener();
-    private long mTestStartTimestamp;
-    private static int sNumPassedTests = 0;
 
-    @Override
-    protected void onRun() throws Throwable {
-        switch (sNumPassedTests) {
-        // avoid re-running passed tests, so purposely want fallthroughs here
-            case 0:
-                // use walking to change location and trigger significant motion
-                runTest("walk 15 steps for significant motion to be detected", true, false, false);
-            case 1:
-                runTest("walk another 15 steps to ensure significant motion "
-                        + "is not reported after trigger cancelled", false, true, false);
-            case 2:
-                // use vibrator to ensure significant motion is not triggered
-                runTest("leave the device on a level surface", false, false, true);
-            case 3:
-                // use natural motion that does not change location to ensure
-                // significant motion is not triggered
-                runTest("hold the device in hand while performing natural "
-                        + "hand movements", false, false, false);
-            case 4:
-                runTest("keep the device in pocket and move naturally while "
-                        + "sitting in a chair", false, false, false);
-            default:
-                break;
-        }
+    /**
+     * Test cases.
+     */
+    public String testTrigger() throws Throwable {
+        return runTest(
+                R.string.snsr_significant_motion_test_trigger,
+                true /* isMotionExpected */,
+                false /* cancelEventNotification */,
+                false /* vibrate */);
     }
 
-    private void vibrateDevice(int timeInMs) {
-        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(timeInMs);
+    public String testNotTriggerAfterCancell() throws Throwable {
+        return runTest(
+                R.string.snsr_significant_motion_test_cancel,
+                false /* isMotionExpected */,
+                true /* cancelEventNotification */,
+                false /* vibrate */);
     }
 
     /**
-     * @param instructions Instruction to be shown to testers
+     * Verifies that Significant Motion is not trigger by the vibrator motion.
+     */
+    public String testVibratorDoesNotTrigger() throws Throwable {
+     return runTest(
+             R.string.snsr_significant_motion_test_vibration,
+             false /* isMotionExpected */,
+             false /* cancelEventNotification */,
+             true /* vibrate */);
+    }
+
+    /**
+     * Verifies that the natural motion of keeping the device in hand does not change the location.
+     * It ensures that Significant Motion will not trigger in that scenario.
+     */
+    public String testInHandDoesNotTrigger() throws Throwable {
+        return runTest(
+                R.string.snsr_significant_motion_test_in_hand,
+                false /* isMotionExpected */,
+                false /* cancelEventNotification */,
+                false /* vibrate */);
+    }
+
+    public String testSittingDoesNotTrigger() throws Throwable {
+        return runTest(
+                R.string.snsr_significant_motion_test_sitting,
+                false /* isMotionExpected */,
+                false /* cancelEventNotification */,
+                false /* vibrate */);
+    }
+
+    public String testTriggerDeactivation() throws Throwable {
+        appendText(R.string.snsr_significant_motion_test_deactivation);
+        waitForUser();
+
+        TriggerVerifier verifier = new TriggerVerifier();
+        mSensorManager.requestTriggerSensor(verifier, mSensorSignificantMotion);
+        appendText(R.string.snsr_test_play_sound);
+
+        // wait for the first event to trigger
+        verifier.verifyEventTriggered();
+
+        // wait for a second event not to trigger
+        String result = verifier.verifyEventNotTriggered();
+        playSound();
+        return result;
+    }
+
+    /**
+     * @param instructionsResId Instruction to be shown to testers
      * @param isMotionExpected Should the device detect significant motion event
      *            for this test?
      * @param cancelEventNotification If TRUE, motion notifications will be
@@ -137,57 +129,40 @@ public class SignificantMotionTestActivity extends BaseSensorSemiAutomatedTestAc
      * @param vibrate If TRUE, vibration will be concurrent with the test
      * @throws Throwable
      */
-    private void runTest(String instructions, final boolean isMotionExpected,
-            final boolean cancelEventNotification, final boolean vibrate) throws Throwable {
-
-        appendText("Click 'Next' and " + instructions);
+    private String runTest(
+            int instructionsResId,
+            boolean isMotionExpected,
+            boolean cancelEventNotification,
+            boolean vibrate) throws Throwable {
+        appendText(instructionsResId);
         waitForUser();
 
         if (vibrate) {
-            vibrateDevice(VIBRATE_DURATION_MILLIS);
+            vibrate(VIBRATE_DURATION_MILLIS);
         }
 
-        mTestStartTimestamp = System.currentTimeMillis();
-        startMeasurements(cancelEventNotification);
-
-        long testTime = System.currentTimeMillis() - mTestStartTimestamp;
-
-        while (!mTriggeredListener.wasEventTriggered()
-                && testTime < MIN_TEST_TIME_MILLIS) {
-            int timeWaitSec = Math
-                    .round((MIN_TEST_TIME_MILLIS - testTime) / 1000);
-            clearText();
-            appendText("Current test: " + instructions);
-            appendText(
-                    String.format("%d seconds for the test to complete", timeWaitSec),
-                    Color.GRAY);
-
-            Thread.sleep(1000);
-            testTime = System.currentTimeMillis() - mTestStartTimestamp;
+        TriggerVerifier verifier = new TriggerVerifier();
+        Assert.assertTrue(
+                getString(R.string.snsr_significant_motion_registration),
+                mSensorManager.requestTriggerSensor(verifier, mSensorSignificantMotion));
+        if (cancelEventNotification) {
+            Assert.assertTrue(
+                    getString(R.string.snsr_significant_motion_cancelation),
+                    mSensorManager.cancelTriggerSensor(verifier, mSensorSignificantMotion));
         }
-        clearText();
-        appendText("Current test: " + instructions);
-        playSound();
-        verifyMeasurements(isMotionExpected);
-        sNumPassedTests++;
-    }
+        appendText(R.string.snsr_test_play_sound);
 
-    private void startMeasurements(boolean isCancelTriggerRequested) throws Throwable {
-        mTriggeredListener.reset();
-
-        mSensorManager.requestTriggerSensor(mTriggeredListener, mSensorSignificantMotion);
-
-        if (isCancelTriggerRequested) {
-            mSensorManager.cancelTriggerSensor(mTriggeredListener, mSensorSignificantMotion);
+        String result;
+        try {
+            if (isMotionExpected) {
+                result = verifier.verifyEventTriggered();
+            } else {
+                result = verifier.verifyEventNotTriggered();
+            }
+        } finally {
+            mSensorManager.cancelTriggerSensor(verifier, mSensorSignificantMotion);
         }
-    }
-
-    private void verifyMeasurements(boolean isMotionExpected) throws Throwable {
-        Assert.assertEquals("Significant motion event expected/detected mismatch: "
-                + isMotionExpected + " / " + mTriggeredListener.wasEventTriggered(),
-                isMotionExpected, mTriggeredListener.wasEventTriggered());
-        appendText("Significant motion event " + isMotionExpected + " as expected", Color.GRAY);
-        logSuccess();
+        return result;
     }
 
     @Override
@@ -196,29 +171,102 @@ public class SignificantMotionTestActivity extends BaseSensorSemiAutomatedTestAc
 
         mSensorManager = (SensorManager) getApplicationContext()
                 .getSystemService(Context.SENSOR_SERVICE);
-
         mSensorSignificantMotion = mSensorManager
                 .getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    /**
+     * Helper Trigger listener for testing.
+     * It cannot be reused.
+     */
+    private class TriggerVerifier extends TriggerEventListener {
+        private volatile CountDownLatch mCountDownLatch;
+        private volatile TriggerEventRegistry mEventRegistry;
 
-        if (mSensorManager != null && mSensorSignificantMotion != null) {
-            mSensorManager.requestTriggerSensor(mTriggeredListener,
-                    mSensorSignificantMotion);
+        private class TriggerEventRegistry {
+            public final TriggerEvent triggerEvent;
+            public final long realtimeTimestampNanos;
+
+            public TriggerEventRegistry(TriggerEvent event, long realtimeTimestampNanos) {
+                this.triggerEvent = event;
+                this.realtimeTimestampNanos = realtimeTimestampNanos;
+            }
         }
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+        public void onTrigger(TriggerEvent event) {
+            long elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos();
+            mEventRegistry = new TriggerEventRegistry(event, elapsedRealtimeNanos);
+            mCountDownLatch.countDown();
+        }
 
-        if (mSensorManager != null && mSensorSignificantMotion != null) {
-            mSensorManager.cancelTriggerSensor(mTriggeredListener,
-                    mSensorSignificantMotion);
+        public String verifyEventTriggered() throws Throwable {
+            TriggerEventRegistry registry = awaitForEvent();
+
+            // verify an event arrived, and it is indeed a Significant Motion event
+            TriggerEvent event = registry.triggerEvent;
+            String eventArrivalMessage =
+                    getString(R.string.snsr_significant_motion_event_arrival, event);
+            Assert.assertNotNull(eventArrivalMessage, event);
+
+            int eventType = event.sensor.getType();
+            String eventTypeMessage = getString(
+                    R.string.snsr_significant_motion_event_type,
+                    Sensor.TYPE_SIGNIFICANT_MOTION,
+                    eventType);
+            Assert.assertEquals(eventTypeMessage, Sensor.TYPE_SIGNIFICANT_MOTION, eventType);
+
+            int valuesLength = event.values.length;
+            String valuesLengthMessage = getString(
+                    R.string.snsr_significant_motion_event_length,
+                    EVENT_VALUES_LENGTH,
+                    valuesLength);
+            Assert.assertEquals(valuesLengthMessage, EVENT_VALUES_LENGTH, valuesLength);
+
+            float value = event.values[0];
+            String valuesMessage = getString(
+                    R.string.snsr_significant_motion_event_value,
+                    EXPECTED_EVENT_VALUE,
+                    value);
+            Assert.assertEquals(valuesMessage, EXPECTED_EVENT_VALUE, value);
+
+            // Check that timestamp is within MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS: it might take
+            // time to determine Significant Motion, but then that event should be reported to the
+            // host in a timely fashion.
+            long eventTimestamp = event.timestamp;
+            long elapsedRealtimeNanos = registry.realtimeTimestampNanos;
+            long timestampDelta = Math.abs(eventTimestamp - elapsedRealtimeNanos);
+            String timestampMessage = getString(
+                    R.string.snsr_significant_motion_event_time,
+                    elapsedRealtimeNanos,
+                    eventTimestamp,
+                    timestampDelta,
+                    MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS);
+            Assert.assertTrue(
+                    timestampMessage,
+                    timestampDelta < MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS);
+            return timestampMessage;
+        }
+
+        public String verifyEventNotTriggered() throws Throwable {
+            TriggerEventRegistry registry = awaitForEvent();
+
+            TriggerEvent event = registry.triggerEvent;
+            String eventMessage =
+                    getString(R.string.snsr_significant_motion_event_unexpected, event);
+            Assert.assertNull(eventMessage, event);
+            return eventMessage;
+        }
+
+        private TriggerEventRegistry awaitForEvent() throws InterruptedException {
+            mCountDownLatch = new CountDownLatch(1);
+            mCountDownLatch.await(TRIGGER_MAX_DELAY_SECONDS, TimeUnit.SECONDS);
+
+            TriggerEventRegistry registry = mEventRegistry;
+            mEventRegistry = null;
+
+            playSound();
+            return registry != null ? registry : new TriggerEventRegistry(null, 0);
         }
     }
 }
