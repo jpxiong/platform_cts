@@ -39,6 +39,7 @@ import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.printservice.PrintJob;
 import android.printservice.PrinterDiscoverySession;
 
+import junit.framework.AssertionFailedError;
 import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -241,13 +242,18 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         inOrder.verify(firstSessionCallbacks).onStopPrinterStateTracking(
                 firstPrinterId);
 
-        // We print again which brings the print activity up but the old
-        // print activity is not destroyed yet (just fine) which is the
-        // printer discovery session is not destroyed and the second print
-        // will join the ongoing session. Hence, instead of start printer
-        // discovery we are getting a printer validation request.
+        // This is tricky. It is possible that the print activity was not
+        // destroyed (the platform delays destruction at convenient time as
+        // an optimization) and we get the same instance which means that
+        // the discovery session may not have been destroyed. We try the
+        // case with the activity being destroyed and if this fails the
+        // case with the activity brought to front.
         priorityList.add(firstPrinterId);
-        inOrder.verify(firstSessionCallbacks).onValidatePrinters(priorityList);
+        try {
+            inOrder.verify(firstSessionCallbacks).onStartPrinterDiscovery(priorityList);
+        } catch (AssertionFailedError error) {
+            inOrder.verify(firstSessionCallbacks).onValidatePrinters(priorityList);
+        }
 
         // The system selects the highest ranked historical printer.
         inOrder.verify(firstSessionCallbacks).onStartPrinterStateTracking(
