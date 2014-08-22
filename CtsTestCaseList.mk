@@ -32,7 +32,7 @@ cts_support_packages := \
 	CtsAccelerationTestStubs \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
-	CtsHoloDeviceApp \
+	CtsThemeDeviceApp \
 	CtsMonkeyApp \
 	CtsMonkeyApp2 \
 	CtsSomeAccessibilityServices \
@@ -108,7 +108,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 # Host side only tests
 cts_host_libraries := \
 	CtsAppSecurityTests \
-	CtsHoloHostTestCases \
+	CtsThemeHostTestCases \
 	CtsMonkeyTestCases
 
 # Native test executables that need to have associated test XMLs.
