@@ -21,12 +21,14 @@ import com.android.cts.verifier.TestResult;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -284,6 +286,11 @@ public abstract class BaseSensorTestActivity
         }
     }
 
+    protected void vibrate(int timeInMs) {
+        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(timeInMs);
+    }
+
     private List<Method> findTestMethods() {
         ArrayList<Method> testMethods = new ArrayList<Method>();
         for (Method method : mTestClass.getDeclaredMethods()) {
@@ -299,7 +306,7 @@ public abstract class BaseSensorTestActivity
 
     private SensorTestDetails executeTest(Method testMethod) {
         SensorTestDetails testDetails = new SensorTestDetails();
-        testDetails.name = String.format("%s.%s", getTestClassName(), testMethod.getName());
+        testDetails.name = String.format("%s#%s", getTestClassName(), testMethod.getName());
 
         try {
             appendText(getString(R.string.snsr_executing_test, testDetails.name));

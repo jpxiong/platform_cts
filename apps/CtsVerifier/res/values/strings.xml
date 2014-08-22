@@ -503,6 +503,21 @@
 
     <!-- Significant Motion -->
     <string name="snsr_significant_motion_test">Significant Motion Tests</string>
+    <string name="snsr_significant_motion_event_arrival">Event expected to trigger. Current: %1$s</string>
+    <string name="snsr_significant_motion_event_type">Event expected to be of type=%1$d. Found=%2$d</string>
+    <string name="snsr_significant_motion_event_length">Event values expected to have size=%1$d. Found=%2$d</string>
+    <string name="snsr_significant_motion_event_value">Event value[0] expected to be of value=%1$f. Found=%2$f</string>
+    <string name="snsr_significant_motion_event_time">Event timestamp expected to be at=%1$d. Found=%2$d. Delta=%3$d. Threshold=%4$d.</string>
+    <string name="snsr_significant_motion_event_unexpected">Event not expected to trigger. Current: %1$s.</string>
+    <string name="snsr_significant_motion_disable_info">Significant Motion is expected to disable itself after it triggers once.</string>
+    <string name="snsr_significant_motion_test_trigger">Once you begin the test, you will need to walk for Significant Motion to be detected.</string>
+    <string name="snsr_significant_motion_test_cancel">Once you begin the test, you will need to walk to ensure Significant Motion is not reported after trigger canceled.</string>
+    <string name="snsr_significant_motion_test_vibration">Leave the device in a level surface. Once you begin the test, the device will vibrate to ensure that Significant Motion is not triggered.</string>
+    <string name="snsr_significant_motion_test_in_hand">Once you begin the test, hold the device in your hand while you perform natural hand movements.</string>
+    <string name="snsr_significant_motion_test_sitting">Once you begin the test, keep the device in your pocket and move naturally while sitting in a chair.</string>
+    <string name="snsr_significant_motion_test_deactivation">Once you begin the test, you will need to walk to ensure Significant Motion triggers only once.</string>
+    <string name="snsr_significant_motion_registration">Expected to be able to register for TriggerSensor. Found=%b.</string>
+    <string name="snsr_significant_motion_cancelation">Expected to be able to cancel TriggerSensor. Found=%b.</string>
 
     <!-- Strings for Sample Test Activities -->
     <string name="share_button_text">Share</string>
