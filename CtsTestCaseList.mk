@@ -31,7 +31,7 @@ cts_security_apps_list := \
 cts_support_packages := \
 	CtsAccelerationTestStubs \
 	CtsDeviceAdmin \
-	CtsHoloDeviceApp \
+	CtsThemeDeviceApp \
 	CtsMonkeyApp \
 	CtsMonkeyApp2 \
 	CtsSomeAccessibilityServices \
@@ -114,7 +114,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
 	CtsAdbTests \
 	CtsAppSecurityTests \
-	CtsHoloHostTestCases \
+	CtsThemeHostTestCases \
 	CtsMonkeyTestCases
 
 
