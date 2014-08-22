@@ -20,6 +20,8 @@ LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
 
 LOCAL_STATIC_LIBRARIES += \
+    libtinyxml2 \
+    liblog \
     libgtest \
     libgtest_main \
 
