@@ -442,6 +442,7 @@
     <string name="snsr_airplane_mode_request">You will be redirected to set \'Airplane Mode\' ON.</string>
     <string name="snsr_screen_off_timeout">Screen Off Timeout set to: %1$d seconds.</string>
     <string name="snsr_screen_off_request">You will be redirected to set \'Display Sleep\' to %1$d seconds.</string>
+    <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
 
     <!-- Accelerometer -->
     <string name="snsr_accel_test">Accelerometer Test</string>
@@ -491,6 +492,9 @@
     <!-- Sensor Value Accuracy -->
     <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
     <string name="snsr_rot_vec_test">Rotation Vector Accuracy Test</string>
+    <string name="snsr_event_length">Sensor(%3$s). Event values expected to have size=%1$d. Found=%2$d</string>
+    <string name="snsr_event_value">Sensor(%3$s). Event value[0] expected to be of value=%1$f. Found=%2$f</string>
+    <string name="snsr_event_time">Sensor(%3$s). Event timestamp expected to be at=%1$d. Found=%2$d. Delta=%3$d. Threshold=%4$d.</string>
 
     <!-- Sensor Batching -->
     <string name="snsr_batch_test">Sensor Batching Tests</string>
@@ -500,14 +504,21 @@
 
     <!-- Step Counter and Detector -->
     <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
+    <string name="snsr_step_counter_test_walking">Once the test begins, you will need to walk, and tap on the screen with each step you take.</string>
+    <string name="snsr_step_counter_test_still">Once the test begins, you will need to hold the device still in your hand.</string>
+    <string name="snsr_step_counter_test_waving">Once the test begins, you will need to wave the device in your hand throughout the test.</string>
+    <string name="snsr_step_counter_expected_steps">At least %1$d steps are expected to be reported. Reported=%2$d.</string>
+    <string name="snsr_step_counter_detected_reported">Steps reported by user=%1$d. Steps counted=%2$d. Delta=%3$d. Tolerance=%4$d.</string>
+    <string name="snsr_step_detector_detected_reported">Steps reported by user=%1$d. Steps detected=%2$d. Delta=%3$d. Tolerance=%4$d.</string>
+    <string name="snsr_step_counter_event_changed">Step counter expected to increase monotonically, with a delta > 0. Found=%1$d. Timestamp=%2$d.</string>
+    <string name="snsr_step_reported">%1$d | User reported step.</string>
+    <string name="snsr_step_counter_event">%1$d | Step Counter event. count=%2$d.</string>
+    <string name="snsr_step_detector_event">%1$d | Step Detector event.</string>
 
     <!-- Significant Motion -->
     <string name="snsr_significant_motion_test">Significant Motion Tests</string>
     <string name="snsr_significant_motion_event_arrival">Event expected to trigger. Current: %1$s</string>
     <string name="snsr_significant_motion_event_type">Event expected to be of type=%1$d. Found=%2$d</string>
-    <string name="snsr_significant_motion_event_length">Event values expected to have size=%1$d. Found=%2$d</string>
-    <string name="snsr_significant_motion_event_value">Event value[0] expected to be of value=%1$f. Found=%2$f</string>
-    <string name="snsr_significant_motion_event_time">Event timestamp expected to be at=%1$d. Found=%2$d. Delta=%3$d. Threshold=%4$d.</string>
     <string name="snsr_significant_motion_event_unexpected">Event not expected to trigger. Current: %1$s.</string>
     <string name="snsr_significant_motion_disable_info">Significant Motion is expected to disable itself after it triggers once.</string>
     <string name="snsr_significant_motion_test_trigger">Once you begin the test, you will need to walk for Significant Motion to be detected.</string>
