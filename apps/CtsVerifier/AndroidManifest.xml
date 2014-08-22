@@ -732,7 +732,8 @@
                        android:value="android.hardware.sensor.accelerometer" />
         </activity>
 
-        <activity android:name=".sensors.SensorSynchronizationTestActivity"
+        <!-- TODO: enable test when a more reliable way to identify time synchronization is available -->
+        <!--activity android:name=".sensors.SensorSynchronizationTestActivity"
                   android:label="@string/snsr_synch_test"
                   android:screenOrientation="nosensor">
             <intent-filter>
@@ -742,7 +743,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
             <meta-data android:name="test_required_features"
                        android:value="android.hardware.sensor.gyroscope" />
-        </activity>
+        </activity-->
 
         <activity android:name=".location.LocationModeOffTestActivity"
                 android:label="@string/location_mode_off_test">
