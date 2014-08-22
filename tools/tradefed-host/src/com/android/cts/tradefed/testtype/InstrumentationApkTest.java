@@ -93,7 +93,7 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
                 String[] options = {};
                 String forceAbi = getForceAbi();
                 if (forceAbi != null) {
-                    String abi = AbiFormatter.getDefaultAbi(mTestDevice, mForceAbi);
+                    String abi = AbiFormatter.getDefaultAbi(mTestDevice, forceAbi);
                     if (abi != null) {
                         options = new String[]{String.format("--abi %s ", abi)};
                     }
