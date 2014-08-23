@@ -18,15 +18,19 @@ package android.webkit.cts;
 import android.content.Context;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
+import android.net.http.SslError;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.TextSize;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 import java.io.FileOutputStream;
 import java.util.Locale;
@@ -930,6 +934,70 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         FileOutputStream fos = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
         fos.write(content.getBytes());
         fos.close();
+    }
+
+    public void testAllowMixedMode() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+        final class SslWebViewClient extends WaitForLoadedClient {
+            public SslWebViewClient() {
+                super(mOnUiThread);
+            }
+            @Override
+            public void onReceivedSslError(WebView view,
+                    SslErrorHandler handler, SslError error) {
+                handler.proceed();
+            }
+        }
+
+        mSettings.setJavaScriptEnabled(true);
+
+        try {
+            TestWebServer httpsServer = new TestWebServer(true);
+            TestWebServer httpServer = new TestWebServer(false);
+            final String JS_URL = "/insecure.js";
+            final String IMG_URL = "/insecure.png";
+            final String SECURE_URL = "/secure.html";
+            final String JS_HTML = "<script src=\"" + httpServer.getResponseUrl(JS_URL) +
+                "\"></script>";
+            final String IMG_HTML = "<img src=\"" + httpServer.getResponseUrl(IMG_URL) + "\" />";
+            final String SECURE_HTML = "<body>" + IMG_HTML + " " + JS_HTML + "</body>";
+            httpServer.setResponse(JS_URL, "window.loaded_js = 42;", null);
+            httpServer.setResponseBase64(IMG_URL,
+                    "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                    null);
+            String secureUrl = httpsServer.setResponse(SECURE_URL, SECURE_HTML, null);
+
+            mOnUiThread.clearSslPreferences();
+
+            mOnUiThread.setWebViewClient(new SslWebViewClient());
+
+            mSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+            mOnUiThread.loadUrlAndWaitForCompletion(secureUrl);
+            assertEquals(1, httpsServer.getRequestCount(SECURE_URL));
+            assertEquals(0, httpServer.getRequestCount(JS_URL));
+            assertEquals(0, httpServer.getRequestCount(IMG_URL));
+
+            mSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            mOnUiThread.loadUrlAndWaitForCompletion(secureUrl);
+            assertEquals(2, httpsServer.getRequestCount(SECURE_URL));
+            assertEquals(1, httpServer.getRequestCount(JS_URL));
+            assertEquals(1, httpServer.getRequestCount(IMG_URL));
+
+            mSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+            mOnUiThread.loadUrlAndWaitForCompletion(secureUrl);
+            assertEquals(3, httpsServer.getRequestCount(SECURE_URL));
+            assertEquals(1, httpServer.getRequestCount(JS_URL));
+            assertEquals(2, httpServer.getRequestCount(IMG_URL));
+        } finally {
+            if (httpServer != null) {
+                httpServer.shutdown();
+            }
+            if (httpsServer != null) {
+                httpsServer.shutdown();
+            }
+        }
     }
 
     /**
