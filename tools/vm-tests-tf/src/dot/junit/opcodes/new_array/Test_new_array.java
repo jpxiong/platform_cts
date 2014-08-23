@@ -86,13 +86,8 @@ public class Test_new_array extends DxTestCase {
      * @title expected NegativeArraySizeException
      */
     public void testE1() {
-        T_new_array_2 t = new T_new_array_2();
-        try {
-            t.run(-1);
-            fail("expected NegativeArraySizeException");
-        } catch (NegativeArraySizeException nase) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.new_array.d.T_new_array_2", NegativeArraySizeException.class,
+                   -1);
     }
 
 
@@ -101,12 +96,7 @@ public class Test_new_array extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_4", VerifyError.class);
     }
 
     /**
@@ -115,12 +105,7 @@ public class Test_new_array extends DxTestCase {
      * @title  size argument - long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_5", VerifyError.class);
     }
 
     /**
@@ -129,12 +114,7 @@ public class Test_new_array extends DxTestCase {
      * @title  size argument - reference
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_9", VerifyError.class);
     }
 
     /**
@@ -143,12 +123,7 @@ public class Test_new_array extends DxTestCase {
      * @title  constant pool index
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_6", VerifyError.class);
     }
 
     /**
@@ -157,12 +132,7 @@ public class Test_new_array extends DxTestCase {
      * @title  attempt to create object
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_7", VerifyError.class);
     }
 
     /**
@@ -171,12 +141,7 @@ public class Test_new_array extends DxTestCase {
      * @title  array of more than 255 dimensions
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_array.d.T_new_array_8", ClassNotFoundException.class);
     }
 
     /**
@@ -184,11 +149,7 @@ public class Test_new_array extends DxTestCase {
      * @title Attempt to instantiate array of non-existent class.
      */
     public void testVFE7() {
-        try {
-            new T_new_array_11().run();
-            fail("expected NoClassDefFoundError");
-        } catch (NoClassDefFoundError t) {
-        }
+        loadAndRun("dot.junit.opcodes.new_array.d.T_new_array_11", NoClassDefFoundError.class);
     }
 
     /**
@@ -197,11 +158,7 @@ public class Test_new_array extends DxTestCase {
      */
     public void testVFE8() {
         //@uses dot.junit.opcodes.new_array.TestStubs
-        try {
-            new T_new_array_10().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.new_array.d.T_new_array_10", IllegalAccessError.class);
     }
 
 }

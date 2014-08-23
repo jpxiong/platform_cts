@@ -35,12 +35,7 @@ public class Test_move_object extends DxTestCase {
      * @title  number of registers - src is not valid
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_2", VerifyError.class);
     }
     
     /**
@@ -48,12 +43,7 @@ public class Test_move_object extends DxTestCase {
      * @title number of registers - dst is not valid
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_3", VerifyError.class);
     }
 
     /**
@@ -61,12 +51,7 @@ public class Test_move_object extends DxTestCase {
      * @title src register contains integer
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_4", VerifyError.class);
     }
     
     /**
@@ -74,12 +59,7 @@ public class Test_move_object extends DxTestCase {
      * @title src register contains wide
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_5", VerifyError.class);
     }
     
     /**
@@ -87,12 +67,7 @@ public class Test_move_object extends DxTestCase {
      * @title src register is a part of reg pair
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_6", VerifyError.class);
     }
     
     /**
@@ -102,11 +77,6 @@ public class Test_move_object extends DxTestCase {
      * up, and the other register involved in it becomes undefined.
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.move_object.d.T_move_object_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_object.d.T_move_object_7", VerifyError.class);
     }
 }

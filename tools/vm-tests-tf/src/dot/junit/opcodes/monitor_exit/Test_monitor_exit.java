@@ -47,13 +47,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testE3() {
-        T_monitor_exit_3 t = new T_monitor_exit_3();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_3", NullPointerException.class);
     }
 
     /**
@@ -61,12 +55,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_4", VerifyError.class);
     }
 
 
@@ -76,12 +65,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title  type of arguments - int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_5", VerifyError.class);
     }
     
     /**
@@ -89,12 +73,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title  type of arguments - float
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_6", VerifyError.class);
     }
     
     /**
@@ -102,12 +81,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title  type of arguments - long
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_7", VerifyError.class);
     }
     
     /**
@@ -115,12 +89,7 @@ public class Test_monitor_exit extends DxTestCase {
      * @title  type of arguments - double
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.monitor_exit.d.T_monitor_exit_8", VerifyError.class);
     }
 
 }

@@ -68,13 +68,7 @@ public class Test_iput_object extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_iput_object_13 t = new T_iput_object_13();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_13", NullPointerException.class);
     }
 
 
@@ -83,12 +77,7 @@ public class Test_iput_object extends DxTestCase {
      * @title constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_3", VerifyError.class);
     }
 
     /**
@@ -97,12 +86,7 @@ public class Test_iput_object extends DxTestCase {
      * @title number of registers
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_4", VerifyError.class);
     }
 
 
@@ -113,11 +97,7 @@ public class Test_iput_object extends DxTestCase {
      * different type exists
      */
     public void testVFE5() {
-        try {
-            new T_iput_object_17().run();
-            fail("expected NoSuchFieldError");
-        } catch (NoSuchFieldError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_17", NoSuchFieldError.class);
     }
 
 
@@ -128,12 +108,7 @@ public class Test_iput_object extends DxTestCase {
      * field with single-width register
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_18");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_18", VerifyError.class);
     }
 
     /**
@@ -142,11 +117,8 @@ public class Test_iput_object extends DxTestCase {
      * @title Attempt to set non-static field.
      */
     public void testVFE8() {
-         try {
-             new T_iput_object_7().run();
-             fail("expected IncompatibleClassChangeError");
-         } catch (IncompatibleClassChangeError t) {
-         }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_7",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -155,12 +127,7 @@ public class Test_iput_object extends DxTestCase {
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.iput_object.TestStubs
-        //@uses dot.junit.opcodes.iput_object.d.T_iput_object_8
-        try {
-            new T_iput_object_8().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_8", IllegalAccessError.class);
     }
 
     /**
@@ -168,11 +135,7 @@ public class Test_iput_object extends DxTestCase {
      * @title Attempt to modify field of undefined class.
      */
     public void testVFE10() {
-        try {
-            new T_iput_object_9().run();
-            fail("expected NoClassDefFoundError");
-        } catch (NoClassDefFoundError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_9", NoClassDefFoundError.class);
     }
 
     /**
@@ -180,11 +143,7 @@ public class Test_iput_object extends DxTestCase {
      * @title Attempt to modify undefined field.
      */
     public void testVFE11() {
-        try {
-            new T_iput_object_10().run();
-            fail("expected NoSuchFieldError");
-        } catch (NoSuchFieldError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_10", NoSuchFieldError.class);
     }
 
 
@@ -195,12 +154,7 @@ public class Test_iput_object extends DxTestCase {
      */
     public void testVFE12() {
         //@uses dot.junit.opcodes.iput_object.d.T_iput_object_1
-        //@uses dot.junit.opcodes.iput_object.d.T_iput_object_15
-        try {
-            new T_iput_object_15().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_15", IllegalAccessError.class);
     }
 
 
@@ -209,12 +163,7 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for wide numbers
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_2", VerifyError.class);
     }
 
     /**
@@ -223,12 +172,7 @@ public class Test_iput_object extends DxTestCase {
      * @title assignment incompatible references
      */
     public void testVFE14() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_20", VerifyError.class);
     }
 
     /**
@@ -237,12 +181,7 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for char fields
      */
     public void testVFE15() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_21");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_21", VerifyError.class);
     }
 
     /**
@@ -251,12 +190,7 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for int fields
      */
     public void testVFE16() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_22");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_22", VerifyError.class);
     }
 
     /**
@@ -265,12 +199,7 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for byte fields
      */
     public void testVFE17() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_23");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_23", VerifyError.class);
     }
 
     /**
@@ -279,12 +208,7 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for boolean fields
      */
     public void testVFE18() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_24");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_24", VerifyError.class);
     }
 
     /**
@@ -293,27 +217,23 @@ public class Test_iput_object extends DxTestCase {
      * @title iput-object shall not work for short fields
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_6", VerifyError.class);
     }
-
-
 
     /**
      * @constraint B6
      * @title instance fields may only be accessed on already initialized instances.
      */
     public void testVFE30() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_object.d.T_iput_object_30");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_30", VerifyError.class);
+    }
+
+    /**
+     * @constraint N/A
+     * @title instance fields may only be accessed on reference registers.
+     */
+    public void testVFE31() {
+        load("dot.junit.opcodes.iput_object.d.T_iput_object_31", VerifyError.class);
     }
 
     /**
@@ -322,12 +242,7 @@ public class Test_iput_object extends DxTestCase {
      */
     public void testVFE19() {
         //@uses dot.junit.opcodes.iput_object.TestStubs
-        //@uses dot.junit.opcodes.iput_object.d.T_iput_object_11
-    	try {
-            new T_iput_object_11().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.iput_object.d.T_iput_object_11", IllegalAccessError.class);
     }
 }
 

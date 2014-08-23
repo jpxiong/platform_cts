@@ -105,12 +105,7 @@ public class Test_if_ne extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_5", VerifyError.class);
     }
 
 
@@ -120,12 +115,7 @@ public class Test_if_ne extends DxTestCase {
      * @title types of arguments - int, double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_7", VerifyError.class);
     }
 
     /**
@@ -133,12 +123,7 @@ public class Test_if_ne extends DxTestCase {
      * @title types of arguments - long, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_8", VerifyError.class);
     }
     
     /**
@@ -146,12 +131,7 @@ public class Test_if_ne extends DxTestCase {
      * @title  types of arguments - int, reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_9", VerifyError.class);
     }
 
     /**
@@ -159,12 +139,7 @@ public class Test_if_ne extends DxTestCase {
      * @title  branch target shall be inside the method
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_10", VerifyError.class);
     }
 
     /**
@@ -172,12 +147,7 @@ public class Test_if_ne extends DxTestCase {
      * @title branch target shall not be "inside" instruction
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_11", VerifyError.class);
     }
 
     /**
@@ -185,12 +155,7 @@ public class Test_if_ne extends DxTestCase {
      * @title branch target shall not be 0
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_12", VerifyError.class);
     }
 
     /**
@@ -199,12 +164,7 @@ public class Test_if_ne extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.if_ne.d.T_if_ne_4", VerifyError.class);
     }
 
 }

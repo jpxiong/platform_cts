@@ -103,12 +103,7 @@ public class Test_float_to_double extends DxTestCase {
      * @title type of argument - double
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_2", VerifyError.class);
     }
 
     /**
@@ -117,12 +112,7 @@ public class Test_float_to_double extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_3", VerifyError.class);
     }
 
     /**
@@ -130,12 +120,7 @@ public class Test_float_to_double extends DxTestCase {
      * @title number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_4", VerifyError.class);
     }
 
     /**
@@ -143,12 +128,7 @@ public class Test_float_to_double extends DxTestCase {
      * @title type of argument - reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_5", VerifyError.class);
     }
     
     /**
@@ -156,12 +136,7 @@ public class Test_float_to_double extends DxTestCase {
      * @title number of registers
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_6", VerifyError.class);
     }
 
     /**
@@ -170,12 +145,7 @@ public class Test_float_to_double extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.float_to_double.d.T_float_to_double_7", VerifyError.class);
     }
 
 }

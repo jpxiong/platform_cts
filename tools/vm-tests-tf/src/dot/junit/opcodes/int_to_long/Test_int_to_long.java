@@ -77,12 +77,7 @@ public class Test_int_to_long extends DxTestCase {
      * @title type of argument - double
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_2", VerifyError.class);
     }
 
     /**
@@ -91,12 +86,7 @@ public class Test_int_to_long extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_3", VerifyError.class);
     }
 
     /**
@@ -104,12 +94,7 @@ public class Test_int_to_long extends DxTestCase {
      * @title number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_4", VerifyError.class);
     }
 
     /**
@@ -117,12 +102,7 @@ public class Test_int_to_long extends DxTestCase {
      * @title type of argument - reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_5", VerifyError.class);
     }
 
     /**
@@ -130,12 +110,7 @@ public class Test_int_to_long extends DxTestCase {
      * @title number of registers
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_7", VerifyError.class);
     }
 
     /**
@@ -144,11 +119,6 @@ public class Test_int_to_long extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_long.d.T_int_to_long_6", VerifyError.class);
     }
 }

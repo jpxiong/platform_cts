@@ -71,12 +71,7 @@ public class Test_or_int_lit8 extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_6", VerifyError.class);
     }
 
     
@@ -86,12 +81,7 @@ public class Test_or_int_lit8 extends DxTestCase {
      * @title  types of arguments - double & int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_7", VerifyError.class);
     }
 
     /**
@@ -99,12 +89,7 @@ public class Test_or_int_lit8 extends DxTestCase {
      * @title  types of arguments - long & int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_8", VerifyError.class);
     }
 
     /**
@@ -112,12 +97,7 @@ public class Test_or_int_lit8 extends DxTestCase {
      * @title  types of arguments - reference & int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_9", VerifyError.class);
     }
 
     /**
@@ -126,11 +106,6 @@ public class Test_or_int_lit8 extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.or_int_lit8.d.T_or_int_lit8_4", VerifyError.class);
     }
 }

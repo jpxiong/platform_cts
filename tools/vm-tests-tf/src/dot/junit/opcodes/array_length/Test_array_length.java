@@ -45,28 +45,16 @@ public class Test_array_length extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testNPE1() {
-        T_array_length_1 t = new T_array_length_1();
-        try {
-            t.run(null);
-            fail("NPE expected");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.array_length.d.T_array_length_1", NullPointerException.class,
+                   new Object[] {null});
     }
-
-
 
     /**
      * @constraint B1 
      * @title types of arguments - Object
      */
     public void testVFE1() {
-        try {
-            Class.forName("dxc.junit.opcodes.array_length.jm.T_array_length_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.array_length.d.T_array_length_2", VerifyError.class);
     }
 
     /**
@@ -74,12 +62,7 @@ public class Test_array_length extends DxTestCase {
      * @title types of arguments - int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dxc.junit.opcodes.array_length.jm.T_array_length_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.array_length.d.T_array_length_3", VerifyError.class);
     }
     
     /**
@@ -87,11 +70,6 @@ public class Test_array_length extends DxTestCase {
      * @title number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dxc.junit.opcodes.array_length.jm.T_array_length_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.array_length.d.T_array_length_5", VerifyError.class);
     }
 }

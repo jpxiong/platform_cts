@@ -54,12 +54,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title invalid constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_3",
+             VerifyError.class);
     }
 
     /**
@@ -67,12 +63,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_4",
+             VerifyError.class);
     }
     
     /**
@@ -80,12 +72,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title try to pass obj ref instead of int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_5",
+             VerifyError.class);
     }
     
     /**
@@ -93,12 +81,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title try to pass long instead of int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_6",
+             VerifyError.class);
     }
     
     /**
@@ -106,12 +90,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title try to create non-array type
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_7",
+             VerifyError.class);
     }
     
     /**
@@ -119,12 +99,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title invalid arg count
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_8",
+             VerifyError.class);
     }
     
     /**
@@ -132,12 +108,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title attempt to instantiate String[] and fill it with reference to assignment-incompatible class
      */
     public void testVFE7() {
-        try {
-        	Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_9");
-        	fail("expected a verification exception"); 
-        } catch(Throwable t) { 
-        	DxUtil.checkVerifyException(t);	
-        }
+        load("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_9",
+             VerifyError.class);
     }
     
     /**
@@ -145,13 +117,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title attempt to instantiate array of non-existent class
      */
     public void testVFE8() {
-        T_filled_new_array_range_10 t = new T_filled_new_array_range_10();
-        try {
-            t.run();
-            fail("expected NoClassDefFoundError exception");
-        } catch (NoClassDefFoundError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_10",
+                   NoClassDefFoundError.class);
     }
 
     /**
@@ -159,14 +126,8 @@ public class Test_filled_new_array_range extends DxTestCase {
      * @title attempt to instantiate array of inaccessible class
      */
     public void testVFE9() {
-        //@uses dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11
         //@uses dot.junit.opcodes.filled_new_array_range.TestStubs
-        T_filled_new_array_range_11 t = new T_filled_new_array_range_11();
-        try {
-            t.run();
-            fail("expected IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11",
+                   IllegalAccessError.class);
     }
 }
