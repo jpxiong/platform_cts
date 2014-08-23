@@ -90,9 +90,7 @@ public class VersionTest extends RSBaseCompute {
     public void testVersion_too_high() {
         try {
             ScriptC_set_target_api_too_high test_too_high =
-                    new ScriptC_set_target_api_too_high(mRS,
-                                                        mRes,
-                                                        R.raw.set_target_api_too_high);
+                    new ScriptC_set_target_api_too_high(mRS);
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }

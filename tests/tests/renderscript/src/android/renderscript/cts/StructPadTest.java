@@ -25,9 +25,7 @@ public class StructPadTest extends RSBaseCompute {
      */
     public void testStructPadding() {
         mRS.setErrorHandler(mRsError);
-        ScriptC_struct_pad pad = new ScriptC_struct_pad(mRS,
-                                                        mRes,
-                                                        R.raw.struct_pad);
+        ScriptC_struct_pad pad = new ScriptC_struct_pad(mRS);
         ScriptField_PadMe S = new ScriptField_PadMe(mRS, 1);
         Float4 F4 = new Float4(1.0f, 2.0f, 3.0f, 4.0f);
 
