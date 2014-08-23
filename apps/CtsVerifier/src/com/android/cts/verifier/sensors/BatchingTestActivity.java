@@ -16,304 +16,206 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.R;
+
+import junit.framework.Assert;
+
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener2;
+import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.TestSensorEvent;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.SystemClock;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener2;
-import android.hardware.SensorManager;
-import android.hardware.cts.helpers.TestSensorEvent;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.SystemClock;
-import android.util.Log;
-
 /**
  * Activity that verifies batching capabilities for sensors
- * (https://source.android.com/devices/sensors/batching.html). If sensor
- * supports the batching mode, FifoReservedEventCount for that sensor should be
- * greater than one.
+ * (https://source.android.com/devices/sensors/batching.html).
+ *
+ * If a sensor supports the batching mode, FifoReservedEventCount for that sensor should be greater
+ * than one.
  */
-@TargetApi(Build.VERSION_CODES.KITKAT)
-public class BatchingTestActivity extends
-        BaseSensorSemiAutomatedTestActivity implements SensorEventListener2 {
+public class BatchingTestActivity extends BaseSensorTestActivity implements SensorEventListener2 {
+    public BatchingTestActivity() {
+        super(BatchingTestActivity.class);
+    }
 
-    private final double NANOS_PER_MILLI = 1e6;
-    private final int TWO_SECONDS_MILLIS = 2000;
-    private final int TEN_SECONDS_MILLIS = 10000;
-    private final int DATA_COLLECTION_TIME_IN_MS = TEN_SECONDS_MILLIS;
-    private final int MIN_BATCH_TIME_MILLIS = 5000;
-    private final int SENSOR_RATE = SensorManager.SENSOR_DELAY_FASTEST;
-    private final int MAX_BATCH_REPORT_LATENCY_US = DATA_COLLECTION_TIME_IN_MS * 500;
-    private final double MAX_DEVIATION_FROM_AVG = 1.5;
+    private final long TWO_SECONDS_MILLIS = TimeUnit.SECONDS.toMillis(2);
+    private static final long DATA_COLLECTION_TIME_IN_MS = TimeUnit.SECONDS.toMillis(10);
+    private final long MIN_BATCH_TIME_NANOS = TimeUnit.SECONDS.toNanos(5);
+    private final long MAX_BATCH_REPORT_LATENCY_US = DATA_COLLECTION_TIME_IN_MS * 500;
 
-    private SensorManager mSensorManager = null;
-    private Sensor mSensorUnderTest = null;
-    private List<TestSensorEvent> mSensorEvents = new ArrayList<TestSensorEvent>();
-    private int mFifoMaxEventCount = 0;
-    private int mFifoReservedEventCount = 0;
-    private long mTimeBatchingStarted = 0L;
-    private long mTimeFirstBatchedEventReceived = 0L;
-    private boolean mSynchronousTimestampsCheck = false;
-    private boolean mAssertAtEnd = false;
+    private final List<TestSensorEvent> mSensorEvents = new ArrayList<TestSensorEvent>();
+
+    private SensorManager mSensorManager;
+
+    private volatile Sensor mSensorUnderTest;
+    private volatile long mTimeFirstBatchedEventReceivedNanos;
 
     private CountDownLatch mSensorEventReceived;
     private CountDownLatch mFlushCompleteReceived;
     private PowerManager.WakeLock mWakeLock;
 
-    private void startBatching(int sensorType, String sensorName) throws Throwable {
-        appendText(" Batching...");
-
-        mSensorEvents.clear();
-        mSensorUnderTest = mSensorManager.getDefaultSensor(sensorType);
-        if (mSensorUnderTest == null) {
-            Log.d(LOG_TAG, String.format("No default sensor of type %d was found...continuing",
-                    sensorType));
-            return;
-        }
-
-        mFifoReservedEventCount = mSensorUnderTest.getFifoReservedEventCount();
-        mFifoMaxEventCount = mSensorUnderTest.getFifoMaxEventCount();
-
-        Assert.assertTrue(
-                "FifoReservedEventCount should be 0 or greater and at most FifoMaxEventCount.",
-                ((mFifoReservedEventCount <= mFifoMaxEventCount) & (mFifoReservedEventCount >= 0)));
-
-        // Time when start batching
-        mTimeBatchingStarted = System.currentTimeMillis();
-        mTimeFirstBatchedEventReceived = 0;
-
-        // Batch with the fastest rate and set report latency large enough to
-        // ensure full batching occurs.
-        mSensorManager.registerListener(this, mSensorUnderTest, SENSOR_RATE,
-                MAX_BATCH_REPORT_LATENCY_US);
-    }
-
-    private void stopBatching() throws Throwable {
-        mSensorManager.flush(this);
-    }
-
-    private void analyzeData(int sensorType, String sensorName) throws Throwable {
-        int numberOfCollectedEvents = mSensorEvents.size();
-        assertTrueDeferred(String.format(
-                "Sensor %s was not batched eventhough reported Fifo size is nonzero", sensorName),
-                numberOfCollectedEvents > 1, false);
-        if (numberOfCollectedEvents <= 1)
-            return;
-
-        boolean isTimeDetectedIncreases = true;
-        long maxTimeGapBetweenEventsNanos = 0;
-        long sumTimeGapBetweenEventsNanos = 0;
-
-        long lastTimeDetected = mSensorEvents.get(0).timestamp;
-        for (int i = 1; i < numberOfCollectedEvents; i++) {
-            long currentTimeDetected = mSensorEvents.get(i).timestamp;
-            if (currentTimeDetected < lastTimeDetected) {
-                isTimeDetectedIncreases = false;
-            }
-            long timeDetectDelta = Math.abs(currentTimeDetected - lastTimeDetected);
-            if (timeDetectDelta > maxTimeGapBetweenEventsNanos) {
-                maxTimeGapBetweenEventsNanos = timeDetectDelta;
-            }
-            sumTimeGapBetweenEventsNanos += timeDetectDelta;
-
-            lastTimeDetected = currentTimeDetected;
-        }
-        double maxTimeGapBetweenEventsMillis =
-                (double) (maxTimeGapBetweenEventsNanos / NANOS_PER_MILLI);
-        double avgTimeGapBetweenEventsMillis =
-                (double) (sumTimeGapBetweenEventsNanos / numberOfCollectedEvents / NANOS_PER_MILLI);
-        appendText(" Events detected: " + numberOfCollectedEvents);
-        appendText(String.format(" Maximum timestamp difference (msec): %6.4f",
-                maxTimeGapBetweenEventsMillis));
-        appendText(String.format(" Average timestamp difference (msec): %6.4f",
-                avgTimeGapBetweenEventsMillis));
-
-        if (mSynchronousTimestampsCheck) {
-            assertTrueDeferred(String.format("Timestamp gap in events during "
-                    + " batching %6.4f more than %f times the average %6.4f.\n"
-                    + "This will fail in future versions of CtsVerifier.",
-                    maxTimeGapBetweenEventsMillis, MAX_DEVIATION_FROM_AVG,
-                    avgTimeGapBetweenEventsMillis), (maxTimeGapBetweenEventsMillis
-                    < MAX_DEVIATION_FROM_AVG * avgTimeGapBetweenEventsMillis), true);
-        }
-        assertTrueDeferred("Event detection time does not increase monotonically",
-                isTimeDetectedIncreases, false);
-    }
-
-    private void testSensorInBatchingMode(int sensorType, String sensorName) throws Throwable {
-        // Register to wait for first sensor event arrival, and when FIFO
-        // has been flushed
-        mSensorEventReceived = new CountDownLatch(1);
-        mFlushCompleteReceived = new CountDownLatch(1);
-
-        startBatching(sensorType, sensorName);
-
-        // add a buffer to the duration of the test for timeout
-        boolean awaitSuccess =
-                mSensorEventReceived.await(DATA_COLLECTION_TIME_IN_MS + TWO_SECONDS_MILLIS,
-                        TimeUnit.MILLISECONDS);
-        // verify the minimum batching time
-        if((mTimeFirstBatchedEventReceived - mTimeBatchingStarted) >= MIN_BATCH_TIME_MILLIS) {
-            appendText(" ...events arrived at batch report latency as expected.");
-        }
-        assertTrueDeferred(String.format(
-                "Batching did not wait the minimum %d msec to report first event.",
-                MIN_BATCH_TIME_MILLIS),
-                ((mTimeFirstBatchedEventReceived - mTimeBatchingStarted) >= MIN_BATCH_TIME_MILLIS)
-                        && awaitSuccess, false);
-        // batch a bit more to test the flush
-        Thread.sleep((int) (0.5*MIN_BATCH_TIME_MILLIS));
-        stopBatching();
-
-        boolean flushAwaitSuccess =
-                mFlushCompleteReceived.await(DATA_COLLECTION_TIME_IN_MS + TWO_SECONDS_MILLIS,
-                        TimeUnit.MILLISECONDS);
-        if (flushAwaitSuccess) {
-            appendText(" ...events arrived after flush batching as expected.");
-            analyzeData(sensorType, sensorName);
-        } else {
-            appendText("FIFO flush event not received.", Color.RED);
-            mAssertAtEnd = true;
-        }
-    }
-
-    private void assertTrueDeferred(String msg, boolean condition, boolean onlyWarn) {
-        if (!condition) {
-            if (onlyWarn) {
-                appendText(msg, Color.YELLOW);
-            } else {
-                appendText(msg, Color.RED);
-                mAssertAtEnd = true;
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: extend TestSensorManager to batching cases as needed and
-        // refactor there
-        mSensorManager = (SensorManager) getApplicationContext()
-                .getSystemService(Context.SENSOR_SERVICE);
+    }
 
+    @Override
+    protected void activitySetUp() throws InterruptedException {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "BatchingTests");
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mWakeLock.release();
-        mSensorManager.unregisterListener(this);
-    }
-
-    // TODO: refactor to use beep in upstream SensorCtsHelper after merge
-    private void beep() {
-        final ToneGenerator tg = new ToneGenerator(
-                AudioManager.STREAM_NOTIFICATION, 100);
-        tg.startTone(ToneGenerator.TONE_PROP_BEEP);
-    }
-
-    @Override
-    protected void onRun() throws Throwable {
-        List<Sensor> walkingNeeded = new ArrayList<Sensor>();
-        walkingNeeded.add(mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER));
-        walkingNeeded.add(mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR));
-
-        List<Sensor> relaxedTimestampReq = new ArrayList<Sensor>();
-        relaxedTimestampReq.add(mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY));
-        relaxedTimestampReq.add(mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
-
-        // TODO: can launch a UI to show user where to turn off screen rotation
-        appendText("Turn off all features that register for sensors including screen rotation"
-                + " then click 'Next' to start batching tests.");
-
+        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
         mWakeLock.acquire();
+    }
 
-        mAssertAtEnd = false;
+    @Override
+    protected void activityCleanUp() throws InterruptedException {
+        mWakeLock.release();
+        mSensorFeaturesDeactivator.requestToRestoreFeatures();
+    }
+
+    // TODO: refactor to discover all available sensors of each type and dinamically generate test
+    // cases for all of them
+    public String testStepCounter() throws Throwable {
+        return runTest(Sensor.TYPE_STEP_COUNTER, R.string.snsr_batching_walking_needed);
+    }
+
+    public String testStepDetector() throws Throwable {
+        return  runTest(Sensor.TYPE_STEP_DETECTOR, R.string.snsr_batching_walking_needed);
+    }
+
+    public String testProximity() throws Throwable {
+        return runTest(Sensor.TYPE_PROXIMITY, R.string.snsr_batching_interrupt_needed);
+    }
+
+    public String testLight() throws Throwable {
+        return runTest(Sensor.TYPE_LIGHT, R.string.snsr_batching_interrupt_needed);
+    }
+
+    // TODO: move sensors that do not require interaction to CTS
+    public String testGameRotationVector() throws Throwable {
+        return runTest(Sensor.TYPE_GAME_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testGeomagneticRotationVector() throws Throwable {
+        return runTest(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testAccelerometer() throws Throwable {
+        return runTest(Sensor.TYPE_ACCELEROMETER, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testGyroscope() throws Throwable {
+        return runTest(Sensor.TYPE_GYROSCOPE, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testGyroscopeUncalibrated() throws Throwable {
+        return runTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testMagneticField() throws Throwable {
+        return runTest(Sensor.TYPE_MAGNETIC_FIELD, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testMagneticFieldUncalibrated() throws Throwable {
+        return runTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, R.string.snsr_batching_no_interaction);
+    }
+
+    public String testRotationVector() throws Throwable {
+        return runTest(Sensor.TYPE_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+    }
+
+    // TODO: split batching and flush scenarios
+    private String runTest(int sensorType, int instructionsResId) throws Throwable {
+        mSensorUnderTest = mSensorManager.getDefaultSensor(sensorType);
+        // TODO: add exception for batching not supported
+        if (mSensorUnderTest == null || mSensorUnderTest.getFifoMaxEventCount() < 1) {
+            throw new SensorNotSupportedException(Sensor.TYPE_STEP_COUNTER);
+        }
+
+        appendText(instructionsResId);
         waitForUser();
-        clearText();
 
-        // step batching needs user movement
-        appendText("Walk to batch step events", Color.GREEN);
-        for (Sensor ssr : walkingNeeded) {
-            appendText(String.format("\nSensor %s\n FifoMaxEventCount: %d", ssr.getName(),
-                    ssr.getFifoMaxEventCount()));
-            if (ssr.getFifoMaxEventCount() > 1) {
-                mSynchronousTimestampsCheck = false;
-                testSensorInBatchingMode(ssr.getType(), ssr.getName());
-            } else {
-                appendText("Batching not supported, continuing...", Color.YELLOW);
-            }
-        }
+        // Register to wait for first sensor event arrival, and when FIFO has been flushed
+        mSensorEventReceived = new CountDownLatch(1);
+        mFlushCompleteReceived = new CountDownLatch(1);
+        mSensorEvents.clear();
 
-        beep();
-        appendText("Walking tests done, click 'Next' for additional batching tests", Color.GREEN);
-        waitForUser();
-        clearText();
+        int fifoReservedEventCount = mSensorUnderTest.getFifoReservedEventCount();
+        int fifoMaxEventCount = mSensorUnderTest.getFifoMaxEventCount();
+        String fifoMessage = getString(
+                R.string.snsr_batching_fifo_count,
+                fifoReservedEventCount,
+                fifoMaxEventCount);
+        Assert.assertTrue(fifoMessage, fifoReservedEventCount <= fifoMaxEventCount);
 
-        // proximity (and sometimes light) are interrupt based and hence should
-        // have user intervention
-        appendText("Wave hand over the proximity sensor (usually near top front of device)",
-                Color.GREEN);
-        for (Sensor ssr : relaxedTimestampReq) {
-            appendText(String.format("\nSensor %s\n FifoMaxEventCount: %d", ssr.getName(),
-                    ssr.getFifoMaxEventCount()));
-            if (ssr.getFifoMaxEventCount() > 1) {
-                mSynchronousTimestampsCheck = false;
-                testSensorInBatchingMode(ssr.getType(), ssr.getName());
-            } else {
-                appendText("Batching not supported, continuing...", Color.YELLOW);
-            }
-        }
+        // Time when start batching
+        mTimeFirstBatchedEventReceivedNanos = 0;
+        long timeBatchingStartedNanos = SystemClock.elapsedRealtimeNanos();
 
-        beep();
-        appendText("Interrupt based tests done, click 'Next' for additional batching tests",
-                Color.GREEN);
-        waitForUser();
-        clearText();
+        // Batch with the fastest rate and set report latency large enough to ensure full batching
+        // occurs
+        boolean registerResult = mSensorManager.registerListener(
+                this /* listener */,
+                mSensorUnderTest,
+                SensorManager.SENSOR_DELAY_FASTEST,
+                (int) MAX_BATCH_REPORT_LATENCY_US);
+        Assert.assertTrue(
+                getString(R.string.snsr_register_listener, registerResult),
+                registerResult);
 
-        appendText("Remaining sensors will be tested for batching.", Color.GREEN);
-        for (Sensor ssr : mSensorManager.getSensorList(Sensor.TYPE_ALL)) {
-            if (walkingNeeded.contains(ssr) || relaxedTimestampReq.contains(ssr)) {
-                continue;
-            }
-            appendText(String.format("\nSensor %s\n FifoMaxEventCount: %d", ssr.getName(),
-                    ssr.getFifoMaxEventCount()));
-            if (ssr.getFifoMaxEventCount() > 1) {
-                mSynchronousTimestampsCheck = true;
-                testSensorInBatchingMode(ssr.getType(), ssr.getName());
-            } else {
-                appendText("Batching not supported, continuing...", Color.YELLOW);
-            }
-        }
+        // add a buffer to the duration of the test for timeout
+        mSensorEventReceived
+                .await(DATA_COLLECTION_TIME_IN_MS + TWO_SECONDS_MILLIS, TimeUnit.MILLISECONDS);
+        // TODO: add delayed assertion for await
 
-        beep();
-        if (mAssertAtEnd) {
-            Assert.fail("\nSome batching test failures occurred.");
-        }
-        appendText("\nAll batching tests passed.", Color.GREEN);
+        // verify the minimum batching time
+        long firstTimeArrivalDelta = mTimeFirstBatchedEventReceivedNanos - timeBatchingStartedNanos;
+        String firstTimeArrivalMessage = getString(
+                R.string.snsr_batching_first_event_arrival,
+                MIN_BATCH_TIME_NANOS,
+                firstTimeArrivalDelta);
+        Assert.assertTrue(firstTimeArrivalMessage, firstTimeArrivalDelta >= MIN_BATCH_TIME_NANOS);
+
+        // batch a bit more to test the flush
+        long sleepTime = TimeUnit.NANOSECONDS.toMillis(MIN_BATCH_TIME_NANOS / 2);
+        Thread.sleep(sleepTime);
+        mSensorManager.flush(this);
+
+        boolean flushAwaitSuccess = mFlushCompleteReceived
+                .await(DATA_COLLECTION_TIME_IN_MS + TWO_SECONDS_MILLIS, TimeUnit.MILLISECONDS);
+        Assert.assertTrue(
+                getString(R.string.snsr_batching_flush_complete, flushAwaitSuccess),
+                flushAwaitSuccess);
+
+        playSound();
+        // TODO: use SensorTestVerifications to check for event ordering and event gap
+        return null;
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.sensor.getType() == mSensorUnderTest.getType()) {
-            mSensorEvents.add(new TestSensorEvent(sensorEvent, SystemClock.elapsedRealtimeNanos()));
-            if (mTimeFirstBatchedEventReceived == 0) {
-                mTimeFirstBatchedEventReceived = System.currentTimeMillis();
-                mSensorEventReceived.countDown();
-            }
+        long elapsedTime = SystemClock.elapsedRealtimeNanos();
+        if (sensorEvent.sensor.getType() != mSensorUnderTest.getType()) {
+            // TODO: add delayed assertion
+            return;
+        }
+
+        mSensorEvents.add(new TestSensorEvent(sensorEvent, elapsedTime));
+        if (mTimeFirstBatchedEventReceivedNanos == 0) {
+            mTimeFirstBatchedEventReceivedNanos = elapsedTime;
+            mSensorEventReceived.countDown();
         }
     }
 
