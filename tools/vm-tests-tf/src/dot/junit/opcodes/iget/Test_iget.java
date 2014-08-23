@@ -62,13 +62,7 @@ public class Test_iget extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_iget_9 t = new T_iget_9();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_9", NullPointerException.class);
     }
     
     /**
@@ -76,12 +70,7 @@ public class Test_iget extends DxTestCase {
      * @title constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_4", VerifyError.class);
     }
 
     /**
@@ -90,12 +79,7 @@ public class Test_iget extends DxTestCase {
      * @title number of registers
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_3", VerifyError.class);
     }
     
     /**
@@ -104,12 +88,7 @@ public class Test_iget extends DxTestCase {
      * different type exist
      */
     public void testVFE3() {
-        try {
-            new T_iget_13().run();
-            fail("expected a NoSuchFieldError exception");
-        } catch (NoSuchFieldError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_13", NoSuchFieldError.class);
     }
     
     /**
@@ -117,14 +96,8 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read inaccessible private field.
      */
     public void testVFE4() {
-        //@uses dot.junit.opcodes.iget.d.T_iget_6
         //@uses dot.junit.opcodes.iget.TestStubs
-        try {
-            new T_iget_6().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_6",  IllegalAccessError.class);
     }
 
     /**
@@ -132,12 +105,7 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read field of undefined class.
      */
     public void testVFE5() {
-        try {
-            new T_iget_7().run();
-            fail("expected a NoClassDefFoundError exception");
-        } catch (NoClassDefFoundError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_7", NoClassDefFoundError.class);
     }
 
     /**
@@ -145,12 +113,7 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read undefined field.
      */
     public void testVFE6() {
-        try {
-            new T_iget_8().run();
-            fail("expected a NoSuchFieldError exception");
-        } catch (NoSuchFieldError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_8", NoSuchFieldError.class);
     }
     
     /**
@@ -158,14 +121,8 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read superclass' private field from subclass.
      */
     public void testVFE7() {
-        //@uses dot.junit.opcodes.iget.d.T_iget_12
         //@uses dot.junit.opcodes.iget.d.T_iget_1
-        try {
-            new T_iget_12().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_12", IllegalAccessError.class);
     }
    
     /**
@@ -173,12 +130,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for reference fields
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_14");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_14", VerifyError.class);
     }
     
     /**
@@ -187,12 +139,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for short fields
      */
     public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_15");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_15", VerifyError.class);
     }
     
     /**
@@ -201,12 +148,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for boolean fields
      */
     public void testVFE10() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_16", VerifyError.class);
     }
     
     /**
@@ -215,12 +157,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for char fields
      */
     public void testVFE11() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_17", VerifyError.class);
     }
     
     /**
@@ -229,12 +166,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for byte fields
      */
     public void testVFE12() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_18");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_18", VerifyError.class);
     }    
     
     /**
@@ -243,12 +175,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for double fields
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_19");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_19", VerifyError.class);
     } 
     
     /**
@@ -257,12 +184,7 @@ public class Test_iget extends DxTestCase {
      * @title iget shall not work for long fields
      */
     public void testVFE14() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_20", VerifyError.class);
     }
     
     /**
@@ -270,14 +192,8 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read protected field of unrelated class.
      */
     public void testVFE15() {
-        //@uses dot.junit.opcodes.iget.d.T_iget_21
         //@uses dot.junit.opcodes.iget.TestStubs
-        try {
-            new T_iget_21().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_21", IllegalAccessError.class);
     }
     
     /**
@@ -285,27 +201,24 @@ public class Test_iget extends DxTestCase {
      * @title Attempt to read static field.
      */
     public void testVFE16() {
-        //@uses dot.junit.opcodes.iget.d.T_iget_5
         //@uses dot.junit.opcodes.iget.TestStubs
-        try {
-            new T_iget_5().run();
-            fail("expected an IncompatibleClassChangeError exception");
-        } catch (IncompatibleClassChangeError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget.d.T_iget_5", IncompatibleClassChangeError.class);
     }
 
     /**
      * @constraint B6 
-     * @title instance fields may only be accessed on already initialized instances. 
+     * @title instance fields may only be accessed on already initialized instances.
      */
     public void testVFE30() {
-        try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_30");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget.d.T_iget_30", VerifyError.class);
+    }
+
+    /**
+     * @constraint N/A 
+     * @title instance fields may only be accessed on reference values.
+     */
+    public void testVFE31() {
+        load("dot.junit.opcodes.iget.d.T_iget_31", VerifyError.class);
     }
 }
 

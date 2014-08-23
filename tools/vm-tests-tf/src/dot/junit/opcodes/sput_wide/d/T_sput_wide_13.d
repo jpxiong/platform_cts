@@ -25,7 +25,8 @@
        const/4 v1, 5
        div-int/2addr v1, v0
 
-       sput-wide v1, dot.junit.opcodes.sput_wide.d.JtubInitError.value J
+       int-to-long v0, v0
+       sput-wide v0, dot.junit.opcodes.sput_wide.d.JtubInitError.value J
        return-void
 .end method
 

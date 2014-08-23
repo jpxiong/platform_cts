@@ -46,15 +46,7 @@ public class Test_const_class extends DxTestCase {
      * @title Class definition not found
      */
     public void testE1() {
-        try {
-            T_const_class_6 t = new T_const_class_6();
-            t.run();
-            fail("expected a verification exception");
-        } catch (NoClassDefFoundError e) {
-            // expected
-        } catch(VerifyError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.const_class.d.T_const_class_6", NoClassDefFoundError.class);
     }
     
     /**
@@ -62,14 +54,7 @@ public class Test_const_class extends DxTestCase {
      */
     public void testE2() {
         //@uses dot.junit.opcodes.const_class.TestStubs
-        //@uses dot.junit.opcodes.const_class.d.T_const_class_7
-        try {
-            T_const_class_7 t = new T_const_class_7();
-            t.run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.const_class.d.T_const_class_7", IllegalAccessError.class);
     }
     
     /**
@@ -77,12 +62,7 @@ public class Test_const_class extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.const_class.d.T_const_class_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_class.d.T_const_class_3", VerifyError.class);
     }
     
     /**
@@ -92,12 +72,7 @@ public class Test_const_class extends DxTestCase {
      * other register involved in it becomes undefined
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.const_class.d.T_const_class_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_class.d.T_const_class_4", VerifyError.class);
     }
     
     /**
@@ -105,12 +80,7 @@ public class Test_const_class extends DxTestCase {
      * @title  constant pool index
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.const_class.d.T_const_class_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_class.d.T_const_class_5", VerifyError.class);
     }
     
 }

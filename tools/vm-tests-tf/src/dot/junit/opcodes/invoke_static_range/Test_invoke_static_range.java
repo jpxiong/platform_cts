@@ -87,13 +87,8 @@ public class Test_invoke_static_range extends DxTestCase {
      *
      */
     public void testE2() {
-        T_invoke_static_range_6 t = new T_invoke_static_range_6();
-        try {
-            t.run();
-            fail("expected UnsatisfiedLinkError");
-        } catch (UnsatisfiedLinkError ule) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_6",
+                   UnsatisfiedLinkError.class);
     }
 
 
@@ -101,13 +96,8 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title initialization of referenced class throws exception
      */
     public void testE7() {
-        T_invoke_static_range_14 t = new T_invoke_static_range_14();
-        try {
-            t.run();
-            fail("expected Error");
-        } catch (Error e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_14", 
+                   ExceptionInInitializerError.class);
     }
 
     /**
@@ -115,12 +105,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title invalid constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_3", VerifyError.class);
     }
 
     /**
@@ -128,12 +113,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title &lt;clinit&gt; may not be called using invoke_static_range
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_10", VerifyError.class);
     }
 
     /**
@@ -141,12 +121,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title number of arguments passed to method
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_11", VerifyError.class);
     }
 
     /**
@@ -154,12 +129,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title &lt;init&gt; may not be called using invoke_static_range
      */
     public void testVFE5() {
-        try {
-            new T_invoke_static_range_19().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_19", VerifyError.class);
     }
 
     /**
@@ -167,12 +137,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title types of arguments passed to method
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_20", VerifyError.class);
     }
 
 
@@ -181,11 +146,8 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title Attempt to call non-static method.
      */
     public void testVFE7() {
-         try {
-             new T_invoke_static_range_5().run();
-             fail("expected IncompatibleClassChangeError");
-         } catch (IncompatibleClassChangeError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_5",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -193,11 +155,8 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title Attempt to call undefined method.
      */
     public void testVFE8() {
-        try {
-            new T_invoke_static_range_7().run();
-            fail("expected NoSuchMethodError");
-        } catch (NoSuchMethodError t) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_7",
+                   NoSuchMethodError.class);
     }
 
     /**
@@ -205,13 +164,9 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title Attempt to call private method of other class.
      */
     public void testVFE9() {
-        //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_8
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
-        try {
-            new T_invoke_static_range_8().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_8",
+                   IllegalAccessError.class);
     }
 
     /**
@@ -219,13 +174,9 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title Method has different signature.
      */
     public void testVFE10() {
-        //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_13
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
-        try {
-            new T_invoke_static_range_13().run();
-            fail("expected NoSuchMethodError");
-        } catch (NoSuchMethodError t) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_13",
+                   NoSuchMethodError.class);
     }
 
 
@@ -234,13 +185,9 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title Attempt to call protected method of unrelated class.
      */
     public void testVFE12() {
-        //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
-        try {
-            new T_invoke_static_range_17().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17",
+                   IllegalAccessError.class);
     }
 
     /**
@@ -248,12 +195,7 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title number of registers
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_16", VerifyError.class);
     }
 
     /**
@@ -261,12 +203,6 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
-        //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_24
-        try {
-            new T_invoke_static_range_24().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_24", VerifyError.class);
     }
 }

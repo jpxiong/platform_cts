@@ -22,6 +22,7 @@
     const v0, 1
     const v1, 0
     div-int v0, v0, v1
+    return-void
 .end method
 
 .method static public test()V

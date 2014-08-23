@@ -30,33 +30,20 @@ public class Test_return_void extends DxTestCase {
         assertEquals(123456, t.run());
     }
 
-
     /**
      * @title Method is synchronized but thread is not monitor owner
      */
     public void testE1() {
-        T_return_void_3 t = new T_return_void_3();
-        try {
-            assertTrue(t.run());
-            fail("expected IllegalMonitorStateException");
-        } catch (IllegalMonitorStateException imse) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.return_void.d.T_return_void_3",
+                   IllegalMonitorStateException.class);
     }
-
-
 
     /**
      * @constraint B11 
      * @title method's return type - int
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.return_void.d.T_return_void_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_void.d.T_return_void_5", VerifyError.class);
     }
 
     /**
@@ -64,12 +51,7 @@ public class Test_return_void extends DxTestCase {
      * @title method's return type - reference
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.return_void.d.T_return_void_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_void.d.T_return_void_6", VerifyError.class);
     }
 
     /**
@@ -77,12 +59,7 @@ public class Test_return_void extends DxTestCase {
      * @title method's return type - wide
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.return_void.d.T_return_void_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_void.d.T_return_void_7", VerifyError.class);
     }
     
 }

@@ -42,12 +42,8 @@ public class Test_new_instance extends DxTestCase {
      * @title class initialization throws exception
      */
     public void testE1() {
-        try {
-            T_new_instance_3.run();
-            fail("expected Error");
-        } catch (Error e) {
-            // expected
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_3",
+             ExceptionInInitializerError.class);
     }
 
     /**
@@ -56,14 +52,7 @@ public class Test_new_instance extends DxTestCase {
      */
     public void testE4() {
         //@uses dot.junit.opcodes.new_instance.d.TestAbstractClass
-        //@uses dot.junit.opcodes.new_instance.d.T_new_instance_8
-        T_new_instance_8 t = new T_new_instance_8();
-        try {
-            t.run();
-            fail("expected InstantiationError");
-        } catch (InstantiationError ie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.new_instance.d.T_new_instance_8", InstantiationError.class);
     }
 
     /**
@@ -73,14 +62,7 @@ public class Test_new_instance extends DxTestCase {
      */
     public void testE5() {
         //@uses dot.junit.opcodes.new_instance.d.TestAbstractClass
-        //@uses dot.junit.opcodes.new_instance.d.T_new_instance_9
-        T_new_instance_9 t = new T_new_instance_9();
-        try {
-            t.run();
-            fail("expected Error");
-        } catch (Error iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.new_instance.d.T_new_instance_9", InstantiationError.class);
     }
 
     /**
@@ -88,12 +70,7 @@ public class Test_new_instance extends DxTestCase {
      * @title  constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_6", VerifyError.class);
     }
 
     /**
@@ -102,12 +79,7 @@ public class Test_new_instance extends DxTestCase {
      * @title  attempt to create array using new
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_7", VerifyError.class);
     }
 
     /**
@@ -116,12 +88,7 @@ public class Test_new_instance extends DxTestCase {
      * called
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_2", VerifyError.class);
     }
 
     /**
@@ -129,12 +96,7 @@ public class Test_new_instance extends DxTestCase {
      * @title number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_10", VerifyError.class);
     }
 
     /**
@@ -143,12 +105,7 @@ public class Test_new_instance extends DxTestCase {
      */
     public void testVFE5() {
         //@uses dot.junit.opcodes.new_instance.TestStubs
-        //@uses dot.junit.opcodes.new_instance.d.T_new_instance_4
-        try {
-            new T_new_instance_4().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.new_instance.d.T_new_instance_4", IllegalAccessError.class);
     }
 
     /**
@@ -156,11 +113,7 @@ public class Test_new_instance extends DxTestCase {
      * @title Attempt to instantiate array of non-existent class.
      */
     public void testVFE6() {
-        try {
-            new T_new_instance_5().run();
-            fail("expected NoClassDefFoundError");
-        } catch (NoClassDefFoundError t) {
-        }
+        loadAndRun("dot.junit.opcodes.new_instance.d.T_new_instance_5", NoClassDefFoundError.class);
     }
 
     /**
@@ -169,12 +122,7 @@ public class Test_new_instance extends DxTestCase {
      * if the same new-instance  instruction is again executed before the instance is initialized
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_11", VerifyError.class);
     }
 
     /**
@@ -183,11 +131,6 @@ public class Test_new_instance extends DxTestCase {
      * if the same new-instance  instruction is again executed before the instance is initialized
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.new_instance.d.T_new_instance_12", VerifyError.class);
     }
 }

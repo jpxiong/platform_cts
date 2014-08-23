@@ -54,28 +54,16 @@ public class Test_iget_boolean extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_iget_boolean_9 t = new T_iget_boolean_9();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_9",
+                   NullPointerException.class);
     }
-
-   
 
     /**
      * @constraint A11 
      * @title constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_4", VerifyError.class);
     }
 
     /**
@@ -83,12 +71,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title number of registers
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_3", VerifyError.class);
     }
     
     /**
@@ -97,12 +80,7 @@ public class Test_iget_boolean extends DxTestCase {
      * different type exists
      */
     public void testVFE3() {
-        try {
-            new T_iget_boolean_13().run();
-            fail("expected a NoSuchFieldError exception");
-        } catch (NoSuchFieldError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_13", NoSuchFieldError.class);
     }
     
     /**
@@ -110,14 +88,8 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read inaccessible field
      */
     public void testVFE4() {
-        //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_6
         //@uses dot.junit.opcodes.iget_boolean.TestStubs
-        try {
-            new T_iget_boolean_6().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_6", IllegalAccessError.class);
     }
 
     /**
@@ -125,12 +97,8 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read field of undefined class.
      */
     public void testVFE5() {
-        try {
-            new T_iget_boolean_7().run();
-            fail("expected a NoClassDefFoundError exception");
-        } catch (NoClassDefFoundError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_7",
+                   NoClassDefFoundError.class);
     }
 
     /**
@@ -138,12 +106,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read undefined field.
      */
     public void testVFE6() {
-        try {
-            new T_iget_boolean_8().run();
-            fail("expected a NoSuchFieldError exception");
-        } catch (NoSuchFieldError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_8", NoSuchFieldError.class);
     }
     
     /**
@@ -151,14 +114,9 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read superclass' private field from subclass.
      */
     public void testVFE7() {
-        //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_12
         //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_1
-        try {
-            new T_iget_boolean_12().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_12
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_12", IllegalAccessError.class);
     }
    
     /**
@@ -166,12 +124,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for reference fields
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_14");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_14", VerifyError.class);
     }
     
     /**
@@ -180,12 +133,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for short fields
      */
     public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_15");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_15", VerifyError.class);
     }
     
     /**
@@ -193,12 +141,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for int fields
      */
     public void testVFE10() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_16", VerifyError.class);
     }
     
     /**
@@ -206,12 +149,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for char fields
      */
     public void testVFE11() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_17", VerifyError.class);
     }
     
     /**
@@ -219,12 +157,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for byte fields
      */
     public void testVFE12() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_18");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_18", VerifyError.class);
     }    
     
     /**
@@ -232,12 +165,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for double fields
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_19");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_19", VerifyError.class);
     } 
     
     /**
@@ -245,12 +173,7 @@ public class Test_iget_boolean extends DxTestCase {
      * @title iget_boolean shall not work for long fields
      */
     public void testVFE14() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_20", VerifyError.class);
     }
     
     /**
@@ -258,14 +181,8 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read inaccessible protected field.
      */
     public void testVFE15() {
-        //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_21
         //@uses dot.junit.opcodes.iget_boolean.TestStubs
-        try {
-            new T_iget_boolean_21().run();
-            fail("expected an IllegalAccessError exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_21", IllegalAccessError.class);
     }
 
 
@@ -274,14 +191,9 @@ public class Test_iget_boolean extends DxTestCase {
      * @title Attempt to read static field.
      */
     public void testVFE16() {
-        //@uses dot.junit.opcodes.iget_boolean.d.T_iget_boolean_5
         //@uses dot.junit.opcodes.iget_boolean.TestStubs
-        try {
-            new T_iget_boolean_5().run();
-            fail("expected an IncompatibleClassChangeError exception");
-        } catch (IncompatibleClassChangeError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_5",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -289,11 +201,14 @@ public class Test_iget_boolean extends DxTestCase {
      * @title instance fields may only be accessed on already initialized instances. 
      */
     public void testVFE30() {
-        try {
-            Class.forName("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_30");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_30", VerifyError.class);
+    }
+
+    /**
+     * @constraint N/A
+     * @title instance fields may only be accessed on reference values.
+     */
+    public void testVFE31() {
+        load("dot.junit.opcodes.iget_boolean.d.T_iget_boolean_31", VerifyError.class);
     }
 }

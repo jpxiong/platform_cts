@@ -86,12 +86,7 @@ public class Test_shr_long extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_2", VerifyError.class);
     }
 
     
@@ -101,12 +96,7 @@ public class Test_shr_long extends DxTestCase {
      * @title types of arguments - long, double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_3", VerifyError.class);
     }
 
     /**
@@ -114,12 +104,7 @@ public class Test_shr_long extends DxTestCase {
      * @title types of arguments - int, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_4", VerifyError.class);
     }
 
     /**
@@ -127,12 +112,7 @@ public class Test_shr_long extends DxTestCase {
      * @title types of arguments - float, int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_5", VerifyError.class);
     }
 
     /**
@@ -140,12 +120,7 @@ public class Test_shr_long extends DxTestCase {
      * @title types of arguments - reference, int
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_6", VerifyError.class);
     }
 
     /**
@@ -154,11 +129,6 @@ public class Test_shr_long extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.shr_long.d.T_shr_long_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.shr_long.d.T_shr_long_7", VerifyError.class);
     }
 }

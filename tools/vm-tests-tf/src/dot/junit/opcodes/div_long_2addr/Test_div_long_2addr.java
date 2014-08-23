@@ -122,13 +122,8 @@ public class Test_div_long_2addr extends DxTestCase {
      * @title Divisor is 0
      */
     public void testE1() {
-        T_div_long_2addr_1 t = new T_div_long_2addr_1();
-        try {
-            t.run(12345678912345l, 0);
-            fail("expected ArithmeticException");
-        } catch (ArithmeticException ae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_1",
+                   ArithmeticException.class, 12345678912345l, 0);
     }
 
     
@@ -138,12 +133,7 @@ public class Test_div_long_2addr extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_6", VerifyError.class);
     }
 
     /**
@@ -151,12 +141,7 @@ public class Test_div_long_2addr extends DxTestCase {
      * @title types of arguments - int / long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_3", VerifyError.class);
     }
 
     /**
@@ -164,12 +149,7 @@ public class Test_div_long_2addr extends DxTestCase {
      * @title  types of arguments - float / long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_4", VerifyError.class);
     }
 
     /**
@@ -177,12 +157,7 @@ public class Test_div_long_2addr extends DxTestCase {
      * @title types of arguments - reference / long
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_5", VerifyError.class);
     }
 
     /**
@@ -191,12 +166,7 @@ public class Test_div_long_2addr extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.div_long_2addr.d.T_div_long_2addr_2", VerifyError.class);
     }
 
 }
