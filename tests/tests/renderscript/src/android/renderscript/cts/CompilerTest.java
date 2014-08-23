@@ -31,9 +31,7 @@ public class CompilerTest extends RSBaseCompute {
      */
     public void testMissingLink() {
         try {
-            ScriptC_missing_link t = new ScriptC_missing_link(mRS,
-                                                              mRes,
-                                                              R.raw.missing_link);
+            ScriptC_missing_link t = new ScriptC_missing_link(mRS);
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }

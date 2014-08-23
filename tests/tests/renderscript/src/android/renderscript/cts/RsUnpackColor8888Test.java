@@ -32,7 +32,7 @@ public class RsUnpackColor8888Test extends RSBaseCompute {
     }
 
     public void testRsUnpackColor8888RGB() {
-        script = new ScriptC_rs_unpack_color_8888(mRS, mRes, R.raw.rs_unpack_color_8888);
+        script = new ScriptC_rs_unpack_color_8888(mRS);
         Allocation mAllocationIn = Allocation.createSized(mRS, Element.U8_4(mRS), INPUTSIZE);
         Allocation mAllocationOut = Allocation.createSized(mRS, Element.F32_4(mRS), INPUTSIZE);
         byte[] inArray = new byte[INPUTSIZE * 4];

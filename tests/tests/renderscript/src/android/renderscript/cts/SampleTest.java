@@ -74,7 +74,7 @@ public class SampleTest extends RSBaseCompute {
         mAlloc_RGBA_1D = createAlloc(b.setX(8).create());
         mAlloc_RGBA_2D = createAlloc(b.setX(8).setY(8).create());
 
-        mScript = new ScriptC_sample(mRS, mRes, R.raw.sample);
+        mScript = new ScriptC_sample(mRS);
 
         mScript.set_gNearest(Sampler.CLAMP_NEAREST(mRS));
         mScript.set_gLinear(Sampler.CLAMP_LINEAR(mRS));

@@ -32,7 +32,7 @@ public class InitTest extends RSBaseCompute {
     }
 
     public void testInitTest() {
-        script = new ScriptC_init_test(mRS, mRes, R.raw.init_test);
+        script = new ScriptC_init_test(mRS);
         float[] ref = new float[INPUTSIZE];
         float[] in = new float[INPUTSIZE];
         float[] out = new float[INPUTSIZE];

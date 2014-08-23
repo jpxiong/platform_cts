@@ -23,9 +23,7 @@ public class StructArrayTest extends RSBaseCompute {
      */
     public void testStructArrays() {
         mRS.setErrorHandler(mRsError);
-        ScriptC_struct_array pad = new ScriptC_struct_array(mRS,
-                                                            mRes,
-                                                            R.raw.struct_array);
+        ScriptC_struct_array pad = new ScriptC_struct_array(mRS);
         ScriptField_ArrayMe S = new ScriptField_ArrayMe(mRS, 1);
         int[] values = {0, 1, 2, 3, 4};
         S.set_i(0, values, true);

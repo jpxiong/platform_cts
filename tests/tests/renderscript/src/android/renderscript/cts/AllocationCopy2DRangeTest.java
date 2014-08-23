@@ -28,7 +28,7 @@ public class AllocationCopy2DRangeTest extends RSBaseCompute {
 
     public void testAllocationCopy2DRange() {
         ScriptC_allocationCopy2DRange mScript =
-                new ScriptC_allocationCopy2DRange(mRS, mRes, R.raw.allocationcopy2drange);
+                new ScriptC_allocationCopy2DRange(mRS);
         Random random = new Random(0x172d8ab9);
         int width = random.nextInt(512);
         int height = random.nextInt(512);
