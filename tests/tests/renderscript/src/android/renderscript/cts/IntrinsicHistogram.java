@@ -73,10 +73,14 @@ public class IntrinsicHistogram extends IntrinsicBase {
             for (int x = x1; x < x2; x++) {
                 int ct = (y * w + x) * invs2;
 
-                int t = i[ct];
-                if (t < 0) t = 256 + t;
-                if ((ct % invs2) < outVSize) {
-                    ref[(t * outvs2) + (ct % invs2)] ++;
+                int v = 0;
+                for (int c = 0; c < inVSize; c++) {
+                    int t = i[ct + c];
+                    if (t < 0) t = 256 + t;
+
+                    if (c < outVSize) {
+                        ref[(t * outvs2) + c] ++;
+                    }
                 }
             }
         }
