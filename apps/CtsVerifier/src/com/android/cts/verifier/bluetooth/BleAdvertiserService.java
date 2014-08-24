@@ -179,7 +179,7 @@ public class BleAdvertiserService extends Service {
         return new AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setTxPowerLevel(power)
-            .setIsConnectable(false)
+            .setConnectable(false)
             .build();
     }
 
