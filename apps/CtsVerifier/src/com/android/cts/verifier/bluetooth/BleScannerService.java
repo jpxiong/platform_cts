@@ -101,8 +101,7 @@ public class BleScannerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mScanner != null) {
             List<ScanFilter> filters = new ArrayList<ScanFilter>();
-            ScanSettings.Builder settingBuilder = new ScanSettings.Builder()
-                    .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
+            ScanSettings.Builder settingBuilder = new ScanSettings.Builder();
 
             int command = intent.getIntExtra(EXTRA_COMMAND, -1);
             switch (command) {
@@ -119,7 +118,7 @@ public class BleScannerService extends Service {
                         .setServiceData(new ParcelUuid(BleAdvertiserService.SCAN_RESP_UUID),
                             BleAdvertiserService.PRIVACY_RESPONSE)
                         .build());
-                    settingBuilder.setScanMode(ScanSettings.SCAN_RESULT_TYPE_FULL);
+                    settingBuilder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
                     break;
                 case COMMAND_POWER_LEVEL:
                     filters.add(new ScanFilter.Builder()
