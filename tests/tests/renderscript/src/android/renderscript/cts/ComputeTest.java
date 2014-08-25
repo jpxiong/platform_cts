@@ -314,9 +314,7 @@ public class ComputeTest extends RSBaseCompute {
      * Test primitive types.
      */
     public void testPrimitives() {
-        ScriptC_primitives t = new ScriptC_primitives(mRS,
-                                                      mRes,
-                                                      R.raw.primitives);
+        ScriptC_primitives t = new ScriptC_primitives(mRS);
 
         assertTrue(initializeGlobals(t));
         t.invoke_test();
@@ -381,9 +379,7 @@ public class ComputeTest extends RSBaseCompute {
      * Test array initialization.
      */
     public void testArrayInit() {
-        ScriptC_array_init t = new ScriptC_array_init(mRS,
-                                                      mRes,
-                                                      R.raw.array_init);
+        ScriptC_array_init t = new ScriptC_array_init(mRS);
 
         checkInit(t);
         t.invoke_array_init_test();
@@ -672,7 +668,7 @@ public class ComputeTest extends RSBaseCompute {
     }
 
     public void testVector() {
-        ScriptC_vector s = new ScriptC_vector(mRS, mRes, R.raw.vector);
+        ScriptC_vector s = new ScriptC_vector(mRS);
         if (!initializeVector(s)) {
             fail("Failed to init vector components");
         } else {
@@ -693,7 +689,7 @@ public class ComputeTest extends RSBaseCompute {
 
     public void testStructObject() {
         ScriptC_struct_object s =
-                new ScriptC_struct_object(mRS, mRes, R.raw.struct_object);
+                new ScriptC_struct_object(mRS);
         if (!initializeStructObject(s)) {
             fail("Failed to init structure with RS objects");
         } else {
@@ -706,7 +702,7 @@ public class ComputeTest extends RSBaseCompute {
 
     /*
     public void testClamp() {
-        ScriptC_clamp s = new ScriptC_clamp(mRS, mRes, R.raw.clamp);
+        ScriptC_clamp s = new ScriptC_clamp(mRS);
         s.invoke_clamp_test();
         mRS.finish();
         waitForMessage();
@@ -715,7 +711,7 @@ public class ComputeTest extends RSBaseCompute {
 
     public void testClampRelaxed() {
         ScriptC_clamp_relaxed s =
-                new ScriptC_clamp_relaxed(mRS, mRes, R.raw.clamp_relaxed);
+                new ScriptC_clamp_relaxed(mRS);
         s.invoke_clamp_test();
         mRS.finish();
         waitForMessage();
@@ -727,9 +723,7 @@ public class ComputeTest extends RSBaseCompute {
      * Test utility functions.
      */
     public void testUtilityFunctions() {
-        ScriptC_primitives t = new ScriptC_primitives(mRS,
-                                                      mRes,
-                                                      R.raw.utils);
+        ScriptC_utils t = new ScriptC_utils(mRS);
         t.invoke_test();
         waitForMessage();
         checkForErrors();
@@ -761,9 +755,7 @@ public class ComputeTest extends RSBaseCompute {
      * Test support for reflected forEach() as well as validation of parameters.
      */
     public void testForEach() {
-        ScriptC_negate s = new ScriptC_negate(mRS,
-                                              mRes,
-                                              R.raw.negate);
+        ScriptC_negate s = new ScriptC_negate(mRS);
 
         int x = 7;
         Type t = new Type.Builder(mRS, Element.I32(mRS)).setX(x).create();
