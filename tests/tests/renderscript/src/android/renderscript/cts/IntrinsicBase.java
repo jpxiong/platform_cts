@@ -124,8 +124,8 @@ public class IntrinsicBase extends RSBaseCompute {
         if (mAllocDst != null) {
             mAllocDst.destroy();
         }
-        mAllocRef = Allocation.createTyped(mRS, mAllocSrc.getType());
-        mAllocDst = Allocation.createTyped(mRS, mAllocSrc.getType());
+        mAllocRef = makeAllocation(w, h, e);
+        mAllocDst = makeAllocation(w, h, e);
     }
 
 
