@@ -41,7 +41,8 @@ public class SignificantMotionTestActivity extends BaseSensorTestActivity {
     }
 
     // acceptable time difference between event time and system time
-    private static final long MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS = 500;
+    private static final long MAX_ACCEPTABLE_EVENT_TIME_DELAY_NANOS =
+            TimeUnit.MILLISECONDS.toNanos(500);
 
     // time for the test to wait for a trigger
     private static final int TRIGGER_MAX_DELAY_SECONDS = 30;
@@ -184,6 +185,7 @@ public class SignificantMotionTestActivity extends BaseSensorTestActivity {
         private volatile CountDownLatch mCountDownLatch;
         private volatile TriggerEventRegistry mEventRegistry;
 
+        // TODO: refactor out if needed
         private class TriggerEventRegistry {
             public final TriggerEvent triggerEvent;
             public final long realtimeTimestampNanos;
@@ -216,36 +218,28 @@ public class SignificantMotionTestActivity extends BaseSensorTestActivity {
                     eventType);
             Assert.assertEquals(eventTypeMessage, Sensor.TYPE_SIGNIFICANT_MOTION, eventType);
 
+            String sensorName = event.sensor.getName();
             int valuesLength = event.values.length;
             String valuesLengthMessage = getString(
-                    R.string.snsr_significant_motion_event_length,
+                    R.string.snsr_event_length,
                     EVENT_VALUES_LENGTH,
-                    valuesLength);
+                    valuesLength,
+                    sensorName);
             Assert.assertEquals(valuesLengthMessage, EVENT_VALUES_LENGTH, valuesLength);
 
             float value = event.values[0];
             String valuesMessage = getString(
-                    R.string.snsr_significant_motion_event_value,
+                    R.string.snsr_event_value,
                     EXPECTED_EVENT_VALUE,
-                    value);
+                    value,
+                    sensorName);
             Assert.assertEquals(valuesMessage, EXPECTED_EVENT_VALUE, value);
 
-            // Check that timestamp is within MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS: it might take
-            // time to determine Significant Motion, but then that event should be reported to the
-            // host in a timely fashion.
-            long eventTimestamp = event.timestamp;
-            long elapsedRealtimeNanos = registry.realtimeTimestampNanos;
-            long timestampDelta = Math.abs(eventTimestamp - elapsedRealtimeNanos);
-            String timestampMessage = getString(
-                    R.string.snsr_significant_motion_event_time,
-                    elapsedRealtimeNanos,
-                    eventTimestamp,
-                    timestampDelta,
-                    MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS);
-            Assert.assertTrue(
-                    timestampMessage,
-                    timestampDelta < MAX_ACCEPTABLE_EVENT_TIME_DELAY_MILLIS);
-            return timestampMessage;
+            return assertTimestampSynchronization(
+                    event.timestamp,
+                    registry.realtimeTimestampNanos,
+                    MAX_ACCEPTABLE_EVENT_TIME_DELAY_NANOS,
+                    sensorName);
         }
 
         public String verifyEventNotTriggered() throws Throwable {

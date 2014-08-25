@@ -19,6 +19,8 @@ package com.android.cts.verifier.sensors;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestResult;
 
+import junit.framework.Assert;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -287,8 +289,13 @@ public abstract class BaseSensorTestActivity
     }
 
     protected void vibrate(int timeInMs) {
-        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(timeInMs);
+    }
+
+    protected void vibrate(long[] pattern) {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(pattern, -1);
     }
 
     private List<Method> findTestMethods() {
@@ -435,6 +442,25 @@ public abstract class BaseSensorTestActivity
             throw new IllegalStateException("'Display Sleep' not set to " + timeoutInSec +
                     " seconds.");
         }
+    }
+
+    // TODO: move to sensor assertions
+    protected String assertTimestampSynchronization(
+            long eventTimestamp,
+            long receivedTimestamp,
+            long deltaThreshold,
+            String sensorName) {
+        long timestampDelta = Math.abs(eventTimestamp - receivedTimestamp);
+        String timestampMessage = getString(
+                R.string.snsr_event_time,
+                receivedTimestamp,
+                eventTimestamp,
+                timestampDelta,
+                deltaThreshold,
+                sensorName);
+        Assert.assertTrue(timestampMessage, timestampDelta < deltaThreshold);
+        return timestampMessage;
+
     }
 
     private void launchAndWaitForSubactivity(String action) throws InterruptedException {
