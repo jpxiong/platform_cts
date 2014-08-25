@@ -251,6 +251,18 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFileOwnedByGroup(f, "root");
     }
 
+    @MediumTest
+    public void testIdletimerDirectoryExistsAndSane() throws Exception {
+        File dir = new File("/sys/class/xt_idletimer");
+        assertTrue(dir.isDirectory());
+        assertTrue(dir.canRead());
+        assertFalse(dir.canWrite());
+        assertTrue(dir.canExecute());
+
+        assertFileOwnedBy(dir, "root");
+        assertFileOwnedByGroup(dir, "root");
+    }
+
     /**
      * Assert that a file is owned by a specific owner. This is a noop if the
      * file does not exist.
