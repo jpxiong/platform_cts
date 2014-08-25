@@ -107,7 +107,6 @@ cts_test_packages := \
     CtsPrintTestCases \
     CtsProviderTestCases \
     CtsRenderscriptTestCases \
-    CtsRenderscriptGraphicsTestCases \
     CtsRsCppTestCases \
     CtsSaxTestCases \
     CtsSecurityTestCases \
