@@ -461,7 +461,7 @@ public class KernelTest extends RSBaseCompute {
 
 
     public void testMultipleForEach() {
-        ScriptC_foreach s = new ScriptC_foreach(mRS, mRes, R.raw.foreach);
+        ScriptC_foreach s = new ScriptC_foreach(mRS);
         Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
 
         int X = 5;
@@ -482,7 +482,7 @@ public class KernelTest extends RSBaseCompute {
     }
 
     public void testNoRoot() {
-        ScriptC_noroot s = new ScriptC_noroot(mRS, mRes, R.raw.noroot);
+        ScriptC_noroot s = new ScriptC_noroot(mRS);
         Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
 
         int X = 5;

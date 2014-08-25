@@ -736,7 +736,7 @@ public class AllocationTest extends RSBaseCompute {
         Allocation largeArray = Allocation.createTyped(mRS, b.setX(48).create());
         Allocation singleElement = Allocation.createTyped(mRS, b.setX(1).create());
 
-        ScriptC_setelementat script = new ScriptC_setelementat(mRS, mRes, R.raw.setelementat);
+        ScriptC_setelementat script = new ScriptC_setelementat(mRS);
 
         script.set_memset_toValue(1);
         script.forEach_memset(singleElement);
@@ -761,7 +761,7 @@ public class AllocationTest extends RSBaseCompute {
         Allocation singleElement = Allocation.createTyped(mRS, b.setX(1).create());
         Allocation largeArray = Allocation.createTyped(mRS, b.setX(48).setY(16).create());
 
-        ScriptC_setelementat script = new ScriptC_setelementat(mRS, mRes, R.raw.setelementat);
+        ScriptC_setelementat script = new ScriptC_setelementat(mRS);
 
         script.set_memset_toValue(1);
         script.forEach_memset(singleElement);
