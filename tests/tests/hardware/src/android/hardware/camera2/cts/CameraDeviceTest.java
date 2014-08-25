@@ -877,9 +877,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     private void verifyCaptureResults(
             CameraCaptureSession.CaptureListener mockListener,
             int expectResultCount) {
+        final int TIMEOUT_PER_RESULT_MS = 2000;
         // Should receive expected number of capture results.
         verify(mockListener,
-                timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
+                timeout(TIMEOUT_PER_RESULT_MS * expectResultCount).atLeast(expectResultCount))
                         .onCaptureCompleted(
                                 eq(mSession),
                                 isA(CaptureRequest.class),
