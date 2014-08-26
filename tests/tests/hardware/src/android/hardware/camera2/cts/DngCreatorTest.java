@@ -25,6 +25,8 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.DngCreator;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
+import android.location.Location;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
 import android.util.Log;
@@ -45,7 +47,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.configureCameraSessio
 public class DngCreatorTest extends Camera2AndroidTestCase {
     private static final String TAG = "DngCreatorTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final String DEBUG_DNG_FILE = "/raw16.dng";
+    private static final String DEBUG_DNG_FILE = "raw16.dng";
 
     @Override
     protected void setUp() throws Exception {
@@ -85,7 +87,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                                 StaticMetadata.StreamDirection.Output);
                 if (targetCaptureSizes.length == 0) {
                     if (VERBOSE) {
-                        Log.v(TAG, "Skipping testSingleImageBasic - " +
+                        Log.i(TAG, "Skipping testSingleImageBasic - " +
                                 "no raw output streams for camera " + deviceId);
                     }
                     continue;
@@ -106,15 +108,15 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 outputStream = new ByteArrayOutputStream();
                 dngCreator.writeImage(outputStream, resultPair.first);
 
-                if (VERBOSE && i == 0) {
+                if (VERBOSE) {
+                    String filePath = DEBUG_FILE_NAME_BASE + "camera_" + deviceId + "_" +
+                            DEBUG_DNG_FILE;
                     // Write out captured DNG file for the first camera device if setprop is enabled
-                    fileStream = new FileOutputStream(DEBUG_FILE_NAME_BASE +
-                            DEBUG_DNG_FILE);
+                    fileStream = new FileOutputStream(filePath);
                     fileStream.write(outputStream.toByteArray());
                     fileStream.flush();
                     fileStream.close();
-                    Log.v(TAG, "Test DNG file for camera " + deviceId + " saved to " +
-                            DEBUG_FILE_NAME_BASE + DEBUG_DNG_FILE);
+                    Log.v(TAG, "Test DNG file for camera " + deviceId + " saved to " + filePath);
                 }
             } finally {
                 closeDevice(deviceId);
@@ -131,7 +133,121 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         }
     }
 
-    // TODO: Further tests for DNG header validation.
+    /**
+     * Test basic raw capture and DNG saving with a thumbnail, rotation, usercomment, and GPS tags
+     * set.
+     *
+     * <p>
+     * For each camera, capture a single RAW16 image at the first capture size reported for
+     * the raw format on that device, and save that image as a DNG file.  No further validation
+     * is done.
+     * </p>
+     *
+     * <p>
+     * Note: Enabling adb shell setprop log.tag.DngCreatorTest VERBOSE will also cause the
+     * raw image captured for the first reported camera device to be saved to an output file.
+     * </p>
+     */
+    public void testSingleImageThumbnail() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            String deviceId = mCameraIds[i];
+            List<ImageReader> captureReaders = new ArrayList<ImageReader>();
+            List<CameraTestUtils.SimpleImageReaderListener> captureListeners =
+                    new ArrayList<CameraTestUtils.SimpleImageReaderListener>();
+            FileOutputStream fileStream = null;
+            ByteArrayOutputStream outputStream = null;
+            try {
+                openDevice(deviceId);
+
+                Size[] targetCaptureSizes =
+                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
+                                StaticMetadata.StreamDirection.Output);
+                if (targetCaptureSizes.length == 0) {
+                    if (VERBOSE) {
+                        Log.i(TAG, "Skipping testSingleImageThumbnail - " +
+                                "no raw output streams for camera " + deviceId);
+                    }
+                    continue;
+                }
+
+                Size[] targetPreviewSizes =
+                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.YUV_420_888,
+                                StaticMetadata.StreamDirection.Output);
+                // Get smallest preview size
+                Size previewSize = mOrderedPreviewSizes.get(mOrderedPreviewSizes.size() - 1);
+
+                Size s = targetCaptureSizes[0];
+
+                // Create capture image reader
+                CameraTestUtils.SimpleImageReaderListener captureListener
+                        = new CameraTestUtils.SimpleImageReaderListener();
+                captureReaders.add(createImageReader(s, ImageFormat.RAW_SENSOR, 2,
+                        captureListener));
+                captureListeners.add(captureListener);
+
+                CameraTestUtils.SimpleImageReaderListener previewListener
+                        = new CameraTestUtils.SimpleImageReaderListener();
+
+                captureReaders.add(createImageReader(previewSize, ImageFormat.YUV_420_888, 2,
+                        previewListener));
+                captureListeners.add(previewListener);
+
+                Pair<List<Image>, CaptureResult> resultPair = captureSingleRawShot(s, captureReaders,
+                        captureListeners);
+                CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
+
+                // Test simple writeImage, no header checks
+                DngCreator dngCreator = new DngCreator(characteristics, resultPair.second);
+                Location l = new Location("test");
+                l.reset();
+                l.setLatitude(37.420016);
+                l.setLongitude(-122.081987);
+                l.setTime(System.currentTimeMillis());
+                dngCreator.setLocation(l);
+
+                dngCreator.setDescription("helloworld");
+                dngCreator.setOrientation(ExifInterface.ORIENTATION_FLIP_VERTICAL);
+                dngCreator.setThumbnail(resultPair.first.get(1));
+                outputStream = new ByteArrayOutputStream();
+                dngCreator.writeImage(outputStream, resultPair.first.get(0));
+
+                if (VERBOSE) {
+                    String filePath = DEBUG_FILE_NAME_BASE + "camera_" + deviceId + "_" +
+                            DEBUG_DNG_FILE;
+                    // Write out captured DNG file for the first camera device if setprop is enabled
+                    fileStream = new FileOutputStream(filePath);
+                    fileStream.write(outputStream.toByteArray());
+                    fileStream.flush();
+                    fileStream.close();
+                    Log.v(TAG, "Test DNG file for camera " + deviceId + " saved to " + filePath);
+                }
+            } finally {
+                closeDevice(deviceId);
+                for (ImageReader r : captureReaders) {
+                    closeImageReader(r);
+                }
+
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+
+                if (fileStream != null) {
+                    fileStream.close();
+                }
+            }
+        }
+    }
+
+    private Pair<Image, CaptureResult> captureSingleRawShot(Size s, ImageReader captureReader,
+            CameraTestUtils.SimpleImageReaderListener captureListener) throws Exception {
+        List<ImageReader> readers = new ArrayList<ImageReader>();
+        readers.add(captureReader);
+        List<CameraTestUtils.SimpleImageReaderListener> listeners =
+                new ArrayList<CameraTestUtils.SimpleImageReaderListener>();
+        listeners.add(captureListener);
+        Pair<List<Image>, CaptureResult> res = captureSingleRawShot(s, readers, listeners);
+        return new Pair<Image, CaptureResult>(res.first.get(0), res.second);
+    }
 
     /**
      * Capture a single raw image.
@@ -142,8 +258,8 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
      *          device.
      * @return a pair containing the {@link Image} and {@link CaptureResult} used for this capture.
      */
-    private Pair<Image, CaptureResult> captureSingleRawShot(Size s, ImageReader captureReader,
-            CameraTestUtils.SimpleImageReaderListener captureListener) throws Exception {
+    private Pair<List<Image>, CaptureResult> captureSingleRawShot(Size s, List<ImageReader> captureReaders,
+            List<CameraTestUtils.SimpleImageReaderListener> captureListeners) throws Exception {
         if (VERBOSE) {
             Log.v(TAG, "captureSingleRawShot - Capturing raw image.");
         }
@@ -162,11 +278,15 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
             }
         }
         assertTrue("Capture size is supported.", validSize);
-        Surface captureSurface = captureReader.getSurface();
+
 
         // Capture images.
         List<Surface> outputSurfaces = new ArrayList<Surface>();
-        outputSurfaces.add(captureSurface);
+        for (ImageReader captureReader : captureReaders) {
+            Surface captureSurface = captureReader.getSurface();
+            outputSurfaces.add(captureSurface);
+        }
+
         CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
         request.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                 CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
@@ -178,14 +298,18 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         // Verify capture result and images
         CaptureResult result = resultListener.getCaptureResult(CAPTURE_WAIT_TIMEOUT_MS);
 
-        Image captureImage = captureListener.getImage(CAPTURE_WAIT_TIMEOUT_MS);
+        List<Image> resultImages = new ArrayList<Image>();
+        for (CameraTestUtils.SimpleImageReaderListener captureListener : captureListeners) {
+            Image captureImage = captureListener.getImage(CAPTURE_WAIT_TIMEOUT_MS);
 
-        CameraTestUtils.validateImage(captureImage, s.getWidth(), s.getHeight(),
-                ImageFormat.RAW_SENSOR, null);
+            /*CameraTestUtils.validateImage(captureImage, s.getWidth(), s.getHeight(),
+                    ImageFormat.RAW_SENSOR, null);*/
+            resultImages.add(captureImage);
+        }
         // Stop capture, delete the streams.
         stopCapture(/*fast*/false);
 
-        return new Pair<Image, CaptureResult>(captureImage, result);
+        return new Pair<List<Image>, CaptureResult>(resultImages, result);
     }
 
     private CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces)
