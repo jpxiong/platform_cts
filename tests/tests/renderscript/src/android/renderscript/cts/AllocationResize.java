@@ -34,6 +34,10 @@ public class AllocationResize extends RSBaseCompute {
     }
 
     public void testResize() {
+        if (mRS.getApplicationContext().getApplicationInfo().targetSdkVersion >= 21) {
+            return;
+        }
+
         mScript = new ScriptC_allocation_resize(mRS);
         mIn = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE/2);
         mOut = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE*2);
