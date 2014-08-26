@@ -20,6 +20,8 @@ import com.android.cts.verifier.sensors.helpers.PowerTestHostLink;
 
 import junit.framework.Assert;
 
+import java.util.concurrent.TimeUnit;
+
 public class SensorPowerTestActivity extends BaseSensorTestActivity implements
         PowerTestHostLink.HostToDeviceInterface {
 
@@ -65,8 +67,8 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
 
             // test setup, make sure the device is in the correct state before
             // executing the scenarios
-            askToSetAirplaneMode();
-            askToSetScreenOffTimeout(15 /* seconds */);
+            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+            mSensorFeaturesDeactivator.requestToSetScreenOffTimeout(15, TimeUnit.SECONDS);
 
             // ask the operator to set up the host
             appendText("Connect the device to the host machine.");
@@ -87,6 +89,8 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
                 testDetails = testResult.testDetails;
                 Assert.assertEquals(testDetails, 0, testResult.failedCount );
             } finally {
+                mSensorFeaturesDeactivator.requestToRestoreFeatures();
+                mSensorFeaturesDeactivator.requestToResetScreenOffTimeout();
                 mHostLink.close();
                 mHostLink = null;
             }
