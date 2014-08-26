@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SensorPowerTestActivity extends BaseSensorTestActivity implements
         PowerTestHostLink.HostToDeviceInterface {
-
     public class TestExecutionException extends Exception {
         public TestExecutionException(final String message) {
             super(message);
@@ -35,7 +34,6 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
         super(SensorPowerTestActivity.class);
     }
 
-    private String TAG = "SensorPowerTestActivity";
     private PowerTestHostLink mHostLink;
 
     /** HostToDeviceInterface implementation **/
@@ -59,19 +57,30 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
         setTestResult(testId, testResult, testDetails);
     }
 
+    @Override
+    protected void activitySetUp() throws InterruptedException {
+        mSensorFeaturesDeactivator.requestToSetScreenOffTimeout(15, TimeUnit.SECONDS);
+        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+    }
+
+    @Override
+    protected void activityCleanUp() throws InterruptedException {
+        if (mHostLink != null) {
+            mHostLink.close();
+        }
+
+        mSensorFeaturesDeactivator.requestToRestoreFeatures();
+        mSensorFeaturesDeactivator.requestToResetScreenOffTimeout();
+    }
+
     public String testSensorsPower() throws Throwable {
         String testDetails = "";
         if (mHostLink == null) {
             // prepare Activity screen to show instructions to the operator
             clearText();
 
-            // test setup, make sure the device is in the correct state before
-            // executing the scenarios
-            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
-            mSensorFeaturesDeactivator.requestToSetScreenOffTimeout(15, TimeUnit.SECONDS);
-
             // ask the operator to set up the host
-            appendText("Connect the device to the host machine.");
+            appendText("Connect the device to the host machine via the USB passthrough.");
             appendText("Execute the following script (the command is available in CtsVerifier.zip):");
             appendText("    # python power/execute_power_tests.py --power_monitor <implementation> --run");
             appendText("where \"<implementation>\" is the power monitor implementation being used, for example \"monsoon\"");
@@ -87,16 +96,14 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
                 // sequentially here:
                 final PowerTestHostLink.PowerTestResult testResult = mHostLink.run();
                 testDetails = testResult.testDetails;
-                Assert.assertEquals(testDetails, 0, testResult.failedCount );
+                Assert.assertEquals(testDetails, 0, testResult.failedCount);
             } finally {
-                mSensorFeaturesDeactivator.requestToRestoreFeatures();
-                mSensorFeaturesDeactivator.requestToResetScreenOffTimeout();
                 mHostLink.close();
                 mHostLink = null;
             }
 
         } else {
-            throw new IllegalStateException("Attempt to run test twice");            
+            throw new IllegalStateException("Attempt to run test twice");
         }
         return testDetails;
     }
