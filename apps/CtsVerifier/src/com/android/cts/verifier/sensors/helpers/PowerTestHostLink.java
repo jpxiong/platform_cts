@@ -27,69 +27,56 @@ import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
 /*
- * This class handles communication with the host to respond to commands
- * The command/response link is through a TCP socket on the host side,
- * forwarded via adb to a local socket on the device.  The system uses a 
- * standard "accept-read_command-send_response-close" to execute commands
- * sent from the host.  
+ * This class handles communication with the host to respond to commands.
+ * The command/response link is through a TCP socket on the host side, forwarded via adb to a local
+ * socket on the device.  The system uses a standard "accept-read_command-send_response-close" to
+ * execute commands sent from the host.  
  * 
- * CAUTION: The local socket name (SOCKET_NAME below) must match that used by the host
- * to set up the adb-forwarding.
+ * CAUTION: The local socket name (SOCKET_NAME below) must match that used by the host to set up
+ * the adb-forwarding.
  */
 public class PowerTestHostLink {
 
     /*
-     * Host-to-device bridge will use a Listener instance to drive the test via
-     * the CtsVerifier running on the device.
+     * Host-to-device bridge will use a Listener instance to drive the test via the CtsVerifier
+     * running on the device.
      */
     public interface HostToDeviceInterface {
-
-        public void logTestResult(final String testName,
-                final SensorTestResult result,
-                final String message);
-
-        public void raiseError(final String testName, final String message) throws Exception;
-
-        public void waitForUserAcknowledgement(final String message);
-
-        public void logText(String text);
-
+        void logTestResult(String testName, SensorTestResult result, String message);
+        void raiseError(String testName, String message) throws Exception;
+        void waitForUserAcknowledgement(String message);
+        void logText(String text);
     };
-    
-    /** This is a data-only message to communicate result of a power test **/
+
+    /** This is a data-only message to communicate result of a power test */
     public class PowerTestResult{
         public int passedCount = 0;
         public int skippedCount = 0;
         public int failedCount = 0;
         public String testDetails = "";
     };
-   
+
 
     public final String TAG = "PowerTestHostLink";
 
     /**
-     * Standard response types back to host. Host-side code must match these
-     * definitions
+     * Standard response types back to host. Host-side code must match these definitions.
      */
     private final static String RESPONSE_OK = "OK";
     private final static String RESPONSE_ERR = "ERR";
     private final static String RESPONSE_UNAVAILABLE = "UNAVAILABLE";
 
     /**
-     * Socket name for host adb forwarded communications. Must match naem in
-     * host-side code
+     * Socket name for host adb forwarded communications. Must match naem in host-side code.
      */
     public final static String SOCKET_NAME = "/android/cts/powertest";
 
@@ -126,17 +113,15 @@ public class PowerTestHostLink {
     }
 
     /**
-     * Ensure connection to host is closed; stop accepting requests
+     * Ensure connection to host is closed; stop accepting requests.
      **/
     public void close() {
         mStopThread = true;
     }
 
-
-    
     /**
-     * Run the suite of tests via the host, responding to host requests
-     * 
+     * Run the suite of tests via the host, responding to host requests.
+     *
      * @return number of failed test cases
      * @throws Exception
      */
@@ -206,8 +191,7 @@ public class PowerTestHostLink {
                             Log.d(TAG, "Sending response " + response);
                             streamOut.write(response.getBytes(), 0, response.length());
                         }
-                        // null response means response is defered awaiting user
-                        // response
+                        // null response means response is defered awaiting user response
                     } catch (Exception e) {
                         Log.e(TAG, "Error executing " + clientRequest, e);
                         streamOut.write(RESPONSE_ERR.getBytes(), 0, RESPONSE_ERR.length());
@@ -229,21 +213,18 @@ public class PowerTestHostLink {
             }
         }
         mHostToDeviceExecutor.logText("Device disconnected.");
-        if (mStringBuilder!=null){
+        if (mStringBuilder != null){
             mTestResult.testDetails = mStringBuilder.toString();
         }
         Log.d(TAG, "Returning " + mTestResult.passedCount + "passed " + mTestResult.skippedCount + "skipped " +
         mTestResult.failedCount + "failed :" + mTestResult.testDetails);
         return mTestResult;
     }
-    
 
-    protected String processClientRequest(String request) throws SettingNotFoundException,
-            Exception {
+    protected String processClientRequest(String request) throws Exception {
         final String USER_REQUEST = "REQUEST USER RESPONSE";
         String response = RESPONSE_ERR;
-        // Queries must appear first and then commands to direct actions after
-        // in this if/else construct
+        // Queries must appear first and then commands to direct actions after in these statements
         if (request.startsWith("SCREEN OFF TIMEOUT?")) {
             int timeout = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.SCREEN_OFF_TIMEOUT);
@@ -264,7 +245,7 @@ public class PowerTestHostLink {
         } else if (request.startsWith("EXTERNAL STORAGE?")){
             response = System.getenv("EXTERNAL_STORAGE");
             Log.d(TAG,"External storage is " + response);
-        }else if (request.startsWith("SCREEN OFF?")) {        
+        } else if (request.startsWith("SCREEN OFF?")) {
             boolean screenOn = mPowerManager.isScreenOn();
             response = screenOn ? RESPONSE_ERR : RESPONSE_OK;
         } else if (request.startsWith("SCREEN ON?")) {
@@ -307,12 +288,8 @@ public class PowerTestHostLink {
         return response;
     }
 
-    protected String getCurrentTime() {
-        return DateFormat.getDateTimeInstance().format(new Date());
-    }
-
     protected String handleSetTestResultCmd(final String request) {
-        String response = RESPONSE_OK;
+        String response;
         StringTokenizer tokenizer = new StringTokenizer(request, " ");
         String testName = "";
         SensorTestResult result = SensorTestResult.FAIL;
@@ -358,7 +335,7 @@ public class PowerTestHostLink {
     }
 
     protected String handleSensorSensorSwitchCmd(String sensorList, boolean switchOn) {
-        String response = RESPONSE_ERR;
+        String response;
         try {
             StringTokenizer tokenizer = new StringTokenizer(sensorList, " ");
             int n = tokenizer.countTokens();
@@ -432,7 +409,7 @@ public class PowerTestHostLink {
     }
 
     protected String switchSensor(int sensorId, boolean switchOn, String requestFrequency) {
-        String response = RESPONSE_ERR;
+        String response;
         int rateUs = SensorManager.SENSOR_DELAY_NORMAL;
 
         if (requestFrequency.compareToIgnoreCase("SENSOR_DELAY_FASTEST") == 0) {
@@ -479,5 +456,4 @@ public class PowerTestHostLink {
         public void onSensorChanged(SensorEvent event) {
         }
     };
-
 }

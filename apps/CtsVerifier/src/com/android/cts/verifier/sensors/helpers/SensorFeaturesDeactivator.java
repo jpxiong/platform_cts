@@ -144,7 +144,7 @@ public class SensorFeaturesDeactivator {
     }
 
     private boolean isScreenOffTimeout(long expectedTimeoutInMs) {
-        return getScreenOffTimeoutInMs() <= expectedTimeoutInMs;
+        return getScreenOffTimeoutInMs() == expectedTimeoutInMs;
     }
 
     private long getScreenOffTimeoutInMs() {
