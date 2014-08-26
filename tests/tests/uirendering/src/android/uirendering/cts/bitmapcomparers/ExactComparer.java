@@ -58,7 +58,7 @@ public class ExactComparer extends BaseRenderScriptComparer {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_ExactComparer(renderScript, resources, R.raw.exactcomparer);
+            mScript = new ScriptC_ExactComparer(renderScript);
         }
         mScript.set_WIDTH(width);
         mScript.set_OFFSET(offset);

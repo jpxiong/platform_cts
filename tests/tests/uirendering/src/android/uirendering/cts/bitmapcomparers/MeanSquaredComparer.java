@@ -53,8 +53,7 @@ public class MeanSquaredComparer extends BaseRenderScriptComparer {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_MeanSquaredComparer(renderScript, resources,
-                    R.raw.meansquaredcomparer);
+            mScript = new ScriptC_MeanSquaredComparer(renderScript);
         }
         mScript.set_WIDTH(width);
 

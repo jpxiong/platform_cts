@@ -69,8 +69,7 @@ public class ThresholdDifferenceComparer extends BaseRenderScriptComparer {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_ThresholdDifferenceComparer(renderScript, resources,
-                    R.raw.thresholddifferencecomparer);
+            mScript = new ScriptC_ThresholdDifferenceComparer(renderScript);
         }
 
         mScript.set_THRESHOLD(mThreshold);
