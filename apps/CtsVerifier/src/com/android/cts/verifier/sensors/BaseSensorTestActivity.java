@@ -1,4 +1,5 @@
 /*
+
  * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@ package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestResult;
+import com.android.cts.verifier.sensors.helpers.SensorFeaturesDeactivator;
 
 import junit.framework.Assert;
 
@@ -28,7 +30,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -49,7 +50,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base class to author Sensor test cases. It provides access to the following flow:
@@ -69,12 +69,13 @@ public abstract class BaseSensorTestActivity
     protected final Class mTestClass;
     private final int mLayoutId;
 
+    private final DeactivatorActivityHandler mDeactivatorActivityHandler;
+    protected final SensorFeaturesDeactivator mSensorFeaturesDeactivator;
     private final Semaphore mSemaphore = new Semaphore(0);
 
     private TextView mLogView;
     private View mNextView;
     private Thread mWorkerThread;
-    private CountDownLatch mCountDownLatch;
 
     private volatile int mTestPassedCounter;
     private volatile int mTestSkippedCounter;
@@ -87,6 +88,8 @@ public abstract class BaseSensorTestActivity
     protected BaseSensorTestActivity(Class testClass, int layoutId) {
         mTestClass = testClass;
         mLayoutId = layoutId;
+        mDeactivatorActivityHandler = new DeactivatorActivityHandler();
+        mSensorFeaturesDeactivator = new SensorFeaturesDeactivator(mDeactivatorActivityHandler);
     }
 
     @Override
@@ -150,7 +153,7 @@ public abstract class BaseSensorTestActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mCountDownLatch.countDown();
+        mDeactivatorActivityHandler.onActivityResult();
     }
 
     private static class SensorTestDetails {
@@ -298,6 +301,23 @@ public abstract class BaseSensorTestActivity
         vibrator.vibrate(pattern, -1);
     }
 
+    // TODO: move to sensor assertions
+    protected String assertTimestampSynchronization(
+            long eventTimestamp,
+            long receivedTimestamp,
+            long deltaThreshold,
+            String sensorName) {
+        long timestampDelta = Math.abs(eventTimestamp - receivedTimestamp);
+        String timestampMessage = getString(
+                R.string.snsr_event_time,
+                receivedTimestamp,
+                eventTimestamp,
+                deltaThreshold,
+                sensorName);
+        Assert.assertTrue(timestampMessage, timestampDelta < deltaThreshold);
+        return timestampMessage;
+    }
+
     private List<Method> findTestMethods() {
         ArrayList<Method> testMethods = new ArrayList<Method>();
         for (Method method : mTestClass.getDeclaredMethods()) {
@@ -408,102 +428,41 @@ public abstract class BaseSensorTestActivity
         }
     }
 
-    // TODO: ideally we want to store the original state of each feature, and make sure that we can
-    // restore their values at the end of the test
+    private class DeactivatorActivityHandler implements SensorFeaturesDeactivator.ActivityHandler {
+        private static final int SENSOR_FEATURES_DEACTIVATOR_RESULT = 0;
 
-    protected void askToSetAirplaneMode() throws InterruptedException {
-        if (isAirplaneModeOn()) {
-            appendText(R.string.snsr_airplane_mode_set);
-            appendText(R.string.snsr_on_complete_return);
-            return;
+        private CountDownLatch mCountDownLatch;
+
+        @Override
+        public ContentResolver getContentResolver() {
+            return BaseSensorTestActivity.this.getContentResolver();
         }
 
-        appendText(R.string.snsr_airplane_mode_request);
-        waitForUser();
-        launchAndWaitForSubactivity(Settings.ACTION_WIRELESS_SETTINGS);
-
-        if (!isAirplaneModeOn()) {
-            throw new IllegalStateException("Airplane Mode is not set.");
-        }
-    }
-
-    protected void askToSetScreenOffTimeout(int timeoutInSec) throws InterruptedException {
-        long timeoutInMs = TimeUnit.SECONDS.toMillis(timeoutInSec);
-        if (isScreenOffTimeout(timeoutInMs)) {
-            appendText(getString(R.string.snsr_screen_off_timeout, timeoutInSec));
-            return;
+        @Override
+        public void logInstructions(int instructionsResId, Object ... params) {
+            appendText(BaseSensorTestActivity.this.getString(instructionsResId, params));
         }
 
-        appendText(getString(R.string.snsr_screen_off_request, timeoutInSec));
-        waitForUser();
-        launchAndWaitForSubactivity(Settings.ACTION_DISPLAY_SETTINGS);
-
-        if (!isScreenOffTimeout(timeoutInMs)) {
-            throw new IllegalStateException("'Display Sleep' not set to " + timeoutInSec +
-                    " seconds.");
+        @Override
+        public void waitForUser() {
+            BaseSensorTestActivity.this.waitForUser();
         }
-    }
 
-    // TODO: move to sensor assertions
-    protected String assertTimestampSynchronization(
-            long eventTimestamp,
-            long receivedTimestamp,
-            long deltaThreshold,
-            String sensorName) {
-        long timestampDelta = Math.abs(eventTimestamp - receivedTimestamp);
-        String timestampMessage = getString(
-                R.string.snsr_event_time,
-                receivedTimestamp,
-                eventTimestamp,
-                timestampDelta,
-                deltaThreshold,
-                sensorName);
-        Assert.assertTrue(timestampMessage, timestampDelta < deltaThreshold);
-        return timestampMessage;
-
-    }
-
-    private void launchAndWaitForSubactivity(String action) throws InterruptedException {
-        launchAndWaitForSubactivity(new Intent(action));
-    }
-
-    private void launchAndWaitForSubactivity(Intent intent) throws InterruptedException {
-        mCountDownLatch = new CountDownLatch(1);
-        startActivityForResult(intent, 0);
-        mCountDownLatch.await();
-    }
-
-    private boolean isAirplaneModeOn() {
-        ContentResolver contentResolver = getContentResolver();
-        int airplaneModeOn;
-        // Settings.System.AIRPLANE_MODE_ON is deprecated in API 17
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            try {
-                airplaneModeOn =
-                        Settings.System.getInt(contentResolver, Settings.System.AIRPLANE_MODE_ON);
-            } catch (Settings.SettingNotFoundException e) {
-                airplaneModeOn = 0;
-            }
-        } else {
-            try {
-                airplaneModeOn =
-                        Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON);
-            } catch (Settings.SettingNotFoundException e) {
-                airplaneModeOn = 0;
-            }
+        @Override
+        public void launchAndWaitForSubactivity(String action) throws InterruptedException {
+            mCountDownLatch = new CountDownLatch(1);
+            Intent intent = new Intent(action);
+            startActivityForResult(intent, SENSOR_FEATURES_DEACTIVATOR_RESULT);
+            mCountDownLatch.await();
         }
-        return airplaneModeOn != 0;
-    }
 
-    private boolean isScreenOffTimeout(long expectedTimeoutInMs) {
-        ContentResolver contentResolver = getContentResolver();
-        long screenOffTimeoutInMs;
-        try {
-            screenOffTimeoutInMs =
-                    Settings.System.getLong(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT);
-        } catch(Settings.SettingNotFoundException e) {
-            screenOffTimeoutInMs = Integer.MAX_VALUE;
+        public void onActivityResult() {
+            mCountDownLatch.countDown();
         }
-        return screenOffTimeoutInMs <= expectedTimeoutInMs;
+
+        @Override
+        public String getString(int resId, Object ... params) {
+            return BaseSensorTestActivity.this.getString(resId, params);
+        }
     }
 }
