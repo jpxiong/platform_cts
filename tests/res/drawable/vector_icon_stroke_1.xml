@@ -35,6 +35,7 @@
         <path
             android:name="twoLines"
             android:pathData="M 100,20 l 0 80 l -30 -80"
+            android:fillColor="#FF000000"
             android:strokeColor="#FF00FF00"
             android:strokeLineCap="butt"
             android:strokeLineJoin="miter"
