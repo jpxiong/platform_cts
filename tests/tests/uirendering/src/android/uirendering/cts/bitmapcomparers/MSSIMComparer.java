@@ -88,8 +88,7 @@ public class MSSIMComparer extends BaseRenderScriptComparer {
             Allocation given, int offset, int stride, int width, int height,
             RenderScript renderScript, Allocation inputAllocation, Allocation outputAllocation) {
         if (mScript == null) {
-            mScript = new ScriptC_MSSIMComparer(renderScript, resources,
-                    R.raw.mssimcomparer);
+            mScript = new ScriptC_MSSIMComparer(renderScript);
         }
         mScript.set_WIDTH(width);
         mScript.set_HEIGHT(height);
