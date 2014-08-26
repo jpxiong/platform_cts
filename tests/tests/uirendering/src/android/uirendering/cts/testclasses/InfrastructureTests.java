@@ -36,7 +36,7 @@ public class InfrastructureTests extends ActivityTestBase {
 
     @SmallTest
     public void testScreenshot() {
-        for (int i = 0 ; i < 1000 ; i ++) {
+        for (int i = 0 ; i < 500 ; i ++) {
             takeScreenshot();
             System.gc();
         }

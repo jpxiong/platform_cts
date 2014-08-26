@@ -85,20 +85,22 @@ public abstract class ActivityTestBase extends
      */
     @Override
     public void tearDown() {
-        List<TestCase> testCases = mTestCaseBuilder.getTestCases();
+        if (mTestCaseBuilder != null) {
+            List<TestCase> testCases = mTestCaseBuilder.getTestCases();
 
-        if (testCases.size() == 0) {
-            throw new IllegalStateException("Must have at least one test case");
-        }
-
-        for (TestCase testCase : testCases) {
-            if (!testCase.wasTestRan) {
-                Log.w(TAG_NAME, getName() + " not all of the tests were ran");
-                break;
+            if (testCases.size() == 0) {
+                throw new IllegalStateException("Must have at least one test case");
             }
-        }
 
-        mTestCaseBuilder = null;
+
+            for (TestCase testCase : testCases) {
+                if (!testCase.wasTestRan) {
+                    Log.w(TAG_NAME, getName() + " not all of the tests were ran");
+                    break;
+                }
+            }
+            mTestCaseBuilder = null;
+        }
 
         Runnable finishRunnable = new Runnable() {
 
