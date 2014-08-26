@@ -17,8 +17,10 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
+import static junit.framework.Assert.assertNotNull;
 
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -28,6 +30,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.hardware.camera2.DngCreator;
 import android.media.ImageReader;
+import android.util.Pair;
 import android.util.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
@@ -176,6 +179,13 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
            try {
                Log.i(TAG, "Testing raw capture for Camera " + mCameraIds[i]);
                openDevice(mCameraIds[i]);
+
+               if (!mStaticInfo.isCapabilitySupported(
+                       CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                   Log.i(TAG, "RAW capability is not supported in camera " + mCameraIds[i] +
+                           ". Skip the test.");
+                   continue;
+               }
 
                rawCaptureTestByCamera();
            } finally {
@@ -661,7 +671,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 dumpFile(rawFileName, rawBuffer);
             }
 
-            verifyRawCaptureResult(rawRequest, resultListener);
+            verifyRawCaptureResult(rawRequest, resultListener.getCaptureResultForRequest(rawRequest,
+                    NUM_RESULTS_WAIT_TIMEOUT));
             stopPreview();
         }
     }
@@ -732,6 +743,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 basicValidateJpegImage(jpegImage, maxStillSz);
                 Image rawImage = rawListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateRaw16Image(rawImage, size);
+                verifyRawCaptureResult(multiRequest, result);
 
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -766,9 +778,89 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void verifyRawCaptureResult(CaptureRequest rawRequest,
-            SimpleCaptureListener resultListener) {
-        // TODO: validate DNG metadata tags.
+    /**
+     * Validate that raw {@link CaptureResult}.
+     *
+     * @param rawRequest a {@link CaptureRequest} use to capture a RAW16 image.
+     * @param rawResult the {@link CaptureResult} corresponding to the given request.
+     */
+    private void verifyRawCaptureResult(CaptureRequest rawRequest, CaptureResult rawResult) {
+        assertNotNull(rawRequest);
+        assertNotNull(rawResult);
+
+        Rational[] empty = new Rational[] { Rational.ZERO, Rational.ZERO, Rational.ZERO};
+        Rational[] neutralColorPoint = mCollector.expectKeyValueNotNull("NeutralColorPoint",
+                rawResult, CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
+        if (neutralColorPoint != null) {
+            mCollector.expectEquals("NeutralColorPoint length", empty.length,
+                    neutralColorPoint.length);
+            mCollector.expectNotEquals("NeutralColorPoint cannot be all zeroes, ", empty,
+                    neutralColorPoint);
+            mCollector.expectValuesInRange("NeutralColorPoint", neutralColorPoint,
+                    Rational.ZERO, Rational.ZERO);
+        }
+
+        mCollector.expectKeyValueGreaterOrEqual(rawResult, CaptureResult.SENSOR_GREEN_SPLIT, 0.0f);
+
+        Pair<Double, Double>[] noiseProfile = mCollector.expectKeyValueNotNull("NoiseProfile",
+                rawResult, CaptureResult.SENSOR_NOISE_PROFILE);
+        if (noiseProfile != null) {
+            mCollector.expectEquals("NoiseProfile length", noiseProfile.length,
+                /*Num CFA channels*/4);
+            for (Pair<Double, Double> p : noiseProfile) {
+                mCollector.expectTrue("NoiseProfile coefficients " + p +
+                        " must have: S > 0, O >= 0", p.first > 0 && p.second >= 0);
+            }
+        }
+
+        Integer hotPixelMode = mCollector.expectKeyValueNotNull("HotPixelMode", rawResult,
+                CaptureResult.HOT_PIXEL_MODE);
+        Boolean hotPixelMapMode = mCollector.expectKeyValueNotNull("HotPixelMapMode", rawResult,
+                CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
+        Point[] hotPixelMap = rawResult.get(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
+
+        Size pixelArraySize = mStaticInfo.getPixelArraySizeChecked();
+        boolean[] availableHotPixelMapModes = mStaticInfo.getValueFromKeyNonNull(
+                        CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES);
+
+        if (hotPixelMode != null) {
+            Integer requestMode = mCollector.expectKeyValueNotNull(rawRequest,
+                    CaptureRequest.HOT_PIXEL_MODE);
+            if (requestMode != null) {
+                mCollector.expectKeyValueEquals(rawResult, CaptureResult.HOT_PIXEL_MODE,
+                        requestMode);
+            }
+        }
+
+        if (hotPixelMapMode != null) {
+            Boolean requestMapMode = mCollector.expectKeyValueNotNull(rawRequest,
+                    CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
+            if (requestMapMode != null) {
+                mCollector.expectKeyValueEquals(rawResult,
+                        CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE, requestMapMode);
+            }
+
+            if (!hotPixelMapMode) {
+                mCollector.expectTrue("HotPixelMap must be empty", hotPixelMap == null ||
+                        hotPixelMap.length == 0);
+            } else {
+                mCollector.expectTrue("HotPixelMap must not be empty", hotPixelMap != null);
+                mCollector.expectNotNull("AvailableHotPixelMapModes must not be null",
+                        availableHotPixelMapModes);
+                if (availableHotPixelMapModes != null) {
+                    mCollector.expectContains("HotPixelMapMode", availableHotPixelMapModes, true);
+                }
+
+                int height = pixelArraySize.getHeight();
+                int width = pixelArraySize.getWidth();
+                for (Point p : hotPixelMap) {
+                    mCollector.expectTrue("Hotpixel " + p + " must be in pixelArray " +
+                            pixelArraySize, p.x >= 0 && p.x < width && p.y >= 0 && p.y < height);
+                }
+            }
+        }
+        // TODO: profileHueSatMap, and profileToneCurve aren't supported yet.
+
     }
 
     private static boolean areGpsFieldsEqual(Location a, Location b) {

@@ -567,7 +567,7 @@ public class StaticMetadata {
      *
      * @return the available hot pixel map modes
      */
-    public int[] getAvailableHotPixelMapModesChecked() {
+    public int[] getAvailableHotPixelModesChecked() {
         Key<int[]> key = CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES;
         int[] modes = getValueFromKeyNonNull(key);
 

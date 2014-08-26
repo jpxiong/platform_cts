@@ -29,6 +29,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -144,11 +145,24 @@ public class CameraErrorCollector extends ErrorCollector {
         }
 
         if (!Objects.equals(expected, actual)) {
-            if (actual == null) {
-                addMessage(msg + ", actual value is null");
-                return false;
-            }
+            addMessage(String.format("%s (expected = %s, actual = %s) ", msg, expected,
+                    actual));
+            return false;
+        }
 
+        return true;
+    }
+
+    /**
+     * Check if the two values are not equal.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected Expected value to be checked against.
+     * @param actual Actual value to be checked.
+     * @return {@code true} if the two values are not equal, {@code false} otherwise.
+     */
+    public <T> boolean expectNotEquals(String msg, T expected, T actual) {
+        if (Objects.equals(expected, actual)) {
             addMessage(String.format("%s (expected = %s, actual = %s) ", msg, expected,
                     actual));
             return false;
@@ -173,11 +187,31 @@ public class CameraErrorCollector extends ErrorCollector {
         }
 
         if (!Arrays.deepEquals(expected, actual)) {
-            if (actual == null) {
-                addMessage(msg + ", actual value is null");
-                return false;
-            }
+            addMessage(String.format("%s (expected = %s, actual = %s) ", msg,
+                    Arrays.deepToString(expected), Arrays.deepToString(actual)));
+            return false;
+        }
 
+        return true;
+    }
+
+    /**
+     * Check if the two arrays of values are not deeply equal.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected Expected array of values to be checked against.
+     * @param actual Actual array of values to be checked.
+     * @return {@code true} if the two arrays of values are not deeply equal, {@code false}
+     *          otherwise.
+     *
+     * @throws IllegalArgumentException if {@code expected} was {@code null}
+     */
+    public <T> boolean expectNotEquals(String msg, T[] expected, T[] actual) {
+        if (expected == null) {
+            throw new IllegalArgumentException("expected value shouldn't be null");
+        }
+
+        if (Arrays.deepEquals(expected, actual)) {
             addMessage(String.format("%s (expected = %s, actual = %s) ", msg,
                     Arrays.deepToString(expected), Arrays.deepToString(actual)));
             return false;
@@ -320,6 +354,22 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Expect the array of values are in the range.
+     *
+     * @param msg Message to be logged
+     * @param array The array of values to be checked
+     * @param min The min value of the range
+     * @param max The max value of the range
+     */
+    public void expectValuesInRange(String msg, int[] array, int min, int max) {
+        ArrayList<Integer> l = new ArrayList<>(array.length);
+        for (int i : array) {
+            l.add(i);
+        }
+        expectValuesInRange(msg, l, min, max);
+    }
+
+    /**
      * Expect the value is in the range.
      *
      * @param msg Message to be logged
@@ -374,7 +424,7 @@ public class CameraErrorCollector extends ErrorCollector {
 
         if (!expectEquals(differentSizesMsg, expected.length, actual.length)) return false;
 
-        boolean succ = true;;
+        boolean succ = true;
         for (int i = 0; i < expected.length; ++i) {
             if (i < actual.length) {
                 // Avoid printing multiple errors for the same rectangle
@@ -512,7 +562,7 @@ public class CameraErrorCollector extends ErrorCollector {
     /**
      * Check if the key value is not null and return the value.
      *
-     * @param request The {@link CameraCharacteristics} to get the key from.
+     * @param characteristics The {@link CameraCharacteristics} to get the key from.
      * @param key The {@link CameraCharacteristics} key to be checked.
      *
      * @return The value of the key.
@@ -521,6 +571,25 @@ public class CameraErrorCollector extends ErrorCollector {
             CameraCharacteristics.Key<T> key) {
 
         T value = characteristics.get(key);
+        if (value == null) {
+            addMessage("Key " + key.getName() + " shouldn't be null");
+        }
+
+        return value;
+    }
+
+    /**
+     * Check if the key value is not null and return the value.
+     *
+     * @param request The {@link CaptureRequest} to get the key from.
+     * @param key The {@link CaptureRequest} key to be checked.
+     *
+     * @return The value of the key.
+     */
+    public <T> T expectKeyValueNotNull(CaptureRequest request,
+                                       CaptureRequest.Key<T> key) {
+
+        T value = request.get(key);
         if (value == null) {
             addMessage("Key " + key.getName() + " shouldn't be null");
         }
@@ -663,6 +732,229 @@ public class CameraErrorCollector extends ErrorCollector {
         String reason = "Key " + key.getName() + " value " + value.toString()
                 + " doesn't match the expected value " + expected.toString();
         checkThat(reason, value, CoreMatchers.equalTo(expected));
+    }
+
+    /**
+     * Check if the key is non-null, and the key value is greater than the expected value.
+     *
+     * @param result {@link CaptureResult} to check.
+     * @param key The {@link CaptureResult} key to be checked.
+     * @param expected The expected to be compared to the value for the given key.
+     */
+    public <T extends Comparable<? super T>> void expectKeyValueGreaterOrEqual(
+            CaptureResult result, CaptureResult.Key<T> key, T expected) {
+        T value;
+        if ((value = expectKeyValueNotNull(result, key)) == null) {
+            return;
+        }
+
+        expectGreaterOrEqual(key.getName(), expected, value);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value is greater than the expected value.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param expected The expected to be compared to the value for the given key.
+     */
+    public <T extends Comparable<? super T>> void expectKeyValueGreaterThan(
+            CameraCharacteristics characteristics, CameraCharacteristics.Key<T> key, T expected) {
+        T value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+
+        expectGreater(key.getName(), expected, value);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value is in the expected range.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param min The min value of the range
+     * @param max The max value of the range
+     */
+    public <T extends Comparable<? super T>> void expectKeyValueInRange(
+            CameraCharacteristics characteristics, CameraCharacteristics.Key<T> key, T min, T max) {
+        T value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+        expectInRange(key.getName(), value, min, max);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value is one of the expected values.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param expected The expected values for the given key.
+     */
+    public <T> void expectKeyValueIsIn(CameraCharacteristics characteristics,
+                                       CameraCharacteristics.Key<T> key, T... expected) {
+        T value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+        String reason = "Key " + key.getName() + " value " + value
+                + " isn't one of the expected values " + Arrays.deepToString(expected);
+        expectContains(reason, expected, value);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value contains the expected element.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param expected The expected element to be contained in the value for the given key.
+     */
+    public <T> void expectKeyValueContains(CameraCharacteristics characteristics,
+                                           CameraCharacteristics.Key<T[]> key, T expected) {
+        T[] value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+        String reason = "Key " + key.getName() + " value " + value
+                + " doesn't contain the expected value " + expected;
+        expectContains(reason, value, expected);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value contains the expected element.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param expected The expected element to be contained in the value for the given key.
+     */
+    public void expectKeyValueContains(CameraCharacteristics characteristics,
+                                           CameraCharacteristics.Key<int[]> key, int expected) {
+        int[] value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+        String reason = "Key " + key.getName() + " value " + value
+                + " doesn't contain the expected value " + expected;
+        expectContains(reason, value, expected);
+    }
+
+    /**
+     * Check if the key is non-null, and the key value contains the expected element.
+     *
+     * @param characteristics {@link CameraCharacteristics} to check.
+     * @param key The {@link CameraCharacteristics} key to be checked.
+     * @param expected The expected element to be contained in the value for the given key.
+     */
+    public void expectKeyValueContains(CameraCharacteristics characteristics,
+                                       CameraCharacteristics.Key<boolean[]> key, boolean expected) {
+        boolean[] value;
+        if ((value = expectKeyValueNotNull(characteristics, key)) == null) {
+            return;
+        }
+        String reason = "Key " + key.getName() + " value " + value
+                + " doesn't contain the expected value " + expected;
+        expectContains(reason, value, expected);
+    }
+
+    /**
+     * Check if the {@code values} array contains the expected element.
+     *
+     * @param reason reason to print for failure.
+     * @param values array to check for membership in.
+     * @param expected the value to check.
+     */
+    public <T> void expectContains(String reason, T[] values, T expected) {
+        if (values == null) {
+            throw new NullPointerException();
+        }
+        checkThat(reason, expected, InMatcher.in(values));
+    }
+
+    public <T> void expectContains(T[] values, T expected) {
+        String reason = "Expected value " + expected
+                + " is not contained in the given values " + values;
+        expectContains(reason, values, expected);
+    }
+
+    /**
+     * Specialize {@link InMatcher} class for integer primitive array.
+     */
+    private static class IntInMatcher extends InMatcher<Integer> {
+        public IntInMatcher(int[] values) {
+            Preconditions.checkNotNull("values", values);
+            mValues = new ArrayList<>(values.length);
+            for (int i : values) {
+                mValues.add(i);
+            }
+        }
+    }
+
+    /**
+     * Check if the {@code values} array contains the expected element.
+     *
+     * <p>Specialized for primitive int arrays</p>
+     *
+     * @param reason reason to print for failure.
+     * @param values array to check for membership in.
+     * @param expected the value to check.
+     */
+    public void expectContains(String reason, int[] values, int expected) {
+        if (values == null) {
+            throw new NullPointerException();
+        }
+
+        checkThat(reason, expected, new IntInMatcher(values));
+    }
+
+    public void expectContains(int[] values, int expected) {
+        String reason = "Expected value " + expected
+                + " is not contained in the given values " + values;
+        expectContains(reason, values, expected);
+    }
+
+    /**
+     * Specialize {@link BooleanInMatcher} class for boolean primitive array.
+     */
+    private static class BooleanInMatcher extends InMatcher<Boolean> {
+        public BooleanInMatcher(boolean[] values) {
+            Preconditions.checkNotNull("values", values);
+            mValues = new ArrayList<>(values.length);
+            for (boolean i : values) {
+                mValues.add(i);
+            }
+        }
+    }
+
+    /**
+     * Check if the {@code values} array contains the expected element.
+     *
+     * <p>Specialized for primitive boolean arrays</p>
+     *
+     * @param reason reason to print for failure.
+     * @param values array to check for membership in.
+     * @param expected the value to check.
+     */
+    public void expectContains(String reason, boolean[] values, boolean expected) {
+        if (values == null) {
+            throw new NullPointerException();
+        }
+
+        checkThat(reason, expected, new BooleanInMatcher(values));
+    }
+
+    /**
+     * Check if the {@code values} array contains the expected element.
+     *
+     * <p>Specialized for primitive boolean arrays</p>
+     *
+     * @param values array to check for membership in.
+     * @param expected the value to check.
+     */
+    public void expectContains(boolean[] values, boolean expected) {
+        String reason = "Expected value " + expected
+                + " is not contained in the given values " + values;
+        expectContains(reason, values, expected);
     }
 
     /**
