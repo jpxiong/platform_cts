@@ -123,6 +123,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 boolean isCapabilityAvailable = availableCaps.contains(capability);
                 validateCapability(capability, isCapabilityAvailable);
             }
+            // Note: Static metadata for capabilities is tested in ExtendedCameraCharacteristicsTest
         }
     }
 
