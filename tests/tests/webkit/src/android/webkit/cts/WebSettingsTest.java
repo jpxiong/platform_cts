@@ -952,10 +952,11 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         }
 
         mSettings.setJavaScriptEnabled(true);
-
+        TestWebServer httpsServer = null;
+        TestWebServer httpServer = null;
         try {
-            TestWebServer httpsServer = new TestWebServer(true);
-            TestWebServer httpServer = new TestWebServer(false);
+            httpsServer = new TestWebServer(true);
+            httpServer = new TestWebServer(false);
             final String JS_URL = "/insecure.js";
             final String IMG_URL = "/insecure.png";
             final String SECURE_URL = "/secure.html";
