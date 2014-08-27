@@ -1600,7 +1600,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     private void digitalZoomTestByCamera(Size previewSize) throws Exception {
-        final int ZOOM_STEPS = 30;
+        final int ZOOM_STEPS = 15;
         final PointF[] TEST_ZOOM_CENTERS;
 
         final int croppingType = mStaticInfo.getScalerCroppingTypeChecked();
@@ -1635,7 +1635,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         SimpleCaptureListener listener = new SimpleCaptureListener();
-        startPreview(requestBuilder, previewSize, listener);
+
+        updatePreviewSurface(previewSize);
+        configurePreviewOutput(requestBuilder);
+
         CaptureRequest[] requests = new CaptureRequest[ZOOM_STEPS];
 
         // Set algorithm regions to full active region
@@ -1681,6 +1684,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRegions[i]);
                 requests[i] = requestBuilder.build();
                 for (int j = 0; j < CAPTURE_SUBMIT_REPEAT; ++j) {
+                    if (VERBOSE) {
+                        Log.v(TAG, "submit crop region " + cropRegions[i]);
+                    }
                     mSession.capture(requests[i], listener, mHandler);
                 }
 
@@ -1746,18 +1752,44 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                              previousCrop.height() < activeArraySize.height()));
             }
         }
-
-        stopPreview();
     }
 
     private void digitalZoomPreviewCombinationTestByCamera() throws Exception {
+        final double ASPECT_RATIO_THRESHOLD = 0.001;
+        List<Double> aspectRatiosTested = new ArrayList<Double>();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        aspectRatiosTested.add((double)(maxPreviewSize.getWidth()) / maxPreviewSize.getHeight());
+
         for (Size size : mOrderedPreviewSizes) {
+            // Max preview size was already tested in testDigitalZoom test. skip it.
+            if (size.equals(maxPreviewSize)) {
+                continue;
+            }
+
+            // Only test the largest size for each aspect ratio.
+            double aspectRatio = (double)(size.getWidth()) / size.getHeight();
+            if (isAspectRatioContained(aspectRatiosTested, aspectRatio, ASPECT_RATIO_THRESHOLD)) {
+                continue;
+            }
+
             if (VERBOSE) {
                 Log.v(TAG, "Test preview size " + size.toString() + " digital zoom");
             }
 
+            aspectRatiosTested.add(aspectRatio);
             digitalZoomTestByCamera(size);
         }
+    }
+
+    private static boolean isAspectRatioContained(List<Double> aspectRatioList,
+            double aspectRatio, double delta) {
+        for (Double ratio : aspectRatioList) {
+            if (Math.abs(ratio - aspectRatio) < delta) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void sceneModeTestByCamera() throws Exception {
