@@ -211,9 +211,11 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_RAW:
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_RAW";
-                mCollector.expectGreater(
-                        "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
-                        /*expected*/0, mStaticInfo.getRawOutputSizesChecked().length);
+                if (isCapabilityAvailable) {
+                    mCollector.expectGreater(
+                            "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
+                            /*expected*/0, mStaticInfo.getRawOutputSizesChecked().length);
+                }
                 requestKeys.add(CaptureRequest.HOT_PIXEL_MODE);
                 requestKeys.add(CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
                 break;
