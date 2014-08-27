@@ -31,7 +31,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -815,19 +817,29 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     }
 
     public void testDevRandomWorldReadableAndWritable() throws Exception {
+        File f = new File("/dev/random");
+
+        assertTrue(f + " cannot be opened for reading", canOpenForReading(f));
+        assertTrue(f + " cannot be opened for writing", canOpenForWriting(f));
+
         FileUtils.FileStatus status = new FileUtils.FileStatus();
-        assertTrue(FileUtils.getFileStatus("/dev/random", status, false));
+        assertTrue(FileUtils.getFileStatus(f.getPath(), status, false));
         assertTrue(
-                "/dev/random not world-readable/writable. Actual mode: 0"
+                f + " not world-readable/writable. Actual mode: 0"
                         + Integer.toString(status.mode, 8),
                 (status.mode & 0666) == 0666);
     }
 
     public void testDevUrandomWorldReadableAndWritable() throws Exception {
+        File f = new File("/dev/urandom");
+
+        assertTrue(f + " cannot be opened for reading", canOpenForReading(f));
+        assertTrue(f + " cannot be opened for writing", canOpenForWriting(f));
+
         FileUtils.FileStatus status = new FileUtils.FileStatus();
-        assertTrue(FileUtils.getFileStatus("/dev/urandom", status, false));
+        assertTrue(FileUtils.getFileStatus(f.getPath(), status, false));
         assertTrue(
-                "/dev/urandom not world-readable/writable. Actual mode: 0"
+                f + " not world-readable/writable. Actual mode: 0"
                         + Integer.toString(status.mode, 8),
                 (status.mode & 0666) == 0666);
     }
@@ -839,15 +851,28 @@ public class FileSystemPermissionTest extends AndroidTestCase {
             return;
         }
 
-        FileUtils.FileStatus status = new FileUtils.FileStatus();
-        assertTrue(FileUtils.getFileStatus(f.getCanonicalPath(), status, false));
-        assertTrue(
-                f + " has wrong file mode: 0"
-                        + Integer.toOctalString(status.mode),
-                (status.mode & 0777) == 0440);
+        assertFalse(f + " can be opened for reading", canOpenForReading(f));
+        assertFalse(f + " can be opened for writing", canOpenForWriting(f));
 
-        assertFileOwnedBy(f, "root");
-        assertFileOwnedByGroup(f, "system");
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertFalse("stat permitted on " + f,
+                FileUtils.getFileStatus(f.getPath(), status, false));
+    }
+
+    private static boolean canOpenForReading(File f) {
+        try (InputStream in = new FileInputStream(f)) {
+            return true;
+        } catch (IOException expected) {
+            return false;
+        }
+    }
+
+    private static boolean canOpenForWriting(File f) {
+        try (OutputStream out = new FileOutputStream(f)) {
+            return true;
+        } catch (IOException expected) {
+            return false;
+        }
     }
 
     public void testFileHasOnlyCapsThrowsOnInvalidCaps() throws Exception {
