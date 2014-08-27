@@ -111,6 +111,7 @@ cts_test_packages := \
     CtsSaxTestCases \
     CtsSecurityTestCases \
     CtsSpeechTestCases \
+    CtsTelecommTestCases \
     CtsTelephonyTestCases \
     CtsTextTestCases \
     CtsTextureViewTestCases \
