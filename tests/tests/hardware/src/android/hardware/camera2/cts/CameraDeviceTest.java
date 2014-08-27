@@ -33,6 +33,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
@@ -989,6 +990,25 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     }
 
     /**
+     * <p>Check if 3A metering settings are "up to HAL" in request template</p>
+     *
+     * <p>This function doesn't fail the test immediately, it updates the
+     * test pass/fail status and appends the failure message to the error collector each key.</p>
+     *
+     * @param regions The metering rectangles to be checked
+     */
+    private void checkMeteringRect(MeteringRectangle[] regions) {
+        if (regions == null) {
+            return;
+        }
+        mCollector.expectNotEquals("Number of metering region should not be 0", 0, regions.length);
+        for (int i = 0; i < regions.length; i++) {
+            mCollector.expectEquals("Default metering regions should have all zero weight",
+                    0, regions[i].getMeteringWeight());
+        }
+    }
+
+    /**
      * <p>Check if the request settings are suitable for a given request template.</p>
      *
      * <p>This function doesn't fail the test immediately, it updates the
@@ -1044,12 +1064,18 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
             if (maxRegionsAe > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AE_REGIONS);
+                MeteringRectangle[] aeRegions = request.get(CONTROL_AE_REGIONS);
+                checkMeteringRect(aeRegions);
             }
             if (maxRegionsAwb > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AWB_REGIONS);
+                MeteringRectangle[] awbRegions = request.get(CONTROL_AWB_REGIONS);
+                checkMeteringRect(awbRegions);
             }
             if (maxRegionsAf > 0) {
                 mCollector.expectKeyValueNotNull(request, CONTROL_AF_REGIONS);
+                MeteringRectangle[] afRegions = request.get(CONTROL_AF_REGIONS);
+                checkMeteringRect(afRegions);
             }
         }
 
