@@ -36,12 +36,7 @@ public class Test_const_wide_32 extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.const_wide_32.d.T_const_wide_32_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_wide_32.d.T_const_wide_32_3", VerifyError.class);
     }
     
     /**
@@ -51,12 +46,7 @@ public class Test_const_wide_32 extends DxTestCase {
      * other register involved in it becomes undefined
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.const_wide_32.d.T_const_wide_32_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_wide_32.d.T_const_wide_32_4", VerifyError.class);
     }
 
 }

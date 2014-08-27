@@ -47,56 +47,32 @@ public class Test_aget_byte extends DxTestCase {
      * @title expected ArrayIndexOutOfBoundsException
      */
     public void testE1() {
-        T_aget_byte_1 t = new T_aget_byte_1();
-        byte[] arr = new byte[2];
-        try {
-            t.run(arr, 2);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_byte.d.T_aget_byte_1",
+                   ArrayIndexOutOfBoundsException.class, new byte[2], 2);
     }
 
     /**
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_aget_byte_1 t = new T_aget_byte_1();
-        try {
-            t.run(null, 2);
-            fail("expected NullPointerException");
-        } catch (NullPointerException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_byte.d.T_aget_byte_1", NullPointerException.class, null,
+                   2);
     }
 
     /**
      * @title expected ArrayIndexOutOfBoundsException (negative index)
      */
     public void testE3() {
-        T_aget_byte_1 t = new T_aget_byte_1();
-        byte[] arr = new byte[2];
-        try {
-            t.run(arr, -1);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_byte.d.T_aget_byte_1",
+                   ArrayIndexOutOfBoundsException.class, new byte[2], -1);
     }
-
-    
 
     /**
      * @constraint B1
      * @title types of arguments - array, double
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_2", VerifyError.class);
     }
 
     /**
@@ -104,12 +80,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title types of arguments - array, long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_3", VerifyError.class);
     }
 
     /**
@@ -117,12 +88,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title types of arguments - Object, short
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_4", VerifyError.class);
     }
 
     /**
@@ -130,12 +96,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title types of arguments - double[], int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_5", VerifyError.class);
     }
 
     /**
@@ -143,12 +104,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title types of arguments - int[], int
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_6", VerifyError.class);
     }
 
     /**
@@ -156,12 +112,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title types of arguments - array, reference
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_7", VerifyError.class);
     }
     
     /**
@@ -169,12 +120,7 @@ public class Test_aget_byte extends DxTestCase {
      * @title number of registers
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_9", VerifyError.class);
     }
 
     /**
@@ -183,12 +129,7 @@ public class Test_aget_byte extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_byte.d.T_aget_byte_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_byte.d.T_aget_byte_8", VerifyError.class);
     }
 
 }

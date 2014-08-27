@@ -59,41 +59,24 @@ public class Test_aput_wide extends DxTestCase {
      * @title expected ArrayIndexOutOfBoundsException
      */
     public void testE1() {
-        T_aput_wide_1 t = new T_aput_wide_1();
-        long[] arr = new long[2];
-        try {
-            t.run(arr, 2, 100000000000l);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_wide.d.T_aput_wide_1",
+                   ArrayIndexOutOfBoundsException.class, new long[2], 2, 100000000000l);
     }
 
     /**
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_aput_wide_1 t = new T_aput_wide_1();
-        try {
-            t.run(null, 1, 100000000000l);
-            fail("expected NullPointerException");
-        } catch (NullPointerException np) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_wide.d.T_aput_wide_1", NullPointerException.class,
+                   null, 2, 100000000000l);
     }
 
     /**
      * @title expected ArrayIndexOutOfBoundsException (negative index)
      */
     public void testE3() {
-        T_aput_wide_1 t = new T_aput_wide_1();
-        long[] arr = new long[2];
-        try {
-            t.run(arr, -1, 100000000000l);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_wide.d.T_aput_wide_1",
+                   ArrayIndexOutOfBoundsException.class, new long[2], -1, 100000000000l);
     }
 
 
@@ -102,12 +85,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title types of arguments - array, double, long
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_3", VerifyError.class);
     }
 
     /**
@@ -115,12 +93,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title types of arguments - array, int, int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_4", VerifyError.class);
     }
 
     /**
@@ -128,12 +101,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title types of arguments - object, int, long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_5", VerifyError.class);
     }
 
     /**
@@ -142,12 +110,7 @@ public class Test_aput_wide extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_9", VerifyError.class);
     }
 
     /**
@@ -155,12 +118,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title types of arguments - int[], int, long
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_7", VerifyError.class);
     }
 
     /**
@@ -168,12 +126,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title types of arguments - array, reference, long
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_8", VerifyError.class);
     }
     
     /**
@@ -181,12 +134,7 @@ public class Test_aput_wide extends DxTestCase {
      * @title number of registers
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_10", VerifyError.class);
     }
 
     /**
@@ -195,11 +143,6 @@ public class Test_aput_wide extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_wide.d.T_aput_wide_6", VerifyError.class);
     }
 }

@@ -34,12 +34,7 @@ public class Test_move_result_wide extends DxTestCase {
      * @title  number of registers - dest is not valid
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_2", VerifyError.class);
     }
 
 
@@ -48,12 +43,7 @@ public class Test_move_result_wide extends DxTestCase {
      * @title reference
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_3", VerifyError.class);
     }
     
     /**
@@ -61,12 +51,7 @@ public class Test_move_result_wide extends DxTestCase {
      * @title  32-bit value
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_4", VerifyError.class);
     }
 
     
@@ -77,12 +62,7 @@ public class Test_move_result_wide extends DxTestCase {
      * up, and the other register involved in it becomes undefined.
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_5", VerifyError.class);
     }
     
     /**
@@ -91,12 +71,7 @@ public class Test_move_result_wide extends DxTestCase {
      * (in the insns array) by an <invoke-kind> instruction
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_6", VerifyError.class);
     }
     
     /**
@@ -105,12 +80,7 @@ public class Test_move_result_wide extends DxTestCase {
      * (in actual control flow) by an <invoke-kind> instruction
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_7", VerifyError.class);
     }
 
     /**
@@ -118,12 +88,7 @@ public class Test_move_result_wide extends DxTestCase {
      * @title number of registers
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_result_wide.d.T_move_result_wide_8", VerifyError.class);
     }
     
 }

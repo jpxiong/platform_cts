@@ -48,12 +48,7 @@ public class Test_opc_const extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_const.d.T_opc_const_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_const.d.T_opc_const_3", VerifyError.class);
     }
     
     /**
@@ -63,12 +58,7 @@ public class Test_opc_const extends DxTestCase {
      * other register involved in it becomes undefined
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_const.d.T_opc_const_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_const.d.T_opc_const_4", VerifyError.class);
     }
 
 }

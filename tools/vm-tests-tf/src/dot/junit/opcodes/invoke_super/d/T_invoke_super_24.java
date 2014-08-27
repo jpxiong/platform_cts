@@ -18,7 +18,6 @@ package dot.junit.opcodes.invoke_super.d;
 
 public class T_invoke_super_24 {
 
-    public int run() {
-        return 0;
+    public void run() {
     }
 }

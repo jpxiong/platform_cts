@@ -120,12 +120,7 @@ public class Test_mul_double extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_double.d.T_mul_double_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_double.d.T_mul_double_2", VerifyError.class);
     }
 
     
@@ -135,12 +130,7 @@ public class Test_mul_double extends DxTestCase {
      * @title types of arguments - float, double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_double.d.T_mul_double_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_double.d.T_mul_double_3", VerifyError.class);
     }
 
     /**
@@ -148,12 +138,7 @@ public class Test_mul_double extends DxTestCase {
      * @title types of arguments - double, reference
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_double.d.T_mul_double_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_double.d.T_mul_double_5", VerifyError.class);
     }
 
     /**
@@ -162,11 +147,6 @@ public class Test_mul_double extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_double.d.T_mul_double_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_double.d.T_mul_double_4", VerifyError.class);
     }
 }

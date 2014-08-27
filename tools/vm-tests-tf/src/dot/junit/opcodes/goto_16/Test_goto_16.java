@@ -35,12 +35,7 @@ public class Test_goto_16 extends DxTestCase {
         * @title branch target is inside instruction
         */
        public void testVFE1() {
-           try {
-               Class.forName("dot.junit.opcodes.goto_16.d.T_goto_16_3");
-               fail("expected a verification exception");
-           } catch (Throwable t) {
-               DxUtil.checkVerifyException(t);
-           }
+        load("dot.junit.opcodes.goto_16.d.T_goto_16_3", VerifyError.class);
        }
 
        /**
@@ -48,12 +43,7 @@ public class Test_goto_16 extends DxTestCase {
         * @title branch target shall be inside the method
         */
        public void testVFE2() {
-           try {
-               Class.forName("dot.junit.opcodes.goto_16.d.T_goto_16_2");
-               fail("expected a verification exception");
-           } catch (Throwable t) {
-               DxUtil.checkVerifyException(t);
-           }
+        load("dot.junit.opcodes.goto_16.d.T_goto_16_2", VerifyError.class);
        }
 
        /**
@@ -61,11 +51,6 @@ public class Test_goto_16 extends DxTestCase {
         * @title zero offset
         */
        public void testVFE3() {
-           try {
-               Class.forName("dot.junit.opcodes.goto_16.d.T_goto_16_4");
-               fail("expected a verification exception");
-           } catch (Throwable t) {
-               DxUtil.checkVerifyException(t);
-           }
+        load("dot.junit.opcodes.goto_16.d.T_goto_16_4", VerifyError.class);
        }
 }

@@ -82,45 +82,25 @@ public class Test_invoke_super extends DxTestCase {
      * @title obj ref is null
      */
     public void testE1() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_1
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_2", NullPointerException.class);
         T_invoke_super_2 t = new T_invoke_super_2();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
     }
 
     /**
      * @title Native method can't be linked
      */
     public void testE2() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_4
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-        T_invoke_super_4 t = new T_invoke_super_4();
-        try {
-            t.run();
-            fail("expected UnsatisfiedLinkError");
-        } catch (UnsatisfiedLinkError ule) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_4", UnsatisfiedLinkError.class);
     }
 
     /**
      * @title Attempt to invoke abstract method
      */
     public void testE4() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_6
         //@uses dot.junit.opcodes.invoke_super.ATest
-        T_invoke_super_6 t = new T_invoke_super_6();
-        try {
-            t.run();
-            fail("expected AbstractMethodError");
-        } catch (AbstractMethodError iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_6", AbstractMethodError.class);
     }
 
     /**
@@ -128,12 +108,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title invalid constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_8", ClassNotFoundException.class);
     }
 
     /**
@@ -141,12 +116,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title &lt;clinit&gt; may not be called using invoke-super
      */
     public void testVFE3() {
-        try {
-            new T_invoke_super_10().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_10", VerifyError.class);
     }
 
     /**
@@ -154,12 +124,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title number of arguments passed to method
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_11", VerifyError.class);
     }
 
     /**
@@ -167,14 +132,8 @@ public class Test_invoke_super extends DxTestCase {
      * @title types of arguments passed to method.
      */
     public void testVFE5() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_12
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_12", VerifyError.class);
     }
 
     /**
@@ -182,12 +141,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title &lt;init&gt; may not be called using invoke_super
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_16", VerifyError.class);
     }
 
     /**
@@ -196,15 +150,9 @@ public class Test_invoke_super extends DxTestCase {
      *                  protected method
      */
     public void testVFE8() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_22
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
         //@uses dot.junit.opcodes.invoke_super.d.TPlain
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_22");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_22", VerifyError.class);
     }
 
     /**
@@ -213,15 +161,9 @@ public class Test_invoke_super extends DxTestCase {
      *                  public method
      */
     public void testVFE9() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_23
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
         //@uses dot.junit.opcodes.invoke_super.d.TSuper2
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_23");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_23", VerifyError.class);
     }
 
     /**
@@ -229,13 +171,9 @@ public class Test_invoke_super extends DxTestCase {
      * @title Attempt to call static method.
      */
     public void testVFE10() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_5
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-         try {
-             new T_invoke_super_5().run();
-             fail("expected IncompatibleClassChangeError");
-         } catch (IncompatibleClassChangeError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_5",
+                   IncompatibleClassChangeError.class);
     }
 
 
@@ -244,11 +182,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title Attempt to invoke non-existing method.
      */
     public void testVFE12() {
-         try {
-             new T_invoke_super_15().run();
-             fail("expected NoSuchMethodError");
-         } catch (NoSuchMethodError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_15", NoSuchMethodError.class);
     }
 
     /**
@@ -256,13 +190,9 @@ public class Test_invoke_super extends DxTestCase {
      * @title Attempt to invoke private method of other class.
      */
     public void testVFE13() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_18
         //@uses dot.junit.opcodes.invoke_super.TestStubs
-         try {
-             new T_invoke_super_18().run(new TestStubs());
-             fail("expected IllegalAccessError");
-         } catch (IllegalAccessError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_18", IllegalAccessError.class,
+                   new TestStubs());
     }
 
     /**
@@ -270,13 +200,9 @@ public class Test_invoke_super extends DxTestCase {
      * @title Attempt to invoke protected method of unrelated class.
      */
     public void testVFE14() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_20
         //@uses dot.junit.opcodes.invoke_super.TestStubs
-         try {
-             new T_invoke_super_20().run(new TestStubs());
-             fail("expected IllegalAccessError");
-         } catch (IllegalAccessError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_20", IllegalAccessError.class,
+                   new TestStubs());
     }
 
     /**
@@ -284,13 +210,8 @@ public class Test_invoke_super extends DxTestCase {
      * @title Method has different signature.
      */
     public void testVFE15() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_19
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-         try {
-             new T_invoke_super_19().run();
-             fail("expected NoSuchMethodError");
-         } catch (NoSuchMethodError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_19", NoSuchMethodError.class);
     }
 
     /**
@@ -298,14 +219,8 @@ public class Test_invoke_super extends DxTestCase {
      * @title invoke-super shall be used to invoke private methods
      */
     public void testVFE16() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_13
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-         try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_13");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
-         }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_13", VerifyError.class);
     }
 
     /**
@@ -313,12 +228,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title number of registers
      */
     public void testVFE17() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_9", VerifyError.class);
     }
 
     /**
@@ -326,13 +236,8 @@ public class Test_invoke_super extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_24
-        try {
-            new T_invoke_super_24().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        loadAndRun("dot.junit.opcodes.invoke_super.d.T_invoke_super_24", 
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -340,13 +245,7 @@ public class Test_invoke_super extends DxTestCase {
      * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE19() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_25
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-         try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_25");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
-         }
+        load("dot.junit.opcodes.invoke_super.d.T_invoke_super_25", VerifyError.class);
     }
 }

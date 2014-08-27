@@ -34,13 +34,8 @@ public class Test_return_wide extends DxTestCase {
      * @title Method is synchronized but thread is not monitor owner
      */
     public void testE1() {
-        T_return_wide_3 t = new T_return_wide_3();
-        try {
-            assertTrue(t.run());
-            fail("expected IllegalMonitorStateException");
-        } catch (IllegalMonitorStateException imse) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.return_wide.d.T_return_wide_3",
+                   IllegalMonitorStateException.class);
     }
 
 
@@ -49,12 +44,7 @@ public class Test_return_wide extends DxTestCase {
      * @title method's return type - int
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.return_wide.d.T_return_wide_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_wide.d.T_return_wide_5", VerifyError.class);
     }
 
     /**
@@ -62,12 +52,7 @@ public class Test_return_wide extends DxTestCase {
      * @title method's return type - reference
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.return_wide.d.T_return_wide_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_wide.d.T_return_wide_6", VerifyError.class);
     }
 
     /**
@@ -75,12 +60,7 @@ public class Test_return_wide extends DxTestCase {
      * @title number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.return_wide.d.T_return_wide_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_wide.d.T_return_wide_7", VerifyError.class);
     }
     
     /**
@@ -88,12 +68,7 @@ public class Test_return_wide extends DxTestCase {
      * @title return-wide on single-width register
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.return_wide.d.T_return_wide_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_wide.d.T_return_wide_8", VerifyError.class);
     }
 
 
