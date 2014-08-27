@@ -79,26 +79,15 @@ public class Test_opc_throw extends DxTestCase {
      * a NullPointerException instead of objectref
      */
     public void testE1() {
-        T_opc_throw_4 t = new T_opc_throw_4();
-        try {
-            t.run();
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.opc_throw.d.T_opc_throw_4", NullPointerException.class);
     }
 
     /**
      * @title expected IllegalMonitorStateException
      */
     public void testE2() {
-        T_opc_throw_5 t = new T_opc_throw_5();
-        try {
-            t.run();
-            fail("expected IllegalMonitorStateException");
-        } catch (IllegalMonitorStateException imse) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.opc_throw.d.T_opc_throw_5", 
+                   IllegalMonitorStateException.class);
     }
 
     /**
@@ -106,12 +95,7 @@ public class Test_opc_throw extends DxTestCase {
      * @title  (number of registers)
      */
     public void testVFE2() {
-        try {
-            Class.forName("dxc.junit.opcodes.opc_throw.jm.T_opc_throw_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_throw.d.T_opc_throw_6", VerifyError.class);
     }
 
     
@@ -122,12 +106,7 @@ public class Test_opc_throw extends DxTestCase {
      * @title type of argument - float
      */
     public void testVFE3() {
-        try {
-            Class.forName("dxc.junit.opcodes.opc_throw.jm.T_opc_throw_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_throw.d.T_opc_throw_7", VerifyError.class);
     }
     
     /**
@@ -136,12 +115,7 @@ public class Test_opc_throw extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE4() {
-        try {
-            Class.forName("dxc.junit.opcodes.opc_throw.jm.T_opc_throw_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_throw.d.T_opc_throw_7", VerifyError.class);
     }
 
     /**
@@ -151,11 +125,6 @@ public class Test_opc_throw extends DxTestCase {
 
      */
     public void testVFE5() {
-        try {
-            Class.forName("dxc.junit.opcodes.opc_throw.jm.T_opc_throw_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_throw.d.T_opc_throw_10", VerifyError.class);
     }
 }

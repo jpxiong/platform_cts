@@ -93,12 +93,7 @@ public class Test_not_long extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.not_long.d.T_not_long_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.not_long.d.T_not_long_3", VerifyError.class);
     }
 
     
@@ -108,12 +103,7 @@ public class Test_not_long extends DxTestCase {
      * @title types of arguments - int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.not_long.d.T_not_long_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.not_long.d.T_not_long_4", VerifyError.class);
     }
 
     /**
@@ -121,12 +111,7 @@ public class Test_not_long extends DxTestCase {
      * @title types of arguments - float
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.not_long.d.T_not_long_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.not_long.d.T_not_long_5", VerifyError.class);
     }
 
     /**
@@ -134,12 +119,7 @@ public class Test_not_long extends DxTestCase {
      * @title types of arguments - reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.not_long.d.T_not_long_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.not_long.d.T_not_long_6", VerifyError.class);
     }
 
     /**
@@ -148,11 +128,6 @@ public class Test_not_long extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.not_long.d.T_not_long_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.not_long.d.T_not_long_2", VerifyError.class);
     }
 }

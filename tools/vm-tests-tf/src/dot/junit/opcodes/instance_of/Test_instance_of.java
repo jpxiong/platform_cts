@@ -64,28 +64,14 @@ public class Test_instance_of extends DxTestCase {
      */
     public void testE2() {
         //@uses dot.junit.opcodes.instance_of.TestStubs
-        //@uses dot.junit.opcodes.instance_of.d.T_instance_of_3
-        try {
-            T_instance_of_3 tt = new T_instance_of_3();
-            tt.run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError e) {
-        }
+        loadAndRun("dot.junit.opcodes.instance_of.d.T_instance_of_3", IllegalAccessError.class);
     }
 
     /**
      * @title Attempt to access undefined class.
      */
     public void testE3() {
-        try {
-            T_instance_of_7 tt = new T_instance_of_7();
-            tt.run();
-            fail("expected a verification exception");
-        } catch (NoClassDefFoundError e) {
-            // expected
-        } catch(VerifyError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.instance_of.d.T_instance_of_7", NoClassDefFoundError.class);
     }
 
     /**
@@ -93,12 +79,7 @@ public class Test_instance_of extends DxTestCase {
      * @title constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.instance_of.d.T_instance_of_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.instance_of.d.T_instance_of_4", VerifyError.class);
     }
 
     /**
@@ -107,12 +88,7 @@ public class Test_instance_of extends DxTestCase {
      * @title type of argument - int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.instance_of.d.T_instance_of_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.instance_of.d.T_instance_of_5", VerifyError.class);
     }
 
     /**
@@ -121,12 +97,7 @@ public class Test_instance_of extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.instance_of.d.T_instance_of_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.instance_of.d.T_instance_of_8", VerifyError.class);
     }
 
     /**
@@ -135,12 +106,7 @@ public class Test_instance_of extends DxTestCase {
      * @title number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.instance_of.d.T_instance_of_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.instance_of.d.T_instance_of_6", VerifyError.class);
     }
 
 

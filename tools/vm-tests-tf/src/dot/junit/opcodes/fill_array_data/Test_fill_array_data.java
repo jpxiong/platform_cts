@@ -88,12 +88,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_3", VerifyError.class);
     }
 
     /**
@@ -101,12 +96,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title type of argument - double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_4", VerifyError.class);
     }
     
     /**
@@ -114,12 +104,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_5", VerifyError.class);
     }
     
     /**
@@ -127,12 +112,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title type of argument - reference (not array)
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_6", VerifyError.class);
     }
     
     /**
@@ -140,12 +120,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title array of Objects
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_7", VerifyError.class);
     }
     
     /**
@@ -153,12 +128,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title array type and data size shall be consistent
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_8", VerifyError.class);
     }
 
     /**
@@ -166,12 +136,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title offset to table shall be inside method
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_9", VerifyError.class);
     }
 
     /**
@@ -179,12 +144,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title the size and the list must be consistent. 
      */
     public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_11", VerifyError.class);
     }
 
     
@@ -193,12 +153,7 @@ public class Test_fill_array_data extends DxTestCase {
      * @title packed-switch-data pseudo-instructions must not be reachable by control flow 
      */
     public void testVFE10() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_12", VerifyError.class);
     }
     
     /**
@@ -206,11 +161,6 @@ public class Test_fill_array_data extends DxTestCase {
      * @title table has wrong ident code
      */
     public void testVFE11() {
-        try {
-            Class.forName("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.fill_array_data.d.T_fill_array_data_13", VerifyError.class);
     }
 }

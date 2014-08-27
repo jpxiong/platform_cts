@@ -63,64 +63,40 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title objref is null
      */
     public void testE3() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_3
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
-        try {
-            new T_invoke_interface_range_3(null);
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_3",
+                   NullPointerException.class);
     }
 
     /**
      * @title object doesn't implement interface
      */
     public void testE4() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_11
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        T_invoke_interface_range_11 t = new T_invoke_interface_range_11();
-        try {
-            t.run();
-            fail("expected IncompatibleClassChangeError");
-        } catch (IncompatibleClassChangeError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_11",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
      * @title Native method can't be linked
      */
     public void testE5() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_12
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        T_invoke_interface_range_12 t = new T_invoke_interface_range_12();
-        ITestImpl impl = new ITestImpl();
-        try {
-            t.run(impl);
-            fail("expected UnsatisfiedLinkError");
-        } catch (UnsatisfiedLinkError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_12",
+                   UnsatisfiedLinkError.class, new ITestImpl());
     }
 
     /**
      * @title Attempt to invoke abstract method
      */
     public void testE6() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_13
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImplAbstract
-        T_invoke_interface_range_13 t = new T_invoke_interface_range_13();
-        try {
-            t.run();
-            fail("expected AbstractMethodError");
-        } catch (AbstractMethodError e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_13",
+                   AbstractMethodError.class);
     }
 
     /**
@@ -128,12 +104,8 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title invalid constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_2",
+             VerifyError.class);
     }
 
     /**
@@ -141,11 +113,8 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title The referenced method_id must belong to an interface (not a class).
      */
     public void testVFE2() {
-        try {
-            new T_invoke_interface_range_4().run();
-            fail("expected an IncompatibleClassChangeError");
-        } catch (IncompatibleClassChangeError e) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_4",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -155,11 +124,8 @@ public class Test_invoke_interface_range extends DxTestCase {
     public void testVFE5() {
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            new T_invoke_interface_range_5(new ITestImpl());
-            fail("expected VerifyError");
-        } catch (VerifyError t) {
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_5",
+             VerifyError.class);
     }
 
     /**
@@ -167,12 +133,8 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title int is passed instead of objref
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_10",
+             VerifyError.class);
     }
 
     /**
@@ -180,12 +142,8 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title number of arguments passed to method
      */
     public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_9",
+             VerifyError.class);
     }
 
     /**
@@ -193,13 +151,10 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title invoke-interface may not be used to call <init>.
      */
     public void testVFE10() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_18
-        try {
-            new T_invoke_interface_range_18().run(new ITestImpl());
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        //@uses dot.junit.opcodes.invoke_interface_range.ITest
+        //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_18",
+             VerifyError.class);
     }
 
     /**
@@ -209,12 +164,8 @@ public class Test_invoke_interface_range extends DxTestCase {
     public void testVFE11() {
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            new T_invoke_interface_range_20().run(new ITestImpl());
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_20",
+             VerifyError.class);
     }
 
     /**
@@ -224,11 +175,8 @@ public class Test_invoke_interface_range extends DxTestCase {
     public void testVFE12() {
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            new T_invoke_interface_range_21().run(new ITestImpl());
-            fail("expected VerifyError");
-        } catch (VerifyError t) {
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_21",
+             VerifyError.class);
     }
 
     /**
@@ -236,12 +184,8 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title number of registers
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_8",
+             VerifyError.class);
     }
 
     /**
@@ -249,14 +193,10 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title Attempt to call undefined method.
      */
     public void testVFE14() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_7
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            new T_invoke_interface_range_7().run(new ITestImpl());
-            fail("expected NoSuchMethodError");
-        } catch (NoSuchMethodError t) {
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_7",
+                   NoSuchMethodError.class, new ITestImpl());
     }
 
     /**
@@ -264,15 +204,10 @@ public class Test_invoke_interface_range extends DxTestCase {
      * @title Method has different signature.
      */
     public void testVFE15() {
-        //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_16
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            new T_invoke_interface_range_16().run(new ITestImpl());
-            fail("expected NoSuchMethodError");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        loadAndRun("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_16",
+                   NoSuchMethodError.class, new ITestImpl());
     }
 
     /**
@@ -283,11 +218,7 @@ public class Test_invoke_interface_range extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_22
         //@uses dot.junit.opcodes.invoke_interface_range.ITest
         //@uses dot.junit.opcodes.invoke_interface_range.ITestImpl
-        try {
-            Class.forName("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_22");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_interface_range.d.T_invoke_interface_range_22",
+             VerifyError.class);
     }
 }

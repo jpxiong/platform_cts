@@ -130,13 +130,8 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * @title Divisor is 0
      */
     public void testE1() {
-        T_rem_int_lit8_9 t = new T_rem_int_lit8_9();
-        try {
-            t.run(1);
-            fail("expected ArithmeticException");
-        } catch (ArithmeticException ae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_9", ArithmeticException.class,
+                   1);
     }
 
     /**
@@ -144,12 +139,7 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_10", VerifyError.class);
     }
 
     
@@ -159,12 +149,7 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * @title types of arguments - int, double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_11", VerifyError.class);
     }
 
     /**
@@ -172,12 +157,7 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * @title types of arguments - long, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_12", VerifyError.class);
     }
 
     /**
@@ -185,12 +165,7 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * @title types of arguments - reference, int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_13", VerifyError.class);
     }
 
     /**
@@ -199,12 +174,7 @@ public class Test_rem_int_lit8 extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.rem_int_lit8.d.T_rem_int_lit8_4", VerifyError.class);
     }
 
 }

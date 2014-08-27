@@ -27,15 +27,8 @@ public class Test_move_exception extends DxTestCase {
      * @title tests move-exception functionality
      */
     public void testN1() {
-        T_move_exception_1 t = new T_move_exception_1();
-        try {
-            t.run();
-            fail("ArithmeticException was not thrown");
-        } catch (ArithmeticException ae) {
-            //expected
-        } catch (Exception ex) {
-            fail("Exception " + ex + " was thrown instead off ArithmeticException");
-        }
+        loadAndRun("dot.junit.opcodes.move_exception.d.T_move_exception_1",
+                   ArithmeticException.class);
     }
     
     /**
@@ -51,12 +44,7 @@ public class Test_move_exception extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.move_exception.d.T_move_exception_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_exception.d.T_move_exception_3", VerifyError.class);
     }
     
     /**
@@ -64,12 +52,7 @@ public class Test_move_exception extends DxTestCase {
      * @title  move-exception is not first instruction in an exception handler
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.move_exception.d.T_move_exception_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.move_exception.d.T_move_exception_5", VerifyError.class);
     }    
     
 }

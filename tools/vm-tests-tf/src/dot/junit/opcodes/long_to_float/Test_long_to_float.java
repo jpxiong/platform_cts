@@ -79,12 +79,7 @@ public class Test_long_to_float extends DxTestCase {
      * doubles are not used interchangeably.
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.long_to_float.d.T_long_to_float_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.long_to_float.d.T_long_to_float_2", VerifyError.class);
     }
 
     /**
@@ -92,12 +87,7 @@ public class Test_long_to_float extends DxTestCase {
      * @title type of argument - integer
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.long_to_float.d.T_long_to_float_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.long_to_float.d.T_long_to_float_3", VerifyError.class);
     }
 
     /**
@@ -106,12 +96,7 @@ public class Test_long_to_float extends DxTestCase {
      * @title type of argument - reference
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.long_to_float.d.T_long_to_float_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.long_to_float.d.T_long_to_float_4", VerifyError.class);
     }
     
     /**
@@ -120,12 +105,7 @@ public class Test_long_to_float extends DxTestCase {
      * @title number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.long_to_float.d.T_long_to_float_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.long_to_float.d.T_long_to_float_5", VerifyError.class);
     }
 
 }

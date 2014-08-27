@@ -16,14 +16,15 @@
 .class public dot.junit.opcodes.invoke_interface.d.T_invoke_interface_3
 .super java/lang/Object
 
-
-.method public <init>(Ldot/junit/opcodes/invoke_interface/ITest;)V
-.limit regs 5
-Label0:
-       invoke-direct {v3}, java/lang/Object/<init>()V
-
-       invoke-interface {v4}, dot/junit/opcodes/invoke_interface/ITest/doit()V
+.method public <init>()V
+.limit regs 2
+       invoke-direct {v1}, java/lang/Object/<init>()V
        return-void
 .end method
 
-
+.method public run()V
+.limit regs 5
+       const/4 v1, 0
+       invoke-interface {v1}, dot/junit/opcodes/invoke_interface/ITest/doit()V
+       return-void
+.end method

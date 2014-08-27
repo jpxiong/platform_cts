@@ -91,42 +91,25 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title expected NullPointerException
      */
     public void testE1() {
-        T_invoke_virtual_range_1 t = new T_invoke_virtual_range_1();
-        String s = "s";
-        try {
-            t.run(null, s);
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_1",
+                   NullPointerException.class, null, "Test");
     }
 
     /**
      * @title Native method can't be linked
      */
     public void testE2() {
-        T_invoke_virtual_range_4 t = new T_invoke_virtual_range_4();
-        try {
-            t.run();
-            fail("expected UnsatisfiedLinkError");
-        } catch (UnsatisfiedLinkError ule) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_4",
+                   UnsatisfiedLinkError.class);
     }
 
     /**
      * @title Attempt to invoke abstract method
      */
     public void testE4() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_6
         //@uses dot.junit.opcodes.invoke_virtual_range.ATest
-        T_invoke_virtual_range_6 t = new T_invoke_virtual_range_6();
-        try {
-            t.run();
-            fail("expected AbstractMethodError");
-        } catch (AbstractMethodError iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_6",
+                   AbstractMethodError.class);
     }
 
     /**
@@ -134,12 +117,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title invalid constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_8",
+             VerifyError.class);
     }
 
     /**
@@ -147,12 +126,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title &lt;clinit&gt; may not be called using invoke-virtual
      */
     public void testVFE3() {
-        try {
-            new T_invoke_virtual_range_10().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_10",
+             VerifyError.class);
     }
 
     /**
@@ -160,12 +135,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title number of arguments passed to method
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_11",
+             VerifyError.class);
     }
 
     /**
@@ -173,12 +144,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title types of arguments passed to method
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_12",
+             VerifyError.class);
     }
 
     /**
@@ -186,12 +153,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title &lt;init&gt; may not be called using invoke_virtual_range
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_16",
+             VerifyError.class);
     }
 
     /**
@@ -200,15 +163,10 @@ public class Test_invoke_virtual_range extends DxTestCase {
      *                  protected method
      */
     public void testVFE8() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_22
         //@uses dot.junit.opcodes.invoke_virtual_range.d.TSuper
         //@uses dot.junit.opcodes.invoke_virtual_range.d.TPlain
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_22");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_22",
+             VerifyError.class);
     }
 
     /**
@@ -217,15 +175,10 @@ public class Test_invoke_virtual_range extends DxTestCase {
      *                  public method
      */
     public void testVFE9() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_23
         //@uses dot.junit.opcodes.invoke_virtual_range.d.TSuper
         //@uses dot.junit.opcodes.invoke_virtual_range.d.TSuper2
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_23");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_23",
+             VerifyError.class);
     }
 
     /**
@@ -233,11 +186,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title Attempt to call static method.
      */
     public void testVFE10() {
-         try {
-             new T_invoke_virtual_range_5().run();
-             fail("expected IncompatibleClassChangeError");
-         } catch (IncompatibleClassChangeError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_5",
+                   IncompatibleClassChangeError.class);
     }
 
 
@@ -246,11 +196,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title Attempt to invoke non-existing method.
      */
     public void testVFE12() {
-         try {
-             new T_invoke_virtual_range_15().run();
-             fail("expected NoSuchMethodError");
-         } catch (NoSuchMethodError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_15",
+                   NoSuchMethodError.class);
     }
 
     /**
@@ -258,13 +205,9 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title Attempt to invoke private method of other class.
      */
     public void testVFE13() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_18
         //@uses dot.junit.opcodes.invoke_virtual_range.TestStubs
-         try {
-             new T_invoke_virtual_range_18().run(new TestStubs());
-             fail("expected IllegalAccessError");
-         } catch (IllegalAccessError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_18",
+                   IllegalAccessError.class, new TestStubs());
     }
 
     /**
@@ -272,13 +215,9 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title Attempt to invoke protected method of unrelated class.
      */
     public void testVFE14() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_20
         //@uses dot.junit.opcodes.invoke_virtual_range.TestStubs
-         try {
-             new T_invoke_virtual_range_20().run(new TestStubs());
-             fail("expected IllegalAccessError");
-         } catch (IllegalAccessError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_20",
+                   IllegalAccessError.class, new TestStubs());
     }
 
     /**
@@ -286,13 +225,9 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title Method has different signature.
      */
     public void testVFE15() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_19
         //@uses dot.junit.opcodes.invoke_virtual_range.d.TSuper
-         try {
-             new T_invoke_virtual_range_19().run();
-             fail("expected NoSuchMethodError");
-         } catch (NoSuchMethodError t) {
-         }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_19",
+                   NoSuchMethodError.class);
     }
 
     /**
@@ -300,12 +235,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title invoke-virtual/range shall be used to invoke private methods
      */
     public void testVFE16() {
-         try {
-             Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_13");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
-         }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_13",
+             VerifyError.class);
     }
 
     /**
@@ -313,12 +244,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title number of registers
      */
     public void testVFE17() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_9",
+             VerifyError.class);
     }
 
     /**
@@ -326,13 +253,8 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
-        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_24
-        try {
-            new T_invoke_virtual_range_24().run();
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        loadAndRun("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_24",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -340,11 +262,7 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE19() {
-        try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_25");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_25",
+             VerifyError.class);
     }
 }

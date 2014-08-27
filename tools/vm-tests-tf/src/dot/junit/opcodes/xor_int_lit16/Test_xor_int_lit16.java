@@ -65,12 +65,7 @@ public class Test_xor_int_lit16 extends DxTestCase {
      * @title types of arguments - long & int
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_5", VerifyError.class);
     }
 
     /**
@@ -78,12 +73,7 @@ public class Test_xor_int_lit16 extends DxTestCase {
      * @title  types of arguments - reference & int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_6", VerifyError.class);
     }
     
     /**
@@ -91,12 +81,7 @@ public class Test_xor_int_lit16 extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_8", VerifyError.class);
     }
 
     /**
@@ -105,11 +90,6 @@ public class Test_xor_int_lit16 extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.xor_int_lit16.d.T_xor_int_lit16_7", VerifyError.class);
     }
 }

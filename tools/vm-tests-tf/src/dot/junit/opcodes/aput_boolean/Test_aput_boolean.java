@@ -46,56 +46,32 @@ public class Test_aput_boolean extends DxTestCase {
      * @title expected ArrayIndexOutOfBoundsException
      */
     public void testE1() {
-        T_aput_boolean_1 t = new T_aput_boolean_1();
-        boolean[] arr = new boolean[2];
-        try {
-            t.run(arr, 2, true);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_1",
+                   ArrayIndexOutOfBoundsException.class, new boolean[2], 2, true);
     }
 
     /**
      * @title expected NullPointerException
      */
     public void testE2() {
-        T_aput_boolean_1 t = new T_aput_boolean_1();
-        try {
-            t.run(null, 2, true);
-            fail("expected NullPointerException");
-        } catch (NullPointerException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_1",
+                   NullPointerException.class, null, 2, true);
     }
 
     /**
      * @title expected ArrayIndexOutOfBoundsException (negative index)
      */
     public void testE3() {
-        T_aput_boolean_1 t = new T_aput_boolean_1();
-        boolean[] arr = new boolean[2];
-        try {
-            t.run(arr, -1, true);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aie) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_1",
+                   ArrayIndexOutOfBoundsException.class, new boolean[2], -1, true);
     }
-
-    
 
     /**
      * @constraint B1 
      * @title types of arguments - array, double, int
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_2", VerifyError.class);
     }
 
     /**
@@ -103,12 +79,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title types of arguments - array, int, long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_3", VerifyError.class);
     }
 
     /**
@@ -116,12 +87,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title types of arguments - object, int, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_4", VerifyError.class);
     }
 
     /**
@@ -129,12 +95,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title types of arguments - double[], int, int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_5", VerifyError.class);
     }
 
     /**
@@ -142,12 +103,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title types of arguments - long[], int, int
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_6", VerifyError.class);
     }
 
     /**
@@ -155,12 +111,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title types of arguments - array, reference, int
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_7", VerifyError.class);
     }
     
     /**
@@ -168,12 +119,7 @@ public class Test_aput_boolean extends DxTestCase {
      * @title number of registers
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_9", VerifyError.class);
     }
 
     /**
@@ -182,12 +128,7 @@ public class Test_aput_boolean extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE10() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_8", VerifyError.class);
     }
 
 }

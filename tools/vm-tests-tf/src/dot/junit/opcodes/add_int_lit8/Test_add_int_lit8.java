@@ -137,12 +137,7 @@ public class Test_add_int_lit8 extends DxTestCase {
      * @title types of arguments - int, double
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_13", VerifyError.class);
     }
 
     /**
@@ -150,12 +145,7 @@ public class Test_add_int_lit8 extends DxTestCase {
      * @title types of arguments - long, int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_14");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_14", VerifyError.class);
     }
 
     /**
@@ -163,12 +153,7 @@ public class Test_add_int_lit8 extends DxTestCase {
      * @title types of arguments - reference, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_15");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_15", VerifyError.class);
     }
     
     /**
@@ -176,12 +161,7 @@ public class Test_add_int_lit8 extends DxTestCase {
      * @title number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_17", VerifyError.class);
     }
 
     /**
@@ -190,11 +170,6 @@ public class Test_add_int_lit8 extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.add_int_lit8.d.T_add_int_lit8_16", VerifyError.class);
     }
 }
