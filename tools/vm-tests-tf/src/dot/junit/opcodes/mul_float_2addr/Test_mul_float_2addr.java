@@ -120,12 +120,7 @@ public class Test_mul_float_2addr extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_2", VerifyError.class);
     }
 
     
@@ -135,12 +130,7 @@ public class Test_mul_float_2addr extends DxTestCase {
      * @title types of arguments - float, double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_3", VerifyError.class);
     }
 
     /**
@@ -148,12 +138,7 @@ public class Test_mul_float_2addr extends DxTestCase {
      * @title types of arguments - long, float
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_4", VerifyError.class);
     }
 
     /**
@@ -161,12 +146,7 @@ public class Test_mul_float_2addr extends DxTestCase {
      * @title types of arguments - reference, float
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_5", VerifyError.class);
     }
 
     /**
@@ -175,11 +155,6 @@ public class Test_mul_float_2addr extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.mul_float_2addr.d.T_mul_float_2addr_6", VerifyError.class);
     }
 }

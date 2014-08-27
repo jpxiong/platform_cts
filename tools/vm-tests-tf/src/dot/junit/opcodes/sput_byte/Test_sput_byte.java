@@ -69,13 +69,8 @@ public class Test_sput_byte extends DxTestCase {
      * @title initialization of referenced class throws exception
      */
     public void testE6() {
-        T_sput_byte_13 t = new T_sput_byte_13();
-        try {
-            t.run();
-            fail("expected Error");
-        } catch (Error e) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_13",
+                   ExceptionInInitializerError.class);
     }
 
     /**
@@ -83,12 +78,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_3", VerifyError.class);
     }
 
     /**
@@ -97,12 +87,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title number of registers
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_4", VerifyError.class);
     }
 
 
@@ -113,11 +98,7 @@ public class Test_sput_byte extends DxTestCase {
      * different type exists
      */
     public void testVFE5() {
-        try {
-            new T_sput_byte_17().run();
-            fail("expected NoSuchFieldError");
-        } catch (NoSuchFieldError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_17", NoSuchFieldError.class);
     }
 
     /**
@@ -127,12 +108,7 @@ public class Test_sput_byte extends DxTestCase {
      * field with single-width register
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_18");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_18", VerifyError.class);
     }
 
     /**
@@ -141,11 +117,8 @@ public class Test_sput_byte extends DxTestCase {
      * @title Attempt to set non-static field.
      */
     public void testVFE8() {
-         try {
-             new T_sput_byte_7().run();
-             fail("expected IncompatibleClassChangeError");
-         } catch (IncompatibleClassChangeError t) {
-         }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_7",
+                   IncompatibleClassChangeError.class);
     }
 
     /**
@@ -154,12 +127,7 @@ public class Test_sput_byte extends DxTestCase {
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.sput_byte.TestStubs
-        //@uses dot.junit.opcodes.sput_byte.d.T_sput_byte_8
-        try {
-            new T_sput_byte_8().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_8", IllegalAccessError.class);
     }
 
     /**
@@ -167,11 +135,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title Attempt to modify field of undefined class.
      */
     public void testVFE10() {
-        try {
-            new T_sput_byte_9().run();
-            fail("expected NoClassDefFoundError");
-        } catch (NoClassDefFoundError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_9", NoClassDefFoundError.class);
     }
 
     /**
@@ -179,11 +143,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title Attempt to modify undefined field.
      */
     public void testVFE11() {
-        try {
-            new T_sput_byte_10().run();
-            fail("expected NoSuchFieldError");
-        } catch (NoSuchFieldError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_10", NoSuchFieldError.class);
     }
 
 
@@ -194,12 +154,7 @@ public class Test_sput_byte extends DxTestCase {
      */
     public void testVFE12() {
         //@uses dot.junit.opcodes.sput_byte.d.T_sput_byte_1
-        //@uses dot.junit.opcodes.sput_byte.d.T_sput_byte_15
-        try {
-            new T_sput_byte_15().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_15", IllegalAccessError.class);
     }
 
 
@@ -208,12 +163,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for wide numbers
      */
     public void testVFE13() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_2", VerifyError.class);
     }
 
     /**
@@ -222,12 +172,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for reference fields
      */
     public void testVFE14() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_20", VerifyError.class);
     }
 
     /**
@@ -236,12 +181,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for short fields
      */
     public void testVFE15() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_21");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_21", VerifyError.class);
     }
 
     /**
@@ -250,12 +190,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for int fields
      */
     public void testVFE16() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_22");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_22", VerifyError.class);
     }
 
     /**
@@ -264,12 +199,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for char fields
      */
     public void testVFE17() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_23");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_23", VerifyError.class);
     }
 
     /**
@@ -277,12 +207,7 @@ public class Test_sput_byte extends DxTestCase {
      * @title sput-byte shall not work for boolean fields
      */
     public void testVFE18() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_byte.d.T_sput_byte_24");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.sput_byte.d.T_sput_byte_24", VerifyError.class);
     }
 
     /**
@@ -291,12 +216,7 @@ public class Test_sput_byte extends DxTestCase {
      */
     public void testVFE19() {
         //@uses dot.junit.opcodes.sput_byte.TestStubs
-        //@uses dot.junit.opcodes.sput_byte.d.T_sput_byte_11
-    	try {
-            new T_sput_byte_11().run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError t) {
-        }
+        loadAndRun("dot.junit.opcodes.sput_byte.d.T_sput_byte_11", IllegalAccessError.class);
     }
 
 }

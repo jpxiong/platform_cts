@@ -506,6 +506,22 @@ public class BuildDalvikSuite {
             entries.add(res.trim());
         }
 
+        // search for " load(\"...\" " and add as dependency
+        Pattern loadPattern = Pattern.compile("load\\(\"([^\"]*)\"", Pattern.MULTILINE);
+        Matcher loadMatcher = loadPattern.matcher(methodSource);
+        while (loadMatcher.find()) {
+            String res = loadMatcher.group(1);
+            entries.add(res.trim());
+        }
+
+        // search for " loadAndRun(\"...\" " and add as dependency
+        Pattern loadAndRunPattern = Pattern.compile("loadAndRun\\(\"([^\"]*)\"", Pattern.MULTILINE);
+        Matcher loadAndRunMatcher = loadAndRunPattern.matcher(methodSource);
+        while (loadAndRunMatcher.find()) {
+            String res = loadAndRunMatcher.group(1);
+            entries.add(res.trim());
+        }
+
         // lines with the form @uses
         // dot.junit.opcodes.add_double.jm.T_add_double_2
         // one dependency per one @uses

@@ -45,42 +45,24 @@ public class Test_aget_object extends DxTestCase {
      * @title expected ArrayIndexOutOfBoundsException
      */
     public void testE1() {
-        T_aget_object_1 t = new T_aget_object_1();
-        String[] arr = new String[] {"a", "b"};
-        try {
-            t.run(arr, 2);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aioobe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_object.d.T_aget_object_1",
+                   ArrayIndexOutOfBoundsException.class, new String[2], 2);
     }
 
     /**
      * @title expected ArrayIndexOutOfBoundsException (negative index)
      */
     public void testE2() {
-        T_aget_object_1 t = new T_aget_object_1();
-        String[] arr = new String[] {"a", "b"};
-        try {
-            t.run(arr, -1);
-            fail("expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException aioobe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_object.d.T_aget_object_1",
+                   ArrayIndexOutOfBoundsException.class, new String[2], -1);
     }
 
     /**
      * @title expected NullPointerException
      */
     public void testE3() {
-        T_aget_object_1 t = new T_aget_object_1();
-        String[] arr = null;
-        try {
-            t.run(arr, 0);
-            fail("expected NullPointerException");
-        } catch (NullPointerException npe) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.aget_object.d.T_aget_object_1", NullPointerException.class,
+                   null, 0);
     }
 
     /**
@@ -88,12 +70,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - array, double
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_2", VerifyError.class);
     }
 
     /**
@@ -101,12 +78,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - array, long
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_3", VerifyError.class);
     }
 
     /**
@@ -114,12 +86,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - Object, int
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_4", VerifyError.class);
     }
 
     /**
@@ -127,12 +94,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - float[], int
      */
     public void testVFE4() {
-        try { 
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_5", VerifyError.class);
     }
 
     /**
@@ -140,12 +102,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - long[], int
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_6", VerifyError.class);
     }
 
     /**
@@ -153,12 +110,7 @@ public class Test_aget_object extends DxTestCase {
      * @title types of arguments - array, reference
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_7", VerifyError.class);
     }
     
     /**
@@ -166,12 +118,7 @@ public class Test_aget_object extends DxTestCase {
      * @title number of registers
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_9", VerifyError.class);
     }
 
     /**
@@ -180,12 +127,7 @@ public class Test_aget_object extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.aget_object.d.T_aget_object_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.aget_object.d.T_aget_object_8", VerifyError.class);
     }
 
 }

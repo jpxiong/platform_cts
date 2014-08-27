@@ -93,12 +93,7 @@ public class Test_int_to_char extends DxTestCase {
      * @title type of argument - double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_char.d.T_int_to_char_2", VerifyError.class);
     }
 
     /**
@@ -106,12 +101,7 @@ public class Test_int_to_char extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_char.d.T_int_to_char_3", VerifyError.class);
     }
 
     /**
@@ -119,12 +109,7 @@ public class Test_int_to_char extends DxTestCase {
      * @title type of argument - reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_char.d.T_int_to_char_4", VerifyError.class);
     }
     
     /**
@@ -132,12 +117,7 @@ public class Test_int_to_char extends DxTestCase {
      * @title number of registers
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_char.d.T_int_to_char_6", VerifyError.class);
     }
 
     /**
@@ -146,12 +126,7 @@ public class Test_int_to_char extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.int_to_char.d.T_int_to_char_5", VerifyError.class);
     }
 
 }
