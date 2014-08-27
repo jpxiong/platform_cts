@@ -88,13 +88,8 @@ public class Test_return_object extends DxTestCase {
      * @title Method is synchronized but thread is not monitor owner
      */
     public void testE1() {
-        T_return_object_8 t = new T_return_object_8();
-        try {
-            assertTrue(t.run());
-            fail("expected IllegalMonitorStateException");
-        } catch (IllegalMonitorStateException imse) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.return_object.d.T_return_object_8",
+                   IllegalMonitorStateException.class);
     }
 
 
@@ -103,12 +98,7 @@ public class Test_return_object extends DxTestCase {
      * @title method's return type - void
      */
     public void testVFE1() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_3", VerifyError.class);
     }
 
     /**
@@ -116,12 +106,7 @@ public class Test_return_object extends DxTestCase {
      * @title method's return type - float
      */
     public void testVFE2() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_4", VerifyError.class);
     }
     
     /**
@@ -129,12 +114,7 @@ public class Test_return_object extends DxTestCase {
      * @title method's return type - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_16", VerifyError.class);
     }
 
     /**
@@ -142,12 +122,7 @@ public class Test_return_object extends DxTestCase {
      * @title number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_5", VerifyError.class);
     }
 
   
@@ -156,12 +131,7 @@ public class Test_return_object extends DxTestCase {
      * @title types of argument - int
      */
     public void testVFE6() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_10", VerifyError.class);
     }
 
     /**
@@ -169,12 +139,7 @@ public class Test_return_object extends DxTestCase {
      * @title types of argument - long
      */
     public void testVFE7() {
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_11", VerifyError.class);
     }
 
     /**
@@ -186,12 +151,7 @@ public class Test_return_object extends DxTestCase {
         //@uses dot.junit.opcodes.return_object.d.TChild
         //@uses dot.junit.opcodes.return_object.d.TSuper
         //@uses dot.junit.opcodes.return_object.d.TInterface
-        try {
-            Class.forName("dxc.junit.opcodes.return_object.jm.T_return_object_14");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.return_object.d.T_return_object_14", VerifyError.class);
     }
 
     /**

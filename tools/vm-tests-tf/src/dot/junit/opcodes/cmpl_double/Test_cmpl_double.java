@@ -96,12 +96,7 @@ public class Test_cmpl_double extends DxTestCase {
      * @title  types of arguments - double, float
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_2", VerifyError.class);
     }
 
     /**
@@ -109,12 +104,7 @@ public class Test_cmpl_double extends DxTestCase {
     * @title number of registers
     */
     public void testVFE2() {
-       try {
-           Class.forName("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_5");
-           fail("expected a verification exception");
-       } catch (Throwable t) {
-           DxUtil.checkVerifyException(t);
-       }
+        load("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_5", VerifyError.class);
     }
 
     /**
@@ -122,12 +112,7 @@ public class Test_cmpl_double extends DxTestCase {
      * @title  types of arguments - double, reference
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_4", VerifyError.class);
     }
 
     /**
@@ -135,12 +120,7 @@ public class Test_cmpl_double extends DxTestCase {
      * @title  types of arguments - int, int
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_6", VerifyError.class);
     }
 
     /**
@@ -149,12 +129,7 @@ public class Test_cmpl_double extends DxTestCase {
      * and doubles are not used interchangeably.
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.cmpl_double.d.T_cmpl_double_3", VerifyError.class);
     }
 
 }

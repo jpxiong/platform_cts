@@ -68,12 +68,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_3", VerifyError.class);
     }
 
 
@@ -83,12 +78,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title type of argument - double
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_4", VerifyError.class);
     }
     
     /**
@@ -96,12 +86,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title type of argument - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_5", VerifyError.class);
     }
     
     /**
@@ -109,12 +94,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title type of argument - reference
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_6", VerifyError.class);
     }
 
     /**
@@ -122,12 +102,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title branch target shall be inside the method
      */
     public void testVFE5() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_7", VerifyError.class);
     }
 
     /**
@@ -135,12 +110,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title branch target shall not be "inside" instruction
      */
     public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_8", VerifyError.class);
     }
 
 
@@ -149,12 +119,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title offset to table shall be inside method
      */
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_9", VerifyError.class);
     }
 
     /**
@@ -163,12 +128,7 @@ public class Test_packed_switch extends DxTestCase {
      * and floats are not used interchangeably.
      */
     public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_2");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_2", VerifyError.class);
     }
 
     /**
@@ -176,12 +136,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title the size and the list of targets must be consistent. 
      */
     public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_11", VerifyError.class);
     }
 
     
@@ -190,12 +145,7 @@ public class Test_packed_switch extends DxTestCase {
      * @title packed-switch-data pseudo-instructions must not be reachable by control flow 
      */
     public void testVFE10() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_12", VerifyError.class);
     }
     
     /**
@@ -203,11 +153,6 @@ public class Test_packed_switch extends DxTestCase {
      * @title table has wrong ident code
      */
     public void testVFE11() {
-        try {
-            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.packed_switch.d.T_packed_switch_13", VerifyError.class);
     }
 }

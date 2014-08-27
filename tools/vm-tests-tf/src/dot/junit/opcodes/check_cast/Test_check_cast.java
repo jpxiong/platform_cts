@@ -56,13 +56,8 @@ public class Test_check_cast extends DxTestCase {
      * @title expected ClassCastException
      */
     public void testE1() {
-        T_check_cast_1 t = new T_check_cast_1();
-        try {
-            t.run(t);
-            fail("expected ClassCastException");
-        } catch (ClassCastException iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.check_cast.d.T_check_cast_1", ClassCastException.class,
+                   new Integer(1));
     }
 
     /**
@@ -70,12 +65,7 @@ public class Test_check_cast extends DxTestCase {
      * @title  constant pool index
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.check_cast.d.T_check_cast_4", VerifyError.class);
     }
 
     /**
@@ -84,12 +74,7 @@ public class Test_check_cast extends DxTestCase {
      * @title  type of argument - int
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.check_cast.d.T_check_cast_5", VerifyError.class);
     }
 
     /**
@@ -98,12 +83,7 @@ public class Test_check_cast extends DxTestCase {
      * @title  type of argument - long
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.check_cast.d.T_check_cast_8", VerifyError.class);
     }
     
     /**
@@ -112,12 +92,7 @@ public class Test_check_cast extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.check_cast.d.T_check_cast_6", VerifyError.class);
     }
 
     /**
@@ -126,14 +101,7 @@ public class Test_check_cast extends DxTestCase {
      */
     public void testVFE5() {
         //@uses dot.junit.opcodes.check_cast.TestStubs
-        //@uses dot.junit.opcodes.check_cast.d.T_check_cast_3
-        T_check_cast_3 t = new T_check_cast_3();
-        try {
-            t.run();
-            fail("expected IllegalAccessError");
-        } catch (IllegalAccessError iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.check_cast.d.T_check_cast_3", IllegalAccessError.class);
     }
 
     /**
@@ -142,13 +110,7 @@ public class Test_check_cast extends DxTestCase {
      * first access
      */
     public void testVFE6() {
-        T_check_cast_7 t = new T_check_cast_7();
-        try {
-            t.run();
-            fail("expected NoClassDefFoundError");
-        } catch (NoClassDefFoundError iae) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.check_cast.d.T_check_cast_7", NoClassDefFoundError.class);
     }
     
     /**
@@ -156,12 +118,7 @@ public class Test_check_cast extends DxTestCase {
      * @title  constant pool type
      */    
     public void testVFE7() {
-        try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.check_cast.d.T_check_cast_9", VerifyError.class);
     }
 
 }

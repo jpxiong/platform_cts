@@ -38,12 +38,7 @@ public class Test_const_string extends DxTestCase {
      * @title  number of registers
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.const_string.d.T_const_string_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_string.d.T_const_string_3", VerifyError.class);
     }
     
     /**
@@ -53,12 +48,7 @@ public class Test_const_string extends DxTestCase {
      * other register involved in it becomes undefined
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.const_string.d.T_const_string_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_string.d.T_const_string_4", VerifyError.class);
     }
     
     /**
@@ -66,12 +56,7 @@ public class Test_const_string extends DxTestCase {
      * @title  constant pool index
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.const_string.d.T_const_string_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.const_string.d.T_const_string_5", VerifyError.class);
     }
 
 }

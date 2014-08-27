@@ -30,32 +30,20 @@ public class Test_opc_return extends DxTestCase {
         assertEquals(123456, t.run());
     }
 
-
     /**
      * @title Method is synchronized but thread is not monitor owner
      */
     public void testE1() {
-        T_opc_return_3 t = new T_opc_return_3();
-        try {
-            assertTrue(t.run());
-            fail("expected IllegalMonitorStateException");
-        } catch (IllegalMonitorStateException imse) {
-            // expected
-        }
+        loadAndRun("dot.junit.opcodes.opc_return.d.T_opc_return_3",
+                   IllegalMonitorStateException.class);
     }
-
 
     /**
      * @constraint B11 
      * @title method's return type - long
      */
     public void testVFE1() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_return.d.T_opc_return_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_return.d.T_opc_return_5", VerifyError.class);
     }
 
     /**
@@ -63,12 +51,7 @@ public class Test_opc_return extends DxTestCase {
      * @title method's return type - reference
      */
     public void testVFE2() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_return.d.T_opc_return_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_return.d.T_opc_return_6", VerifyError.class);
     }
 
     /**
@@ -76,12 +59,7 @@ public class Test_opc_return extends DxTestCase {
      * @title number of registers
      */
     public void testVFE3() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_return.d.T_opc_return_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_return.d.T_opc_return_7", VerifyError.class);
     }
     
     /**
@@ -89,12 +67,6 @@ public class Test_opc_return extends DxTestCase {
      * @title return on wide register pair
      */
     public void testVFE4() {
-        try {
-            Class.forName("dot.junit.opcodes.opc_return.d.T_opc_return_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
+        load("dot.junit.opcodes.opc_return.d.T_opc_return_8", VerifyError.class);
     }
-
 }
