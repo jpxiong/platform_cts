@@ -36,7 +36,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsFloatFloat {
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertFloat2Float2() {
@@ -68,8 +68,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -78,14 +78,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -127,8 +127,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -137,14 +137,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -186,8 +186,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -196,14 +196,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -218,7 +218,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsCharFloat {
         public byte inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertChar2Float2() {
@@ -250,8 +250,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharFloat args = new ArgumentsCharFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -266,7 +266,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -308,8 +308,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharFloat args = new ArgumentsCharFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -324,7 +324,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -366,8 +366,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharFloat args = new ArgumentsCharFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -382,7 +382,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -397,7 +397,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUcharFloat {
         public byte inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUchar2Float2() {
@@ -429,8 +429,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharFloat args = new ArgumentsUcharFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -445,7 +445,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -487,8 +487,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharFloat args = new ArgumentsUcharFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -503,7 +503,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -545,8 +545,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharFloat args = new ArgumentsUcharFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -561,7 +561,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -576,7 +576,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsShortFloat {
         public short inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertShort2Float2() {
@@ -608,8 +608,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortFloat args = new ArgumentsShortFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -624,7 +624,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -666,8 +666,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortFloat args = new ArgumentsShortFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -682,7 +682,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -724,8 +724,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortFloat args = new ArgumentsShortFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -740,7 +740,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -755,7 +755,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUshortFloat {
         public short inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUshort2Float2() {
@@ -787,8 +787,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortFloat args = new ArgumentsUshortFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -803,7 +803,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -845,8 +845,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortFloat args = new ArgumentsUshortFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -861,7 +861,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -903,8 +903,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortFloat args = new ArgumentsUshortFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -919,7 +919,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -934,7 +934,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsIntFloat {
         public int inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertInt2Float2() {
@@ -966,8 +966,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntFloat args = new ArgumentsIntFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -982,7 +982,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -1024,8 +1024,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntFloat args = new ArgumentsIntFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -1040,7 +1040,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -1082,8 +1082,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntFloat args = new ArgumentsIntFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -1098,7 +1098,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -1113,7 +1113,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUintFloat {
         public int inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUint2Float2() {
@@ -1145,8 +1145,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintFloat args = new ArgumentsUintFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -1161,7 +1161,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -1203,8 +1203,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintFloat args = new ArgumentsUintFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -1219,7 +1219,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -1261,8 +1261,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintFloat args = new ArgumentsUintFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -1277,7 +1277,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -1324,7 +1324,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatChar args = new ArgumentsFloatChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1334,7 +1333,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -1382,7 +1381,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatChar args = new ArgumentsFloatChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1392,7 +1390,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -1440,7 +1438,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatChar args = new ArgumentsFloatChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1450,7 +1447,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -1503,7 +1500,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1560,7 +1556,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1617,7 +1612,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1679,7 +1673,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharChar args = new ArgumentsUcharChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1736,7 +1729,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharChar args = new ArgumentsUcharChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1793,7 +1785,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharChar args = new ArgumentsUcharChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1855,7 +1846,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortChar args = new ArgumentsShortChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1912,7 +1902,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortChar args = new ArgumentsShortChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1969,7 +1958,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortChar args = new ArgumentsShortChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2031,7 +2019,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortChar args = new ArgumentsUshortChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2088,7 +2075,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortChar args = new ArgumentsUshortChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2145,7 +2131,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortChar args = new ArgumentsUshortChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2207,7 +2192,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntChar args = new ArgumentsIntChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2264,7 +2248,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntChar args = new ArgumentsIntChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2321,7 +2304,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntChar args = new ArgumentsIntChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2383,7 +2365,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintChar args = new ArgumentsUintChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2440,7 +2421,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintChar args = new ArgumentsUintChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2497,7 +2477,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintChar args = new ArgumentsUintChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2559,7 +2538,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUchar args = new ArgumentsFloatUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2569,7 +2547,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -2617,7 +2595,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUchar args = new ArgumentsFloatUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2627,7 +2604,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -2675,7 +2652,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUchar args = new ArgumentsFloatUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2685,7 +2661,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -2738,7 +2714,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2795,7 +2770,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2852,7 +2826,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2914,7 +2887,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2971,7 +2943,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3028,7 +2999,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3090,7 +3060,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUchar args = new ArgumentsShortUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3147,7 +3116,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUchar args = new ArgumentsShortUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3204,7 +3172,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUchar args = new ArgumentsShortUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3266,7 +3233,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUchar args = new ArgumentsUshortUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3323,7 +3289,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUchar args = new ArgumentsUshortUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3380,7 +3345,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUchar args = new ArgumentsUshortUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3442,7 +3406,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUchar args = new ArgumentsIntUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3499,7 +3462,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUchar args = new ArgumentsIntUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3556,7 +3518,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUchar args = new ArgumentsIntUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3618,7 +3579,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUchar args = new ArgumentsUintUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3675,7 +3635,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUchar args = new ArgumentsUintUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3732,7 +3691,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUchar args = new ArgumentsUintUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3794,7 +3752,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatShort args = new ArgumentsFloatShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3804,7 +3761,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -3852,7 +3809,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatShort args = new ArgumentsFloatShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3862,7 +3818,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -3910,7 +3866,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatShort args = new ArgumentsFloatShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3920,7 +3875,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -3973,7 +3928,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharShort args = new ArgumentsCharShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4030,7 +3984,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharShort args = new ArgumentsCharShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4087,7 +4040,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharShort args = new ArgumentsCharShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4149,7 +4101,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharShort args = new ArgumentsUcharShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4206,7 +4157,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharShort args = new ArgumentsUcharShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4263,7 +4213,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharShort args = new ArgumentsUcharShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4325,7 +4274,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4382,7 +4330,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4439,7 +4386,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4501,7 +4447,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortShort args = new ArgumentsUshortShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4558,7 +4503,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortShort args = new ArgumentsUshortShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4615,7 +4559,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortShort args = new ArgumentsUshortShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4677,7 +4620,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntShort args = new ArgumentsIntShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4734,7 +4676,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntShort args = new ArgumentsIntShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4791,7 +4732,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntShort args = new ArgumentsIntShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4853,7 +4793,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintShort args = new ArgumentsUintShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4910,7 +4849,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintShort args = new ArgumentsUintShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4967,7 +4905,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintShort args = new ArgumentsUintShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5029,7 +4966,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUshort args = new ArgumentsFloatUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5039,7 +4975,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -5087,7 +5023,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUshort args = new ArgumentsFloatUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5097,7 +5032,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -5145,7 +5080,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUshort args = new ArgumentsFloatUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5155,7 +5089,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -5208,7 +5142,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUshort args = new ArgumentsCharUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5265,7 +5198,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUshort args = new ArgumentsCharUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5322,7 +5254,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUshort args = new ArgumentsCharUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5384,7 +5315,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUshort args = new ArgumentsUcharUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5441,7 +5371,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUshort args = new ArgumentsUcharUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5498,7 +5427,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUshort args = new ArgumentsUcharUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5560,7 +5488,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5617,7 +5544,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5674,7 +5600,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5736,7 +5661,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5793,7 +5717,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5850,7 +5773,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5912,7 +5834,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUshort args = new ArgumentsIntUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -5969,7 +5890,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUshort args = new ArgumentsIntUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6026,7 +5946,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUshort args = new ArgumentsIntUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6088,7 +6007,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUshort args = new ArgumentsUintUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6145,7 +6063,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUshort args = new ArgumentsUintUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6202,7 +6119,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUshort args = new ArgumentsUintUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6264,7 +6180,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6274,7 +6189,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -6322,7 +6237,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6332,7 +6246,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -6380,7 +6294,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatInt args = new ArgumentsFloatInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6390,7 +6303,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -6443,7 +6356,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharInt args = new ArgumentsCharInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6500,7 +6412,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharInt args = new ArgumentsCharInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6557,7 +6468,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharInt args = new ArgumentsCharInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6619,7 +6529,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharInt args = new ArgumentsUcharInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6676,7 +6585,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharInt args = new ArgumentsUcharInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6733,7 +6641,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharInt args = new ArgumentsUcharInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6795,7 +6702,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortInt args = new ArgumentsShortInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6852,7 +6758,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortInt args = new ArgumentsShortInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6909,7 +6814,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortInt args = new ArgumentsShortInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -6971,7 +6875,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortInt args = new ArgumentsUshortInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7028,7 +6931,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortInt args = new ArgumentsUshortInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7085,7 +6987,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortInt args = new ArgumentsUshortInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7147,7 +7048,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7204,7 +7104,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7261,7 +7160,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7323,7 +7221,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintInt args = new ArgumentsUintInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7380,7 +7277,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintInt args = new ArgumentsUintInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7437,7 +7333,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintInt args = new ArgumentsUintInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7499,7 +7394,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUint args = new ArgumentsFloatUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7509,7 +7403,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -7557,7 +7451,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUint args = new ArgumentsFloatUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7567,7 +7460,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -7615,7 +7508,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUint args = new ArgumentsFloatUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7625,7 +7517,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -7678,7 +7570,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUint args = new ArgumentsCharUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7735,7 +7626,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUint args = new ArgumentsCharUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7792,7 +7682,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUint args = new ArgumentsCharUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7854,7 +7743,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUint args = new ArgumentsUcharUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7911,7 +7799,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUint args = new ArgumentsUcharUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -7968,7 +7855,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUint args = new ArgumentsUcharUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8030,7 +7916,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUint args = new ArgumentsShortUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8087,7 +7972,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUint args = new ArgumentsShortUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8144,7 +8028,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUint args = new ArgumentsShortUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8206,7 +8089,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUint args = new ArgumentsUshortUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8263,7 +8145,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUint args = new ArgumentsUshortUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8320,7 +8201,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUint args = new ArgumentsUshortUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8382,7 +8262,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8439,7 +8318,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8496,7 +8374,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8558,7 +8435,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8615,7 +8491,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8672,7 +8547,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -8702,7 +8576,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsDoubleDouble {
         public double inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertDouble2Double2() {
@@ -8734,8 +8608,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -8744,14 +8618,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -8793,8 +8667,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -8803,14 +8677,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -8852,8 +8726,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -8862,14 +8736,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -8884,7 +8758,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsLongDouble {
         public long inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertLong2Double2() {
@@ -8916,8 +8790,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongDouble args = new ArgumentsLongDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -8932,7 +8806,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -8974,8 +8848,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongDouble args = new ArgumentsLongDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -8990,7 +8864,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -9032,8 +8906,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongDouble args = new ArgumentsLongDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -9048,7 +8922,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -9063,7 +8937,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUlongDouble {
         public long inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUlong2Double2() {
@@ -9095,8 +8969,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongDouble args = new ArgumentsUlongDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -9111,7 +8985,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -9153,8 +9027,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongDouble args = new ArgumentsUlongDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -9169,7 +9043,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -9211,8 +9085,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongDouble args = new ArgumentsUlongDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -9227,7 +9101,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -9274,7 +9148,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleLong args = new ArgumentsDoubleLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9284,7 +9157,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9332,7 +9205,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleLong args = new ArgumentsDoubleLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9342,7 +9214,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9390,7 +9262,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleLong args = new ArgumentsDoubleLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9400,7 +9271,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9453,7 +9324,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongLong args = new ArgumentsLongLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9510,7 +9380,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongLong args = new ArgumentsLongLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9567,7 +9436,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongLong args = new ArgumentsLongLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9629,7 +9497,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongLong args = new ArgumentsUlongLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9686,7 +9553,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongLong args = new ArgumentsUlongLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9743,7 +9609,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongLong args = new ArgumentsUlongLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9805,7 +9670,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9815,7 +9679,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9863,7 +9727,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9873,7 +9736,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9921,7 +9784,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -9931,7 +9793,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -9984,7 +9846,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUlong args = new ArgumentsLongUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10041,7 +9902,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUlong args = new ArgumentsLongUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10098,7 +9958,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUlong args = new ArgumentsLongUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10160,7 +10019,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUlong args = new ArgumentsUlongUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10217,7 +10075,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUlong args = new ArgumentsUlongUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10274,7 +10131,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUlong args = new ArgumentsUlongUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10304,7 +10160,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsDoubleFloat {
         public double inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertDouble2Float2() {
@@ -10336,8 +10192,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -10346,14 +10202,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -10395,8 +10251,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10405,14 +10261,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10454,8 +10310,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10464,14 +10320,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10486,7 +10342,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsLongFloat {
         public long inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertLong2Float2() {
@@ -10518,8 +10374,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongFloat args = new ArgumentsLongFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -10534,7 +10390,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -10576,8 +10432,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongFloat args = new ArgumentsLongFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10592,7 +10448,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10634,8 +10490,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongFloat args = new ArgumentsLongFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10650,7 +10506,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10665,7 +10521,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUlongFloat {
         public long inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUlong2Float2() {
@@ -10697,8 +10553,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongFloat args = new ArgumentsUlongFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -10713,7 +10569,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -10755,8 +10611,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongFloat args = new ArgumentsUlongFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10771,7 +10627,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10813,8 +10669,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongFloat args = new ArgumentsUlongFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -10829,7 +10685,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -10876,7 +10732,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleChar args = new ArgumentsDoubleChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10886,7 +10741,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -10934,7 +10789,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleChar args = new ArgumentsDoubleChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -10944,7 +10798,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -10992,7 +10846,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleChar args = new ArgumentsDoubleChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11002,7 +10855,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -11055,7 +10908,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongChar args = new ArgumentsLongChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11112,7 +10964,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongChar args = new ArgumentsLongChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11169,7 +11020,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongChar args = new ArgumentsLongChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11231,7 +11081,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongChar args = new ArgumentsUlongChar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11288,7 +11137,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongChar args = new ArgumentsUlongChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11345,7 +11193,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongChar args = new ArgumentsUlongChar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11407,7 +11254,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11417,7 +11263,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -11465,7 +11311,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11475,7 +11320,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -11523,7 +11368,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11533,7 +11377,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -11586,7 +11430,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUchar args = new ArgumentsLongUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11643,7 +11486,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUchar args = new ArgumentsLongUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11700,7 +11542,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUchar args = new ArgumentsLongUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11762,7 +11603,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUchar args = new ArgumentsUlongUchar();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11819,7 +11659,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUchar args = new ArgumentsUlongUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11876,7 +11715,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUchar args = new ArgumentsUlongUchar();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11938,7 +11776,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleShort args = new ArgumentsDoubleShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -11948,7 +11785,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -11996,7 +11833,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleShort args = new ArgumentsDoubleShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12006,7 +11842,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -12054,7 +11890,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleShort args = new ArgumentsDoubleShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12064,7 +11899,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -12117,7 +11952,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongShort args = new ArgumentsLongShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12174,7 +12008,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongShort args = new ArgumentsLongShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12231,7 +12064,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongShort args = new ArgumentsLongShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12293,7 +12125,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongShort args = new ArgumentsUlongShort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12350,7 +12181,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongShort args = new ArgumentsUlongShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12407,7 +12237,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongShort args = new ArgumentsUlongShort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12469,7 +12298,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12479,7 +12307,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -12527,7 +12355,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12537,7 +12364,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -12585,7 +12412,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12595,7 +12421,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -12648,7 +12474,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUshort args = new ArgumentsLongUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12705,7 +12530,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUshort args = new ArgumentsLongUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12762,7 +12586,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUshort args = new ArgumentsLongUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12824,7 +12647,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUshort args = new ArgumentsUlongUshort();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12881,7 +12703,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUshort args = new ArgumentsUlongUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -12938,7 +12759,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUshort args = new ArgumentsUlongUshort();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13000,7 +12820,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleInt args = new ArgumentsDoubleInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13010,7 +12829,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13058,7 +12877,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleInt args = new ArgumentsDoubleInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13068,7 +12886,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13116,7 +12934,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleInt args = new ArgumentsDoubleInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13126,7 +12943,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13179,7 +12996,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongInt args = new ArgumentsLongInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13236,7 +13052,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongInt args = new ArgumentsLongInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13293,7 +13108,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongInt args = new ArgumentsLongInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13355,7 +13169,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongInt args = new ArgumentsUlongInt();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13412,7 +13225,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongInt args = new ArgumentsUlongInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13469,7 +13281,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongInt args = new ArgumentsUlongInt();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13531,7 +13342,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUint args = new ArgumentsDoubleUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13541,7 +13351,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13589,7 +13399,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUint args = new ArgumentsDoubleUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13599,7 +13408,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13647,7 +13456,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsDoubleUint args = new ArgumentsDoubleUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13657,7 +13465,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -13710,7 +13518,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUint args = new ArgumentsLongUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13767,7 +13574,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUint args = new ArgumentsLongUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13824,7 +13630,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsLongUint args = new ArgumentsLongUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13886,7 +13691,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUint args = new ArgumentsUlongUint();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -13943,7 +13747,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUint args = new ArgumentsUlongUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -14000,7 +13803,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUlongUint args = new ArgumentsUlongUint();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -14030,7 +13832,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsFloatDouble {
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertFloat2Double2() {
@@ -14062,8 +13864,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatDouble args = new ArgumentsFloatDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14072,14 +13874,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -14121,8 +13923,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatDouble args = new ArgumentsFloatDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14131,14 +13933,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14180,8 +13982,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatDouble args = new ArgumentsFloatDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14190,14 +13992,14 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14212,7 +14014,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsCharDouble {
         public byte inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertChar2Double2() {
@@ -14244,8 +14046,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharDouble args = new ArgumentsCharDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14260,7 +14062,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -14302,8 +14104,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharDouble args = new ArgumentsCharDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14318,7 +14120,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14360,8 +14162,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharDouble args = new ArgumentsCharDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14376,7 +14178,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14391,7 +14193,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUcharDouble {
         public byte inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUchar2Double2() {
@@ -14423,8 +14225,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharDouble args = new ArgumentsUcharDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14439,7 +14241,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -14481,8 +14283,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharDouble args = new ArgumentsUcharDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14497,7 +14299,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14539,8 +14341,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharDouble args = new ArgumentsUcharDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14555,7 +14357,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14570,7 +14372,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsShortDouble {
         public short inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertShort2Double2() {
@@ -14602,8 +14404,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortDouble args = new ArgumentsShortDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14618,7 +14420,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -14660,8 +14462,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortDouble args = new ArgumentsShortDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14676,7 +14478,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14718,8 +14520,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortDouble args = new ArgumentsShortDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14734,7 +14536,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14749,7 +14551,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUshortDouble {
         public short inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUshort2Double2() {
@@ -14781,8 +14583,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortDouble args = new ArgumentsUshortDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14797,7 +14599,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -14839,8 +14641,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortDouble args = new ArgumentsUshortDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14855,7 +14657,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14897,8 +14699,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortDouble args = new ArgumentsUshortDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -14913,7 +14715,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -14928,7 +14730,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsIntDouble {
         public int inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertInt2Double2() {
@@ -14960,8 +14762,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntDouble args = new ArgumentsIntDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -14976,7 +14778,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -15018,8 +14820,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntDouble args = new ArgumentsIntDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -15034,7 +14836,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -15076,8 +14878,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntDouble args = new ArgumentsIntDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -15092,7 +14894,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -15107,7 +14909,7 @@ public class TestConvert extends RSBaseCompute {
 
     public class ArgumentsUintDouble {
         public int inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkConvertUint2Double2() {
@@ -15139,8 +14941,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintDouble args = new ArgumentsUintDouble();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -15155,7 +14957,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -15197,8 +14999,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintDouble args = new ArgumentsUintDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -15213,7 +15015,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -15255,8 +15057,8 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintDouble args = new ArgumentsUintDouble();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeConvert(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeConvert(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -15271,7 +15073,7 @@ public class TestConvert extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g %16x %31a",
+                    message.append(String.format("%24.8g {%16x} %31a",
                             arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -15318,7 +15120,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatLong args = new ArgumentsFloatLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15328,7 +15129,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -15376,7 +15177,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatLong args = new ArgumentsFloatLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15386,7 +15186,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -15434,7 +15234,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatLong args = new ArgumentsFloatLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15444,7 +15243,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -15497,7 +15296,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharLong args = new ArgumentsCharLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15554,7 +15352,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharLong args = new ArgumentsCharLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15611,7 +15408,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharLong args = new ArgumentsCharLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15673,7 +15469,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharLong args = new ArgumentsUcharLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15730,7 +15525,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharLong args = new ArgumentsUcharLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15787,7 +15581,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharLong args = new ArgumentsUcharLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15849,7 +15642,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortLong args = new ArgumentsShortLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15906,7 +15698,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortLong args = new ArgumentsShortLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -15963,7 +15754,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortLong args = new ArgumentsShortLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16025,7 +15815,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortLong args = new ArgumentsUshortLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16082,7 +15871,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortLong args = new ArgumentsUshortLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16139,7 +15927,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortLong args = new ArgumentsUshortLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16201,7 +15988,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntLong args = new ArgumentsIntLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16258,7 +16044,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntLong args = new ArgumentsIntLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16315,7 +16100,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntLong args = new ArgumentsIntLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16377,7 +16161,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintLong args = new ArgumentsUintLong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16434,7 +16217,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintLong args = new ArgumentsUintLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16491,7 +16273,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintLong args = new ArgumentsUintLong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16553,7 +16334,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUlong args = new ArgumentsFloatUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16563,7 +16343,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -16611,7 +16391,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUlong args = new ArgumentsFloatUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16621,7 +16400,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -16669,7 +16448,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsFloatUlong args = new ArgumentsFloatUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16679,7 +16457,7 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
@@ -16732,7 +16510,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUlong args = new ArgumentsCharUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16789,7 +16566,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUlong args = new ArgumentsCharUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16846,7 +16622,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsCharUlong args = new ArgumentsCharUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16908,7 +16683,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUlong args = new ArgumentsUcharUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -16965,7 +16739,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUlong args = new ArgumentsUcharUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17022,7 +16795,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUcharUlong args = new ArgumentsUcharUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17084,7 +16856,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUlong args = new ArgumentsShortUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17141,7 +16912,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUlong args = new ArgumentsShortUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17198,7 +16968,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsShortUlong args = new ArgumentsShortUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17260,7 +17029,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUlong args = new ArgumentsUshortUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17317,7 +17085,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUlong args = new ArgumentsUshortUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17374,7 +17141,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUshortUlong args = new ArgumentsUshortUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17436,7 +17202,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUlong args = new ArgumentsIntUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17493,7 +17258,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUlong args = new ArgumentsIntUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17550,7 +17314,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsIntUlong args = new ArgumentsIntUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17612,7 +17375,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUlong args = new ArgumentsUintUlong();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17669,7 +17431,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUlong args = new ArgumentsUintUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -17726,7 +17487,6 @@ public class TestConvert extends RSBaseCompute {
                 ArgumentsUintUlong args = new ArgumentsUintUlong();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeConvert(args);
                 // Validate the outputs.
                 boolean valid = true;

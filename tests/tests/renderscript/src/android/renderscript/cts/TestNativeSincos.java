@@ -36,8 +36,8 @@ public class TestNativeSincos extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inV;
-        public Floaty outCosptr;
-        public Floaty out;
+        public Target.Floaty outCosptr;
+        public Target.Floaty out;
     }
 
     private void checkNativeSincosFloatFloatFloat() {
@@ -75,8 +75,8 @@ public class TestNativeSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeSincos(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
@@ -88,14 +88,14 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outCosptr: ");
                     message.append(args.outCosptr.toString());
                     message.append("\n");
                     message.append("Actual   output outCosptr: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutCosptr[i * 1 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
                     if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
                         message.append(" FAIL");
@@ -105,7 +105,7 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -153,8 +153,8 @@ public class TestNativeSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeSincos(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
@@ -166,14 +166,14 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outCosptr: ");
                     message.append(args.outCosptr.toString());
                     message.append("\n");
                     message.append("Actual   output outCosptr: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutCosptr[i * 2 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
                     if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
                         message.append(" FAIL");
@@ -183,7 +183,7 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -231,8 +231,8 @@ public class TestNativeSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeSincos(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
@@ -244,14 +244,14 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outCosptr: ");
                     message.append(args.outCosptr.toString());
                     message.append("\n");
                     message.append("Actual   output outCosptr: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
                     if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                         message.append(" FAIL");
@@ -261,7 +261,7 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -309,8 +309,8 @@ public class TestNativeSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeSincos(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
@@ -322,14 +322,14 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outCosptr: ");
                     message.append(args.outCosptr.toString());
                     message.append("\n");
                     message.append("Actual   output outCosptr: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
                     if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                         message.append(" FAIL");
@@ -339,7 +339,7 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

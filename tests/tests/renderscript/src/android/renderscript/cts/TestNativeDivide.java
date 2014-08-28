@@ -37,7 +37,7 @@ public class TestNativeDivide extends RSBaseCompute {
     public class ArgumentsFloatFloatFloat {
         public float inLhs;
         public float inRhs;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNativeDivideFloatFloatFloat() {
@@ -75,8 +75,8 @@ public class TestNativeDivide extends RSBaseCompute {
                 args.inLhs = arrayInLhs[i];
                 args.inRhs = arrayInRhs[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeDivide(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeDivide(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -85,18 +85,18 @@ public class TestNativeDivide extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
                     message.append("\n");
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -144,8 +144,8 @@ public class TestNativeDivide extends RSBaseCompute {
                 args.inLhs = arrayInLhs[i * 2 + j];
                 args.inRhs = arrayInRhs[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeDivide(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeDivide(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -154,18 +154,18 @@ public class TestNativeDivide extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
                     message.append("\n");
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -213,8 +213,8 @@ public class TestNativeDivide extends RSBaseCompute {
                 args.inLhs = arrayInLhs[i * 4 + j];
                 args.inRhs = arrayInRhs[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeDivide(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeDivide(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -223,18 +223,18 @@ public class TestNativeDivide extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
                     message.append("\n");
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -282,8 +282,8 @@ public class TestNativeDivide extends RSBaseCompute {
                 args.inLhs = arrayInLhs[i * 4 + j];
                 args.inRhs = arrayInRhs[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNativeDivide(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeDivide(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -292,18 +292,18 @@ public class TestNativeDivide extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
                     message.append("\n");
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

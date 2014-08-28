@@ -36,7 +36,7 @@ public class TestNan extends RSBaseCompute {
 
     public class ArgumentsUintFloat {
         public int in;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkNanUintFloat() {
@@ -68,8 +68,8 @@ public class TestNan extends RSBaseCompute {
                 ArgumentsUintFloat args = new ArgumentsUintFloat();
                 args.in = arrayIn[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeNan(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNan(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -84,7 +84,7 @@ public class TestNan extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");

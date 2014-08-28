@@ -36,8 +36,8 @@ public class TestFract extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inV;
-        public Floaty outFloor;
-        public Floaty out;
+        public Target.Floaty outFloor;
+        public Target.Floaty out;
     }
 
     private void checkFractFloatFloatFloat() {
@@ -75,8 +75,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 1 + j])) {
@@ -88,14 +88,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outFloor: ");
                     message.append(args.outFloor.toString());
                     message.append("\n");
                     message.append("Actual   output outFloor: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutFloor[i * 1 + j], Float.floatToRawIntBits(arrayOutFloor[i * 1 + j]), arrayOutFloor[i * 1 + j]));
                     if (!args.outFloor.couldBe(arrayOutFloor[i * 1 + j])) {
                         message.append(" FAIL");
@@ -105,7 +105,7 @@ public class TestFract extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -153,8 +153,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 2 + j])) {
@@ -166,14 +166,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outFloor: ");
                     message.append(args.outFloor.toString());
                     message.append("\n");
                     message.append("Actual   output outFloor: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutFloor[i * 2 + j], Float.floatToRawIntBits(arrayOutFloor[i * 2 + j]), arrayOutFloor[i * 2 + j]));
                     if (!args.outFloor.couldBe(arrayOutFloor[i * 2 + j])) {
                         message.append(" FAIL");
@@ -183,7 +183,7 @@ public class TestFract extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -231,8 +231,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
@@ -244,14 +244,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outFloor: ");
                     message.append(args.outFloor.toString());
                     message.append("\n");
                     message.append("Actual   output outFloor: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutFloor[i * 4 + j], Float.floatToRawIntBits(arrayOutFloor[i * 4 + j]), arrayOutFloor[i * 4 + j]));
                     if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
                         message.append(" FAIL");
@@ -261,7 +261,7 @@ public class TestFract extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -309,8 +309,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
@@ -322,14 +322,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output outFloor: ");
                     message.append(args.outFloor.toString());
                     message.append("\n");
                     message.append("Actual   output outFloor: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutFloor[i * 4 + j], Float.floatToRawIntBits(arrayOutFloor[i * 4 + j]), arrayOutFloor[i * 4 + j]));
                     if (!args.outFloor.couldBe(arrayOutFloor[i * 4 + j])) {
                         message.append(" FAIL");
@@ -339,7 +339,7 @@ public class TestFract extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -354,7 +354,7 @@ public class TestFract extends RSBaseCompute {
 
     public class ArgumentsFloatFloat {
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkFractFloatFloat() {
@@ -386,8 +386,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -396,14 +396,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -445,8 +445,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -455,14 +455,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -504,8 +504,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -514,14 +514,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -563,8 +563,8 @@ public class TestFract extends RSBaseCompute {
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeFract(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeFract(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -573,14 +573,14 @@ public class TestFract extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

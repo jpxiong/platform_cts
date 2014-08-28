@@ -37,7 +37,7 @@ public class TestStep extends RSBaseCompute {
     public class ArgumentsFloatFloatFloat {
         public float inEdge;
         public float inV;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkStepFloatFloatFloat() {
@@ -75,8 +75,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i];
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -85,18 +85,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -144,8 +144,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 2 + j];
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -154,18 +154,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -213,8 +213,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 4 + j];
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -223,18 +223,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -282,8 +282,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 4 + j];
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -292,18 +292,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -351,8 +351,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 2 + j];
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -361,18 +361,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -420,8 +420,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 4 + j];
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -430,18 +430,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -489,8 +489,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i * 4 + j];
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -499,18 +499,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -558,8 +558,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i];
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -568,18 +568,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -627,8 +627,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i];
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -637,18 +637,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -696,8 +696,8 @@ public class TestStep extends RSBaseCompute {
                 args.inEdge = arrayInEdge[i];
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeStep(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeStep(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -706,18 +706,18 @@ public class TestStep extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inEdge: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
                     message.append("\n");
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

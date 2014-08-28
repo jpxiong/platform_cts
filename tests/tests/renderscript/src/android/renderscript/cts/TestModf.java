@@ -36,8 +36,8 @@ public class TestModf extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inX;
-        public Floaty outIret;
-        public Floaty out;
+        public Target.Floaty outIret;
+        public Target.Floaty out;
     }
 
     private void checkModfFloatFloatFloat() {
@@ -75,8 +75,8 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeModf(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeModf(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 1 + j])) {
@@ -88,14 +88,14 @@ public class TestModf extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output outIret: ");
                     message.append(args.outIret.toString());
                     message.append("\n");
                     message.append("Actual   output outIret: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutIret[i * 1 + j], Float.floatToRawIntBits(arrayOutIret[i * 1 + j]), arrayOutIret[i * 1 + j]));
                     if (!args.outIret.couldBe(arrayOutIret[i * 1 + j])) {
                         message.append(" FAIL");
@@ -105,7 +105,7 @@ public class TestModf extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -153,8 +153,8 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeModf(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeModf(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 2 + j])) {
@@ -166,14 +166,14 @@ public class TestModf extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output outIret: ");
                     message.append(args.outIret.toString());
                     message.append("\n");
                     message.append("Actual   output outIret: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutIret[i * 2 + j], Float.floatToRawIntBits(arrayOutIret[i * 2 + j]), arrayOutIret[i * 2 + j]));
                     if (!args.outIret.couldBe(arrayOutIret[i * 2 + j])) {
                         message.append(" FAIL");
@@ -183,7 +183,7 @@ public class TestModf extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -231,8 +231,8 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeModf(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeModf(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
@@ -244,14 +244,14 @@ public class TestModf extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output outIret: ");
                     message.append(args.outIret.toString());
                     message.append("\n");
                     message.append("Actual   output outIret: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutIret[i * 4 + j], Float.floatToRawIntBits(arrayOutIret[i * 4 + j]), arrayOutIret[i * 4 + j]));
                     if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                         message.append(" FAIL");
@@ -261,7 +261,7 @@ public class TestModf extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -309,8 +309,8 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeModf(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeModf(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
@@ -322,14 +322,14 @@ public class TestModf extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output outIret: ");
                     message.append(args.outIret.toString());
                     message.append("\n");
                     message.append("Actual   output outIret: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOutIret[i * 4 + j], Float.floatToRawIntBits(arrayOutIret[i * 4 + j]), arrayOutIret[i * 4 + j]));
                     if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                         message.append(" FAIL");
@@ -339,7 +339,7 @@ public class TestModf extends RSBaseCompute {
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");

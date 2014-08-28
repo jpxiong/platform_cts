@@ -37,7 +37,7 @@ public class TestCross extends RSBaseCompute {
     public class ArgumentsFloatNFloatNFloatN {
         public float[] inLhs;
         public float[] inRhs;
-        public Floaty[] out;
+        public Target.Floaty[] out;
     }
 
     private void checkCrossFloat3Float3Float3() {
@@ -73,7 +73,7 @@ public class TestCross extends RSBaseCompute {
             // Create the appropriate sized arrays in args
             args.inLhs = new float[3];
             args.inRhs = new float[3];
-            args.out = new Floaty[3];
+            args.out = new Target.Floaty[3];
             // Fill args with the input values
             for (int j = 0; j < 3 ; j++) {
                 args.inLhs[j] = arrayInLhs[i * 4 + j];
@@ -81,8 +81,8 @@ public class TestCross extends RSBaseCompute {
             for (int j = 0; j < 3 ; j++) {
                 args.inRhs[j] = arrayInRhs[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeCross(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeCross(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -95,13 +95,13 @@ public class TestCross extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
                     message.append("\n");
                 }
@@ -110,7 +110,7 @@ public class TestCross extends RSBaseCompute {
                     message.append(args.out[j].toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -156,7 +156,7 @@ public class TestCross extends RSBaseCompute {
             // Create the appropriate sized arrays in args
             args.inLhs = new float[4];
             args.inRhs = new float[4];
-            args.out = new Floaty[4];
+            args.out = new Target.Floaty[4];
             // Fill args with the input values
             for (int j = 0; j < 4 ; j++) {
                 args.inLhs[j] = arrayInLhs[i * 4 + j];
@@ -164,8 +164,8 @@ public class TestCross extends RSBaseCompute {
             for (int j = 0; j < 4 ; j++) {
                 args.inRhs[j] = arrayInRhs[i * 4 + j];
             }
-            Floaty.setRelaxed(relaxed);
-            CoreMathVerifier.computeCross(args);
+            Target target = new Target(relaxed);
+            CoreMathVerifier.computeCross(args, target);
 
             // Compare the expected outputs to the actual values returned by RS.
             boolean valid = true;
@@ -178,13 +178,13 @@ public class TestCross extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inLhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inRhs: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
                     message.append("\n");
                 }
@@ -193,7 +193,7 @@ public class TestCross extends RSBaseCompute {
                     message.append(args.out[j].toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
