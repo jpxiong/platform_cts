@@ -16,6 +16,8 @@
 
 package android.text.format.cts;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.test.AndroidTestCase;
 import android.text.format.Time;
 import android.util.Log;
@@ -43,7 +45,7 @@ public class TimeTest extends AndroidTestCase {
     @Override
     public void tearDown() throws Exception {
         // The Locale may be changed by tests. Revert to the original.
-        Locale.setDefault(originalLocale);
+        changeJavaAndAndroidLocale(originalLocale);
         super.tearDown();
     }
 
@@ -769,7 +771,7 @@ public class TimeTest extends AndroidTestCase {
     }
 
     public void testFormat_tokensUkLocale() throws Exception {
-        Locale.setDefault(Locale.UK);
+        changeJavaAndAndroidLocale(Locale.UK);
 
         Time t = new Time("Europe/London");
         Fields.setDateTime(t, 2005, 5, 1, 12, 30, 15);
@@ -810,9 +812,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%r", "12:30:15 pm");
         assertFormatEquals(t, "%S", "15");
         // The original C implementation uses the (native) system default TZ, not the timezone of
-        // the Time and is therefore not stable. The commented value below is the one using the
-        // Time's timezone which is probably the expected answer.
-        // assertFormatEquals(t, "%s", "1117625415");
+        // the Time to calculate this and was therefore not stable. This changed to use the Time's
+        // timezone when the Time class was re-written in Java.
+        assertFormatEquals(t, "%s", "1117625415");
         assertFormatEquals(t, "%T", "12:30:15");
         assertFormatEquals(t, "%t", "\t");
         assertFormatEquals(t, "%U", "22");
@@ -861,7 +863,7 @@ public class TimeTest extends AndroidTestCase {
     }
 
     public void testFormat_tokensUsLocale() throws Exception {
-        Locale.setDefault(Locale.US);
+        changeJavaAndAndroidLocale(Locale.US);
 
         Time t = new Time("America/New_York");
         Fields.setDateTime(t, 2005, 5, 1, 12, 30, 15);
@@ -877,7 +879,7 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%B", "June");
         assertFormatEquals(t, "%b", "Jun");
         assertFormatEquals(t, "%C", "20");
-        assertFormatEquals(t, "%c", "1 Jun 2005, 12:30:15");
+        assertFormatEquals(t, "%c", "Jun 1, 2005, 12:30:15 PM");
         assertFormatEquals(t, "%D", "06/01/05");
         assertFormatEquals(t, "%d", "01");
         assertFormatEquals(t, "%E", "E");
@@ -902,9 +904,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%r", "12:30:15 PM");
         assertFormatEquals(t, "%S", "15");
         // The original C implementation uses the (native) system default TZ, not the timezone of
-        // the Time and is therefore not stable. The commented value below is the one using the
-        // Time's timezone which is probably the expected answer.
-        // assertFormatEquals(t, "%s", "1117643415");
+        // the Time to calculate this and was therefore not stable. This changed to use the Time's
+        // timezone when the Time class was re-written in Java.
+        assertFormatEquals(t, "%s", "1117643415");
         assertFormatEquals(t, "%T", "12:30:15");
         assertFormatEquals(t, "%t", "\t");
         assertFormatEquals(t, "%U", "22");
@@ -913,8 +915,8 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%v", " 1-Jun-2005");
         assertFormatEquals(t, "%W", "22");
         assertFormatEquals(t, "%w", "3");
-        assertFormatEquals(t, "%X", "12:30:15");
-        assertFormatEquals(t, "%x", "1 June 2005");
+        assertFormatEquals(t, "%X", "12:30:15 PM");
+        assertFormatEquals(t, "%x", "June 1, 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
         assertFormatEquals(t, "%Z", "EDT");
@@ -953,7 +955,7 @@ public class TimeTest extends AndroidTestCase {
     }
 
     public void testFormat_tokensFranceLocale() throws Exception {
-        Locale.setDefault(Locale.FRANCE);
+        changeJavaAndAndroidLocale(Locale.FRANCE);
 
         Time t = new Time("Europe/Paris");
         Fields.setDateTime(t, 2005, 5, 1, 12, 30, 15);
@@ -969,7 +971,7 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%B", "juin");
         assertFormatEquals(t, "%b", "juin");
         assertFormatEquals(t, "%C", "20");
-        assertFormatEquals(t, "%c", "1 juin 2005, 12:30:15");
+        assertFormatEquals(t, "%c", "1 juin 2005 à 12:30:15");
         assertFormatEquals(t, "%D", "06/01/05");
         assertFormatEquals(t, "%d", "01");
         assertFormatEquals(t, "%E", "E");
@@ -994,9 +996,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%r", "12:30:15 PM");
         assertFormatEquals(t, "%S", "15");
         // The original C implementation uses the (native) system default TZ, not the timezone of
-        // the Time and is therefore not stable. The commented value below is the one using the
-        // Time's timezone which is probably the expected answer.
-        // assertFormatEquals(t, "%s", "1117621815");
+        // the Time to calculate this and was therefore not stable. This changed to use the Time's
+        // timezone when the Time class was re-written in Java.
+        assertFormatEquals(t, "%s", "1117621815");
         assertFormatEquals(t, "%T", "12:30:15");
         assertFormatEquals(t, "%t", "\t");
         assertFormatEquals(t, "%U", "22");
@@ -1009,9 +1011,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%x", "1 juin 2005");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
-        assertFormatEquals(t, "%Z", "GMT+01:00");
+        assertFormatEquals(t, "%Z", "GMT+02:00");
         assertFormatEquals(t, "%z", "+0200");
-        assertFormatEquals(t, "%+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%+", "mer. juin  1 12:30:15 GMT+02:00 2005");
         assertFormatEquals(t, "%%", "%");
 
         // Modifiers
@@ -1019,11 +1021,11 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%EC", "20");
         assertFormatEquals(t, "%OC", "20");
 
-        assertFormatEquals(t, "%_+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        assertFormatEquals(t, "%-+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        assertFormatEquals(t, "%0+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        assertFormatEquals(t, "%^+", "mer. juin  1 12:30:15 GMT+01:00 2005");
-        assertFormatEquals(t, "%#+", "mer. juin  1 12:30:15 GMT+01:00 2005");
+        assertFormatEquals(t, "%_+", "mer. juin  1 12:30:15 GMT+02:00 2005");
+        assertFormatEquals(t, "%-+", "mer. juin  1 12:30:15 GMT+02:00 2005");
+        assertFormatEquals(t, "%0+", "mer. juin  1 12:30:15 GMT+02:00 2005");
+        assertFormatEquals(t, "%^+", "mer. juin  1 12:30:15 GMT+02:00 2005");
+        assertFormatEquals(t, "%#+", "mer. juin  1 12:30:15 GMT+02:00 2005");
 
         assertFormatEquals(t, "%_A", "mercredi");
         assertFormatEquals(t, "%-A", "mercredi");
@@ -1045,7 +1047,7 @@ public class TimeTest extends AndroidTestCase {
     }
 
     public void testFormat_tokensJapanLocale() throws Exception {
-        Locale.setDefault(Locale.JAPAN);
+        changeJavaAndAndroidLocale(Locale.JAPAN);
 
         Time t = new Time("Asia/Tokyo");
         Fields.setDateTime(t, 2005, 5, 1, 12, 30, 15);
@@ -1061,7 +1063,7 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%B", "6月");
         assertFormatEquals(t, "%b", "6月");
         assertFormatEquals(t, "%C", "20");
-        assertFormatEquals(t, "%c", "1 6月 2005, 12:30:15");
+        assertFormatEquals(t, "%c", "2005/06/01 12:30:15");
         assertFormatEquals(t, "%D", "06/01/05");
         assertFormatEquals(t, "%d", "01");
         assertFormatEquals(t, "%E", "E");
@@ -1085,9 +1087,9 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%r", "12:30:15 午後");
         assertFormatEquals(t, "%S", "15");
         // The original C implementation uses the (native) system default TZ, not the timezone of
-        // the Time and is therefore not stable. The commented value below is the one using the
-        // Time's timezone which is probably the expected answer.
-        // assertFormatEquals(t, "%s", "1117596615");
+        // the Time to calculate this and was therefore not stable. This changed to use the Time's
+        // timezone when the Time class was re-written in Java.
+        assertFormatEquals(t, "%s", "1117596615");
         assertFormatEquals(t, "%T", "12:30:15");
         assertFormatEquals(t, "%t", "\t");
         assertFormatEquals(t, "%U", "22");
@@ -1097,7 +1099,7 @@ public class TimeTest extends AndroidTestCase {
         assertFormatEquals(t, "%W", "22");
         assertFormatEquals(t, "%w", "3");
         assertFormatEquals(t, "%X", "12:30:15");
-        assertFormatEquals(t, "%x", "1 6月 2005");
+        assertFormatEquals(t, "%x", "2005年6月1日");
         assertFormatEquals(t, "%y", "05");
         assertFormatEquals(t, "%Y", "2005");
         assertFormatEquals(t, "%Z", "JST");
@@ -2839,5 +2841,28 @@ public class TimeTest extends AndroidTestCase {
         public static int getUtcOffsetMillis(boolean isDst) {
             return getUtcOffsetSeconds(isDst) * 1000;
         }
+    }
+
+    private static void changeJavaAndAndroidLocale(Locale locale) {
+        // The Time class uses the Android-managed locale for string resources containing format
+        // patterns and the Java-managed locale for other things (e.g. month names, week days names)
+        // that are placed into those patterns. For example the format "%c" expands to include
+        // a pattern that includes month names.
+        // Changing the Java-managed Locale does not affect the Android-managed locale.
+        // Changing the Android-managed locale does not affect the Java-managed locale.
+        //
+        // In order to ensure consistent behavior in the tests the device Locale must not be
+        // assumed. To simulate the most common behavior (i.e. when the Java and the Android-managed
+        // locales agree), when the Java-managed locale is changed during this test the locale in
+        // the runtime-local copy of the system resources is modified as well.
+
+        // Change the Java-managed locale.
+        Locale.setDefault(locale);
+
+        // Change the local copy of the Android system configuration: this simulates the device
+        // being set to the locale and forces a reload of the string resources.
+        Configuration configuration = Resources.getSystem().getConfiguration();
+        configuration.locale = locale;
+        Resources.getSystem().updateConfiguration(configuration, null);
     }
 }
