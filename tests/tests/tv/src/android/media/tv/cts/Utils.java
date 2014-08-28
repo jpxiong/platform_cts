@@ -7,6 +7,6 @@ public class Utils {
     private Utils() { }
 
     public static boolean hasTvInputFramework(Context context) {
-        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LIVE_TV);
     }
 }
