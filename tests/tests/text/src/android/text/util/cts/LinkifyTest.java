@@ -315,7 +315,7 @@ public class LinkifyTest extends AndroidTestCase {
         String numbersInvalid = "123456789 not a phone number";
         String numbersUKLocal = "tel:(0812)1234560 (0812)1234561";
         String numbersUSLocal = "tel:(812)1234562 (812)123.4563 "
-                + " tel:(800)5551210 (800) 555-1211 555-1212";
+                + " tel:(800)5551210 (800)555-1211 555-1212";
         String numbersIntl = "tel:+4408121234564 +44-0812-123-4565"
                 + " tel:+18005551213 +1-800-555-1214";
         SpannableString spannable = new SpannableString(
