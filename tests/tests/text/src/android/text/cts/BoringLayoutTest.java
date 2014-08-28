@@ -79,69 +79,29 @@ public class BoringLayoutTest extends AndroidTestCase {
                 DEFAULT_OUTER_WIDTH);
     }
 
-    public void testScale() {
+    private void verifyMultAddScale(float spacingMult, float spacingAdd) {
         final int metricsBottomToTop = METRICS_BOTTOM - METRICS_TOP;
 
-        //no scale
-        BoringLayout boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, SPACING_ADD_NO_SCALE);
-
+        BoringLayout boringLayout = makeBoringLayout(spacingMult, spacingAdd);
         assertEquals(metricsBottomToTop, boringLayout.getHeight());
         assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
+    }
 
-        // scale two times
-        float spacingMult = 2.0f;
-        boringLayout = makeBoringLayout(spacingMult, SPACING_ADD_NO_SCALE);
+    public void testScale() {
+        // no scale
+        verifyMultAddScale(1.0f, 0.0f);
 
-        assertEquals(metricsBottomToTop * spacingMult, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
+        // test line spacing multiplier
+        verifyMultAddScale(2.0f, 0.0f);
+        verifyMultAddScale(0.5f, 0.0f);
 
-        // scale 0.5 times
-        spacingMult = 0.5f;
-        boringLayout = makeBoringLayout(spacingMult, SPACING_ADD_NO_SCALE);
-        assertEquals(metricsBottomToTop * spacingMult, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // add 1.5f
-        float spacingAdd = 1.5f;
-        float roundOff = 2.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingAdd);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // minus 1.6f
-        float spacingMinus = -1.6f;
-        roundOff = -2.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingMinus);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // add 1.4f
-        spacingAdd = 1.4f;
-        roundOff = 1.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingAdd);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // minus 1.4f
-        spacingMinus = -1.4f;
-        roundOff = -1.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingMinus);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // add 3.0f
-        spacingAdd = 3.0f;
-        roundOff = 3.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingAdd);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
-
-        // minus 3.0f
-        spacingMinus = -3.0f;
-        roundOff = -3.0f;
-        boringLayout = makeBoringLayout(SPACING_MULT_NO_SCALE, spacingMinus);
-        assertEquals(metricsBottomToTop + roundOff, (float) boringLayout.getHeight());
-        assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
+        // test line spacing add
+        verifyMultAddScale(1.0f, 1.5f);
+        verifyMultAddScale(1.0f, -1.6f);
+        verifyMultAddScale(1.0f, 1.4f);
+        verifyMultAddScale(1.0f, -1.4f);
+        verifyMultAddScale(1.0f, 3.0f);
+        verifyMultAddScale(1.0f, -3.0f);
     }
 
     public void testPreconditions() {
