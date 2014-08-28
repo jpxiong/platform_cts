@@ -38,7 +38,7 @@ public class TestRemquo extends RSBaseCompute {
         public float inB;
         public float inC;
         public int outD;
-        public Floaty out;
+        public float out;
     }
 
     private void checkRemquoFloatFloatIntFloat() {
@@ -81,46 +81,30 @@ public class TestRemquo extends RSBaseCompute {
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
                 args.inB = arrayInB[i];
                 args.inC = arrayInC[i];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeRemquo(args);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outD != arrayOutD[i * 1 + j] && args.out.isNaN()) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                    valid = false;
-                }
+                // Extract the outputs.
+                args.outD = arrayOutD[i * 1 + j];
+                args.out = arrayOut[i * 1 + j];
+                // Ask the CoreMathVerifier to validate.
+                Target target = new Target(relaxed);
+                String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Input inC: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append("Expected output outD: ");
+                    message.append("Output outD: ");
                     message.append(String.format("%d", args.outD));
                     message.append("\n");
-                    message.append("Actual   output outD: ");
-                    message.append(String.format("%d", arrayOutD[i * 1 + j]));
-                    if (args.outD != arrayOutD[i * 1 + j] && args.out.isNaN()) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloatFloatIntFloat" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -168,46 +152,30 @@ public class TestRemquo extends RSBaseCompute {
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
                 args.inB = arrayInB[i * 2 + j];
                 args.inC = arrayInC[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeRemquo(args);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outD != arrayOutD[i * 2 + j] && args.out.isNaN()) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                    valid = false;
-                }
+                // Extract the outputs.
+                args.outD = arrayOutD[i * 2 + j];
+                args.out = arrayOut[i * 2 + j];
+                // Ask the CoreMathVerifier to validate.
+                Target target = new Target(relaxed);
+                String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Input inC: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append("Expected output outD: ");
+                    message.append("Output outD: ");
                     message.append(String.format("%d", args.outD));
                     message.append("\n");
-                    message.append("Actual   output outD: ");
-                    message.append(String.format("%d", arrayOutD[i * 2 + j]));
-                    if (args.outD != arrayOutD[i * 2 + j] && args.out.isNaN()) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat2Float2Int2Float2" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -255,46 +223,30 @@ public class TestRemquo extends RSBaseCompute {
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
                 args.inB = arrayInB[i * 4 + j];
                 args.inC = arrayInC[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeRemquo(args);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                    valid = false;
-                }
+                // Extract the outputs.
+                args.outD = arrayOutD[i * 4 + j];
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
+                Target target = new Target(relaxed);
+                String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Input inC: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append("Expected output outD: ");
+                    message.append("Output outD: ");
                     message.append(String.format("%d", args.outD));
                     message.append("\n");
-                    message.append("Actual   output outD: ");
-                    message.append(String.format("%d", arrayOutD[i * 4 + j]));
-                    if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat3Float3Int3Float3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -342,46 +294,30 @@ public class TestRemquo extends RSBaseCompute {
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
                 args.inB = arrayInB[i * 4 + j];
                 args.inC = arrayInC[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeRemquo(args);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                    valid = false;
-                }
+                // Extract the outputs.
+                args.outD = arrayOutD[i * 4 + j];
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
+                Target target = new Target(relaxed);
+                String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Input inC: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append("Expected output outD: ");
+                    message.append("Output outD: ");
                     message.append(String.format("%d", args.outD));
                     message.append("\n");
-                    message.append("Actual   output outD: ");
-                    message.append(String.format("%d", arrayOutD[i * 4 + j]));
-                    if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat4Float4Int4Float4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }

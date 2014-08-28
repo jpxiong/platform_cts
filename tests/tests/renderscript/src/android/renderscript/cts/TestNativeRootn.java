@@ -34,6 +34,12 @@ public class TestNativeRootn extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNativeRootnRelaxed(mRS);
     }
 
+    public class ArgumentsFloatIntFloat {
+        public float inV;
+        public int inN;
+        public Target.Floaty out;
+    }
+
     private void checkNativeRootnFloatIntFloat() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6693fe5c237ac0f1l, false);
         Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6693fe5c237ac0e9l, false);
@@ -41,6 +47,7 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInN(inN);
             script.forEach_testNativeRootnFloatIntFloat(inV, out);
+            verifyResultsNativeRootnFloatIntFloat(inV, inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloatIntFloat: " + e.toString());
         }
@@ -48,8 +55,56 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInN(inN);
             scriptRelaxed.forEach_testNativeRootnFloatIntFloat(inV, out);
+            verifyResultsNativeRootnFloatIntFloat(inV, inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloatIntFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeRootnFloatIntFloat(Allocation inV, Allocation inN, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
+        int[] arrayInN = new int[INPUTSIZE * 1];
+        inN.copyTo(arrayInN);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inV = arrayInV[i];
+                args.inN = arrayInN[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeRootn(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeRootnFloatIntFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -60,6 +115,7 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInN(inN);
             script.forEach_testNativeRootnFloat2Int2Float2(inV, out);
+            verifyResultsNativeRootnFloat2Int2Float2(inV, inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat2Int2Float2: " + e.toString());
         }
@@ -67,8 +123,56 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInN(inN);
             scriptRelaxed.forEach_testNativeRootnFloat2Int2Float2(inV, out);
+            verifyResultsNativeRootnFloat2Int2Float2(inV, inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat2Int2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeRootnFloat2Int2Float2(Allocation inV, Allocation inN, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayInN = new int[INPUTSIZE * 2];
+        inN.copyTo(arrayInN);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inV = arrayInV[i * 2 + j];
+                args.inN = arrayInN[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeRootn(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeRootnFloat2Int2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -79,6 +183,7 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInN(inN);
             script.forEach_testNativeRootnFloat3Int3Float3(inV, out);
+            verifyResultsNativeRootnFloat3Int3Float3(inV, inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat3Int3Float3: " + e.toString());
         }
@@ -86,8 +191,56 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInN(inN);
             scriptRelaxed.forEach_testNativeRootnFloat3Int3Float3(inV, out);
+            verifyResultsNativeRootnFloat3Int3Float3(inV, inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat3Int3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeRootnFloat3Int3Float3(Allocation inV, Allocation inN, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayInN = new int[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inV = arrayInV[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeRootn(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeRootnFloat3Int3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -98,6 +251,7 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInN(inN);
             script.forEach_testNativeRootnFloat4Int4Float4(inV, out);
+            verifyResultsNativeRootnFloat4Int4Float4(inV, inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat4Int4Float4: " + e.toString());
         }
@@ -105,8 +259,56 @@ public class TestNativeRootn extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInN(inN);
             scriptRelaxed.forEach_testNativeRootnFloat4Int4Float4(inV, out);
+            verifyResultsNativeRootnFloat4Int4Float4(inV, inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeRootnFloat4Int4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeRootnFloat4Int4Float4(Allocation inV, Allocation inN, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayInN = new int[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inV = arrayInV[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeNativeRootn(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g {%8x} %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeRootnFloat4Int4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
