@@ -17,10 +17,11 @@
 package android.renderscript.cts;
 
 import android.content.res.Resources;
-import java.util.Random;
 import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import com.android.cts.stub.R;
+
+import java.util.Random;
 
 /**
  * This class supplies some utils for renderscript tests
@@ -31,8 +32,8 @@ public class RSUtils {
         1.0,
         Math.E,
         Math.PI,
-        Math.PI / 2f,
-        Math.PI * 2f,
+        Math.PI / 2.0,
+        Math.PI * 2.0,
         -0.0,
         -1.0,
         -Math.E,
@@ -48,8 +49,27 @@ public class RSUtils {
     public static void genRandomDoubles(long seed, double min, double max, double array[],
             boolean includeExtremes) {
         Random r = new Random(seed);
-        for (int i = 0; i < array.length; i++) {
-            array[i] = min + r.nextDouble() * (max - min);
+        int minExponent = Math.min(Math.getExponent(min), 0);
+        int maxExponent = Math.max(Math.getExponent(max), 0);
+        if (minExponent < -6 || maxExponent > 6) {
+            // Use an exponential distribution
+            int exponentDiff = maxExponent - minExponent;
+            for (int i = 0; i < array.length; i++) {
+                double mantissa = r.nextDouble();
+                int exponent = minExponent + r.nextInt(maxExponent - minExponent);
+                int sign = (min >= 0) ? 1 : 1 - r.nextInt(2) * 2;  // -1 or 1
+                double rand = sign * mantissa * Math.pow(2.0, exponent);
+                if (rand < min || rand > max) {
+                    continue;
+                }
+                array[i] = rand;
+            }
+        } else {
+            // Use a linear distribution
+            for (int i = 0; i < array.length; i++) {
+                double rand = r.nextDouble();
+                array[i] = min + rand * (max - min);
+            }
         }
         // Seed a few special numbers we want to be sure to test.
         for (int i = 0; i < sInterestingDoubles.length; i++) {
@@ -67,6 +87,9 @@ public class RSUtils {
             array[r.nextInt(array.length)] = Double.MIN_VALUE;
             array[r.nextInt(array.length)] = Double.MIN_NORMAL;
             array[r.nextInt(array.length)] = Double.MAX_VALUE;
+            array[r.nextInt(array.length)] = -Double.MIN_VALUE;
+            array[r.nextInt(array.length)] = -Double.MIN_NORMAL;
+            array[r.nextInt(array.length)] = -Double.MAX_VALUE;
         }
     }
 
@@ -77,8 +100,27 @@ public class RSUtils {
     public static void genRandomFloats(long seed, float min, float max, float array[],
             boolean includeExtremes) {
         Random r = new Random(seed);
-        for (int i = 0; i < array.length; i++) {
-            array[i] = min + r.nextFloat() * (max - min);
+        int minExponent = Math.min(Math.getExponent(min), 0);
+        int maxExponent = Math.max(Math.getExponent(max), 0);
+        if (minExponent < -6 || maxExponent > 6) {
+            // Use an exponential distribution
+            int exponentDiff = maxExponent - minExponent;
+            for (int i = 0; i < array.length; i++) {
+                float mantissa = r.nextFloat();
+                int exponent = minExponent + r.nextInt(maxExponent - minExponent);
+                int sign = (min >= 0) ? 1 : 1 - r.nextInt(2) * 2;  // -1 or 1
+                float rand = sign * mantissa * (float) Math.pow(2.0, exponent);
+                if (rand < min || rand > max) {
+                    continue;
+                }
+                array[i] = rand;
+            }
+        } else {
+            // Use a linear distribution
+            for (int i = 0; i < array.length; i++) {
+                float rand = r.nextFloat();
+                array[i] = min + rand * (max - min);
+            }
         }
         // Seed a few special numbers we want to be sure to test.
         for (int i = 0; i < sInterestingDoubles.length; i++) {
@@ -96,6 +138,9 @@ public class RSUtils {
             array[r.nextInt(array.length)] = Float.MIN_VALUE;
             array[r.nextInt(array.length)] = Float.MIN_NORMAL;
             array[r.nextInt(array.length)] = Float.MAX_VALUE;
+            array[r.nextInt(array.length)] = -Float.MIN_VALUE;
+            array[r.nextInt(array.length)] = -Float.MIN_NORMAL;
+            array[r.nextInt(array.length)] = -Float.MAX_VALUE;
         }
     }
 

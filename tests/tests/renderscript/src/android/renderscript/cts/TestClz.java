@@ -68,7 +68,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -125,7 +124,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -182,7 +180,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -239,7 +236,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -301,7 +297,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -358,7 +353,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -415,7 +409,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -472,7 +465,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -534,7 +526,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -591,7 +582,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -648,7 +638,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -705,7 +694,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -767,7 +755,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -824,7 +811,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -881,7 +867,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -938,7 +923,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1000,7 +984,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1057,7 +1040,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1114,7 +1096,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1171,7 +1152,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1233,7 +1213,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1290,7 +1269,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1347,7 +1325,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1404,7 +1381,6 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
                 // Validate the outputs.
                 boolean valid = true;

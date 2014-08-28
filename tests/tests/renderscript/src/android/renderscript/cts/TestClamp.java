@@ -38,7 +38,7 @@ public class TestClamp extends RSBaseCompute {
         public float inValue;
         public float inMinValue;
         public float inMaxValue;
-        public Floaty out;
+        public Target.Floaty out;
     }
 
     private void checkClampFloatFloatFloatFloat() {
@@ -83,8 +83,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 1 + j])) {
@@ -93,22 +93,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
@@ -163,8 +163,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -173,22 +173,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -243,8 +243,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -253,22 +253,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -323,8 +323,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -333,22 +333,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -403,8 +403,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 2 + j])) {
@@ -413,22 +413,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
@@ -483,8 +483,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -493,22 +493,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -563,8 +563,8 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeClamp(args);
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeClamp(args, target);
                 // Validate the outputs.
                 boolean valid = true;
                 if (!args.out.couldBe(arrayOut[i * 4 + j])) {
@@ -573,22 +573,22 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g %8x %15a",
+                    message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
@@ -650,7 +650,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -726,7 +725,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -802,7 +800,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -878,7 +875,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -961,7 +957,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1037,7 +1032,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1113,7 +1107,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1189,7 +1182,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1272,7 +1264,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1348,7 +1339,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1424,7 +1414,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1500,7 +1489,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1583,7 +1571,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1659,7 +1646,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1735,7 +1721,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1811,7 +1796,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1894,7 +1878,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -1970,7 +1953,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2046,7 +2028,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2122,7 +2103,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2205,7 +2185,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2281,7 +2260,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2357,7 +2335,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2433,7 +2410,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2516,7 +2492,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2592,7 +2567,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2668,7 +2642,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2744,7 +2717,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2827,7 +2799,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2903,7 +2874,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -2979,7 +2949,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3055,7 +3024,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3131,7 +3099,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3207,7 +3174,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3283,7 +3249,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3359,7 +3324,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3435,7 +3399,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3511,7 +3474,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3587,7 +3549,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3663,7 +3624,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3739,7 +3699,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3815,7 +3774,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3891,7 +3849,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -3967,7 +3924,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4043,7 +3999,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4119,7 +4074,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4195,7 +4149,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4271,7 +4224,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4347,7 +4299,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4423,7 +4374,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4499,7 +4449,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4575,7 +4524,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4651,7 +4599,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4727,7 +4674,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4803,7 +4749,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -4879,7 +4824,6 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
                 // Validate the outputs.
                 boolean valid = true;

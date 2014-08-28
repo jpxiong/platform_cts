@@ -68,7 +68,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -125,7 +124,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -182,7 +180,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -239,7 +236,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -301,7 +297,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -358,7 +353,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -415,7 +409,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -472,7 +465,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -534,7 +526,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -591,7 +582,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -648,7 +638,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
@@ -705,7 +694,6 @@ public class TestAbs extends RSBaseCompute {
                 ArgumentsIntUint args = new ArgumentsIntUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
                 boolean valid = true;
