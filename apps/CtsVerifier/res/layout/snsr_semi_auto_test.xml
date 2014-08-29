@@ -16,26 +16,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" >
 
-    <TextView android:id="@+id/log_text"
-              android:layout_height="0dp"
-              android:layout_width="wrap_content"
-              android:layout_weight="1"
-              android:layout_gravity="bottom"
-              android:paddingBottom="5dip"
-              android:paddingLeft="10dip"
-              android:paddingRight="10dip"
-              android:paddingTop="5dip"
-              android:scrollbars="vertical"
-            />
+    <ScrollView android:id="@+id/log_scroll_view"
+        android:layout_height="0dp"
+        android:layout_width="wrap_content"
+        android:layout_weight="1" >
 
-    <Button android:id="@+id/next_button"
-            android:layout_gravity="center_horizontal"
-            android:layout_height="wrap_content"
+        <LinearLayout android:id="@+id/log_layout"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:paddingBottom="5dip"
-            android:text="@string/next_button_text"
-            />
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/snsr_view_padding_bottom"
+        android:paddingTop="@dimen/snsr_view_padding_top" >
+
+        <Button android:id="@+id/next_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/next_button_text" />
+
+    </LinearLayout>
 
 </LinearLayout>

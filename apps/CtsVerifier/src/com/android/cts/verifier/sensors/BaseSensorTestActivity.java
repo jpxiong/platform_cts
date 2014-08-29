@@ -33,13 +33,11 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.Settings;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.lang.reflect.InvocationTargetException;
@@ -73,7 +71,8 @@ public abstract class BaseSensorTestActivity
     protected final SensorFeaturesDeactivator mSensorFeaturesDeactivator;
     private final Semaphore mSemaphore = new Semaphore(0);
 
-    private TextView mLogView;
+    private ScrollView mLogScrollView;
+    private LinearLayout mLogLayout;
     private View mNextView;
     private Thread mWorkerThread;
 
@@ -97,10 +96,10 @@ public abstract class BaseSensorTestActivity
         super.onCreate(savedInstanceState);
         setContentView(mLayoutId);
 
-        mLogView = (TextView) this.findViewById(R.id.log_text);
-        mNextView = this.findViewById(R.id.next_button);
+        mLogScrollView = (ScrollView) findViewById(R.id.log_scroll_view);
+        mLogLayout = (LinearLayout) findViewById(R.id.log_layout);
+        mNextView = findViewById(R.id.next_button);
         mNextView.setOnClickListener(this);
-        mLogView.setMovementMethod(new ScrollingMovementMethod());
 
         updateButton(false /*enabled*/);
         mWorkerThread = new Thread(this);
@@ -133,6 +132,8 @@ public abstract class BaseSensorTestActivity
             logTestDetails(testDetails.result, testDetails.summary);
             overallTestResults.append(testDetails.toString() + "\n");
         }
+        appendText(R.string.snsr_test_complete);
+
         // log to screen and save the overall test summary (activity level)
         SensorTestDetails testDetails = getOverallTestDetails();
         logTestDetails(testDetails.result, testDetails.summary);
@@ -146,7 +147,6 @@ public abstract class BaseSensorTestActivity
             Log.e(LOG_TAG, "An error occurred on Activity CleanUp.", e);
         }
 
-        appendText(R.string.snsr_test_complete);
         waitForUser();
         finish();
     }
@@ -195,33 +195,36 @@ public abstract class BaseSensorTestActivity
     }
 
     private void logTestDetails(SensorTestResult testResult, String testSummary) {
-        int textColor;
+        int textViewResId;
+        int testResultResId;
         int logPriority;
-        String testResultString;
         switch(testResult) {
             case SKIPPED:
-                textColor = Color.YELLOW;
+                textViewResId = R.layout.snsr_warning;
+                testResultResId = R.string.snsr_test_skipped;
                 logPriority = Log.INFO;
-                testResultString = getString(R.string.snsr_test_skipped);
                 break;
             case PASS:
-                textColor = Color.GREEN;
+                textViewResId = R.layout.snsr_success;
+                testResultResId = R.string.snsr_test_pass;
                 logPriority = Log.DEBUG;
-                testResultString = getString(R.string.snsr_test_pass);
                 break;
             case FAIL:
-                textColor = Color.RED;
+                textViewResId = R.layout.snsr_error;
+                testResultResId = R.string.snsr_test_fail;
                 logPriority = Log.ERROR;
-                testResultString = getString(R.string.snsr_test_fail);
                 break;
             default:
                 throw new InvalidParameterException("Unrecognized testResult.");
         }
         if (TextUtils.isEmpty(testSummary)) {
-            testSummary = testResultString;
+            testSummary = getString(testResultResId);
         }
-        appendText("\n" + testSummary, textColor);
         Log.println(logPriority, LOG_TAG, testSummary);
+
+        TextAppender textAppender = new TextAppender(textViewResId);
+        textAppender.setText(testSummary);
+        textAppender.append();
     }
 
     /**
@@ -240,29 +243,36 @@ public abstract class BaseSensorTestActivity
      */
     protected void activityCleanUp() throws Throwable {}
 
+    @Deprecated
     protected void appendText(int resId, int textColor) {
-        appendText(getString(resId), textColor);
+        appendText(resId);
     }
 
     @Deprecated
     protected void appendText(String text, int textColor) {
-        this.runOnUiThread(new TextAppender(mLogView, text, textColor));
+        appendText(text);
     }
 
+    @Deprecated
     protected void appendText(int resId) {
-        appendText(getString(resId));
+        TextAppender textAppender = new TextAppender(R.layout.snsr_instruction);
+        textAppender.setText(resId);
+        textAppender.append();
     }
 
     @Deprecated
     protected void appendText(String text) {
-        this.runOnUiThread(new TextAppender(mLogView, text));
+        TextAppender textAppender = new TextAppender(R.layout.snsr_instruction);
+        textAppender.setText(text);
+        textAppender.append();
     }
 
+    @Deprecated
     protected void clearText() {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mLogView.setText("");
+                mLogLayout.removeAllViews();
             }
         });
     }
@@ -333,10 +343,14 @@ public abstract class BaseSensorTestActivity
 
     private SensorTestDetails executeTest(Method testMethod) {
         SensorTestDetails testDetails = new SensorTestDetails();
-        testDetails.name = String.format("%s#%s", getTestClassName(), testMethod.getName());
+        String testMethodName = testMethod.getName();
+        testDetails.name = String.format("%s#%s", getTestClassName(), testMethodName);
 
         try {
-            appendText(getString(R.string.snsr_executing_test, testDetails.name));
+            TextAppender textAppender = new TextAppender(R.layout.snsr_test_title);
+            textAppender.setText(testMethodName);
+            textAppender.append();
+
             testDetails.summary = (String) testMethod.invoke(this);
             testDetails.result = SensorTestResult.PASS;
             ++mTestPassedCounter;
@@ -387,29 +401,34 @@ public abstract class BaseSensorTestActivity
         return mTestClass.getName();
     }
 
-    private class TextAppender implements Runnable {
+    private class TextAppender {
         private final TextView mTextView;
-        private final SpannableStringBuilder mMessageBuilder;
 
-        public TextAppender(TextView textView, String message, int textColor) {
-            mTextView = textView;
-            mMessageBuilder = new SpannableStringBuilder(message + "\n");
-
-            ForegroundColorSpan colorSpan = new ForegroundColorSpan(textColor);
-            mMessageBuilder.setSpan(
-                    colorSpan,
-                    0 /*start*/,
-                    message.length(),
-                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        public TextAppender(int textViewResId) {
+            mTextView = (TextView) getLayoutInflater().inflate(textViewResId, null /* viewGroup */);
         }
 
-        public TextAppender(TextView textView, String message) {
-            this(textView, message, textView.getCurrentTextColor());
+        public void setText(String text) {
+            mTextView.setText(text);
         }
 
-        @Override
-        public void run() {
-            mTextView.append(mMessageBuilder);
+        public void setText(int textResId) {
+            mTextView.setText(textResId);
+        }
+
+        public void append() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLogLayout.addView(mTextView);
+                    mLogScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLogScrollView.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+                }
+            });
         }
     }
 
