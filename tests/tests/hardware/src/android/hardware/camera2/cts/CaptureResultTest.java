@@ -188,15 +188,21 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 for (int frame = 0; frame < NUM_FRAMES_TESTED; frame++) {
                     Pair<TotalCaptureResult, List<CaptureResult>> resultPair =
                             listener.getCaptureResultPairs(WAIT_FOR_RESULT_TIMOUT_MS);
-                    if (resultPair.second == null) {
+
+                    List<CaptureResult> partialResults = resultPair.second;
+
+                    if (partialResults == null) {
                         // HAL only sends total result is legal
-                        continue;
+                        partialResults = new ArrayList<>();
                     }
+
+                    TotalCaptureResult totalResult = resultPair.first;
+
                     mCollector.expectLessOrEqual("Too many partial results",
-                            partialResultCount, resultPair.second.size());
+                            partialResultCount, partialResults.size());
                     Set<CaptureResult.Key<?>> appearedPartialKeys =
                             new HashSet<CaptureResult.Key<?>>();
-                    for (CaptureResult partialResult : resultPair.second) {
+                    for (CaptureResult partialResult : partialResults) {
                         List<CaptureResult.Key<?>> partialKeys = partialResult.getKeys();
                         mCollector.expectValuesUnique("Partial result keys: ", partialKeys);
                         for (CaptureResult.Key<?> key : partialKeys) {
@@ -207,10 +213,23 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                         }
                         appearedPartialKeys.addAll(partialKeys);
                     }
-                    List<CaptureResult.Key<?>> totalResultKeys = resultPair.first.getKeys();
+
+                    // Test total result against the partial results
+                    List<CaptureResult.Key<?>> totalResultKeys = totalResult.getKeys();
                     mCollector.expectTrue(
-                            "TotalCaptureResult should be a super set of partial capture results",
+                            "TotalCaptureResult must be a super set of partial capture results",
                             totalResultKeys.containsAll(appearedPartialKeys));
+
+                    List<CaptureResult> totalResultPartials = totalResult.getPartialResults();
+                    mCollector.expectEquals("TotalCaptureResult's partial results must match " +
+                            "the ones observed by #onCaptureProgressed",
+                            partialResults, totalResultPartials);
+
+                    if (VERBOSE) {
+                        Log.v(TAG, "testPartialResult - Observed " +
+                                partialResults.size() + "; queried for " +
+                                totalResultPartials.size());
+                    }
                 }
 
                 int errorCode = listener.getErrorCode();
@@ -511,9 +530,9 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
 
         private final LinkedBlockingQueue<Pair<TotalCaptureResult, List<CaptureResult>> > mQueue =
                 new LinkedBlockingQueue<>();
-        private HashMap<CaptureRequest, List<CaptureResult>> mPartialResultsMap =
+        private final HashMap<CaptureRequest, List<CaptureResult>> mPartialResultsMap =
                 new HashMap<CaptureRequest, List<CaptureResult>>();
-        private HashSet<CaptureRequest> completedRequests = new HashSet<>();
+        private final HashSet<CaptureRequest> completedRequests = new HashSet<>();
         private int errorCode = 0;
 
         @Override
