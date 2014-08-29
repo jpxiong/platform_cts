@@ -71,7 +71,7 @@ public class StepCounterTestActivity extends BaseSensorTestActivity implements S
         mSensorStepCounter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mSensorStepDetector = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
-        View screen = findViewById(R.id.log_text);
+        View screen = findViewById(R.id.log_layout);
         screen.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
