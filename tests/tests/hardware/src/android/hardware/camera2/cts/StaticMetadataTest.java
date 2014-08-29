@@ -127,7 +127,16 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
         }
     }
 
-    private void validateRequestKeysPresence(String capabilityName,
+    /**
+     * Check if request keys' presence match expectation.
+     *
+     * @param capabilityName The name string of capability being tested. Used for output messages.
+     * @param requestKeys The capture request keys to be checked
+     * @param expectedPresence Expected presence of {@code requestKeys}. {@code true} for expecting
+     *        all keys are available. Otherwise {@code false}
+     * @return {@code true} if request keys' presence match expectation. Otherwise {@code false}
+     */
+    private boolean validateRequestKeysPresence(String capabilityName,
             List<CaptureRequest.Key<?>> requestKeys, boolean expectedPresence) {
         boolean actualPresence = mStaticInfo.areRequestKeysAvailable(requestKeys);
         if (expectedPresence != actualPresence) {
@@ -140,11 +149,13 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                     }
                 }
             } else {
-                mCollector.addMessage(String.format(
+                Log.w(TAG, String.format(
                         "Camera %s doesn't list capability %s but contain all required keys",
                         mCameraId, capabilityName));
             }
+            return false;
         }
+        return true;
     }
 
     private void validateCapability(Integer capability, boolean isCapabilityAvailable) {
@@ -211,10 +222,11 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_RAW:
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_RAW";
+                boolean rawOutputSupported = mStaticInfo.getRawOutputSizesChecked().length > 0;
                 if (isCapabilityAvailable) {
-                    mCollector.expectGreater(
+                    mCollector.expectTrue(
                             "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
-                            /*expected*/0, mStaticInfo.getRawOutputSizesChecked().length);
+                            rawOutputSupported);
                 }
                 requestKeys.add(CaptureRequest.HOT_PIXEL_MODE);
                 requestKeys.add(CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
@@ -223,7 +235,27 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 capabilityName = "Unknown";
                 Assert.fail(String.format("Unknown capability: %d", capability));
         }
-        validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+        boolean matchExpectation =
+                validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+
+        // In case of isCapabilityAvailable == true, error has been filed in
+        // validateRequestKeysPresence
+        if (!matchExpectation && !isCapabilityAvailable) {
+            if (capability == REQUEST_AVAILABLE_CAPABILITIES_RAW) {
+                // RAW capability needs to also check raw output capability
+                boolean rawOutputSupported = mStaticInfo.getRawOutputSizesChecked().length > 0;
+                if (rawOutputSupported) {
+                    mCollector.addMessage(String.format(
+                            "Camera %s doesn't list capability %s but contain all required keys" +
+                            " and RAW format output",
+                            mCameraId, capabilityName));
+                }
+            } else {
+                mCollector.addMessage(String.format(
+                        "Camera %s doesn't list capability %s but contain all required keys",
+                        mCameraId, capabilityName));
+            }
+        }
     }
 
     /**
