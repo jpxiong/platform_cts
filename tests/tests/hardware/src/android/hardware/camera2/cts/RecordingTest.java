@@ -283,8 +283,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                     prepareRecording(size, videoFramerate, captureRate);
 
-                    // prepare preview surface: preview size is same as video size.
-                    updatePreviewSurface(size);
+                    // prepare preview surface by using video size.
+                    updatePreviewSurfaceWithVideoSize(size);
 
                     // Start recording
                     startSlowMotionRecording(/*useMediaRecorder*/true, videoFramerate, captureRate,
@@ -409,8 +409,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             prepareRecordingWithProfile(profile);
 
-            // prepare preview surface: preview size is same as video size.
-            updatePreviewSurface(videoSz);
+            // prepare preview surface by using video size.
+            updatePreviewSurfaceWithVideoSize(videoSz);
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
@@ -450,8 +450,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             // Use AVC and AAC a/v compression format.
             prepareRecording(sz, VIDEO_FRAME_RATE, VIDEO_FRAME_RATE);
 
-            // prepare preview surface: preview size is same as video size.
-            updatePreviewSurface(sz);
+            // prepare preview surface by using video size.
+            updatePreviewSurfaceWithVideoSize(sz);
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
@@ -550,9 +550,19 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                             " must be one of the camera device supported video size!",
                             mSupportedVideoSizes.contains(videoSz));
 
-            Size videoSnapshotSz = mStaticInfo.isHardwareLevelFull() ?
-                    mOrderedStillSizes.get(0) : // Full device tests largest jpeg size
-                    videoSz;                    // Non-full device tests video size
+            Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+            Size videoSnapshotSz = videoSz;
+            /**
+             * Only test full res snapshot when below conditions are all true.
+             * 1. Camera is a FULL device
+             * 2. video size is up to max preview size, which will be bounded by 1080p.
+             */
+            if (mStaticInfo.isHardwareLevelFull() &&
+                    videoSz.getWidth() <= maxPreviewSize.getWidth() &&
+                    videoSz.getHeight() <= maxPreviewSize.getHeight()) {
+                videoSnapshotSz = mOrderedStillSizes.get(0);
+            }
+
             createImageReader(
                     videoSnapshotSz, ImageFormat.JPEG,
                     MAX_VIDEO_SNAPSHOT_IMAGES, /*listener*/null);
@@ -576,8 +586,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             CaptureRequest.Builder videoSnapshotRequestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
 
-            // prepare preview surface: preview size is same as video size.
-            updatePreviewSurface(videoSz);
+            // prepare preview surface by using video size.
+            updatePreviewSurfaceWithVideoSize(videoSz);
 
             prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
 
@@ -647,6 +657,29 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         requestBuilder.addTarget(mPreviewSurface);
         assertNotNull("Reader surface must be non-null!", mReaderSurface);
         requestBuilder.addTarget(mReaderSurface);
+    }
+
+    /**
+     * Update preview size with video size.
+     *
+     * <p>Preview size will be capped with max preview size.</p>
+     *
+     * @param videoSize The video size used for preview.
+     */
+    private void updatePreviewSurfaceWithVideoSize(Size videoSize) {
+        if (mOrderedPreviewSizes == null) {
+            throw new IllegalStateException("supported preview size list is not initialized yet");
+        }
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        Size previewSize = videoSize;
+        if (videoSize.getWidth() > maxPreviewSize.getWidth() ||
+                videoSize.getHeight() > maxPreviewSize.getHeight()) {
+            Log.w(TAG, "Overwrite preview size from " + videoSize.toString() +
+                    " to " + maxPreviewSize.toString());
+            previewSize = maxPreviewSize;
+        }
+
+        updatePreviewSurface(previewSize);
     }
 
     /**
