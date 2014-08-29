@@ -39,6 +39,8 @@ import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.android.cts.util.TimeoutReq;
+
 public class SensorTest extends AndroidTestCase {
     private SensorManager mSensorManager;
     private TriggerListener mTriggerListener;
@@ -46,8 +48,8 @@ public class SensorTest extends AndroidTestCase {
     private List<Sensor> mSensorList;
     private static final String TAG = "SensorTest";
     // Test only SDK defined sensors. Any sensors with type > 100 are ignored.
-    private static final int MAX_SENSOR_TYPE = 100;
-    private static final int TIMEOUT = 40;
+    private static final int MAX_OFFICIAL_ANDROID_SENSOR_TYPE = 100;
+    private static final long TIMEOUT_TOLERANCE_US = TimeUnit.SECONDS.toMicros(10);
 
     private PowerManager.WakeLock mWakeLock;
 
@@ -138,10 +140,71 @@ public class SensorTest extends AndroidTestCase {
     }
 
     public void testValuesForAllSensors() {
-        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
-            Sensor sensor = mSensorManager.getDefaultSensor(i);
-            if (sensor != null) {
-                assertSensorValues(sensor);
+        for (Sensor sensor : mSensorList) {
+            assertSensorValues(sensor);
+        }
+    }
+
+    private void hasOnlyOneWakeUpSensorOrEmpty(List<Sensor> sensors) {
+        if (sensors == null || sensors.isEmpty()) return;
+        if (sensors.size() > 1) {
+            fail("More than one " + sensors.get(0).getName() + " defined.");
+            return;
+        }
+        assertTrue(sensors.get(0).getName() + " defined as non-wake-up sensor",
+                sensors.get(0).isWakeUpSensor());
+        return;
+    }
+
+    // Some sensors like proximity, significant motion etc. are defined as wake-up sensors by
+    // default. Check if the wake-up flag is set correctly.
+    public void testWakeUpFlags() {
+        final int TYPE_WAKE_GESTURE = 23;
+        final int TYPE_GLANCE_GESTURE = 24;
+        final int TYPE_PICK_UP_GESTURE = 25;
+
+        hasOnlyOneWakeUpSensorOrEmpty(mSensorManager.getSensorList(Sensor.TYPE_SIGNIFICANT_MOTION));
+        hasOnlyOneWakeUpSensorOrEmpty(mSensorManager.getSensorList(TYPE_WAKE_GESTURE));
+        hasOnlyOneWakeUpSensorOrEmpty(mSensorManager.getSensorList(TYPE_GLANCE_GESTURE));
+        hasOnlyOneWakeUpSensorOrEmpty(mSensorManager.getSensorList(TYPE_PICK_UP_GESTURE));
+
+        List<Sensor> proximity_sensors = mSensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
+        if (proximity_sensors.isEmpty()) return;
+        boolean hasWakeUpProximitySensor = false;
+        for (Sensor sensor : proximity_sensors) {
+            if (sensor.isWakeUpSensor()) {
+                hasWakeUpProximitySensor = true;
+                break;
+            }
+        }
+        assertTrue("No wake-up proximity sensors implemented", hasWakeUpProximitySensor);
+    }
+
+    public void testGetDefaultSensorWithWakeUpFlag() {
+        // With wake-up flags set to false, the sensor returned should be a non wake-up sensor.
+        for (Sensor sensor : mSensorList) {
+            Sensor curr_sensor = mSensorManager.getDefaultSensor(sensor.getType(), false);
+            if (curr_sensor != null) {
+                assertFalse("getDefaultSensor wakeup=false returns a wake-up sensor" +
+                        curr_sensor.getName(),
+                        curr_sensor.isWakeUpSensor());
+            }
+
+            curr_sensor = mSensorManager.getDefaultSensor(sensor.getType(), true);
+            if (curr_sensor != null) {
+                assertTrue("getDefaultSensor wake-up returns non wake sensor" +
+                        curr_sensor.getName(),
+                        curr_sensor.isWakeUpSensor());
+            }
+        }
+    }
+
+    public void testSensorStringTypes() {
+        for (Sensor sensor : mSensorList) {
+            if (sensor.getType() < MAX_OFFICIAL_ANDROID_SENSOR_TYPE &&
+                    !sensor.getStringType().startsWith("android.sensor.")) {
+                fail("StringType not set correctly for android defined sensor " +
+                        sensor.getName() + " " + sensor.getStringType());
             }
         }
     }
@@ -188,8 +251,8 @@ public class SensorTest extends AndroidTestCase {
     }
 
     class SensorEventTimeStampListener implements SensorEventListener {
-        SensorEventTimeStampListener(long samplingPeriod, CountDownLatch latch) {
-            mSamplingPeriodNs = samplingPeriod;
+        SensorEventTimeStampListener(long eventReportLatencyNs, CountDownLatch latch) {
+            mEventReportLatencyNs = eventReportLatencyNs;
             mPrevTimeStampNs = -1;
             mLatch = latch;
             numErrors = 0;
@@ -203,25 +266,22 @@ public class SensorTest extends AndroidTestCase {
             }
             long currTimeStampNs = event.timestamp;
             if (currTimeStampNs <= mPrevTimeStampNs) {
-                Log.w(TAG, "Timestamps not monotonically increasing curr_ts=" +
-                        event.timestamp + " prev_ts=" + mPrevTimeStampNs);
+                Log.w(TAG, "Timestamps not monotonically increasing curr_ts_ns=" +
+                        event.timestamp + " prev_ts_ns=" + mPrevTimeStampNs);
                 numErrors++;
+                mPrevTimeStampNs = currTimeStampNs;
                 return;
             }
             mLatch.countDown();
-            if ((double)(currTimeStampNs - mPrevTimeStampNs - mSamplingPeriodNs)/mSamplingPeriodNs
-                    > INTERVAL_ERROR) {
-                Log.w(TAG, "Timestamp Interval error curr=" + currTimeStampNs + " prev_ts="
-                        + mPrevTimeStampNs + " rateNs=" + mSamplingPeriodNs +
-                        " diffNs=" + (currTimeStampNs - mPrevTimeStampNs));
-                numErrors++;
-            }
 
             final long elapsedRealtimeNs = SystemClock.elapsedRealtimeNanos();
-            if (elapsedRealtimeNs - currTimeStampNs > SYNC_TOLERANCE) {
+
+            if (elapsedRealtimeNs - currTimeStampNs > SYNC_TOLERANCE + mEventReportLatencyNs) {
                 Log.w(TAG, "Timestamp sync error elapsedRealTimeNs=" + elapsedRealtimeNs +
-                        " curr_ts=" + currTimeStampNs +
-                        " diff=" + (elapsedRealtimeNs - currTimeStampNs)/1000 + "Us");
+                        " curr_ts_ns=" + currTimeStampNs +
+                        " diff_ns=" + (elapsedRealtimeNs - currTimeStampNs) +
+                        " SYNC_TOLERANCE_NS=" + SYNC_TOLERANCE +
+                        " eventReportLatencyNs=" + mEventReportLatencyNs);
                 numErrors++;
             }
             mPrevTimeStampNs = currTimeStampNs;
@@ -236,51 +296,76 @@ public class SensorTest extends AndroidTestCase {
         }
 
         private int numErrors;
-        private long mSamplingPeriodNs;
+        private long mEventReportLatencyNs;
         private long mPrevTimeStampNs;
-        private final double INTERVAL_ERROR = 0.01; // 1% tolerance for interval_error.
         private final CountDownLatch mLatch;
-        private final long SYNC_TOLERANCE = 3000000000L; // 3 seconds approx.
+        private final long SYNC_TOLERANCE = 500000000L; // 500 milli seconds approx.
     }
 
+    // Register for each sensor and compare the timestamps of SensorEvents that you get with
+    // elapsedRealTimeNano.
+    @TimeoutReq(minutes=60)
     public void testSensorTimeStamps() throws Exception {
-        final CountDownLatch eventReceived = new CountDownLatch(10000);
+        try {
+            mWakeLock.acquire();
+            for (Sensor sensor : mSensorList) {
+                // Skip OEM defined sensors and non continuous sensors.
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
+                    continue;
+                }
 
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (sensor == null) {
-            return;
-        }
-        // SENSOR_DELAY_GAME in nanoseconds
-        final long samplingPeriodNs = 20000000;
-        SensorEventTimeStampListener listener = new SensorEventTimeStampListener(samplingPeriodNs,
-                eventReceived);
+                for (int iterations = 0; iterations < 2; ++iterations) {
+                    // Test in both batch mode and non-batch mode for every sensor.
+                    long maxBatchReportLatencyNs = 10000000000L; // 10 secs
+                    if (iterations % 2 == 0) maxBatchReportLatencyNs = 0;
 
-        boolean result = mSensorManager.registerListener(listener, sensor,
-                SensorManager.SENSOR_DELAY_GAME);
-        assertTrue("Sensor registerListener failed ", result);
+                    final long samplingPeriodNs = 20000000;
+                    // If there is a FIFO and a wake-lock is held, events will be reported when the
+                    // batch timeout expires or when the FIFO is full which ever occurs earlier.
+                    final long eventReportLatencyNs = Math.min(maxBatchReportLatencyNs,
+                            sensor.getFifoMaxEventCount() * samplingPeriodNs);
 
-        // Wait for 300 seconds.
-        boolean countZero = eventReceived.await(300, TimeUnit.SECONDS);
-        if (!countZero) {
-            fail("Timed out waiting for events from " + sensor.getName());
+                    final CountDownLatch eventReceivedLatch = new CountDownLatch(2000);
+                    SensorEventTimeStampListener listener = new SensorEventTimeStampListener(
+                            eventReportLatencyNs, eventReceivedLatch);
+
+                    Log.i(TAG, "Running timeStamp test on " + sensor.getName());
+                    boolean result = mSensorManager.registerListener(listener, sensor,
+                            SensorManager.SENSOR_DELAY_GAME, (int)maxBatchReportLatencyNs/1000);
+                    assertTrue("Sensor registerListener failed ", result);
+
+                    // Wait for 300 seconds.
+                    boolean countZero = eventReceivedLatch.await(300, TimeUnit.SECONDS);
+                    if (!countZero) {
+                        fail("Timed out waiting for events from " + sensor.getName());
+                    }
+                    if (listener.getNumErrors() > 5) {
+                        fail("Check logcat. Timestamp test failed. numErrors=" +
+                                listener.getNumErrors() + " " + sensor.getName() +
+                                " maxBatchReportLatencyNs=" + maxBatchReportLatencyNs +
+                                " samplingPeriodNs=" + samplingPeriodNs);
+                    } else {
+                        Log.i(TAG, "TimeStamp test PASS'd on " + sensor.getName());
+                    }
+                    mSensorManager.unregisterListener(listener);
+                }
+            }
+        } finally {
+            mWakeLock.release();
         }
-        if (listener.getNumErrors() > 5) {
-            fail("Timestamp test failed. " + listener.getNumErrors());
-        }
-        mSensorManager.unregisterListener(listener);
     }
 
-    // Register for updates from each continuous mode sensor, wait for 25 events, call flush and
+    // Register for updates from each continuous mode sensor, wait for N events, call flush and
     // wait for flushCompleteEvent before unregistering for the sensor.
+    @TimeoutReq(minutes=10)
     public void testBatchAndFlush() throws Exception {
         try {
             mWakeLock.acquire();
             for (Sensor sensor : mSensorList) {
-                // Skip OEM defined sensors and trigger sensors.
-                if (sensor.getType() > MAX_SENSOR_TYPE || sensor.getMinDelay() < 0) {
-                    continue;
+                // Skip non-continuos mode sensors.
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
+                    registerListenerCallFlush(sensor, null);
                 }
-                registerListenerCallFlush(sensor, null);
             }
         } finally {
             mWakeLock.release();
@@ -289,6 +374,7 @@ public class SensorTest extends AndroidTestCase {
 
     // Same as testBatchAndFlush but using Handler version of the API to register for sensors.
     // onSensorChanged is now called on a background thread.
+    @TimeoutReq(minutes=10)
     public void testBatchAndFlushWithHandler() throws Exception {
         try {
             mWakeLock.acquire();
@@ -296,8 +382,8 @@ public class SensorTest extends AndroidTestCase {
             handlerThread.start();
             Handler handler = new Handler(handlerThread.getLooper());
             for (Sensor sensor : mSensorList) {
-                // Skip OEM defined sensors and trigger sensors.
-                if (sensor.getType() > MAX_SENSOR_TYPE || sensor.getMinDelay() < 0) {
+                // Skip non-continuous mode sensors.
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
                     continue;
                 }
                 registerListenerCallFlush(sensor, handler);
@@ -309,7 +395,10 @@ public class SensorTest extends AndroidTestCase {
 
     private void registerListenerCallFlush(Sensor sensor, Handler handler)
             throws InterruptedException {
-        final CountDownLatch eventReceived = new CountDownLatch(25);
+        final int numEvents = 500;
+        final int rateUs = 20000; // DELAY_GAME
+        final int maxBatchReportLatencyUs = 10000000;
+        final CountDownLatch eventReceived = new CountDownLatch(numEvents);
         final CountDownLatch flushReceived = new CountDownLatch(1);
         SensorEventListener2 listener = new SensorEventListener2() {
             @Override
@@ -329,14 +418,19 @@ public class SensorTest extends AndroidTestCase {
         // Consider only continuous mode sensors for testing registerListener.
         // For on-change sensors, call registerListener() so that the listener is associated
         // with the sensor so that flush(listener) can be called on it.
-        if (sensor.getMinDelay() >= 0) {
+        if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS ||
+                sensor.getReportingMode() == Sensor.REPORTING_MODE_ON_CHANGE) {
             Log.i(TAG, "testBatch " + sensor.getName());
             boolean result = mSensorManager.registerListener(listener, sensor,
-                    SensorManager.SENSOR_DELAY_NORMAL, 10000000, handler);
+                    rateUs, maxBatchReportLatencyUs, handler);
             assertTrue("registerListener failed " + sensor.getName(), result);
-            // Wait for 25 events or 40 seconds only for continuous mode sensors.
-            if (sensor.getMinDelay() > 0) {
-                boolean countZero = eventReceived.await(TIMEOUT, TimeUnit.SECONDS);
+            // Wait for 500 events or N seconds before the test times out.
+            if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
+                // Wait for approximately the time required to generate these events + a tolerance
+                // of 10 seconds.
+                long timeToWaitUs = (long)numEvents * rateUs + maxBatchReportLatencyUs +
+                        TIMEOUT_TOLERANCE_US;
+                boolean countZero = eventReceived.await(timeToWaitUs, TimeUnit.MICROSECONDS);
                 if (!countZero) {
                     fail("Timed out waiting for events from " + sensor.getName());
                 }
@@ -345,7 +439,7 @@ public class SensorTest extends AndroidTestCase {
         Log.i(TAG, "testFlush " + sensor.getName());
         boolean result = mSensorManager.flush(listener);
         assertTrue("flush failed " + sensor.getName(), result);
-        boolean countZero = flushReceived.await(TIMEOUT, TimeUnit.SECONDS);
+        boolean countZero = flushReceived.await(TIMEOUT_TOLERANCE_US, TimeUnit.MICROSECONDS);
         if (!countZero) {
             fail("Timed out waiting for flushCompleteEvent from " + sensor.getName());
         }
@@ -360,7 +454,10 @@ public class SensorTest extends AndroidTestCase {
         if (numSensors == 0) {
             return;
         }
-        final CountDownLatch eventReceived = new CountDownLatch(numSensors * 50);
+        final int numEvents = 500;
+        final int rateUs = 20000;
+        final int maxBatchReportLatencyUs = 10000000;
+        final CountDownLatch eventReceived = new CountDownLatch(numSensors * numEvents);
         final CountDownLatch flushReceived = new CountDownLatch(numSensors);
         SensorEventListener2 listener = new SensorEventListener2() {
             @Override
@@ -383,7 +480,7 @@ public class SensorTest extends AndroidTestCase {
             StringBuilder registeredSensors = new StringBuilder(30);
             for (Sensor sensor : mSensorList) {
                 // Skip all non-continuous sensors.
-                if (sensor.getMinDelay() <= 0 || sensor.getType() > MAX_SENSOR_TYPE) {
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
                     continue;
                 }
                 boolean result = mSensorManager.registerListener(listener, sensor,
@@ -400,14 +497,15 @@ public class SensorTest extends AndroidTestCase {
             }
 
             Log.i(TAG, "testBatchAndFlushWithMutipleSensors " + registeredSensors);
-            // Wait for numSensors * 50 events or 40 seconds.
-            boolean countZero = eventReceived.await(TIMEOUT, TimeUnit.SECONDS);
+            long timeToWaitUs = (long)numEvents * rateUs + maxBatchReportLatencyUs +
+                    TIMEOUT_TOLERANCE_US;
+            boolean countZero = eventReceived.await(timeToWaitUs, TimeUnit.MICROSECONDS);
             if (!countZero) {
                 fail("Timed out waiting for events from " + registeredSensors.toString());
             }
             boolean result = mSensorManager.flush(listener);
             assertTrue("flush failed " + registeredSensors.toString(), result);
-            countZero = flushReceived.await(TIMEOUT, TimeUnit.SECONDS);
+            countZero = flushReceived.await(TIMEOUT_TOLERANCE_US, TimeUnit.MICROSECONDS);
             if (!countZero) {
                 fail("Timed out waiting for flushCompleteEvent from " +
                       registeredSensors.toString());
@@ -427,6 +525,12 @@ public class SensorTest extends AndroidTestCase {
         assertTrue(sensor.getVersion() > 0);
         assertTrue(sensor.getFifoMaxEventCount() >= 0);
         assertTrue(sensor.getFifoReservedEventCount() >= 0);
+        if (sensor.getReportingMode() == Sensor.REPORTING_MODE_ONE_SHOT) {
+            assertTrue("One shot sensors should have zero FIFO Size",
+                    sensor.getFifoMaxEventCount() == 0);
+            assertTrue("One shot sensors should have zero FIFO Size",
+                    sensor.getFifoReservedEventCount() == 0);
+        }
     }
 
     @SuppressWarnings("deprecation")
