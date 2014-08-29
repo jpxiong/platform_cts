@@ -584,6 +584,11 @@ public class Camera2SurfaceViewTestCase extends
         }
     }
 
+    /**
+     * Update the preview surface size.
+     *
+     * @param size The preview size to be updated.
+     */
     protected void updatePreviewSurface(Size size) {
         if (size.equals(mPreviewSize) && mPreviewSurface != null) {
             Log.w(TAG, "Skipping update preview surface size...");
