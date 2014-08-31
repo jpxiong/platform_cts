@@ -28,5 +28,13 @@
     "org.apache.harmony.jpda.tests.jdwp.VirtualMachine.ReleaseEventsTest#testReleaseEvents001"
   ],
   bug: 16720689
+},
+{
+  description: "A few WebGL tests are known to fail in WebView",
+  names: [
+    "android.webgl.cts.WebGLTest#test_conformance_textures_texture_npot_video_html",
+    "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_html"
+  ],
+  bug: 14639928
 }
 ]
