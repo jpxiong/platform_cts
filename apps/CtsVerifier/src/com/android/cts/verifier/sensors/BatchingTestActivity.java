@@ -96,44 +96,44 @@ public class BatchingTestActivity extends BaseSensorTestActivity implements Sens
     }
 
     public String testProximity() throws Throwable {
-        return runTest(Sensor.TYPE_PROXIMITY, R.string.snsr_batching_interrupt_needed);
+        return runTest(Sensor.TYPE_PROXIMITY, R.string.snsr_interaction_needed);
     }
 
     public String testLight() throws Throwable {
-        return runTest(Sensor.TYPE_LIGHT, R.string.snsr_batching_interrupt_needed);
+        return runTest(Sensor.TYPE_LIGHT, R.string.snsr_interaction_needed);
     }
 
     // TODO: move sensors that do not require interaction to CTS
     public String testGameRotationVector() throws Throwable {
-        return runTest(Sensor.TYPE_GAME_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_GAME_ROTATION_VECTOR, R.string.snsr_no_interaction);
     }
 
     public String testGeomagneticRotationVector() throws Throwable {
-        return runTest(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, R.string.snsr_no_interaction);
     }
 
     public String testAccelerometer() throws Throwable {
-        return runTest(Sensor.TYPE_ACCELEROMETER, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_ACCELEROMETER, R.string.snsr_no_interaction);
     }
 
     public String testGyroscope() throws Throwable {
-        return runTest(Sensor.TYPE_GYROSCOPE, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_GYROSCOPE, R.string.snsr_no_interaction);
     }
 
     public String testGyroscopeUncalibrated() throws Throwable {
-        return runTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, R.string.snsr_no_interaction);
     }
 
     public String testMagneticField() throws Throwable {
-        return runTest(Sensor.TYPE_MAGNETIC_FIELD, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_MAGNETIC_FIELD, R.string.snsr_no_interaction);
     }
 
     public String testMagneticFieldUncalibrated() throws Throwable {
-        return runTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, R.string.snsr_no_interaction);
     }
 
     public String testRotationVector() throws Throwable {
-        return runTest(Sensor.TYPE_ROTATION_VECTOR, R.string.snsr_batching_no_interaction);
+        return runTest(Sensor.TYPE_ROTATION_VECTOR, R.string.snsr_no_interaction);
     }
 
     // TODO: split batching and flush scenarios
