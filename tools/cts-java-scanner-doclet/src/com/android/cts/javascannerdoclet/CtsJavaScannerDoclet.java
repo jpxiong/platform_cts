@@ -96,7 +96,7 @@ public class CtsJavaScannerDoclet extends Doclet {
                         AnnotationDesc[] annotations = method.annotations();
                         for (AnnotationDesc annot : annotations) {
                             String atype = annot.annotationType().toString();
-                            if (atype.equals("android.cts.util.TimeoutReq")) {
+                            if (atype.equals("com.android.cts.util.TimeoutReq")) {
                                 ElementValuePair[] cpairs = annot.elementValues();
                                 for (ElementValuePair pair : cpairs) {
                                     AnnotationTypeElementDoc elem = pair.element();
