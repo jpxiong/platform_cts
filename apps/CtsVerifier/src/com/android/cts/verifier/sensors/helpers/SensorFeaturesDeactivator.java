@@ -42,8 +42,12 @@ public class SensorFeaturesDeactivator {
     private final SensorSettingContainer mAirplaneMode;
     private final SensorSettingContainer mScreenBrightnessMode;
     private final SensorSettingContainer mAutoRotateScreenMode;
+    private final SensorSettingContainer mKeepScreenOnMode;
     private final SensorSettingContainer mLocationMode;
 
+    /**
+     * The handler is a facade for the Activity making use of the {@link SensorFeaturesDeactivator}.
+     */
     public interface ActivityHandler {
         ContentResolver getContentResolver();
         void logInstructions(int instructionsResId, Object ... params);
@@ -57,6 +61,7 @@ public class SensorFeaturesDeactivator {
         mAirplaneMode = new AirplaneModeSettingContainer();
         mScreenBrightnessMode = new ScreenBrightnessModeSettingContainer();
         mAutoRotateScreenMode = new AutoRotateScreenModeSettingContainer();
+        mKeepScreenOnMode = new KeepScreenOnModeSettingContainer();
         mLocationMode = new LocationModeSettingContainer();
     }
 
@@ -66,6 +71,7 @@ public class SensorFeaturesDeactivator {
         mAirplaneMode.requestToSetMode(true);
         mScreenBrightnessMode.requestToSetMode(false);
         mAutoRotateScreenMode.requestToSetMode(false);
+        mKeepScreenOnMode.requestToSetMode(false);
         mLocationMode.requestToSetMode(false);
 
         // TODO: try to use adb shell dumpsys sensorservice to find out if there are clients still
@@ -81,6 +87,7 @@ public class SensorFeaturesDeactivator {
         mAirplaneMode.requestToResetMode();
         mScreenBrightnessMode.requestToResetMode();
         mAutoRotateScreenMode.requestToResetMode();
+        mKeepScreenOnMode.requestToResetMode();
         mLocationMode.requestToResetMode();
     }
 
@@ -134,6 +141,7 @@ public class SensorFeaturesDeactivator {
         mScreenBrightnessMode.captureInitialState();
         mAutoRotateScreenMode.captureInitialState();
         mLocationMode.captureInitialState();
+        mKeepScreenOnMode.captureInitialState();
         mScreenOffTimeoutInMs = getScreenOffTimeoutInMs();
 
         mInitialStateCaptured = true;
@@ -202,6 +210,22 @@ public class SensorFeaturesDeactivator {
                     mActivityHandler.getContentResolver(),
                     Settings.System.ACCELEROMETER_ROTATION,
                     0 /* default */);
+        }
+    }
+
+    private class KeepScreenOnModeSettingContainer extends SensorSettingContainer {
+        public KeepScreenOnModeSettingContainer() {
+            super(mActivityHandler,
+                    Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS,
+                    R.string.snsr_setting_keep_screen_on);
+        }
+
+        @Override
+        protected int getSettingMode() {
+            return Settings.Global.getInt(
+                    mActivityHandler.getContentResolver(),
+                    Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
+                    0);
         }
     }
 

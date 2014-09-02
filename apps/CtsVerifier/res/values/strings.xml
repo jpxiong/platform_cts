@@ -436,7 +436,10 @@
 
     <!-- Strings to interact with users in Sensor Tests -->
     <string name="snsr_test_play_sound">A sound will be played once the verification is complete...</string>
+    <string name="snsr_no_interaction">Leave the device on top of a flat surface.</string>
+    <string name="snsr_interaction_needed">Once the test begins, you will have to wave your hand over the front of the device.</string>
     <string name="snsr_device_steady">Keep the device steady.</string>
+    <string name="snsr_keep_device_rotating_clockwise">Once the test begins, you will have to keep rotating the device clockwise.</string>
     <string name="snsr_wait_for_user">Press \'Next\' to continue.</string>
     <string name="snsr_on_complete_return">After completing the task, go back to this test.</string>
     <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
@@ -447,6 +450,7 @@
     <string name="snsr_setting_airplane_mode">Airplane mode</string>
     <string name="snsr_setting_screen_brightness_mode">Adaptive Brightness</string>
     <string name="snsr_setting_auto_rotate_screen_mode">Auto-rotate screen</string>
+    <string name="snsr_setting_keep_screen_on">Stay awake</string>
     <string name="snsr_setting_location_mode">Location</string>
     <string name="snsr_setting_auto_screen_off_mode">Display Sleep</string>
 
@@ -480,6 +484,8 @@
     <string name="snsr_gyro_rotate_left_side">Rotate the device on its left side until it stands on its side.</string>
     <string name="snsr_gyro_rotate_top_side">Rotate the device on its top side until it stands perpendicular.</string>
     <string name="snsr_gyro_rotate_bottom_side">Rotate the device on its bottom side util it stands perpendicular.</string>
+    <string name="snsr_gyro_rotate_clockwise_integration">Once you begin the test, you will need
+            to rotate the device %1$f degrees counter-clockwise.</string>
 
     <!-- Heart Rate -->
     <string name="snsr_heartrate_test">Heart Rate Test</string>
@@ -498,15 +504,16 @@
     <!-- Sensor Value Accuracy -->
     <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
     <string name="snsr_rot_vec_test">Rotation Vector Accuracy Test</string>
+    <string name="snsr_collected_events_length">Sensor(%2$s). Collected events expected to be greater than zero. Found=%1$d.</string>
     <string name="snsr_event_length">Sensor(%3$s). Event values expected to have size=%1$d. Found=%2$d</string>
+    <string name="snsr_event_length_positive">Sensor(%2$s). Event values expected to have size > 0. Found=%1$d</string>
     <string name="snsr_event_value">Sensor(%3$s). Event value[0] expected to be of value=%1$f. Found=%2$f</string>
     <string name="snsr_event_time">Sensor(%3$s). Event timestamp expected to be at=%1$d. Found=%2$d. Delta=%3$d. Threshold=%4$d.</string>
+    <string name="snsr_event_time_positive">Sensor(%2$s). Event timestamp expected to positive (> 0). Found=%1$d.</string>
 
     <!-- Sensor Batching -->
     <string name="snsr_batch_test">Sensor Batching Tests</string>
     <string name="snsr_batching_walking_needed">Once the test begins, you will have to walk.</string>
-    <string name="snsr_batching_interrupt_needed">Once the test begins, you will have to wave your  hand over the front of the device.</string>
-    <string name="snsr_batching_no_interaction">Leave the device on top of a flat surface.</string>
     <string name="snsr_batching_fifo_count">FifoReservedEventCount=%1$d. Expected to be at most FifoMaxEventCount=%2$d.</string>
     <string name="snsr_batching_first_event_arrival">Batched events expected to arrive after %1$d ns. Found=%2$d ns.</string>
     <string name="snsr_batching_flush_complete">Event \'onFlushComplete\' expected. Found=%1$b.</string>
