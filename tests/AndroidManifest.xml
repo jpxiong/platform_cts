@@ -141,8 +141,10 @@
         <uses-feature android:name="android.hardware.camera" />
     </feature-group>
 
+    <!-- maxRecents=1 keeps the recents list from filling memory with thumbnails -->
     <application android:label="Android TestCase"
                 android:icon="@drawable/size_48x48"
+                android:maxRecents="1"
                 android:multiArch="true"
                 android:name="android.app.cts.MockApplication"
                 android:supportsRtl="true">
