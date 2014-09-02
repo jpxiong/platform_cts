@@ -25,8 +25,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetFileDescriptor;
 import android.cts.util.PollingCheck;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.mtp.MtpConstants;
@@ -440,7 +442,32 @@ public class MediaScannerTest extends AndroidTestCase {
             new MediaScanEntry(R.raw.hebrew,
                     new String[] {"אריק סיני", "", null, "לי ולך", null } ),
             new MediaScanEntry(R.raw.hebrew2,
-                    new String[] {"הפרוייקט של עידן רייכל", "Untitled - 11-11-02 (9)", null, "בואי", null } )
+                    new String[] {"הפרוייקט של עידן רייכל", "Untitled - 11-11-02 (9)", null, "בואי", null } ),
+            new MediaScanEntry(R.raw.iso88591_3,
+                    new String[] {"Mobilé", "Kartographie", null, "Zu Wenig", null }),
+            new MediaScanEntry(R.raw.iso88591_4,
+                    new String[] {"Mobilé", "Kartographie", null, "Rotebeetesalat (Igel Stehlen)", null }),
+            new MediaScanEntry(R.raw.iso88591_5,
+                    new String[] {"The Creatures", "Hai! [UK Bonus DVD] Disc 1", "The Creatures", "Imagoró", null }),
+            new MediaScanEntry(R.raw.iso88591_6,
+                    new String[] {"¡Forward, Russia!", "Give Me a Wall", "Forward Russia", "Fifteen, Pt. 1", "Canning/Nicholls/Sarah Nicolls/Woodhead"}),
+            new MediaScanEntry(R.raw.iso88591_7,
+                    new String[] {"Björk", "Homogenic", "Björk", "Jòga", "Björk/Sjòn"}),
+            // this one has a genre of "Indé" which confused the detector
+            new MediaScanEntry(R.raw.iso88591_8,
+                    new String[] {"The Black Heart Procession", "3", null, "A Heart Like Mine", null}),
+            new MediaScanEntry(R.raw.iso88591_9,
+                    new String[] {"DJ Tiësto", "Just Be", "DJ Tiësto", "Adagio For Strings", "Samuel Barber"}),
+            new MediaScanEntry(R.raw.iso88591_10,
+                    new String[] {"Ratatat", "LP3", null, "Bruleé", null}),
+            new MediaScanEntry(R.raw.iso88591_11,
+                    new String[] {"Sempé", "Le Petit Nicolas vol. 1", null, "Les Cow-Boys", null}),
+            new MediaScanEntry(R.raw.iso88591_12,
+                    new String[] {"UUVVWWZ", "UUVVWWZ", null, "Neolaño", null}),
+            new MediaScanEntry(R.raw.iso88591_13,
+                    new String[] {"Michael Bublé", "Crazy Love", "Michael Bublé", "Haven't Met You Yet", null}),
+            new MediaScanEntry(R.raw.utf16_1,
+                    new String[] {"Shakira", "Latin Mix USA", "Shakira", "Estoy Aquí", null})
     };
 
     public void testEncodingDetection() throws Exception {
@@ -490,6 +517,31 @@ public class MediaScannerTest extends AndroidTestCase {
                     MediaStore.Audio.Media.DATA + "=?", new String[] {path});
 
             c.close();
+
+            // also test with the MediaMetadataRetriever API
+            MediaMetadataRetriever woodly = new MediaMetadataRetriever();
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(entry.res);
+            woodly.setDataSource(afd.getFileDescriptor(),
+                    afd.getStartOffset(), afd.getDeclaredLength());
+
+            String[] actual = new String[5];
+            actual[0] = woodly.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            actual[1] = woodly.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            actual[2] = woodly.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+            actual[3] = woodly.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            actual[4] = woodly.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER);
+
+            for (int j = 0; j < 5; j++) {
+                if ("".equals(entry.tags[j])) {
+                    // retriever doesn't insert "unknown artist" and such, it just returns null
+                    assertNull("retriever: unexpected non-null for entry " + i + " field " + j,
+                            actual[j]);
+                } else {
+                    Log.i("@@@", "tags: @@" + entry.tags[j] + "@@" + actual[j] + "@@");
+                    assertEquals("retriever: mismatch on entry " + i + " field " + j,
+                            entry.tags[j], actual[j]);
+                }
+            }
         }
     }
 
