@@ -510,10 +510,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isPerFrameControlSupported()) {
-                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
-                    continue;
-                }
 
                 digitalZoomPreviewCombinationTestByCamera();
             } finally {
