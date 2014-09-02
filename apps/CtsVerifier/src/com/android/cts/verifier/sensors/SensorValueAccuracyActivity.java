@@ -16,347 +16,302 @@
 
 package com.android.cts.verifier.sensors;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.cts.verifier.R;
 
 import junit.framework.Assert;
-import android.annotation.TargetApi;
+
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.hardware.cts.helpers.TestSensorEvent;
-import android.os.Build;
-import android.os.Bundle;
+import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.hardware.cts.helpers.sensorverification.ISensorVerification;
+import android.hardware.cts.helpers.sensorverification.MagnitudeVerification;
 import android.os.SystemClock;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 /**
- * Activity that verifies sensor event quality. Sensors will be verified with
- * different requested data rates. Also sensor events will be verified while
- * other sensors are also active.
+ * Activity that verifies sensor event quality. Sensors will be verified with different requested
+ * data rates. Also sensor events will be verified while other sensors are also active.
  */
-@TargetApi(Build.VERSION_CODES.KITKAT)
-public class SensorValueAccuracyActivity extends
-        BaseSensorSemiAutomatedTestActivity implements SensorEventListener {
+public class SensorValueAccuracyActivity
+        extends BaseSensorTestActivity
+        implements SensorEventListener {
+    public SensorValueAccuracyActivity() {
+        super(SensorValueAccuracyActivity.class);
+    }
 
-    private final int DATA_COLLECTION_TIME_IN_MS = 500;
-    private final int SENSOR_RATE = SensorManager.SENSOR_DELAY_FASTEST;
-    private final float MAX_ERROR_ACCELEROMETER = 0.5f; // about 5% of g
-    private final float MAX_ERROR_GYROSCOPE = 0.02f; // about 1dps
-    private final float RANGE_ATMOSPHERIC_PRESSURE = 35f;
-    private final float AMBIENT_TEMPERATURE_MIN = 15f;
-    private final float AMBIENT_TEMPERATURE_MAX = 30f;
-    private final float PROXIMITY_MIN = 0f;
-    private final float PROXIMITY_MAX = 100f;
+    private static final int EVENTS_TO_COLLECT = 100;
+    private static final int SENSOR_RATE = SensorManager.SENSOR_DELAY_FASTEST;
 
-    private SensorManager mSensorManager = null;
-    private List<TestSensorEvent> mSensorEvents = new ArrayList<TestSensorEvent>();
-    private static Set<Integer> mCompletedTests = new HashSet<Integer>();
-    private boolean alreadyWarned = false;
+    private static final float MAGNETIC_FIELD_CALIBRATED_UNCALIBRATED_THRESHOLD_UT = 1f;
+    private static final float GYROSCOPE_CALIBRATED_UNCALIBRATED_THRESHOLD_RAD_SEC = 0.01f;
+
+    private static final float RANGE_ATMOSPHERIC_PRESSURE = 35f;
+    private static final float AMBIENT_TEMPERATURE_AVERAGE = 22.5f;
+    private static final float AMBIENT_TEMPERATURE_THRESHOLD = 7.5f;
+    private static final float PROXIMITY_AVERAGE = 50f;
+    private static final float PROXIMITY_THRESHOLD = 50f;
+    private static final double ONE_HUNDRED_EIGHTY_DEGREES = 180.0f;
+
+    private static final double GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES = 10.0f;
+
+    private SensorManager mSensorManager;
+
+    private final List<TestSensorEvent> mSensorEvents = new ArrayList<TestSensorEvent>();
 
     @Override
-    protected void onRun() throws Throwable {
-        List<Sensor> supportedTests = new ArrayList<Sensor>();
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD));
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE));
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE));
-
-        appendText("Place device on a level surface and click 'Next' to start.");
-        waitForUser();
-
-        for (Sensor ssr : supportedTests) {
-            if (ssr == null) {
-                continue;
-            }
-            appendText(String.format("\nSensor %s", ssr.getName()));
-            testSensorAccuracy(ssr);
-            appendText("Passed");
-        }
-        appendText("Stationary tests passed\n", Color.GREEN);
-
-        supportedTests.clear();
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY));
-        supportedTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
-        appendText("Wave hand over the proximity sensor (usually near top front of device)"
-                + " and click 'Next' to start");
-        waitForUser();
-
-        for (Sensor ssr : supportedTests) {
-            if (ssr == null) {
-                continue;
-            }
-            appendText(String.format("\nSensor %s", ssr.getName()));
-            testSensorAccuracy(ssr);
-            appendText("Passed");
-        }
-        appendText("Proximity and light tests passed\n", Color.GREEN);
-
-        appendText("Place device on a level surface, click 'Next', then rotate device "
-                + "180 degrees counter-clockwise.");
-        appendText("Finally click 'Next' when done rotating.");
-        waitForUser();
-
-        testMagGyroAdditional();
-        appendText("All sensor value accuracy tests passed", Color.GREEN);
+    protected void activitySetUp() {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mSensorManager = (SensorManager) getApplicationContext()
-                .getSystemService(Context.SENSOR_SERVICE);
+    // TODO: move tests without interaction to CTS
+    public String testPressure() throws Throwable {
+        return verifySensorNorm(
+                Sensor.TYPE_PRESSURE,
+                R.string.snsr_no_interaction,
+                SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
+                RANGE_ATMOSPHERIC_PRESSURE);
     }
 
-    private void testSensorAccuracy(Sensor ssr) throws Throwable {
-        int sensorType = ssr.getType();
-        String sensorName = ssr.getName();
-        if (!mCompletedTests.contains(sensorType)) {
-            startDataCollection(ssr);
-
-            Thread.sleep(DATA_COLLECTION_TIME_IN_MS);
-            stopDataCollection();
-
-            // No need to synchronize because events arrive as they are sampled
-            analyzeData(sensorType, sensorName);
-            mCompletedTests.add(sensorType);
-        }
+    public String testAmbientTemperature() throws Throwable {
+        return verifySensorNorm(
+                Sensor.TYPE_AMBIENT_TEMPERATURE,
+                R.string.snsr_no_interaction,
+                AMBIENT_TEMPERATURE_AVERAGE,
+                AMBIENT_TEMPERATURE_THRESHOLD);
     }
 
-    private void testMagGyroAdditional() throws Throwable {
-        List<Sensor> additionalTests = new ArrayList<Sensor>();
-        additionalTests.add(mSensorManager
-                .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED));
-        additionalTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD));
-        additionalTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED));
-        additionalTests.add(mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
-        for (Sensor ssr : additionalTests) {
-            if (ssr == null) {
-                continue;
-            }
-            startDataCollection(ssr);
+    // TODO: add support for proximity and light to test operations and add test cases here
+
+    // TODO: remove from here, refactor and merge with gyroscope and magnetic field tests
+    public String testMagneticFieldCalibratedUncalibrated() throws Throwable {
+        return verifyCalibratedUncalibrated(
+                Sensor.TYPE_MAGNETIC_FIELD,
+                Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+                MAGNETIC_FIELD_CALIBRATED_UNCALIBRATED_THRESHOLD_UT);
+    }
+
+    public String testGyroscopeCalibratedUncalibrated() throws Throwable {
+        appendText(R.string.snsr_keep_device_rotating_clockwise);
+        return verifyCalibratedUncalibrated(
+                Sensor.TYPE_GYROSCOPE,
+                Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
+                GYROSCOPE_CALIBRATED_UNCALIBRATED_THRESHOLD_RAD_SEC);
+    }
+
+    /**
+     * Verifies that the measurements of the gyroscope correspond to predefined angular positions.
+     * The test uses a routine to integrate gyroscope's readings on a predefined rotation to
+     * ensure that it corresponds to the expected angular position.
+     */
+    // TODO: refactor the integration routine into a SensorTestVerification
+    // TODO: use the new verification in GyroscopeMeasurement tests
+    public String testGyroscopeIntegration() throws Throwable {
+        Sensor gyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        if (gyroscope == null) {
+            throw new SensorNotSupportedException(Sensor.TYPE_GYROSCOPE);
         }
+
+        appendText(R.string.snsr_no_interaction);
+        String rotationInstructions = getString(
+                R.string.snsr_gyro_rotate_clockwise_integration,
+                ONE_HUNDRED_EIGHTY_DEGREES);
+        appendText(rotationInstructions);
         waitForUser();
+
+        startDataCollection(gyroscope);
+        appendText(R.string.snsr_test_play_sound);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(10));
         stopDataCollection();
-        analyzeMagGyro();
+        playSound();
+
+        // run the verification
+        double integratedGyroscope = 0;
+        long lastTimestamp = 0;
+        for (TestSensorEvent event : mSensorEvents) {
+            float[] eventValues = event.values.clone();
+            long eventTimestamp = event.timestamp;
+            if (lastTimestamp != 0) {
+                long timeDeltaNs = eventTimestamp - lastTimestamp;
+                long nanosecondsInOneSecond = TimeUnit.SECONDS.toNanos(1);
+                integratedGyroscope += eventValues[2] * timeDeltaNs / nanosecondsInOneSecond;
+            }
+            lastTimestamp = eventTimestamp;
+        }
+        integratedGyroscope = Math.toDegrees(integratedGyroscope);
+
+        String integrationMessage = String.format(
+                "Gyroscope integration expected to be=%fdeg. Found=%fdeg, Tolerance=%fdeg",
+                ONE_HUNDRED_EIGHTY_DEGREES,
+                integratedGyroscope,
+                GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES);
+        Assert.assertEquals(
+                integrationMessage,
+                ONE_HUNDRED_EIGHTY_DEGREES,
+                integratedGyroscope,
+                GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES);
+        return integrationMessage;
+    }
+
+    /**
+     * Validates the norm of a sensor.
+     */
+    // TODO: fix up EventOrdering, EventGap and timestamp>0 Verifications so they can be added to
+    // this test
+    private String verifySensorNorm(
+            int sensorType,
+            int instructionsResId,
+            float expectedNorm,
+            float threshold) {
+        appendText(instructionsResId);
+        waitForUser();
+
+        TestSensorOperation verifyNormOperation = new TestSensorOperation(
+                getApplicationContext(),
+                sensorType,
+                SENSOR_RATE,
+                0 /* reportLatencyInUs */,
+                EVENTS_TO_COLLECT);
+
+        // TODO: add event ordering and timestamp > 0 verifications
+        ISensorVerification magnitudeVerification =
+                new MagnitudeVerification(expectedNorm, threshold);
+        verifyNormOperation.addVerification(magnitudeVerification);
+
+        verifyNormOperation.execute();
+        return null;
+    }
+
+    /**
+     * Verifies that the relationship between readings from calibrated and their corresponding
+     * uncalibrated sensors comply to the following equation:
+     *      calibrated = uncalibrated - bias
+     *
+     * NOTES:
+     * Currently given that timestamps might not be synchronized, the verification attempts to
+     * 'match' events from both sensors by aligning them to (time delta mean) / 2.
+     *
+     * @param calibratedSensorType The type of the calibrated sensor to verify.
+     * @param uncalibratedSensorType The type of the uncalibrated sensor to verify.
+     * @param threshold The threshold to consider the difference between the equation as
+     *                            acceptable.
+     */
+    // TODO: find a better synchronization mechanism
+    // TODO: revisit the need of a tolerance once a better synchronization mechanism is available
+    // TODO: refactor this function into a Sensor Test Operation / Verification
+    private String verifyCalibratedUncalibrated(
+            int calibratedSensorType,
+            int uncalibratedSensorType,
+            float threshold) throws Throwable {
+        appendText(R.string.snsr_no_interaction);
+        waitForUser();
+
+        Sensor calibratedSensor = mSensorManager.getDefaultSensor(calibratedSensorType);
+        if (calibratedSensor == null) {
+            throw new SensorNotSupportedException(calibratedSensorType);
+        }
+        Sensor uncalibratedSensor = mSensorManager.getDefaultSensor(uncalibratedSensorType);
+        if (uncalibratedSensor == null) {
+            throw new SensorNotSupportedException(uncalibratedSensorType);
+        }
+
+        // collect the required events
+        final long timeout = TimeUnit.SECONDS.toMillis(10);
+        startDataCollection(calibratedSensor);
+        startDataCollection(uncalibratedSensor);
+        appendText(R.string.snsr_test_play_sound);
+        Thread.sleep(timeout);
+        stopDataCollection();
+
+        // create a set of readings for verification
+        float[] calibratedValues = new float[3];
+        long calibratedTimestamp = 0;
+        long timestampDeltaSum = 0;
+        int calibratedEventCount = 0;
+        int uncalibratedEventCount = 0;
+        ArrayList<CalibratedUncalibratedReading> readings =
+                new ArrayList<CalibratedUncalibratedReading>();
+        for (TestSensorEvent event : mSensorEvents) {
+            if (event.sensor.getType() == calibratedSensorType) {
+                calibratedValues = event.values.clone();
+                calibratedTimestamp = event.receivedTimestamp;
+                ++calibratedEventCount;
+            } else if (event.sensor.getType() == uncalibratedSensorType) {
+                float[] uncalibratedValues = event.values.clone();
+                long timestampDelta = event.receivedTimestamp - calibratedTimestamp;
+                timestampDeltaSum += timestampDelta;
+                ++uncalibratedEventCount;
+
+                CalibratedUncalibratedReading reading = new CalibratedUncalibratedReading(
+                        calibratedValues,
+                        uncalibratedValues,
+                        timestampDelta);
+                readings.add(reading);
+            }
+            // TODO: use delayed asserts to log on else clause
+        }
+
+        // verify readings that are under a timestamp synchronization threshold
+        String calibratedEventsMessage = String.format(
+                "Calibrated (%s) events expected. Found=%d.",
+                calibratedSensor.getName(),
+                calibratedEventCount);
+        Assert.assertTrue(calibratedEventsMessage, calibratedEventCount > 0);
+
+        String uncalibratedEventsMessage = String.format(
+                "Uncalibrated (%s) events expected. Found=%d.",
+                uncalibratedSensor.getName(),
+                uncalibratedEventCount);
+        Assert.assertTrue(uncalibratedEventsMessage, uncalibratedEventCount > 0);
+
+        long timestampDeltaMean = timestampDeltaSum / readings.size();
+        long timestampTolerance = timestampDeltaMean / 2;
+        int verifiedEventsCount = 0;
+        for (CalibratedUncalibratedReading reading : readings) {
+            if (reading.timestampDelta < timestampTolerance) {
+                for (int i = 0; i < 3; ++i) {
+                    float calibrated = reading.calibratedValues[i];
+                    float uncalibrated = reading.uncalibratedValues[i];
+                    float bias = reading.uncalibratedValues[i + 3];
+                    String message = String.format(
+                            "Calibrated (%s) and Uncalibrated (%s) sensor readings are expected to"
+                                    + " satisfy: calibrated = uncalibrated - bias. Axis=%d,"
+                                    + " Calibrated=%s, Uncalibrated=%s, Bias=%s, Threshold=%s",
+                            calibratedSensor.getName(),
+                            uncalibratedSensor.getName(),
+                            i,
+                            calibrated,
+                            uncalibrated,
+                            bias,
+                            threshold);
+                    Assert.assertEquals(message, calibrated, uncalibrated - bias, threshold);
+                }
+                ++verifiedEventsCount;
+            }
+        }
+
+        playSound();
+        String eventsFoundMessage = String.format(
+                "At least one uncalibrated event expected to be verified. Found=%d.",
+                verifiedEventsCount);
+        Assert.assertTrue(eventsFoundMessage, verifiedEventsCount > 0);
+        return eventsFoundMessage;
     }
 
     private void startDataCollection(Sensor sensorUnderTest) throws Throwable {
-        alreadyWarned = false;
-        appendText(String.format(" Gathering data on %s", sensorUnderTest.getName()));
         mSensorEvents.clear();
         mSensorManager.registerListener(this, sensorUnderTest, SENSOR_RATE);
     }
 
     private void stopDataCollection() {
         mSensorManager.unregisterListener(this);
-    }
-
-    private void assertTrueWarning(String msg, boolean condition) {
-        if (!condition && !alreadyWarned) {
-            appendText(msg, Color.YELLOW);
-            alreadyWarned = true;
-        }
-    }
-
-    private void assertEqualsWarning(String msg, double expected, double actual, double delta) {
-        if (Math.abs(expected - actual) > delta) {
-            appendText(msg + String.format("\nexpected:<%f> but was:<%f>", expected, actual),
-                    Color.YELLOW);
-        }
-    }
-
-    private void analyzeData(int sensorType, String sensorName) {
-        int numberOfCollectedEvents = mSensorEvents.size();
-        appendText(String.format(" Collected %d events", numberOfCollectedEvents));
-
-        if (numberOfCollectedEvents < 1) {
-            appendText("No sensor events collected for " + sensorName, Color.YELLOW);
-        }
-
-        // Tests valid for all sensors:
-        for (int i = 0; i < numberOfCollectedEvents; i++) {
-            TestSensorEvent event = mSensorEvents.get(i);
-            Assert.assertTrue("Data should be present in the sensor event", event.values.length > 0);
-            Assert.assertTrue("Timestamp should be greater then zero", event.timestamp > 0);
-        }
-
-        // Specific tests by sensor type:
-        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-            double norm = 0;
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                norm += Math.sqrt(event.values[0] * event.values[0] +
-                        event.values[1] * event.values[1] +
-                        event.values[2] * event.values[2]);
-            }
-            norm /= numberOfCollectedEvents;
-
-            // Suggested tolerance gets a warning (for now) and required
-            // tolerance is an assert
-            assertEqualsWarning(String.format("Not within suggested tolerance of %f m/s/s",
-                    MAX_ERROR_ACCELEROMETER / 10.), SensorManager.GRAVITY_EARTH, norm,
-                    MAX_ERROR_ACCELEROMETER / 10.f);
-            Assert.assertEquals(String.format("Not within required tolerance of %6.4f m/s/s",
-                    MAX_ERROR_ACCELEROMETER), SensorManager.GRAVITY_EARTH, norm,
-                    MAX_ERROR_ACCELEROMETER);
-        } else if (sensorType == Sensor.TYPE_MAGNETIC_FIELD) {
-            double norm = 0;
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                norm += Math.sqrt(event.values[0] * event.values[0] +
-                        event.values[1] * event.values[1] +
-                        event.values[2] * event.values[2]);
-            }
-            norm /= numberOfCollectedEvents;
-            assertTrueWarning(String.format("Magnetic field strength should be greater than %f"
-                    + " but value %f was detected", SensorManager.MAGNETIC_FIELD_EARTH_MIN,
-                    norm), norm > SensorManager.MAGNETIC_FIELD_EARTH_MIN);
-            assertTrueWarning(String.format("Magnetic field strength should be less than %f"
-                    + " but value %f was detected", SensorManager.MAGNETIC_FIELD_EARTH_MAX,
-                    norm), norm < SensorManager.MAGNETIC_FIELD_EARTH_MAX);
-
-        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            double norm = 0;
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                norm += Math.sqrt(event.values[0] * event.values[0] +
-                        event.values[1] * event.values[1] +
-                        event.values[2] * event.values[2]);
-            }
-            norm /= numberOfCollectedEvents;
-
-            // Suggested tolerance gets a warning (for now) and required
-            // tolerance is an assert
-            assertEqualsWarning(
-                    String.format("Not within tolerance of %f rps", MAX_ERROR_GYROSCOPE / 10.),
-                    0.0f, norm, MAX_ERROR_GYROSCOPE / 10.);
-            Assert.assertEquals(
-                    String.format("Not within tolerance of %f rps", MAX_ERROR_GYROSCOPE),
-                    0.0f, norm, MAX_ERROR_GYROSCOPE);
-        } else if (sensorType == Sensor.TYPE_PRESSURE) {
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                float norm = event.values[0];
-                float minAtmosphericPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE
-                        - RANGE_ATMOSPHERIC_PRESSURE;
-                float maxAtmosphericPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE
-                        + RANGE_ATMOSPHERIC_PRESSURE;
-                assertTrueWarning(String.format("Barometer should be greater than %f"
-                        + " but value %f was detected", minAtmosphericPressure, norm),
-                        norm > minAtmosphericPressure);
-                assertTrueWarning(String.format("Barometer should be less than %f"
-                        + " but value %f was detected", maxAtmosphericPressure, norm),
-                        norm < maxAtmosphericPressure);
-            }
-        } else if (sensorType == Sensor.TYPE_AMBIENT_TEMPERATURE) {
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                float norm = event.values[0];
-                assertTrueWarning(String.format("Ambient Temperature should be greater than %f"
-                        + " but value %f was detected", AMBIENT_TEMPERATURE_MIN, norm),
-                        norm > AMBIENT_TEMPERATURE_MIN);
-                assertTrueWarning(String.format("Ambient Temperature should be less than %f"
-                        + " but value %f was detected", AMBIENT_TEMPERATURE_MAX, norm),
-                        norm < AMBIENT_TEMPERATURE_MAX);
-            }
-        } else if (sensorType == Sensor.TYPE_PROXIMITY) {
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                float norm = event.values[0];
-                assertTrueWarning(String.format("Proximity should be greater than %f"
-                        + " but value %f was detected", PROXIMITY_MIN, norm),
-                        norm > PROXIMITY_MIN);
-                assertTrueWarning(String.format("Proximity should be less than %f"
-                        + " but value %f was detected", PROXIMITY_MAX, norm),
-                        norm < PROXIMITY_MAX);
-            }
-        } else if (sensorType == Sensor.TYPE_LIGHT) {
-            for (int i = 0; i < numberOfCollectedEvents; i++) {
-                TestSensorEvent event = mSensorEvents.get(i);
-
-                float norm = event.values[0];
-                assertTrueWarning(String.format("Light readings should be greater than %f"
-                        + " but value %f was detected", 0.0f, norm), norm > 0.0f);
-                assertTrueWarning(String.format("Light readings should be less than %f"
-                        + " but value %f was detected", SensorManager.LIGHT_SUNLIGHT_MAX,
-                        norm), norm < SensorManager.LIGHT_SUNLIGHT_MAX);
-            }
-        }
-    }
-
-    private float[] gyrval = new float[3];
-    private float[] magval = new float[3];
-    private double gyrTime = 0, magTime = 0;
-    private final double ONE_HUNDRED_EIGHTY_DEGREES = 180.0f;
-    private final double INTEGRATION_TOLERANCE_DEGREES = 10.0f;
-    // TODO: remove these two tolerances once event.timestamp is consistent in
-    // implementations and can compare sample to sample exactly
-    private final long TIMESTAMP_TOLERANCE = 30000L;
-    private final double MAG_VALUE_TOLERANCE = 3.0f;
-
-    private void analyzeMagGyro() {
-        int numberOfCollectedEvents = mSensorEvents.size();
-        int numberOfUncalGyroEvents = 0, numberOfUncalMagEvents = 0;
-        double integratedGyro = 0;
-        for (int i = 0; i < numberOfCollectedEvents; i++) {
-            TestSensorEvent event = mSensorEvents.get(i);
-            if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-                gyrval = event.values.clone();
-                if (gyrTime != 0) {
-                    integratedGyro += gyrval[2] * (event.receivedTimestamp - gyrTime) / 1e9;
-                }
-                gyrTime = event.receivedTimestamp;
-            }
-            if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE_UNCALIBRATED) {
-                float[] uncalGyrval = event.values.clone();
-                if ((event.receivedTimestamp - gyrTime) < TIMESTAMP_TOLERANCE) {
-                    for (int j = 0; j < 3; j++) {
-                        Assert.assertEquals("Uncalibrated and calibrated gyroscope do not match",
-                                gyrval[j], uncalGyrval[j] - uncalGyrval[j + 3]);
-                    }
-                    numberOfUncalGyroEvents++;
-                }
-            }
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                magval = event.values.clone();
-                magTime = event.receivedTimestamp;
-            }
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED) {
-                float[] uncalMagval = event.values.clone();
-                if ((event.receivedTimestamp - magTime) < TIMESTAMP_TOLERANCE) {
-                    for (int j = 0; j < 3; j++) {
-                        Assert.assertEquals(
-                                "Uncalibrated and calibrated magnetic field do not match",
-                                magval[j], uncalMagval[j] - uncalMagval[j + 3], MAG_VALUE_TOLERANCE);
-                    }
-                    numberOfUncalMagEvents++;
-                }
-            }
-        }
-        if (numberOfUncalMagEvents > 0) {
-            appendText("Calibrated and Uncalibrated MAGNETIC_FIELD agree\n", Color.GREEN);
-        }
-        if (numberOfUncalGyroEvents > 0) {
-            appendText("Calibrated and Uncalibrated GYROSCOPE agree\n", Color.GREEN);
-        }
-        if (integratedGyro > 0) {
-            integratedGyro = Math.toDegrees(integratedGyro);
-            Assert.assertEquals("Gyroscope integration not as expected.  Check gyroscope scale, ",
-                    ONE_HUNDRED_EIGHTY_DEGREES, integratedGyro, INTEGRATION_TOLERANCE_DEGREES);
-            appendText("Gyroscope scale is within tolerance\n", Color.GREEN);
-        }
     }
 
     @Override
@@ -368,4 +323,18 @@ public class SensorValueAccuracyActivity extends
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    private class CalibratedUncalibratedReading {
+        public final float[] calibratedValues;
+        public final float[] uncalibratedValues;
+        public final long timestampDelta;
+
+        public CalibratedUncalibratedReading(
+                float[] calibratedValues,
+                float[] uncalibratedValues,
+                long timestampDelta) {
+            this.calibratedValues = calibratedValues;
+            this.uncalibratedValues = uncalibratedValues;
+            this.timestampDelta = timestampDelta;
+        }
+    }
 }
