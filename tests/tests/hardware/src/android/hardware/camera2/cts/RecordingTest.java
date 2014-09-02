@@ -55,7 +55,7 @@ import java.util.List;
 public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "RecordingTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final boolean DEBUG_DUMP = false;
+    private static final boolean DEBUG_DUMP = Log.isLoggable(TAG, Log.DEBUG);
     private static final int RECORDING_DURATION_MS = 2000;
     private static final int DURATION_MARGIN_MS = 400;
     private static final int FRAME_DURATION_ERROR_TOLERANCE_MS = 3;
