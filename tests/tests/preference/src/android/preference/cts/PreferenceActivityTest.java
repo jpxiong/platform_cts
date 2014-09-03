@@ -16,7 +16,7 @@
 
 package android.preference.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.preference.R;
 
 import android.content.Intent;
 import android.preference.PreferenceActivity;
@@ -25,12 +25,12 @@ import android.preference.PreferenceScreen;
 import android.test.ActivityInstrumentationTestCase2;
 
 public class PreferenceActivityTest
-        extends ActivityInstrumentationTestCase2<PreferenceStubActivity> {
+        extends ActivityInstrumentationTestCase2<PreferenceCtsActivity> {
 
     private PreferenceActivity mActivity;
 
     public PreferenceActivityTest() {
-        super(PreferenceStubActivity.class);
+        super(PreferenceCtsActivity.class);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PreferenceActivityTest
     public void testAddPreferencesFromIntent() {
         assertNull(mActivity.findPreference("check_box_preference_from_intent"));
 
-        Intent intent = new Intent(mActivity, PreferenceStubActivity.class);
+        Intent intent = new Intent(mActivity, PreferenceCtsActivity.class);
         mActivity.addPreferencesFromIntent(intent);
 
         assertNotNull(mActivity.findPreference("check_box_preference_from_intent"));
