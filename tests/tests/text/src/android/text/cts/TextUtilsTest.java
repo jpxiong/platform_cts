@@ -2089,117 +2089,40 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(LAYOUT_DIRECTION_LTR,
                 TextUtils.getLayoutDirectionFromLocale(Locale.TRADITIONAL_CHINESE));
 
-        Locale locale = new Locale("ar");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "AE");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "BH");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "DZ");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "EG");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "IQ");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "JO");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "KW");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "LB");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "LY");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "MA");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "OM");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "QA");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "SA");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "SD");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "SY");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "TN");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ar", "YE");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
+        // Some languages always use an RTL script.
+        for (Locale l : Locale.getAvailableLocales()) {
+            String languageCode = l.getLanguage();
+            if (languageCode.equals("ar") ||
+                    languageCode.equals("fa") ||
+                    languageCode.equals("iw") ||
+                    languageCode.equals("he") ||
+                    languageCode.equals("ps") ||
+                    languageCode.equals("ur")) {
+                int direction = TextUtils.getLayoutDirectionFromLocale(l);
+                assertEquals(l.toLanguageTag() + " not RTL: " + direction,
+                             LAYOUT_DIRECTION_RTL, direction);
+            }
+        }
 
-        locale = new Locale("fa");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("fa", "AF");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("fa", "IR");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-
-        locale = new Locale("iw");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("iw", "IL");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("he");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("he", "IL");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-
-        locale = new Locale("pa_Arab");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("pa_Arab", "PK");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-
-        locale = new Locale("ps");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ps", "AF");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-
-        locale = new Locale("ur");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ur", "IN");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("ur", "PK");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-
-        locale = new Locale("uz_Arab");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
-        locale = new Locale("uz_Arab", "AF");
-        assertEquals(LAYOUT_DIRECTION_RTL,
-                TextUtils.getLayoutDirectionFromLocale(locale));
+        // Other languages have some cases where they use an RTL script.
+        String[] tags = {
+            "pa-Arab",
+            "pa-Arab-PK",
+            "ps",
+            "ps-AF",
+            "uz-Arab",
+            "uz-Arab-AF",
+        };
+        for (String tag : tags) {
+            Locale l = Locale.forLanguageTag(tag);
+            int direction = TextUtils.getLayoutDirectionFromLocale(l);
+            assertEquals(l.toLanguageTag() + " not RTL: " + direction,
+                         LAYOUT_DIRECTION_RTL, direction);
+        }
 
         // Locale without a real language
-        locale = new Locale("zz");
+        Locale locale = Locale.forLanguageTag("zz");
         assertEquals(LAYOUT_DIRECTION_LTR,
                 TextUtils.getLayoutDirectionFromLocale(locale));
-    }}
+    }
+}
