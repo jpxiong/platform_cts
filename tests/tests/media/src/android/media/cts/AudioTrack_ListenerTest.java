@@ -22,6 +22,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.AudioTrack.OnPlaybackPositionUpdateListener;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.test.AndroidTestCase;
 
@@ -42,24 +43,44 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         }
     };
     private final int mMinBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-    private AudioTrack mAudioTrack = new AudioTrack(TEST_STREAM_TYPE1, TEST_SR, TEST_CONF,
-            TEST_FORMAT, 2 * mMinBuffSize, TEST_MODE);
+    private AudioTrack mAudioTrack;
     private OnPlaybackPositionUpdateListener mListener =
                                 new MockOnPlaybackPositionUpdateListener();
+    private MakeSomethingAsynchronouslyAndLoop<AudioTrack> mMakeSomething;
+
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        if (mAudioTrack == null) {
+            mMakeSomething = new MakeSomethingAsynchronouslyAndLoop<AudioTrack>(
+                new MakesSomething<AudioTrack>() {
+                    @Override
+                    public AudioTrack makeSomething()
+                    {
+                        return new AudioTrack(TEST_STREAM_TYPE1, TEST_SR, TEST_CONF,
+                            TEST_FORMAT, 2 * mMinBuffSize, TEST_MODE);
+                    }
+                }
+            );
+            mAudioTrack = mMakeSomething.make();
+        }
+    }
 
     public void testAudioTrackCallback() throws Exception {
         mAudioTrack.setPlaybackPositionUpdateListener(mListener);
-        doTest();
+        doTest(false /*customHandler*/);
     }
 
     public void testAudioTrackCallbackWithHandler() throws Exception {
         mAudioTrack.setPlaybackPositionUpdateListener(mListener, mHandler);
-        doTest();
+        doTest(true /*customHandler*/);
         // ToBeFixed: Handler#handleMessage() is never called
+        // FIXME possibly because the new Handler() is missing the Looper parameter
         assertFalse(mIsHandleMessageCalled);
     }
 
-    private void doTest() throws Exception {
+    private void doTest(boolean customHandler) throws Exception {
         mOnMarkerReachedCalled = false;
         mOnPeriodicNotificationCalled = false;
         byte[] vai = AudioTrackTest.createSoundDataInByteArray(2 * mMinBuffSize, TEST_SR, 1024);
@@ -83,9 +104,93 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         final int bytesPerFrame = numChannels * bytesPerSample;
         final int sampleLengthMs = (int)(1000 * ((float)vai.length / TEST_SR / bytesPerFrame));
         Thread.sleep(sampleLengthMs + 1000);
-        assertTrue(mOnMarkerReachedCalled);
-        assertTrue(mOnPeriodicNotificationCalled);
+        if (!customHandler) {
+            assertTrue(mOnMarkerReachedCalled);
+            assertTrue(mOnPeriodicNotificationCalled);
+        }
         mAudioTrack.stop();
+    }
+
+    // lightweight java.util.concurrent.Future*
+    private static class FutureLatch<T>
+    {
+        private T mValue;
+        private boolean mSet;
+        public void set(T value)
+        {
+            synchronized (this) {
+                assert !mSet;
+                mValue = value;
+                mSet = true;
+                notify();
+            }
+        }
+        public T get()
+        {
+            T value;
+            synchronized (this) {
+                while (!mSet) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        ;
+                    }
+                }
+                value = mValue;
+            }
+            return value;
+        }
+    }
+
+    // represents a factory for T
+    private interface MakesSomething<T>
+    {
+        T makeSomething();
+    }
+
+    // used to construct an object in the context of an asynchronous thread with looper
+    private static class MakeSomethingAsynchronouslyAndLoop<T>
+    {
+        private Thread mThread;
+        volatile private Looper mLooper;
+        private final MakesSomething<T> mWhatToMake;
+
+        public MakeSomethingAsynchronouslyAndLoop(MakesSomething<T> whatToMake)
+        {
+            assert whatToMake != null;
+            mWhatToMake = whatToMake;
+        }
+
+        public T make()
+        {
+            final FutureLatch<T> futureLatch = new FutureLatch<T>();
+            mThread = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    Looper.prepare();
+                    mLooper = Looper.myLooper();
+                    T something = mWhatToMake.makeSomething();
+                    futureLatch.set(something);
+                    Looper.loop();
+                }
+            };
+            mThread.start();
+            return futureLatch.get();
+        }
+        public void join()
+        {
+            mLooper.quit();
+            try {
+                mThread.join();
+            } catch (InterruptedException e) {
+                ;
+            }
+            // avoid dangling references
+            mLooper = null;
+            mThread = null;
+        }
     }
 
     private class MockOnPlaybackPositionUpdateListener
@@ -103,7 +208,13 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        mAudioTrack.release();
+        if (mMakeSomething != null) {
+            mMakeSomething.join();
+        }
+        if (mAudioTrack != null) {
+            mAudioTrack.release();
+            mAudioTrack = null;
+        }
         super.tearDown();
     }
 
