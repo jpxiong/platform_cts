@@ -37,11 +37,11 @@ cts_support_packages := \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
-    CtsHoloDeviceApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
     CtsSomeAccessibilityServices \
     CtsTestStubs \
+    CtsThemeDeviceApp \
     SignatureTest \
     TestDeviceSetup \
     CtsUiAutomatorApp \
@@ -88,7 +88,6 @@ cts_test_packages := \
     CtsGraphicsTestCases \
     CtsGraphics2TestCases \
     CtsHardwareTestCases \
-    CtsHoloTestCases \
     CtsJniTestCases \
     CtsKeystoreTestCases \
     CtsLocationTestCases \
@@ -133,10 +132,10 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
-    CtsHoloHostTestCases \
     CtsHostJank \
     CtsHostUi \
     CtsMonkeyTestCases \
+    CtsThemeHostTestCases \
     CtsUsbTests
 
 # Native test executables that need to have associated test XMLs.
