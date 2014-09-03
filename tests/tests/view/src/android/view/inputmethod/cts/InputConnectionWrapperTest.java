@@ -84,9 +84,8 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         assertTrue(inputConnection.isGetSelectedTextCalled);
         wrapper.setComposingRegion(0, 3);
         assertTrue(inputConnection.isSetComposingRegionCalled);
-        wrapper.requestUpdateCursorAnchorInfo(
-                InputConnection.REQUEST_UPDATE_CURSOR_ANCHOR_INFO_IMMEDIATE);
-        assertTrue(inputConnection.isRequestUpdateCursorAnchorInfoCalled);
+        wrapper.requestCursorUpdates(InputConnection.CURSOR_UPDATE_IMMEDIATE);
+        assertTrue(inputConnection.isRequestCursorUpdatesCalled);
     }
 
     private class MockInputConnection implements InputConnection {
@@ -111,7 +110,7 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         public boolean isSetComposingTextCalled;
         public boolean isSetComposingRegionCalled;
         public boolean isSetSelectionCalled;
-        public boolean isRequestUpdateCursorAnchorInfoCalled;
+        public boolean isRequestCursorUpdatesCalled;
 
         public boolean beginBatchEdit() {
             isBeginBatchEditCalled = true;
@@ -218,9 +217,16 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             return false;
         }
 
-        public boolean requestUpdateCursorAnchorInfo(int cursorUpdateMode) {
-            isRequestUpdateCursorAnchorInfoCalled = true;
+        public boolean requestCursorUpdates(int cursorUpdateMode) {
+            isRequestCursorUpdatesCalled = true;
             return false;
+        }
+
+        /**
+         * @removed
+         */
+        public boolean requestUpdateCursorAnchorInfo(int cursorUpdateMode) {
+            return requestCursorUpdates(cursorUpdateMode);
         }
     }
 }
