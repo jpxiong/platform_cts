@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * - GAME_ROTATION_VECTOR.
  */
 public class RotationVectorTestActivity
-        extends BaseSensorTestActivity
+        extends SensorCtsVerifierTestActivity
         implements SensorEventListener {
     public RotationVectorTestActivity() {
         super(RotationVectorTestActivity.class, R.layout.snsr_rotvec);

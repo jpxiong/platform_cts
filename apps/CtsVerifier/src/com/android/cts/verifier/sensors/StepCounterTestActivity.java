@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -35,7 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class StepCounterTestActivity extends BaseSensorTestActivity implements SensorEventListener {
+public class StepCounterTestActivity
+        extends SensorCtsVerifierTestActivity
+        implements SensorEventListener {
     public StepCounterTestActivity() {
         super(StepCounterTestActivity.class);
     }

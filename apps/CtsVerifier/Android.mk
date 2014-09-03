@@ -23,7 +23,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-Iaidl-files-under, src)
 
-LOCAL_STATIC_JAVA_LIBRARIES := cts-sensors-tests
+LOCAL_STATIC_JAVA_LIBRARIES := cts-sensors-tests ctstestrunner
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
@@ -35,6 +35,8 @@ LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 LOCAL_SDK_VERSION := current
 
 LOCAL_DEX_PREOPT := false
+
+LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
 include $(BUILD_PACKAGE)
 

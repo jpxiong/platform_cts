@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -43,7 +44,9 @@ import java.util.concurrent.TimeUnit;
  * If a sensor supports the batching mode, FifoReservedEventCount for that sensor should be greater
  * than one.
  */
-public class BatchingTestActivity extends BaseSensorTestActivity implements SensorEventListener2 {
+public class BatchingTestActivity
+        extends SensorCtsVerifierTestActivity
+        implements SensorEventListener2 {
     public BatchingTestActivity() {
         super(BatchingTestActivity.class);
     }
@@ -75,14 +78,14 @@ public class BatchingTestActivity extends BaseSensorTestActivity implements Sens
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "BatchingTests");
 
-        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+        deactivateSensorFeatures();
         mWakeLock.acquire();
     }
 
     @Override
     protected void activityCleanUp() throws InterruptedException {
         mWakeLock.release();
-        mSensorFeaturesDeactivator.requestToRestoreFeatures();
+        restoreSensorFeatures();
     }
 
     // TODO: refactor to discover all available sensors of each type and dinamically generate test
