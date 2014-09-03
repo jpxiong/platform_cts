@@ -1216,11 +1216,12 @@ public class AudioTrackTest extends AndroidTestCase {
             AudioTrack.ERROR_BAD_VALUE);
     }
 
-    // Test case 2: getMinBufferSize() return ERROR_BAD_VALUE if SR > 48000
+    // Test case 2: getMinBufferSize() return ERROR_BAD_VALUE if sample rate too high
     public void testGetMinBufferSizeTooHighSR() throws Exception {
         // constant for test
         final String TEST_NAME = "testGetMinBufferSizeTooHighSR";
-        final int TEST_SR = 48001;
+        // FIXME need an API to retrieve AudioTrack.SAMPLE_RATE_HZ_MAX
+        final int TEST_SR = 96001;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT;
 
