@@ -24,7 +24,7 @@ import android.test.AndroidTestCase;
 import android.renderscript.*;
 import android.util.Log;
 
-class RSCppTest extends AndroidTestCase {
+public class RSCppTest extends AndroidTestCase {
 
     Context mCtx;
     Resources mRes;
