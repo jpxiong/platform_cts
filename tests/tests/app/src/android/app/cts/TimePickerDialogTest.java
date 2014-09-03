@@ -85,7 +85,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     public void testOnClick(){
-        mTimePickerDialog.onClick(null, 0);
+        mTimePickerDialog.onClick(null, TimePickerDialog.BUTTON_POSITIVE);
 
         assertEquals(TARGET_HOUR, mCallbackHour);
         assertEquals(TARGET_MINUTE, mCallbackMinute);
