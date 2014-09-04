@@ -16,7 +16,7 @@
 
 package android.security.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.security.R;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
