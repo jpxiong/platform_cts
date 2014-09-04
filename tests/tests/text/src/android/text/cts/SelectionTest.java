@@ -240,14 +240,19 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(4, Selection.getSelectionStart(builder));
         assertEquals(4, Selection.getSelectionEnd(builder));
 
+        // move to beginning of first line (behavior changed in L)
+        assertTrue(Selection.moveUp(builder, layout));
+        assertEquals(0, Selection.getSelectionStart(builder));
+        assertEquals(0, Selection.getSelectionEnd(builder));
+
         assertFalse(Selection.moveUp(builder, layout));
-        assertEquals(4, Selection.getSelectionStart(builder));
-        assertEquals(4, Selection.getSelectionEnd(builder));
+        assertEquals(0, Selection.getSelectionStart(builder));
+        assertEquals(0, Selection.getSelectionEnd(builder));
 
         Selection.setSelection(builder, 5);
-        assertFalse(Selection.moveUp(builder, layout));
-        assertEquals(5, Selection.getSelectionStart(builder));
-        assertEquals(5, Selection.getSelectionEnd(builder));
+        assertTrue(Selection.moveUp(builder, layout));
+        assertEquals(0, Selection.getSelectionStart(builder));
+        assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
     public void testMoveDown() {
@@ -272,9 +277,14 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(14, Selection.getSelectionStart(builder));
         assertEquals(14, Selection.getSelectionEnd(builder));
 
+        // move to end of last line (behavior changed in L)
+        assertTrue(Selection.moveDown(builder, layout));
+        assertEquals(18, Selection.getSelectionStart(builder));
+        assertEquals(18, Selection.getSelectionEnd(builder));
+
         assertFalse(Selection.moveDown(builder, layout));
-        assertEquals(14, Selection.getSelectionStart(builder));
-        assertEquals(14, Selection.getSelectionEnd(builder));
+        assertEquals(18, Selection.getSelectionStart(builder));
+        assertEquals(18, Selection.getSelectionEnd(builder));
 
         Selection.setSelection(builder, 10);
         Selection.moveDown(builder, layout);
