@@ -71,7 +71,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
             public void run() {
                 getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-                
+
                 getActivity().setContentView(mTextView);
                 mTextView.setFocusable(true);
                 mTextView.requestFocus();
@@ -245,12 +245,20 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         // last line
         assertSelection(correspondingIn1stLine);
 
-        assertFalse(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
+        // Move to beginning of first line (behavior changed in L)
+        assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
                 KeyEvent.KEYCODE_DPAD_UP, noMetaEvent));
-        // first lin|e
+        // |first line
         // second line
         // last line
-        assertSelection(correspondingIn1stLine);
+        assertSelection(0);
+
+        assertFalse(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
+                KeyEvent.KEYCODE_DPAD_UP, noMetaEvent));
+        // |first line
+        // second line
+        // last line
+        assertSelection(0);
     }
 
     @UiThreadTest
@@ -321,12 +329,21 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         // last lin|e
         assertSelection(correspondingIn3rdLine);
 
+        // move to end of last line (behavior changed in L)
+        Selection.setSelection(mEditable, END_OF_ALL_TEXT - 1);
+        assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
+                KeyEvent.KEYCODE_DPAD_DOWN, noMetaEvent));
+        // first line
+        // second line
+        // last line|
+        assertSelection(END_OF_ALL_TEXT);
+
         assertFalse(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
                 KeyEvent.KEYCODE_DPAD_DOWN, noMetaEvent));
         // first line
         // second line
-        // last lin|e
-        assertSelection(correspondingIn3rdLine);
+        // last line|
+        assertSelection(END_OF_ALL_TEXT);
     }
 
     @UiThreadTest
