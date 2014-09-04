@@ -126,7 +126,7 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
             // The only error accepted is ERROR_MAX_CAMERAS_IN_USE, which means HAL doesn't support
             // concurrent camera streaming
             assertEquals("Camera device open failed",
-                    CameraDevice.StateListener.ERROR_MAX_CAMERAS_IN_USE, e.getCode());
+                    CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE, e.getCode());
             Log.i(TAG, "Camera HAL does not support dual camera preview. Skip the test");
         } finally {
             for (int i = 0; i < NUM_CAMERAS_TESTED; i++) {

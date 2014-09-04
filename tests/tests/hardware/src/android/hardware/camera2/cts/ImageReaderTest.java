@@ -218,7 +218,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 outputSurfaces.add(yuvSurface);
                 outputSurfaces.add(captureSurface);
                 CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
-                SimpleCaptureListener resultListener = new SimpleCaptureListener();
+                SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
 
                 for (int i = 0; i < NUM_SINGLE_CAPTURE_TESTED; i++) {
                     startCapture(request.build(), /*repeating*/false, resultListener, mHandler);
@@ -278,7 +278,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
 
                 // Start capture.
                 CaptureRequest request = prepareCaptureRequest();
-                SimpleCaptureListener listener = new SimpleCaptureListener();
+                SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 startCapture(request, repeating, listener, mHandler);
 
                 int numFrameVerified = repeating ? NUM_FRAME_VERIFIED : 1;
@@ -305,7 +305,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
      * @param size The capture size.
      * @param listener The capture listener to get capture result callbacks.
      */
-    private void validateCaptureResult(int format, Size size, SimpleCaptureListener listener,
+    private void validateCaptureResult(int format, Size size, SimpleCaptureCallback listener,
             int numFrameVerified) {
         for (int i = 0; i < numFrameVerified; i++) {
             CaptureResult result = listener.getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);

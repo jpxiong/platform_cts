@@ -25,7 +25,7 @@ import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,12 +60,12 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 CaptureRequest.Builder request =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 request.addTarget(surface);
-                CameraCaptureSession.CaptureListener mockCaptureListener =
-                        mock(CameraCaptureSession.CaptureListener.class);
+                CameraCaptureSession.CaptureCallback mockCaptureListener =
+                        mock(CameraCaptureSession.CaptureCallback.class);
 
                 // Check that correct session callback is hit.
-                CameraCaptureSession.StateListener sessionListener =
-                        mock(CameraCaptureSession.StateListener.class);
+                CameraCaptureSession.StateCallback sessionListener =
+                        mock(CameraCaptureSession.StateCallback.class);
                 mCamera.createCaptureSession(surfaces, sessionListener, mHandler);
                 verify(sessionListener, timeout(FAILED_CONFIGURE_TIMEOUT).atLeastOnce()).
                         onConfigureFailed(any(CameraCaptureSession.class));

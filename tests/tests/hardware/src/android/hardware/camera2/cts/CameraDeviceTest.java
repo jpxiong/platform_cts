@@ -17,8 +17,8 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
-import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
+import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
 import static org.mockito.Mockito.*;
 import static android.hardware.camera2.CaptureRequest.*;
 
@@ -40,8 +40,8 @@ import android.util.Log;
 import android.util.Range;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 import com.android.ex.camera2.utils.StateWaiter;
 
 import org.mockito.ArgumentMatcher;
@@ -65,9 +65,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     private CameraCaptureSession mSession;
 
-    private BlockingStateListener mCameraMockListener;
+    private BlockingStateCallback mCameraMockListener;
     private int mLatestDeviceState = STATE_UNINITIALIZED;
-    private BlockingSessionListener mSessionMockListener;
+    private BlockingSessionCallback mSessionMockListener;
     private StateWaiter mSessionWaiter;
     private int mLatestSessionState = -1; // uninitialized
 
@@ -95,7 +95,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
          * Use spy object here since we want to use the SimpleDeviceListener callback
          * implementation (spy doesn't stub the functions unless we ask it to do so).
          */
-        mCameraMockListener = spy(new BlockingStateListener());
+        mCameraMockListener = spy(new BlockingStateCallback());
     }
 
     @Override
@@ -405,7 +405,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         // A cascade of Device->Session->Capture listeners, each of which invokes at least one
         // method on the camera device or session.
 
-        class ChainedCaptureListener extends CameraCaptureSession.CaptureListener {
+        class ChainedCaptureCallback extends CameraCaptureSession.CaptureCallback {
             public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
                     TotalCaptureResult result) {
                 try {
@@ -444,8 +444,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
         }
 
-        class ChainedSessionListener extends CameraCaptureSession.StateListener {
-            private final ChainedCaptureListener mCaptureListener = new ChainedCaptureListener();
+        class ChainedSessionListener extends CameraCaptureSession.StateCallback {
+            private final ChainedCaptureCallback mCaptureCallback = new ChainedCaptureCallback();
 
             public void onConfigured(CameraCaptureSession session) {
                 try {
@@ -456,7 +456,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     session.getDevice();
                     session.abortCaptures();
                     // The important call for the next level of chaining
-                    session.capture(request.build(), mCaptureListener, mHandler);
+                    session.capture(request.build(), mCaptureCallback, mHandler);
                     // Some more calls
                     session.setRepeatingRequest(request.build(),
                             /*listener*/ null, /*handler*/ null);
@@ -479,7 +479,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
         }
 
-        class ChainedCameraListener extends CameraDevice.StateListener {
+        class ChainedCameraListener extends CameraDevice.StateCallback {
             private final ChainedSessionListener mSessionListener = new ChainedSessionListener();
 
             public CameraDevice cameraDevice;
@@ -760,19 +760,19 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(template);
         assertNotNull("Failed to create capture request", requestBuilder);
         requestBuilder.addTarget(mReaderSurface);
-        CameraCaptureSession.CaptureListener mockCaptureListener =
-                mock(CameraCaptureSession.CaptureListener.class);
+        CameraCaptureSession.CaptureCallback mockCaptureCallback =
+                mock(CameraCaptureSession.CaptureCallback.class);
 
         if (VERBOSE) {
             Log.v(TAG, String.format("Capturing shot for device %s, template %d",
                     id, template));
         }
 
-        startCapture(requestBuilder.build(), repeating, mockCaptureListener, mHandler);
+        startCapture(requestBuilder.build(), repeating, mockCaptureCallback, mHandler);
         waitForSessionState(SESSION_ACTIVE, SESSION_ACTIVE_TIMEOUT_MS);
 
         int expectedCaptureResultCount = repeating ? REPEATING_CAPTURE_EXPECTED_RESULT_COUNT : 1;
-        verifyCaptureResults(mockCaptureListener, expectedCaptureResultCount);
+        verifyCaptureResults(mockCaptureCallback, expectedCaptureResultCount);
 
         if (repeating) {
             if (abort) {
@@ -802,18 +802,18 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             requestBuilder.addTarget(mReaderSurface);
             requests.add(requestBuilder.build());
         }
-        CameraCaptureSession.CaptureListener mockCaptureListener =
-                mock(CameraCaptureSession.CaptureListener.class);
+        CameraCaptureSession.CaptureCallback mockCaptureCallback =
+                mock(CameraCaptureSession.CaptureCallback.class);
 
         if (VERBOSE) {
             Log.v(TAG, String.format("Capturing burst shot for device %s", id));
         }
 
         if (!repeating) {
-            mSession.captureBurst(requests, mockCaptureListener, mHandler);
+            mSession.captureBurst(requests, mockCaptureCallback, mHandler);
         }
         else {
-            mSession.setRepeatingBurst(requests, mockCaptureListener, mHandler);
+            mSession.setRepeatingBurst(requests, mockCaptureCallback, mHandler);
         }
         waitForSessionState(SESSION_ACTIVE, SESSION_READY_TIMEOUT_MS);
 
@@ -822,7 +822,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             expectedResultCount *= REPEATING_CAPTURE_EXPECTED_RESULT_COUNT;
         }
 
-        verifyCaptureResults(mockCaptureListener, expectedResultCount);
+        verifyCaptureResults(mockCaptureCallback, expectedResultCount);
 
         if (repeating) {
             if (abort) {
@@ -854,7 +854,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         // Create a new session listener each time, it's not reusable across cameras
-        mSessionMockListener = spy(new BlockingSessionListener());
+        mSessionMockListener = spy(new BlockingSessionCallback());
         mSessionWaiter = mSessionMockListener.getStateWaiter();
 
         List<Surface> outputSurfaces = new ArrayList<>(Arrays.asList(mReaderSurface));
@@ -876,7 +876,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     }
 
     private void verifyCaptureResults(
-            CameraCaptureSession.CaptureListener mockListener,
+            CameraCaptureSession.CaptureCallback mockListener,
             int expectResultCount) {
         final int TIMEOUT_PER_RESULT_MS = 2000;
         // Should receive expected number of capture results.
@@ -1304,11 +1304,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
      *
      * @param request The {@link #CaptureRequest} to be captured.
      * @param repeating If the capture is single capture or repeating.
-     * @param listener The {@link #CaptureListener} camera device used to notify callbacks.
+     * @param listener The {@link #CaptureCallback} camera device used to notify callbacks.
      * @param handler The handler camera device used to post callbacks.
      */
     protected void startCapture(CaptureRequest request, boolean repeating,
-            CameraCaptureSession.CaptureListener listener, Handler handler)
+            CameraCaptureSession.CaptureCallback listener, Handler handler)
                     throws CameraAccessException {
         if (VERBOSE) Log.v(TAG, "Starting capture from session");
 
@@ -1321,7 +1321,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     /**
      * Close a {@link #CameraCaptureSession capture session}; blocking until
-     * the close finishes with a transition to {@link CameraCaptureSession.StateListener#onClosed}.
+     * the close finishes with a transition to {@link CameraCaptureSession.StateCallback#onClosed}.
      */
     protected void closeSession() {
         if (mSession == null) {

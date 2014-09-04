@@ -113,7 +113,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 requestBuilder.addTarget(mReaderSurface);
 
                 // Start capture
-                SimpleCaptureListener captureListener = new SimpleCaptureListener();
+                SimpleCaptureCallback captureListener = new SimpleCaptureCallback();
                 startCapture(requestBuilder.build(), /*repeating*/true, captureListener, mHandler);
 
                 // Get the waived keys for current camera device
@@ -293,10 +293,10 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 multiBuilder.addTarget(previewReader.getSurface());
                 multiBuilder.addTarget(jpegReader.getSurface());
 
-                CaptureListener mockCaptureListener = getMockCaptureListener();
+                CaptureCallback mockCaptureCallback = getMockCaptureListener();
 
                 // Capture targeting only preview
-                Pair<TotalCaptureResult, Long> result = captureAndVerifyResult(mockCaptureListener,
+                Pair<TotalCaptureResult, Long> result = captureAndVerifyResult(mockCaptureCallback,
                         session, previewBuilder.build(), mHandler);
 
                 // Check if all timestamps are the same
@@ -304,7 +304,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                         prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result.second);
 
                 // Capture targeting both jpeg and preview
-                Pair<TotalCaptureResult, Long> result2 = captureAndVerifyResult(mockCaptureListener,
+                Pair<TotalCaptureResult, Long> result2 = captureAndVerifyResult(mockCaptureCallback,
                         session, multiBuilder.build(), mHandler);
 
                 // Check if all timestamps are the same
@@ -319,9 +319,9 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
 
                 // Capture two preview frames
                 long startTime = SystemClock.elapsedRealtimeNanos();
-                Pair<TotalCaptureResult, Long> result3 = captureAndVerifyResult(mockCaptureListener,
+                Pair<TotalCaptureResult, Long> result3 = captureAndVerifyResult(mockCaptureCallback,
                         session, previewBuilder.build(), mHandler);
-                Pair<TotalCaptureResult, Long> result4 = captureAndVerifyResult(mockCaptureListener,
+                Pair<TotalCaptureResult, Long> result4 = captureAndVerifyResult(mockCaptureCallback,
                         session, previewBuilder.build(), mHandler);
                 long clockDiff = SystemClock.elapsedRealtimeNanos() - startTime;
                 long resultDiff = result4.second - result3.second;
@@ -352,7 +352,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 resultImage.getTimestamp(), captureTime);
     }
 
-    private void validateCaptureResult(SimpleCaptureListener captureListener,
+    private void validateCaptureResult(SimpleCaptureCallback captureListener,
             List<CaptureResult.Key<?>> skippedKeys, CaptureRequest.Builder requestBuilder,
             int numFramesVerified) throws Exception {
         CaptureResult result = null;
@@ -524,7 +524,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
      * with multiple handlers.</p>
      * */
     private static class TotalAndPartialResultListener
-            extends CameraCaptureSession.CaptureListener {
+            extends CameraCaptureSession.CaptureCallback {
         static final int ERROR_DUPLICATED_REQUEST = 1 << 0;
         static final int ERROR_WRONG_CALLBACK_ORDER = 1 << 1;
 

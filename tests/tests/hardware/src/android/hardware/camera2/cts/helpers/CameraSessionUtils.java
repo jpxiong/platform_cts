@@ -27,8 +27,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingCaptureListener;
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingCaptureCallback;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import junit.framework.Assert;
@@ -51,7 +51,7 @@ public class CameraSessionUtils extends Assert {
     /**
      * A blocking listener class for synchronously opening and configuring sessions.
      */
-    public static class SessionListener extends BlockingSessionListener {
+    public static class SessionListener extends BlockingSessionCallback {
         private final LinkedBlockingQueue<CameraCaptureSession> mSessionQueue =
                 new LinkedBlockingQueue<>();
 
@@ -91,7 +91,7 @@ public class CameraSessionUtils extends Assert {
     /**
      * A blocking listener class for synchronously capturing and results with a session.
      */
-    public static class CaptureListener extends BlockingCaptureListener {
+    public static class CaptureCallback extends BlockingCaptureCallback {
         private final LinkedBlockingQueue<TotalCaptureResult> mResultQueue =
                 new LinkedBlockingQueue<>();
         private final LinkedBlockingQueue<Long> mCaptureTimeQueue =
@@ -138,14 +138,14 @@ public class CameraSessionUtils extends Assert {
     }
 
     /**
-     * Get a mocked {@link CaptureListener}.
+     * Get a mocked {@link CaptureCallback}.
      */
-    public static CaptureListener getMockCaptureListener() {
-        return spy(new CaptureListener());
+    public static CaptureCallback getMockCaptureListener() {
+        return spy(new CaptureCallback());
     }
 
     /**
-     * Get a mocked {@link CaptureListener}.
+     * Get a mocked {@link CaptureCallback}.
      */
     public static SessionListener getMockSessionListener() {
         return spy(new SessionListener());
@@ -200,7 +200,7 @@ public class CameraSessionUtils extends Assert {
      * {@link CameraTestUtils#CAPTURE_RESULT_TIMEOUT_MS}.
      * </p>
      *
-     * @param listener a {@link CaptureListener} to use for callbacks.
+     * @param listener a {@link CaptureCallback} to use for callbacks.
      * @param session the {@link CameraCaptureSession} to use.
      * @param request the {@link CaptureRequest} to capture with.
      * @param handler the {@link Handler} to call callbacks on.
@@ -209,7 +209,7 @@ public class CameraSessionUtils extends Assert {
      * @throws CameraAccessException if any of the {@link CameraDevice} methods fail.
      * @throws TimeoutRuntimeException if no result was received before the timeout.
      */
-    public static Pair<TotalCaptureResult, Long> captureAndVerifyResult(CaptureListener listener,
+    public static Pair<TotalCaptureResult, Long> captureAndVerifyResult(CaptureCallback listener,
             CameraCaptureSession session, CaptureRequest request, Handler handler)
             throws CameraAccessException {
         checkNotNull(listener);
