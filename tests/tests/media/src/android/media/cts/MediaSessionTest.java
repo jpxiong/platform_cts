@@ -102,12 +102,7 @@ public class MediaSessionTest extends AndroidTestCase {
         } catch (IllegalArgumentException e) {
             // expected
         }
-        VolumeProvider vp = new VolumeProvider(VolumeProvider.VOLUME_CONTROL_FIXED, 11) {
-            @Override
-            public int onGetCurrentVolume() {
-                return 11; // It's bigger than 10
-            }
-        };
+        VolumeProvider vp = new VolumeProvider(VolumeProvider.VOLUME_CONTROL_FIXED, 11, 11) {};
         session.setPlaybackToRemote(vp);
         MediaController.PlaybackInfo info = controller.getPlaybackInfo();
         assertNotNull(info);
