@@ -56,8 +56,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "RecordingTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG_DUMP = Log.isLoggable(TAG, Log.DEBUG);
-    private static final int RECORDING_DURATION_MS = 2000;
-    private static final int DURATION_MARGIN_MS = 400;
+    private static final int RECORDING_DURATION_MS = 3000;
+    private static final int DURATION_MARGIN_MS = 600;
     private static final int FRAME_DURATION_ERROR_TOLERANCE_MS = 3;
     private static final int BIT_RATE_1080P = 16000000;
     private static final int BIT_RATE_MIN = 64000;
@@ -804,6 +804,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             assertTrue("Video size doesn't match, expected " + sz.toString() +
                     " got " + videoSz.toString(), videoSz.equals(sz));
             int duration = mediaPlayer.getDuration();
+            if (VERBOSE) {
+                Log.v(TAG, String.format("Video duration: recorded %dms, expected %dms",
+                                         duration, durationMs));
+            }
 
             // TODO: Don't skip this for video snapshot
             if (!mStaticInfo.isHardwareLevelLegacy()) {
