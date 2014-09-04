@@ -86,6 +86,13 @@ public class PassFailButtons {
 
         /** @return null or details about the test run. */
         String getTestDetails();
+
+        /**
+         * Set the result of the test and finish the activity.
+         *
+         * @param passed Whether or not the test passed.
+         */
+        void setTestResultAndFinish(boolean passed);
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
@@ -138,6 +145,12 @@ public class PassFailButtons {
         public String getTestDetails() {
             return null;
         }
+
+        @Override
+        public void setTestResultAndFinish(boolean passed) {
+            PassFailButtons.setTestResultAndFinishHelper(this, getTestId(), getTestDetails(),
+                    passed);
+        }
     }
 
     public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
@@ -170,6 +183,12 @@ public class PassFailButtons {
         @Override
         public String getTestDetails() {
             return null;
+        }
+
+        @Override
+        public void setTestResultAndFinish(boolean passed) {
+            PassFailButtons.setTestResultAndFinishHelper(this, getTestId(), getTestDetails(),
+                    passed);
         }
     }
 
@@ -204,6 +223,12 @@ public class PassFailButtons {
         @Override
         public String getTestDetails() {
             return null;
+        }
+
+        @Override
+        public void setTestResultAndFinish(boolean passed) {
+            PassFailButtons.setTestResultAndFinishHelper(this, getTestId(), getTestDetails(),
+                    passed);
         }
     }
 
@@ -328,11 +353,11 @@ public class PassFailButtons {
             default:
                 throw new IllegalArgumentException("Unknown id: " + target.getId());
         }
-        setTestResultAndFinish(activity, testId, testDetails, passed);
+        setTestResultAndFinishHelper(activity, testId, testDetails, passed);
     }
 
     /** Set the test result and finish the activity. */
-    public static void setTestResultAndFinish(android.app.Activity activity, String testId,
+    private static void setTestResultAndFinishHelper(android.app.Activity activity, String testId,
             String testDetails, boolean passed) {
         if (passed) {
             TestResult.setPassedResult(activity, testId, testDetails);

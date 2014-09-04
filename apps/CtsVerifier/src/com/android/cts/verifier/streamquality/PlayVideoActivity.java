@@ -118,8 +118,7 @@ public class PlayVideoActivity extends PassFailButtons.Activity
                         .setNegativeButton("Close", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                PassFailButtons.setTestResultAndFinish(PlayVideoActivity.this,
-                                        getTestId(), null, false);
+                                setTestResultAndFinish(false);
                             }
                         })
                         .show();
