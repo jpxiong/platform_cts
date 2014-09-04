@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)http://www.corp.google.com/~vollick/timing-functions.html -->
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript">
+    // Pass the WebGL harness calls through to the native app.
+    webglTestHarness = {
+        notifyFinished: function() {
+            WebGLCallback.notifyFinished();
+        },
+        reportResults: function(success, msg) {
+            WebGLCallback.reportResults(success, msg);
+        },
+    }
+
+    function navigateToTest() {
+        window.open(WebGLCallback.getUrlToTest(), "TestFrame");
+    }
+    window.addEventListener('load', navigateToTest, false);
+</script>
+
+<style type="text/css">
+body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+#content { position:absolute; left: 0; right: 0; bottom: 0; top: 0px; }
+</style>
+
+</head>
+
+<body>
+  <div id="content">
+    <iframe name="TestFrame" width="100%" height="100%" frameborder="0"/>
+  </div>
+</body>
+</html>
