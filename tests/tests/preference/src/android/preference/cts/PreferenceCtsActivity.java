@@ -18,5 +18,5 @@ package android.preference.cts;
 
 import android.preference.PreferenceActivity;
 
-public class PreferenceStubActivity extends PreferenceActivity {
+public class PreferenceCtsActivity extends PreferenceActivity {
 }
