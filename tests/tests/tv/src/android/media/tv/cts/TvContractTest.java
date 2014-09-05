@@ -27,14 +27,12 @@ import android.graphics.BitmapFactory;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
-import android.os.RemoteException;
 import android.test.AndroidTestCase;
 
 import com.android.cts.tv.R;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * Test for {@link android.media.tv.TvContract}.

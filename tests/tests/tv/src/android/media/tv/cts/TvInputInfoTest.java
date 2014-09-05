@@ -52,7 +52,7 @@ public class TvInputInfoTest extends AndroidTestCase {
         if (!Utils.hasTvInputFramework(getContext())) {
             return;
         }
-        Intent intent = mStubInfo.getIntentForSettingsActivity();
+        Intent intent = mStubInfo.createSettingsIntent();
 
         assertEquals(intent.getComponent(), new ComponentName(getContext(),
                 TvInputSettingsActivityStub.class));
@@ -64,7 +64,7 @@ public class TvInputInfoTest extends AndroidTestCase {
         if (!Utils.hasTvInputFramework(getContext())) {
             return;
         }
-        Intent intent = mStubInfo.getIntentForSetupActivity();
+        Intent intent = mStubInfo.createSetupIntent();
 
         assertEquals(intent.getComponent(), new ComponentName(getContext(),
                 TvInputSetupActivityStub.class));

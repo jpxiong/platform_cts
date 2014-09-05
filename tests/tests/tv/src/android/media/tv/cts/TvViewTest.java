@@ -21,15 +21,14 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.cts.util.PollingCheck;
 import android.database.Cursor;
-import android.test.ActivityInstrumentationTestCase2;
-import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
-import android.media.tv.cts.Utils;
+import android.media.tv.TvView.TvInputCallback;
 import android.net.Uri;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.ArrayMap;
 import android.util.SparseIntArray;
 import android.view.InputEvent;
@@ -54,13 +53,13 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     private Instrumentation mInstrumentation;
     private TvInputManager mManager;
     private TvInputInfo mStubInfo;
-    private final MockListener mListener = new MockListener();
+    private final MockCallback mCallback = new MockCallback();
 
-    private static class MockListener extends TvView.TvInputListener {
+    private static class MockCallback extends TvInputCallback {
         private final Map<String, Boolean> mVideoAvailableMap = new ArrayMap<>();
         private final Map<String, SparseIntArray> mSelectedTrackGenerationMap = new ArrayMap<>();
         private final Map<String, Integer> mTracksGenerationMap = new ArrayMap<>();
-        private Object mLock = new Object();
+        private final Object mLock = new Object();
 
         public boolean isVideoAvailable(String inputId) {
             synchronized (mLock) {
@@ -77,13 +76,6 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                     return 0;
                 }
                 return selectedTrackGenerationMap.get(type, 0);
-            }
-        }
-
-        public int getTrackGeneration(String inputId) {
-            synchronized (mLock) {
-                Integer tracksGeneration = mTracksGenerationMap.get(inputId);
-                return tracksGeneration == null ? 0 : tracksGeneration.intValue();
             }
         }
 
@@ -159,7 +151,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
             }
         }
         assertNotNull(mStubInfo);
-        mTvView.setTvInputListener(mListener);
+        mTvView.setCallback(mCallback);
     }
 
     @Override
@@ -203,7 +195,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 new PollingCheck(TIME_OUT) {
                     @Override
                     protected boolean check() {
-                        return mListener.isVideoAvailable(mStubInfo.getId());
+                        return mCallback.isVideoAvailable(mStubInfo.getId());
                     }
                 }.run();
 
@@ -223,13 +215,13 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
 
     private void selectTrackAndVerify(final int type, final TvTrackInfo track,
             List<TvTrackInfo> tracks) {
-        final int previousGeneration = mListener.getSelectedTrackGeneration(
+        final int previousGeneration = mCallback.getSelectedTrackGeneration(
                 mStubInfo.getId(), type);
         mTvView.selectTrack(type, track == null ? null : track.getId());
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.getSelectedTrackGeneration(
+                return mCallback.getSelectedTrackGeneration(
                         mStubInfo.getId(), type) > previousGeneration;
             }
         }.run();
@@ -304,7 +296,6 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 final int[] types = { TvTrackInfo.TYPE_AUDIO, TvTrackInfo.TYPE_VIDEO,
                     TvTrackInfo.TYPE_SUBTITLE };
                 for (int type : types) {
-                    final int typeF = type;
                     for (TvTrackInfo track : mTvView.getTracks(type)) {
                         selectTrackAndVerify(type, track, tracks);
                     }
@@ -355,7 +346,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
             new PollingCheck(TIME_OUT) {
                 @Override
                 protected boolean check() {
-                    return mListener.isVideoAvailable(mStubInfo.getId());
+                    return mCallback.isVideoAvailable(mStubInfo.getId());
                 }
             }.run();
         }
