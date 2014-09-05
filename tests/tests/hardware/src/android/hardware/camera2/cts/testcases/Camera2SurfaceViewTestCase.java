@@ -17,7 +17,7 @@
 package android.hardware.camera2.cts.testcases;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.STATE_CLOSED;
 
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
@@ -33,7 +33,7 @@ import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
@@ -43,13 +43,13 @@ import android.util.Size;
 import android.util.Range;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
-import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ import java.util.List;
  *
  * <p>This class encapsulates the SurfaceView based preview common functionalities.
  * The setup and teardown of CameraManager, test HandlerThread, Activity, Camera IDs
- * and CameraStateListener are handled in this class. Some basic preview related utility
+ * and CameraStateCallback are handled in this class. Some basic preview related utility
  * functions are provided to facilitate the derived preview-based test classes.
  * </p>
  */
@@ -85,8 +85,8 @@ public class Camera2SurfaceViewTestCase extends
     protected String[] mCameraIds;
     protected HandlerThread mHandlerThread;
     protected Handler mHandler;
-    protected BlockingStateListener mCameraListener;
-    protected BlockingSessionListener mSessionListener;
+    protected BlockingStateCallback mCameraListener;
+    protected BlockingSessionCallback mSessionListener;
     protected CameraErrorCollector mCollector;
     // Per device fields:
     protected StaticMetadata mStaticInfo;
@@ -110,7 +110,7 @@ public class Camera2SurfaceViewTestCase extends
     protected void setUp() throws Exception {
         /**
          * Set up the camera preview required environments, including activity,
-         * CameraManager, HandlerThread, Camera IDs, and CameraStateListener.
+         * CameraManager, HandlerThread, Camera IDs, and CameraStateCallback.
          */
         super.setUp();
         mContext = getActivity();
@@ -128,7 +128,7 @@ public class Camera2SurfaceViewTestCase extends
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
+        mCameraListener = new BlockingStateCallback();
         mCollector = new CameraErrorCollector();
     }
 
@@ -164,7 +164,7 @@ public class Camera2SurfaceViewTestCase extends
      *            capture is available.
      */
     protected void startPreview(CaptureRequest.Builder request, Size previewSz,
-            CaptureListener listener) throws Exception {
+            CaptureCallback listener) throws Exception {
         // Update preview size.
         updatePreviewSurface(previewSz);
         if (VERBOSE) {
@@ -185,7 +185,7 @@ public class Camera2SurfaceViewTestCase extends
             throws CameraAccessException {
         List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
         outputSurfaces.add(mPreviewSurface);
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         request.addTarget(mPreviewSurface);
@@ -233,7 +233,7 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size stillSz,
-            CaptureListener resultListener,
+            CaptureCallback resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         prepareCaptureAndStartPreview(previewRequest, stillRequest, previewSz, stillSz,
                 ImageFormat.JPEG, resultListener, MAX_READER_IMAGES, imageListener);
@@ -252,7 +252,7 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size stillSz,
-            CaptureListener resultListener, int maxNumImages,
+            CaptureCallback resultListener, int maxNumImages,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         prepareCaptureAndStartPreview(previewRequest, stillRequest, previewSz, stillSz,
                 ImageFormat.JPEG, resultListener, maxNumImages, imageListener);
@@ -274,7 +274,7 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected void prepareRawCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder rawRequest, Size previewSz, Size rawSz,
-            CaptureListener resultListener,
+            CaptureCallback resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         prepareCaptureAndStartPreview(previewRequest, rawRequest, previewSz, rawSz,
                 ImageFormat.RAW_SENSOR, resultListener, MAX_READER_IMAGES, imageListener);
@@ -295,7 +295,7 @@ public class Camera2SurfaceViewTestCase extends
      * seen before the result matching myRequest arrives, or each individual wait
      * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
      */
-    protected static <T> void waitForResultValue(SimpleCaptureListener listener,
+    protected static <T> void waitForResultValue(SimpleCaptureCallback listener,
             CaptureResult.Key<T> resultKey,
             T expectedValue, int numResultsWait) {
         List<T> expectedValues = new ArrayList<T>();
@@ -319,7 +319,7 @@ public class Camera2SurfaceViewTestCase extends
      * seen before the result matching myRequest arrives, or each individual wait
      * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
      */
-    protected static <T> void waitForAnyResultValue(SimpleCaptureListener listener,
+    protected static <T> void waitForAnyResultValue(SimpleCaptureCallback listener,
             CaptureResult.Key<T> resultKey,
             List<T> expectedValues, int numResultsWait) {
         if (numResultsWait < 0 || listener == null || expectedValues == null) {
@@ -370,7 +370,7 @@ public class Camera2SurfaceViewTestCase extends
      * @throws CameraAccessException if capturing failed
      */
     protected int captureRequestsSynchronized(
-            CaptureRequest request, CaptureListener listener, Handler handler)
+            CaptureRequest request, CaptureCallback listener, Handler handler)
                     throws CameraAccessException {
         return captureRequestsSynchronized(request, /*count*/1, listener, handler);
     }
@@ -398,7 +398,7 @@ public class Camera2SurfaceViewTestCase extends
      * @throws CameraAccessException if capturing failed
      */
     protected int captureRequestsSynchronized(
-            CaptureRequest request, int count, CaptureListener listener, Handler handler)
+            CaptureRequest request, int count, CaptureCallback listener, Handler handler)
                     throws CameraAccessException {
         if (count < 1) {
             throw new IllegalArgumentException("count must be positive");
@@ -428,7 +428,7 @@ public class Camera2SurfaceViewTestCase extends
      *
      * @return the last result, or {@code null} if there was none
      */
-    protected static CaptureResult waitForNumResults(SimpleCaptureListener resultListener,
+    protected static CaptureResult waitForNumResults(SimpleCaptureCallback resultListener,
             int numResultsWait) {
         if (numResultsWait < 0 || resultListener == null) {
             throw new IllegalArgumentException(
@@ -450,7 +450,7 @@ public class Camera2SurfaceViewTestCase extends
      * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
      *                                       unknown.
      */
-    protected void waitForSettingsApplied(SimpleCaptureListener resultListener,
+    protected void waitForSettingsApplied(SimpleCaptureCallback resultListener,
             int numResultWaitForUnknownLatency) {
         int maxLatency = mStaticInfo.getSyncMaxLatency();
         if (maxLatency == CameraMetadata.SYNC_MAX_LATENCY_UNKNOWN) {
@@ -475,7 +475,7 @@ public class Camera2SurfaceViewTestCase extends
      * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
      *                                       unknown.
      */
-    protected void waitForAeStable(SimpleCaptureListener resultListener,
+    protected void waitForAeStable(SimpleCaptureCallback resultListener,
             int numResultWaitForUnknownLatency) {
         waitForSettingsApplied(resultListener, numResultWaitForUnknownLatency);
 
@@ -504,7 +504,7 @@ public class Camera2SurfaceViewTestCase extends
      * @param numResultWaitForUnknownLatency Number of frame to wait if camera device latency is
      *                                       unknown.
      */
-    protected void waitForAeLocked(SimpleCaptureListener resultListener,
+    protected void waitForAeLocked(SimpleCaptureCallback resultListener,
             int numResultWaitForUnknownLatency) {
 
         waitForSettingsApplied(resultListener, numResultWaitForUnknownLatency);
@@ -629,7 +629,7 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected void prepareCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size captureSz, int format,
-            CaptureListener resultListener, int maxNumImages,
+            CaptureCallback resultListener, int maxNumImages,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         if (VERBOSE) {
             Log.v(TAG, String.format("Prepare single capture (%s) and preview (%s)",
@@ -646,7 +646,7 @@ public class Camera2SurfaceViewTestCase extends
         List<Surface> outputSurfaces = new ArrayList<Surface>();
         outputSurfaces.add(mPreviewSurface);
         outputSurfaces.add(mReaderSurface);
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         // Configure the requests.

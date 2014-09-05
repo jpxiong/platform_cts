@@ -16,11 +16,11 @@
 
 package android.hardware.camera2.cts;
 
-import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
+import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
 
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -43,7 +43,7 @@ import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.Stat;
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.util.ArrayList;
@@ -121,8 +121,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                         configureStreamTimes[i] = configureTimeMs - openTimeMs;
 
                         // Blocking start preview (start preview to first image arrives)
-                        CameraTestUtils.SimpleCaptureListener resultListener =
-                                new CameraTestUtils.SimpleCaptureListener();
+                        CameraTestUtils.SimpleCaptureCallback resultListener =
+                                new CameraTestUtils.SimpleCaptureCallback();
                         blockingStartPreview(resultListener, imageListener);
                         previewStartedTimeMs = SystemClock.elapsedRealtime();
                         startPreviewTimes[i] = previewStartedTimeMs - configureTimeMs;
@@ -203,8 +203,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                             mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                     CaptureRequest.Builder captureBuilder =
                             mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-                    CameraTestUtils.SimpleCaptureListener previewResultListener =
-                            new CameraTestUtils.SimpleCaptureListener();
+                    CameraTestUtils.SimpleCaptureCallback previewResultListener =
+                            new CameraTestUtils.SimpleCaptureCallback();
                     SimpleTimingResultListener captureResultListener =
                             new SimpleTimingResultListener();
                     SimpleImageListener imageListener = new SimpleImageListener();
@@ -267,7 +267,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                 CameraTestUtils.SESSION_CLOSE_TIMEOUT_MS);
     }
 
-    private void blockingStartPreview(CaptureListener listener, SimpleImageListener imageListener)
+    private void blockingStartPreview(CaptureCallback listener, SimpleImageListener imageListener)
             throws Exception {
         if (mPreviewSurface == null || mReaderSurface == null) {
             throw new IllegalStateException("preview and reader surface must be initilized first");
@@ -281,7 +281,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         imageListener.waitForImageAvailable(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
     }
 
-    private void blockingCaptureImage(CaptureListener listener,
+    private void blockingCaptureImage(CaptureCallback listener,
             SimpleImageListener imageListener) throws Exception {
         if (mReaderSurface == null) {
             throw new IllegalStateException("reader surface must be initialized first");
@@ -301,7 +301,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         if (mPreviewSurface == null || mReaderSurface == null) {
             throw new IllegalStateException("preview and reader surface must be initilized first");
         }
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         List<Surface> outputSurfaces = new ArrayList<>();
         outputSurfaces.add(mPreviewSurface);
         outputSurfaces.add(mReaderSurface);
@@ -383,7 +383,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
     }
 
     private static class SimpleTimingResultListener
-            extends CameraCaptureSession.CaptureListener {
+            extends CameraCaptureSession.CaptureCallback {
         private final LinkedBlockingQueue<Pair<CaptureResult, Long> > mPartialResultQueue =
                 new LinkedBlockingQueue<Pair<CaptureResult, Long> >();
         private final LinkedBlockingQueue<Pair<CaptureResult, Long> > mResultQueue =
