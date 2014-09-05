@@ -16,8 +16,6 @@
 
 package android.cts.rscpp;
 
-import com.android.cts.stub.R;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.test.AndroidTestCase;

@@ -30,8 +30,6 @@ LOCAL_JNI_SHARED_LIBRARIES := librscpptest_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)

@@ -16,7 +16,7 @@
 
 package android.cts.rscpp;
 
-import com.android.cts.stub.R;
+import com.android.cts.rscpp.R;
 
 import android.content.Context;
 import android.content.res.Resources;
