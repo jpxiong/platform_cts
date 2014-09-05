@@ -226,18 +226,6 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     }
 
     /**
-     * Tests the TelephonyManager.setCdmaSubscription() API. This makes a call to
-     * setCdmaSubscription() API and expects a SecurityException since the test apk
-     * is not signed by certificate on the SIM.
-     */
-    public void testSetCdmaSubscription() {
-        try {
-            TelephonyManager.getDefault().setCdmaSubscription(0);
-            fail("Expected SecurityException. App doesn't have carrier privileges.");
-        } catch (SecurityException expected) {}
-    }
-
-    /**
      * Tests that the test apk doesn't  have carrier previliges.
      */
     public void testHasCarrierPrivileges() {
