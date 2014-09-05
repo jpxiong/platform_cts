@@ -19,32 +19,24 @@ package android.media.tv.cts;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.cts.util.PollingCheck;
-import android.database.Cursor;
-import android.test.ActivityInstrumentationTestCase2;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.media.tv.TvView;
-import android.media.tv.TvInputService.Session;
 import android.media.tv.cts.TvInputServiceTest.CountingTvInputService.CountingSession;
-import android.media.tv.cts.Utils;
 import android.net.Uri;
-import android.util.ArrayMap;
-import android.util.SparseIntArray;
+import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.Surface;
 
 import com.android.cts.tv.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Test {@link android.media.tv.TvInputService}.
@@ -58,9 +50,9 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     private Instrumentation mInstrumentation;
     private TvInputManager mManager;
     private TvInputInfo mStubInfo;
-    private final StubListener mListener = new StubListener();
+    private final StubCallback mCallback = new StubCallback();
 
-    private static class StubListener extends TvView.TvInputListener {
+    private static class StubCallback extends TvView.TvInputCallback {
         private int mChannelRetunedCount;
         private int mVideoAvailableCount;
         private int mVideoUnavailableCount;
@@ -126,7 +118,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             }
         }
         assertNotNull(mStubInfo);
-        mTvView.setTvInputListener(mListener);
+        mTvView.setCallback(mCallback);
 
         CountingTvInputService.sSession = null;
     }
@@ -171,7 +163,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     }
 
     public void verifyCommandSetStreamVolume() {
-        mTvView.setStreamVolume(1.0f);;
+        mTvView.setStreamVolume(1.0f);
         mInstrumentation.waitForIdleSync();
         new PollingCheck(TIME_OUT) {
             @Override
@@ -226,7 +218,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mChannelRetunedCount > 0;
+                return mCallback.mChannelRetunedCount > 0;
             }
         }.run();
     }
@@ -238,7 +230,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mVideoAvailableCount > 0;
+                return mCallback.mVideoAvailableCount > 0;
             }
         }.run();
     }
@@ -250,7 +242,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mVideoUnavailableCount > 0;
+                return mCallback.mVideoUnavailableCount > 0;
             }
         }.run();
     }
@@ -262,7 +254,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mTrackChangedCount > 0;
+                return mCallback.mTrackChangedCount > 0;
             }
         }.run();
     }
@@ -274,7 +266,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mTrackSelectedCount > 0;
+                return mCallback.mTrackSelectedCount > 0;
             }
         }.run();
     }
@@ -286,7 +278,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mContentAllowedCount > 0;
+                return mCallback.mContentAllowedCount > 0;
             }
         }.run();
     }
@@ -300,7 +292,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mListener.mContentBlockedCount > 0;
+                return mCallback.mContentBlockedCount > 0;
             }
         }.run();
     }
