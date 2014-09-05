@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.net.cts;
+package android.security.cts;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.io.IOException;
 public class NetlinkSocket {
 
     static {
-        System.loadLibrary("cts_jni");
+        System.loadLibrary("ctssecurity_jni");
     }
 
     private static native void create_native(FileDescriptor fd);

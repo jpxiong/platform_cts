@@ -24,22 +24,22 @@
 #include <string.h>
 #include "JNIHelp.h"
 
-#include "android_net_cts_NetlinkSocket.h"
+#include "android_security_cts_NetlinkSocket.h"
 
-static void android_net_cts_NetlinkSocket_create(JNIEnv* env, jclass,
+static void android_security_cts_NetlinkSocket_create(JNIEnv* env, jclass,
     jobject fileDescriptor)
 {
     int sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (sock == -1) {
         ALOGE("Can't create socket %s", strerror(errno));
-        jclass SocketException = env->FindClass("java/net/SocketException");
+        jclass SocketException = env->FindClass("java/security/SocketException");
         env->ThrowNew(SocketException, "Can't create socket");
         return;
     }
     jniSetFileDescriptorOfFD(env, fileDescriptor, sock);
 }
 
-static int android_net_cts_NetlinkSocket_sendmsg(JNIEnv *e, jclass,
+static int android_security_cts_NetlinkSocket_sendmsg(JNIEnv *e, jclass,
     jobject fileDescriptor, jint pid, jbyteArray packet)
 {
     void *bytes = (void *)e->GetByteArrayElements(packet, NULL);
@@ -60,13 +60,13 @@ static int android_net_cts_NetlinkSocket_sendmsg(JNIEnv *e, jclass,
 
 
 static JNINativeMethod gMethods[] = {
-    {  "sendmsg", "(Ljava/io/FileDescriptor;I[B)I", (void *) android_net_cts_NetlinkSocket_sendmsg },
-    {  "create_native", "(Ljava/io/FileDescriptor;)V", (void *) android_net_cts_NetlinkSocket_create },
+    {  "sendmsg", "(Ljava/io/FileDescriptor;I[B)I", (void *) android_security_cts_NetlinkSocket_sendmsg },
+    {  "create_native", "(Ljava/io/FileDescriptor;)V", (void *) android_security_cts_NetlinkSocket_create },
 };
 
-int register_android_net_cts_NetlinkSocket(JNIEnv* env)
+int register_android_security_cts_NetlinkSocket(JNIEnv* env)
 {
-    jclass clazz = env->FindClass("android/net/cts/NetlinkSocket");
+    jclass clazz = env->FindClass("android/security/cts/NetlinkSocket");
 
     return env->RegisterNatives(clazz, gMethods,
             sizeof(gMethods) / sizeof(JNINativeMethod));

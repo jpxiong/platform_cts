@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
         <uses-library android:name="android.test.runner" />
@@ -29,10 +30,13 @@
                  android:process=":death_test_service"
                  android:isolatedProcess="true"
                  android:exported="true"/>
+
+        <service android:name="android.security.cts.activity.SecureRandomService"
+                 android:process=":secureRandom"/>
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.security"
                      android:label="CTS tests of com.android.cts.security">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />

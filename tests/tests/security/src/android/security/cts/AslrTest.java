@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import android.os.cts.ReadElf;
+import android.security.cts.ReadElf;
 
 /**
  * Verify that ASLR is properly enabled on Android Compatible devices.
