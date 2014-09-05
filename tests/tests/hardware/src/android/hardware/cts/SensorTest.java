@@ -16,12 +16,7 @@
 
 package android.hardware.cts;
 
-import java.lang.IllegalArgumentException;
-import java.lang.Override;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import com.android.cts.util.TimeoutReq;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -36,12 +31,13 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.android.cts.util.TimeoutReq;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-public class SensorTest extends AndroidTestCase {
+public class SensorTest extends SensorTestCase {
     private SensorManager mSensorManager;
     private TriggerListener mTriggerListener;
     private SensorListener mSensorListener;

@@ -16,7 +16,7 @@
 
 package com.android.cts.verifier.sensors.helpers;
 
-import com.android.cts.verifier.sensors.BaseSensorTestActivity.SensorTestResult;
+import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -35,7 +35,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.StringTokenizer;
 
-/*
+/**
  * This class handles communication with the host to respond to commands.
  * The command/response link is through a TCP socket on the host side, forwarded via adb to a local
  * socket on the device.  The system uses a standard "accept-read_command-send_response-close" to
@@ -46,12 +46,12 @@ import java.util.StringTokenizer;
  */
 public class PowerTestHostLink {
 
-    /*
+    /**
      * Host-to-device bridge will use a Listener instance to drive the test via the CtsVerifier
      * running on the device.
      */
     public interface HostToDeviceInterface {
-        void logTestResult(String testName, SensorTestResult result, String message);
+        void logTestResult(SensorTestDetails testDetails);
         void raiseError(String testName, String message) throws Exception;
         void waitForUserAcknowledgement(String message);
         void logText(String text);
@@ -62,7 +62,6 @@ public class PowerTestHostLink {
         public int passedCount = 0;
         public int skippedCount = 0;
         public int failedCount = 0;
-        public String testDetails = "";
     };
 
 
@@ -87,7 +86,6 @@ public class PowerTestHostLink {
     private final Context mContext;
     private final HostToDeviceInterface mHostToDeviceExecutor;
     private PowerTestResult mTestResult;
-    private StringBuilder mStringBuilder;
 
     public PowerTestHostLink(Context context, final HostToDeviceInterface listener) {
         Log.d(TAG, " +++ Begin of localSocketServer() +++ ");
@@ -127,7 +125,6 @@ public class PowerTestHostLink {
      */
     public PowerTestResult run() throws Exception {
         mTestResult = new PowerTestResult();
-        mStringBuilder = new StringBuilder();
         // define buffer to receive data from host
         final int BUFFER_SIZE = 4096;
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -213,11 +210,8 @@ public class PowerTestHostLink {
             }
         }
         mHostToDeviceExecutor.logText("Device disconnected.");
-        if (mStringBuilder != null){
-            mTestResult.testDetails = mStringBuilder.toString();
-        }
         Log.d(TAG, "Returning " + mTestResult.passedCount + "passed " + mTestResult.skippedCount + "skipped " +
-        mTestResult.failedCount + "failed :" + mTestResult.testDetails);
+        mTestResult.failedCount + "failed.");
         return mTestResult;
     }
 
@@ -292,7 +286,7 @@ public class PowerTestHostLink {
         String response;
         StringTokenizer tokenizer = new StringTokenizer(request, " ");
         String testName = "";
-        SensorTestResult result = SensorTestResult.FAIL;
+        SensorTestDetails.ResultCode resultCode = SensorTestDetails.ResultCode.FAIL;
         String message = "";
 
         try {
@@ -303,17 +297,17 @@ public class PowerTestHostLink {
             final String resultToken = tokenizer.nextToken();
 
             if (resultToken.equals("PASS")) {
-                result = SensorTestResult.PASS;
+                resultCode = SensorTestDetails.ResultCode.PASS;
                 ++mTestResult.passedCount;
                 message = "PASSED: ";
                 response = RESPONSE_OK;
             } else if (resultToken.equals("FAIL")) {
-                result = SensorTestResult.FAIL;
+                resultCode = SensorTestDetails.ResultCode.FAIL;
                 ++mTestResult.failedCount;
                 message = "FAILED: ";
                 response = RESPONSE_OK;
             } else if (resultToken.equals("SKIPPED")) {
-                result = SensorTestResult.SKIPPED;
+                resultCode = SensorTestDetails.ResultCode.SKIPPED;
                 ++mTestResult.skippedCount;
                 message = "SKIPPED: ";
                 response = RESPONSE_OK;
@@ -329,8 +323,8 @@ public class PowerTestHostLink {
             response = RESPONSE_ERR;
         }
         String fullMessage = testName + " " + message;
-        mStringBuilder.append(fullMessage + "\n");
-        mHostToDeviceExecutor.logTestResult(testName, result, fullMessage );
+        mHostToDeviceExecutor.logTestResult(
+                new SensorTestDetails(testName, resultCode, fullMessage));
         return response;
     }
 

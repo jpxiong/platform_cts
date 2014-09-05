@@ -7,7 +7,7 @@
 }
 
 # ensure we keep public sensor test methods, these are needed at runtime
--keepclassmembers class * extends com.android.cts.verifier.sensors.BaseSensorTestActivity {
+-keepclassmembers class * extends com.android.cts.verifier.sensors.base.BaseSensorTestActivity {
     public <methods>;
 }
 

@@ -16,21 +16,22 @@
 
 package android.hardware.cts;
 
-import android.app.Instrumentation;
-import android.cts.util.CtsAndroidTestCase;
-import android.cts.util.DeviceReportLog;
-import android.hardware.cts.helpers.SensorNotSupportedException;
-import android.hardware.cts.helpers.SensorStats;
-import android.util.Log;
-
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 
+import android.app.Instrumentation;
+import android.cts.util.DeviceReportLog;
+import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.SensorStats;
+import android.test.AndroidTestCase;
+import android.util.Log;
+
 /**
  * Test Case class that handles gracefully sensors that are not available in the device.
  */
-public abstract class SensorTestCase extends CtsAndroidTestCase {
+public abstract class SensorTestCase extends AndroidTestCase {
+    // TODO: consolidate all log tags
     protected final String LOG_TAG = "TestRunner";
 
     protected SensorTestCase() {}

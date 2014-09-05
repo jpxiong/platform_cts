@@ -228,6 +228,7 @@ class PowerTest:
                 print("This current high: %.2f mAmps. Device is probably not in suspend mode.  Waiting..."%\
                       (1000.0*(sum(measurements)/len(measurements))))
             if tries >= TIMEOUT_SCREEN_OFF:
+                # TODO: dump the state of sensor service to identify if there are features using sensors
                 self.reportErrorIf(tries>=TIMEOUT_SCREEN_OFF, msg="Unable to determine application processor suspend mode status.")
                 break
         if DELAY_SCREEN_OFF:
@@ -369,6 +370,7 @@ class PowerTest:
             self.setUSBEnabled(True)
             max_power = max(measurements) - avg
             if current_diff <= max_power_allowed:
+                # TODO: fail the test of background > current
                 message = ("Draw is within limits. Current:%f Background:%f   Measured: %f Stddev: %f  Peak: %f")%\
                              ( current_diff*1000.0, backgnd*1000.0, avg*1000.0, stddev*1000.0, max_power*1000.0)
             else:

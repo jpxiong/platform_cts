@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -26,7 +27,7 @@ import android.hardware.cts.helpers.sensorverification.SigNumVerification;
 /**
  * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
  */
-public class GyroscopeMeasurementTestActivity extends BaseSensorTestActivity {
+public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActivity {
     public GyroscopeMeasurementTestActivity() {
         super(GyroscopeMeasurementTestActivity.class);
     }

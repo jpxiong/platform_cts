@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -35,7 +36,7 @@ import android.hardware.cts.helpers.sensorverification.StandardDeviationVerifica
  * Also, it is recommended to execute these tests outdoors, or at least far from magnetic
  * disturbances.
  */
-public class MagneticFieldMeasurementTestActivity extends BaseSensorTestActivity {
+public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestActivity {
     public MagneticFieldMeasurementTestActivity() {
         super(MagneticFieldMeasurementTestActivity.class);
     }
