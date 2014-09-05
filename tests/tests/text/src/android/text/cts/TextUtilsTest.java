@@ -410,7 +410,7 @@ public class TextUtilsTest extends AndroidTestCase {
 
         // TruncateAt.END, specify preserveLength
         resetRange();
-        textWidth = p.measureText("long str" + mEllipsis);
+        textWidth = p.measureText("long str") + p.measureText(mEllipsis);
         ellipsisNum = text.length() - "long str".length();
         assertEquals("long str" + getBlankString(true, ellipsisNum),
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.END, true, callback).toString());
