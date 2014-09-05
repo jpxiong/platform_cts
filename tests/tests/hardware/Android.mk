@@ -23,7 +23,15 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_SDK_VERSION := current
 
+# TODO: sensors need to be refactored out into their own namespace: android.hardware.sensors.cts
 LOCAL_SRC_FILES := $(call all-java-files-under, src/android/hardware/cts/helpers)
+LOCAL_SRC_FILES += \
+    src/android/hardware/cts/SensorTestCase.java \
+    src/android/hardware/cts/SingleSensorTests.java \
+    src/android/hardware/cts/SensorIntegrationTests.java \
+    src/android/hardware/cts/SensorTest.java \
+
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 

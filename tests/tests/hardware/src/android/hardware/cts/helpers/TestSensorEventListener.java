@@ -16,12 +16,12 @@
 
 package android.hardware.cts.helpers;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.util.Log;
-
-import junit.framework.Assert;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -59,7 +59,16 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * Construct a {@link TestSensorEventListener} that wraps a {@link SensorEventListener2}.
      */
     public TestSensorEventListener(SensorEventListener2 listener) {
-        mListener = listener;
+        if (listener != null) {
+            mListener = listener;
+        } else {
+            // use a Null Object to simplify handling the listener
+            mListener = new SensorEventListener2() {
+                public void onFlushCompleted(Sensor sensor) {}
+                public void onSensorChanged(SensorEvent sensorEvent) {}
+                public void onAccuracyChanged(Sensor sensor, int i) {}
+            };
+        }
     }
 
     /**
@@ -83,12 +92,11 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(mEventLatch != null) {
-            mEventLatch.countDown();
+        CountDownLatch eventLatch = mEventLatch;
+        if(eventLatch != null) {
+            eventLatch.countDown();
         }
-        if (mListener != null) {
-            mListener.onSensorChanged(event);
-        }
+        mListener.onSensorChanged(event);
         if (mLogEvents) {
             StringBuilder valuesSb = new StringBuilder();
             if (event.values.length == 1) {
@@ -113,9 +121,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        if (mListener != null) {
-            mListener.onAccuracyChanged(sensor, accuracy);
-        }
+        mListener.onAccuracyChanged(sensor, accuracy);
     }
 
     /**
@@ -128,15 +134,13 @@ public class TestSensorEventListener implements SensorEventListener2 {
         if(latch != null) {
             latch.countDown();
         }
-        if (mListener != null) {
-            mListener.onFlushCompleted(sensor);
-        }
+        mListener.onFlushCompleted(sensor);
     }
 
     /**
      * Wait for {@link #onFlushCompleted(Sensor)} to be called.
      *
-     * @throws AssertionError if there was a timeout after {@value #FLUSH_TIMEOUT_US} &micro;s
+     * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForFlushComplete() {
         CountDownLatch latch = mFlushLatch;
@@ -154,7 +158,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
     /**
      * Collect a specific number of {@link TestSensorEvent}s.
      *
-     * @throws AssertionError if there was a timeout after {@value #FLUSH_TIMEOUT_US} &micro;s
+     * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForEvents(int eventCount) {
         mEventLatch = new CountDownLatch(eventCount);

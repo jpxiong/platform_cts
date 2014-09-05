@@ -1,10 +1,10 @@
 
 package com.android.cts.verifier.sensors;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.cts.verifier.sensors.base.BaseSensorSemiAutomatedTestActivity;
 
 import junit.framework.Assert;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
@@ -16,13 +16,17 @@ import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.Build;
 import android.os.SystemClock;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Test cross-sensor timestamp alignment by detecting major change in each
  * sensor and comparing timestamps of that change.
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-public class SensorSynchronizationTestActivity extends
-        BaseSensorSemiAutomatedTestActivity implements SensorEventListener {
+public class SensorSynchronizationTestActivity
+        extends BaseSensorSemiAutomatedTestActivity
+        implements SensorEventListener {
 
     private final double NANOS_PER_MILLI = 1e6;
     private final int DATA_COLLECTION_TIME_IN_MS = 5000;

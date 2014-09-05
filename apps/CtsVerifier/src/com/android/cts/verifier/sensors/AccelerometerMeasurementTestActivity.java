@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
  */
-public class AccelerometerMeasurementTestActivity extends BaseSensorTestActivity {
+public class AccelerometerMeasurementTestActivity extends SensorCtsVerifierTestActivity {
     public AccelerometerMeasurementTestActivity() {
         super(AccelerometerMeasurementTestActivity.class);
     }

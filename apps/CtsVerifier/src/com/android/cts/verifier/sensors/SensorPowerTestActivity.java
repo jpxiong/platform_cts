@@ -16,14 +16,17 @@
 
 package com.android.cts.verifier.sensors;
 
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 import com.android.cts.verifier.sensors.helpers.PowerTestHostLink;
+import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
 import junit.framework.Assert;
 
 import java.util.concurrent.TimeUnit;
 
-public class SensorPowerTestActivity extends BaseSensorTestActivity implements
-        PowerTestHostLink.HostToDeviceInterface {
+public class SensorPowerTestActivity
+        extends SensorCtsVerifierTestActivity
+        implements PowerTestHostLink.HostToDeviceInterface {
     public class TestExecutionException extends Exception {
         public TestExecutionException(final String message) {
             super(message);
@@ -43,9 +46,8 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
     }
 
     /* channel for host to raise an exception on the device if needed */
-    public void raiseError(final String testname,
-            final String message) throws Exception {
-        setTestResult(testname, SensorTestResult.SKIPPED, message);
+    public void raiseError(String testName, String message) throws Exception {
+        getTestLogger().logTestFail(testName, message);
         throw new TestExecutionException(message);
     }
 
@@ -53,14 +55,14 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
         appendText(text);
     }
 
-    public void logTestResult(String testId, SensorTestResult testResult, String testDetails) {
-        setTestResult(testId, testResult, testDetails);
+    public void logTestResult(SensorTestDetails testDetails) {
+        getTestLogger().logTestDetails(testDetails);
     }
 
     @Override
     protected void activitySetUp() throws InterruptedException {
-        mSensorFeaturesDeactivator.requestToSetScreenOffTimeout(15, TimeUnit.SECONDS);
-        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+        setScreenOffTimeout(15, TimeUnit.SECONDS);
+        deactivateSensorFeatures();
     }
 
     @Override
@@ -69,12 +71,11 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
             mHostLink.close();
         }
 
-        mSensorFeaturesDeactivator.requestToRestoreFeatures();
-        mSensorFeaturesDeactivator.requestToResetScreenOffTimeout();
+        restoreSensorFeatures();
+        resetScreenOffTimeout();
     }
 
     public String testSensorsPower() throws Throwable {
-        String testDetails = "";
         if (mHostLink == null) {
             // prepare Activity screen to show instructions to the operator
             clearText();
@@ -94,17 +95,22 @@ public class SensorPowerTestActivity extends BaseSensorTestActivity implements
                 // until it issues an "EXIT" command to break out
                 // of the run loop. The host will run all associated tests
                 // sequentially here:
-                final PowerTestHostLink.PowerTestResult testResult = mHostLink.run();
-                testDetails = testResult.testDetails;
-                Assert.assertEquals(testDetails, 0, testResult.failedCount);
+                PowerTestHostLink.PowerTestResult testResult = mHostLink.run();
+
+                SensorTestDetails testDetails = new SensorTestDetails(
+                        getApplicationContext(),
+                        "SensorPowerTest",
+                        testResult.passedCount,
+                        testResult.skippedCount,
+                        testResult.failedCount);
+                Assert.assertEquals(testDetails.getSummary(), 0, testResult.failedCount);
+                return testDetails.getSummary();
             } finally {
                 mHostLink.close();
                 mHostLink = null;
             }
-
         } else {
             throw new IllegalStateException("Attempt to run test twice");
         }
-        return testDetails;
     }
 }

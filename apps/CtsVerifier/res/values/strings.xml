@@ -441,6 +441,8 @@
     <string name="snsr_device_steady">Keep the device steady.</string>
     <string name="snsr_keep_device_rotating_clockwise">Once the test begins, you will have to keep rotating the device clockwise.</string>
     <string name="snsr_wait_for_user">Press \'Next\' to continue.</string>
+    <string name="snsr_wait_to_begin">Press \'Next\' to begin.</string>
+    <string name="snsr_wait_to_complete">Press \'Next\' to complete.</string>
     <string name="snsr_on_complete_return">After completing the task, go back to this test.</string>
     <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
     <string name="snsr_sensor_feature_deactivation">Additionally, turn off any other features installed in the device, that register for sensors. Once you are done, you can continue the test.</string>
@@ -548,6 +550,11 @@
     <string name="snsr_significant_motion_test_deactivation">Once you begin the test, you will need to walk to ensure Significant Motion triggers only once.</string>
     <string name="snsr_significant_motion_registration">Expected to be able to register for TriggerSensor. Found=%b.</string>
     <string name="snsr_significant_motion_cancelation">Expected to be able to cancel TriggerSensor. Found=%b.</string>
+
+    <!-- Strings for Sensor CTS tests inside CtsVerifier -->
+    <string name="snsr_single_sensor_tests">CTS Single Sensor Tests</string>
+    <string name="snsr_sensor_integration_tests">CTS Sensor Integration Tests</string>
+    <string name="snsr_sensor_test">CTS Sensor Test</string>
 
     <!-- Strings for Sample Test Activities -->
     <string name="share_button_text">Share</string>

@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -41,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * data rates. Also sensor events will be verified while other sensors are also active.
  */
 public class SensorValueAccuracyActivity
-        extends BaseSensorTestActivity
+        extends SensorCtsVerifierTestActivity
         implements SensorEventListener {
     public SensorValueAccuracyActivity() {
         super(SensorValueAccuracyActivity.class);

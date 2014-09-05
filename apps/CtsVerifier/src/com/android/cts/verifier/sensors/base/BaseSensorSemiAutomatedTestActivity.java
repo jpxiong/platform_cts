@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.sensors;
+package com.android.cts.verifier.sensors.base;
 
-import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
-import android.graphics.Color;
 import android.hardware.cts.helpers.SensorNotSupportedException;
 
 /**
- * Base class to author Sensor semi-automated test cases.
- * These tests can only wait for operators to notify at some intervals, but the test needs to be
- * autonomous to verify the data collected.
+ * Base class to author a single Sensor semi-automated test case.
  *
  * @deprecated use {@link BaseSensorTestActivity} instead.
  */
@@ -35,23 +32,20 @@ public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTest
     }
 
     @Override
-    public void run() {
-        String message = "";
-        SensorTestResult testResult = SensorTestResult.PASS;
+    public SensorTestDetails executeTests() {
+        String summary = "";
+        SensorTestDetails.ResultCode resultCode = SensorTestDetails.ResultCode.PASS;
         try {
             onRun();
         } catch(SensorNotSupportedException e) {
             // the sensor is not supported/available in the device, log a warning and skip the test
-            testResult = SensorTestResult.SKIPPED;
-            message = e.getMessage();
+            resultCode = SensorTestDetails.ResultCode.SKIPPED;
+            summary = e.getMessage();
         } catch(Throwable e) {
-            testResult = SensorTestResult.FAIL;
-            message = e.getMessage();
+            resultCode = SensorTestDetails.ResultCode.FAIL;
+            summary = e.getMessage();
         }
-        setTestResult(getTestId(), testResult, message);
-        appendText(R.string.snsr_test_complete);
-        waitForUser();
-        finish();
+        return new SensorTestDetails(getTestClassName(), resultCode, summary);
     }
 
     /**
@@ -62,13 +56,6 @@ public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTest
      *
      * throws Throwable
      */
+    @Deprecated
     protected abstract void onRun() throws Throwable;
-
-    protected void logSuccess() {
-        appendText(R.string.snsr_test_pass, Color.GREEN);
-    }
-
-    private String getTestId() {
-        return this.getClass().getName();
-    }
 }
