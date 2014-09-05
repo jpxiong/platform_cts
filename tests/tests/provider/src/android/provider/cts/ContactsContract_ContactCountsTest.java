@@ -72,7 +72,7 @@ public class ContactsContract_ContactCountsTest extends InstrumentationTestCase 
     public void testContactCounts_correctCountsReturned() throws Exception {
         final String filterString = getFilterString(setupTestData());
         final Uri uri = Contacts.CONTENT_URI.buildUpon()
-                .appendQueryParameter(Contacts.ADDRESS_BOOK_INDEX_EXTRAS, "true").build();
+                .appendQueryParameter(Contacts.EXTRA_ADDRESS_BOOK_INDEX, "true").build();
         final Cursor cursor = mResolver.query(uri, TEST_PROJECTION,
                 filterString, null, null);
         try {
