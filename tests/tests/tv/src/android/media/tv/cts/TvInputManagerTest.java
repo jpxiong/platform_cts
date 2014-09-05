@@ -16,15 +16,10 @@
 
 package android.media.tv.cts;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.test.AndroidTestCase;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.media.tv.TvInputService;
-import android.media.tv.cts.Utils;
+import android.test.AndroidTestCase;
 
 import java.util.List;
 

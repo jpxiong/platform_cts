@@ -20,19 +20,16 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvView;
-import android.media.tv.cts.Utils;
-import android.net.Uri;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.ArrayMap;
 
 import com.android.cts.tv.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -42,7 +39,6 @@ import java.util.Random;
  */
 public class BundledTvInputServiceTest
         extends ActivityInstrumentationTestCase2<TvViewStubActivity> {
-    private static final String TAG = BundledTvInputServiceTest.class.getSimpleName();
     /** The maximum time to wait for an operation. */
     private static final long TIME_OUT = 15000L;
 
@@ -50,12 +46,12 @@ public class BundledTvInputServiceTest
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private TvInputManager mManager;
-    private List<TvInputInfo> mPassthroughInputList = new ArrayList<>();
-    private final MockListener mListener = new MockListener();
+    private final List<TvInputInfo> mPassthroughInputList = new ArrayList<>();
+    private final MockCallback mCallback = new MockCallback();
 
-    private static class MockListener extends TvView.TvInputListener {
+    private static class MockCallback extends TvView.TvInputCallback {
         private final Map<String, Integer> mVideoUnavailableReasonMap = new ArrayMap<>();
-        private Object mLock = new Object();
+        private final Object mLock = new Object();
         private final int VIDEO_AVAILABLE = -1;
 
         public Integer getVideoUnavailableReason(String inputId) {
@@ -109,7 +105,7 @@ public class BundledTvInputServiceTest
                 mPassthroughInputList.add(info);
             }
         }
-        mTvView.setTvInputListener(mListener);
+        mTvView.setCallback(mCallback);
     }
 
     @Override
@@ -138,7 +134,7 @@ public class BundledTvInputServiceTest
             new PollingCheck(TIME_OUT) {
                 @Override
                 protected boolean check() {
-                    Integer reason = mListener.getVideoUnavailableReason(info.getId());
+                    Integer reason = mCallback.getVideoUnavailableReason(info.getId());
                     return reason != null
                             && reason != TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
                             && reason != TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING;
@@ -162,7 +158,7 @@ public class BundledTvInputServiceTest
                 new PollingCheck(TIME_OUT) {
                     @Override
                     protected boolean check() {
-                        Integer reason = mListener.getVideoUnavailableReason(info.getId());
+                        Integer reason = mCallback.getVideoUnavailableReason(info.getId());
                         return reason != null
                                 && reason != TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
                                 && reason != TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING;
