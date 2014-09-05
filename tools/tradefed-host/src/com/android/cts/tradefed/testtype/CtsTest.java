@@ -172,6 +172,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "Should be an amount that can comfortably fit in memory.")
     private int mMaxLogcatBytes = 500 * 1024; // 500K
 
+    @Option(name = "collect-deqp-logs", description =
+            "Collect dEQP logs from the device.")
+    private boolean mCollectDeqpLogs = false;
+
     private long mPrevRebootTime; // last reboot time
 
     /** data structure for a {@link IRemoteTest} and its known tests */
@@ -482,6 +486,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 // This is not the best fix, but works.
                 if (test instanceof InstrumentationTest) {
                     ((InstrumentationTest)test).setForceAbi(mForceAbi);
+                }
+                if (test instanceof DeqpTest) {
+                    ((DeqpTest)test).setCollectLogs(mCollectDeqpLogs);
                 }
 
                 forwardPackageDetails(knownTests.getPackageDef(), listener);

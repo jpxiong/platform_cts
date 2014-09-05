@@ -46,6 +46,7 @@ class TestPackageDef implements ITestPackageDef {
     public static final String NATIVE_TEST = "native";
     public static final String WRAPPED_NATIVE_TEST = "wrappednative";
     public static final String VM_HOST_TEST = "vmHostTest";
+    public static final String DEQP_TEST = "deqpTest";
     public static final String ACCESSIBILITY_TEST =
             "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
     public static final String ACCESSIBILITY_SERVICE_TEST =
@@ -233,6 +234,8 @@ class TestPackageDef implements ITestPackageDef {
             vmHostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
+        } else if (DEQP_TEST.equals(mTestType)) {
+            return new DeqpTest(mUri, mTests);
         } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
         } else if (WRAPPED_NATIVE_TEST.equals(mTestType)) {
