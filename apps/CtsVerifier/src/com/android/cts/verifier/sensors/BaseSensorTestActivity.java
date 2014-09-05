@@ -322,6 +322,7 @@ public abstract class BaseSensorTestActivity
                 R.string.snsr_event_time,
                 receivedTimestamp,
                 eventTimestamp,
+                timestampDelta,
                 deltaThreshold,
                 sensorName);
         Assert.assertTrue(timestampMessage, timestampDelta < deltaThreshold);

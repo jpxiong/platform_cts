@@ -208,7 +208,7 @@ public class SignificantMotionTestActivity extends BaseSensorTestActivity {
             // verify an event arrived, and it is indeed a Significant Motion event
             TriggerEvent event = registry.triggerEvent;
             String eventArrivalMessage =
-                    getString(R.string.snsr_significant_motion_event_arrival, event);
+                    getString(R.string.snsr_significant_motion_event_arrival, event != null);
             Assert.assertNotNull(eventArrivalMessage, event);
 
             int eventType = event.sensor.getType();
@@ -247,7 +247,7 @@ public class SignificantMotionTestActivity extends BaseSensorTestActivity {
 
             TriggerEvent event = registry.triggerEvent;
             String eventMessage =
-                    getString(R.string.snsr_significant_motion_event_unexpected, event);
+                    getString(R.string.snsr_significant_motion_event_unexpected, event != null);
             Assert.assertNull(eventMessage, event);
             return eventMessage;
         }
