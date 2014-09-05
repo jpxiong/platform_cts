@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts;
 
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.hardware.camera2.cts.CameraTestUtils.configureCameraSession;
+import static android.hardware.camera2.cts.helpers.AssertHelpers.*;
 
 /**
  * Tests for the DngCreator API.
@@ -82,25 +84,34 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
             try {
                 openDevice(deviceId);
 
-                Size[] targetCaptureSizes =
-                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
-                                StaticMetadata.StreamDirection.Output);
-                if (targetCaptureSizes.length == 0) {
-                    if (VERBOSE) {
-                        Log.i(TAG, "Skipping testSingleImageBasic - " +
-                                "no raw output streams for camera " + deviceId);
-                    }
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                    Log.i(TAG, "RAW capability is not supported in camera " + mCameraIds[i] +
+                            ". Skip the test.");
                     continue;
                 }
 
-                Size s = targetCaptureSizes[0];
+                Size[] targetCaptureSizes =
+                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
+                                StaticMetadata.StreamDirection.Output);
+
+                assertTrue("No capture sizes available for RAW format!",
+                        targetCaptureSizes.length != 0);
+                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
+                Size activeArraySize = new Size(activeArray.width(), activeArray.height());
+                assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
+                        activeArray.height() > 0);
+                // TODO: Allow PixelArraySize also.
+                assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
+                        targetCaptureSizes, activeArraySize);
 
                 // Create capture image reader
                 CameraTestUtils.SimpleImageReaderListener captureListener
                         = new CameraTestUtils.SimpleImageReaderListener();
-                captureReader = createImageReader(s, ImageFormat.RAW_SENSOR, 2,
+                captureReader = createImageReader(activeArraySize, ImageFormat.RAW_SENSOR, 2,
                         captureListener);
-                Pair<Image, CaptureResult> resultPair = captureSingleRawShot(s, captureReader, captureListener);
+                Pair<Image, CaptureResult> resultPair = captureSingleRawShot(activeArraySize,
+                        captureReader, captureListener);
                 CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
 
                 // Test simple writeImage, no header checks
@@ -159,16 +170,26 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
             try {
                 openDevice(deviceId);
 
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                    Log.i(TAG, "RAW capability is not supported in camera " + mCameraIds[i] +
+                            ". Skip the test.");
+                    continue;
+                }
+
                 Size[] targetCaptureSizes =
                         mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
                                 StaticMetadata.StreamDirection.Output);
-                if (targetCaptureSizes.length == 0) {
-                    if (VERBOSE) {
-                        Log.i(TAG, "Skipping testSingleImageThumbnail - " +
-                                "no raw output streams for camera " + deviceId);
-                    }
-                    continue;
-                }
+
+                assertTrue("No capture sizes available for RAW format!",
+                        targetCaptureSizes.length != 0);
+                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
+                Size activeArraySize = new Size(activeArray.width(), activeArray.height());
+                assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
+                        activeArray.height() > 0);
+                // TODO: Allow PixelArraySize also.
+                assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
+                        targetCaptureSizes, activeArraySize);
 
                 Size[] targetPreviewSizes =
                         mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.YUV_420_888,
@@ -176,12 +197,10 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 // Get smallest preview size
                 Size previewSize = mOrderedPreviewSizes.get(mOrderedPreviewSizes.size() - 1);
 
-                Size s = targetCaptureSizes[0];
-
                 // Create capture image reader
                 CameraTestUtils.SimpleImageReaderListener captureListener
                         = new CameraTestUtils.SimpleImageReaderListener();
-                captureReaders.add(createImageReader(s, ImageFormat.RAW_SENSOR, 2,
+                captureReaders.add(createImageReader(activeArraySize, ImageFormat.RAW_SENSOR, 2,
                         captureListener));
                 captureListeners.add(captureListener);
 
@@ -192,8 +211,8 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                         previewListener));
                 captureListeners.add(previewListener);
 
-                Pair<List<Image>, CaptureResult> resultPair = captureSingleRawShot(s, captureReaders,
-                        captureListeners);
+                Pair<List<Image>, CaptureResult> resultPair = captureSingleRawShot(activeArraySize,
+                        captureReaders, captureListeners);
                 CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
 
                 // Test simple writeImage, no header checks
