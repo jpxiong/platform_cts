@@ -17,6 +17,7 @@
 package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Test cases for Significant Motion sensor.
  * They use walking motion to change the location and trigger Significant Motion.
  */
-public class SignificantMotionTestActivity extends BaseSensorTestActivity {
+public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity {
     public SignificantMotionTestActivity() {
         super(SignificantMotionTestActivity.class);
     }

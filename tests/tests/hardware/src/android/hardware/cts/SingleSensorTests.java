@@ -648,10 +648,6 @@ public class SingleSensorTests extends SensorTestCase {
         op.setLogEvents(true);
         try {
             op.execute();
-
-            // Only report stats if it passes.
-            logSelectedStatsToReportLog(getInstrumentation(), 2, STAT_KEYS,
-                    op.getStats());
         } finally {
             SensorStats.logStats(TAG, op.getStats());
 
@@ -667,8 +663,6 @@ public class SingleSensorTests extends SensorTestCase {
             String fileName = String.format("single_sensor_%s_%s%s.txt",
                     sensorName, sensorRate, batching);
             SensorStats.logStatsToFile(fileName, op.getStats());
-
-
         }
     }
 }
