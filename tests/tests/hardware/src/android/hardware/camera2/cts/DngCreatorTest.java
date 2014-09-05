@@ -290,8 +290,8 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
         request.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                 CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
-        CameraTestUtils.SimpleCaptureListener resultListener =
-                new CameraTestUtils.SimpleCaptureListener();
+        CameraTestUtils.SimpleCaptureCallback resultListener =
+                new CameraTestUtils.SimpleCaptureCallback();
 
         startCapture(request.build(), /*repeating*/false, resultListener, mHandler);
 

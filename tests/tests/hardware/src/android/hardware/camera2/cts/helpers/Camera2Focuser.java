@@ -19,7 +19,7 @@ package android.hardware.camera2.cts.helpers;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.params.MeteringRectangle;
@@ -215,7 +215,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
         CaptureRequest.Builder requestBuilder = createRequestBuilder();
         mAutoFocus.setPassiveAutoFocus(/*picture*/true, mRepeatingBuilder);
         mAutoFocus.unlockAutoFocus(mRepeatingBuilder, requestBuilder);
-        CaptureListener listener = createCaptureListener();
+        CaptureCallback listener = createCaptureListener();
         mSession.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
         mSession.capture(requestBuilder.build(), listener, mHandler);
     }
@@ -252,7 +252,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
                 return;
             } else if (mSuccess) {
                 mAutoFocus.lockAutoFocus(mRepeatingBuilder, requestBuilder);
-                CaptureListener listener = createCaptureListener();
+                CaptureCallback listener = createCaptureListener();
                 mSession.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
                 mSession.capture(requestBuilder.build(), listener, mHandler);
             } else {
@@ -276,7 +276,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
         }
         mAutoFocus.resetState();
 
-        CaptureListener listener = createCaptureListener();
+        CaptureCallback listener = createCaptureListener();
         mSession.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
         mSession.capture(requestBuilder.build(), listener, mHandler);
     }
@@ -332,7 +332,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
         mAfRegions = new MeteringRectangle[] {
                 new MeteringRectangle(0, 0, 0, 0, MeteringRectangle.METERING_WEIGHT_DONT_CARE)};
     }
-    private CaptureListener createCaptureListener() {
+    private CaptureCallback createCaptureListener() {
 
         int thisAfRun;
         synchronized (this) {
@@ -341,7 +341,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
 
         final int finalAfRun = thisAfRun;
 
-        return new CaptureListener() {
+        return new CaptureCallback() {
             private long mLatestFrameCount = -1;
 
             @Override

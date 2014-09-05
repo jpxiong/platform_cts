@@ -16,7 +16,7 @@
 
 package android.hardware.camera2.cts;
 
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -43,8 +43,8 @@ import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
-import com.android.ex.camera2.blocking.BlockingSessionListener;
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import junit.framework.Assert;
@@ -195,7 +195,7 @@ public class CameraTestUtils extends Assert {
         }
     }
 
-    public static class SimpleCaptureListener extends CameraCaptureSession.CaptureListener {
+    public static class SimpleCaptureCallback extends CameraCaptureSession.CaptureCallback {
         private final LinkedBlockingQueue<CaptureResult> mQueue =
                 new LinkedBlockingQueue<CaptureResult>();
 
@@ -292,7 +292,7 @@ public class CameraTestUtils extends Assert {
      *            If opening times out. Typically unrecoverable.
      */
     public static CameraDevice openCamera(CameraManager manager, String cameraId,
-            CameraDevice.StateListener listener, Handler handler) throws CameraAccessException,
+            CameraDevice.StateCallback listener, Handler handler) throws CameraAccessException,
             BlockingOpenException {
 
         /**
@@ -338,9 +338,9 @@ public class CameraTestUtils extends Assert {
      */
     public static CameraCaptureSession configureCameraSession(CameraDevice camera,
             List<Surface> outputSurfaces,
-            CameraCaptureSession.StateListener listener, Handler handler)
+            CameraCaptureSession.StateCallback listener, Handler handler)
             throws CameraAccessException {
-        BlockingSessionListener sessionListener = new BlockingSessionListener(listener);
+        BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
         camera.createCaptureSession(outputSurfaces, sessionListener, handler);
 
         return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
@@ -781,19 +781,19 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
-     * Provide a mock for {@link CameraDevice.StateListener}.
+     * Provide a mock for {@link CameraDevice.StateCallback}.
      *
-     * <p>Only useful because mockito can't mock {@link CameraDevice.StateListener} which is an
+     * <p>Only useful because mockito can't mock {@link CameraDevice.StateCallback} which is an
      * abstract class.</p>
      *
      * <p>
      * Use this instead of other classes when needing to verify interactions, since
-     * trying to spy on {@link BlockingStateListener} (or others) will cause unnecessary extra
+     * trying to spy on {@link BlockingStateCallback} (or others) will cause unnecessary extra
      * interactions which will cause false test failures.
      * </p>
      *
      */
-    public static class MockStateListener extends CameraDevice.StateListener {
+    public static class MockStateCallback extends CameraDevice.StateCallback {
 
         @Override
         public void onOpened(CameraDevice camera) {
@@ -807,13 +807,13 @@ public class CameraTestUtils extends Assert {
         public void onError(CameraDevice camera, int error) {
         }
 
-        private MockStateListener() {}
+        private MockStateCallback() {}
 
         /**
-         * Create a Mockito-ready mocked StateListener.
+         * Create a Mockito-ready mocked StateCallback.
          */
-        public static MockStateListener mock() {
-            return Mockito.spy(new MockStateListener());
+        public static MockStateCallback mock() {
+            return Mockito.spy(new MockStateCallback());
         }
     }
 

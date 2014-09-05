@@ -17,8 +17,8 @@
 package android.hardware.camera2.cts.testcases;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -26,7 +26,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
@@ -45,8 +45,8 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
-import com.android.ex.camera2.blocking.BlockingSessionListener;
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 
 import junit.framework.Assert;
 
@@ -71,7 +71,7 @@ public class Camera2MultiViewTestCase extends
     protected Handler mHandler;
 
     private CameraManager mCameraManager;
-    private BlockingStateListener mCameraListener;
+    private BlockingStateCallback mCameraListener;
     private HandlerThread mHandlerThread;
     private Context mContext;
 
@@ -94,7 +94,7 @@ public class Camera2MultiViewTestCase extends
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
+        mCameraListener = new BlockingStateCallback();
         Camera2MultiViewStubActivity activity = (Camera2MultiViewStubActivity) mContext;
         mTextureView[0] = activity.getTextureView(0);
         mTextureView[1] = activity.getTextureView(1);
@@ -229,7 +229,7 @@ public class Camera2MultiViewTestCase extends
     }
 
     protected void startPreview(
-            String cameraId, List<Surface> outputSurfaces, CaptureListener listener)
+            String cameraId, List<Surface> outputSurfaces, CaptureCallback listener)
             throws Exception {
         CameraHolder camera = getCameraHolder(cameraId);
         assertTrue("Camera " + cameraId + " is not openned", camera.isOpenned());
@@ -339,7 +339,7 @@ public class Camera2MultiViewTestCase extends
         private CameraDevice mCamera;
         private StaticMetadata mStaticInfo;
         private List<Size> mOrderedPreviewSizes;
-        private BlockingSessionListener mSessionListener;
+        private BlockingSessionCallback mSessionListener;
 
         public CameraHolder(String id){
             mCameraId = id;
@@ -380,9 +380,9 @@ public class Camera2MultiViewTestCase extends
             mOrderedPreviewSizes = null;
         }
 
-        public void startPreview(List<Surface> outputSurfaces, CaptureListener listener)
+        public void startPreview(List<Surface> outputSurfaces, CaptureCallback listener)
                 throws Exception {
-            mSessionListener = new BlockingSessionListener();
+            mSessionListener = new BlockingSessionCallback();
             mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
             // TODO: vary the different settings like crop region to cover more cases.

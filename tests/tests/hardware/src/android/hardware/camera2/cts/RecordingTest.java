@@ -12,7 +12,7 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingSessionListener.*;
+import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
 
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
@@ -39,7 +39,7 @@ import android.util.Log;
 import android.util.Range;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 
 import junit.framework.AssertionFailedError;
 
@@ -337,7 +337,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         if (mReaderSurface != null) {
             outputSurfaces.add(mReaderSurface);
         }
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         CaptureRequest.Builder recordingRequestBuilder =
@@ -581,7 +581,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             prepareRecordingWithProfile(profile);
 
             // prepare video snapshot
-            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
             SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
             CaptureRequest.Builder videoSnapshotRequestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
@@ -726,7 +726,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     }
 
     private void startRecording(boolean useMediaRecorder,
-            CameraCaptureSession.CaptureListener listener) throws Exception {
+            CameraCaptureSession.CaptureCallback listener) throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(2);
         assertTrue("Both preview and recording surfaces should be valid",
                 mPreviewSurface.isValid() && mRecordingSurface.isValid());
@@ -736,7 +736,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         if (mReaderSurface != null) {
             outputSurfaces.add(mReaderSurface);
         }
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
 
         CaptureRequest.Builder recordingRequestBuilder =
@@ -841,7 +841,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * Here frame drop is defined as frame duration >= 2 * expected frame duration.
      */
     private void validateFrameDropAroundVideoSnapshot(
-            SimpleCaptureListener resultListener, long imageTimeStamp) {
+            SimpleCaptureCallback resultListener, long imageTimeStamp) {
         int expectedDurationMs = 1000 / mVideoFrameRate;
         CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
@@ -890,7 +890,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     /**
      * Validate frame jittering from the input simple listener's buffered results
      */
-    private void validateJittering(SimpleCaptureListener resultListener) {
+    private void validateJittering(SimpleCaptureCallback resultListener) {
         int expectedDurationMs = 1000 / mVideoFrameRate;
         CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
