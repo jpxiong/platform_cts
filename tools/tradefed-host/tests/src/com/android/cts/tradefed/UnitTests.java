@@ -22,6 +22,7 @@ import com.android.cts.tradefed.result.TestResultsTest;
 import com.android.cts.tradefed.result.TestSummaryXmlTest;
 import com.android.cts.tradefed.result.TestTest;
 import com.android.cts.tradefed.testtype.CtsTestTest;
+import com.android.cts.tradefed.testtype.DeqpTestTest;
 import com.android.cts.tradefed.testtype.JarHostTestTest;
 import com.android.cts.tradefed.testtype.TestFilterTest;
 import com.android.cts.tradefed.testtype.TestPackageDefTest;
@@ -59,6 +60,7 @@ public class UnitTests extends TestSuite {
         addTestSuite(TestPackageXmlParserTest.class);
         addTestSuite(TestPlanTest.class);
         addTestSuite(WrappedGTestResultParserTest.class);
+        addTestSuite(DeqpTestTest.class);
     }
 
     public static Test suite() {
