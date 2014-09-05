@@ -445,6 +445,16 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.SENSOR_NOISE_PROFILE);
         }
 
+        if (mStaticInfo.getAeMaxRegionsChecked() == 0) {
+            waiverKeys.add(CaptureResult.CONTROL_AE_REGIONS);
+        }
+        if (mStaticInfo.getAwbMaxRegionsChecked() == 0) {
+            waiverKeys.add(CaptureResult.CONTROL_AWB_REGIONS);
+        }
+        if (mStaticInfo.getAfMaxRegionsChecked() == 0) {
+            waiverKeys.add(CaptureResult.CONTROL_AF_REGIONS);
+        }
+
         if (mStaticInfo.isHardwareLevelFull()) {
             return waiverKeys;
         }
@@ -498,7 +508,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER);
         waiverKeys.add(CaptureResult.CONTROL_AE_STATE);
         waiverKeys.add(CaptureResult.CONTROL_AWB_STATE);
-        waiverKeys.add(CaptureResult.CONTROL_AWB_REGIONS);
         waiverKeys.add(CaptureResult.FLASH_STATE);
         waiverKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
         waiverKeys.add(CaptureResult.LENS_FOCUS_RANGE);
