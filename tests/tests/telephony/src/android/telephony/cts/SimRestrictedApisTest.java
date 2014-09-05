@@ -214,13 +214,13 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     }
 
     /**
-     * Tests the TelephonyManager.setPreferredNetworkType() API. This makes a call to
-     * setPreferredNetworkType() API and expects a SecurityException since the test apk
+     * Tests the TelephonyManager.setGlobalPreferredNetworkType() API. This makes a call to
+     * setGlobalPreferredNetworkType() API and expects a SecurityException since the test apk
      * is not signed by certificate on the SIM.
      */
-    public void testSetPreferredNetworkType() {
+    public void testSetGlobalPreferredNetworkType() {
         try {
-            TelephonyManager.getDefault().setPreferredNetworkType(0);
+            TelephonyManager.getDefault().setGlobalPreferredNetworkType();
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
