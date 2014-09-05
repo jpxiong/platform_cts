@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef __ANDROID_NET_CTS_H__
-#define __ANDROID_NET_CTS_H__
+#ifndef __ANDROID_SECURITY_CTS_H__
+#define __ANDROID_SECURITY_CTS_H__
 
-int register_android_net_cts_NetlinkSocket(JNIEnv*);
+int register_android_security_cts_NetlinkSocket(JNIEnv*);
 
-#endif /* __ANDROID_NET_CTS_H__ */
+#endif /* __ANDROID_SECURITY_CTS_H__ */
