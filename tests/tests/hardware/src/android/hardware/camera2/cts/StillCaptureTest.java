@@ -32,7 +32,7 @@ import android.hardware.camera2.DngCreator;
 import android.media.ImageReader;
 import android.util.Pair;
 import android.util.Size;
-import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
 import android.hardware.camera2.cts.helpers.Camera2Focuser;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
@@ -46,7 +46,7 @@ import android.util.Range;
 import android.util.Rational;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.io.ByteArrayOutputStream;
@@ -391,8 +391,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
 
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
-        SimpleCaptureListener stillResultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+        SimpleCaptureCallback stillResultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
         CaptureRequest.Builder previewRequest =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -443,7 +443,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
         CaptureResult result;
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
         CaptureRequest.Builder previewRequest =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -496,7 +496,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         /**
          * Step 2: AF is already locked, wait for AWB converged, then lock it.
          */
-        resultListener = new SimpleCaptureListener();
+        resultListener = new SimpleCaptureCallback();
         boolean canSetAwbRegion =
                 (awbRegions != null) && isRegionsSupportedFor3A(MAX_REGIONS_AWB_INDEX);
         if (canSetAwbRegion) {
@@ -528,7 +528,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         /**
          * Step 3: trigger an AE precapture metering sequence and wait for AE converged.
          */
-        resultListener = new SimpleCaptureListener();
+        resultListener = new SimpleCaptureCallback();
         boolean canSetAeRegion =
                 (aeRegions != null) && isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
         if (canSetAeRegion) {
@@ -560,7 +560,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         /**
          * Step 4: take a picture when all 3A are in good state.
          */
-        resultListener = new SimpleCaptureListener();
+        resultListener = new SimpleCaptureCallback();
         CaptureRequest request = stillRequest.build();
         mSession.capture(request, resultListener, mHandler);
         // Validate the next result immediately for region and mode.
@@ -591,7 +591,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      * Test touch region for focus by camera.
      */
     private void touchForFocusTestByCamera() throws Exception {
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
@@ -610,7 +610,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     private void previewStillCombinationTestByCamera() throws Exception {
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
 
         for (Size stillSz : mOrderedStillSizes)
@@ -652,7 +652,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             CaptureRequest.Builder rawBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
             SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
             prepareRawCaptureAndStartPreview(previewBuilder, rawBuilder, maxPreviewSz, size,
                     resultListener, imageListener);
@@ -693,7 +693,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             CaptureRequest.Builder multiBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
 
-            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
             SimpleImageReaderListener jpegListener = new SimpleImageReaderListener();
             SimpleImageReaderListener rawListener = new SimpleImageReaderListener();
 
@@ -714,7 +714,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 outputSurfaces.add(rawReader.getSurface());
                 outputSurfaces.add(jpegReader.getSurface());
                 outputSurfaces.add(mPreviewSurface);
-                mSessionListener = new BlockingSessionListener();
+                mSessionListener = new BlockingSessionCallback();
                 mSession = configureCameraSession(mCamera, outputSurfaces,
                         mSessionListener, mHandler);
 
@@ -892,7 +892,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         CaptureRequest.Builder stillBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
         prepareStillCaptureAndStartPreview(previewBuilder, stillBuilder, maxPreviewSz, maxStillSz,
                 resultListener, imageListener);
@@ -1214,7 +1214,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
         CaptureRequest.Builder previewRequest =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);

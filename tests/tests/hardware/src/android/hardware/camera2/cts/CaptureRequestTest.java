@@ -27,7 +27,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.Face;
@@ -138,7 +138,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                SimpleCaptureListener listener = new SimpleCaptureListener();
+                SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 CaptureRequest.Builder requestBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -156,7 +156,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
                 // Double the exposure time and gain, with black level still being locked.
                 changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS * 2, DEFAULT_SENSITIVITY * 2);
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, previewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 // Allow at most one lock OFF state as the exposure is changed once.
@@ -191,7 +191,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                SimpleCaptureListener listener = new SimpleCaptureListener();
+                SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 CaptureRequest.Builder requestBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -204,7 +204,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
 
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, previewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_OFF);
@@ -213,7 +213,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // should output valid maps.
                 requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_FAST);
 
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, previewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 // Allow at most one lock OFF state as the exposure is changed once.
@@ -223,7 +223,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // should output valid maps.
                 requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_HIGH_QUALITY);
 
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, previewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_HIGH_QUALITY);
@@ -309,7 +309,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
-                SimpleCaptureListener listener = new SimpleCaptureListener();
+                SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 CaptureRequest.Builder requestBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -555,12 +555,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         int[] availableModes = mStaticInfo.getAvailableNoiseReductionModesChecked();
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPrevSize, resultListener);
 
         for (int mode : availableModes) {
             requestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE, mode);
-            resultListener = new SimpleCaptureListener();
+            resultListener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
             waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -583,7 +583,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPrevSize, resultListener);
 
         CaptureRequest request;
@@ -591,7 +591,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < testDistances.length; i++) {
             requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, testDistances[i]);
             request = requestBuilder.build();
-            resultListener = new SimpleCaptureListener();
+            resultListener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(request, resultListener, mHandler);
             waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             resultDistances[i] = verifyFocusDistanceControl(testDistances[i], request,
@@ -614,7 +614,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             if (hyperFocalDistance > 0) {
                 requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, hyperFocalDistance);
                 request = requestBuilder.build();
-                resultListener = new SimpleCaptureListener();
+                resultListener = new SimpleCaptureCallback();
                 mSession.setRepeatingRequest(request, resultListener, mHandler);
                 waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -651,7 +651,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @return the result focus distance
      */
     private float verifyFocusDistanceControl(float distance, CaptureRequest request,
-            SimpleCaptureListener resultListener) {
+            SimpleCaptureCallback resultListener) {
         // Need make sure the result corresponding to the request is back, then check.
         CaptureResult result =
                 resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
@@ -682,12 +682,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         int[] edgeModes = mStaticInfo.getAvailableEdgeModesChecked();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPrevSize, resultListener);
 
         for (int mode : edgeModes) {
             requestBuilder.set(CaptureRequest.EDGE_MODE, mode);
-            resultListener = new SimpleCaptureListener();
+            resultListener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
             waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -717,7 +717,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         updatePreviewSurface(maxPreviewSz);
         CaptureRequest.Builder manualRequestBuilder = createRequestForPreview();
         CaptureRequest.Builder previewRequestBuilder = createRequestForPreview();
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
 
         startPreview(previewRequestBuilder, maxPreviewSz, listener);
 
@@ -814,7 +814,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param listener The Capture listener that is used to wait for capture result
      * @param aeMode The AE mode for flash to test with
      */
-    private void flashTestByAeMode(SimpleCaptureListener listener, int aeMode) throws Exception {
+    private void flashTestByAeMode(SimpleCaptureCallback listener, int aeMode) throws Exception {
         CaptureResult result;
         final int NUM_FLASH_REQUESTS_TESTED = 10;
         CaptureRequest.Builder requestBuilder = createRequestForPreview();
@@ -892,7 +892,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 result.get(CaptureResult.FLASH_MODE));
     }
 
-    private void verifyAntiBandingMode(SimpleCaptureListener listener, int numFramesVerified,
+    private void verifyAntiBandingMode(SimpleCaptureCallback listener, int numFramesVerified,
             int mode, boolean isAeManual, long requestExpTime) throws Exception {
         // Skip the first a couple of frames as antibanding may not be fully up yet.
         final int NUM_FRAMES_SKIPPED = 5;
@@ -959,7 +959,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         requestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, mode);
 
         // Test auto AE mode anti-banding behavior
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, size, resultListener);
         waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/false,
@@ -970,7 +970,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         final long TEST_MANUAL_EXP_TIME_NS = 65000000L;
         long manualExpTime = mStaticInfo.getExposureClampToRange(TEST_MANUAL_EXP_TIME_NS);
         changeExposure(requestBuilder, manualExpTime);
-        resultListener = new SimpleCaptureListener();
+        resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, size, resultListener);
         waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/true,
@@ -1053,7 +1053,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         final int NUM_CAPTURES_BEFORE_LOCK = 2;
-        SimpleCaptureListener listener =  new SimpleCaptureListener();
+        SimpleCaptureCallback listener =  new SimpleCaptureCallback();
 
         CaptureResult[] resultsDuringLock = new CaptureResult[numCapturesDuringLock];
 
@@ -1119,7 +1119,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
         configurePreviewOutput(requestBuilder);
-        SimpleCaptureListener listener =  new SimpleCaptureListener();
+        SimpleCaptureCallback listener =  new SimpleCaptureCallback();
 
         long[] expTimes = getExposureTimeTestValues();
         int[] sensitivities = getSensitivityTestValues();
@@ -1151,7 +1151,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     /**
      * Verify black level lock control.
      */
-    private void verifyBlackLevelLockResults(SimpleCaptureListener listener, int numFramesVerified,
+    private void verifyBlackLevelLockResults(SimpleCaptureCallback listener, int numFramesVerified,
             int maxLockOffCnt) throws Exception {
         int noLockCnt = 0;
         for (int i = 0; i < numFramesVerified; i++) {
@@ -1175,7 +1175,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     /**
      * Verify shading map for different shading modes.
      */
-    private void verifyShadingMap(SimpleCaptureListener listener, int numFramesVerified,
+    private void verifyShadingMap(SimpleCaptureCallback listener, int numFramesVerified,
             int shadingMode) throws Exception {
 
         for (int i = 0; i < numFramesVerified; i++) {
@@ -1225,7 +1225,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void faceDetectionTestByCamera() throws Exception {
         int[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
 
-        SimpleCaptureListener listener;
+        SimpleCaptureCallback listener;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -1238,7 +1238,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
             // Create a new listener for each run to avoid the results from one run spill
             // into another run.
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             startPreview(requestBuilder, maxPreviewSz, listener);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
             verifyFaceDetectionResults(listener, NUM_FACE_DETECTION_FRAMES_VERIFIED, mode);
@@ -1254,7 +1254,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param numFramesVerified Number of results to be verified
      * @param faceDetectionMode Face detection mode to be verified against
      */
-    private void verifyFaceDetectionResults(SimpleCaptureListener listener, int numFramesVerified,
+    private void verifyFaceDetectionResults(SimpleCaptureCallback listener, int numFramesVerified,
             int faceDetectionMode) {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
@@ -1337,7 +1337,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             return;
         }
 
-        SimpleCaptureListener listener;
+        SimpleCaptureCallback listener;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
@@ -1356,7 +1356,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcLinear);
                 // Create a new listener for each run to avoid the results from one run spill
                 // into another run.
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, maxPreviewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
@@ -1367,7 +1367,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcSrgb);
                 // Create a new listener for each run to avoid the results from one run spill
                 // into another run.
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, maxPreviewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
@@ -1375,7 +1375,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             } else {
                 // Create a new listener for each run to avoid the results from one run spill
                 // into another run.
-                listener = new SimpleCaptureListener();
+                listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, maxPreviewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
                 verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
@@ -1398,7 +1398,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param inputToneCurve Tonemap curve used by all 3 channels, ignored when
      * map mode is not CONTRAST_CURVE.
      */
-    private void verifyToneMapModeResults(SimpleCaptureListener listener, int numFramesVerified,
+    private void verifyToneMapModeResults(SimpleCaptureCallback listener, int numFramesVerified,
             int tonemapMode, float[] inputToneCurve) {
         final int MIN_TONEMAP_CURVE_POINTS = 2;
         final Float ZERO = new Float(0);
@@ -1459,9 +1459,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
 
         for (int mode : awbModes) {
-            SimpleCaptureListener listener;
+            SimpleCaptureCallback listener;
             requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, mode);
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -1471,7 +1471,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
             // Verify color correction transform and gains stay unchanged after a lock.
             requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -1484,7 +1484,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void verifyAwbCaptureResultUnchanged(SimpleCaptureListener listener,
+    private void verifyAwbCaptureResultUnchanged(SimpleCaptureCallback listener,
             int numFramesVerified) {
         // Skip check if cc gains/transform/mode are not available
         if (!mStaticInfo.areKeysAvailable(
@@ -1532,9 +1532,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
 
         for (int mode : afModes) {
-            SimpleCaptureListener listener;
+            SimpleCaptureCallback listener;
             requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, mode);
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -1571,11 +1571,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPreviewSize, listener);
 
         for (int mode : videoStabModes) {
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
@@ -1584,7 +1584,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         for (int mode : opticalStabModes) {
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             requestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, mode);
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
@@ -1630,7 +1630,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         MeteringRectangle[][] expectRegions = new MeteringRectangle[ZOOM_STEPS][];
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
 
         updatePreviewSurface(previewSize);
         configurePreviewOutput(requestBuilder);
@@ -1793,13 +1793,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
         requestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
         startPreview(requestBuilder, maxPreviewSize, listener);
 
         for(int mode : sceneModes) {
             requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, mode);
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -1817,12 +1817,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         requestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
-        SimpleCaptureListener listener = new SimpleCaptureListener();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPreviewSize, listener);
 
         for(int mode : effectModes) {
             requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, mode);
-            listener = new SimpleCaptureListener();
+            listener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
             waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
@@ -1999,7 +1999,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * @param numFramesVerified The number of capture results to be verified
      */
     private <T> void verifyCaptureResultForKey(CaptureResult.Key<T> key, T requestMode,
-            SimpleCaptureListener listener, int numFramesVerified) {
+            SimpleCaptureCallback listener, int numFramesVerified) {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             validatePipelineDepth(result);
@@ -2035,7 +2035,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         Range<Integer>[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
         boolean antiBandingOffIsSupported = mStaticInfo.isAntiBandingOffModeSupported();
         Range<Integer> fpsRange;
-        SimpleCaptureListener resultListener;
+        SimpleCaptureCallback resultListener;
 
         for (int i = 0; i < fpsRanges.length; i += 1) {
             fpsRange = fpsRanges[i];
@@ -2065,7 +2065,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                         " mode");
             }
 
-            resultListener = new SimpleCaptureListener();
+            resultListener = new SimpleCaptureCallback();
             startPreview(requestBuilder, previewSz, resultListener);
             long[] frameDurationRange =
                     new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};

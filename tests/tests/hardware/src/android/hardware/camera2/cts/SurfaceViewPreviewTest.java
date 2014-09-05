@@ -19,14 +19,14 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.util.Size;
-import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
 import android.util.Range;
@@ -64,7 +64,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
      * Test all supported preview sizes for each camera device.
      * <p>
      * For the first  {@link #NUM_FRAMES_VERIFIED}  of capture results,
-     * the {@link CaptureListener} callback availability and the capture timestamp
+     * the {@link CaptureCallback} callback availability and the capture timestamp
      * (monotonically increasing) ordering are verified.
      * </p>
      */
@@ -129,7 +129,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         Range<Integer> fpsRange;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         startPreview(requestBuilder, maxPreviewSz, resultListener);
 
         for (int i = 0; i < fpsRanges.length; i += 1) {
@@ -149,7 +149,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
                         " mode");
             }
 
-            resultListener = new SimpleCaptureListener();
+            resultListener = new SimpleCaptureCallback();
             mSession.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
             verifyPreviewTargetFpsRange(resultListener, NUM_FRAMES_VERIFIED, fpsRange,
@@ -159,7 +159,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         stopPreview();
     }
 
-    private void verifyPreviewTargetFpsRange(SimpleCaptureListener resultListener,
+    private void verifyPreviewTargetFpsRange(SimpleCaptureCallback resultListener,
             int numFramesVerified, Range<Integer> fpsRange, Size previewSz) {
         CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         List<Integer> capabilities = mStaticInfo.getAvailableCapabilitiesChecked();
@@ -206,11 +206,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             // TODO: vary the different settings like crop region to cover more cases.
             CaptureRequest.Builder requestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            CaptureListener mockCaptureListener =
-                    mock(CameraCaptureSession.CaptureListener.class);
+            CaptureCallback mockCaptureCallback =
+                    mock(CameraCaptureSession.CaptureCallback.class);
 
-            startPreview(requestBuilder, sz, mockCaptureListener);
-            verifyCaptureResults(mSession, mockCaptureListener, NUM_FRAMES_VERIFIED,
+            startPreview(requestBuilder, sz, mockCaptureCallback);
+            verifyCaptureResults(mSession, mockCaptureCallback, NUM_FRAMES_VERIFIED,
                     NUM_FRAMES_VERIFIED * FRAME_TIMEOUT_MS);
             stopPreview();
         }
@@ -221,7 +221,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         int[] testPatternModes = mStaticInfo.getAvailableTestPatternModesChecked();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        CaptureListener mockCaptureListener;
+        CaptureCallback mockCaptureCallback;
 
         final int[] TEST_PATTERN_DATA = {0, 0xFFFFFFFF, 0xFFFFFFFF, 0}; // G:100%, RB:0.
         for (int mode : testPatternModes) {
@@ -233,9 +233,9 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
                 // Assign color pattern to SENSOR_TEST_PATTERN_MODE_DATA
                 requestBuilder.set(CaptureRequest.SENSOR_TEST_PATTERN_DATA, TEST_PATTERN_DATA);
             }
-            mockCaptureListener = mock(CaptureListener.class);
-            startPreview(requestBuilder, maxPreviewSize, mockCaptureListener);
-            verifyCaptureResults(mSession, mockCaptureListener, NUM_TEST_PATTERN_FRAMES_VERIFIED,
+            mockCaptureCallback = mock(CaptureCallback.class);
+            startPreview(requestBuilder, maxPreviewSize, mockCaptureCallback);
+            verifyCaptureResults(mSession, mockCaptureCallback, NUM_TEST_PATTERN_FRAMES_VERIFIED,
                     NUM_TEST_PATTERN_FRAMES_VERIFIED * FRAME_TIMEOUT_MS);
         }
 
@@ -256,7 +256,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
 
     private void verifyCaptureResults(
             CameraCaptureSession session,
-            CaptureListener mockListener,
+            CaptureCallback mockListener,
             int expectResultCount,
             int timeOutMs) {
         // Should receive expected number of onCaptureStarted callbacks.

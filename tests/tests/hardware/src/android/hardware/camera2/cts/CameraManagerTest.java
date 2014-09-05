@@ -25,16 +25,16 @@ import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraDevice.StateListener;
+import android.hardware.camera2.CameraDevice.StateCallback;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.cts.CameraTestUtils.MockStateListener;
+import android.hardware.camera2.cts.CameraTestUtils.MockStateCallback;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -56,7 +56,7 @@ public class CameraManagerTest extends AndroidTestCase {
     private NoopCameraListener mListener;
     private HandlerThread mHandlerThread;
     private Handler mHandler;
-    private BlockingStateListener mCameraListener;
+    private BlockingStateCallback mCameraListener;
     private CameraErrorCollector mCollector;
 
     @Override
@@ -81,7 +81,7 @@ public class CameraManagerTest extends AndroidTestCase {
          */
         System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
 
-        mCameraListener = spy(new BlockingStateListener());
+        mCameraListener = spy(new BlockingStateCallback());
 
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
@@ -205,13 +205,13 @@ public class CameraManagerTest extends AndroidTestCase {
             for (int j = 0; j < NUM_CAMERA_REOPENS; j++) {
                 CameraDevice camera = null;
                 try {
-                    MockStateListener mockListener = MockStateListener.mock();
-                    mCameraListener = new BlockingStateListener(mockListener);
+                    MockStateCallback mockListener = MockStateCallback.mock();
+                    mCameraListener = new BlockingStateCallback(mockListener);
 
                     mCameraManager.openCamera(ids[i], mCameraListener, mHandler);
 
                     // Block until unConfigured
-                    mCameraListener.waitForState(BlockingStateListener.STATE_OPENED,
+                    mCameraListener.waitForState(BlockingStateCallback.STATE_OPENED,
                             CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
                     // Ensure state transitions are in right order:
@@ -241,19 +241,19 @@ public class CameraManagerTest extends AndroidTestCase {
         }
 
         List<CameraDevice> cameraList = new ArrayList<CameraDevice>();
-        List<MockStateListener> listenerList = new ArrayList<MockStateListener>();
-        List<BlockingStateListener> blockingListenerList = new ArrayList<BlockingStateListener>();
+        List<MockStateCallback> listenerList = new ArrayList<MockStateCallback>();
+        List<BlockingStateCallback> blockingListenerList = new ArrayList<BlockingStateCallback>();
         try {
             for (int i = 0; i < ids.length; i++) {
                 // Ignore state changes from other cameras
-                MockStateListener mockListener = MockStateListener.mock();
-                mCameraListener = new BlockingStateListener(mockListener);
+                MockStateCallback mockListener = MockStateCallback.mock();
+                mCameraListener = new BlockingStateCallback(mockListener);
 
                 /**
                  * Track whether or not we got a synchronous error from openCamera.
                  *
                  * A synchronous error must also be accompanied by an asynchronous
-                 * StateListener#onError callback.
+                 * StateCallback#onError callback.
                  */
                 boolean expectingError = false;
 
@@ -271,16 +271,16 @@ public class CameraManagerTest extends AndroidTestCase {
                 }
 
                 List<Integer> expectedStates = new ArrayList<Integer>();
-                expectedStates.add(BlockingStateListener.STATE_OPENED);
-                expectedStates.add(BlockingStateListener.STATE_ERROR);
+                expectedStates.add(BlockingStateCallback.STATE_OPENED);
+                expectedStates.add(BlockingStateCallback.STATE_ERROR);
                 int state = mCameraListener.waitForAnyOfStates(
                         expectedStates, CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
                 // It's possible that we got an asynchronous error transition only. This is ok.
                 if (expectingError) {
                     assertEquals("Throwing a CAMERA_ERROR exception must be accompanied with a " +
-                            "StateListener#onError callback",
-                            BlockingStateListener.STATE_ERROR, state);
+                            "StateCallback#onError callback",
+                            BlockingStateCallback.STATE_ERROR, state);
                 }
 
                 /**
@@ -297,7 +297,7 @@ public class CameraManagerTest extends AndroidTestCase {
                  */
 
                 CameraDevice camera;
-                if (state == BlockingStateListener.STATE_ERROR) {
+                if (state == BlockingStateCallback.STATE_ERROR) {
                     // Camera did not open because too many other cameras were opened
                     // => onError called exactly once with a non-null camera
                     assertTrue("At least one camera must be opened successfully",
@@ -309,13 +309,13 @@ public class CameraManagerTest extends AndroidTestCase {
                     verify(mockListener)
                             .onError(
                                     argument.capture(),
-                                    eq(CameraDevice.StateListener.ERROR_MAX_CAMERAS_IN_USE));
+                                    eq(CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE));
                     verifyNoMoreInteractions(mockListener);
 
                     camera = argument.getValue();
                     assertNotNull("Expected a non-null camera for the error transition for ID: "
                             + ids[i], camera);
-                } else if (state == BlockingStateListener.STATE_OPENED) {
+                } else if (state == BlockingStateCallback.STATE_OPENED) {
                     // Camera opened successfully.
                     // => onOpened called exactly once
                     camera = verifyCameraStateOpened(cameraId,
@@ -334,9 +334,9 @@ public class CameraManagerTest extends AndroidTestCase {
             for (CameraDevice camera : cameraList) {
                 camera.close();
             }
-            for (BlockingStateListener blockingListener : blockingListenerList) {
+            for (BlockingStateCallback blockingListener : blockingListenerList) {
                 blockingListener.waitForState(
-                        BlockingStateListener.STATE_CLOSED,
+                        BlockingStateCallback.STATE_CLOSED,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
             }
         }
@@ -346,7 +346,7 @@ public class CameraManagerTest extends AndroidTestCase {
          * after closing the cameras.
          */
         int i = 0;
-        for (MockStateListener listener : listenerList) {
+        for (MockStateCallback listener : listenerList) {
             CameraDevice camera = cameraList.get(i);
 
             verify(listener).onClosed(eq(camera));
@@ -373,7 +373,7 @@ public class CameraManagerTest extends AndroidTestCase {
      * @return The camera device (non-{@code null}).
      */
     private static CameraDevice verifyCameraStateOpened(String cameraId,
-            MockStateListener listener) {
+            MockStateCallback listener) {
         ArgumentCaptor<CameraDevice> argument =
                 ArgumentCaptor.forClass(CameraDevice.class);
         InOrder inOrder = inOrder(listener);
@@ -411,13 +411,13 @@ public class CameraManagerTest extends AndroidTestCase {
             mCollector.setCameraId(ids[i]);
 
             try {
-                MockStateListener mockSuccessListener = MockStateListener.mock();
-                MockStateListener mockFailListener = MockStateListener.mock();
+                MockStateCallback mockSuccessListener = MockStateCallback.mock();
+                MockStateCallback mockFailListener = MockStateCallback.mock();
 
-                BlockingStateListener successListener =
-                        new BlockingStateListener(mockSuccessListener);
-                BlockingStateListener failListener =
-                        new BlockingStateListener(mockFailListener);
+                BlockingStateCallback successListener =
+                        new BlockingStateCallback(mockSuccessListener);
+                BlockingStateCallback failListener =
+                        new BlockingStateCallback(mockFailListener);
 
                 mCameraManager.openCamera(ids[i], successListener, mHandler);
 
@@ -434,7 +434,7 @@ public class CameraManagerTest extends AndroidTestCase {
                             CameraAccessException.CAMERA_ERROR, e.getReason());
                 }
 
-                successListener.waitForState(BlockingStateListener.STATE_OPENED,
+                successListener.waitForState(BlockingStateCallback.STATE_OPENED,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
                 // Have to get the successCamera here, otherwise, it won't be
                 // closed if STATE_ERROR timeout exception occurs.
@@ -442,7 +442,7 @@ public class CameraManagerTest extends AndroidTestCase {
                         ArgumentCaptor.forClass(CameraDevice.class);
                 verify(mockSuccessListener, atLeastOnce()).onOpened(argument.capture());
 
-                failListener.waitForState(BlockingStateListener.STATE_ERROR,
+                failListener.waitForState(BlockingStateCallback.STATE_ERROR,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
                 successCamera = verifyCameraStateOpened(
@@ -451,7 +451,7 @@ public class CameraManagerTest extends AndroidTestCase {
                 verify(mockFailListener)
                         .onError(
                                 and(notNull(CameraDevice.class), not(eq(successCamera))),
-                                eq(StateListener.ERROR_CAMERA_IN_USE));
+                                eq(StateCallback.ERROR_CAMERA_IN_USE));
                 verifyNoMoreInteractions(mockFailListener);
             } finally {
                 if (successCamera != null) {
@@ -461,7 +461,7 @@ public class CameraManagerTest extends AndroidTestCase {
         }
     }
 
-    private class NoopCameraListener extends CameraManager.AvailabilityListener {
+    private class NoopCameraListener extends CameraManager.AvailabilityCallback {
         @Override
         public void onCameraAvailable(String cameraId) {
             // No-op
@@ -480,11 +480,11 @@ public class CameraManagerTest extends AndroidTestCase {
      * a listener that isn't registered should have no effect.
      */
     public void testCameraManagerListener() throws Exception {
-        mCameraManager.removeAvailabilityListener(mListener);
-        mCameraManager.addAvailabilityListener(mListener, mHandler);
-        mCameraManager.addAvailabilityListener(mListener, mHandler);
-        mCameraManager.removeAvailabilityListener(mListener);
-        mCameraManager.removeAvailabilityListener(mListener);
+        mCameraManager.unregisterAvailabilityCallback(mListener);
+        mCameraManager.registerAvailabilityCallback(mListener, mHandler);
+        mCameraManager.registerAvailabilityCallback(mListener, mHandler);
+        mCameraManager.unregisterAvailabilityCallback(mListener);
+        mCameraManager.unregisterAvailabilityCallback(mListener);
 
         // TODO: test the listener callbacks
     }

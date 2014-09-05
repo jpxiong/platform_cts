@@ -17,11 +17,11 @@
 package android.hardware.camera2.cts.testcases;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.content.Context;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCaptureSession.CaptureListener;
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
@@ -39,8 +39,8 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
-import com.android.ex.camera2.blocking.BlockingSessionListener;
-import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
 
 import java.util.List;
 
@@ -57,8 +57,8 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected CameraManager mCameraManager;
     protected CameraDevice mCamera;
     protected CameraCaptureSession mCameraSession;
-    protected BlockingSessionListener mCameraSessionListener;
-    protected BlockingStateListener mCameraListener;
+    protected BlockingSessionCallback mCameraSessionListener;
+    protected BlockingStateCallback mCameraListener;
     protected String[] mCameraIds;
     protected ImageReader mReader;
     protected Surface mReaderSurface;
@@ -79,7 +79,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
 
     /**
      * Set up the camera2 test case required environments, including CameraManager,
-     * HandlerThread, Camera IDs, and CameraStateListener etc.
+     * HandlerThread, Camera IDs, and CameraStateCallback etc.
      */
     @Override
     protected void setUp() throws Exception {
@@ -98,7 +98,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
+        mCameraListener = new BlockingStateCallback();
         mCollector = new CameraErrorCollector();
     }
 
@@ -123,11 +123,11 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
      *
      * @param request The {@link #CaptureRequest} to be captured.
      * @param repeating If the capture is single capture or repeating.
-     * @param listener The {@link #CaptureListener} camera device used to notify callbacks.
+     * @param listener The {@link #CaptureCallback} camera device used to notify callbacks.
      * @param handler The handler camera device used to post callbacks.
      */
     protected void startCapture(CaptureRequest request, boolean repeating,
-            CaptureListener listener, Handler handler) throws Exception {
+            CaptureCallback listener, Handler handler) throws Exception {
         if (VERBOSE) Log.v(TAG, "Starting capture from device");
 
         if (repeating) {
@@ -153,11 +153,11 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
              */
             mCameraSession.abortCaptures();
             mCameraSessionListener.getStateWaiter().
-                    waitForState(BlockingSessionListener.SESSION_READY, CAMERA_IDLE_TIMEOUT_MS);
+                    waitForState(BlockingSessionCallback.SESSION_READY, CAMERA_IDLE_TIMEOUT_MS);
         } else {
             mCameraSession.close();
             mCameraSessionListener.getStateWaiter().
-                    waitForState(BlockingSessionListener.SESSION_CLOSED, CAMERA_IDLE_TIMEOUT_MS);
+                    waitForState(BlockingSessionCallback.SESSION_CLOSED, CAMERA_IDLE_TIMEOUT_MS);
         }
     }
 
@@ -175,9 +175,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
      * Open a {@link #CameraDevice} and get the StaticMetadata for a given camera id and listener.
      *
      * @param cameraId The id of the camera device to be opened.
-     * @param listener The {@link #BlockingStateListener} used to wait for states.
+     * @param listener The {@link #BlockingStateCallback} used to wait for states.
      */
-    protected void openDevice(String cameraId, BlockingStateListener listener) throws Exception {
+    protected void openDevice(String cameraId, BlockingStateCallback listener) throws Exception {
         mCamera = CameraTestUtils.openCamera(
                 mCameraManager, cameraId, listener, mHandler);
         mCollector.setCameraId(cameraId);
@@ -199,7 +199,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
      * @param outputSurfaces The set of output surfaces to configure for this session
      */
     protected void createSession(List<Surface> outputSurfaces) throws Exception {
-        mCameraSessionListener = new BlockingSessionListener();
+        mCameraSessionListener = new BlockingSessionCallback();
         mCameraSession = CameraTestUtils.configureCameraSession(mCamera, outputSurfaces,
                 mCameraSessionListener, mHandler);
     }
@@ -227,9 +227,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
      * </p>
      *
      * @param cameraId The id of the camera device to be closed.
-     * @param listener The BlockingStateListener used to wait for states.
+     * @param listener The BlockingStateCallback used to wait for states.
      */
-    protected void closeDevice(String cameraId, BlockingStateListener listener) {
+    protected void closeDevice(String cameraId, BlockingStateCallback listener) {
         if (mCamera != null) {
             if (!cameraId.equals(mCamera.getId())) {
                 throw new IllegalStateException("Try to close a device that is not opened yet");

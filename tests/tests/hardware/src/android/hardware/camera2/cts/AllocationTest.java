@@ -20,7 +20,7 @@ import static android.graphics.ImageFormat.YUV_420_888;
 import static android.hardware.camera2.cts.helpers.Preconditions.*;
 import static android.hardware.camera2.cts.helpers.AssertHelpers.*;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
@@ -56,8 +56,8 @@ import android.util.Rational;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
-import com.android.ex.camera2.blocking.BlockingStateListener;
-import com.android.ex.camera2.blocking.BlockingSessionListener;
+import com.android.ex.camera2.blocking.BlockingStateCallback;
+import com.android.ex.camera2.blocking.BlockingSessionCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,8 +78,8 @@ public class AllocationTest extends AndroidTestCase {
     private CameraManager mCameraManager;
     private CameraDevice mCamera;
     private CameraCaptureSession mSession;
-    private BlockingStateListener mCameraListener;
-    private BlockingSessionListener mSessionListener;
+    private BlockingStateCallback mCameraListener;
+    private BlockingSessionCallback mSessionListener;
 
     private String[] mCameraIds;
 
@@ -107,7 +107,7 @@ public class AllocationTest extends AndroidTestCase {
         mHandlerThread = new HandlerThread("AllocationTest");
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
+        mCameraListener = new BlockingStateCallback();
 
         mCameraIterable = new CameraIterable();
         mSizeIterable = new SizeIterable();
@@ -360,7 +360,7 @@ public class AllocationTest extends AndroidTestCase {
         assertNotNull("Failed to get Surface", cameraTarget);
         outputSurfaces.add(cameraTarget);
 
-        mSessionListener = new BlockingSessionListener();
+        mSessionListener = new BlockingSessionCallback();
         mCamera.createCaptureSession(outputSurfaces, mSessionListener, mHandler);
         mSession = mSessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
         CaptureRequest.Builder captureBuilder =
@@ -384,7 +384,7 @@ public class AllocationTest extends AndroidTestCase {
         checkNotNull("request", request);
         checkNotNull("graph", graph);
 
-        mSession.capture(request, new CameraCaptureSession.CaptureListener() {
+        mSession.capture(request, new CameraCaptureSession.CaptureCallback() {
             @Override
             public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
                     TotalCaptureResult result) {
@@ -402,7 +402,7 @@ public class AllocationTest extends AndroidTestCase {
         if (VERBOSE) Log.v(TAG, "Stopping capture and waiting for idle");
         // Stop repeat, wait for captures to complete, and disconnect from surfaces
         mSession.close();
-        mSessionListener.getStateWaiter().waitForState(BlockingSessionListener.SESSION_CLOSED,
+        mSessionListener.getStateWaiter().waitForState(BlockingSessionCallback.SESSION_CLOSED,
                 SESSION_CLOSE_TIMEOUT_MS);
         mSession = null;
         mSessionListener = null;
@@ -824,7 +824,7 @@ public class AllocationTest extends AndroidTestCase {
 
             // TODO: start capture, i.e. configureOutputs
 
-            SimpleCaptureListener listener = new SimpleCaptureListener();
+            SimpleCaptureCallback listener = new SimpleCaptureCallback();
 
             if (!repeating) {
                 for (int i = 0; i < count; ++i) {
@@ -835,7 +835,7 @@ public class AllocationTest extends AndroidTestCase {
             }
 
             // Assume that the device is already IDLE.
-            mSessionListener.getStateWaiter().waitForState(BlockingSessionListener.SESSION_ACTIVE,
+            mSessionListener.getStateWaiter().waitForState(BlockingSessionCallback.SESSION_ACTIVE,
                     CAMERA_ACTIVE_TIMEOUT_MS);
 
             for (int i = 0; i < count; ++i) {
@@ -851,7 +851,7 @@ public class AllocationTest extends AndroidTestCase {
             if (repeating) {
                 mSession.stopRepeating();
                 mSessionListener.getStateWaiter().waitForState(
-                    BlockingSessionListener.SESSION_READY, CAMERA_IDLE_TIMEOUT_MS);
+                    BlockingSessionCallback.SESSION_READY, CAMERA_IDLE_TIMEOUT_MS);
             }
 
             // TODO: Make a Configure decorator or some such for configureOutputs
