@@ -20,7 +20,6 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.Type;
 import java.util.Random;
-import com.android.cts.stub.R;
 
 public class AllocationCopy2DRangeTest extends RSBaseCompute {
     private Allocation mInAllocation;

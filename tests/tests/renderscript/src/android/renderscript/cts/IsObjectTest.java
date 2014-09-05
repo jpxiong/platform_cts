@@ -21,7 +21,6 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import com.android.cts.stub.R;
 
 import junit.framework.Assert;
 

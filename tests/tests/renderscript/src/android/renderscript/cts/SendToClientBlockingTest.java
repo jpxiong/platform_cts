@@ -21,8 +21,6 @@ import android.renderscript.RenderScript.RSMessageHandler;
 import java.util.concurrent.Semaphore;
 import java.util.Random;
 
-import com.android.cts.stub.R;
-
 public class SendToClientBlockingTest extends RSBaseCompute {
     private static final Semaphore mSync = new Semaphore(0);
 

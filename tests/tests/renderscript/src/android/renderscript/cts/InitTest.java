@@ -19,7 +19,6 @@ package android.renderscript.cts;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 
 public class InitTest extends RSBaseCompute {
     private Allocation mIn;

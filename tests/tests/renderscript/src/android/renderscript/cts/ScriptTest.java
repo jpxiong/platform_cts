@@ -28,8 +28,6 @@ import android.renderscript.Type;
 
 import android.renderscript.cts.ScriptC_negate;
 
-import com.android.cts.stub.R;
-
 public class ScriptTest extends RSBaseCompute {
 
     public void testScript() {
