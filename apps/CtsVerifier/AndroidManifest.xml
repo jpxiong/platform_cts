@@ -45,6 +45,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-feature android:name="android.hardware.usb.accessory" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -1105,6 +1108,33 @@
         <service android:name=".projection.ProjectionService"
                  android:label="@string/projection_service_name"
                  android:process=":projectionservice" />
+
+        <activity android:name=".telecomm.TelecommTestActivity"
+                  android:label="@string/telecomm_test_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_telecomm" />
+        </activity>
+
+        <activity android:name=".telecomm.CancelCallTestActivity"
+                  android:label="@string/telecomm_cancel_call_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_telecomm" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecomm.TelecommTestActivity" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.telephony"/>
+        </activity>
+
+        <service android:name=".telecomm.CancelCallTestActivity$CancellingConnectionService"
+                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecomm.ConnectionService" />
+            </intent-filter>
+        </service>
 
    </application>
 
