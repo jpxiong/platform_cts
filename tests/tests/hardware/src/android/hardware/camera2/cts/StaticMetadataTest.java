@@ -171,15 +171,12 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION);
                 requestKeys.add(CaptureRequest.CONTROL_AE_LOCK);
                 requestKeys.add(CaptureRequest.CONTROL_AE_MODE);
-                requestKeys.add(CaptureRequest.CONTROL_AE_REGIONS);
                 requestKeys.add(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
                 requestKeys.add(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER);
                 requestKeys.add(CaptureRequest.CONTROL_AF_MODE);
-                requestKeys.add(CaptureRequest.CONTROL_AF_REGIONS);
                 requestKeys.add(CaptureRequest.CONTROL_AF_TRIGGER);
                 requestKeys.add(CaptureRequest.CONTROL_AWB_LOCK);
                 requestKeys.add(CaptureRequest.CONTROL_AWB_MODE);
-                requestKeys.add(CaptureRequest.CONTROL_AWB_REGIONS);
                 requestKeys.add(CaptureRequest.CONTROL_CAPTURE_INTENT);
                 requestKeys.add(CaptureRequest.CONTROL_EFFECT_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_MODE);
@@ -194,6 +191,15 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.LENS_FOCUS_DISTANCE);
                 requestKeys.add(CaptureRequest.SCALER_CROP_REGION);
                 requestKeys.add(CaptureRequest.STATISTICS_FACE_DETECT_MODE);
+                if (mStaticInfo.getAeMaxRegionsChecked() > 0) {
+                    requestKeys.add(CaptureRequest.CONTROL_AE_REGIONS);
+                }
+                if (mStaticInfo.getAwbMaxRegionsChecked() > 0) {
+                    requestKeys.add(CaptureRequest.CONTROL_AWB_REGIONS);
+                }
+                if (mStaticInfo.getAfMaxRegionsChecked() > 0) {
+                    requestKeys.add(CaptureRequest.CONTROL_AF_REGIONS);
+                }
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING:
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING";
