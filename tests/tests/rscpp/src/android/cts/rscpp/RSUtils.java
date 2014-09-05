@@ -20,7 +20,6 @@ import android.content.res.Resources;
 import java.util.Random;
 import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 
 /**
  * This class supplies some utils for renderscript tests
