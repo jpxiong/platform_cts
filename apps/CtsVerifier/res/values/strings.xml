@@ -505,10 +505,10 @@
     <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
     <string name="snsr_rot_vec_test">Rotation Vector Accuracy Test</string>
     <string name="snsr_collected_events_length">Sensor(%2$s). Collected events expected to be greater than zero. Found=%1$d.</string>
-    <string name="snsr_event_length">Sensor(%3$s). Event values expected to have size=%1$d. Found=%2$d</string>
+    <string name="snsr_event_length">Sensor(%3$s). Event values expected to have size=%1$d. Found=%2$d.</string>
     <string name="snsr_event_length_positive">Sensor(%2$s). Event values expected to have size > 0. Found=%1$d</string>
-    <string name="snsr_event_value">Sensor(%3$s). Event value[0] expected to be of value=%1$f. Found=%2$f</string>
-    <string name="snsr_event_time">Sensor(%3$s). Event timestamp expected to be at=%1$d. Found=%2$d. Delta=%3$d. Threshold=%4$d.</string>
+    <string name="snsr_event_value">Sensor(%3$s). Event value[0] expected to be of value=%1$f. Found=%2$f.</string>
+    <string name="snsr_event_time">Sensor(%5$s). Event timestamp expected to be synchronized with SystemClock.elapsedRealtimeNanos(). Event received at=%1$d. Event timestamp=%2$d. Delta=%3$d. Threshold=%4$d.</string>
     <string name="snsr_event_time_positive">Sensor(%2$s). Event timestamp expected to positive (> 0). Found=%1$d.</string>
 
     <!-- Sensor Batching -->
@@ -524,7 +524,7 @@
     <!-- Step Counter and Detector -->
     <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
     <string name="snsr_step_counter_test_walking">Once the test begins, you will need to walk, and tap on the screen with each step you take.</string>
-    <string name="snsr_step_counter_test_still">Once the test begins, you will need to hold the device still in your hand.</string>
+    <string name="snsr_step_counter_test_still">Once the test begins, you will need to remain still and hold the device still in your hand.</string>
     <string name="snsr_step_counter_test_waving">Once the test begins, you will need to wave the device in your hand throughout the test.</string>
     <string name="snsr_step_counter_expected_steps">At least %1$d steps are expected to be reported. Reported=%2$d.</string>
     <string name="snsr_step_counter_detected_reported">Steps reported by user=%1$d. Steps counted=%2$d. Delta=%3$d. Tolerance=%4$d.</string>
@@ -536,9 +536,9 @@
 
     <!-- Significant Motion -->
     <string name="snsr_significant_motion_test">Significant Motion Tests</string>
-    <string name="snsr_significant_motion_event_arrival">Event expected to trigger. Current: %1$s</string>
-    <string name="snsr_significant_motion_event_type">Event expected to be of type=%1$d. Found=%2$d</string>
-    <string name="snsr_significant_motion_event_unexpected">Event not expected to trigger. Current: %1$s.</string>
+    <string name="snsr_significant_motion_event_arrival">Event expected to trigger. Triggered=%1$s.</string>
+    <string name="snsr_significant_motion_event_type">Event expected to be of type=%1$d. Found=%2$d.</string>
+    <string name="snsr_significant_motion_event_unexpected">Event not expected to trigger. Triggered=%1$s.</string>
     <string name="snsr_significant_motion_disable_info">Significant Motion is expected to disable itself after it triggers once.</string>
     <string name="snsr_significant_motion_test_trigger">Once you begin the test, you will need to walk for Significant Motion to be detected.</string>
     <string name="snsr_significant_motion_test_cancel">Once you begin the test, you will need to walk to ensure Significant Motion is not reported after trigger canceled.</string>
