@@ -48,8 +48,6 @@ import android.renderscript.Short4;
 
 import android.renderscript.Type;
 
-import com.android.cts.stub.R;
-
 public class KernelTest extends RSBaseCompute {
     /**
      * Test support for reflected forEach() as well as validation of parameters.

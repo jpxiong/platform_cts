@@ -19,8 +19,6 @@ package android.renderscript.cts;
 import android.renderscript.RSRuntimeException;
 import android.util.Log;
 
-import com.android.cts.stub.R;
-
 /**
  * Test whether the driver properly handles compile-time issues.
  */

@@ -16,8 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.Allocation.MipmapControl;

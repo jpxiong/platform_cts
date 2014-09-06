@@ -22,7 +22,6 @@ import android.renderscript.Type;
 import android.renderscript.Sampler;
 import android.renderscript.Script;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 
 public class ClearObjectTest extends RSBaseCompute {
     int ObjectNum = 1;

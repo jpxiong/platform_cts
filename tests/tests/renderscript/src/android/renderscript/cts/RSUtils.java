@@ -19,7 +19,6 @@ package android.renderscript.cts;
 import android.content.res.Resources;
 import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 
 import java.util.Random;
 

@@ -17,7 +17,6 @@
 package android.renderscript.cts;
 
 import android.renderscript.Float4;
-import com.android.cts.stub.R;
 
 public class StructPadTest extends RSBaseCompute {
     /**

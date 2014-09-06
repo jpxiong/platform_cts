@@ -16,7 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.Float3;
