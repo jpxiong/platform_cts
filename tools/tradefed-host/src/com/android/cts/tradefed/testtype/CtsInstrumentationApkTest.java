@@ -95,7 +95,6 @@ public class CtsInstrumentationApkTest extends InstrumentationTest implements IB
                 File apkFile = mCtsBuild.getTestApp(apkFileName);
                 String errorCode = null;
                 String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
-                Log.d(LOG_TAG, "installPackage options: " + options);
                 errorCode = mTestDevice.installPackage(apkFile, true, options);
                 if (errorCode != null) {
                     Log.e(LOG_TAG, String.format("Failed to install %s on %s. Reason: %s",

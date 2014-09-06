@@ -39,7 +39,7 @@ public class CtsXmlGenerator {
         System.err.println("Usage: cts-xml-generator -p PACKAGE_NAME -n NAME [-t TEST_TYPE]"
                 + " [-j JAR_PATH] [-i INSTRUMENTATION] [-m MANIFEST_FILE] [-e EXPECTATION_FILE]"
                 + " [-b UNSUPPORTED_ABI_FILE] [-a ARCHITECTURE] [-o OUTPUT_FILE]"
-                + " [-n APP_NAME_SPACE] [-x ADDITIONAL_ATTRIBUTE_KEY->VALUE]");
+                + " [-s APP_NAME_SPACE] [-x ADDITIONAL_ATTRIBUTE_KEY->VALUE]");
         System.exit(1);
     }
 

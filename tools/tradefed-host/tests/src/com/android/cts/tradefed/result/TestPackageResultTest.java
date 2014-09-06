@@ -20,6 +20,7 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import junit.framework.TestCase;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Unit tests for {@link TestPackageResult}.
@@ -33,7 +34,7 @@ public class TestPackageResultTest extends TestCase {
         TestPackageResult pkgResult = new TestPackageResult();
         TestIdentifier excludedTest = new TestIdentifier("com.example.ExampleTest", "testPass");
         pkgResult.insertTest(excludedTest);
-        pkgResult.reportTestEnded(excludedTest);
+        pkgResult.reportTestEnded(excludedTest, new HashMap<String, String>());
         TestIdentifier includedTest = new TestIdentifier("com.example.ExampleTest",
                 "testNotExecuted");
         pkgResult.insertTest(includedTest);

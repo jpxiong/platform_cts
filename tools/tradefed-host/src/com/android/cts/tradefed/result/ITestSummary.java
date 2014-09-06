@@ -23,43 +23,43 @@ public interface ITestSummary {
     /**
      * @return the session id
      */
-    int getId();
+    public int getId();
 
     /**
      * @return the starting timestamp, also known as result directory name
      */
-    String getTimestamp();
+    public String getTimestamp();
 
     /**
      * @return the num of not executed tests
      */
-    int getNumIncomplete();
+    public int getNumIncomplete();
 
     /**
      * @return the number of failed tests
      */
-    int getNumFailed();
+    public int getNumFailed();
 
     /**
      * @return the number of passed tests
      */
-    int getNumPassed();
+    public int getNumPassed();
 
     /**
      * @return the test plan associated with result
      */
-    String getTestPlan();
+    public String getTestPlan();
 
     /**
      * Return the user-friendly displayed start time stored in result XML.
      * <p/>
      * Expected format: {@link TimeUtil#getTimestamp()}
      */
-    String getStartTime();
+    public String getStartTime();
 
     /**
      * @return a comma separated list of device serials associated with result
      */
-    String getDeviceSerials();
+    public String getDeviceSerials();
 
 }

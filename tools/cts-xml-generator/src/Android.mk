@@ -14,12 +14,14 @@
 
 LOCAL_PATH := $(call my-dir)
 
-
 # cts-xml-generator java library
 # ============================================================
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-subdir-java-files)
+LOCAL_SRC_FILES := \
+    $(call all-subdir-java-files) \
+    ../../../libs/commonutil/src/com/android/cts/util/AbiUtils.java
+
 LOCAL_JAR_MANIFEST := MANIFEST.mf
 
 LOCAL_MODULE := cts-xml-generator

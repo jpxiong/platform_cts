@@ -19,7 +19,6 @@ package com.android.cts.tradefed.result;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
-import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -48,8 +47,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Writes results to an XML files in the CTS format.
@@ -103,13 +100,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
     private File mLogDir;
     private String mSuiteName;
     private String mReferenceUrl;
-
-    private static final Pattern mCtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
-
-    @Option(name = AbiFormatter.FORCE_ABI_STRING,
-            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
-            importance = Importance.IF_UNSET)
-    private String mForceAbi = null;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -232,9 +222,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
 
 
     @Override
-    public void testRunStarted(String name, int numTests) {
-        mCurrentPkgResult = mResults.getOrCreatePackage(name);
-        mIsDeviceInfoRun = name.equals(DeviceInfoCollector.APP_PACKAGE_NAME);
+    public void testRunStarted(String id, int numTests) {
+        mCurrentPkgResult = mResults.getOrCreatePackage(id);
+        mIsDeviceInfoRun = DeviceInfoCollector.IDS.contains(id);
     }
 
     /**
@@ -258,33 +248,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
      */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        collectCtsResults(test, testMetrics);
-        mCurrentPkgResult.reportTestEnded(test);
-    }
-
-    /**
-     * Collect Cts results for both device and host tests to the package result.
-     * @param test test ran
-     * @param testMetrics test metrics which can contain performance result for device tests
-     */
-    private void collectCtsResults(TestIdentifier test, Map<String, String> testMetrics) {
-        // device test can have performance results in testMetrics
-        String perfResult = CtsReportUtil.getCtsResultFromMetrics(testMetrics);
-        // host test should be checked in CtsHostStore.
-        if (perfResult == null) {
-            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, "armeabi-v7a", test.toString());
-        }
-        if (perfResult != null) {
-            // CTS result is passed in Summary++++Details format.
-            // Extract Summary and Details, and pass them.
-            Matcher m = mCtsLogPattern.matcher(perfResult);
-            if (m.find()) {
-                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1),
-                        m.group(2));
-            } else {
-                logResult("CTS Result unrecognizable:" + perfResult);
-            }
-        }
+        mCurrentPkgResult.reportTestEnded(test, testMetrics);
     }
 
     /**
@@ -377,9 +341,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
         serializer.attribute(ns, "suite", mSuiteName);
-        if (mForceAbi != null) {
-            serializer.attribute(ns, "abi", mForceAbi);
-        }
         mResults.serialize(serializer);
         // TODO: not sure why, but the serializer doesn't like this statement
         //serializer.endTag(ns, RESULT_TAG);

@@ -29,23 +29,23 @@ public class WrappedGTestResultParser extends GeeTestResultParser {
     /**
      * Creates the WrappedGTestResultParser.
      *
-     * @param testRunName the test run name to provide to
+     * @param testRunId the test run id to provide to
      *            {@link ITestRunListener#testRunStarted(String, int)}
      * @param listeners informed of test results as the tests are executing
      */
-    public WrappedGTestResultParser(String testRunName, Collection<ITestRunListener> listeners) {
-        super(testRunName, listeners);
+    public WrappedGTestResultParser(String testRunId, Collection<ITestRunListener> listeners) {
+        super(testRunId, listeners);
     }
 
     /**
      * Creates the WrappedGTestResultParser for a single listener.
      *
-     * @param testRunName the test run name to provide to
+     * @param testRunId the test run id to provide to
      *            {@link ITestRunListener#testRunStarted(String, int)}
      * @param listener informed of test results as the tests are executing
      */
-    public WrappedGTestResultParser(String testRunName, ITestRunListener listener) {
-        super(testRunName, listener);
+    public WrappedGTestResultParser(String testRunId, ITestRunListener listener) {
+        super(testRunId, listener);
     }
 
     /**

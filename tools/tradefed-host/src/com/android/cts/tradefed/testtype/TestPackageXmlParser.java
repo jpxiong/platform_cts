@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser;
@@ -22,7 +23,11 @@ import com.android.tradefed.util.xml.AbstractXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -35,11 +40,18 @@ public class TestPackageXmlParser extends AbstractXmlParser {
 
     private static final String LOG_TAG = "TestPackageXmlParser";
 
+    private final Set<String> mAbis;
     private final boolean mIncludeKnownFailures;
 
-    private TestPackageDef mPackageDef;
+    private Map<String, TestPackageDef> mPackageDefs = new HashMap<String, TestPackageDef>();
 
-    public TestPackageXmlParser(boolean includeKnownFailures) {
+    /**
+     * @param abis Holds the ABIs which the test must be run against. This must be a subset of the
+     * ABIs supported by the device under test.
+     * @param includeKnownFailures Whether to run tests which are known to fail.
+     */
+    public TestPackageXmlParser(Set<String> abis, boolean includeKnownFailures) {
+        mAbis = abis;
         mIncludeKnownFailures = includeKnownFailures;
     }
 
@@ -65,32 +77,37 @@ public class TestPackageXmlParser extends AbstractXmlParser {
         @Override
         public void startElement(String uri, String localName, String name, Attributes attributes) {
             if (TEST_PACKAGE_TAG.equals(localName)) {
-                // appPackageName is used as the uri
-                final String entryUriValue = attributes.getValue("appPackageName");
+                final String appPackageName = attributes.getValue("appPackageName");
                 final String testPackageNameSpace = attributes.getValue("appNameSpace");
                 final String packageName = attributes.getValue("name");
                 final String runnerName = attributes.getValue("runner");
                 final String jarPath = attributes.getValue("jarPath");
-                final String signatureCheck = attributes.getValue("signatureCheck");
+                final boolean signatureCheck = parseBoolean(attributes.getValue("signatureCheck"));
                 final String javaPackageFilter = attributes.getValue("javaPackageFilter");
                 final String targetBinaryName = attributes.getValue("targetBinaryName");
                 final String targetNameSpace = attributes.getValue("targetNameSpace");
                 final String runTimeArgs = attributes.getValue("runtimeArgs");
+                final String testType = getTestType(attributes);
 
-                mPackageDef = new TestPackageDef();
-                mPackageDef.setUri(entryUriValue);
-                mPackageDef.setAppNameSpace(testPackageNameSpace);
-                mPackageDef.setName(packageName);
-                mPackageDef.setRunner(runnerName);
-                mPackageDef.setTestType(getTestType(attributes));
-                mPackageDef.setJarPath(jarPath);
-                mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
-                mPackageDef.setRunTimeArgs(runTimeArgs);
-                if (!"".equals(javaPackageFilter)) {
-                    mPackageDef.setTestPackageName(javaPackageFilter);
+                for (String abiName : mAbis) {
+                    Abi abi = new Abi(abiName, AbiUtils.getBitness(abiName));
+                    TestPackageDef packageDef = new TestPackageDef();
+                    packageDef.setAppPackageName(appPackageName);
+                    packageDef.setAppNameSpace(testPackageNameSpace);
+                    packageDef.setName(packageName);
+                    packageDef.setRunner(runnerName);
+                    packageDef.setTestType(testType);
+                    packageDef.setJarPath(jarPath);
+                    packageDef.setIsSignatureCheck(signatureCheck);
+                    packageDef.setRunTimeArgs(runTimeArgs);
+                    if (!"".equals(javaPackageFilter)) {
+                        packageDef.setTestPackageName(javaPackageFilter);
+                    }
+                    packageDef.setTargetBinaryName(targetBinaryName);
+                    packageDef.setTargetNameSpace(targetNameSpace);
+                    packageDef.setAbi(abi);
+                    mPackageDefs.put(abiName, packageDef);
                 }
-                mPackageDef.setTargetBinaryName(targetBinaryName);
-                mPackageDef.setTargetNameSpace(targetNameSpace);
 
                 // reset the class name
                 mClassNameStack = new Stack<String>();
@@ -112,7 +129,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 }
             } else if (TEST_TAG.equals(localName)) {
                 String methodName = attributes.getValue("name");
-                if (mPackageDef == null) {
+                if (mPackageDefs.isEmpty()) {
                     Log.e(LOG_TAG, String.format(
                             "Invalid XML: encountered a '%s' tag not enclosed within a '%s' tag",
                             TEST_TAG, TEST_PACKAGE_TAG));
@@ -133,11 +150,26 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                     if (timeoutStr != null) {
                         timeout = Integer.parseInt(timeoutStr);
                     }
-                    TestIdentifier testId = new TestIdentifier(classNameBuilder.toString(),
-                            methodName);
                     boolean isKnownFailure = "failure".equals(attributes.getValue("expectation"));
                     if (!isKnownFailure || mIncludeKnownFailures) {
-                        mPackageDef.addTest(testId, timeout);
+                        String abiList = attributes.getValue("abis");
+                        Set<String> abis = new HashSet<String>();
+                        if (abiList == null) {
+                            // If no specification, add all supported abis
+                            abis.addAll(mAbis);
+                        } else {
+                            for (String abi : abiList.split(", ")) {
+                                if (mAbis.contains(abi)) {
+                                    // Else only add the abi which are supported
+                                    abis.add(abi);
+                                }
+                            }
+                        }
+                        for (String abi : abis) {
+                            TestIdentifier testId = new TestIdentifier(
+                                    classNameBuilder.toString(), methodName);
+                            mPackageDefs.get(abi).addTest(testId, timeout);
+                        }
                     }
                 }
             }
@@ -170,19 +202,15 @@ public class TestPackageXmlParser extends AbstractXmlParser {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected DefaultHandler createXmlHandler() {
         return new TestPackageHandler();
     }
 
     /**
-     * @returns the {@link TestPackageDef} containing data parsed from xml or <code>null</code> if
-     *          xml did not contain the correct information.
+     * @returns the set of {@link TestPackageDef} containing data parsed from xml
      */
-    public TestPackageDef getTestPackageDef() {
-        return mPackageDef;
+    public Set<TestPackageDef> getTestPackageDefs() {
+        return new HashSet<TestPackageDef>(mPackageDefs.values());
     }
 }

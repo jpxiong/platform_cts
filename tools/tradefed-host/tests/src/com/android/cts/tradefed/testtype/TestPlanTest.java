@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
@@ -25,15 +26,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Unit tests for {@link TestPlan}.
  */
 public class TestPlanTest extends TestCase {
 
-    private static final String TEST_URI1 = "foo";
-    private static final String TEST_URI2 = "foo2";
+    private static final String TEST_NAME1 = "foo";
+    private static final String TEST_NAME2 = "foo2";
     private static final String EXCLUDE_TEST_CLASS = "com.example.FooTest";
     private static final String EXCLUDE_TEST_METHOD = "testFoo";
     private static final String EXCLUDE_TEST_METHOD2 = "testFoo2";
@@ -42,26 +47,26 @@ public class TestPlanTest extends TestCase {
 
     static final String TEST_DATA =
         "<TestPlan version=\"1.0\">" +
-            String.format("<Entry uri=\"%s\" />", TEST_URI1) +
-            String.format("<Entry uri=\"%s\" />", TEST_URI2) +
+            String.format("<Entry name=\"%s\" />", TEST_NAME1) +
+            String.format("<Entry name=\"%s\" />", TEST_NAME2) +
         "</TestPlan>";
 
     static final String TEST_EXCLUDED_DATA =
         "<TestPlan version=\"1.0\">" +
-            String.format("<Entry uri=\"%s\" exclude=\"%s#%s\" />", TEST_URI1, EXCLUDE_TEST_CLASS,
+            String.format("<Entry name=\"%s\" exclude=\"%s#%s\" />", TEST_NAME1, EXCLUDE_TEST_CLASS,
                     EXCLUDE_TEST_METHOD) +
         "</TestPlan>";
 
     static final String TEST_MULTI_EXCLUDED_DATA =
         "<TestPlan version=\"1.0\">" +
-            String.format("<Entry uri=\"%s\" exclude=\"%s#%s;%s#%s\" />", TEST_URI1,
+            String.format("<Entry name=\"%s\" exclude=\"%s#%s;%s#%s\" />", TEST_NAME1,
                     EXCLUDE_TEST_CLASS, EXCLUDE_TEST_METHOD, EXCLUDE_TEST_CLASS,
                     EXCLUDE_TEST_METHOD2) +
         "</TestPlan>";
 
     static final String TEST_CLASS_EXCLUDED_DATA =
         "<TestPlan version=\"1.0\">" +
-            String.format("<Entry uri=\"%s\" exclude=\"%s\" />", TEST_URI1,
+            String.format("<Entry name=\"%s\" exclude=\"%s\" />", TEST_NAME1,
                     EXCLUDE_TEST_CLASS) +
         "</TestPlan>";
 
@@ -70,11 +75,11 @@ public class TestPlanTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mPlan = new TestPlan("plan");
+        mPlan = new TestPlan("plan", AbiUtils.getAbisSupportedByCts());
     }
 
     /**
-     * Simple test for parsing a plan containing two uris
+     * Simple test for parsing a plan containing two names
      */
     public void testParse() throws ParseException  {
         mPlan.parse(getStringAsStream(TEST_DATA));
@@ -86,13 +91,20 @@ public class TestPlanTest extends TestCase {
      * @param plan
      */
     private void assertTestData(TestPlan plan) {
-        assertEquals(2, plan.getTestUris().size());
-        Iterator<String> iter = plan.getTestUris().iterator();
-        // assert uris in order
-        assertEquals(TEST_URI1, iter.next());
-        assertEquals(TEST_URI2, iter.next());
-        assertFalse(plan.getExcludedTestFilter(TEST_URI1).hasExclusion());
-        assertFalse(plan.getExcludedTestFilter(TEST_URI2).hasExclusion());
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+        assertEquals(2 * abis.size(), plan.getTestIds().size());
+        List<String> sortedAbis = new ArrayList<String>(abis);
+        Collections.sort(sortedAbis);
+        Iterator<String> iter = plan.getTestIds().iterator();
+        for (String abi : sortedAbis) {
+            String test1Id = AbiUtils.createId(abi, TEST_NAME1);
+            String test2Id = AbiUtils.createId(abi, TEST_NAME2);
+            // assert names in order
+            assertEquals(test1Id, iter.next());
+            assertEquals(test2Id, iter.next());
+            assertFalse(plan.getTestFilter(test1Id).hasExclusion());
+            assertFalse(plan.getTestFilter(test2Id).hasExclusion());
+        }
     }
 
     /**
@@ -100,10 +112,15 @@ public class TestPlanTest extends TestCase {
      */
     public void testParse_exclude() throws ParseException  {
         mPlan.parse(getStringAsStream(TEST_EXCLUDED_DATA));
-        assertEquals(1, mPlan.getTestUris().size());
-        TestFilter filter = mPlan.getExcludedTestFilter(TEST_URI1);
-        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
-                EXCLUDE_TEST_METHOD)));
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+        assertEquals(abis.size(), mPlan.getTestIds().size());
+
+        for (String abi : abis) {
+            String test1Id = AbiUtils.createId(abi, TEST_NAME1);
+            TestFilter filter = mPlan.getTestFilter(test1Id);
+            assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD)));
+        }
     }
 
     /**
@@ -119,12 +136,17 @@ public class TestPlanTest extends TestCase {
      * @param plan
      */
     private void assertMultiExcluded(TestPlan plan) {
-        assertEquals(1, plan.getTestUris().size());
-        TestFilter filter = plan.getExcludedTestFilter(TEST_URI1);
-        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
-                EXCLUDE_TEST_METHOD)));
-        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
-                EXCLUDE_TEST_METHOD2)));
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+        assertEquals(abis.size(), plan.getTestIds().size());
+
+        for (String abi : abis) {
+            String test1Id = AbiUtils.createId(abi, TEST_NAME1);
+            TestFilter filter = plan.getTestFilter(test1Id);
+            assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD)));
+            assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD2)));
+        }
     }
 
     /**
@@ -132,16 +154,21 @@ public class TestPlanTest extends TestCase {
      */
     public void testParse_classExclude() throws ParseException  {
         mPlan.parse(getStringAsStream(TEST_CLASS_EXCLUDED_DATA));
-        assertEquals(1, mPlan.getTestUris().size());
-        TestFilter filter = mPlan.getExcludedTestFilter(TEST_URI1);
-        assertTrue(filter.getExcludedClasses().contains(EXCLUDE_TEST_CLASS));
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+        assertEquals(abis.size(), mPlan.getTestIds().size());
+
+        for (String abi : abis) {
+            String test1Id = AbiUtils.createId(abi, TEST_NAME1);
+            TestFilter filter = mPlan.getTestFilter(test1Id);
+            assertTrue(filter.getExcludedClasses().contains(EXCLUDE_TEST_CLASS));
+        }
     }
 
     /**
      * Test serializing an empty plan
      * @throws IOException
      */
-    public void testSerialize_empty() throws ParseException, IOException  {
+    public void testSerialize_empty() throws IOException  {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         mPlan.serialize(outStream);
         assertTrue(outStream.toString().contains(EMPTY_DATA));
@@ -152,11 +179,14 @@ public class TestPlanTest extends TestCase {
      * @throws IOException
      */
     public void testSerialize_packages() throws ParseException, IOException  {
-        mPlan.addPackage(TEST_URI1);
-        mPlan.addPackage(TEST_URI2);
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+        for (String abi : abis) {
+            mPlan.addPackage(AbiUtils.createId(abi, TEST_NAME1));
+            mPlan.addPackage(AbiUtils.createId(abi, TEST_NAME2));
+        }
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         mPlan.serialize(outStream);
-        TestPlan parsedPlan = new TestPlan("parsed");
+        TestPlan parsedPlan = new TestPlan("parsed", AbiUtils.getAbisSupportedByCts());
         parsedPlan.parse(getStringAsStream(outStream.toString()));
         // parsedPlan should contain same contents as TEST_DATA
         assertTestData(parsedPlan);
@@ -166,14 +196,19 @@ public class TestPlanTest extends TestCase {
      * Test serializing and deserializing plan with multiple excluded tests
      */
     public void testSerialize_multiExclude() throws ParseException, IOException  {
-        mPlan.addPackage(TEST_URI1);
-        mPlan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
-                EXCLUDE_TEST_METHOD));
-        mPlan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
-                EXCLUDE_TEST_METHOD2));
+        Set<String> abis = AbiUtils.getAbisSupportedByCts();
+
+        for (String abi : abis) {
+            String test1Id = AbiUtils.createId(abi, TEST_NAME1);
+            mPlan.addPackage(test1Id);
+            mPlan.addExcludedTest(test1Id, new TestIdentifier(EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD));
+            mPlan.addExcludedTest(test1Id, new TestIdentifier(EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD2));
+        }
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         mPlan.serialize(outStream);
-        TestPlan parsedPlan = new TestPlan("parsed");
+        TestPlan parsedPlan = new TestPlan("parsed", AbiUtils.getAbisSupportedByCts());
         parsedPlan.parse(getStringAsStream(outStream.toString()));
         // parsedPlan should contain same contents as TEST_DATA
         assertMultiExcluded(parsedPlan);

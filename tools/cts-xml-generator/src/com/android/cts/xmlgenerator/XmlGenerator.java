@@ -16,6 +16,8 @@
 
 package com.android.cts.xmlgenerator;
 
+import com.android.cts.util.AbiUtils;
+
 import vogar.Expectation;
 import vogar.ExpectationStore;
 
@@ -27,8 +29,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -49,29 +49,6 @@ import java.util.Set;
  * test:testMethod2
  */
 class XmlGenerator {
-
-    private static final Set<String> ARM_ABI = new HashSet<String>();
-    private static final Set<String> INTEL_ABI = new HashSet<String>();
-    private static final Set<String> MIPS_ABI = new HashSet<String>();
-    private static final Set<String> SUPPORTED_ABIS = new HashSet<String>();
-    private static final Map<String, Set<String>> ARCH_TO_ABIS = new HashMap<String, Set<String>>();
-    static {
-        ARM_ABI.add("armeabi-v7a");
-        ARM_ABI.add("arm64-v8a");
-        INTEL_ABI.add("x86");
-        INTEL_ABI.add("x86_64");
-        MIPS_ABI.add("mips");
-        MIPS_ABI.add("mips64");
-        ARCH_TO_ABIS.put("arm", ARM_ABI);
-        ARCH_TO_ABIS.put("arm64", ARM_ABI);
-        ARCH_TO_ABIS.put("x86", INTEL_ABI);
-        ARCH_TO_ABIS.put("x86_64", INTEL_ABI);
-        ARCH_TO_ABIS.put("mips", MIPS_ABI);
-        ARCH_TO_ABIS.put("mips64", MIPS_ABI);
-        SUPPORTED_ABIS.addAll(ARM_ABI);
-        SUPPORTED_ABIS.addAll(INTEL_ABI);
-        SUPPORTED_ABIS.addAll(MIPS_ABI);
-    }
 
     /** Example: com.android.cts.holo */
     private final String mAppNamespace;
@@ -256,7 +233,7 @@ class XmlGenerator {
     // Returns the list of ABIs supported by this TestCase on this architecture.
     public static Set<String> getSupportedAbis(ExpectationStore expectationStore,
             String architecture, String className) {
-        Set<String> supportedAbis = new HashSet<String>(ARCH_TO_ABIS.get(architecture));
+        Set<String> supportedAbis = AbiUtils.getAbisForArch(architecture);
         Expectation e = (expectationStore == null) ? null : expectationStore.get(className);
         if (e != null && !e.getDescription().isEmpty()) {
             // Description should be written in the form "blah blah: abi1, abi2..."
@@ -264,7 +241,7 @@ class XmlGenerator {
             String[] unsupportedAbis = description.split(",");
             for (String a : unsupportedAbis) {
                 String abi = a.trim();
-                if (!SUPPORTED_ABIS.contains(abi)) {
+                if (!AbiUtils.isAbiSupportedByCts(abi)) {
                     throw new RuntimeException(
                             String.format("Unrecognised ABI %s in %s", abi, e.getDescription()));
                 }
