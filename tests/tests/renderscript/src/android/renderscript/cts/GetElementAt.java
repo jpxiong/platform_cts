@@ -20,7 +20,6 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.Type;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 import java.util.Random;
 
 public class GetElementAt extends RSBaseCompute {

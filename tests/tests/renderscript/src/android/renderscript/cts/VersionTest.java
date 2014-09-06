@@ -18,7 +18,6 @@ package android.renderscript.cts;
 
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.renderscript.RSRuntimeException;
-import com.android.cts.stub.R;
 
 /**
  * Test for appropriate handling of versioned bitcode.

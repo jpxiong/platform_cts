@@ -21,7 +21,6 @@ import java.util.Random;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript.RSMessageHandler;
-import com.android.cts.stub.R;
 
 public class SendToClient extends RSBaseCompute {
     private Allocation mInAllocation;

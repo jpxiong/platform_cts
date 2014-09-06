@@ -15,7 +15,6 @@
  */
 
 package android.renderscript.cts;
-import com.android.cts.stub.R;
 
 public class StructArrayTest extends RSBaseCompute {
     /**
