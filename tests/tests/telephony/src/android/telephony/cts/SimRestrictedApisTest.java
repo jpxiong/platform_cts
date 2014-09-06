@@ -243,7 +243,7 @@ public class SimRestrictedApisTest extends AndroidTestCase {
      */
     public void testSetOperatorBrandOverride() {
         try {
-            TelephonyManager.getDefault().setOperatorBrandOverride("", "");
+            TelephonyManager.getDefault().setOperatorBrandOverride("");
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
