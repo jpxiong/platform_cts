@@ -565,6 +565,9 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                             mEventListener.onBufferReady(encodedData, info);
                             mEncoder.releaseOutputBuffer(index, false);
                         }
+                    } else if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED){
+                        Log.i(TAG, "output buffer changed");
+                        encoderOutputBuffers = mEncoder.getOutputBuffers();
                     }
                 }
             } catch (Exception e) {
