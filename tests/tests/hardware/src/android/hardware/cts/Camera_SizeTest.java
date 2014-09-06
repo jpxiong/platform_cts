@@ -61,37 +61,44 @@ public class Camera_SizeTest extends CtsAndroidTestCase {
      * aspect ratio must be the same as the physical camera sensor, and the FOV for these outputs
      * must not be cropped.
      *
-     * This is required for backward compatibility of the Camera2 API.
+     * This is only required for backward compatibility of the Camera2 API when running in LEGACY
+     * mode.
+     *
+     * @see {@link android.hardware.camera2.CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL}
      */
-    public void testMaxAspectRatios() {
-        if (Camera.getNumberOfCameras() < 1) {
-            return;
+    public void testMaxAspectRatios() throws Exception {
+        for (int id = 0; id < Camera.getNumberOfCameras(); ++id) {
+            if (CameraUtils.isLegacyHAL(getContext(), id)) {
+
+                Camera camera = Camera.open(id);
+                Parameters parameters = camera.getParameters();
+
+                List<Camera.Size> supportedJpegDimens = parameters.getSupportedPictureSizes();
+                List<Camera.Size> supportedPreviewDimens = parameters.getSupportedPreviewSizes();
+
+                Collections.sort(supportedJpegDimens, new CameraUtils.LegacySizeComparator());
+                Collections.sort(supportedPreviewDimens, new CameraUtils.LegacySizeComparator());
+
+                Camera.Size largestJpegDimen =
+                        supportedJpegDimens.get(supportedJpegDimens.size() - 1);
+                Camera.Size largestPreviewDimen =
+                        supportedPreviewDimens.get(supportedPreviewDimens.size() - 1);
+
+                float jpegAspect = largestJpegDimen.width / (float) largestJpegDimen.height;
+                float previewAspect =
+                        largestPreviewDimen.width / (float) largestPreviewDimen.height;
+
+                assertTrue("Largest preview dimension (w=" + largestPreviewDimen.width + ", h=" +
+                                largestPreviewDimen.height + ") must have the same aspect ratio " +
+                                "as the largest Jpeg dimension (w=" + largestJpegDimen.width +
+                                ", h=" + largestJpegDimen.height + ")",
+                        Math.abs(jpegAspect - previewAspect) < ASPECT_RATIO_TOLERANCE
+                );
+
+
+                camera.release();
+            }
         }
-
-        Camera camera = Camera.open(0);
-        Parameters parameters = camera.getParameters();
-
-        List<Camera.Size> supportedJpegDimens = parameters.getSupportedPictureSizes();
-        List<Camera.Size> supportedPreviewDimens = parameters.getSupportedPreviewSizes();
-
-        Collections.sort(supportedJpegDimens, new CameraUtils.LegacySizeComparator());
-        Collections.sort(supportedPreviewDimens, new CameraUtils.LegacySizeComparator());
-
-        Camera.Size largestJpegDimen = supportedJpegDimens.get(supportedJpegDimens.size() - 1);
-        Camera.Size largestPreviewDimen =
-                supportedPreviewDimens.get(supportedPreviewDimens.size() - 1);
-
-        float jpegAspect = largestJpegDimen.width / (float) largestJpegDimen.height;
-        float previewAspect = largestPreviewDimen.width / (float) largestPreviewDimen.height;
-
-        assertTrue("Largest preview dimension (w=" + largestPreviewDimen.width + ", h=" +
-                        largestPreviewDimen.height +
-                        ") must have the same aspect ratio as the largest Jpeg dimension (w=" +
-                        largestJpegDimen.width + ", h=" + largestJpegDimen.height + ")",
-                Math.abs(jpegAspect - previewAspect) < ASPECT_RATIO_TOLERANCE);
-
-
-        camera.release();
     }
 
     private void checkSize(Parameters parameters, int width, int height) {
