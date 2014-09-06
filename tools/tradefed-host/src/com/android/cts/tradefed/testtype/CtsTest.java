@@ -487,8 +487,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 if (test instanceof InstrumentationTest) {
                     ((InstrumentationTest)test).setForceAbi(mForceAbi);
                 }
-                if (test instanceof DeqpTest) {
-                    ((DeqpTest)test).setCollectLogs(mCollectDeqpLogs);
+                if (test instanceof DeqpTestRunner) {
+                    ((DeqpTestRunner)test).setCollectLogs(mCollectDeqpLogs);
                 }
 
                 forwardPackageDetails(knownTests.getPackageDef(), listener);
@@ -821,7 +821,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     void collectDeviceInfo(ITestDevice device, CtsBuildHelper ctsBuild,
             ITestInvocationListener listener) throws DeviceNotAvailableException {
         if (!mSkipDeviceInfo) {
-            DeviceInfoCollector.collectDeviceInfo(device, ctsBuild.getTestCasesDir(), listener);
+            DeviceInfoCollector.collectDeviceInfo(device, "armeabi-v7a", ctsBuild.getTestCasesDir(), listener);
         }
     }
 

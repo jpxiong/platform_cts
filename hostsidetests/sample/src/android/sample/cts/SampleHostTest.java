@@ -17,9 +17,12 @@
 package android.sample.cts;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
@@ -29,11 +32,11 @@ import java.util.Scanner;
 /**
  * Test to check the APK logs to Logcat.
  *
- * When this test builds, it also builds {@see android.sample.app.SampleDeviceActivity} into an APK
+ * When this test builds, it also builds {@link android.sample.app.SampleDeviceActivity} into an APK
  * which it then installs at runtime and starts. The activity simply prints a message to Logcat and
  * then gets uninstalled.
  */
-public class SampleHostTest extends DeviceTestCase implements IBuildReceiver {
+public class SampleHostTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
 
     /**
      * The package name of the APK.
@@ -62,6 +65,11 @@ public class SampleHostTest extends DeviceTestCase implements IBuildReceiver {
     private static final String TEST_STRING = "SampleTestString";
 
     /**
+     * The ABI to use.
+     */
+    private String mAbi;
+
+    /**
      * A reference to the build.
      */
     private CtsBuildHelper mBuild;
@@ -70,6 +78,11 @@ public class SampleHostTest extends DeviceTestCase implements IBuildReceiver {
      * A reference to the device under test.
      */
     private ITestDevice mDevice;
+
+    @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -86,8 +99,10 @@ public class SampleHostTest extends DeviceTestCase implements IBuildReceiver {
         mDevice.uninstallPackage(PACKAGE);
         // Get the APK from the build.
         File app = mBuild.getTestApp(APK);
+        // Get the ABI flag.
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
         // Install the APK on the device.
-        mDevice.installPackage(app, false);
+        mDevice.installPackage(app, false, options);
     }
 
     @Override

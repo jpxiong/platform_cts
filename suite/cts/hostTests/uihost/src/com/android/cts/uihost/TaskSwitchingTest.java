@@ -17,9 +17,9 @@
 package com.android.cts.uihost;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.result.CtsReportUtil;
 import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.cts.tradefed.util.HostReportLog;
+import com.android.cts.util.AbiUtils;
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.TimeoutReq;
 import com.android.ddmlib.Log;
@@ -34,6 +34,8 @@ import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
@@ -45,12 +47,13 @@ import java.util.Map;
  * Actual test is done in device, but this host side code installs all necessary APKs
  * and starts device test which is in CtsDeviceTaskswitchingControl.
  */
-public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver {
+public class TaskSwitchingTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
     private static final String TAG = "TaskSwitchingTest";
     private final static String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
     private String mCtsReport = null;
+    private IAbi mAbi;
 
     static final String[] PACKAGES = {
         "com.android.cts.taskswitching.control",
@@ -64,6 +67,11 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
     };
 
     @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
+
+    @Override
     public void setBuild(IBuildInfo buildInfo) {
         mBuild = CtsBuildHelper.createBuildHelper(buildInfo);
     }
@@ -72,10 +80,11 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
     protected void setUp() throws Exception {
         super.setUp();
         mDevice = getDevice();
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
         for (int i = 0; i < PACKAGES.length; i++) {
             mDevice.uninstallPackage(PACKAGES[i]);
             File app = mBuild.getTestApp(APKS[i]);
-            mDevice.installPackage(app, false);
+            mDevice.installPackage(app, false, options);
         }
     }
 
@@ -90,8 +99,9 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
 
     @TimeoutReq(minutes = 30)
     public void testTaskswitching() throws Exception {
-        HostReportLog report =
-                new HostReportLog(mDevice.getSerialNumber(), ReportLog.getClassMethodNames());
+        // TODO is this used?
+        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbi.getName(),
+                ReportLog.getClassMethodNames());
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGES[0], RUNNER,
                 mDevice.getIDevice());
         LocalListener listener = new LocalListener();
@@ -101,7 +111,7 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
             fail(result.getRunFailureMessage());
         }
         assertNotNull("no performance data", mCtsReport);
-        CtsHostStore.storeCtsResult(mDevice.getSerialNumber(),
+        CtsHostStore.storeCtsResult(mDevice.getSerialNumber(), mAbi.getName(),
                 ReportLog.getClassMethodNames(), mCtsReport);
 
     }
@@ -110,7 +120,7 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
         @Override
         public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
             // necessary as testMetrics passed from CollectingTestListerner is empty
-            mCtsReport = CtsReportUtil.getCtsResultFromMetrics(testMetrics);
+            mCtsReport = testMetrics.get("CTS_TEST_REPORT");
             super.testEnded(test, testMetrics);
         }
     }

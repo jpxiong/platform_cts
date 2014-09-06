@@ -16,9 +16,9 @@
 
 package com.android.cts.tradefed.testtype;
 
-import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.targetprep.SettingsToggler;
-import com.android.tradefed.build.IBuildInfo;
+import com.android.cts.util.AbiUtils;
+import com.android.ddmlib.Log;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
@@ -37,7 +37,9 @@ import java.io.File;
  * these services, running the tests, disabling the services, and removing
  * the accessibility services package.
  */
-public class AccessibilityTestRunner extends InstrumentationApkTest {
+public class AccessibilityTestRunner extends CtsInstrumentationApkTest {
+
+    private static final String LOG_TAG = AccessibilityTestRunner.class.getSimpleName();
 
     private static final String SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME =
         "android.view.accessibility.services";
@@ -50,14 +52,6 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
 
     private static final String SOME_ACCESSIBLITY_SERVICES_APK =
         "CtsSomeAccessibilityServices.apk";
-
-    private CtsBuildHelper mCtsBuild;
-
-    @Override
-    public void setBuild(IBuildInfo build) {
-        super.setBuild(build);
-        mCtsBuild  = CtsBuildHelper.createBuildHelper(build);
-    }
 
     @Override
     public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
@@ -78,7 +72,9 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
 
     private void installApkAndAssert(String apkName) throws DeviceNotAvailableException {
         File file = FileUtil.getFileForPath(mCtsBuild.getTestCasesDir(), apkName);
-        String errorMessage = getDevice().installPackage(file, true);
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+        Log.d(LOG_TAG, "installPackage options: " + options);
+        String errorMessage = getDevice().installPackage(file, true, options);
         TestCase.assertNull("Error installing: " + apkName, errorMessage);
     }
 

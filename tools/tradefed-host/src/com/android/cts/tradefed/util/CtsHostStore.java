@@ -33,26 +33,27 @@ public class CtsHostStore {
      * Note that key is generated in the form of device_serial#class#method name.
      * So there should be no concurrent test for the same (serial, class, method).
      * @param deviceSerial
+     * @param abi
      * @param classMethodName
      * @param result CTS result string
      */
-    public static void storeCtsResult(String deviceSerial, String classMethodName, String result) {
-        mMap.put(generateTestKey(deviceSerial, classMethodName), result);
+    public static void storeCtsResult(String deviceSerial, String abi, String classMethodName, String result) {
+        mMap.put(generateTestKey(deviceSerial, abi, classMethodName), result);
     }
 
     /**
      * retrieves a CTS result for the given condition and remove it from the internal
      * storage. If there is no result for the given condition, it will return null.
      */
-    public static String removeCtsResult(String deviceSerial, String classMethodName) {
-        return mMap.remove(generateTestKey(deviceSerial, classMethodName));
+    public static String removeCtsResult(String deviceSerial, String abi, String classMethodName) {
+        return mMap.remove(generateTestKey(deviceSerial, abi, classMethodName));
     }
 
     /**
-     * return test key in the form of device_serial#class_name#method_name
+     * return test key in the form of device_serial#abi#class_name#method_name
      */
-    private static String generateTestKey(String deviceSerial, String classMethodName) {
-        return String.format("%s#%s", deviceSerial, classMethodName);
+    private static String generateTestKey(String deviceSerial, String abi, String classMethodName) {
+        return String.format("%s#%s#%s", deviceSerial, abi, classMethodName);
 
     }
 }

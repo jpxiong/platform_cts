@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.device;
 
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -22,6 +23,8 @@ import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.InstrumentationTest;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Collects info from device under test.
@@ -36,16 +39,22 @@ public class DeviceInfoCollector {
     private static final String APK_NAME = "TestDeviceSetup";
     public static final String APP_PACKAGE_NAME = "android.tests.devicesetup";
     private static final String INSTRUMENTATION_NAME = "android.tests.getinfo.DeviceInfoInstrument";
+    public static final Set<String> IDS = new HashSet<String>();
+    static {
+        for (String abi : AbiUtils.getAbisSupportedByCts()) {
+            IDS.add(AbiUtils.createId(abi, APP_PACKAGE_NAME));
+        }
+    }
 
     /**
      * Installs and runs the device info collector instrumentation, and forwards results
-     * to the <var>listener</var>
+     * to the listener.
      *
      * @param device
      * @param listener
      * @throws DeviceNotAvailableException
      */
-    public static void collectDeviceInfo(ITestDevice device, File testApkDir,
+    public static void collectDeviceInfo(ITestDevice device, String abi, File testApkDir,
             ITestInvocationListener listener) throws DeviceNotAvailableException {
         File apkFile = new File(testApkDir, String.format("%s.apk", APK_NAME));
         if (!apkFile.exists()) {
@@ -59,6 +68,7 @@ public class DeviceInfoCollector {
         // no need to collect tests and re-run
         instrTest.setRerunMode(false);
         instrTest.setPackageName(APP_PACKAGE_NAME);
+        instrTest.setRunName(AbiUtils.createId(abi, APP_PACKAGE_NAME));
         instrTest.setRunnerName(INSTRUMENTATION_NAME);
         instrTest.run(listener);
     }

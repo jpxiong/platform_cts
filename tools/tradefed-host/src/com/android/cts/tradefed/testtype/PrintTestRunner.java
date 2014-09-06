@@ -18,12 +18,14 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.targetprep.SettingsToggler;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner.TestSize;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -65,6 +67,7 @@ public class PrintTestRunner implements IBuildReceiver, IRemoteTest, IDeviceTest
 
     private CtsBuildHelper mCtsBuild;
 
+    private IAbi mAbi;
     private String mPackageName;
     private String mRunnerName = "android.test.InstrumentationTestRunner";
     private String mTestClassName;
@@ -74,6 +77,13 @@ public class PrintTestRunner implements IBuildReceiver, IRemoteTest, IDeviceTest
     private String mTestSize;
     private String mRunName = null;
     private Map<String, String> mInstrArgMap = new HashMap<String, String>();
+
+    /**
+     * @param abi The ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -191,8 +201,9 @@ public class PrintTestRunner implements IBuildReceiver, IRemoteTest, IDeviceTest
 
     private void installTestsAndServicesApk() throws DeviceNotAvailableException {
         try {
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installCode = getDevice().installPackage(mCtsBuild.getTestApp(
-                    PRINT_TEST_AND_SERVICES_APP_NAME), true);
+                    PRINT_TEST_AND_SERVICES_APP_NAME), true, options);
             if (installCode != null) {
                 throw new IllegalArgumentException("Failed to install "
                         + PRINT_TEST_AND_SERVICES_APP_NAME + " on " + getDevice().getSerialNumber()
