@@ -16,7 +16,10 @@
 
 package android.hardware.cts.helpers;
 
+import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 
 import java.util.Comparator;
 
@@ -24,6 +27,23 @@ import java.util.Comparator;
  * Utility class containing helper functions for the Camera CTS tests.
  */
 public class CameraUtils {
+
+    /**
+     * Returns {@code true} if this device only supports {@code LEGACY} mode operation in the
+     * Camera2 API for the given camera ID.
+     *
+     * @param context {@link Context} to access the {@link CameraManager} in.
+     * @param cameraId the ID of the camera device to check.
+     * @return {@code true} if this device only supports {@code LEGACY} mode.
+     */
+    public static boolean isLegacyHAL(Context context, int cameraId) throws Exception {
+        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        CameraCharacteristics characteristics =
+                manager.getCameraCharacteristics(Integer.toString(cameraId));
+
+        return characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL) ==
+                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
+    }
 
     /**
      * Shared size comparison method used by size comparators.
