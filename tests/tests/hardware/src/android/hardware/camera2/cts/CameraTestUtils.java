@@ -31,6 +31,7 @@ import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.cts.helpers.CameraUtils;
 import android.util.Size;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -522,13 +523,8 @@ public class CameraTestUtils extends Assert {
     public static class SizeComparator implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs) {
-            long left = lhs.getWidth() * lhs.getHeight();
-            long right = rhs.getWidth() * rhs.getHeight();
-            if (left == right) {
-                left = lhs.getWidth();
-                right = rhs.getWidth();
-            }
-            return (left < right) ? -1 : (left > right ? 1 : 0);
+            return CameraUtils
+                    .compareSizes(lhs.getWidth(), lhs.getHeight(), rhs.getWidth(), rhs.getHeight());
         }
     }
 
