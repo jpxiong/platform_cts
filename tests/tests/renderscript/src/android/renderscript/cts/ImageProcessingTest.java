@@ -59,8 +59,6 @@ import android.renderscript.ScriptIntrinsicConvolve3x3;
 import android.renderscript.ScriptIntrinsicConvolve5x5;
 import android.renderscript.ScriptIntrinsicLUT;
 
-import com.android.cts.stub.R;
-
 public class ImageProcessingTest extends RSBaseCompute {
     private Allocation a1, a2;
 

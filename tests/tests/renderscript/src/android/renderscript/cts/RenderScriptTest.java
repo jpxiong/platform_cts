@@ -16,8 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.RenderScript;
 import android.test.AndroidTestCase;
 

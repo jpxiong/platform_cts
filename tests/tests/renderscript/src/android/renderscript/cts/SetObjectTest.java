@@ -20,7 +20,6 @@ import android.renderscript.*;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.util.Log;
-import com.android.cts.stub.R;
 
 import junit.framework.Assert;
 
