@@ -165,6 +165,7 @@ class CtsBuilder(object):
     # CTS Stable plan
     plan = tools.TestPlan(packages)
     plan.Exclude(r'android\.display')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-stable')
@@ -173,6 +174,7 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.display')
+    plan.Include(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.Include(package)
       plan.IncludeTests(package, test_list)
