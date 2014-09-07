@@ -57,6 +57,8 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         "This", "is", "short", "!",
     };
     private final String[] mCountryList = new String[] {
+        "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
+        "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States"
     };
 
