@@ -35,7 +35,7 @@ $(cts_library_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_library_xml): PRIVATE_TEST_APK := $(LOCAL_CTS_TEST_APK)
 $(cts_library_xml): PRIVATE_LIBRARY := $(LOCAL_MODULE)
 $(cts_library_xml): PRIVATE_JAR_PATH := $(LOCAL_MODULE).jar
-$(cts_library_xml): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))/javalib.jar $(CTS_EXPECTATIONS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
+$(cts_library_xml): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))/javalib.jar $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for uiautomator library $(PRIVATE_LIBRARY)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	$(hide) $(CTS_JAVA_TEST_SCANNER) -s $(PRIVATE_PATH) \
@@ -43,9 +43,11 @@ $(cts_library_xml): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))
 			$(CTS_XML_GENERATOR) -t uiAutomator \
 						-i $(PRIVATE_TEST_APK) \
 						-j $(PRIVATE_JAR_PATH) \
-						-a $(PRIVATE_TEST_PACKAGE) \
+						-s $(PRIVATE_TEST_PACKAGE) \
 						-n $(PRIVATE_LIBRARY) \
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-r $(PRIVATE_TEST_APP_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
+						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(TARGET_ARCH) \
 						-o $@

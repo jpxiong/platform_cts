@@ -31,7 +31,7 @@ $(cts_executable_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_executable_xml): PRIVATE_EXECUTABLE := $(LOCAL_MODULE)
 $(cts_executable_xml): PRIVATE_LIST_EXECUTABLE := $(HOST_OUT_EXECUTABLES)/$(LOCAL_MODULE)_list
 $(cts_executable_xml): $(HOST_OUT_EXECUTABLES)/$(LOCAL_MODULE)_list
-$(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPECTATIONS) $(CTS_NATIVE_TEST_SCANNER) $(CTS_XML_GENERATOR) $(cts_list_executable)
+$(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_NATIVE_TEST_SCANNER) $(CTS_XML_GENERATOR) $(cts_list_executable)
 	$(hide) echo Generating test description for native package $(PRIVATE_TEST_PACKAGE)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	$(hide) $(PRIVATE_LIST_EXECUTABLE) --gtest_list_tests | \
@@ -40,4 +40,6 @@ $(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPE
 						-n $(PRIVATE_EXECUTABLE) \
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
+						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(TARGET_ARCH) \
 						-o $@

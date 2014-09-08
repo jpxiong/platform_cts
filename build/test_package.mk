@@ -44,7 +44,7 @@ endif
 $(cts_package_xml): PRIVATE_TEST_PACKAGE := $(PRIVATE_CTS_TEST_PACKAGE_NAME_)
 $(cts_package_xml): PRIVATE_MANIFEST := $(LOCAL_PATH)/AndroidManifest.xml
 $(cts_package_xml): PRIVATE_TEST_TYPE := $(if $(LOCAL_CTS_TEST_RUNNER),$(LOCAL_CTS_TEST_RUNNER),'')
-$(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/package.apk $(CTS_EXPECTATIONS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
+$(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/package.apk $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for java package $(PRIVATE_PACKAGE)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	$(hide) $(CTS_JAVA_TEST_SCANNER) \
@@ -57,4 +57,6 @@ $(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/pac
 						-n $(PRIVATE_PACKAGE) \
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
+						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(TARGET_ARCH) \
 						-o $@
