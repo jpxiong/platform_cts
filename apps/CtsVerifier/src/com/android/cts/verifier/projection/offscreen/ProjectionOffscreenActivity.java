@@ -169,7 +169,7 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
     protected void onPause() {
         super.onPause();
         if (mTestStatus == TestStatus.FAILED) {
-            PassFailButtons.setTestResultAndFinish(this, getTestId(), getTestDetails(), false);
+            setTestResultAndFinish(false);
         }
     }
 

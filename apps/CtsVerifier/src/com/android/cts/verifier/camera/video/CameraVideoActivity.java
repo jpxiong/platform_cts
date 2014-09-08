@@ -734,10 +734,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                PassFailButtons.setTestResultAndFinish(CameraVideoActivity.this,
-                                        CameraVideoActivity.this.getTestId(),
-                                        CameraVideoActivity.this.getTestDetails(),
-                                        /* passed */false);
+                                setTestResultAndFinish(/* passed */false);
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
