@@ -108,9 +108,9 @@ public class CancelCallTestActivity extends PassFailButtons.Activity {
         return (TelecommManager) getSystemService(TELECOMM_SERVICE);
     }
 
-    private void setTestResultAndFinish(boolean passed) {
-        PassFailButtons.setTestResultAndFinish(CancelCallTestActivity.this, getTestId(),
-                getTestDetails(), passed);
+    @Override
+    public void setTestResultAndFinish(boolean passed) {
+        super.setTestResultAndFinish(passed);
         if (mPhoneAccountHandle != null) {
             getTelecommManager().unregisterPhoneAccount(mPhoneAccountHandle);
         }
