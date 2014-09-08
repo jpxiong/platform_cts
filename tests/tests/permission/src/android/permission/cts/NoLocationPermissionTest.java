@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.telephony.PhoneStateListener;
@@ -280,9 +281,13 @@ public class NoLocationPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Helper method to verify that calling isProviderEnabled with given
-     * provider throws SecurityException.
-     * 
+     * Helper method to verify that calling
+     * {@link LocationManager#isProviderEnabled(String)} with given
+     * provider completes without an exception. (Note that under the conditions
+     * of these tests, that method threw SecurityException on OS levels before
+     * {@link android.os.Build.VERSION_CODES#L}. See the method's javadoc for
+     * details.)
+     *
      * @param provider the String provider name.
      */
     private void checkIsProviderEnabled(String provider) {
@@ -290,13 +295,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
             // skip this test if the provider is unknown
             return;
         }
-
-        try {
-            mLocationManager.isProviderEnabled(provider);
-            fail("LocationManager.isProviderEnabled did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
+        mLocationManager.isProviderEnabled(provider);
     }
 
     /**
