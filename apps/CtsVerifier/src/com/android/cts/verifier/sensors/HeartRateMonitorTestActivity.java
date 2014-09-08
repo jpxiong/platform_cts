@@ -61,7 +61,7 @@ public class HeartRateMonitorTestActivity extends PassFailButtons.Activity {
         if (!mSensorManager.registerListener(mSensorListener, mSensor,
                 SensorManager.SENSOR_DELAY_UI)) {
             showNoHeartRateWarningDialog();
-            PassFailButtons.setTestResultAndFinish(this, getTestId(), getTestDetails(), true);
+            setTestResultAndFinish(true);
         }
     }
 
