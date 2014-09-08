@@ -169,8 +169,7 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
                         .setNegativeButton("Close", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                PassFailButtons.setTestResultAndFinish(StreamingVideoActivity.this,
-                                        getTestId(), null, false);
+                                setTestResultAndFinish(false);
                             }
                         }).show();
             default:
