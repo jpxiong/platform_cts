@@ -239,6 +239,8 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 Sensor.TYPE_STEP_DETECTOR);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE,
                 Sensor.TYPE_HEART_RATE);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
+                Sensor.TYPE_HEART_RATE);
 
         assertTrue("Assertions need to be added to this test for " + featuresLeft,
                 featuresLeft.isEmpty());
