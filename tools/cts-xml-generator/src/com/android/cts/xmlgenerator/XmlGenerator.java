@@ -27,8 +27,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Generator of TestPackage XML files for native tests.
@@ -46,6 +49,29 @@ import java.util.List;
  * test:testMethod2
  */
 class XmlGenerator {
+
+    private static final Set<String> ARM_ABI = new HashSet<String>();
+    private static final Set<String> INTEL_ABI = new HashSet<String>();
+    private static final Set<String> MIPS_ABI = new HashSet<String>();
+    private static final Set<String> SUPPORTED_ABIS = new HashSet<String>();
+    private static final Map<String, Set<String>> ARCH_TO_ABIS = new HashMap<String, Set<String>>();
+    static {
+        ARM_ABI.add("armeabi-v7a");
+        ARM_ABI.add("arm64-v8a");
+        INTEL_ABI.add("x86");
+        INTEL_ABI.add("x86_64");
+        MIPS_ABI.add("mips");
+        MIPS_ABI.add("mips64");
+        ARCH_TO_ABIS.put("arm", ARM_ABI);
+        ARCH_TO_ABIS.put("arm64", ARM_ABI);
+        ARCH_TO_ABIS.put("x86", INTEL_ABI);
+        ARCH_TO_ABIS.put("x86_64", INTEL_ABI);
+        ARCH_TO_ABIS.put("mips", MIPS_ABI);
+        ARCH_TO_ABIS.put("mips64", MIPS_ABI);
+        SUPPORTED_ABIS.addAll(ARM_ABI);
+        SUPPORTED_ABIS.addAll(INTEL_ABI);
+        SUPPORTED_ABIS.addAll(MIPS_ABI);
+    }
 
     /** Example: com.android.cts.holo */
     private final String mAppNamespace;
@@ -71,14 +97,19 @@ class XmlGenerator {
     private final String mOutputPath;
 
     /** ExpectationStore to filter out known failures. */
-    private final ExpectationStore mExpectations;
+    private final ExpectationStore mKnownFailures;
+
+    /** ExpectationStore to filter out unsupported abis. */
+    private final ExpectationStore mUnsupportedAbis;
+
+    private final String mArchitecture;
 
     private final Map<String, String> mAdditionalAttributes;
 
-    XmlGenerator(ExpectationStore expectations, String appNameSpace, String appPackageName,
-            String name, String runner, String targetBinaryName, String targetNameSpace,
-            String jarPath, String testType, String outputPath,
-            Map<String, String> additionalAttributes) {
+    XmlGenerator(ExpectationStore knownFailures, ExpectationStore unsupportedAbis,
+            String architecture, String appNameSpace, String appPackageName, String name,
+            String runner, String targetBinaryName, String targetNameSpace, String jarPath,
+            String testType, String outputPath, Map<String, String> additionalAttributes) {
         mAppNamespace = appNameSpace;
         mAppPackageName = appPackageName;
         mName = name;
@@ -88,7 +119,9 @@ class XmlGenerator {
         mJarPath = jarPath;
         mTestType = testType;
         mOutputPath = outputPath;
-        mExpectations = expectations;
+        mKnownFailures = knownFailures;
+        mUnsupportedAbis = unsupportedAbis;
+        mArchitecture = architecture;
         mAdditionalAttributes = additionalAttributes;
     }
 
@@ -192,9 +225,12 @@ class XmlGenerator {
             StringBuilder nameCollector) {
         Collection<Test> sorted = sortCollection(tests);
         for (Test test : sorted) {
+            String className = nameCollector.toString();
             nameCollector.append('#').append(test.getName());
             writer.append("<Test name=\"").append(test.getName()).append("\"");
-            if (isKnownFailure(mExpectations, nameCollector.toString())) {
+            String abis = getSupportedAbis(mUnsupportedAbis, mArchitecture, className).toString();
+            writer.append(" abis=\"" + abis.substring(1, abis.length() - 1) + "\"");
+            if (isKnownFailure(mKnownFailures, nameCollector.toString())) {
                 writer.append(" expectation=\"failure\"");
             }
             if (test.getTimeout() >= 0) {
@@ -216,4 +252,26 @@ class XmlGenerator {
     public static boolean isKnownFailure(ExpectationStore expectationStore, String testName) {
         return expectationStore != null && expectationStore.get(testName) != Expectation.SUCCESS;
     }
+
+    // Returns the list of ABIs supported by this TestCase on this architecture.
+    public static Set<String> getSupportedAbis(ExpectationStore expectationStore,
+            String architecture, String className) {
+        Set<String> supportedAbis = new HashSet<String>(ARCH_TO_ABIS.get(architecture));
+        Expectation e = (expectationStore == null) ? null : expectationStore.get(className);
+        if (e != null && !e.getDescription().isEmpty()) {
+            // Description should be written in the form "blah blah: abi1, abi2..."
+            String description = e.getDescription().split(":")[1];
+            String[] unsupportedAbis = description.split(",");
+            for (String a : unsupportedAbis) {
+                String abi = a.trim();
+                if (!SUPPORTED_ABIS.contains(abi)) {
+                    throw new RuntimeException(
+                            String.format("Unrecognised ABI %s in %s", abi, e.getDescription()));
+                }
+                supportedAbis.remove(abi);
+            }
+        }
+        return supportedAbis;
+    }
+
 }
