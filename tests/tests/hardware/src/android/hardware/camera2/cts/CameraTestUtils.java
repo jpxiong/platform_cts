@@ -201,7 +201,8 @@ public class CameraTestUtils extends Assert {
                 new LinkedBlockingQueue<CaptureResult>();
 
         @Override
-        public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request, long timestamp)
+        public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request,
+                long timestamp, long frameNumber)
         {
         }
 
