@@ -30,7 +30,7 @@ import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.cts.Camera2MultiViewStubActivity;
+import android.hardware.camera2.cts.Camera2MultiViewCtsActivity;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.os.ConditionVariable;
@@ -57,7 +57,7 @@ import java.util.HashMap;
  * Camera2 test case base class by using mixed SurfaceView and TextureView as rendering target.
  */
 public class Camera2MultiViewTestCase extends
-        ActivityInstrumentationTestCase2<Camera2MultiViewStubActivity> {
+        ActivityInstrumentationTestCase2<Camera2MultiViewCtsActivity> {
     private static final String TAG = "MultiViewTestCase";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
@@ -79,7 +79,7 @@ public class Camera2MultiViewTestCase extends
     private HashMap<String, Integer> mCameraIdMap;
 
     public Camera2MultiViewTestCase() {
-        super(Camera2MultiViewStubActivity.class);
+        super(Camera2MultiViewCtsActivity.class);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Camera2MultiViewTestCase extends
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
         mCameraListener = new BlockingStateCallback();
-        Camera2MultiViewStubActivity activity = (Camera2MultiViewStubActivity) mContext;
+        Camera2MultiViewCtsActivity activity = (Camera2MultiViewCtsActivity) mContext;
         mTextureView[0] = activity.getTextureView(0);
         mTextureView[1] = activity.getTextureView(1);
         assertNotNull("Unable to get texture view", mTextureView);
@@ -136,7 +136,7 @@ public class Camera2MultiViewTestCase extends
      */
     protected void updatePreviewDisplayRotation(Size previewSize, TextureView textureView) {
         int rotationDegrees = 0;
-        Camera2MultiViewStubActivity activity = (Camera2MultiViewStubActivity) mContext;
+        Camera2MultiViewCtsActivity activity = (Camera2MultiViewCtsActivity) mContext;
         int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         Configuration config = activity.getResources().getConfiguration();
 
