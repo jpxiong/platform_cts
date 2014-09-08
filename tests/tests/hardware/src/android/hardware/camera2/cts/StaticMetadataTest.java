@@ -193,12 +193,24 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.STATISTICS_FACE_DETECT_MODE);
                 if (mStaticInfo.getAeMaxRegionsChecked() > 0) {
                     requestKeys.add(CaptureRequest.CONTROL_AE_REGIONS);
+                } else {
+                    mCollector.expectTrue(
+                            "CONTROL_AE_REGIONS is available but aeMaxRegion is 0",
+                            !mStaticInfo.areKeysAvailable(CaptureRequest.CONTROL_AE_REGIONS));
                 }
                 if (mStaticInfo.getAwbMaxRegionsChecked() > 0) {
                     requestKeys.add(CaptureRequest.CONTROL_AWB_REGIONS);
+                } else {
+                    mCollector.expectTrue(
+                            "CONTROL_AWB_REGIONS is available but awbMaxRegion is 0",
+                            !mStaticInfo.areKeysAvailable(CaptureRequest.CONTROL_AWB_REGIONS));
                 }
                 if (mStaticInfo.getAfMaxRegionsChecked() > 0) {
                     requestKeys.add(CaptureRequest.CONTROL_AF_REGIONS);
+                } else {
+                    mCollector.expectTrue(
+                            "CONTROL_AF_REGIONS is available but afMaxRegion is 0",
+                            !mStaticInfo.areKeysAvailable(CaptureRequest.CONTROL_AF_REGIONS));
                 }
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING:
