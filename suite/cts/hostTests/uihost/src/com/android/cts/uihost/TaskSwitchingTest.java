@@ -47,7 +47,7 @@ import java.util.Map;
  */
 public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver {
     private static final String TAG = "TaskSwitchingTest";
-    private final static String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
+    private final static String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
     private String mCtsReport = null;
@@ -92,7 +92,7 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
     public void testTaskswitching() throws Exception {
         HostReportLog report =
                 new HostReportLog(mDevice.getSerialNumber(), ReportLog.getClassMethodNames());
-        RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGES[0], CTS_RUNNER,
+        RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGES[0], RUNNER,
                 mDevice.getIDevice());
         LocalListener listener = new LocalListener();
         mDevice.runInstrumentationTests(testRunner, listener);
