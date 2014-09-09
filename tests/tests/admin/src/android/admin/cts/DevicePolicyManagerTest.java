@@ -40,6 +40,23 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
     private ComponentName mComponent;
     private boolean mDeviceAdmin;
 
+    private static final String TEST_CA_STRING1 =
+            "-----BEGIN CERTIFICATE-----\n" +
+            "MIICVzCCAgGgAwIBAgIJAMvnLHnnfO/IMA0GCSqGSIb3DQEBBQUAMIGGMQswCQYD\n" +
+            "VQQGEwJJTjELMAkGA1UECAwCQVAxDDAKBgNVBAcMA0hZRDEVMBMGA1UECgwMSU1G\n" +
+            "TCBQVlQgTFREMRAwDgYDVQQLDAdJTUZMIE9VMRIwEAYDVQQDDAlJTUZMLklORk8x\n" +
+            "HzAdBgkqhkiG9w0BCQEWEHJhbWVzaEBpbWZsLmluZm8wHhcNMTMwODI4MDk0NDA5\n" +
+            "WhcNMjMwODI2MDk0NDA5WjCBhjELMAkGA1UEBhMCSU4xCzAJBgNVBAgMAkFQMQww\n" +
+            "CgYDVQQHDANIWUQxFTATBgNVBAoMDElNRkwgUFZUIExURDEQMA4GA1UECwwHSU1G\n" +
+            "TCBPVTESMBAGA1UEAwwJSU1GTC5JTkZPMR8wHQYJKoZIhvcNAQkBFhByYW1lc2hA\n" +
+            "aW1mbC5pbmZvMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJ738cbTQlNIO7O6nV/f\n" +
+            "DJTMvWbPkyHYX8CQ7yXiAzEiZ5bzKJjDJmpRAkUrVinljKns2l6C4++l/5A7pFOO\n" +
+            "33kCAwEAAaNQME4wHQYDVR0OBBYEFOdbZP7LaMbgeZYPuds2CeSonmYxMB8GA1Ud\n" +
+            "IwQYMBaAFOdbZP7LaMbgeZYPuds2CeSonmYxMAwGA1UdEwQFMAMBAf8wDQYJKoZI\n" +
+            "hvcNAQEFBQADQQBdrk6J9koyylMtl/zRfiMAc2zgeC825fgP6421NTxs1rjLs1HG\n" +
+            "VcUyQ1/e7WQgOaBHi9TefUJi+4PSVSluOXon\n" +
+            "-----END CERTIFICATE-----";
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -391,6 +408,47 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testInstallCaCert_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testInstallCaCert_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.installCaCert(mComponent,
+                    TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testUninstallCaCert_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testUninstallCaCert_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.uninstallCaCert(mComponent,
+                    TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testGetInstalledCaCerts_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testGetInstalledCaCerts_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.getInstalledCaCerts(mComponent);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
         }
     }
 
