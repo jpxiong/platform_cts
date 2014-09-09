@@ -28,15 +28,15 @@ import java.util.List;
 
 public class TelecommManagerTest extends AndroidTestCase {
     public void testRegisterAccountsBlocked() {
-        PhoneAccount phoneAccount = PhoneAccount.builder()
-                .setAccountHandle(new PhoneAccountHandle(
-                                new ComponentName(getContext(), TelecommManagerTest.class),
-                                "testRegisterAccountsBlocked"))
-                .setHandle(Uri.parse("tel:6502637643"))
+        PhoneAccount phoneAccount = new PhoneAccount.Builder(
+                new PhoneAccountHandle(
+                        new ComponentName(getContext(), TelecommManagerTest.class),
+                        "testRegisterAccountsBlocked"),
+                "Mock PhoneAccount")
+                .setAddress(Uri.parse("tel:6502637643"))
                 .setSubscriptionAddress(Uri.parse("tel:650-263-7643"))
                 .setCapabilities(PhoneCapabilities.ALL)
                 .setIconResId(0)
-                .setLabel("Mock PhoneAccount")
                 .setShortDescription("PhoneAccount used in TelecommManagerTest")
                 .build();
 
