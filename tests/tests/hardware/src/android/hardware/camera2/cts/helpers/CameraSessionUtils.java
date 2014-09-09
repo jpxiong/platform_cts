@@ -124,9 +124,9 @@ public class CameraSessionUtils extends Assert {
 
         @Override
         public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request,
-                                     long timestamp) {
+                                     long timestamp, long frameNumber) {
             mCaptureTimeQueue.offer(timestamp);
-            super.onCaptureStarted(session, request, timestamp);
+            super.onCaptureStarted(session, request, timestamp, frameNumber);
         }
 
         @Override
@@ -222,7 +222,8 @@ public class CameraSessionUtils extends Assert {
         if (new MockUtil().isMock(listener)) {
             verify(listener, never()).onCaptureFailed(any(CameraCaptureSession.class),
                     any(CaptureRequest.class), any(CaptureFailure.class));
-            verify(listener, atLeastOnce()).onCaptureStarted(eq(session), eq(request), anyLong());
+            verify(listener, atLeastOnce()).onCaptureStarted(eq(session), eq(request),
+                    anyLong(), anyLong());
             verify(listener, atLeastOnce()).onCaptureCompleted(eq(session), eq(request),
                     eq(result.first));
         }

@@ -261,12 +261,14 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             int timeOutMs) {
         // Should receive expected number of onCaptureStarted callbacks.
         ArgumentCaptor<Long> timestamps = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Long> frameNumbers = ArgumentCaptor.forClass(Long.class);
         verify(mockListener,
                 timeout(timeOutMs).atLeast(expectResultCount))
                         .onCaptureStarted(
                                 eq(session),
                                 isA(CaptureRequest.class),
-                                timestamps.capture());
+                                timestamps.capture(),
+                                frameNumbers.capture());
 
         // Validate timestamps: all timestamps should be larger than 0 and monotonically increase.
         long timestamp = 0;
@@ -274,6 +276,15 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             assertNotNull("Next timestamp is null!", nextTimestamp);
             assertTrue("Captures are out of order", timestamp < nextTimestamp);
             timestamp = nextTimestamp;
+        }
+
+        // Validate framenumbers: all framenumbers should be consecutive and positive
+        long frameNumber = -1;
+        for (Long nextFrameNumber : frameNumbers.getAllValues()) {
+            assertNotNull("Next frame number is null!", nextFrameNumber);
+            assertTrue("Captures are out of order",
+                    (frameNumber == -1) || (frameNumber + 1 == nextFrameNumber));
+            frameNumber = nextFrameNumber;
         }
 
         // Should receive expected number of capture results.

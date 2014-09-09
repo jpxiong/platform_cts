@@ -546,7 +546,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
 
         @Override
         public void onCaptureStarted(
-                CameraCaptureSession session, CaptureRequest request, long timestamp)
+            CameraCaptureSession session, CaptureRequest request, long timestamp, long frameNumber)
         {
             checkCallbackOrder(request);
             createMapEntryIfNecessary(request);
