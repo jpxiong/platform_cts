@@ -21,17 +21,17 @@ import android.test.ActivityInstrumentationTestCase2;
 
 /**
  */
-public class CompressedTextureTest extends ActivityInstrumentationTestCase2<CompressedTextureStubActivity> {
+public class CompressedTextureTest extends ActivityInstrumentationTestCase2<CompressedTextureCtsActivity> {
 
     public CompressedTextureTest() {
-        super("com.android.cts.stub", CompressedTextureStubActivity.class);
+        super("com.android.cts.graphics", CompressedTextureCtsActivity.class);
     }
 
     private void launchTest(String format) throws Exception {
         Bundle extras = new Bundle();
         extras.putString("TextureFormat", format);
-        CompressedTextureStubActivity activity = launchActivity("com.android.cts.stub",
-                CompressedTextureStubActivity.class, extras);
+        CompressedTextureCtsActivity activity = launchActivity("com.android.cts.graphics",
+                CompressedTextureCtsActivity.class, extras);
         activity.finish();
         assertTrue(activity.getPassed());
     }

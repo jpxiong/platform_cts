@@ -29,7 +29,7 @@ import android.os.ParcelFileDescriptor;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 
 import java.io.ByteArrayOutputStream;

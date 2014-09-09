@@ -36,7 +36,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
  * Test for checking whether the ro.opengles.version property is set to the correct value.
  */
 public class OpenGlEsVersionTest
-        extends ActivityInstrumentationTestCase2<OpenGlEsVersionStubActivity> {
+        extends ActivityInstrumentationTestCase2<OpenGlEsVersionCtsActivity> {
 
     private static final String TAG = OpenGlEsVersionTest.class.getSimpleName();
 
@@ -45,10 +45,10 @@ public class OpenGlEsVersionTest
     private static final int EGL_OPENGL_ES2_BIT = 0x0004;
     private static final int EGL_OPENGL_ES3_BIT_KHR = 0x0040;
 
-    private OpenGlEsVersionStubActivity mActivity;
+    private OpenGlEsVersionCtsActivity mActivity;
 
     public OpenGlEsVersionTest() {
-        super("com.android.cts.stub", OpenGlEsVersionStubActivity.class);
+        super("com.android.cts.graphics", OpenGlEsVersionCtsActivity.class);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class OpenGlEsVersionTest
     }
 
     private static boolean hasExtension(String extensions, String name) {
-        return OpenGlEsVersionStubActivity.hasExtension(extensions, name);
+        return OpenGlEsVersionCtsActivity.hasExtension(extensions, name);
     }
 
     /** @return OpenGL ES major version 1, 2, or 3 or some non-positive number for error */
@@ -251,13 +251,13 @@ public class OpenGlEsVersionTest
                 mActivity.getVersionString()));
     }
 
-    /** Restart {@link GLSurfaceViewStubActivity} with a specific client version. */
+    /** Restart {@link GLSurfaceViewCtsActivity} with a specific client version. */
     private void restartActivityWithClientVersion(int version) {
         mActivity.finish();
         setActivity(null);
 
         try {
-            Intent intent = OpenGlEsVersionStubActivity.createIntent(version);
+            Intent intent = OpenGlEsVersionCtsActivity.createIntent(version);
             setActivityIntent(intent);
             mActivity = getActivity();
         } finally {

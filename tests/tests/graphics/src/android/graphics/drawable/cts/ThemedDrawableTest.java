@@ -33,7 +33,7 @@ import android.util.SparseIntArray;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 @TargetApi(19)
 public class ThemedDrawableTest extends AndroidTestCase {
