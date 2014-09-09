@@ -57,10 +57,9 @@ public class CancelCallTestActivity extends PassFailButtons.Activity {
                                 CancellingConnectionService.class),
                         getClass().getSimpleName()
                 );
-                PhoneAccount account = new PhoneAccount.Builder()
-                        .withAccountHandle(mPhoneAccountHandle)
-                        .withCapabilities(PhoneAccount.CAPABILITY_CONNECTION_MANAGER)
-                        .withLabel("Call Cancel Manager")
+                PhoneAccount account = new PhoneAccount.Builder(mPhoneAccountHandle,
+                                                                "Call Cancel Manager")
+                        .setCapabilities(PhoneAccount.CAPABILITY_CONNECTION_MANAGER)
                         .build();
 
                 getTelecommManager().registerPhoneAccount(account);
