@@ -296,6 +296,104 @@ public class Vp8EncoderTest extends Vp8CodecTestBase {
         }
     }
 
+     /**
+      * Check if encoder and decoder can run simultaneously on different threads.
+      *
+      * Encodes and decodes 9 seconds of raw stream sequentially in CBR mode,
+      * and then run parallel encoding and decoding of the same streams.
+      * Compares average bitrate and PSNR for sequential and parallel runs.
+      */
+     public void testParallelEncodingAndDecoding() throws Exception {
+         MediaCodecInfo codecInfo = selectCodec(VP8_MIME);
+         if (codecInfo == null) {
+             Log.w(TAG, "Codec " + VP8_MIME + " not supported. "
+                     + "Return from testParallelEncodingAndDecoding.");
+             return;
+         }
+
+         int encodeSeconds = 9;
+         final int[] bitrate = new int[1];
+         final double[] psnr = new double[1];
+         final Exception[] exceptionEncoder = new Exception[1];
+         final Exception[] exceptionDecoder = new Exception[1];
+         final EncoderOutputStreamParameters params = getDefaultEncodingParameters(
+                 INPUT_YUV,
+                 ENCODED_IVF_BASE,
+                 encodeSeconds,
+                 WIDTH,
+                 HEIGHT,
+                 FPS,
+                 VIDEO_ControlRateConstant,
+                 BITRATE,
+                 true);
+         final String inputIvfFilename = params.outputIvfFilename;
+
+         Runnable runEncoder = new Runnable() {
+             public void run() {
+                 try {
+                     ArrayList<MediaCodec.BufferInfo> bufInfo = encode(params);
+                     Vp8EncodingStatistics statistics = computeEncodingStatistics(bufInfo);
+                     bitrate[0] = statistics.mAverageBitrate;
+                 } catch (Exception e) {
+                     Log.e(TAG, "Encoder error: " + e.toString());
+                     exceptionEncoder[0] = e;
+                 }
+             }
+         };
+         Runnable runDecoder = new Runnable() {
+             public void run() {
+                 try {
+                     decode(inputIvfFilename, OUTPUT_YUV, FPS, params.forceSwEncoder);
+                     Vp8DecodingStatistics statistics = computeDecodingStatistics(
+                            params.inputYuvFilename, R.raw.football_qvga, OUTPUT_YUV,
+                            params.frameWidth, params.frameHeight);
+                     psnr[0] = statistics.mAveragePSNR;
+                 } catch (Exception e) {
+                     Log.e(TAG, "Decoder error: " + e.toString());
+                     exceptionDecoder[0] = e;
+                 }
+             }
+         };
+
+         // Sequential encoding and decoding.
+         runEncoder.run();
+         if (exceptionEncoder[0] != null) {
+             throw exceptionEncoder[0];
+         }
+         int referenceBitrate = bitrate[0];
+         runDecoder.run();
+         if (exceptionDecoder[0] != null) {
+             throw exceptionDecoder[0];
+         }
+         double referencePsnr = psnr[0];
+
+         // Parallel encoding and decoding.
+         params.outputIvfFilename = SDCARD_DIR + File.separator + ENCODED_IVF_BASE + "_copy.ivf";
+         Thread threadEncoder = new Thread(runEncoder);
+         Thread threadDecoder = new Thread(runDecoder);
+         threadEncoder.start();
+         threadDecoder.start();
+         threadEncoder.join();
+         threadDecoder.join();
+         if (exceptionEncoder[0] != null) {
+             throw exceptionEncoder[0];
+         }
+         if (exceptionDecoder[0] != null) {
+             throw exceptionDecoder[0];
+         }
+
+         // Compare bitrates and PSNRs for sequential and parallel cases.
+         Log.d(TAG, "Sequential bitrate: " + referenceBitrate + ". PSNR: " + referencePsnr);
+         Log.d(TAG, "Parallel bitrate: " + bitrate[0] + ". PSNR: " + psnr[0]);
+         assertEquals("Bitrate for sequenatial encoding" + referenceBitrate +
+                 " is different from parallel encoding " + bitrate[0],
+                 referenceBitrate, bitrate[0], MAX_BITRATE_VARIATION * referenceBitrate);
+         assertEquals("PSNR for sequenatial encoding" + referencePsnr +
+                 " is different from parallel encoding " + psnr[0],
+                 referencePsnr, psnr[0], MAX_ASYNC_AVERAGE_PSNR_DIFFERENCE);
+     }
+
+
     /**
      * Check the encoder quality for various bitrates by calculating PSNR
      *
