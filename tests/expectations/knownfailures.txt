@@ -36,5 +36,16 @@
     "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_html"
   ],
   bug: 14639928
+},
+{
+  description: "permissions for the API previously used in the test has changed, making it impossible to pass",
+  names: [
+    "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingFast",
+    "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingSlow",
+    "android.openglperf.cts.GlVboPerfTest#testVboVsNonVboPerfGeometry0",
+    "android.openglperf.cts.GlVboPerfTest#testVboVsNonVboPerfGeometry1",
+    "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers"
+  ],
+  bug: 17394321
 }
 ]
