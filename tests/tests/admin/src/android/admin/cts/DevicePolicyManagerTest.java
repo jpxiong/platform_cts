@@ -452,6 +452,33 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testHasCaCertInstalled_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testHasCaCertInstalled_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.hasCaCertInstalled(mComponent,
+                    TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testUninstallAllUserCaCerts_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testUninstallAllUserCaCerts_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.uninstallAllUserCaCerts(mComponent);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
     private void assertDeviceOwnerMessage(String message) {
         assertTrue("message is: "+ message, message.contains("does not own the device")
                 || message.contains("can only be called by the device owner"));
