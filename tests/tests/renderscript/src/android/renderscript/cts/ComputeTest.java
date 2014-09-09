@@ -677,6 +677,14 @@ public class ComputeTest extends RSBaseCompute {
         checkForErrors();
     }
 
+    public void testMatrix() {
+        ScriptC_MatrixTest s = new ScriptC_MatrixTest(mRS);
+        s.invoke_matrixTests();
+        mRS.finish();
+        waitForMessage();
+        checkForErrors();
+    }
+
     private boolean initializeStructObject(ScriptC_struct_object s) {
         ScriptField_objects_rs.Item i = new ScriptField_objects_rs.Item();
         i.e = Element.FONT(mRS);
@@ -697,25 +705,6 @@ public class ComputeTest extends RSBaseCompute {
         }
         checkForErrors();
     }
-
-    /*
-    public void testClamp() {
-        ScriptC_clamp s = new ScriptC_clamp(mRS);
-        s.invoke_clamp_test();
-        mRS.finish();
-        waitForMessage();
-        checkForErrors();
-    }
-
-    public void testClampRelaxed() {
-        ScriptC_clamp_relaxed s =
-                new ScriptC_clamp_relaxed(mRS);
-        s.invoke_clamp_test();
-        mRS.finish();
-        waitForMessage();
-        checkForErrors();
-    }
-    */
 
     /**
      * Test utility functions.
