@@ -109,15 +109,19 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
 
         sql = sqliteQueryBuilder.buildQuery(null, // projectionIn is null
                 null, null, null, null, null, null);
-        // TODO: implement an order-independent way of doing the projection columns comparison
-        expected = "SELECT age, name, address FROM " + TEST_TABLE_NAME;
-        assertEquals(expected, sql);
+        assertTrue(sql.matches("SELECT (age|name|address), (age|name|address), (age|name|address) "
+                + "FROM " + TEST_TABLE_NAME));
+        assertTrue(sql.contains("age"));
+        assertTrue(sql.contains("name"));
+        assertTrue(sql.contains("address"));
 
         sqliteQueryBuilder.setProjectionMap(null);
         sql = sqliteQueryBuilder.buildQuery(new String[] { "name", "address" },
                 null, null, null, null, null, null);
-        expected = "SELECT name, address FROM " + TEST_TABLE_NAME;
-        assertEquals(expected, sql);
+        assertTrue(sql.matches("SELECT (name|address), (name|address) "
+                + "FROM " + TEST_TABLE_NAME));
+        assertTrue(sql.contains("name"));
+        assertTrue(sql.contains("address"));
     }
 
     public void testSetCursorFactory() {
