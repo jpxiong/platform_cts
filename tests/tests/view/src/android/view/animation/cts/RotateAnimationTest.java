@@ -28,11 +28,11 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.animation.Transformation;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 public class RotateAnimationTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     private Activity mActivity;
 
@@ -42,7 +42,7 @@ public class RotateAnimationTest
     private static final float TO_DEGREE = 90.0f;
 
     public RotateAnimationTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

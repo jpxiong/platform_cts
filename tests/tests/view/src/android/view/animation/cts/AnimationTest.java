@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -38,7 +38,7 @@ import android.view.animation.Animation.AnimationListener;
 /**
  * Test {@link Animation}.
  */
-public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
     private static final float ALPHA_DELTA = 0.001f;
 
     /** It is defined in R.anim.accelerate_alpha */
@@ -51,7 +51,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
     private Object mLockObject = new Object();
 
     public AnimationTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

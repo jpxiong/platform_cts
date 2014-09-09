@@ -41,7 +41,7 @@ public class EditorInfoTest extends AndroidTestCase {
         info.initialSelStart = 0;
         info.inputType = EditorInfo.TYPE_MASK_CLASS;
         info.label = "label";
-        info.packageName = "com.android.cts.stub";
+        info.packageName = "com.android.cts.view";
         info.privateImeOptions = "privateIme";
         Bundle b = new Bundle();
         String key = "bundleKey";

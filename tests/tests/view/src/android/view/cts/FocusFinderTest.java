@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinderStubActivity> {
+public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinderCtsActivity> {
 
     private FocusFinder mFocusFinder;
     private ViewGroup mLayout;
@@ -34,7 +34,7 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
     private Button mBottomRight;
 
     public FocusFinderTest() {
-        super("com.android.cts.stub", FocusFinderStubActivity.class);
+        super("com.android.cts.view", FocusFinderCtsActivity.class);
     }
 
     @Override

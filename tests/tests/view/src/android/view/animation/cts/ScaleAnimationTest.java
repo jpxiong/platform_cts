@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.content.res.XmlResourceParser;
@@ -30,7 +30,7 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 
 public class ScaleAnimationTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
     private static long DURATION = 1000;
     private static float DELTA = 0.001f;
     private static float FROM_X = 1.0f;
@@ -41,10 +41,10 @@ public class ScaleAnimationTest
     private static float PIVOT_Y = 0.6f;
     private static float MID_X = 0.8f;
     private static float MID_Y = 3.3f;
-    private AnimationTestStubActivity mActivity;
+    private AnimationTestCtsActivity mActivity;
 
     public ScaleAnimationTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override
