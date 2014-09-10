@@ -1539,4 +1539,71 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         assertWritingClipNotAllowed(clipMeowCat, "writing should have failed");
         assertNoPersistedUriPermission();
     }
+
+    /**
+     * Validate behavior of a direct permission grant, where the receiver of
+     * that permission revokes it.
+     */
+    public void testDirectGrantReceiverRevokeUriPermission() throws Exception {
+        final ContentResolver resolver = getContext().getContentResolver();
+
+        final Uri target = Uri.withAppendedPath(PERM_URI_GRANTING, "foo3");
+        final Uri targetMeow = Uri.withAppendedPath(target, "meow");
+        final Uri targetMeowCat = Uri.withAppendedPath(targetMeow, "cat");
+
+        final ClipData clip = makeSingleClipData(target);
+        final ClipData clipMeow = makeSingleClipData(targetMeow);
+        final ClipData clipMeowCat = makeSingleClipData(targetMeowCat);
+
+        // Make sure we can't see the target
+        assertReadingClipNotAllowed(clipMeow, "reading should have failed");
+        assertWritingClipNotAllowed(clipMeow, "writing should have failed");
+
+        // Give ourselves some grants:
+        // /meow/cat  WRITE|PERSISTABLE
+        // /meow      READ|PREFIX
+        // /meow      WRITE
+        grantClipUriPermissionViaContext(targetMeowCat, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        grantClipUriPermissionViaContext(targetMeow, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        grantClipUriPermissionViaContext(targetMeow, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        SystemClock.sleep(2000);
+
+        long before = System.currentTimeMillis();
+        resolver.takePersistableUriPermission(targetMeowCat, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        long after = System.currentTimeMillis();
+        assertPersistedUriPermission(targetMeowCat, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, before, after);
+
+        // Verify they look good
+        assertReadingClipNotAllowed(clip, "reading should have failed");
+        assertReadingClipAllowed(clipMeow);
+        assertReadingClipAllowed(clipMeowCat);
+        assertWritingClipNotAllowed(clip, "writing should have failed");
+        assertWritingClipAllowed(clipMeow);
+        assertWritingClipAllowed(clipMeowCat);
+
+        // Revoke anyone with write under meow
+        getContext().revokeUriPermission(targetMeow, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // This should have nuked persisted permission at lower level, but it
+        // shoulnd't have touched our prefix read.
+        assertReadingClipNotAllowed(clip, "reading should have failed");
+        assertReadingClipAllowed(clipMeow);
+        assertReadingClipAllowed(clipMeowCat);
+        assertWritingClipNotAllowed(clip, "writing should have failed");
+        assertWritingClipNotAllowed(clipMeow, "writing should have failed");
+        assertWritingClipNotAllowed(clipMeowCat, "writing should have failed");
+        assertNoPersistedUriPermission();
+
+        // Revoking read at top of tree should nuke everything else
+        getContext().revokeUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        assertReadingClipNotAllowed(clip, "reading should have failed");
+        assertReadingClipNotAllowed(clipMeow, "reading should have failed");
+        assertReadingClipNotAllowed(clipMeowCat, "reading should have failed");
+        assertWritingClipNotAllowed(clip, "writing should have failed");
+        assertWritingClipNotAllowed(clipMeow, "writing should have failed");
+        assertWritingClipNotAllowed(clipMeowCat, "writing should have failed");
+        assertNoPersistedUriPermission();
+    }
 }
