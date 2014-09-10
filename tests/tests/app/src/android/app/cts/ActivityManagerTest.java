@@ -228,6 +228,7 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         }
         // start a new process
         mIntent = new Intent("android.app.REMOTESERVICE");
+        mIntent.setPackage("com.android.cts.stub");
         mInstrumentation.getTargetContext().startService(mIntent);
         Thread.sleep(WAITFOR_MSEC);
 
