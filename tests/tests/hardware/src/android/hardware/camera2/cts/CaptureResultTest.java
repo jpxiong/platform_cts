@@ -403,6 +403,21 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                         // Only do non-null check for the rest of keys.
                         mCollector.expectKeyValueNotNull(failMsg, result, key);
                     }
+                } else {
+                    // These keys should always be null
+                    if (key.equals(CaptureResult.CONTROL_AE_REGIONS)) {
+                        mCollector.expectNull(
+                                "Capture result contains AE regions but aeMaxRegions is 0",
+                                result.get(CaptureResult.CONTROL_AE_REGIONS));
+                    } else if (key.equals(CaptureResult.CONTROL_AWB_REGIONS)) {
+                        mCollector.expectNull(
+                                "Capture result contains AWB regions but awbMaxRegions is 0",
+                                result.get(CaptureResult.CONTROL_AWB_REGIONS));
+                    } else if (key.equals(CaptureResult.CONTROL_AF_REGIONS)) {
+                        mCollector.expectNull(
+                                "Capture result contains AF regions but afMaxRegions is 0",
+                                result.get(CaptureResult.CONTROL_AF_REGIONS));
+                    }
                 }
             }
         }

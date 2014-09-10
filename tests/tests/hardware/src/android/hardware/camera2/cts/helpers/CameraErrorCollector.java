@@ -534,6 +534,12 @@ public class CameraErrorCollector extends ErrorCollector {
         checkThat(msg, obj, CoreMatchers.notNullValue());
     }
 
+    public void expectNull(String msg, Object obj) {
+        if (obj != null) {
+            addMessage(msg);
+        }
+    }
+
     /**
      * Check if the values in the array are monotonically increasing (decreasing) and not all
      * equal.
