@@ -52,6 +52,8 @@ public class WebGLActivity extends Activity {
         mWebView = new WebView(this);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAllowFileAccessFromFileURLs(true);
+        mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+
         mWebView.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public String getUrlToTest() {
@@ -61,10 +63,10 @@ public class WebGLActivity extends Activity {
             }
 
             @JavascriptInterface
-            public void reportResults(boolean passed, String message) {
+            public void reportResults(String type, boolean success, String message) {
                 synchronized(WebGLActivity.this) {
-                    mMessage.append((passed ? "PASS " : "FAIL ") + message + "\n");
-                    mPassed &= passed;
+                    mMessage.append((success ? "PASS " : "FAIL ") + message + "\n");
+                    mPassed &= success;
                 }
             }
 
@@ -94,13 +96,13 @@ public class WebGLActivity extends Activity {
         });
 
         // Wait on test completion.
-        boolean finished = mFinished.tryAcquire(20, TimeUnit.SECONDS);
+        boolean finished = mFinished.tryAcquire(60, TimeUnit.SECONDS);
         String message;
         synchronized(WebGLActivity.this) {
             message = mMessage.toString();
         }
         if (!finished)
-            throw new Exception("\n" + url + "\n Test timed-out after 20 seconds: " + message);
+            throw new Exception("\n" + url + "\n Test timed-out after 60 seconds: " + message);
         if(!mPassed)
             throw new Exception("\n" + url + "\n Test failed: " + message);
     }

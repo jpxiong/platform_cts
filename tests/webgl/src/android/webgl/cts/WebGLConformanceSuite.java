@@ -33,7 +33,7 @@ public class WebGLConformanceSuite {
     private WebGLConformanceSuite(WebGLActivity activity) throws Exception {
         Log.i(TAG, "Unzipping WebGL Conformance Suite: "
                 + activity.getCacheDir().getPath());
-        InputStream suite = activity.getResources().openRawResource(R.raw.webgl_1_0_1);
+        InputStream suite = activity.getResources().openRawResource(R.raw.webgl_sdk_tests);
         ZipUtil.unzipToPath(suite, activity.getCacheDir());
         InputStream harness = activity.getResources().openRawResource(R.raw.harness);
         ZipUtil.streamToPath(harness, activity.getCacheDir(), "harness.html");
