@@ -389,7 +389,8 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
         String instrumentationName =
                 "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
         String command = "am instrument -w -e deqpLogFileName \"" + logFileName
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + caseListFileName + "\" "
+                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + caseListFileName + " "
+                + "--deqp-gl-config-name=rgba8888d24s8\" "
                 + (mLogData ? "-e deqpLogData \"true\" " : "") + instrumentationName;
 
         mDevice.executeShellCommand(command, parser);
