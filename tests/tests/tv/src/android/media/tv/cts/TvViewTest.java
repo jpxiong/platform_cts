@@ -138,7 +138,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
-        if (!Utils.hasTvInputFramework(getActivity())) {
+        if (!Utils.hasTvInputFramework(mActivity)) {
             return;
         }
         mInstrumentation = getInstrumentation();
@@ -156,6 +156,10 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
 
     @Override
     protected void tearDown() throws Exception {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            super.tearDown();
+            return;
+        }
         StubTunerTvInputService.deleteChannels(mActivity.getContentResolver(), mStubInfo);
         StubTunerTvInputService.clearTracks();
         try {
@@ -173,6 +177,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     }
 
     public void testConstructor() throws Exception {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         new TvView(mActivity);
 
         new TvView(mActivity, null);
@@ -322,6 +329,9 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
     }
 
     public void testOnUnhandledInputEventListener() throws Throwable {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
         final InputEvent[] unhandledEvent = { null };
         mTvView.setOnUnhandledInputEventListener(new TvView.OnUnhandledInputEventListener() {
             @Override
