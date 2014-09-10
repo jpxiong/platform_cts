@@ -89,7 +89,7 @@ public class SimRestrictedApisTest extends AndroidTestCase {
      */
     public void testSetLine1NumberForDisplay2() {
         try {
-            TelephonyManager.getDefault().setLine1NumberForDisplay(0, "", "");
+            TelephonyManager.getDefault().setLine1NumberForDisplayForSubscriber(0, "", "");
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
@@ -255,7 +255,7 @@ public class SimRestrictedApisTest extends AndroidTestCase {
      */
     public void testEnableSimplifiedNetworkSettings() {
         try {
-            TelephonyManager.getDefault().enableSimplifiedNetworkSettings(0, false);
+            TelephonyManager.getDefault().enableSimplifiedNetworkSettingsForSubscriber(0, false);
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
