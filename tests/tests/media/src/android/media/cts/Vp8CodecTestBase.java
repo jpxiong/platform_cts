@@ -846,9 +846,9 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                 } else {
                     encFrameLength = encFrame.length;
 
-                    mInputBuffers[index].clear();
-                    mInputBuffers[index].put(encFrame);
-                    mInputBuffers[index].rewind();
+                    ByteBuffer byteBuffer = mCodec.getInputBuffer(index);
+                    byteBuffer.put(encFrame);
+                    byteBuffer.rewind();
 
                     mInPresentationTimeUs = (mInputFrameIndex * 1000000) / mFrameRate;
 
@@ -877,8 +877,8 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                 MediaEncoderOutput out = new MediaEncoderOutput();
 
                 out.buffer = new byte[info.size];
-                mOutputBuffers[index].position(info.offset);
-                mOutputBuffers[index].get(out.buffer, 0, info.size);
+                ByteBuffer outputBuffer = mCodec.getOutputBuffer(index);
+                outputBuffer.get(out.buffer, 0, info.size);
                 mOutPresentationTimeUs = info.presentationTimeUs;
 
                 String logStr = "Enc" + mId + ". Frame # " + mOutputFrameIndex;
@@ -1014,8 +1014,12 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             }
             mCodec.configure(mFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mCodec.start();
-            mInputBuffers = mCodec.getInputBuffers();
-            mOutputBuffers = mCodec.getOutputBuffers();
+
+            // get the cached input/output only in sync mode
+            if (!mAsync) {
+                mInputBuffers = mCodec.getInputBuffers();
+                mOutputBuffers = mCodec.getOutputBuffers();
+            }
         }
 
         public void createCodec(int id, final String name, final MediaFormat format,
