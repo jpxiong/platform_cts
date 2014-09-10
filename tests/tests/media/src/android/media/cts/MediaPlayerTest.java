@@ -917,8 +917,6 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     public void testDeselectTrack() throws Exception {
         loadResource(R.raw.testvideo_with_2_subtitles);
         loadSubtitleSource(R.raw.test_subtitle1_srt);
-        readTimedTextTracks();
-        assertEquals(getTimedTextTrackCount(), 3);
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -936,6 +934,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
         });
         mMediaPlayer.prepare();
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 3);
+
         mMediaPlayer.start();
         assertTrue(mMediaPlayer.isPlaying());
 
@@ -977,14 +978,6 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
     public void testChangeSubtitleTrack() throws Exception {
         loadResource(R.raw.testvideo_with_2_subtitles);
-        readTimedTextTracks();
-        assertEquals(getTimedTextTrackCount(), 2);
-
-        // Adds two more external subtitle files.
-        loadSubtitleSource(R.raw.test_subtitle1_srt);
-        loadSubtitleSource(R.raw.test_subtitle2_srt);
-        readTimedTextTracks();
-        assertEquals(getTimedTextTrackCount(), 4);
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -1019,6 +1012,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         mMediaPlayer.prepare();
         assertFalse(mMediaPlayer.isPlaying());
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 2);
+
+        // Adds two more external subtitle files.
+        loadSubtitleSource(R.raw.test_subtitle1_srt);
+        loadSubtitleSource(R.raw.test_subtitle2_srt);
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 4);
 
         selectSubtitleTrack(0);
         mOnTimedTextCalled.reset();
