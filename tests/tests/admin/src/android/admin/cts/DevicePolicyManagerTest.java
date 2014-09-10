@@ -20,7 +20,9 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.UserManager;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -479,12 +481,164 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testSetScreenCaptureDisabled_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetScreenCaptureDisabled_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setScreenCaptureDisabled(mComponent, true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetAutoTimeRequired_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetAutoTimeRequired_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setAutoTimeRequired(mComponent, true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testAddPersistentPreferredActivity_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testAddPersistentPreferredActivity_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.addPersistentPreferredActivity(mComponent,
+                    new IntentFilter(Intent.ACTION_MAIN),
+                    new ComponentName("android.admin.cts", "dummy"));
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testClearPackagePersistentPreferredActivities_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testClearPackagePersistentPreferredActivities_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.clearPackagePersistentPreferredActivities(mComponent,
+                    "android.admin.cts");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetApplicationRestrictions_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetApplicationRestrictions_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setApplicationRestrictions(mComponent,
+                    "android.admin.cts", null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testAddUserRestriction_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testAddUserRestriction_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.addUserRestriction(mComponent,
+                    UserManager.DISALLOW_SMS);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetAccountManagementDisabled_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetAccountManagementDisabled_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setAccountManagementDisabled(mComponent,
+                    "dummy", true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetRestrictionsProvider_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetRestrictionsProvider_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setRestrictionsProvider(mComponent,
+                    new ComponentName("android.admin.cts", "dummy"));
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetUninstallBlocked_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetUninstallBlocked_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setUninstallBlocked(mComponent,
+                    "android.admin.cts", true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetPermittedAccessibilityServices_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetPermittedAccessibilityServices_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setPermittedAccessibilityServices(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testSetPermittedInputMethods_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetPermittedInputMethods_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setPermittedInputMethods(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
     private void assertDeviceOwnerMessage(String message) {
         assertTrue("message is: "+ message, message.contains("does not own the device")
                 || message.contains("can only be called by the device owner"));
     }
 
     private void assertProfileOwnerMessage(String message) {
-        assertTrue(message.contains("does not own the profile"));
+        assertTrue("message is: "+ message,
+                message.contains("does not own the profile"));
     }
 }
