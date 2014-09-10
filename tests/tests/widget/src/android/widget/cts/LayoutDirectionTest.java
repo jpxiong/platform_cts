@@ -20,17 +20,17 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 import static android.view.View.LAYOUT_DIRECTION_LTR;
 import static android.view.View.LAYOUT_DIRECTION_RTL;
 import static android.view.View.LAYOUT_DIRECTION_INHERIT;
 import static android.view.View.LAYOUT_DIRECTION_LOCALE;
 
-public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<LayoutDirectionStubActivity> {
+public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<LayoutDirectionCtsActivity> {
 
     public LayoutDirectionTest() {
-        super(LayoutDirectionStubActivity.class);
+        super(LayoutDirectionCtsActivity.class);
     }
 
     private void checkDefaultDirectionForOneLayoutWithCode(ViewGroup vg) {

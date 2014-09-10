@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.content.Context;
@@ -175,7 +175,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
 
     public void testSetViewImage() {
         // resId
-        int sceneryImgResId = com.android.cts.stub.R.drawable.scenery;
+        int sceneryImgResId = com.android.cts.widget.R.drawable.scenery;
         ImageView view = new ImageView(mContext);
         assertNull(view.getDrawable());
         mSimpleCursorAdapter.setViewImage(view, String.valueOf(sceneryImgResId));
@@ -206,7 +206,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
         view = new ImageView(mContext);
         assertNull(view.getDrawable());
         try {
-            int testimgRawId = com.android.cts.stub.R.raw.testimage;
+            int testimgRawId = com.android.cts.widget.R.raw.testimage;
             mSimpleCursorAdapter.setViewImage(view,
                     createTestImage(mContext, SAMPLE_IMAGE_NAME, testimgRawId));
             assertNotNull(view.getDrawable());
@@ -307,7 +307,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup viewGroup = (ViewGroup) layoutInflater.inflate(
-                com.android.cts.stub.R.layout.cursoradapter_host, null);
+                com.android.cts.widget.R.layout.cursoradapter_host, null);
         View result = mSimpleCursorAdapter.newView(mContext, null, viewGroup);
         assertNotNull(result);
         assertEquals(R.id.cursorAdapter_item0, result.getId());
@@ -321,7 +321,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup viewGroup = (ViewGroup) layoutInflater.inflate(
-                com.android.cts.stub.R.layout.cursoradapter_host, null);
+                com.android.cts.widget.R.layout.cursoradapter_host, null);
         View result = mSimpleCursorAdapter.newDropDownView(null, null, viewGroup);
         assertNotNull(result);
         assertEquals(R.id.cursorAdapter_item0, result.getId());

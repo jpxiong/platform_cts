@@ -47,18 +47,18 @@ import android.util.Xml;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**
  * Test {@link ImageView}.
  */
-public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStubActivity> {
+public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewCtsActivity> {
     private ImageView mImageView;
     private Activity mActivity;
 
     public ImageViewTest() {
-        super("com.android.cts.stub", ImageViewStubActivity.class);
+        super("com.android.cts.widget", ImageViewCtsActivity.class);
     }
 
     /**

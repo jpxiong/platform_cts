@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -39,11 +39,11 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
-public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
+public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutCtsActivity> {
     private Context mContext;
 
     public AbsSpinnerTest() {
-        super("com.android.cts.stub", RelativeLayoutStubActivity.class);
+        super("com.android.cts.widget", RelativeLayoutCtsActivity.class);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
     public void testSetSelectionIntBoolean() {
         AbsSpinner absSpinner = (AbsSpinner) getActivity().findViewById(R.id.spinner1);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         absSpinner.setAdapter(adapter);
         assertEquals(0, absSpinner.getSelectedItemPosition());
@@ -101,7 +101,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
     public void testSetSelectionInt() {
         AbsSpinner absSpinner = (AbsSpinner) getActivity().findViewById(R.id.spinner1);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         absSpinner.setAdapter(adapter);
         assertEquals(0, absSpinner.getSelectedItemPosition());
@@ -123,7 +123,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
     public void testAccessAdapter() {
         AbsSpinner absSpinner = (AbsSpinner) getActivity().findViewById(R.id.spinner1);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         absSpinner.setAdapter(adapter);
@@ -158,7 +158,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         AbsSpinner absSpinner = (AbsSpinner) getActivity().findViewById(R.id.spinner1);
 
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(mContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
 
         absSpinner.setAdapter(adapter1);
         assertEquals(adapter1.getCount(), absSpinner.getCount());
@@ -233,7 +233,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
     public void testOnSaveAndRestoreInstanceState() {
         AbsSpinner absSpinner = (AbsSpinner) getActivity().findViewById(R.id.spinner1);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         absSpinner.setAdapter(adapter);
         assertEquals(0, absSpinner.getSelectedItemPosition());

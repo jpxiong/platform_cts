@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -39,13 +39,13 @@ import android.widget.DialerFilter;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
-public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFilterStubActivity> {
+public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFilterCtsActivity> {
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private DialerFilter mDialerFilter;
 
     public DialerFilterTest() {
-        super("com.android.cts.stub", DialerFilterStubActivity.class);
+        super("com.android.cts.widget", DialerFilterCtsActivity.class);
     }
 
     @Override

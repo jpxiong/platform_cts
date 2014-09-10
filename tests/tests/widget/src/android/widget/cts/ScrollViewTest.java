@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -41,7 +41,7 @@ import android.widget.TextView;
 /**
  * Test {@link ScrollView}.
  */
-public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewStubActivity> {
+public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewCtsActivity> {
     // view dpi constants. Must match those defined in scroll_view layout
     private static final int ITEM_WIDTH_DPI  = 250;
     private static final int ITEM_HEIGHT_DPI = 100;
@@ -61,7 +61,7 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
     private Activity mActivity;
 
     public ScrollViewTest() {
-        super("com.android.cts.stub", ScrollViewStubActivity.class);
+        super("com.android.cts.widget", ScrollViewCtsActivity.class);
     }
 
     @Override

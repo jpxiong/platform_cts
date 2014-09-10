@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -36,14 +36,14 @@ import android.widget.RelativeLayout;
 import android.widget.ViewAnimator;
 
 public class ViewAnimatorTest extends
-        ActivityInstrumentationTestCase2<ViewAnimatorStubActivity> {
+        ActivityInstrumentationTestCase2<ViewAnimatorCtsActivity> {
     private ViewAnimator mViewAnimator;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private AttributeSet mAttributeSet;
 
     public ViewAnimatorTest() {
-        super("com.android.cts.stub", ViewAnimatorStubActivity.class);
+        super("com.android.cts.widget", ViewAnimatorCtsActivity.class);
     }
 
     @Override

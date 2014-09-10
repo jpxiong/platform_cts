@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -31,7 +31,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Parcel;
 import android.test.ActivityInstrumentationTestCase2;
-import android.text.style.cts.MockURLSpanTestActivity;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 import android.widget.Chronometer;
@@ -56,8 +55,8 @@ import java.io.OutputStream;
 /**
  * Test {@link RemoteViews}.
  */
-public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteViewsStubActivity> {
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteViewsCtsActivity> {
+    private static final String PACKAGE_NAME = "com.android.cts.widget";
 
     private static final int INVALD_ID = -1;
 
@@ -70,7 +69,7 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
     private Activity mActivity;
 
     public RemoteViewsTest() {
-        super(PACKAGE_NAME, RemoteViewsStubActivity.class);
+        super(PACKAGE_NAME, RemoteViewsCtsActivity.class);
     }
 
     @Override

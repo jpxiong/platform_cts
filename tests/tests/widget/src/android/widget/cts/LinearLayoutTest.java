@@ -31,17 +31,17 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 /**
  * Test {@link LinearLayout}.
  */
-public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayoutStubActivity> {
+public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayoutCtsActivity> {
     private Context mContext;
     private Activity mActivity;
 
     public LinearLayoutTest() {
-        super("com.android.cts.stub", LinearLayoutStubActivity.class);
+        super("com.android.cts.widget", LinearLayoutCtsActivity.class);
     }
 
     @Override

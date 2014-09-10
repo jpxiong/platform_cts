@@ -29,7 +29,7 @@ import android.widget.TimePicker.OnTimeChangedListener;
 /**
  * Test {@link TimePicker}.
  */
-public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class TimePickerTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private TimePicker mTimePicker;
 
     private Activity mActivity;
@@ -39,7 +39,7 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
     private Instrumentation mInstrumentation;
 
     public TimePickerTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.widget", CtsActivity.class);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
 
     public void testConstructors() {
         AttributeSet attrs =
-            mContext.getResources().getLayout(com.android.cts.stub.R.layout.timepicker);
+            mContext.getResources().getLayout(com.android.cts.widget.R.layout.timepicker);
         assertNotNull(attrs);
 
         new TimePicker(mContext);

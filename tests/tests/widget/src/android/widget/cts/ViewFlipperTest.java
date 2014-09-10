@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -32,11 +32,11 @@ import android.widget.ViewFlipper;
 /**
  * Test {@link ViewFlipper}.
  */
-public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipperStubActivity> {
+public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipperCtsActivity> {
     private Activity mActivity;
 
     public ViewFlipperTest() {
-        super("com.android.cts.stub", ViewFlipperStubActivity.class);
+        super("com.android.cts.widget", ViewFlipperCtsActivity.class);
     }
 
     protected void setUp() throws Exception {
