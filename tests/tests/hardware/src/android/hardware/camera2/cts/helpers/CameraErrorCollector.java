@@ -323,6 +323,34 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Check that all values in the list are greater than or equal to the min value.
+     *
+     * @param msg Message to be logged when check fails
+     * @param list The list of values to be checked
+     * @param min The smallest allowed value
+     */
+    public <T extends Comparable<? super T>> void expectValuesGreaterOrEqual(String msg,
+            List<T> list, T min) {
+        for (T value : list) {
+            expectTrue(msg + String.format(", array value " + value.toString() +
+                                    " is less than %s",
+                            min.toString()), value.compareTo(min) >= 0);
+        }
+    }
+
+    /**
+     * Check that all values in the array are greater than or equal to the min value.
+     *
+     * @param msg Message to be logged when check fails
+     * @param array The array of values to be checked
+     * @param min The smallest allowed value
+     */
+    public <T extends Comparable<? super T>> void expectValuesGreaterOrEqual(String msg,
+                                                                             T[] array, T min) {
+        expectValuesGreaterOrEqual(msg, Arrays.asList(array), min);
+    }
+
+    /**
      * Expect the list of values are in the range.
      *
      * @param msg Message to be logged
