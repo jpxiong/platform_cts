@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.app.ActivityManager;
 import android.renderscript.Allocation;

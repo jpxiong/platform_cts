@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.renderscript.RSRuntimeException;

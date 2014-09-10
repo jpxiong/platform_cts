@@ -18,7 +18,7 @@
  * This file is auto-generated. DO NOT MODIFY!
  * The source Renderscript file: set_target_api_11.rs
  */
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.renderscript.*;
 import android.content.res.Resources;
