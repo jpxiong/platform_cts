@@ -283,6 +283,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
+        mOnUiThread.zoomBy(1.25f); // zoom in
+        previousScale = currScale;
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
+        assertTrue(currScale > previousScale);
+
+        mOnUiThread.zoomBy(0.8f); // zoom out
+        previousScale = currScale;
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
+        assertTrue(currScale < previousScale);
+
         // enable zoom support
         settings.setSupportZoom(true);
         assertTrue(settings.supportZoom());
@@ -305,16 +319,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         previousScale = currScale;
         // can not zoom in further
         assertFalse(mOnUiThread.zoomIn());
+
         // We sleep to assert to the best of our ability
         // that a scale change does *not* happen.
         Thread.sleep(500);
         currScale = mOnUiThread.getScale();
         assertEquals(currScale, previousScale);
 
-        // zoom out
         assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
         webViewClient.waitForScaleChanged();
+
         currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
@@ -328,6 +343,54 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         previousScale = currScale;
         assertFalse(mOnUiThread.zoomOut());
+
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
+        assertEquals(currScale, previousScale);
+
+        mOnUiThread.zoomBy(1.25f);
+        previousScale = currScale;
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
+        assertTrue(currScale > previousScale);
+
+        // zoom in until it reaches maximum scale
+        while (mOnUiThread.canZoomIn()) {
+            previousScale = currScale;
+            mOnUiThread.zoomBy(1.25f);
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale > previousScale);
+        }
+
+        previousScale = currScale;
+
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
+        assertEquals(currScale, previousScale);
+
+        mOnUiThread.zoomBy(0.8f);
+        previousScale = currScale;
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
+        assertTrue(currScale < previousScale);
+
+        // zoom out until it reaches minimum scale
+        while (mOnUiThread.canZoomOut()) {
+            previousScale = currScale;
+            mOnUiThread.zoomBy(0.8f);
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale < previousScale);
+        }
+
+        previousScale = currScale;
 
         // We sleep to assert to the best of our ability
         // that a scale change does *not* happen.
