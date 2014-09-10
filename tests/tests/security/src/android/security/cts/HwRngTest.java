@@ -16,6 +16,11 @@
 
 package android.security.cts;
 
+import android.cts.util.CtsAndroidTestCase;
+import com.android.cts.util.ReportLog;
+import com.android.cts.util.ResultType;
+import com.android.cts.util.ResultUnit;
+
 import junit.framework.TestCase;
 
 import java.io.BufferedReader;
@@ -32,7 +37,7 @@ import java.util.Map;
 /**
  * Tests for hardware random number generator device {@code /dev/hw_random}.
  */
-public class HwRngTest extends TestCase {
+public class HwRngTest extends CtsAndroidTestCase {
 
     // The block of constants below is from hw_random framework documentation and source code:
     // see https://www.kernel.org/doc/Documentation/hw_random.txt.
@@ -41,6 +46,24 @@ public class HwRngTest extends TestCase {
     private static final String HWRNG_DRIVER_NAME = "hwrng";
     private static final int HWRNG_DRIVER_MAJOR = 10;
     private static final int HWRNG_DRIVER_MINOR = 183;
+
+    /**
+     * Reports whether the {@code /dev/hw_random} device is found. This test always passes.
+     */
+    public void testDeviceFilePresent() {
+        ReportLog report = getReportLog();
+        // Need to report at least one value, otherwise summary won't be logged.
+        report.printValue(
+                DEV_HW_RANDOM + " found",
+                DEV_HW_RANDOM.exists() ? 1 : 0,
+                ResultType.WARNING,
+                ResultUnit.NONE);
+        report.printSummary(
+                "Hardware RNG exposed",
+                DEV_HW_RANDOM.exists() ? 1 : 0,
+                ResultType.WARNING,
+                ResultUnit.NONE);
+    }
 
     /**
      * Asserts that the {@code /dev/hw_random} device is configured in an acceptable way or is not
