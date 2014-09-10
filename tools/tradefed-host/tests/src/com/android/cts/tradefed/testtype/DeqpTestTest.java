@@ -104,7 +104,8 @@ public class DeqpTestTest extends TestCase {
                 .once();
 
         String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + "\" "
+                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
+                + "--deqp-gl-config-name=rgba8888d24s8\" "
                 + INSTRUMENTATION_NAME;
 
         mockDevice.executeShellCommand(EasyMock.eq(command),
@@ -270,8 +271,10 @@ public class DeqpTestTest extends TestCase {
                 .andReturn(true).once();
 
         String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + "\" "
+                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
+                + "--deqp-gl-config-name=rgba8888d24s8\" "
                 + INSTRUMENTATION_NAME;
+
 
         mockDevice.executeShellCommand(EasyMock.eq(command),
                 EasyMock.<IShellOutputReceiver>notNull());
