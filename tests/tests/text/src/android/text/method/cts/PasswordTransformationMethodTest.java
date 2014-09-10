@@ -35,7 +35,7 @@ import android.widget.LinearLayout.LayoutParams;
  * Test {@link PasswordTransformationMethod}.
  */
 public class PasswordTransformationMethodTest extends
-        ActivityInstrumentationTestCase2<StubActivity> {
+        ActivityInstrumentationTestCase2<CtsActivity> {
     private static final int EDIT_TXT_ID = 1;
 
     /** original text */
@@ -49,7 +49,7 @@ public class PasswordTransformationMethodTest extends
 
     private boolean isPasswordPrefSaved;
 
-    private StubActivity mActivity;
+    private CtsActivity mActivity;
 
     private MockPasswordTransformationMethod mMethod;
 
@@ -58,7 +58,7 @@ public class PasswordTransformationMethodTest extends
     private CharSequence mTransformedText;
 
     public PasswordTransformationMethodTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override

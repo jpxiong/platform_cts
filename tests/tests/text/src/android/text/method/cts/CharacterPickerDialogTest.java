@@ -30,11 +30,11 @@ import android.widget.Gallery;
 import android.widget.TextView;
 
 public class CharacterPickerDialogTest extends
-        ActivityInstrumentationTestCase2<StubActivity> {
+        ActivityInstrumentationTestCase2<CtsActivity> {
     private Activity mActivity;
 
     public CharacterPickerDialogTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override
