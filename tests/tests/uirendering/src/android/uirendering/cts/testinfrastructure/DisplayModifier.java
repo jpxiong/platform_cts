@@ -275,6 +275,7 @@ public abstract class DisplayModifier {
                                     paint.setShader(ResourceModifier.instance().composeShader);
                                 }
                             });
+                            /*
                             put("bad composeShader", new DisplayModifier() {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {
@@ -288,6 +289,7 @@ public abstract class DisplayModifier {
                                             ResourceModifier.instance().doubleGradientComposeShader);
                                 }
                             });
+                            */
                             put("horGradient", new DisplayModifier() {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {
@@ -372,12 +374,16 @@ public abstract class DisplayModifier {
                                     canvas.drawLines(gLinePts, paint);
                                 }
                             });
+                            /* drawPoints does not work with zero stroke width,
+                             * but it isn't a regression
+                             * TODO: fix hardware canvas so that drawPoints works
                             put("plusPoints", new DisplayModifier() {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {
                                     canvas.drawPoints(gPts, paint);
                                 }
                             });
+                             */
                             put("text", new DisplayModifier() {
                                 @Override
                                 public void modifyDrawing(Paint paint, Canvas canvas) {

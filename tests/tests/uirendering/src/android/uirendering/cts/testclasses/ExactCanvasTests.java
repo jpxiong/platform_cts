@@ -210,7 +210,6 @@ public class ExactCanvasTests extends ActivityTestBase {
                     }
                 })
                 .addLayout(R.layout.blue_padded_square, null)
-                .addWebView("file:///android_asset/blue_padded_square.html", null)
                 .runWithVerifier(verifier);
     }
 

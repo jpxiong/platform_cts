@@ -32,7 +32,7 @@ import android.webkit.WebView;
 public class DrawActivity extends Activity {
     private final static long TIME_OUT = 10000;
     private final Object mLock = new Object();
-    public static final int MIN_NUMBER_OF_DRAWS = 5;
+    public static final int MIN_NUMBER_OF_DRAWS = 20;
 
     private Handler mHandler;
     private View mView;
