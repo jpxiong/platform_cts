@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 /*
  * This file is auto-generated. DO NOT MODIFY!
- * The source Renderscript file: set_target_api_18.rs
+ * The source Renderscript file: set_target_api_16.rs
  */
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.renderscript.*;
 import android.content.res.Resources;
@@ -26,10 +26,10 @@ import android.content.res.Resources;
 /**
  * @hide
  */
-public class ScriptC_set_target_api_18 extends ScriptC {
-    private static final String __rs_resource_name = "set_target_api_18";
+public class ScriptC_set_target_api_too_high extends ScriptC {
+    private static final String __rs_resource_name = "set_target_api_too_high";
     // Constructor
-    public  ScriptC_set_target_api_18(RenderScript rs) {
+    public  ScriptC_set_target_api_too_high(RenderScript rs) {
         this(rs,
              rs.getApplicationContext().getResources(),
              rs.getApplicationContext().getResources().getIdentifier(
@@ -37,7 +37,7 @@ public class ScriptC_set_target_api_18 extends ScriptC {
                  rs.getApplicationContext().getPackageName()));
     }
 
-    public  ScriptC_set_target_api_18(RenderScript rs, Resources resources, int id) {
+    public  ScriptC_set_target_api_too_high(RenderScript rs, Resources resources, int id) {
         super(rs, resources, id);
     }
 
