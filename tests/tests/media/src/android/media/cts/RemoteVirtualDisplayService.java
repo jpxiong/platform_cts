@@ -39,7 +39,7 @@ import android.widget.ImageView;
 
 public class RemoteVirtualDisplayService extends Service {
     private static final String TAG = "RemoteVirtualDisplayService";
-
+    private static final boolean DBG = false;
     /** argument: Surface, int w, int h, return none */
     private static final int BINDER_CMD_START = IBinder.FIRST_CALL_TRANSACTION;
     /** argument: int color, return none */
@@ -101,7 +101,9 @@ public class RemoteVirtualDisplayService extends Service {
     }
 
     private void render(int color) {
-        Log.i(TAG, "render");
+        if (DBG) {
+            Log.i(TAG, "render " + Integer.toHexString(color));
+        }
         mPresentation.doRendering(color);
     }
 
@@ -168,7 +170,9 @@ public class RemoteVirtualDisplayService extends Service {
             private ImageView mImageView;
 
             public TestPresentation(Context outerContext, Display display) {
-                super(outerContext, display);
+                // This theme is required to prevent an extra view from obscuring the presentation
+                super(outerContext, display,
+                        android.R.style.Theme_Holo_Light_NoActionBar_TranslucentDecor);
                 getWindow().setType(WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION);
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
             }
