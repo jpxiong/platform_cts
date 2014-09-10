@@ -898,6 +898,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         .onCaptureStarted(
                                eq(mSession),
                                isA(CaptureRequest.class),
+                               anyLong(),
                                anyLong());
     }
 
