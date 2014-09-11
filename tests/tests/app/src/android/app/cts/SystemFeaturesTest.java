@@ -241,6 +241,10 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 Sensor.TYPE_HEART_RATE);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
                 Sensor.TYPE_HEART_RATE);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_AMBIENT_TEMPERATURE,
+                Sensor.TYPE_AMBIENT_TEMPERATURE);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_RELATIVE_HUMIDITY,
+                Sensor.TYPE_RELATIVE_HUMIDITY);
 
         assertTrue("Assertions need to be added to this test for " + featuresLeft,
                 featuresLeft.isEmpty());
