@@ -356,7 +356,7 @@ extern "C" JNIEXPORT jobject JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_remquo(JNIEnv* env, jclass, jfloat numerator,
                                                       jfloat denominator) {
     JavaStruct result(env, "RemquoResult");
-    int quotient = 0.0;
+    int quotient = 0;
     result.SetFloat("remainder", remquof(numerator, denominator, &quotient));
     result.SetInt("quotient", quotient);
     return result.getObject();

@@ -1787,21 +1787,30 @@ public class CoreMathVerifier {
 
     static public String verifyRemquo(TestRemquo.ArgumentsFloatFloatIntFloat args, Target t) {
         t.setPrecision(0, 0, false);
-        RemquoResult result = remquo(args.inB, args.inC);
-        // If the remainder is NaN, we don't validate the quotient.  It's because of a division
-        // by zero.
-        if (args.out != args.out && result.remainder != result.remainder) {
-            return null;
+        RemquoResult expected = remquo(args.inB, args.inC);
+        // If the expected remainder is NaN, we don't validate the quotient.  It's because of
+        // a division by zero.
+        if (expected.remainder != expected.remainder) {
+            // Check that the value we got is NaN too.
+            if (args.out == args.out) {
+                return "Expected a remainder of NaN but got " +  Float.toString(args.out);
+            }
+        } else {
+            // The quotient should have the same sign and the same lowest three bits.
+            if (Integer.signum(args.outD) != Integer.signum(expected.quotient) ||
+                (args.outD & 0x07) != (expected.quotient & 0x07)) {
+                return "Quotient returned " +  Integer.toString(args.outD) +
+                    " does not have the same sign or lower three bits as the expected " +
+                    Integer.toString(expected.quotient);
+            }
+            Target.Floaty remainder = t.new32(expected.remainder);
+            if (!remainder.couldBe(args.out)) {
+                return "Remainder returned " + Float.toString(args.out) +
+                    " is not similar to the expected " +
+                    remainder.toString();
+            }
         }
-        Target.Floaty remainder = t.new32(result.remainder);
-        // The quotient should have the same sign and the same lowest three bits.
-        if (Integer.signum(args.outD) == Integer.signum(result.quotient) &&
-                (args.outD & 0x07) == (result.quotient & 0x07) &&
-                remainder.couldBe(args.out)) {
-            return null;
-        }
-        return "Expected quotient similar to " + Integer.toString(args.outD) + " and " +
-            remainder.toString();
+        return null;
     }
 
     static public void computeRint(TestRint.ArgumentsFloatFloat args, Target t) {
