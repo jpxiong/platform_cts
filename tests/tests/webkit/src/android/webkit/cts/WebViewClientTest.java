@@ -26,11 +26,17 @@ import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
@@ -337,6 +343,144 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
                 return webViewClient.hasOnScaleChangedCalled();
             }
         }.run();
+    }
+
+    // Test that shouldInterceptRequest is called with the correct parameters
+    public void testShouldInterceptRequestParams() throws Throwable {
+        final String mainPath = "/main";
+        final String mainPage = "<head></head><body>test page</body>";
+        final String headerName = "x-test-header-name";
+        final String headerValue = "testheadervalue";
+        HashMap<String, String> headers = new HashMap<String, String>(1);
+        headers.put(headerName, headerValue);
+
+        // A client which saves the WebResourceRequest as interceptRequest
+        final class TestClient extends WaitForLoadedClient {
+            public TestClient() {
+                super(mOnUiThread);
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view,
+                    WebResourceRequest request) {
+                assertNotNull(view);
+                assertNotNull(request);
+
+                assertEquals(view, mOnUiThread.getWebView());
+
+                // Save the main page request; discard any other requests (e.g. for favicon.ico)
+                if (request.getUrl().toString().contains(mainPath)) {
+                    assertNull(interceptRequest);
+                    interceptRequest = request;
+                }
+
+                return null;
+            }
+
+            public volatile WebResourceRequest interceptRequest;
+        }
+
+        TestClient client = new TestClient();
+        mOnUiThread.setWebViewClient(client);
+
+        TestWebServer server = new TestWebServer(false);
+        try {
+            String mainUrl = server.setResponse(mainPath, mainPage, null);
+
+            mOnUiThread.loadUrlAndWaitForCompletion(mainUrl, headers);
+
+            // Inspect the fields of the saved WebResourceRequest
+            assertNotNull(client.interceptRequest);
+            assertEquals(mainUrl, client.interceptRequest.getUrl().toString());
+            assertTrue(client.interceptRequest.isForMainFrame());
+            assertEquals(server.getLastRequest(mainPath).getRequestLine().getMethod(),
+                client.interceptRequest.getMethod());
+
+            // Web request headers are case-insensitive. We provided lower-case headerName and
+            // headerValue. This will pass implementations which either do not mangle case,
+            // convert to lowercase, or convert to uppercase but return a case-insensitive map.
+            Map<String, String> interceptHeaders = client.interceptRequest.getRequestHeaders();
+            assertTrue(interceptHeaders.containsKey(headerName));
+            assertEquals(headerValue, interceptHeaders.get(headerName));
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    // Test that the WebResourceResponse returned by shouldInterceptRequest is handled correctly
+    public void testShouldInterceptRequestResponse() throws Throwable {
+        final String mainPath = "/main";
+        final String mainPage = "<head></head><body>test page</body>";
+        final String interceptPath = "/intercept_me";
+
+        // A client which responds to requests for interceptPath with a saved interceptResponse
+        final class TestClient extends WaitForLoadedClient {
+            public TestClient() {
+                super(mOnUiThread);
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view,
+                    WebResourceRequest request) {
+                if (request.getUrl().toString().contains(interceptPath)) {
+                    assertNotNull(interceptResponse);
+                    return interceptResponse;
+                }
+
+                return null;
+            }
+
+            volatile public WebResourceResponse interceptResponse;
+        }
+
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+
+        TestClient client = new TestClient();
+        mOnUiThread.setWebViewClient(client);
+
+        TestWebServer server = new TestWebServer(false);
+        try {
+            String interceptUrl = server.getResponseUrl(interceptPath);
+
+            // JavaScript which makes a synchronous AJAX request and logs and returns the status
+            String js =
+                "(function() {" +
+                "  var xhr = new XMLHttpRequest();" +
+                "  xhr.open('GET', '" + interceptUrl + "', false);" +
+                "  xhr.send(null);" +
+                "  console.info('xhr.status = ' + xhr.status);" +
+                "  console.info('xhr.statusText = ' + xhr.statusText);" +
+                "  return '[' + xhr.status + '][' + xhr.statusText + ']';" +
+                "})();";
+
+            String mainUrl = server.setResponse(mainPath, mainPage, null);
+            mOnUiThread.loadUrlAndWaitForCompletion(mainUrl, null);
+
+            EvaluateJsResultPollingCheck jsResult;
+
+            // Test a nonexistent page
+            client.interceptResponse = new WebResourceResponse("text/html", "UTF-8", null);
+            jsResult = new EvaluateJsResultPollingCheck("\"[404][Not Found]\"");
+            mOnUiThread.evaluateJavascript(js, jsResult);
+            jsResult.run();
+
+            // Test an empty page
+            client.interceptResponse = new WebResourceResponse("text/html", "UTF-8",
+                new ByteArrayInputStream(new byte[0]));
+            jsResult = new EvaluateJsResultPollingCheck("\"[200][OK]\"");
+            mOnUiThread.evaluateJavascript(js, jsResult);
+            jsResult.run();
+
+            // Test a nonempty page with unusual response code/text
+            client.interceptResponse =
+                new WebResourceResponse("text/html", "UTF-8", 123, "unusual", null,
+                    new ByteArrayInputStream("nonempty page".getBytes(StandardCharsets.UTF_8)));
+            jsResult = new EvaluateJsResultPollingCheck("\"[123][unusual]\"");
+            mOnUiThread.evaluateJavascript(js, jsResult);
+            jsResult.run();
+        } finally {
+            server.shutdown();
+        }
     }
 
     private void requireLoadedPage() throws Throwable {
