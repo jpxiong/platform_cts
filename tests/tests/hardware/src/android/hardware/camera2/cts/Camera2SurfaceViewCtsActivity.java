@@ -22,10 +22,10 @@ import android.os.ConditionVariable;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import com.android.cts.stub.R;
+import com.android.cts.hardware.R;
 
-public class Camera2SurfaceViewStubActivity extends Activity implements SurfaceHolder.Callback {
-    private final static String TAG = "Camera2SurfaceViewStubActivity";
+public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHolder.Callback {
+    private final static String TAG = "Camera2SurfaceViewCtsActivity";
     private final ConditionVariable surfaceChangedDone = new ConditionVariable();
 
     private SurfaceView mSurfaceView;

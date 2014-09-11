@@ -63,9 +63,9 @@ import junit.framework.AssertionFailedError;
  * This test case must run with hardware. It can't be tested in emulator
  */
 @LargeTest
-public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActivity> {
+public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivity> {
     private static String TAG = "CameraTest";
-    private static final String PACKAGE = "com.android.cts.stub";
+    private static final String PACKAGE = "com.android.cts.hardware";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private final String JPEG_PATH = Environment.getExternalStorageDirectory().getPath() +
             "/test.jpg";
@@ -117,14 +117,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     Camera mCamera;
 
     public CameraTest() {
-        super(PACKAGE, CameraStubActivity.class);
+        super(PACKAGE, CameraCtsActivity.class);
         if (VERBOSE) Log.v(TAG, "Camera Constructor");
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        // to start CameraStubActivity.
+        // to starCtsActivity.
         getActivity();
     }
 

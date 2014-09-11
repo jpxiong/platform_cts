@@ -41,7 +41,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.util.Size;
 import android.util.Range;
-import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
+import android.hardware.camera2.cts.Camera2SurfaceViewCtsActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
@@ -67,7 +67,7 @@ import java.util.List;
  */
 
 public class Camera2SurfaceViewTestCase extends
-        ActivityInstrumentationTestCase2<Camera2SurfaceViewStubActivity> {
+        ActivityInstrumentationTestCase2<Camera2SurfaceViewCtsActivity> {
     private static final String TAG = "SurfaceViewTestCase";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
@@ -103,7 +103,7 @@ public class Camera2SurfaceViewTestCase extends
 
 
     public Camera2SurfaceViewTestCase() {
-        super(Camera2SurfaceViewStubActivity.class);
+        super(Camera2SurfaceViewCtsActivity.class);
     }
 
     @Override
@@ -596,8 +596,8 @@ public class Camera2SurfaceViewTestCase extends
         }
 
         mPreviewSize = size;
-        Camera2SurfaceViewStubActivity stubActivity = getActivity();
-        final SurfaceHolder holder = stubActivity.getSurfaceView().getHolder();
+        Camera2SurfaceViewCtsActivity ctsActivity = getActivity();
+        final SurfaceHolder holder = ctsActivity.getSurfaceView().getHolder();
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
@@ -606,7 +606,7 @@ public class Camera2SurfaceViewTestCase extends
             }
         });
 
-        boolean res = stubActivity.waitForSurfaceSizeChanged(
+        boolean res = ctsActivity.waitForSurfaceSizeChanged(
                 WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS, mPreviewSize.getWidth(),
                 mPreviewSize.getHeight());
         assertTrue("wait for surface change to " + mPreviewSize.toString() + " timed out", res);
