@@ -21,7 +21,7 @@
       android:versionName="L_r0">
 
     <!-- Using 10+ for more complete NFC support... -->
-    <uses-sdk android:minSdkVersion="19"></uses-sdk>
+    <uses-sdk android:minSdkVersion="20" android:targetSdkVersion="20"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
