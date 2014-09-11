@@ -257,7 +257,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         Context context = getInstrumentation().getTargetContext();
         try {
             InputStream inputStream = context.getResources().openRawResource(
-                    com.android.cts.stub.R.drawable.testimage);
+                    com.android.cts.provider.R.drawable.testimage);
             int size = inputStream.available();
             byte[] data =  new byte[size];
             inputStream.read(data);
@@ -275,12 +275,12 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             assertNull(photoStream);
 
             bitmap = People.loadContactPhoto(context, mPeopleRowsAdded.get(0),
-                    com.android.cts.stub.R.drawable.size_48x48, null);
+                    com.android.cts.provider.R.drawable.size_48x48, null);
             assertEquals(96, bitmap.getWidth());
             assertEquals(64, bitmap.getHeight());
 
             bitmap = People.loadContactPhoto(context, null,
-                    com.android.cts.stub.R.drawable.size_48x48, null);
+                    com.android.cts.provider.R.drawable.size_48x48, null);
             assertNotNull(bitmap);
         } catch (IOException e) {
             fail("Unexpected IOException");
