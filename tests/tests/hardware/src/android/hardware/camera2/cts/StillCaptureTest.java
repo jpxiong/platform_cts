@@ -808,8 +808,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     neutralColorPoint.length);
             mCollector.expectNotEquals("NeutralColorPoint cannot be all zeroes, ", empty,
                     neutralColorPoint);
-            mCollector.expectValuesInRange("NeutralColorPoint", neutralColorPoint,
-                    Rational.ZERO, new Rational(1, 1));
+            mCollector.expectValuesGreaterOrEqual("NeutralColorPoint", neutralColorPoint,
+                    Rational.ZERO);
         }
 
         mCollector.expectKeyValueGreaterOrEqual(rawResult, CaptureResult.SENSOR_GREEN_SPLIT, 0.0f);
