@@ -63,6 +63,7 @@ import com.android.cts.media.R;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
@@ -840,6 +841,12 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             GLES20.glUniformMatrix4fv(mGluMVPMatrixHandle, 1, false, mMVPMatrix, 0);
             mTopWindow.onDraw(mGluSTMatrixHandle, mGlaPositionHandle, mGlaTextureHandle);
             checkGlError("window draw");
+            if (DBG) {
+                final IntBuffer pixels = IntBuffer.allocate(1);
+                GLES20.glReadPixels(mWidth / 2, mHeight / 2, 1, 1,
+                        GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixels);
+                Log.i(TAG, "glReadPixels returned 0x" + Integer.toHexString(pixels.get(0)));
+            }
             mEglHelper.swapBuffers();
         }
 
@@ -1093,7 +1100,9 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                 @Override
                 public void run() {
                     mVirtualDisplay = mDisplayManager.createVirtualDisplay(
-                            TAG, mWidth, mHeight, 200, mSurface, 0);
+                            TAG, mWidth, mHeight, 200, mSurface,
+                            DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY |
+                            DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION);
                 }
             });
         }
@@ -1148,7 +1157,9 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     private static class TestPresentationBase extends Presentation {
 
         public TestPresentationBase(Context outerContext, Display display) {
-            super(outerContext, display);
+            // This theme is required to prevent an extra view from obscuring the presentation
+            super(outerContext, display,
+                    android.R.style.Theme_Holo_Light_NoActionBar_TranslucentDecor);
             getWindow().setType(WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
@@ -1177,6 +1188,9 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         }
 
         public void doRendering(int color) {
+            if (DBG) {
+                Log.i(TAG, "doRendering " + Integer.toHexString(color));
+            }
             mImageView.setImageDrawable(new ColorDrawable(color));
         }
     }
