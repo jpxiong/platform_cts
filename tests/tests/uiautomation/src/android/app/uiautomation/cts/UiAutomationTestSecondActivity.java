@@ -19,6 +19,7 @@ package android.app.uiautomation.cts;
 import android.app.Activity;
 import android.app.cts.uiautomation.R;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -30,6 +31,10 @@ public class UiAutomationTestSecondActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ui_automation_test);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         String[] cheeses = getResources().getStringArray(R.array.some_cheeses);
         ArrayAdapter<String> cheeseAdapter = new ArrayAdapter<String>(this,
