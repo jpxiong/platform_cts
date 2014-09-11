@@ -87,6 +87,9 @@ public class TvContractTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         mInputId = TvContract.buildInputId(
                 new ComponentName(getContext(), StubTunerTvInputService.class));
         mContentResolver = getContext().getContentResolver();
@@ -95,6 +98,10 @@ public class TvContractTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            super.tearDown();
+            return;
+        }
         // Clean up, just in case we failed to delete the entry when a test failed.
         // The cotentUris are specific to this package, so this will delete only the
         // entries inserted by this package.
@@ -200,6 +207,9 @@ public class TvContractTest extends AndroidTestCase {
     }
 
     public void testChannelsTable() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         // Test: insert
         ContentValues values = createDummyChannelValues(mInputId);
 
@@ -267,6 +277,9 @@ public class TvContractTest extends AndroidTestCase {
     }
 
     public void testChannelLogo() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         // Set-up: add a channel.
         ContentValues values = createDummyChannelValues(mInputId);
         Uri channelUri = mContentResolver.insert(mChannelsUri, values);
@@ -291,6 +304,9 @@ public class TvContractTest extends AndroidTestCase {
     }
 
     public void verifyProgramsTable(Uri programsUri, long channelId) {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         // Test: insert
         ContentValues values = createDummyProgramValues(channelId);
 
@@ -316,6 +332,9 @@ public class TvContractTest extends AndroidTestCase {
     }
 
     public void testProgramsTable() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         // Set-up: add a channel.
         ContentValues values = createDummyChannelValues(mInputId);
         Uri channelUri = mContentResolver.insert(mChannelsUri, values);
@@ -338,6 +357,9 @@ public class TvContractTest extends AndroidTestCase {
     }
 
     public void testProgramsScheduleOverlap() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
         final long programStartMillis = 1403712000000l;  // Jun 25 2014 16:00 UTC
         final long programEndMillis = 1403719200000l;  // Jun 25 2014 18:00 UTC
         final long hour = 3600000l;

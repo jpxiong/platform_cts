@@ -94,7 +94,7 @@ public class BundledTvInputServiceTest
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
-        if (!Utils.hasTvInputFramework(getActivity())) {
+        if (!Utils.hasTvInputFramework(mActivity)) {
             return;
         }
         mInstrumentation = getInstrumentation();
@@ -110,6 +110,10 @@ public class BundledTvInputServiceTest
 
     @Override
     protected void tearDown() throws Exception {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            super.tearDown();
+            return;
+        }
         try {
             runTestOnUiThread(new Runnable() {
                 @Override
