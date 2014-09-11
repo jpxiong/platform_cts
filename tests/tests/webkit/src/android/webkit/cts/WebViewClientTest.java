@@ -347,6 +347,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     // Test that shouldInterceptRequest is called with the correct parameters
     public void testShouldInterceptRequestParams() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         final String mainPath = "/main";
         final String mainPage = "<head></head><body>test page</body>";
         final String headerName = "x-test-header-name";
@@ -409,6 +413,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     // Test that the WebResourceResponse returned by shouldInterceptRequest is handled correctly
     public void testShouldInterceptRequestResponse() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         final String mainPath = "/main";
         final String mainPage = "<head></head><body>test page</body>";
         final String interceptPath = "/intercept_me";
