@@ -121,6 +121,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
      */
     private static final long SCROLL_WAIT_INTERVAL_MS = 200;
 
+    /**
+     * Epsilon used in page scale value comparisons.
+     */
+    private static final float PAGE_SCALE_EPSILON = 0.0001f;
+
     private WebView mWebView;
     private CtsTestServer mWebServer;
     private WebViewOnUiThread mOnUiThread;
@@ -329,7 +334,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // that a scale change does *not* happen.
         Thread.sleep(500);
         currScale = mOnUiThread.getScale();
-        assertEquals(currScale, previousScale);
+        assertEquals(currScale, previousScale, PAGE_SCALE_EPSILON);
 
         assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
@@ -353,7 +358,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // that a scale change does *not* happen.
         Thread.sleep(500);
         currScale = mOnUiThread.getScale();
-        assertEquals(currScale, previousScale);
+        assertEquals(currScale, previousScale, PAGE_SCALE_EPSILON);
 
         mOnUiThread.zoomBy(1.25f);
         previousScale = currScale;
@@ -377,7 +382,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // that a scale change does *not* happen.
         Thread.sleep(500);
         currScale = mOnUiThread.getScale();
-        assertEquals(currScale, previousScale);
+        assertEquals(currScale, previousScale, PAGE_SCALE_EPSILON);
 
         mOnUiThread.zoomBy(0.8f);
         previousScale = currScale;
@@ -401,7 +406,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // that a scale change does *not* happen.
         Thread.sleep(500);
         currScale = mOnUiThread.getScale();
-        assertEquals(currScale, previousScale);
+        assertEquals(currScale, previousScale, PAGE_SCALE_EPSILON);
     }
 
     @UiThreadTest
