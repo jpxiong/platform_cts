@@ -146,7 +146,9 @@ public class BleAdvertiserService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAdvertiser.stopAdvertising(mCallback);
+        if (mAdvertiser != null) {
+            mAdvertiser.stopAdvertising(mCallback);
+        }
     }
 
     private void stopAdvertiser() {
@@ -184,6 +186,10 @@ public class BleAdvertiserService extends Service {
     }
 
     private void handleIntent(Intent intent) {
+        if (mAdvertiser == null) {
+            showMessage("Multi advertising not supported on this device");
+            return;
+        }
         int command = intent.getIntExtra(EXTRA_COMMAND, -1);
         if (command >= 0) {
             stopAdvertiser();
