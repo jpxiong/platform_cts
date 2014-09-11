@@ -18,6 +18,7 @@ package android.uirendering.cts.bitmapverifiers;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
+import android.uirendering.cts.util.CompareUtils;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -29,6 +30,7 @@ public class SamplePointVerifier extends BitmapVerifier {
     private static final String TAG = "SamplePoint";
     private Point[] mTestPoints;
     private int[] mExpectedColors;
+    private int mTolerance = 20;
 
     public SamplePointVerifier(Point[] testPoints, int[] expectedColors) {
         mTestPoints = testPoints;
@@ -44,7 +46,7 @@ public class SamplePointVerifier extends BitmapVerifier {
             int x = mTestPoints[i].x;
             int y = mTestPoints[i].y;
             int index = indexFromXAndY(x, y, stride, offset);
-            if (mExpectedColors[i] != bitmap[index]) {
+            if (!verifyPixel(bitmap[index], mExpectedColors[i])) {
                 Log.d(TAG, "Expected : " + Integer.toHexString(mExpectedColors[i]) +
                         " at position x = " + x + " y = " + y + " , tested color : " +
                         Integer.toHexString(bitmap[index]));
@@ -61,5 +63,9 @@ public class SamplePointVerifier extends BitmapVerifier {
                     ActivityTestBase.TEST_WIDTH, ActivityTestBase.TEST_HEIGHT);
         }
         return success;
+    }
+
+    protected boolean verifyPixel(int color, int expectedColor) {
+        return CompareUtils.verifyPixelWithThreshold(color, expectedColor, mTolerance);
     }
 }
