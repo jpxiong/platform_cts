@@ -358,8 +358,8 @@ public class SensorTest extends SensorTestCase {
         try {
             mWakeLock.acquire();
             for (Sensor sensor : mSensorList) {
-                // Skip non-continuos mode sensors.
-                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
+                // Skip ONLY one-shot sensors.
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_ONE_SHOT) {
                     registerListenerCallFlush(sensor, null);
                 }
             }
@@ -378,11 +378,10 @@ public class SensorTest extends SensorTestCase {
             handlerThread.start();
             Handler handler = new Handler(handlerThread.getLooper());
             for (Sensor sensor : mSensorList) {
-                // Skip non-continuous mode sensors.
-                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
-                    continue;
+                // Skip ONLY one-shot sensors.
+                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_ONE_SHOT) {
+                    registerListenerCallFlush(sensor, handler);
                 }
-                registerListenerCallFlush(sensor, handler);
             }
         }  finally {
             mWakeLock.release();
@@ -391,6 +390,9 @@ public class SensorTest extends SensorTestCase {
 
     private void registerListenerCallFlush(Sensor sensor, Handler handler)
             throws InterruptedException {
+        if (sensor.getReportingMode() == Sensor.REPORTING_MODE_ONE_SHOT) {
+            return;
+        }
         final int numEvents = 500;
         final int rateUs = 20000; // DELAY_GAME
         final int maxBatchReportLatencyUs = 10000000;
@@ -414,26 +416,23 @@ public class SensorTest extends SensorTestCase {
         // Consider only continuous mode sensors for testing registerListener.
         // For on-change sensors, call registerListener() so that the listener is associated
         // with the sensor so that flush(listener) can be called on it.
-        if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS ||
-                sensor.getReportingMode() == Sensor.REPORTING_MODE_ON_CHANGE) {
-            Log.i(TAG, "testBatch " + sensor.getName());
-            boolean result = mSensorManager.registerListener(listener, sensor,
-                    rateUs, maxBatchReportLatencyUs, handler);
-            assertTrue("registerListener failed " + sensor.getName(), result);
-            // Wait for 500 events or N seconds before the test times out.
-            if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
-                // Wait for approximately the time required to generate these events + a tolerance
-                // of 10 seconds.
-                long timeToWaitUs = (long)numEvents * rateUs + maxBatchReportLatencyUs +
-                        TIMEOUT_TOLERANCE_US;
-                boolean countZero = eventReceived.await(timeToWaitUs, TimeUnit.MICROSECONDS);
-                if (!countZero) {
-                    fail("Timed out waiting for events from " + sensor.getName());
-                }
+        Log.i(TAG, "testBatch " + sensor.getName());
+        boolean result = mSensorManager.registerListener(listener, sensor,
+                rateUs, maxBatchReportLatencyUs, handler);
+        assertTrue("registerListener failed " + sensor.getName(), result);
+        // Wait for 500 events or N seconds before the test times out.
+        if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
+            // Wait for approximately the time required to generate these events + a tolerance
+            // of 10 seconds.
+            long timeToWaitUs = (long)numEvents * rateUs + maxBatchReportLatencyUs +
+                    TIMEOUT_TOLERANCE_US;
+            boolean countZero = eventReceived.await(timeToWaitUs, TimeUnit.MICROSECONDS);
+            if (!countZero) {
+                fail("Timed out waiting for events from " + sensor.getName());
             }
         }
         Log.i(TAG, "testFlush " + sensor.getName());
-        boolean result = mSensorManager.flush(listener);
+        result = mSensorManager.flush(listener);
         assertTrue("flush failed " + sensor.getName(), result);
         boolean countZero = flushReceived.await(TIMEOUT_TOLERANCE_US, TimeUnit.MICROSECONDS);
         if (!countZero) {
