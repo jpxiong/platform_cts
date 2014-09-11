@@ -23,10 +23,10 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.WindowManager;
 
-import com.android.cts.stub.R;
+import com.android.cts.hardware.R;
 
-public class Camera2MultiViewStubActivity extends Activity {
-    private final static String TAG = "Camera2MultiViewStubActivity";
+public class Camera2MultiViewCtsActivity extends Activity {
+    private final static String TAG = "Camera2MultiViewCtsActivity";
     private TextureView[] mTextureView = new TextureView[2];
     private SurfaceView[] mSurfaceView = new SurfaceView[2];
 

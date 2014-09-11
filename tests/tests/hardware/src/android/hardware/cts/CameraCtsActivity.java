@@ -21,9 +21,9 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
-import com.android.cts.stub.R;
+import com.android.cts.hardware.R;
 
-public class CameraStubActivity extends Activity {
+public class CameraCtsActivity extends Activity {
     private SurfaceView mSurfaceView;
     private final int LAYOUT_WIDTH = 480;
     private final int LAYOUT_HEIGHT = 320;

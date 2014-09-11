@@ -25,7 +25,6 @@ import android.hardware.Camera.Size;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.opengl.cts.GLSurfaceViewStubActivity;
 
 import android.os.ConditionVariable;
 import android.os.Environment;
@@ -61,9 +60,9 @@ import javax.microedition.khronos.opengles.GL10;
  * This test case must run with hardware. It can't be tested in emulator
  */
 @LargeTest
-public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceViewStubActivity> {
+public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceViewCtsActivity> {
     private static final String TAG = "CameraGLTest";
-    private static final String PACKAGE = "com.android.cts.stub";
+    private static final String PACKAGE = "com.android.cts.hardware";
     private static final boolean LOGV = false;
     private static final boolean LOGVV = false;
     private static final int EGL_OPENGL_ES2_BIT = 0x0004;
@@ -89,7 +88,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
     GLSurfaceView mGLView;
 
     public CameraGLTest() {
-        super(PACKAGE, GLSurfaceViewStubActivity.class);
+        super(PACKAGE, GLSurfaceViewCtsActivity.class);
         if (LOGV) Log.v(TAG, "CameraGLTest Constructor");
     }
 
@@ -98,13 +97,13 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         super.setUp();
         // Set up renderer instance
         mRenderer = this.new Renderer();
-        GLSurfaceViewStubActivity.setRenderer(mRenderer);
-        GLSurfaceViewStubActivity.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        GLSurfaceViewStubActivity.setGlVersion(2);
-        // Start CameraStubActivity.
-        GLSurfaceViewStubActivity stubActivity = getActivity();
+        GLSurfaceViewCtsActivity.setRenderer(mRenderer);
+        GLSurfaceViewCtsActivity.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        GLSurfaceViewCtsActivity.setGlVersion(2);
+        // Start CameraCtsActivity.
+        GLSurfaceViewCtsActivity ctsActivity = getActivity();
         // Store a link to the view so we can redraw it when needed
-        mGLView = stubActivity.getView();
+        mGLView = ctsActivity.getView();
     }
 
     @Override
@@ -112,10 +111,10 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         if (mCamera != null) {
             terminateMessageLooper();
         }
-        // Clean up static values in stub so it can be reused
-        GLSurfaceViewStubActivity.resetRenderMode();
-        GLSurfaceViewStubActivity.resetRenderer();
-        GLSurfaceViewStubActivity.resetGlVersion();
+        // Clean up static values in cts so it can be reused
+        GLSurfaceViewCtsActivity.resetRenderMode();
+        GLSurfaceViewCtsActivity.resetRenderer();
+        GLSurfaceViewCtsActivity.resetGlVersion();
 
         super.tearDown();
     }
