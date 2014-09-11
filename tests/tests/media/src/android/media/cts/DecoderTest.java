@@ -138,6 +138,10 @@ public class DecoderTest extends MediaPlayerTestBase {
         testTimeStampOrdering(R.raw.sinesweeptsaac);
     }
 
+    public void testDecode51M4a() throws Exception {
+        decodeToMemory(R.raw.sinesweep51m4a, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, null);
+    }
+
     private void testTimeStampOrdering(int res) throws Exception {
         List<Long> timestamps = new ArrayList<Long>();
         decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, timestamps);
