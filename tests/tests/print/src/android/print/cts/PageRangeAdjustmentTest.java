@@ -174,10 +174,9 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
             public Void answer(InvocationOnMock invocation) {
                 PrintJob printJob = (PrintJob) invocation.getArguments()[0];
                 PageRange[] pages = printJob.getInfo().getPages();
-                // We always ask for some pages for preview and in this
-                // case we write all, i.e. more than needed.
-                assertTrue(pages.length == 1 && pages[0].getStart() == 1
-                        && pages[0].getEnd() == 1);
+                // We asked for some pages, the app wrote more, but the system
+                // pruned extra pages, hence we expect to print all pages.
+                assertTrue(pages.length == 1 && PageRange.ALL_PAGES.equals(pages[0]));
                 printJob.complete();
                 onPrintJobQueuedCalled();
                 return null;
@@ -285,11 +284,10 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                 PrintJobInfo printJobInfo = printJob.getInfo();
                 PageRange[] pages = printJobInfo.getPages();
                 // We asked only for page 60 (index 59) but got 60 and 61 (indices
-                // 59, 60), hence the written document has two pages (60 and 61)
-                // and the first one, i.e. 3 should be printed.
-                assertTrue(pages.length == 1 && pages[0].getStart() == 0
-                        && pages[0].getEnd() == 0);
-                assertSame(printJob.getDocument().getInfo().getPageCount(), 2);
+                // 59, 60), but the system pruned the extra page, hence we expect
+                // to print all pages.
+                assertTrue(pages.length == 1 && PageRange.ALL_PAGES.equals(pages[0]));
+                assertSame(printJob.getDocument().getInfo().getPageCount(), 1);
                 printJob.complete();
                 onPrintJobQueuedCalled();
                 return null;
@@ -497,12 +495,11 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                     PrintJobInfo printJobInfo = printJob.getInfo();
                     PageRange[] pages = printJobInfo.getPages();
                     // We asked only for page 3 (index 2) but got this page when
-                    // we were getting the pages for preview (indices 0 - 49), hence
-                    // the written document has fifty pages (0 - 49) and the third one,
-                    // i.e. index 2 should be printed.
-                    assertTrue(pages.length == 1 && pages[0].getStart() == 2
-                            && pages[0].getEnd() == 2);
-                    assertSame(printJob.getDocument().getInfo().getPageCount(), 50);
+                    // we were getting the pages for preview (indices 0 - 49),
+                    // but the framework pruned extra pages, hence we should be asked
+                    // to print all pages from a single page document.
+                    assertTrue(pages.length == 1 && PageRange.ALL_PAGES.equals(pages[0]));
+                    assertSame(printJob.getDocument().getInfo().getPageCount(), 1);
                     printJob.complete();
                     onPrintJobQueuedCalled();
                     return null;
