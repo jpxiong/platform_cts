@@ -10,6 +10,6 @@ public class CompareUtils {
         int diff = Math.abs(Color.red(color) - Color.red(expectedColor))
                 + Math.abs(Color.green(color) - Color.green(expectedColor))
                 + Math.abs(Color.blue(color) - Color.blue(expectedColor));
-        return diff < threshold;
+        return diff <= threshold;
     }
 }
