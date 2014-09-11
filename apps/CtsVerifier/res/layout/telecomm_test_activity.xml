@@ -22,6 +22,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/telecomm_open_settings" />
+    <EditText android:id="@+id/phone_number"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/telecomm_default_phone_number"
+              android:hint="@string/telecomm_phone_number_hint" />
     <Button android:id="@+id/simulate_call"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
