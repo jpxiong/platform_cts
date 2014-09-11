@@ -54,17 +54,16 @@ public class CpuFeaturesTest extends TestCase {
         assertHwCap("IDIVT", hwcaps, CpuFeatures.HWCAP_IDIVT);
     }
 
-    private static List<String> getFeaturesFromCpuinfo() throws IOException {
+    private static String getFieldFromCpuinfo(String field) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("/proc/cpuinfo"));
-        Pattern p = Pattern.compile("Features\\s*:\\s*(.*)");
+        Pattern p = Pattern.compile(field + "\\s*:\\s*(.*)");
 
         try {
             String line;
             while ((line = br.readLine()) != null) {
                 Matcher m = p.matcher(line);
                 if (m.matches()) {
-                    String[] features = m.group(1).split("\\s");
-                    return Arrays.asList(features);
+                    return m.group(1);
                 }
             }
        } finally {
@@ -74,10 +73,66 @@ public class CpuFeaturesTest extends TestCase {
        return null;
     }
 
+    private static List<String> getFeaturesFromCpuinfo() throws IOException {
+        String features = getFieldFromCpuinfo("Features");
+        if (features == null)
+            return null;
+
+        return Arrays.asList(features.split("\\s"));
+    }
+
+    private static final String[] armv8RequiredFeatures = {
+            "wp", "half", "thumb", "fastmult", "vfp", "edsp", "neon",
+            "vfpv3", "tlsi", "vfpv4", "idiva", "idivt" };
+
+    private static void assertInCpuinfo(List<String> features,
+            String feature) {
+        assertTrue("/proc/cpuinfo does not advertise required feature " + feature + " to 32-bit ARM processes",
+                features.contains(feature));
+    }
+
     private static void assertNotInCpuinfo(List<String> features,
             String feature) {
-        assertFalse("/proc/cpuinfo advertises required feature " + feature,
+        assertFalse("/proc/cpuinfo advertises required feature " + feature + " to 64-bit ARM processes",
                 features.contains(feature));
+    }
+
+    public void testArmCpuinfo() throws IOException {
+        if (!CpuFeatures.isArmCpu())
+            return;
+
+        String cpuArch = getFieldFromCpuinfo("CPU architecture");
+        /* When /proc/cpuinfo is read by 32-bit ARM processes, the CPU
+         * architecture field must be present and contain an integer.
+         */
+        assertNotNull("Failed to read CPU architecture field from /proc/cpuinfo",
+                cpuArch);
+
+        int cpuArchInt = 0;
+        try {
+            cpuArchInt = Integer.parseInt(cpuArch);
+        } catch (NumberFormatException e) {
+            fail("/proc/cpuinfo reported non-integer CPU architecture " + cpuArch);
+        }
+
+        if (CpuFeatures.isArm64CpuIn32BitMode()) {
+            assertTrue("/proc/cpuinfo reported 32-bit only CPU architecture " + cpuArchInt + " on ARM64 CPU",
+                    cpuArchInt >= 8);
+        }
+
+        List<String> features = getFeaturesFromCpuinfo();
+        /* When /proc/cpuinfo is read by 32-bit ARM processes, the Features
+         * field must be present.  On ARMv8+ devices specifically, it must
+         * include ARMv7-optional features that are now required by ARMv8.
+         */
+        assertNotNull("Failed to read Features field from /proc/cpuinfo",
+                features);
+
+        if (CpuFeatures.isArm64CpuIn32BitMode()) {
+            for (String feature : armv8RequiredFeatures) {
+                assertInCpuinfo(features, feature);
+            }
+        }
     }
 
     public void testArm64Cpuinfo() throws IOException {
@@ -95,17 +150,8 @@ public class CpuFeaturesTest extends TestCase {
             return;
         }
 
-        assertNotInCpuinfo(features, "wp");
-        assertNotInCpuinfo(features, "half");
-        assertNotInCpuinfo(features, "thumb");
-        assertNotInCpuinfo(features, "fastmult");
-        assertNotInCpuinfo(features, "vfp");
-        assertNotInCpuinfo(features, "edsp");
-        assertNotInCpuinfo(features, "neon");
-        assertNotInCpuinfo(features, "vfpv3");
-        assertNotInCpuinfo(features, "tls");
-        assertNotInCpuinfo(features, "vfpv4");
-        assertNotInCpuinfo(features, "idiva");
-        assertNotInCpuinfo(features, "idivt");
+        for (String feature : armv8RequiredFeatures) {
+            assertNotInCpuinfo(features, feature);
+        }
     }
 }
