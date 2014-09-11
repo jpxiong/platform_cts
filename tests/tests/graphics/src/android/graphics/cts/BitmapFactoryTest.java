@@ -16,7 +16,7 @@
 
 package android.graphics.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 
 import android.content.res.Resources;

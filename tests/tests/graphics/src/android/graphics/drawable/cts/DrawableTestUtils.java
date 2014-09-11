@@ -39,7 +39,7 @@ public class DrawableTestUtils {
                        || parser.getDepth() > outerDepth)) {
         }
     }
-    
+
     /**
      * Retrieve an AttributeSet from a XML.
      *
