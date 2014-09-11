@@ -16,9 +16,9 @@
 
 /*
  * This file is auto-generated. DO NOT MODIFY!
- * The source Renderscript file: set_target_api_12.rs
+ * The source Renderscript file: set_target_api_13.rs
  */
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.renderscript.*;
 import android.content.res.Resources;
@@ -26,10 +26,10 @@ import android.content.res.Resources;
 /**
  * @hide
  */
-public class ScriptC_set_target_api_12 extends ScriptC {
-    private static final String __rs_resource_name = "set_target_api_12";
+public class ScriptC_set_target_api_13 extends ScriptC {
+    private static final String __rs_resource_name = "set_target_api_13";
     // Constructor
-    public  ScriptC_set_target_api_12(RenderScript rs) {
+    public  ScriptC_set_target_api_13(RenderScript rs) {
         this(rs,
              rs.getApplicationContext().getResources(),
              rs.getApplicationContext().getResources().getIdentifier(
@@ -37,7 +37,7 @@ public class ScriptC_set_target_api_12 extends ScriptC {
                  rs.getApplicationContext().getPackageName()));
     }
 
-    public  ScriptC_set_target_api_12(RenderScript rs, Resources resources, int id) {
+    public  ScriptC_set_target_api_13(RenderScript rs, Resources resources, int id) {
         super(rs, resources, id);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 The Android Open Source Project
+ * Copyright (C) 2011-2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 /*
  * This file is auto-generated. DO NOT MODIFY!
- * The source Renderscript file: leak.rs
+ * The source Renderscript file: set_target_api_15.rs
  */
-package android.renderscript.cts;
+package android.renderscriptlegacy.cts;
 
 import android.renderscript.*;
 import android.content.res.Resources;
@@ -26,10 +26,10 @@ import android.content.res.Resources;
 /**
  * @hide
  */
-public class ScriptC_leak extends ScriptC {
-    private static final String __rs_resource_name = "leak";
+public class ScriptC_set_target_api_15 extends ScriptC {
+    private static final String __rs_resource_name = "set_target_api_15";
     // Constructor
-    public  ScriptC_leak(RenderScript rs) {
+    public  ScriptC_set_target_api_15(RenderScript rs) {
         this(rs,
              rs.getApplicationContext().getResources(),
              rs.getApplicationContext().getResources().getIdentifier(
@@ -37,25 +37,15 @@ public class ScriptC_leak extends ScriptC {
                  rs.getApplicationContext().getPackageName()));
     }
 
-    public  ScriptC_leak(RenderScript rs, Resources resources, int id) {
+    public  ScriptC_set_target_api_15(RenderScript rs, Resources resources, int id) {
         super(rs, resources, id);
     }
 
-    private FieldPacker __rs_fp_ALLOCATION;
-    private final static int mExportVarIdx_a = 0;
-    private Allocation mExportVar_a;
-    public synchronized void set_a(Allocation v) {
-        setVar(mExportVarIdx_a, v);
-        mExportVar_a = v;
-    }
-
-    public Allocation get_a() {
-        return mExportVar_a;
-    }
-
-    private final static int mExportFuncIdx_print = 0;
-    public void invoke_print() {
-        invoke(mExportFuncIdx_print);
+    private final static int mExportFuncIdx_check = 0;
+    public void invoke_check(int version) {
+        FieldPacker check_fp = new FieldPacker(4);
+        check_fp.addI32(version);
+        invoke(mExportFuncIdx_check, check_fp);
     }
 
 }
