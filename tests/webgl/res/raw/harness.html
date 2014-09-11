@@ -4,18 +4,27 @@
 <head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
 <script type="text/javascript">
+    // Check for WebGL Support.
+    function supportsWebGL() {
+        var canvas = document.createElement('canvas');
+        gl = canvas.getContext("webgl");
+        return !!gl;
+    }
+
     // Pass the WebGL harness calls through to the native app.
     webglTestHarness = {
         notifyFinished: function() {
             WebGLCallback.notifyFinished();
         },
-        reportResults: function(success, msg) {
-            WebGLCallback.reportResults(success, msg);
-        },
+        reportResults: function(type, success, msg) {
+            WebGLCallback.reportResults(type, success, msg);
+        }
     }
-
     function navigateToTest() {
-        window.open(WebGLCallback.getUrlToTest(), "TestFrame");
+        if (supportsWebGL())
+            window.open(WebGLCallback.getUrlToTest(), "TestFrame");
+        else
+            WebGLCallback.notifyFinished();
     }
     window.addEventListener('load', navigateToTest, false);
 </script>

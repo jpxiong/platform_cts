@@ -15,17 +15,27 @@
 import sys
 import os
 
-if len(sys.argv) != 2:
-  raise Exception("Usage: extract_webgl_tests.py <conformance_version_path>")
-
-# Need to handle --min-version for higher versions.
-if not "1.0.1" in sys.argv[1]:
-  raise Exception("Version not supported")
+if len(sys.argv) != 3:
+  raise Exception("Usage: extract_webgl_tests.py <webgl_sdk_tests_path> <version>")
 
 top_list = sys.argv[1] + "/00_test_list.txt"
+version = sys.argv[2]
 tests = []
 lists = []
 lists.append(top_list)
+
+def filter_by_version(lines):
+  version_lines = [ line for line in lines if "--min-version" in line ]
+  version_lines.extend([ line for line in lines if "--max-version" in line ])
+  lines = [ line for line in lines if not line in version_lines ]
+  for line in version_lines:
+    assert len(line.split()) == 3
+    min_version = line.split()[1] if line.split()[0] == "--min-version" else "0.0.0"
+    max_version = line.split()[1] if line.split()[0] == "--max-version" else "9.9.9"
+    test = line.split()[2]
+    if (version >= min_version and version <= max_version):
+      lines.append(test)
+  return lines
 
 while not len(lists) == 0:
   lists2 = lists
@@ -37,7 +47,8 @@ while not len(lists) == 0:
       lines = [ line.strip() for line in file.readlines()]
       lines = [ line for line in lines if not "//" in line ]
       lines = [ line for line in lines if not "#" in line ]
-      lines = [ line for line in lines if not "--min-version" in line ]
+      lines = [ line.replace("--slow","") for line in lines ]
+      lines = filter_by_version(lines)
       # Append lists and tests found in this list.
       lines = [ directory + "/" + line for line in lines ]
       lists.extend([ line for line in lines if "00_test_list.txt" in line ])
