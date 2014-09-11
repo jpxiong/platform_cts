@@ -1300,7 +1300,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mTextView = findTextView(R.id.textview_text);
         assertNull(mTextView.getError());
 
-        final String errorText = "Opps! There is an error";
+        final String errorText = "Oops! There is an error";
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -1344,7 +1344,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         // a key event that will not change the TextView's text
         assertEquals("", mTextView.getText().toString());
         // The icon and error message will not be reset to null
-        assertNull(mTextView.getError());
+        assertEquals(errorText, mTextView.getError().toString());
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
