@@ -23,21 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import android.app.cts.MockActivity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.cts.WidgetTestUtils;
 
 
 public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private Movie mMovie;
-    private final int MOVIE = com.android.cts.stub.R.drawable.animated;
+    private final int MOVIE = com.android.cts.graphics.R.drawable.animated;
 
     public MovieTest() {
-        super("com.android.cts.stub", MockActivity.class);
+        super("com.android.cts.graphics", MockActivity.class);
     }
 
     @Override

@@ -21,10 +21,38 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <uses-library android:name="android.test.runner" />
+
+        <activity android:name="android.graphics.cts.ImageViewCtsActivity"
+            android:label="ImageViewCtsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.graphics.cts.MockActivity" android:label="MockActivity" />
+
+        <activity android:name="android.opengl.cts.CompressedTextureCtsActivity"
+            android:label="CompressedTextureCtsActivity"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.opengl.cts.EglConfigCtsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />
+
+        <activity android:name="android.opengl.cts.GLSurfaceViewCtsActivity"
+                  android:label="GLSurfaceViewCts"/>
+
+        <activity android:name="android.opengl.cts.OpenGlEsVersionCtsActivity"/>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.graphics"
                      android:label="CTS tests of android.graphics">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />

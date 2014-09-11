@@ -31,7 +31,7 @@ import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.test.InstrumentationTestCase;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 
 public class LevelListDrawableTest extends InstrumentationTestCase {

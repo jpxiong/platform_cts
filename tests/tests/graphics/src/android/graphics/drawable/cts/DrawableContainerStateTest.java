@@ -130,9 +130,9 @@ public class DrawableContainerStateTest extends TestCase{
         assertNull(mDrawableContainerState.getConstantPadding());
 
         /*
-         * TODO: the behavior of getConstantPadding when variable padding is 
+         * TODO: the behavior of getConstantPadding when variable padding is
          * false is undefined
-         * 
+         *
         mDrawableContainerState.setVariablePadding(false);
         Rect padding = mDrawableContainerState.getConstantPadding();
         assertNotNull(padding);

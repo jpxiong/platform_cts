@@ -41,7 +41,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 import java.util.Vector;
 
