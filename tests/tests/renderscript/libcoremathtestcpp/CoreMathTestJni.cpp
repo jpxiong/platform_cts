@@ -237,8 +237,9 @@ Java_android_renderscript_cts_CoreMathVerifier_lgamma(JNIEnv*, jclass, jfloat x)
 extern "C" JNIEXPORT jobject JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_lgamma2(JNIEnv* env, jclass, jfloat x) {
     JavaStruct result(env, "LgammaResult");
-    result.SetFloat("lgamma", lgammaf(x));
-    result.SetInt("gammaSign", signgam);
+    int sign = 0;
+    result.SetFloat("lgamma", lgammaf_r(x, &sign));
+    result.SetInt("gammaSign", sign);
     return result.getObject();
 }
 
