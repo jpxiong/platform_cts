@@ -28,7 +28,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 /**
  * Test that gets a list of EGL configurations and tries to use each one in a GLSurfaceView.
  */
-public class EglConfigTest extends ActivityInstrumentationTestCase2<EglConfigStubActivity> {
+public class EglConfigTest extends ActivityInstrumentationTestCase2<EglConfigCtsActivity> {
 
     private static final int EGL_OPENGL_ES_BIT = 0x1;
 
@@ -37,7 +37,7 @@ public class EglConfigTest extends ActivityInstrumentationTestCase2<EglConfigStu
     private Instrumentation mInstrumentation;
 
     public EglConfigTest() {
-        super("com.android.cts.stub", EglConfigStubActivity.class);
+        super("com.android.cts.graphics", EglConfigCtsActivity.class);
     }
 
     @Override
@@ -58,10 +58,10 @@ public class EglConfigTest extends ActivityInstrumentationTestCase2<EglConfigStu
             throws InterruptedException {
         for (int configId : configIds) {
             Bundle extras = new Bundle();
-            extras.putInt(EglConfigStubActivity.CONFIG_ID_EXTRA, configId);
-            extras.putInt(EglConfigStubActivity.CONTEXT_CLIENT_VERSION_EXTRA, contextClientVersion);
-            EglConfigStubActivity activity = launchActivity("com.android.cts.stub",
-                    EglConfigStubActivity.class, extras);
+            extras.putInt(EglConfigCtsActivity.CONFIG_ID_EXTRA, configId);
+            extras.putInt(EglConfigCtsActivity.CONTEXT_CLIENT_VERSION_EXTRA, contextClientVersion);
+            EglConfigCtsActivity activity = launchActivity("com.android.cts.graphics",
+                    EglConfigCtsActivity.class, extras);
             activity.waitToFinishDrawing();
             activity.finish();
             mInstrumentation.waitForIdleSync();

@@ -26,7 +26,7 @@ import android.util.Log;
  * Tests for the GLSurfaceView class.
  */
 public class GLSurfaceViewTest extends
-        ActivityInstrumentationTestCase2<GLSurfaceViewStubActivity> {
+        ActivityInstrumentationTestCase2<GLSurfaceViewCtsActivity> {
 
     private static final int NUM_PAUSE_RESUME_ITERATIONS_WITHOUT_DELAY = 1000;
 
@@ -38,10 +38,10 @@ public class GLSurfaceViewTest extends
 
     private static final String TAG = "GLSurfaceViewTest";
 
-    private GLSurfaceViewStubActivity mActivity;
+    private GLSurfaceViewCtsActivity mActivity;
 
     public GLSurfaceViewTest() {
-        super("com.android.cts.stub", GLSurfaceViewStubActivity.class);
+        super("com.android.cts.graphics", GLSurfaceViewCtsActivity.class);
     }
 
     @Override

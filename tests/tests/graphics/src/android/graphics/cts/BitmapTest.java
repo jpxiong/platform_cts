@@ -15,7 +15,7 @@
  */
 package android.graphics.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 
 import android.content.res.Resources;
@@ -30,7 +30,6 @@ import android.graphics.Bitmap.Config;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
-import android.widget.cts.WidgetTestUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

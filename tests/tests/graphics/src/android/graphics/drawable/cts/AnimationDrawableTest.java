@@ -16,7 +16,7 @@
 
 package android.graphics.drawable.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.graphics.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -32,11 +32,11 @@ import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Xml;
 import android.widget.ImageView;
-import android.widget.cts.ImageViewStubActivity;
+import android.graphics.cts.ImageViewCtsActivity;
 
 import java.io.IOException;
 
-public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<ImageViewStubActivity> {
+public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<ImageViewCtsActivity> {
     private static final int FRAMES_COUNT        = 3;
     private static final int FIRST_FRAME_INDEX   = 0;
     private static final int SECOND_FRAME_INDEX  = 1;
@@ -50,7 +50,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
     private Resources mResources;
 
     public AnimationDrawableTest() {
-        super("com.android.cts.stub", ImageViewStubActivity.class);
+        super("com.android.cts.graphics", ImageViewCtsActivity.class);
     }
 
     @Override
