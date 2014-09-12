@@ -1128,9 +1128,21 @@
     </string>
     <string name="telecomm_open_settings">Open settings</string>
     <string name="telecomm_simulate_call">Place call</string>
+    <string name="telecomm_default_phone_number">555-263-7643</string>
+    <string name="telecomm_phone_number_hint">Phone number to call</string>
     <string name="telecomm_cancel_call_title">Canceled Call Test</string>
     <string name="telecomm_cancel_call_info">This tests to make sure that canceled calls are handled correctly.
         Press the \"Open settings\" button and make sure that \"Call Cancel Manager\" is the default Wi-Fi calling account.
+        Then press the \"Place call\" button; the test will pass (or fail) automatically.
+    </string>
+    <string name="telecomm_failed_call_title">Failed Call Test</string>
+    <string name="telecomm_failed_call_info">This tests to make sure that failed calls are handled correctly.
+        Press the \"Open settings\" button and make sure that \"Call Failed Manager\" is the default Wi-Fi calling account.
+        Then press the \"Place call\" button; the test will pass (or fail) automatically.
+    </string>
+    <string name="telecomm_basic_call_title">Basic Call Test</string>
+    <string name="telecomm_basic_call_info">This tests to make sure that basic calls are handled correctly.
+        Press the \"Open settings\" button and make sure that \"Basic Call Manager\" is the default Wi-Fi calling account.
         Then press the \"Place call\" button; the test will pass (or fail) automatically.
     </string>
 
