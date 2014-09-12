@@ -26,33 +26,9 @@ public class Debug_InstructionCountTest extends TestCase {
     public void testDebugInstructionCount() {
         Debug.InstructionCount instructionCount = new Debug.InstructionCount();
 
-        assertTrue(instructionCount.resetAndStart());
-        addTest(1, 2);
-        instructionCount.collect();
-        int insCountsFirst = instructionCount.globalTotal();
-        int methodInvFirst = instructionCount.globalMethodInvocations();
-
-        assertTrue(instructionCount.resetAndStart());
-        addTest(1, 2);
-        addTest(1, 2);
-        instructionCount.collect();
-        int insCountsSecond = instructionCount.globalTotal();
-        int methodInvSecond = instructionCount.globalMethodInvocations();
-
-        assertTrue(instructionCount.resetAndStart());
-        addTest(1, 2);
-        addTest(1, 2);
-        addTest(1, 2);
-        instructionCount.collect();
-        int insCountsThird = instructionCount.globalTotal();
-        int methodInvThird = instructionCount.globalMethodInvocations();
-
-        assertEquals(insCountsThird - insCountsFirst, (insCountsSecond - insCountsFirst) * 2);
-        assertEquals(methodInvThird - methodInvFirst, (methodInvSecond - methodInvFirst) * 2);
-    }
-
-    // must not be private, otherwise javac may inline the code
-    protected int addTest(int a, int b) {
-        return a + b;
+        assertFalse(instructionCount.resetAndStart());
+        assertFalse(instructionCount.collect());
+        assertEquals(0, instructionCount.globalTotal());
+        assertEquals(0, instructionCount.globalMethodInvocations());
     }
 }
