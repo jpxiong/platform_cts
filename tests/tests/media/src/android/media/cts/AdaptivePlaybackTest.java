@@ -77,6 +77,8 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 mContext,
                 "video/mp4v-es",
                 "OMX.google.mpeg4.decoder",
+
+                R.raw.video_1280x720_mp4_mpeg4_1000kbps_25fps_aac_stereo_128kbps_44100hz,
                 R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz);
     }
 
@@ -242,6 +244,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public void testHEVC_adaptiveDrc() { ex(HEVC(), adaptiveDrc); }
     public void testVP8_adaptiveDrc()  { ex(VP8(),  adaptiveDrc); }
     public void testVP9_adaptiveDrc()  { ex(VP9(),  adaptiveDrc); }
+    public void testMpeg4_adaptiveDrc() { ex(Mpeg4(), adaptiveDrc); }
 
     public void testH264_adaptiveDrcEarlyEos() { ex(H264(), new AdaptiveDrcEarlyEosTest()); }
     public void testHEVC_adaptiveDrcEarlyEos() { ex(HEVC(), new AdaptiveDrcEarlyEosTest()); }
