@@ -17,7 +17,7 @@
 package android.telecom.cts;
 
 import android.telecom.Connection;
-import android.telephony.DisconnectCause;
+import android.telecom.DisconnectCause;
 import android.test.AndroidTestCase;
 
 import java.util.concurrent.Semaphore;
@@ -55,7 +55,8 @@ public class ConnectionTest extends AndroidTestCase {
         waitForStateChange(lock);
         assertEquals(Connection.STATE_HOLDING, connection.getState());
 
-        connection.setDisconnected(DisconnectCause.LOCAL, "Test call");
+        connection.setDisconnected(
+                new DisconnectCause(DisconnectCause.LOCAL, "Test call"));
         waitForStateChange(lock);
         assertEquals(Connection.STATE_DISCONNECTED, connection.getState());
 
@@ -66,8 +67,8 @@ public class ConnectionTest extends AndroidTestCase {
     }
 
     public void testFailedState() {
-        Connection connection =
-                Connection.createFailedConnection(DisconnectCause.LOCAL, "Test call");
+        Connection connection = Connection.createFailedConnection(
+                new DisconnectCause(DisconnectCause.LOCAL, "Test call"));
         assertEquals(Connection.STATE_DISCONNECTED, connection.getState());
 
         connection.setRinging();
