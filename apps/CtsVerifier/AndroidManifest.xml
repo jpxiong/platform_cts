@@ -1159,7 +1159,41 @@
             <meta-data android:name="test_required_features" android:value="android.hardware.telephony"/>
         </activity>
 
-        <service android:name=".telecomm.CancelCallTestActivity$CancellingConnectionService"
+        <service android:name=".telecomm.CancelCallTestActivity$ConnectionService"
+                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecomm.ConnectionService" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".telecomm.FailedCallTestActivity"
+                  android:label="@string/telecomm_failed_call_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_telecomm" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecomm.TelecommTestActivity" />
+        </activity>
+
+        <service android:name=".telecomm.FailedCallTestActivity$ConnectionService"
+                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecomm.ConnectionService" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".telecomm.BasicCallTestActivity"
+                  android:label="@string/telecomm_basic_call_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_telecomm" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecomm.TelecommTestActivity" />
+        </activity>
+
+        <service android:name=".telecomm.BasicCallTestActivity$ConnectionService"
                  android:permission="android.permission.BIND_CONNECTION_SERVICE">
             <intent-filter>
                 <action android:name="android.telecomm.ConnectionService" />
