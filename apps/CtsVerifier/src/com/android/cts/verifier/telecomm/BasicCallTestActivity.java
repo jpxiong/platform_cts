@@ -3,14 +3,12 @@ package com.android.cts.verifier.telecomm;
 import com.android.cts.verifier.R;
 
 import android.net.Uri;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.telecomm.Connection;
 import android.telecomm.ConnectionRequest;
 import android.telecomm.PhoneAccountHandle;
 import android.telecomm.RemoteConnection;
 import android.telecomm.StatusHints;
-import android.util.Log;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +71,7 @@ public class BasicCallTestActivity extends TelecommBaseTestActivity {
     private static class ProxyConnection extends Connection {
         private final RemoteConnection mRemoteConnection;
 
-        private final RemoteConnection.Listener mListener = new RemoteConnection.Listener() {
+        private final RemoteConnection.Callback mCallback = new RemoteConnection.Callback() {
             @Override
             public void onStateChanged(RemoteConnection connection, int state) {
                 switch (state) {
@@ -113,8 +111,8 @@ public class BasicCallTestActivity extends TelecommBaseTestActivity {
             }
 
             @Override
-            public void onHandleChanged(RemoteConnection connection, Uri handle, int presentation) {
-                setHandle(handle, presentation);
+            public void onAddressChanged(RemoteConnection connection, Uri address, int presentation) {
+                setAddress(address, presentation);
             }
 
             @Override
@@ -135,12 +133,12 @@ public class BasicCallTestActivity extends TelecommBaseTestActivity {
             if (connection.getState() == Connection.STATE_DISCONNECTED) {
                 sLock.release();
             } else {
-                mRemoteConnection.addListener(mListener);
+                mRemoteConnection.registerCallback(mCallback);
             }
         }
 
         @Override
-        public void onSetState(int state) {
+        public void onStateChanged(int state) {
             if (state == Connection.STATE_DIALING) {
                 // Good enough; let's disconnect this call.
                 mRemoteConnection.disconnect();
