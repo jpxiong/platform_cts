@@ -35,13 +35,13 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     }
 
     /**
-     * Tests the SmsManager.injectSmsPdu() API. This makes a call to updateMmsDownloadStatus() API
-     * and expects a SecurityException since the test apk is not signed by a certificate on the
-     * SIM.
+     * Tests the SmsManager.updateMmsDownloadStatus() API. This makes a call to
+     * updateMmsDownloadStatus() API and expects a SecurityException since the test apk is not
+     * signed by a certificate on the SIM.
      */
     public void testUpdateMmsDownloadStatus() {
         try {
-            SmsManager.getDefault().updateMmsDownloadStatus(0, TEST_PDU);
+            SmsManager.getDefault().updateMmsDownloadStatus(null, 0, 0, null);
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
@@ -53,7 +53,7 @@ public class SimRestrictedApisTest extends AndroidTestCase {
      */
     public void testUpdateMmsSendStatus() {
         try {
-            SmsManager.getDefault().updateMmsSendStatus(0, false);
+            SmsManager.getDefault().updateMmsSendStatus(null, 0, TEST_PDU, 0, null);
             fail("Expected SecurityException. App doesn't have carrier privileges.");
         } catch (SecurityException expected) {}
     }
