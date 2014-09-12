@@ -16,7 +16,7 @@
 
 #include <jni.h>
 
-#if defined(__aarch64__)
+#if defined(__arm__) || defined(__aarch64__)
 #include <setjmp.h>
 #include <signal.h>
 
@@ -60,7 +60,9 @@ err_segill:
 err_sigaction:
     return ret;
 }
+#endif
 
+#ifdef __aarch64__
 static void cntvct()
 {
     asm volatile ( "mrs x0, cntvct_el0" : : : "x0" );
@@ -77,8 +79,64 @@ jboolean android_os_cts_CpuInstructions_canReadCntvct(JNIEnv *, jobject)
 }
 #endif
 
+#ifdef __arm__
+static void swp()
+{
+    uint32_t dummy = 0;
+    uint32_t *ptr = &dummy;
+    asm volatile ( "swp r0, r0, [%0]" : "+r"(ptr) : : "r0" );
+}
+
+static void setend()
+{
+    asm volatile (
+        "setend be" "\n"
+        "setend le" "\n"
+    );
+}
+
+static void cp15_dsb()
+{
+    asm volatile ( "mcr p15, 0, %0, c7, c10, 4" : : "r"(0) );
+}
+
+jboolean android_os_cts_CpuInstructions_hasSwp(JNIEnv *, jobject)
+{
+    return test_instruction(swp);
+}
+
+jboolean android_os_cts_CpuInstructions_hasSetend(JNIEnv *, jobject)
+{
+    return test_instruction(setend);
+}
+
+jboolean android_os_cts_CpuInstructions_hasCp15Barriers(JNIEnv *, jobject)
+{
+    return test_instruction(cp15_dsb);
+}
+#else
+jboolean android_os_cts_CpuInstructions_hasSwp(JNIEnv *, jobject)
+{
+    return false;
+}
+
+jboolean android_os_cts_CpuInstructions_hasSetend(JNIEnv *, jobject)
+{
+    return false;
+}
+
+jboolean android_os_cts_CpuInstructions_hasCp15Barriers(JNIEnv *, jobject)
+{
+    return false;
+}
+#endif
+
 static JNINativeMethod gMethods[] = {
     { "canReadCntvct", "()Z", (void *)android_os_cts_CpuInstructions_canReadCntvct },
+    { "hasSwp", "()Z", (void *)android_os_cts_CpuInstructions_hasSwp },
+    { "hasSetend", "()Z", (void *)android_os_cts_CpuInstructions_hasSetend },
+    { "hasCp15Barriers", "()Z",
+            (void *)android_os_cts_CpuInstructions_hasCp15Barriers },
 };
 
 int register_android_os_cts_CpuInstructions(JNIEnv *env)
