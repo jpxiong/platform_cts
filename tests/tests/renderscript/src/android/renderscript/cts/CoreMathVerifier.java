@@ -1796,11 +1796,10 @@ public class CoreMathVerifier {
                 return "Expected a remainder of NaN but got " +  Float.toString(args.out);
             }
         } else {
-            // The quotient should have the same sign and the same lowest three bits.
-            if (Integer.signum(args.outD) != Integer.signum(expected.quotient) ||
-                (args.outD & 0x07) != (expected.quotient & 0x07)) {
+            // The quotient should have the same lowest three bits.
+            if ((args.outD & 0x07) != (expected.quotient & 0x07)) {
                 return "Quotient returned " +  Integer.toString(args.outD) +
-                    " does not have the same sign or lower three bits as the expected " +
+                    " does not have the same lower three bits as the expected " +
                     Integer.toString(expected.quotient);
             }
             Target.Floaty remainder = t.new32(expected.remainder);
