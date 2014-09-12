@@ -16,7 +16,7 @@
 
 package android.content.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 import com.android.internal.util.XmlUtils;
 
 

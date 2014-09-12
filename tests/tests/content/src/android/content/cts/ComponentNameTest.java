@@ -85,7 +85,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     public void testFlattenToString() {
-        assertEquals("com.android.cts.stub/android.content.cts.ComponentNameTest",
+        assertEquals("com.android.cts.content/android.content.cts.ComponentNameTest",
                 getComponentName().flattenToString());
     }
 
@@ -121,7 +121,7 @@ public class ComponentNameTest extends AndroidTestCase {
 
     public void testGetPackageName() {
         final String actual = getComponentName().getPackageName();
-        assertEquals("com.android.cts.stub", actual);
+        assertEquals("com.android.cts.content", actual);
     }
 
     public void testUnflattenFromString() {
@@ -135,7 +135,7 @@ public class ComponentNameTest extends AndroidTestCase {
     public void testFlattenToShortString() {
         // Test normal
         String actual = getComponentName().flattenToShortString();
-        assertEquals("com.android.cts.stub/android.content.cts.ComponentNameTest", actual);
+        assertEquals("com.android.cts.content/android.content.cts.ComponentNameTest", actual);
 
         // Test long class name
         final ComponentName componentName = new ComponentName("com.android.view",
@@ -168,7 +168,7 @@ public class ComponentNameTest extends AndroidTestCase {
     public void testToShortString() {
         // Test normal string
         final String shortString = getComponentName().toShortString();
-        assertEquals("{com.android.cts.stub/android.content.cts.ComponentNameTest}", shortString);
+        assertEquals("{com.android.cts.content/android.content.cts.ComponentNameTest}", shortString);
     }
 
     public void testGetClassName() {
@@ -196,7 +196,7 @@ public class ComponentNameTest extends AndroidTestCase {
         ComponentName.writeToParcel(componentName, parcel);
         parcel.setDataPosition(0);
         assertFalse(0 == parcel.dataAvail());
-        assertEquals("com.android.cts.stub", parcel.readString());
+        assertEquals("com.android.cts.content", parcel.readString());
         assertEquals("android.content.cts.ComponentNameTest", parcel.readString());
 
         // Test null data

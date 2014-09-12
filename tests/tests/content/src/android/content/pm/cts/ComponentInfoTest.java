@@ -26,16 +26,15 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.util.StringBuilderPrinter;
-import android.widget.cts.WidgetTestUtils;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 /**
  * Test {@link ComponentInfo}.
  */
 public class ComponentInfoTest extends AndroidTestCase {
-    private final String PACKAGE_NAME = "com.android.cts.stub";
+    private final String PACKAGE_NAME = "com.android.cts.content";
     private ComponentInfo mComponentInfo;
 
     public void testConstructor() {

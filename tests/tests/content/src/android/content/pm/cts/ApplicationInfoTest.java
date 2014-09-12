@@ -16,7 +16,7 @@
 
 package android.content.pm.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 import android.content.pm.ApplicationInfo;

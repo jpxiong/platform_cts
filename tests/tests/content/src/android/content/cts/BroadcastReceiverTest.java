@@ -18,8 +18,6 @@ package android.content.cts;
 
 
 import android.app.Service;
-import android.app.cts.MockActivity;
-import android.app.cts.MockService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -52,7 +50,7 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
     private static final long START_SERVICE_TIMEOUT  = 3000;
 
     public BroadcastReceiverTest() {
-        super("com.android.cts.stub", MockActivity.class);
+        super("com.android.cts.content", MockActivity.class);
     }
 
     @Override
