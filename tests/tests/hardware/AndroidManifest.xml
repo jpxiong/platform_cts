@@ -19,12 +19,39 @@
     package="com.android.cts.hardware">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application>
         <uses-library android:name="android.test.runner" />
+
+        <activity android:name="android.hardware.cts.CameraCtsActivity"
+            android:label="CameraCtsActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+
+        <activity android:name="android.hardware.camera2.cts.Camera2SurfaceViewCtsActivity"
+            android:label="Camera2CtsActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+
+        <activity android:name="android.hardware.camera2.cts.Camera2MultiViewCtsActivity"
+            android:label="Camera2MultiViewCtsActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+
+        <activity android:name="android.hardware.cts.GLSurfaceViewCtsActivity"
+            android:label="GLSurfaceViewCtsActivity"/>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.hardware"
                      android:label="CTS tests of android.hardware">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
