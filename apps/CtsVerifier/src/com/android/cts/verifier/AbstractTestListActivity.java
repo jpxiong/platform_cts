@@ -20,6 +20,7 @@ import com.android.cts.verifier.TestListAdapter.TestListItem;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
@@ -51,6 +52,12 @@ public abstract class AbstractTestListActivity extends ListActivity {
             default:
                 throw new IllegalArgumentException("Unknown request code: " + requestCode);
         }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.list_content);
     }
 
     private void handleLaunchTestResult(int resultCode, Intent data) {
