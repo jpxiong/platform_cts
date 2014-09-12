@@ -51,7 +51,8 @@ public class BinderTest extends ActivityTestsBase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mService = new Intent(LocalService.SERVICE_LOCAL);
+        mService = new Intent(
+                LocalService.SERVICE_LOCAL, null /*uri*/, mContext, LocalService.class);
         mBinder = new MockBinder();
         mStartReceiver = new Binder() {
             @Override

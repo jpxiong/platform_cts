@@ -81,9 +81,12 @@ public class TokenWatcherTest extends AndroidTestCase {
             }
         };
         mIntent = new Intent(EMPTY_SERVICE);
+        mIntent.setPackage(getContext().getPackageName());
         getContext().startService(mIntent);
-        getContext().bindService(new Intent(IEmptyService.class.getName()),
-                mServiceConnection, Context.BIND_AUTO_CREATE);
+
+        Intent secondaryIntent = new Intent(IEmptyService.class.getName());
+        secondaryIntent.setPackage(getContext().getPackageName());
+        getContext().bindService(secondaryIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         synchronized (mSync) {
             if (!mHasConnected) {
                 try {
