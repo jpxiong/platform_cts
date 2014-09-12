@@ -221,12 +221,5 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             isRequestCursorUpdatesCalled = true;
             return false;
         }
-
-        /**
-         * @removed
-         */
-        public boolean requestUpdateCursorAnchorInfo(int cursorUpdateMode) {
-            return requestCursorUpdates(cursorUpdateMode);
-        }
     }
 }
