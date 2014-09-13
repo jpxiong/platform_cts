@@ -300,6 +300,7 @@ public class Camera2MultiViewTestCase extends
              * stopping preview. No need to release the SurfaceTexture here as it
              * is released by TextureView after onSurfaceTextureDestroyed is called.
              */
+            Log.i(TAG, "onSurfaceTextureDestroyed called.");
             return true;
         }
 
