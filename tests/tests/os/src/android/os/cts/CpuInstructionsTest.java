@@ -32,4 +32,17 @@ public class CpuInstructionsTest extends TestCase {
         assertTrue("Machine does not allow access to CNTVCT register",
                 CpuInstructions.canReadCntvct());
     }
+
+    public void testEmulatedArmCpuFeatures() {
+        if (!CpuFeatures.isArm64CpuIn32BitMode()) {
+            return;
+        }
+
+        assertTrue("Machine does not support ARM swp instruction emulation",
+                CpuInstructions.hasSwp());
+        assertTrue("Machine does not support ARM setend instruction emulation",
+                CpuInstructions.hasSetend());
+        assertTrue("Machine does not support ARM CP15 barrier emulation",
+                CpuInstructions.hasCp15Barriers());
+    }
 }

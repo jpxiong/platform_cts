@@ -23,7 +23,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := \
 		CtsJniOnLoad.cpp \
-		android_os_cts_CpuInstructions.cpp \
+		android_os_cts_CpuInstructions.cpp.arm \
 		android_os_cts_TaggedPointer.cpp \
 		android_os_cts_OSFeatures.cpp \
 		android_os_cts_FileUtils.cpp \
