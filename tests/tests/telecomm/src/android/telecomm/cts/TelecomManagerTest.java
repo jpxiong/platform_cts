@@ -18,29 +18,29 @@ package android.telecomm.cts;
 
 import android.content.ComponentName;
 import android.net.Uri;
-import android.telecomm.PhoneAccount;
-import android.telecomm.PhoneAccountHandle;
-import android.telecomm.PhoneCapabilities;
-import android.telecomm.TelecommManager;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.PhoneCapabilities;
+import android.telecom.TelecomManager;
 import android.test.AndroidTestCase;
 
 import java.util.List;
 
-public class TelecommManagerTest extends AndroidTestCase {
+public class TelecomManagerTest extends AndroidTestCase {
     public void testRegisterAccountsBlocked() {
         PhoneAccount phoneAccount = new PhoneAccount.Builder(
                 new PhoneAccountHandle(
-                        new ComponentName(getContext(), TelecommManagerTest.class),
+                        new ComponentName(getContext(), TelecomManagerTest.class),
                         "testRegisterAccountsBlocked"),
                 "Mock PhoneAccount")
                 .setAddress(Uri.parse("tel:6502637643"))
                 .setSubscriptionAddress(Uri.parse("tel:650-263-7643"))
                 .setCapabilities(PhoneCapabilities.ALL)
                 .setIconResId(0)
-                .setShortDescription("PhoneAccount used in TelecommManagerTest")
+                .setShortDescription("PhoneAccount used in TelecomManagerTest")
                 .build();
 
-        TelecommManager tm = TelecommManager.from(getContext());
+        TelecomManager tm = TelecomManager.from(getContext());
         List<PhoneAccountHandle> handles = tm.getEnabledPhoneAccounts();
 
         try {

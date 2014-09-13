@@ -17,9 +17,9 @@
 package com.android.cts.verifier.telecomm;
 
 import android.os.SystemClock;
-import android.telecomm.Connection;
-import android.telecomm.ConnectionRequest;
-import android.telecomm.PhoneAccountHandle;
+import android.telecom.Connection;
+import android.telecom.ConnectionRequest;
+import android.telecom.PhoneAccountHandle;
 
 import com.android.cts.verifier.R;
 
@@ -45,7 +45,7 @@ public class CancelCallTestActivity extends TelecommBaseTestActivity {
     }
 
     @Override
-    protected Class<? extends android.telecomm.ConnectionService> getConnectionService() {
+    protected Class<? extends android.telecom.ConnectionService> getConnectionService() {
         return ConnectionService.class;
     }
 
@@ -71,7 +71,7 @@ public class CancelCallTestActivity extends TelecommBaseTestActivity {
         }
     }
 
-    public static class ConnectionService extends android.telecomm.ConnectionService {
+    public static class ConnectionService extends android.telecom.ConnectionService {
         @Override
         public Connection onCreateOutgoingConnection(
                 PhoneAccountHandle connectionManagerPhoneAccount,

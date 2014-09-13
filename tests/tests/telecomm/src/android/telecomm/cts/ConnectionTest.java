@@ -16,7 +16,7 @@
 
 package android.telecomm.cts;
 
-import android.telecomm.Connection;
+import android.telecom.Connection;
 import android.telephony.DisconnectCause;
 import android.test.AndroidTestCase;
 

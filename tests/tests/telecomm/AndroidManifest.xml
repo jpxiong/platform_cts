@@ -19,14 +19,14 @@
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <!-- We won't be granted this, but we should at least ask for it (to make sure we don't get it). -->
-    <uses-permission android:name="com.android.telecomm.permission.REGISTER_PROVIDER_OR_SUBSCRIPTION" />
+    <uses-permission android:name="com.android.server.telecom.permission.REGISTER_PROVIDER_OR_SUBSCRIPTION" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.stub"
-                     android:label="CTS tests of android.telecomm">
+                     android:label="CTS tests of android.telecom">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
     </instrumentation>
