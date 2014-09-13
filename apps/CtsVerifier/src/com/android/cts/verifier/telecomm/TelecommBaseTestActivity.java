@@ -4,10 +4,10 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.telecomm.ConnectionService;
-import android.telecomm.PhoneAccount;
-import android.telecomm.PhoneAccountHandle;
-import android.telecomm.TelecommManager;
+import android.telecom.ConnectionService;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,7 +47,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
 
                 getTelecommManager().registerPhoneAccount(account);
 
-                Intent i = new Intent(TelecommManager.ACTION_CHANGE_PHONE_ACCOUNTS);
+                Intent i = new Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS);
                 startActivity(i);
             }
         });
@@ -106,8 +106,8 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
         }.start();
     }
 
-    protected TelecommManager getTelecommManager() {
-        return (TelecommManager) getSystemService(TELECOMM_SERVICE);
+    protected TelecomManager getTelecommManager() {
+        return (TelecomManager) getSystemService(TELECOM_SERVICE);
     }
 
     @Override
