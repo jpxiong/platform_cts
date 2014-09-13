@@ -86,7 +86,14 @@ public class CpuFeaturesTest extends TestCase {
         }
 
         List<String> features = getFeaturesFromCpuinfo();
-        assertNotNull("Failed to parse /proc/cpuinfo", features);
+        /* When /proc/cpuinfo is read by 64-bit ARM processes, the Features
+         * field in /proc/cpuinfo must not include ARMv8-required features.
+         * This can be satisified either by not listing required features, or by
+         * not having a Features field at all.
+         */
+        if (features == null) {
+            return;
+        }
 
         assertNotInCpuinfo(features, "wp");
         assertNotInCpuinfo(features, "half");
