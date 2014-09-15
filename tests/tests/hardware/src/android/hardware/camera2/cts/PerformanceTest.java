@@ -194,8 +194,10 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
+
+                boolean partialsExpected = mStaticInfo.getPartialResultCount() > 1;
                 long startTimeMs;
-                boolean isPartialTimingValid = true;
+                boolean isPartialTimingValid = partialsExpected;
                 for (int i = 0; i < NUM_TEST_LOOPS; i++) {
 
                     // setup builders and listeners
@@ -219,9 +221,16 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                     CaptureRequest request = captureBuilder.build();
                     mSession.capture(request, captureResultListener, mHandler);
 
-                    Pair<CaptureResult, Long> partialResultNTime =
-                            captureResultListener.getPartialResultNTimeForRequest(
-                                    request, NUM_RESULTS_WAIT);
+                    Pair<CaptureResult, Long> partialResultNTime = null;
+                    if (partialsExpected) {
+                        partialResultNTime = captureResultListener.getPartialResultNTimeForRequest(
+                            request, NUM_RESULTS_WAIT);
+                        // Even if maxPartials > 1, may not see partials for some devices
+                        if (partialResultNTime == null) {
+                            partialsExpected = false;
+                            isPartialTimingValid = false;
+                        }
+                    }
                     Pair<CaptureResult, Long> captureResultNTime =
                             captureResultListener.getCaptureResultNTimeForRequest(
                                     request, NUM_RESULTS_WAIT);
@@ -229,9 +238,11 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                             CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
 
                     captureTimes[i] = imageListener.getTimeReceivedImage() - startTimeMs;
-                    getPartialTimes[i] = partialResultNTime.second - startTimeMs;
-                    if (getPartialTimes[i] < 0) {
-                        isPartialTimingValid = false;
+                    if (partialsExpected) {
+                        getPartialTimes[i] = partialResultNTime.second - startTimeMs;
+                        if (getPartialTimes[i] < 0) {
+                            isPartialTimingValid = false;
+                        }
                     }
                     getResultTimes[i] = captureResultNTime.second - startTimeMs;
 
@@ -422,7 +433,6 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
             try {
                 Pair<CaptureResult, Long> result =
                         mPartialResultQueue.poll(timeout, TimeUnit.MILLISECONDS);
-                assertNotNull("Wait for a partial result timed out in " + timeout + "ms", result);
                 return result;
             } catch (InterruptedException e) {
                 throw new UnsupportedOperationException("Unhandled interrupted exception", e);
@@ -450,13 +460,17 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
             int i = 0;
             do {
                 result = getPartialResultNTime(CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                // The result may be null if no partials are produced on this particular path, so
+                // stop trying
+                if (result == null) break;
                 if (result.first.getRequest().equals(myRequest)) {
                     return result;
                 }
             } while (i++ < numResultsWait);
 
-            throw new TimeoutRuntimeException("Unable to get the expected capture result after "
-                    + "waiting for " + numResultsWait + " results");
+            // No partials produced - this may not be an error, since a given device may not
+            // produce any partials on this testing path
+            return null;
         }
 
         public Pair<CaptureResult, Long> getCaptureResultNTimeForRequest(CaptureRequest myRequest,
