@@ -56,6 +56,7 @@ import org.hamcrest.Description;
 import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -217,41 +218,72 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     }
 
     protected void selectPrinter(String printerName) throws UiObjectNotFoundException {
-        UiObject destinationSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/destination_spinner"));
-        destinationSpinner.click();
-        UiObject printerOption = new UiObject(new UiSelector().text(printerName));
-        printerOption.click();
+        try {
+            UiObject destinationSpinner = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/destination_spinner"));
+            destinationSpinner.click();
+            UiObject printerOption = new UiObject(new UiSelector().text(printerName));
+            printerOption.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
     }
 
     protected void changeOrientation(String orientation) throws UiObjectNotFoundException {
-        UiObject orientationSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/orientation_spinner"));
-        orientationSpinner.click();
-        UiObject orientationOption = new UiObject(new UiSelector().text(orientation));
-        orientationOption.click();
+        try {
+            UiObject orientationSpinner = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/orientation_spinner"));
+            orientationSpinner.click();
+            UiObject orientationOption = new UiObject(new UiSelector().text(orientation));
+            orientationOption.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
     }
 
     protected void changeMediaSize(String mediaSize) throws UiObjectNotFoundException {
-        UiObject mediaSizeSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/paper_size_spinner"));
-        mediaSizeSpinner.click();
-        UiObject mediaSizeOption = new UiObject(new UiSelector().text(mediaSize));
-        mediaSizeOption.click();
+        try {
+            UiObject mediaSizeSpinner = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/paper_size_spinner"));
+            mediaSizeSpinner.click();
+            UiObject mediaSizeOption = new UiObject(new UiSelector().text(mediaSize));
+            mediaSizeOption.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
     }
 
     protected void changeColor(String color) throws UiObjectNotFoundException {
-        UiObject colorSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/color_spinner"));
-        colorSpinner.click();
-        UiObject colorOption = new UiObject(new UiSelector().text(color));
-        colorOption.click();
+        try {
+            UiObject colorSpinner = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/color_spinner"));
+            colorSpinner.click();
+            UiObject colorOption = new UiObject(new UiSelector().text(color));
+            colorOption.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
     }
 
     protected void clickPrintButton() throws UiObjectNotFoundException {
-        UiObject printButton = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/print_button"));
-        printButton.click();
+        try {
+            UiObject printButton = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/print_button"));
+            printButton.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
+    }
+
+    private void dumpWindowHierarchy() {
+        String name = "print-test-failure-" + System.currentTimeMillis() + ".xml";
+        File file = new File(getActivity().getFilesDir(), name);
+        getUiDevice().dumpWindowHierarchy(file.toString());
     }
 
     protected PrintDocumentActivity getActivity() {
