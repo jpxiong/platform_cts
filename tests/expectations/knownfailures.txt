@@ -61,4 +61,5 @@
     "android.hardware.camera2.cts.RobustnessTest#testMandatoryOutputCombinations"
   ],
   bug: 16899526
+}
 ]
