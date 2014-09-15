@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.telecomm;
+package com.android.cts.verifier.telecom;
 
 import android.os.SystemClock;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.PhoneAccountHandle;
+import android.telephony.DisconnectCause;
 
 import com.android.cts.verifier.R;
 
@@ -27,21 +28,22 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Tests that a call can be canceled by a ConnectionService (and that the cancelation is respected).
- * Once the ConnectionService returns a canceled connection, the test verifies that Telecomm does
- * not have any active calls. If this is the case, the test will pass.
+ * Tests that a connection manager can fail calls and they're handled appropriately. That is, when
+ * a call is failed, it will not go through. The flow here is that the ConnectionService will say
+ * that the call failed because it's busy, and then make sure that there are no active calls. If
+ * this is the case, the test will pass.
  */
-public class CancelCallTestActivity extends TelecommBaseTestActivity {
+public class FailedCallTestActivity extends TelecomBaseTestActivity {
     private static final Semaphore sLock = new Semaphore(0);
 
     @Override
     protected int getTestTitleResource() {
-        return R.string.telecomm_cancel_call_title;
+        return R.string.telecom_failed_call_title;
     }
 
     @Override
     protected int getTestInfoResource() {
-        return R.string.telecomm_cancel_call_info;
+        return R.string.telecom_failed_call_info;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class CancelCallTestActivity extends TelecommBaseTestActivity {
 
     @Override
     protected String getConnectionServiceLabel() {
-        return "Call Cancel Manager";
+        return "Call Failed Manager";
     }
 
     @Override
@@ -65,7 +67,7 @@ public class CancelCallTestActivity extends TelecommBaseTestActivity {
             SystemClock.sleep(1000);
 
             // Make sure that there aren't any ongoing calls.
-            return !getTelecommManager().isInCall();
+            return !getTelecomManager().isInCall();
         } catch (Exception e) {
             return false;
         }
@@ -77,7 +79,8 @@ public class CancelCallTestActivity extends TelecommBaseTestActivity {
                 PhoneAccountHandle connectionManagerPhoneAccount,
                 ConnectionRequest request) {
             sLock.release();
-            return Connection.createCanceledConnection();
+            return Connection.createFailedConnection(DisconnectCause.BUSY,
+                    "Test; no need to continue");
         }
     }
 }

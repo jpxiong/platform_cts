@@ -1,4 +1,4 @@
-package com.android.cts.verifier.telecomm;
+package com.android.cts.verifier.telecom;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import com.android.cts.verifier.R;
 
 import java.util.Objects;
 
-public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity {
+public abstract class TelecomBaseTestActivity extends PassFailButtons.Activity {
     protected PhoneAccountHandle mPhoneAccountHandle;
 
     private Button mOpenSettingsBtn;
@@ -28,7 +28,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
         super.onCreate(savedInstanceState);
 
         setResult(RESULT_CANCELED);
-        setContentView(R.layout.telecomm_test_activity);
+        setContentView(R.layout.telecom_test_activity);
         setPassFailButtonClickListeners();
         setInfoResources(getTestTitleResource(), getTestInfoResource(), 0);
 
@@ -45,7 +45,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
                         .setCapabilities(PhoneAccount.CAPABILITY_CONNECTION_MANAGER)
                         .build();
 
-                getTelecommManager().registerPhoneAccount(account);
+                getTelecomManager().registerPhoneAccount(account);
 
                 Intent i = new Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS);
                 startActivity(i);
@@ -65,7 +65,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
     protected void onResume() {
         super.onResume();
 
-        PhoneAccountHandle defaultConnectionManager = getTelecommManager().getConnectionManager();
+        PhoneAccountHandle defaultConnectionManager = getTelecomManager().getConnectionManager();
         boolean isDefaultConnectionManager = mPhoneAccountHandle != null &&
                 Objects.equals(mPhoneAccountHandle, defaultConnectionManager);
         mOpenSettingsBtn.setEnabled(!isDefaultConnectionManager);
@@ -106,7 +106,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
         }.start();
     }
 
-    protected TelecomManager getTelecommManager() {
+    protected TelecomManager getTelecomManager() {
         return (TelecomManager) getSystemService(TELECOM_SERVICE);
     }
 
@@ -114,7 +114,7 @@ public abstract class TelecommBaseTestActivity extends PassFailButtons.Activity 
     public void setTestResultAndFinish(boolean passed) {
         super.setTestResultAndFinish(passed);
         if (mPhoneAccountHandle != null) {
-            getTelecommManager().unregisterPhoneAccount(mPhoneAccountHandle);
+            getTelecomManager().unregisterPhoneAccount(mPhoneAccountHandle);
         }
     }
 }

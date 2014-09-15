@@ -1121,27 +1121,27 @@
     <string name="snsr_rotation_vector_set_final">Place the device back to the reference position.</string>
     <string name="snsr_rotation_vector_verification">Angular deviation [%1$4.1f %2$4.1f %3$4.1f]. Current: %4$f deg. Max tolerated: %5$f.</string>
 
-    <string name="test_category_telecomm">Telecomm</string>
-    <string name="telecomm_test_title">Telecomm Tests</string>
-    <string name="telecomm_test_summary">These tests cover aspects of Telecomm call routing.
+    <string name="test_category_telecom">Telecom</string>
+    <string name="telecom_test_title">Telecom Tests</string>
+    <string name="telecom_test_summary">These tests cover aspects of Telecom call routing.
         These tests may be run in any order, but each one will require user input before it can be run.
     </string>
-    <string name="telecomm_open_settings">Open settings</string>
-    <string name="telecomm_simulate_call">Place call</string>
-    <string name="telecomm_default_phone_number">555-263-7643</string>
-    <string name="telecomm_phone_number_hint">Phone number to call</string>
-    <string name="telecomm_cancel_call_title">Canceled Call Test</string>
-    <string name="telecomm_cancel_call_info">This tests to make sure that canceled calls are handled correctly.
+    <string name="telecom_open_settings">Open settings</string>
+    <string name="telecom_simulate_call">Place call</string>
+    <string name="telecom_default_phone_number">555-263-7643</string>
+    <string name="telecom_phone_number_hint">Phone number to call</string>
+    <string name="telecom_cancel_call_title">Canceled Call Test</string>
+    <string name="telecom_cancel_call_info">This tests to make sure that canceled calls are handled correctly.
         Press the \"Open settings\" button and make sure that \"Call Cancel Manager\" is the default Wi-Fi calling account.
         Then press the \"Place call\" button; the test will pass (or fail) automatically.
     </string>
-    <string name="telecomm_failed_call_title">Failed Call Test</string>
-    <string name="telecomm_failed_call_info">This tests to make sure that failed calls are handled correctly.
+    <string name="telecom_failed_call_title">Failed Call Test</string>
+    <string name="telecom_failed_call_info">This tests to make sure that failed calls are handled correctly.
         Press the \"Open settings\" button and make sure that \"Call Failed Manager\" is the default Wi-Fi calling account.
         Then press the \"Place call\" button; the test will pass (or fail) automatically.
     </string>
-    <string name="telecomm_basic_call_title">Basic Call Test</string>
-    <string name="telecomm_basic_call_info">This tests to make sure that basic calls are handled correctly.
+    <string name="telecom_basic_call_title">Basic Call Test</string>
+    <string name="telecom_basic_call_info">This tests to make sure that basic calls are handled correctly.
         Press the \"Open settings\" button and make sure that \"Basic Call Manager\" is the default Wi-Fi calling account.
         Then press the \"Place call\" button; the test will pass (or fail) automatically.
     </string>
