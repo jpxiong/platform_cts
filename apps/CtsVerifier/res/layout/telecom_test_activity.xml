@@ -21,15 +21,15 @@
     <Button android:id="@+id/open_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/telecomm_open_settings" />
+            android:text="@string/telecom_open_settings" />
     <EditText android:id="@+id/phone_number"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:text="@string/telecomm_default_phone_number"
-              android:hint="@string/telecomm_phone_number_hint" />
+              android:text="@string/telecom_default_phone_number"
+              android:hint="@string/telecom_phone_number_hint" />
     <Button android:id="@+id/simulate_call"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/telecomm_simulate_call" />
+            android:text="@string/telecom_simulate_call" />
     <include layout="@layout/pass_fail_buttons" />
 </LinearLayout>
