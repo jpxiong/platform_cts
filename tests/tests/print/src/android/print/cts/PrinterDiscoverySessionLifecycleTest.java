@@ -41,6 +41,7 @@ import android.printservice.PrinterDiscoverySession;
 
 import junit.framework.AssertionFailedError;
 import org.mockito.InOrder;
+import org.mockito.exceptions.verification.VerificationInOrderFailure;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -251,7 +252,7 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         priorityList.add(firstPrinterId);
         try {
             inOrder.verify(firstSessionCallbacks).onStartPrinterDiscovery(priorityList);
-        } catch (AssertionFailedError error) {
+        } catch (VerificationInOrderFailure error) {
             inOrder.verify(firstSessionCallbacks).onValidatePrinters(priorityList);
         }
 
