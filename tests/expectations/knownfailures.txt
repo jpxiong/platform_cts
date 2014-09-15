@@ -54,5 +54,11 @@
     "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers"
   ],
   bug: 17394321
-}
+},
+{
+  description: "this test deadlocks on some devices, freezing CTS runs, marking known failure until resolved",
+  names: [
+    "android.hardware.camera2.cts.RobustnessTest#testMandatoryOutputCombinations"
+  ],
+  bug: 16899526
 ]
