@@ -259,7 +259,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                  */
                 for (int j = 0; j < sTemplates.length; j++) {
                     // Skip video snapshots for LEGACY mode
-                    if (sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
+                    if (mStaticInfo.isHardwareLevelLegacy() &&
+                            sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
                         continue;
                     }
                     CaptureRequest.Builder capReq = mCamera.createCaptureRequest(sTemplates[j]);
@@ -712,6 +713,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 if (!burst) {
                     // Test: that a single capture of each template type succeeds.
                     for (int j = 0; j < sTemplates.length; j++) {
+                        // Skip video snapshots for LEGACY mode
+                        if (mStaticInfo.isHardwareLevelLegacy() &&
+                                sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
+                            continue;
+                        }
                         captureSingleShot(mCameraIds[i], sTemplates[j], repeating, abort);
                     }
                 }
@@ -797,6 +803,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         assertTrue("Invalid args to capture function", len <= templates.length);
         List<CaptureRequest> requests = new ArrayList<CaptureRequest>();
         for (int i = 0; i < len; i++) {
+            // Skip video snapshots for LEGACY mode
+            if (mStaticInfo.isHardwareLevelLegacy() &&
+                    templates[i] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
+                continue;
+            }
             CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(templates[i]);
             assertNotNull("Failed to create capture request", requestBuilder);
             requestBuilder.addTarget(mReaderSurface);
