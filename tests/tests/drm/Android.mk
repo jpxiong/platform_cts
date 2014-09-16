@@ -27,8 +27,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsDrmTestCases
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 LOCAL_JNI_SHARED_LIBRARIES := \
 	libctsdrm_jni \
 	libdrmtestplugin
