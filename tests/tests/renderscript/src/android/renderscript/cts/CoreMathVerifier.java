@@ -1340,6 +1340,13 @@ public class CoreMathVerifier {
         LgammaResult resultMax = lgamma2(in.max32());
         args.out = t.new32(result.lgamma, resultMin.lgamma, resultMax.lgamma);
         args.outY = result.gammaSign;
+        /* TODO The current implementation of bionic does not handle the -0.f case correctly.
+         * It should set the sign to -1 but sets it to 1.  We correct the verifier here
+         * until bionic is fixed.
+         */
+        if (args.inX == 0.f && 1.f / args.inX < 0.f) {
+            args.outY = -1;
+        }
     }
 
     // TODO The relaxed ulf for the various log are taken from the old tests.
