@@ -47,7 +47,7 @@
     <uses-feature android:name="android.hardware.usb.accessory" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.software.connectionservice" android:required="false" />
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -1146,6 +1146,7 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
+            <meta-data android:name="test_required_features" android:value="android.software.connectionservice"/>
         </activity>
 
         <activity android:name=".telecom.CancelCallTestActivity"
@@ -1156,7 +1157,6 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecom.TelecomTestActivity" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.telephony"/>
         </activity>
 
         <service android:name=".telecom.CancelCallTestActivity$ConnectionService"
