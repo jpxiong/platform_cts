@@ -28,16 +28,16 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.cts.SurfaceViewStubActivity.MockSurfaceView;
+import android.view.cts.SurfaceViewCtsActivity.MockSurfaceView;
 
-public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceViewStubActivity> {
+public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceViewCtsActivity> {
 
     private Context mContext;
     private Instrumentation mInstrumentation;
     private MockSurfaceView mMockSurfaceView;
 
     public SurfaceViewTest() {
-        super("com.android.cts.stub", SurfaceViewStubActivity.class);
+        super("com.android.cts.view", SurfaceViewCtsActivity.class);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceVie
         super.setUp();
         mInstrumentation = getInstrumentation();
         mContext = mInstrumentation.getContext();
-        final SurfaceViewStubActivity activity = getActivity();
+        final SurfaceViewCtsActivity activity = getActivity();
         new PollingCheck() {
             @Override
                 protected boolean check() {

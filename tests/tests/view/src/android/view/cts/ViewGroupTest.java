@@ -54,7 +54,6 @@ import android.view.animation.RotateAnimation;
 import android.view.animation.Transformation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.TextView;
-import android.widget.cts.ViewGroupStubActivity;
 
 import java.util.ArrayList;
 
@@ -723,7 +722,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     public void testGenerateLayoutParamsWithParaAttributeSet() throws Exception{
         MockViewGroup vg = new MockViewGroup(mContext);
         XmlResourceParser set = mContext.getResources().getLayout(
-                com.android.cts.stub.R.layout.abslistview_layout);
+                com.android.cts.view.R.layout.abslistview_layout);
         XmlUtils.beginDocument(set, "ViewGroup_Layout");
         LayoutParams lp = vg.generateLayoutParams(set);
         assertNotNull(lp);
@@ -862,15 +861,15 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     private void setupActivity(String action) {
 
         Intent intent = new Intent(getInstrumentation().getTargetContext(),
-                ViewGroupStubActivity.class);
+                ViewGroupCtsActivity.class);
         intent.setAction(action);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getInstrumentation().getTargetContext().startActivity(intent);
     }
 
     public void testInvalidateChild() {
-        ViewGroupStubActivity.setResult(this);
-        setupActivity(ViewGroupStubActivity.ACTION_INVALIDATE_CHILD);
+        ViewGroupCtsActivity.setResult(this);
+        setupActivity(ViewGroupCtsActivity.ACTION_INVALIDATE_CHILD);
         waitForResult();
         assertEquals(CTSResult.RESULT_OK, mResultCode);
     }

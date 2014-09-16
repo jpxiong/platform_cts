@@ -22,7 +22,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 import com.google.android.collect.Lists;
 
@@ -81,7 +81,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.cts.StubActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,14 +89,14 @@ import java.util.List;
 /**
  * Test {@link View}.
  */
-public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActivity> {
+public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivity> {
     public ViewTest() {
-        super(ViewTestStubActivity.class);
+        super(ViewTestCtsActivity.class);
     }
 
     private Resources mResources;
     private MockViewParent mMockParent;
-    private ViewTestStubActivity mActivity;
+    private ViewTestCtsActivity mActivity;
 
     /** timeout delta when wait in case the system is sluggish */
     private static final long TIMEOUT_DELTA = 10000;
@@ -2474,7 +2473,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(view.hasCalledOnWindowFocusChanged());
         assertFalse(view.hasCalledDispatchWindowFocusChanged());
 
-        StubActivity activity = launchActivity("com.android.cts.stub", StubActivity.class, null);
+        CtsActivity activity = launchActivity("com.android.cts.view", CtsActivity.class, null);
 
         // Wait until the window lost focus.
         new PollingCheck(TIMEOUT_DELTA) {

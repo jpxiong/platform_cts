@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -31,12 +31,12 @@ import android.view.View;
  * This part contains size, padding, margin, layout and drawing
  */
 public class View_LayoutPositionTest
-        extends ActivityInstrumentationTestCase2<ViewLayoutPositionTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<ViewLayoutPositionTestCtsActivity> {
 
     private Activity mActivity;
 
     public View_LayoutPositionTest() {
-        super("com.android.cts.stub", ViewLayoutPositionTestStubActivity.class);
+        super("com.android.cts.view", ViewLayoutPositionTestCtsActivity.class);
     }
 
     @Override
