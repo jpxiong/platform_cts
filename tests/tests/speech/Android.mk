@@ -29,6 +29,4 @@ LOCAL_PACKAGE_NAME := CtsSpeechTestCases
 
 LOCAL_SDK_VERSION := current
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 include $(BUILD_CTS_PACKAGE)
