@@ -19,8 +19,8 @@ package com.android.cts.verifier.telecom;
 import android.os.SystemClock;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
+import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
-import android.telephony.DisconnectCause;
 
 import com.android.cts.verifier.R;
 
@@ -79,8 +79,8 @@ public class FailedCallTestActivity extends TelecomBaseTestActivity {
                 PhoneAccountHandle connectionManagerPhoneAccount,
                 ConnectionRequest request) {
             sLock.release();
-            return Connection.createFailedConnection(DisconnectCause.BUSY,
-                    "Test; no need to continue");
+            return Connection.createFailedConnection(
+                    new DisconnectCause(DisconnectCause.BUSY, "Test; no need to continue"));
         }
     }
 }
