@@ -466,7 +466,9 @@
                         <TR>
                             <TD class="package" colspan="3">
                                 <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
-                                <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/></a>
+                                <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/>
+                                abi: <xsl:value-of select="@abi"/>
+                                </a>
                             </TD>
                         </TR>
 
