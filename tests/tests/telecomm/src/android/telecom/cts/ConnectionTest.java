@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.telecomm.cts;
+package android.telecom.cts;
 
 import android.telecom.Connection;
 import android.telephony.DisconnectCause;

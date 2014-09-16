@@ -28,7 +28,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsTelecommTestCases
+LOCAL_PACKAGE_NAME := CtsTelecomTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
