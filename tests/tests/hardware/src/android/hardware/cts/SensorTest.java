@@ -518,8 +518,11 @@ public class SensorTest extends SensorTestCase {
         assertTrue(sensor.getResolution() >= 0);
         assertNotNull(sensor.getVendor());
         assertTrue(sensor.getVersion() > 0);
-        assertTrue(sensor.getFifoMaxEventCount() >= 0);
-        assertTrue(sensor.getFifoReservedEventCount() >= 0);
+        int fifoMaxEventCount = sensor.getFifoMaxEventCount();
+        int fifoReservedEventCount = sensor.getFifoReservedEventCount();
+        assertTrue(fifoMaxEventCount >= 0);
+        assertTrue(fifoReservedEventCount >= 0);
+        assertTrue(fifoReservedEventCount <= fifoMaxEventCount);
         if (sensor.getReportingMode() == Sensor.REPORTING_MODE_ONE_SHOT) {
             assertTrue("One shot sensors should have zero FIFO Size",
                     sensor.getFifoMaxEventCount() == 0);

@@ -14,6 +14,7 @@
      limitations under the License.
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:textColor="?android:attr/textColorSecondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/snsr_log_padding_bottom"

@@ -16,14 +16,14 @@
 
 package android.hardware.cts.helpers;
 
+import junit.framework.Assert;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.util.Log;
-
-import junit.framework.Assert;
 
 import java.util.concurrent.TimeUnit;
 
@@ -207,6 +207,29 @@ public class TestSensorManager {
         try {
             registerListener(listener);
             waitForEvents(duration, timeUnit);
+        } finally {
+            unregisterListener();
+        }
+    }
+
+    /**
+     * Registers a listener, waits for a specific duration, calls flush, and waits for flush to
+     * complete.
+     */
+    public void runSensorAndFlush(
+            TestSensorEventListener listener,
+            long duration,
+            TimeUnit timeUnit) {
+        if (mTestSensorEventListener != null) {
+            Log.w(LOG_TAG, "Listener already registered, returning.");
+            return;
+        }
+
+        try {
+            registerListener(listener);
+            SensorCtsHelper.sleep(duration, timeUnit);
+            startFlush();
+            listener.waitForFlushComplete();
         } finally {
             unregisterListener();
         }
