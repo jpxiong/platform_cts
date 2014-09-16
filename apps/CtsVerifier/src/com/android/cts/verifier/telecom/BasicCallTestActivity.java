@@ -1,4 +1,4 @@
-package com.android.cts.verifier.telecomm;
+package com.android.cts.verifier.telecom;
 
 import com.android.cts.verifier.R;
 
@@ -18,17 +18,17 @@ import java.util.concurrent.TimeUnit;
  * notified of an outgoing call, it will create a Connection which wraps a RemoteConnection. Then,
  * once the RemoteConnection starts dialing, it will disconnect the call and the test will pass.
  */
-public class BasicCallTestActivity extends TelecommBaseTestActivity {
+public class BasicCallTestActivity extends TelecomBaseTestActivity {
     private static final Semaphore sLock = new Semaphore(0);
 
     @Override
     protected int getTestTitleResource() {
-        return R.string.telecomm_basic_call_title;
+        return R.string.telecom_basic_call_title;
     }
 
     @Override
     protected int getTestInfoResource() {
-        return R.string.telecomm_basic_call_info;
+        return R.string.telecom_basic_call_info;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BasicCallTestActivity extends TelecommBaseTestActivity {
             // Wait for the listeners to be fired so the call is cleaned up.
             SystemClock.sleep(1000);
 
-            return !getTelecommManager().isInCall();
+            return !getTelecomManager().isInCall();
         } catch (Exception e) {
             return false;
         }

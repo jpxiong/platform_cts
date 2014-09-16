@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.telecomm;
+package com.android.cts.verifier.telecom;
 
 import com.android.cts.verifier.ManifestTestListAdapter;
 import com.android.cts.verifier.PassFailButtons;
@@ -22,13 +22,13 @@ import com.android.cts.verifier.R;
 
 import android.os.Bundle;
 
-public class TelecommTestActivity extends PassFailButtons.TestListActivity {
+public class TelecomTestActivity extends PassFailButtons.TestListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pass_fail_list);
         setPassFailButtonClickListeners();
-        setInfoResources(R.string.telecomm_test_title, R.string.telecomm_test_summary, -1);
+        setInfoResources(R.string.telecom_test_title, R.string.telecom_test_summary, -1);
 
         setTestListAdapter(new ManifestTestListAdapter(this, getClass().getName()));
     }
