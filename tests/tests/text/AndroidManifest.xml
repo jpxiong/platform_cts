@@ -19,12 +19,64 @@
     package="com.android.cts.text">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <application>
-        <uses-library android:name="android.test.runner" />
+        <uses-library android:name="android.test.runner"
+            android:maxRecents="1"/>
+
+        <activity android:name="android.text.cts.EmojiCtsActivity"
+            android:label="AvailableIntentsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.method.cts.KeyListenerCtsActivity"
+            android:label="KeyListenerCtsActivity"/>
+
+        <activity android:name="android.text.method.cts.CtsActivity"
+            android:label="CtsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.style.cts.URLSpanCtsActivity"
+            android:label="URLSpanCtsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.style.cts.MockURLSpanTestActivity"
+            android:label="MockURLSpanTestActivity"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:configChanges="orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+                <data android:scheme="ctstest" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.method.cts.CtsActivity"
+            android:label="CtsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.text"
                      android:label="CTS tests of android.text">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
