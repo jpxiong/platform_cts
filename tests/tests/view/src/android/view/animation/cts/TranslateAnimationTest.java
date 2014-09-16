@@ -28,11 +28,11 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 public class TranslateAnimationTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     private Activity mActivity;
 
@@ -48,7 +48,7 @@ public class TranslateAnimationTest
     private static final float RELATIVE_TO_Y_DELTA = 0.4f;
 
     public TranslateAnimationTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

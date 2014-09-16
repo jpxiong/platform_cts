@@ -26,13 +26,13 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.Transformation;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 /**
  * Test {@link LinearInterpolator}.
  */
-public class LinearInterpolatorTest extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+public class LinearInterpolatorTest extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     private Activity mActivity;
     private static final float ALPHA_DELTA = 0.001f;
@@ -42,7 +42,7 @@ public class LinearInterpolatorTest extends ActivityInstrumentationTestCase2<Ani
     private static final long LINEAR_ALPHA_TIME_STEP = LINEAR_ALPHA_DURATION / 5;
 
     public LinearInterpolatorTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

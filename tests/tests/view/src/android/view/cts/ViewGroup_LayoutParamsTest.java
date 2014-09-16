@@ -28,7 +28,7 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 import com.android.internal.util.XmlUtils;
 
 

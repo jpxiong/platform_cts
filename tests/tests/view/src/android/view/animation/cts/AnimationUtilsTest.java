@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.content.Context;
@@ -30,22 +30,22 @@ import android.view.animation.Interpolator;
 import android.view.animation.LayoutAnimationController;
 
 public class AnimationUtilsTest extends
-        ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
-    private AnimationTestStubActivity mActivity;
+    private AnimationTestCtsActivity mActivity;
 
     public AnimationUtilsTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mActivity = (AnimationTestStubActivity) getActivity();
+        mActivity = (AnimationTestCtsActivity) getActivity();
     }
 
     public void testLoad() {
-        // XML file of com.android.cts.stub.R.anim.anim_alpha
+        // XML file of com.android.cts.view.R.anim.anim_alpha
         // <alpha xmlns:android="http://schemas.android.com/apk/res/android"
         //      android:interpolator="@android:anim/accelerate_interpolator"
         //      android:fromAlpha="0.0"
@@ -61,7 +61,7 @@ public class AnimationUtilsTest extends
                 android.R.anim.accelerate_interpolator);
         assertTrue(interpolator instanceof AccelerateInterpolator);
 
-        // Load LayoutAnimationController from com.android.cts.stub.R.anim.anim_gridlayout
+        // Load LayoutAnimationController from com.android.cts.view.R.anim.anim_gridlayout
         // <gridLayoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
         //      android:delay="10%"
         //      android:rowDelay="50%"

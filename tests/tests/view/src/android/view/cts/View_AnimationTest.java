@@ -24,13 +24,13 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.animation.cts.AnimationTestUtils;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 /**
  * Test {@link View}.
  */
-public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTestStubActivity> {
+public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivity> {
 
     private static final int TIME_OUT = 5000;
     private static final int DURATION = 2000;
@@ -40,7 +40,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
     private TranslateAnimation mAnimation;
 
     public View_AnimationTest() {
-        super("com.android.cts.stub", ViewTestStubActivity.class);
+        super("com.android.cts.view", ViewTestCtsActivity.class);
     }
 
     @Override

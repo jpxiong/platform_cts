@@ -33,11 +33,11 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 public class AnimationSetTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     private static final float DELTA = 0.001f;
     private static final long SHORT_CHILD_DURATION = 400;
@@ -51,7 +51,7 @@ public class AnimationSetTest
     private Activity mActivity;
 
     public AnimationSetTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

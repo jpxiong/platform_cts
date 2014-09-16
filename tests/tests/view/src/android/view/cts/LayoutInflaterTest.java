@@ -16,12 +16,11 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 import com.android.internal.util.XmlUtils;
 
 import org.xmlpull.v1.XmlPullParser;
 
-import android.app.cts.MockActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -212,7 +211,7 @@ public class LayoutInflaterTest extends AndroidTestCase {
 
     public void testInflate() {
         View view = mLayoutInflater.inflate(
-                com.android.cts.stub.R.layout.inflater_layout, null);
+                com.android.cts.view.R.layout.inflater_layout, null);
         assertNotNull(view);
         view = null;
         try {
@@ -385,7 +384,7 @@ public class LayoutInflaterTest extends AndroidTestCase {
 
     public void testInflateTags() {
         final View view = mLayoutInflater.inflate(
-                com.android.cts.stub.R.layout.inflater_layout_tags, null);
+                com.android.cts.view.R.layout.inflater_layout_tags, null);
         assertNotNull(view);
 
         checkViewTag(view, R.id.viewlayout_root, R.id.tag_viewlayout_root, R.string.tag1);

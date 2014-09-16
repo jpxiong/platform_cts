@@ -18,7 +18,6 @@ package android.view.cts;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.opengl.cts.GLSurfaceViewStubActivity;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.Display;
@@ -39,7 +38,7 @@ import javax.microedition.khronos.opengles.GL10;
  * way of measuring the actual refresh rate.
  */
 public class DisplayRefreshRateTest extends
-        ActivityInstrumentationTestCase2<GLSurfaceViewStubActivity> {
+        ActivityInstrumentationTestCase2<GLSurfaceViewCtsActivity> {
 
     // The test passes if
     //   abs(measured_fps - Display.getRefreshRate()) <= FPS_TOLERANCE.
@@ -157,21 +156,21 @@ public class DisplayRefreshRateTest extends
     private FpsResult mResult;
 
     public DisplayRefreshRateTest() {
-        super(GLSurfaceViewStubActivity.class);
+        super(GLSurfaceViewCtsActivity.class);
         mResult = new FpsResult();
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        GLSurfaceViewStubActivity.setRenderer(new Renderer(mResult));
-        GLSurfaceViewStubActivity.setRenderMode(
+        GLSurfaceViewCtsActivity.setRenderer(new Renderer(mResult));
+        GLSurfaceViewCtsActivity.setRenderMode(
                 GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
     public void testRefreshRate() throws java.lang.InterruptedException {
         boolean fpsOk = false;
-        GLSurfaceViewStubActivity activity = getActivity();
+        GLSurfaceViewCtsActivity activity = getActivity();
 
         WindowManager wm = (WindowManager)activity
                 .getView()

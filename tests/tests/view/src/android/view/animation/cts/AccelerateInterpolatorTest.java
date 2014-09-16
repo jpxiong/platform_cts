@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -33,10 +33,10 @@ import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
 
 public class AccelerateInterpolatorTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     public AccelerateInterpolatorTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     private Activity mActivity;

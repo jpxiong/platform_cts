@@ -25,7 +25,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 
 import android.widget.LinearLayout;
 import com.android.internal.util.XmlUtils;
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {

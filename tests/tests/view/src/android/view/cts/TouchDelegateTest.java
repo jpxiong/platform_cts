@@ -19,7 +19,6 @@ package android.view.cts;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.app.cts.MockActivity;
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -45,7 +44,7 @@ public class TouchDelegateTest extends ActivityInstrumentationTestCase2<MockActi
     private Exception mException;
 
     public TouchDelegateTest() {
-        super("com.android.cts.stub", MockActivity.class);
+        super("com.android.cts.view", MockActivity.class);
     }
 
     @Override
