@@ -125,8 +125,6 @@ public class AudioManagerTest extends AndroidTestCase {
     public void testAccessMode() throws Exception {
         mAudioManager.setMode(MODE_RINGTONE);
         assertEquals(MODE_RINGTONE, mAudioManager.getMode());
-        mAudioManager.setMode(MODE_IN_CALL);
-        assertEquals(MODE_IN_CALL, mAudioManager.getMode());
         mAudioManager.setMode(MODE_IN_COMMUNICATION);
         assertEquals(MODE_IN_COMMUNICATION, mAudioManager.getMode());
         mAudioManager.setMode(MODE_NORMAL);
