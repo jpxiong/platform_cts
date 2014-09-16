@@ -95,7 +95,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.util.EncodingUtils;
 import org.apache.http.util.EntityUtils;
 
-public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
     public static final long TEST_TIMEOUT = 20000L;
     private static final int INITIAL_PROGRESS = 100;
     private static final String X_REQUESTED_WITH = "X-Requested-With";
@@ -122,13 +122,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     private WebIconDatabase mIconDb;
 
     public WebViewTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final WebViewStubActivity activity = getActivity();
+        final WebViewCtsActivity activity = getActivity();
         mWebView = activity.getWebView();
         if (mWebView != null) {
             new PollingCheck() {
@@ -2275,7 +2275,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 .setResolution(new PrintAttributes.Resolution("foo", "bar", 300, 300))
                 .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
                 .build();
-        final WebViewStubActivity activity = getActivity();
+        final WebViewCtsActivity activity = getActivity();
         final File file = activity.getFileStreamPath(PRINTER_TEST_FILE);
         final ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(file,
                 ParcelFileDescriptor.parseMode("w"));

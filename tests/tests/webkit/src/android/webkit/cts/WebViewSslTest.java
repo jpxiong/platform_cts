@@ -46,7 +46,7 @@ import java.util.concurrent.Callable;
 
 import javax.net.ssl.X509TrustManager;
 
-public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
     private static final String LOGTAG = "WebViewSslTest";
 
     /**
@@ -428,13 +428,13 @@ public class WebViewSslTest extends ActivityInstrumentationTestCase2<WebViewStub
     private WebViewOnUiThread mOnUiThread;
 
     public WebViewSslTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final WebViewStubActivity activity = getActivity();
+        final WebViewCtsActivity activity = getActivity();
         mWebView = activity.getWebView();
         if (mWebView != null) {
             new PollingCheck() {

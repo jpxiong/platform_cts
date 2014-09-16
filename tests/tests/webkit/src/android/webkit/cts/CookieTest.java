@@ -23,13 +23,13 @@ import android.webkit.CookieSyncManager;
 /**
  * Original framework tests for CookieManager
  */
-public class CookieTest extends ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
+public class CookieTest extends ActivityInstrumentationTestCase2<CookieSyncManagerCtsActivity> {
 
     private CookieManager mCookieManager;
     private static final long WAIT_TIME = 50;
 
     public CookieTest() {
-        super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
+        super("com.android.cts.webkit", CookieSyncManagerCtsActivity.class);
     }
 
     @Override

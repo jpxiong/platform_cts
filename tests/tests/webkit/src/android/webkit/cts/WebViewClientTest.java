@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
     private static final long TEST_TIMEOUT = 5000;
     private static final String TEST_URL = "http://foo.com/";
 
@@ -46,13 +46,13 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     private CtsTestServer mWebServer;
 
     public WebViewClientTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final WebViewStubActivity activity = getActivity();
+        final WebViewCtsActivity activity = getActivity();
         WebView webview = activity.getWebView();
         if (webview != null) {
             new PollingCheck(TEST_TIMEOUT) {
