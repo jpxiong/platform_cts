@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 import com.android.internal.view.menu.MenuBuilder;
 
 
@@ -30,18 +30,17 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.SubMenu;
-import android.widget.cts.WidgetTestUtils;
 
 /**
  * Test {@link MenuInflater}.
  */
-public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInflaterStubActivity> {
+public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInflaterCtsActivity> {
     private MenuInflater mMenuInflater;
 
     private Activity mActivity;
 
     public MenuInflaterTest() {
-        super("com.android.cts.stub", MenuInflaterStubActivity.class);
+        super("com.android.cts.view", MenuInflaterCtsActivity.class);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
         Menu menu = new MenuBuilder(mActivity);
         assertEquals(0, menu.size());
 
-        mMenuInflater.inflate(com.android.cts.stub.R.menu.browser, menu);
+        mMenuInflater.inflate(com.android.cts.view.R.menu.browser, menu);
         assertNotNull(menu);
         assertEquals(1, menu.size());
 
@@ -70,7 +69,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
         }
 
         try {
-            mMenuInflater.inflate(com.android.cts.stub.R.menu.browser, null);
+            mMenuInflater.inflate(com.android.cts.view.R.menu.browser, null);
             fail("should throw NullPointerException");
         } catch (NullPointerException e) {
         }
@@ -94,7 +93,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
 
         // the titles and icons
         menu = new MenuBuilder(mActivity);
-        mMenuInflater.inflate(com.android.cts.stub.R.menu.title_icon, menu);
+        mMenuInflater.inflate(com.android.cts.view.R.menu.title_icon, menu);
 
         assertEquals("Start", menu.findItem(R.id.start).getTitle());
         assertIconUsingDrawableRes((BitmapDrawable) menu.findItem(R.id.start).getIcon(),
@@ -110,7 +109,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
 
         // the orders and categories
         menu = new MenuBuilder(mActivity);
-        mMenuInflater.inflate(com.android.cts.stub.R.menu.category_order, menu);
+        mMenuInflater.inflate(com.android.cts.view.R.menu.category_order, menu);
         // default category
         assertEquals(R.id.most_used_items, menu.findItem(R.id.first_most_item).getGroupId());
         assertEquals(1, menu.findItem(R.id.first_most_item).getOrder());
@@ -134,7 +133,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
 
         // the checkables
         menu = new MenuBuilder(mActivity);
-        mMenuInflater.inflate(com.android.cts.stub.R.menu.checkable, menu);
+        mMenuInflater.inflate(com.android.cts.view.R.menu.checkable, menu);
         // noncheckables
         assertEquals(R.id.noncheckable_group,
                 menu.findItem(R.id.noncheckable_item_1).getGroupId());

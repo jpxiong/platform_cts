@@ -17,18 +17,16 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 # don't include this package in any target
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := tests
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsViewTestCases
-
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
 include $(BUILD_CTS_PACKAGE)

@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.content.Context;
@@ -35,9 +35,9 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 
 public class GridLayoutAnimationControllerTest
-    extends ActivityInstrumentationTestCase2<GridLayoutAnimStubActivity> {
+    extends ActivityInstrumentationTestCase2<GridLayoutAnimCtsActivity> {
 
-    private GridLayoutAnimStubActivity mActivity;
+    private GridLayoutAnimCtsActivity mActivity;
     private Animation mDefaultAnimation;
     private GridLayoutAnimationController mController;
     /** The GridView will be 3*3 */
@@ -58,7 +58,7 @@ public class GridLayoutAnimationControllerTest
     private static final int INDEX_OF_CHILD9 = 8;
 
     public GridLayoutAnimationControllerTest() {
-        super("com.android.cts.stub", GridLayoutAnimStubActivity.class);
+        super("com.android.cts.view", GridLayoutAnimCtsActivity.class);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 import android.app.Instrumentation;
 import android.app.Presentation;
@@ -62,12 +62,12 @@ import android.widget.TextView;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActivity> {
+public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivity> {
     static final String TAG = "WindowTest";
     private Window mWindow;
     private Context mContext;
     private Instrumentation mInstrumentation;
-    private WindowStubActivity mActivity;
+    private WindowCtsActivity mActivity;
 
     private static final int VIEWGROUP_LAYOUT_HEIGHT = 100;
     private static final int VIEWGROUP_LAYOUT_WIDTH = 200;
@@ -77,7 +77,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     private VirtualDisplay mVirtualDisplay;
 
     public WindowTest() {
-        super("com.android.cts.stub", WindowStubActivity.class);
+        super("com.android.cts.view", WindowCtsActivity.class);
     }
 
     @Override

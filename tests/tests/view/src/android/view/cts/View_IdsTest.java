@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -27,9 +27,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class View_IdsTest extends ActivityInstrumentationTestCase2<UsingViewsStubActivity> {
+public class View_IdsTest extends ActivityInstrumentationTestCase2<UsingViewsCtsActivity> {
     public View_IdsTest() {
-        super("com.android.cts.stub", UsingViewsStubActivity.class);
+        super("com.android.cts.view", UsingViewsCtsActivity.class);
     }
 
     @UiThreadTest
