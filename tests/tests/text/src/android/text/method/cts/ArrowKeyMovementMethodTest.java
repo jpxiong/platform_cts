@@ -42,7 +42,7 @@ import android.widget.TextView.BufferType;
  *
  * @see android.widget.cts.TextViewTest
  */
-public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private static final String THREE_LINES_TEXT = "first line\nsecond line\nlast line";
     private static final int END_OF_ALL_TEXT = THREE_LINES_TEXT.length();
     private static final int END_OF_1ST_LINE = THREE_LINES_TEXT.indexOf('\n');
@@ -56,7 +56,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
     private MyMetaKeyKeyListener mMetaListener;
 
     public ArrowKeyMovementMethodTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override

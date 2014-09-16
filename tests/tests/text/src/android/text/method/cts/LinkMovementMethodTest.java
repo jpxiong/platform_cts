@@ -42,7 +42,7 @@ import android.widget.TextView.BufferType;
  * @see android.widget.cts.TextViewTest
  */
 public class LinkMovementMethodTest extends
-        ActivityInstrumentationTestCase2<StubActivity> {
+        ActivityInstrumentationTestCase2<CtsActivity> {
     private static final String CONTENT = "clickable\nunclickable\nclickable";
 
     private LinkMovementMethod mMethod;
@@ -56,7 +56,7 @@ public class LinkMovementMethodTest extends
     private MockClickableSpan mClickable1;
 
     public LinkMovementMethodTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override

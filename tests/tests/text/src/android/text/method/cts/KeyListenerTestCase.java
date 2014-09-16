@@ -16,12 +16,12 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.text.R;
 
 import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.format.DateUtils;
-import android.text.method.cts.KeyListenerStubActivity;
+import android.text.method.cts.KeyListenerCtsActivity;
 import android.text.method.KeyListener;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -47,13 +47,13 @@ import android.widget.TextView;
  * @see TextKeyKeyListenerTest
  */
 public abstract class KeyListenerTestCase extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    protected KeyListenerStubActivity mActivity;
+        ActivityInstrumentationTestCase2<KeyListenerCtsActivity> {
+    protected KeyListenerCtsActivity mActivity;
     protected Instrumentation mInstrumentation;
     protected TextView mTextView;
 
     public KeyListenerTestCase() {
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
+        super("com.android.cts.stub", KeyListenerCtsActivity.class);
     }
 
     @Override
