@@ -16,11 +16,10 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.app.cts.MockActivity;
 import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;

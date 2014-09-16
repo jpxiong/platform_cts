@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 import dalvik.annotation.KnownFailure;
 
@@ -37,12 +37,12 @@ import android.widget.LinearLayout;
 /**
  * Test {@link ViewStub}.
  */
-public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubActivity> {
+public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubCtsActivity> {
     private Context mContext;
     private Activity mActivity;
 
     public ViewStubTest() {
-        super("com.android.cts.stub", ViewStubStubActivity.class);
+        super("com.android.cts.view", ViewStubCtsActivity.class);
     }
 
     @Override

@@ -23,14 +23,14 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 
 public class GestureDetectorTest extends
-        ActivityInstrumentationTestCase2<GestureDetectorStubActivity> {
+        ActivityInstrumentationTestCase2<GestureDetectorCtsActivity> {
 
     private GestureDetector mGestureDetector;
-    private GestureDetectorStubActivity mActivity;
+    private GestureDetectorCtsActivity mActivity;
     private Context mContext;
 
     public GestureDetectorTest() {
-        super("com.android.cts.stub", GestureDetectorStubActivity.class);
+        super("com.android.cts.view", GestureDetectorCtsActivity.class);
     }
 
     @Override

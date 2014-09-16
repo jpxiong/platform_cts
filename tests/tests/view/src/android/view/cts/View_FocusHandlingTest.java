@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -26,9 +26,9 @@ import android.test.UiThreadTest;
 import android.view.View;
 
 public class View_FocusHandlingTest
-        extends ActivityInstrumentationTestCase2<FocusHandlingStubActivity> {
+        extends ActivityInstrumentationTestCase2<FocusHandlingCtsActivity> {
     public View_FocusHandlingTest() {
-        super("com.android.cts.stub", FocusHandlingStubActivity.class);
+        super("com.android.cts.view", FocusHandlingCtsActivity.class);
     }
 
     @UiThreadTest

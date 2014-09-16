@@ -16,7 +16,7 @@
 
 package android.view.inputmethod.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Instrumentation;
@@ -39,16 +39,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class BaseInputConnectionTest extends
-        ActivityInstrumentationTestCase2<InputMethodStubActivity> {
+        ActivityInstrumentationTestCase2<InputMethodCtsActivity> {
 
-    private InputMethodStubActivity mActivity;
+    private InputMethodCtsActivity mActivity;
     private Window mWindow;
     private EditText mView;
     private BaseInputConnection mConnection;
     private Instrumentation mInstrumentation;
 
     public BaseInputConnectionTest() {
-        super("com.android.cts.stub", InputMethodStubActivity.class);
+        super("com.android.cts.view", InputMethodCtsActivity.class);
     }
 
     @Override

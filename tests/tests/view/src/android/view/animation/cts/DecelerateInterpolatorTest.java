@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.Activity;
@@ -36,7 +36,7 @@ import android.view.animation.Transformation;
  * Test {@link DecelerateInterpolator}.
  */
 public class DecelerateInterpolatorTest
-        extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
+        extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
     private Activity mActivity;
     private static final float ALPHA_DELTA = 0.001f;
@@ -45,7 +45,7 @@ public class DecelerateInterpolatorTest
     private static final long DECELERATE_ALPHA_DURATION = 2000;
 
     public DecelerateInterpolatorTest() {
-        super("com.android.cts.stub", AnimationTestStubActivity.class);
+        super("com.android.cts.view", AnimationTestCtsActivity.class);
     }
 
     @Override

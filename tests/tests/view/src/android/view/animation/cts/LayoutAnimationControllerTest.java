@@ -16,7 +16,7 @@
 
 package android.view.animation.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.view.R;
 
 
 import android.app.ListActivity;
@@ -40,7 +40,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 public class LayoutAnimationControllerTest
-        extends ActivityInstrumentationTestCase2<LayoutAnimStubActivity> {
+        extends ActivityInstrumentationTestCase2<LayoutAnimCtsActivity> {
 
     private ListActivity mActivity;
     private Animation mDefaultAnimation;
@@ -58,7 +58,7 @@ public class LayoutAnimationControllerTest
     private static final long DEFAULT_MAX_DURATION = 2000;
 
     public LayoutAnimationControllerTest() {
-        super("com.android.cts.stub", LayoutAnimStubActivity.class);
+        super("com.android.cts.view", LayoutAnimCtsActivity.class);
     }
 
     @Override
