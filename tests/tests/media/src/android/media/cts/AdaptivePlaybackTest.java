@@ -69,7 +69,8 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 mContext,
                 "video/3gpp",
                 "OMX.google.h263.decoder",
-                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz);
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+                R.raw.video_352x288_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz);
     }
 
     public Iterable<Codec> Mpeg4(CodecFactory factory) {
@@ -245,6 +246,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public void testVP8_adaptiveDrc()  { ex(VP8(),  adaptiveDrc); }
     public void testVP9_adaptiveDrc()  { ex(VP9(),  adaptiveDrc); }
     public void testMpeg4_adaptiveDrc() { ex(Mpeg4(), adaptiveDrc); }
+    public void testH263_adaptiveDrc() { ex(H263(), adaptiveDrc); }
 
     public void testH264_adaptiveDrcEarlyEos() { ex(H264(), new AdaptiveDrcEarlyEosTest()); }
     public void testHEVC_adaptiveDrcEarlyEos() { ex(HEVC(), new AdaptiveDrcEarlyEosTest()); }
