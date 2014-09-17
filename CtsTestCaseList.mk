@@ -13,21 +13,21 @@
 # limitations under the License.
 
 cts_security_apps_list := \
-	CtsAppAccessData \
-	CtsAppWithData \
-	CtsExternalStorageApp \
-	CtsInstrumentationAppDiffCert \
-	CtsPermissionDeclareApp \
-	CtsPermissionDeclareAppCompat \
-	CtsReadExternalStorageApp \
-	CtsSharedUidInstall \
-	CtsSharedUidInstallDiffCert \
-	CtsSimpleAppInstall \
-	CtsSimpleAppInstallDiffCert \
-	CtsTargetInstrumentationApp \
-	CtsUsePermissionDiffCert \
-	CtsWriteExternalStorageApp \
-	CtsMultiUserStorageApp
+    CtsAppAccessData \
+    CtsAppWithData \
+    CtsExternalStorageApp \
+    CtsInstrumentationAppDiffCert \
+    CtsPermissionDeclareApp \
+    CtsPermissionDeclareAppCompat \
+    CtsReadExternalStorageApp \
+    CtsSharedUidInstall \
+    CtsSharedUidInstallDiffCert \
+    CtsSimpleAppInstall \
+    CtsSimpleAppInstallDiffCert \
+    CtsTargetInstrumentationApp \
+    CtsUsePermissionDiffCert \
+    CtsWriteExternalStorageApp \
+    CtsMultiUserStorageApp
 
 cts_support_packages := \
     CtsAccelerationTestStubs \
@@ -49,13 +49,14 @@ cts_support_packages := \
     $(cts_security_apps_list)
 
 cts_external_packages := \
-	com.replica.replicaisland
+    com.replica.replicaisland \
+    com.drawelements.deqp
 
 # Any APKs that need to be copied to the CTS distribution's testcases
 # directory but do not require an associated test package XML.
 CTS_TEST_CASE_LIST := \
-	$(cts_support_packages) \
-	$(cts_external_packages)
+    $(cts_support_packages) \
+    $(cts_external_packages)
 
 # Test packages that require an associated test package XML.
 cts_test_packages := \
@@ -128,8 +129,8 @@ cts_test_packages := \
 
 # All APKs that need to be scanned by the coverage utilities.
 CTS_COVERAGE_TEST_CASE_LIST := \
-	$(cts_support_packages) \
-	$(cts_test_packages)
+    $(cts_support_packages) \
+    $(cts_test_packages)
 
 # Host side only tests
 cts_host_libraries := \
@@ -144,8 +145,8 @@ cts_host_libraries := \
 
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \
-	NativeMediaTest_SL \
-	NativeMediaTest_XA \
+    NativeMediaTest_SL \
+    NativeMediaTest_XA \
 
 ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x86_64))
 cts_native_exes += bionic-unit-tests-cts
@@ -180,7 +181,9 @@ CTS_TEST_XMLS := $(call cts-get-test-xmls,$(cts_host_libraries)) \
     $(call cts-get-test-xmls,$(cts_test_packages)) \
     $(call cts-get-test-xmls,$(cts_native_exes)) \
     $(call cts-get-test-xmls,$(cts_target_junit_tests)) \
-    $(call cts-get-test-xmls,$(cts_ui_tests))
+    $(call cts-get-test-xmls,$(cts_ui_tests)) \
+    external/deqp/android/cts/com.drawelements.deqp.gles3.xml \
+    external/deqp/android/cts/com.drawelements.deqp.gles31.xml
 
 # The following files will be placed in the tools directory of the CTS distribution
 CTS_TOOLS_LIST :=
