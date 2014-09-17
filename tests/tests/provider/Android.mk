@@ -23,12 +23,10 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner telephony-common
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsProviderTestCases
-
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
 include $(BUILD_CTS_PACKAGE)

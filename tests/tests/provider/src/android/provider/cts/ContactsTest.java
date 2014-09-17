@@ -219,12 +219,12 @@ public class ContactsTest extends InstrumentationTestCase {
         try {
             Context context = getInstrumentation().getTargetContext();
             InputStream inputStream = context.getResources().openRawResource(
-                    com.android.cts.stub.R.drawable.testimage);
+                    com.android.cts.provider.R.drawable.testimage);
             int size = inputStream.available();
             byte[] data =  new byte[size];
             inputStream.read(data);
             BitmapDrawable sourceDrawable = (BitmapDrawable) context.getResources().getDrawable(
-                    com.android.cts.stub.R.drawable.testimage);
+                    com.android.cts.provider.R.drawable.testimage);
             // Test: insert
             ContentValues value = new ContentValues();
             value.put(Photos.PERSON_ID, 1);

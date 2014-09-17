@@ -16,10 +16,9 @@
 
 package android.provider.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.provider.R;
 
 import android.content.Context;
-import android.os.cts.FileUtils;
 
 import java.io.InputStream;
 
