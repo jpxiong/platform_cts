@@ -24,7 +24,7 @@ import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
 import org.apache.http.HttpStatus;
 
-public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
 
     private static final long TIMEOUT = 10000;
 
@@ -37,7 +37,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     private WebViewOnUiThread mOnUiThread;
 
     public HttpAuthHandlerTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override

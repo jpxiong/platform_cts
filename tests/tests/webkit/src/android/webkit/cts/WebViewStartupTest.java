@@ -30,15 +30,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebViewStartupTest
-        extends ActivityInstrumentationTestCase2<WebViewStartupStubActivity> {
+        extends ActivityInstrumentationTestCase2<WebViewStartupCtsActivity> {
 
     private static final int TEST_TIMEOUT = 5000;
     private static final String TAG = "WebViewStartupTest";
 
-    private WebViewStartupStubActivity mActivity;
+    private WebViewStartupCtsActivity mActivity;
 
     public WebViewStartupTest() {
-        super("com.android.cts.stub", WebViewStartupStubActivity.class);
+        super("com.android.cts.webkit", WebViewStartupCtsActivity.class);
     }
 
     @Override

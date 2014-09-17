@@ -25,7 +25,7 @@ import android.webkit.WebHistoryItem;
 import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 
-public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
     private final static long TEST_TIMEOUT = 10000;
     private CtsTestServer mWebServer;
     private WebViewOnUiThread mOnUiThread;
@@ -47,7 +47,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     };
 
     public WebHistoryItemTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override
