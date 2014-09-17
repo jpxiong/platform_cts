@@ -91,6 +91,7 @@ cts_test_packages := \
     CtsJniTestCases \
     CtsKeystoreTestCases \
     CtsLocationTestCases \
+    CtsLocation2TestCases \
     CtsMediaStressTestCases \
     CtsMediaTestCases \
     CtsNativeOpenGLTestCases \
