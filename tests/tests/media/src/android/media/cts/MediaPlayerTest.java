@@ -237,6 +237,98 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    static class OutputListener {
+        int mSession;
+        AudioEffect mVc;
+        Visualizer mVis;
+        byte [] mVisData;
+        boolean mSoundDetected;
+        OutputListener(int session) {
+            mSession = session;
+            // creating a volume controller on output mix ensures that ro.audio.silent mutes
+            // audio after the effects and not before
+            mVc = new AudioEffect(
+                    AudioEffect.EFFECT_TYPE_NULL,
+                    UUID.fromString("119341a0-8469-11df-81f9-0002a5d5c51b"),
+                    0,
+                    session);
+            mVc.setEnabled(true);
+            mVis = new Visualizer(session);
+            int size = 256;
+            int[] range = Visualizer.getCaptureSizeRange();
+            if (size < range[0]) {
+                size = range[0];
+            }
+            if (size > range[1]) {
+                size = range[1];
+            }
+            assertTrue(mVis.setCaptureSize(size) == Visualizer.SUCCESS);
+
+            mVis.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
+                @Override
+                public void onWaveFormDataCapture(Visualizer visualizer,
+                        byte[] waveform, int samplingRate) {
+                    if (!mSoundDetected) {
+                        for (int i = 0; i < waveform.length; i++) {
+                            // 8 bit unsigned PCM, zero level is at 128, which is -128 when
+                            // seen as a signed byte
+                            if (waveform[i] != -128) {
+                                mSoundDetected = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
+                }
+            }, 10000 /* milliHertz */, true /* PCM */, false /* FFT */);
+            assertTrue(mVis.setEnabled(true) == Visualizer.SUCCESS);
+        }
+
+        void reset() {
+            mSoundDetected = false;
+        }
+
+        boolean heardSound() {
+            return mSoundDetected;
+        }
+
+        void release() {
+            mVis.release();
+            mVc.release();
+        }
+    }
+
+    public void testPlayAudioTwice() throws Exception {
+        final int resid = R.raw.camera_click;
+
+        MediaPlayer mp = MediaPlayer.create(mContext, resid);
+        try {
+            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+
+            OutputListener listener = new OutputListener(mp.getAudioSessionId());
+
+            Thread.sleep(SLEEP_TIME);
+            assertFalse("noise heard before test started", listener.heardSound());
+
+            mp.start();
+            Thread.sleep(SLEEP_TIME);
+            assertFalse("player was still playing after " + SLEEP_TIME + " ms", mp.isPlaying());
+            assertTrue("nothing heard while test ran", listener.heardSound());
+            listener.reset();
+            mp.seekTo(0);
+            mp.start();
+            Thread.sleep(SLEEP_TIME);
+            assertTrue("nothing heard when sound was replayed", listener.heardSound());
+            listener.release();
+        } finally {
+            mp.release();
+        }
+    }
+
     public void testPlayVideo() throws Exception {
         playVideoTest(R.raw.testvideo, 352, 288);
     }
