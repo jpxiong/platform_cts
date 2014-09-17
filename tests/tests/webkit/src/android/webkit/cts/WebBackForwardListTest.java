@@ -23,14 +23,14 @@ import android.webkit.WebHistoryItem;
 import android.webkit.WebView;
 
 
-public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
 
     private static final int TEST_TIMEOUT = 10000;
 
     private WebViewOnUiThread mOnUiThread;
 
     public WebBackForwardListTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override

@@ -32,7 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CookieManagerTest extends
-        ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
+        ActivityInstrumentationTestCase2<CookieSyncManagerCtsActivity> {
 
     private static final int TEST_TIMEOUT = 5000;
 
@@ -41,7 +41,7 @@ public class CookieManagerTest extends
     private WebViewOnUiThread mOnUiThread;
 
     public CookieManagerTest() {
-        super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
+        super("com.android.cts.webkit", CookieSyncManagerCtsActivity.class);
     }
 
     @Override
