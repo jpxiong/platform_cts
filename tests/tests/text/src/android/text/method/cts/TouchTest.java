@@ -29,7 +29,7 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class TouchTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private Activity mActivity;
     private static final String LONG_TEXT = "Scrolls the specified widget to the specified " +
             "coordinates, except constrains the X scrolling position to the horizontal regions " +
@@ -43,7 +43,7 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private boolean mReturnFromTouchEvent;
 
     public TouchTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override

@@ -25,15 +25,13 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
-import android.webkit.cts.NullWebViewUtils;
-import android.webkit.cts.WebViewOnUiThread;
 import android.widget.TextView;
 import android.widget.EditText;
 
-public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivity> {
+public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiCtsActivity> {
 
     public EmojiTest() {
-        super("com.android.cts.stub", EmojiStubActivity.class);
+        super("com.android.cts.stub", EmojiCtsActivity.class);
     }
 
     protected void setUp() throws Exception {
@@ -94,7 +92,7 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivit
 
             // Trigger activity bringup so we can determine if a WebView is available on this
             // device.
-            EmojiStubActivity activity = getActivity();
+            EmojiCtsActivity activity = getActivity();
             if (NullWebViewUtils.isWebViewAvailable()) {
                 CaptureWebView cwebview = new CaptureWebView(getInstrumentation().getContext());
                 mBitmapA = cwebview.capture(Character.toChars(comparedCodePoints[i][0]));

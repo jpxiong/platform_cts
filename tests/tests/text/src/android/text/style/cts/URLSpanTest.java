@@ -16,7 +16,7 @@
 
 package android.text.style.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.text.R;
 
 
 import android.app.Activity;
@@ -27,13 +27,13 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.text.style.URLSpan;
 import android.widget.TextView;
 
-public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubActivity> {
+public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanCtsActivity> {
     // The scheme of TEST_URL must be "ctstest" to launch MockURLSpanTestActivity
     private static final String TEST_URL = "ctstest://urlSpan/test";
     private Activity mActivity;
 
     public URLSpanTest() {
-        super("com.android.cts.stub", URLSpanStubActivity.class);
+        super("com.android.cts.stub", URLSpanCtsActivity.class);
     }
 
     @Override

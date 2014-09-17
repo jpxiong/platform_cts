@@ -27,7 +27,7 @@ import android.widget.EditText;
  * Test {@link ReplacementTransformationMethod}.
  */
 public class ReplacementTransformationMethodTest extends
-        ActivityInstrumentationTestCase2<StubActivity> {
+        ActivityInstrumentationTestCase2<CtsActivity> {
     private final char[] ORIGINAL = new char[] { '0', '1' };
     private final char[] ORIGINAL_WITH_MORE_CHARS = new char[] { '0', '1', '2' };
     private final char[] ORIGINAL_WITH_SAME_CHARS = new char[] { '0', '0' };
@@ -37,7 +37,7 @@ public class ReplacementTransformationMethodTest extends
     private EditText mEditText;
 
     public ReplacementTransformationMethodTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.stub", CtsActivity.class);
     }
 
     @Override
