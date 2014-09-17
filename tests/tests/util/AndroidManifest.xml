@@ -19,12 +19,13 @@
     package="com.android.cts.util">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.util"
                      android:label="CTS tests of android.util">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
