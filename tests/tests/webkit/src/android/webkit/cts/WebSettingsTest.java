@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 /**
  * Tests for {@link android.webkit.WebSettings}
  */
-public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
 
     private static final int WEBVIEW_TIMEOUT = 5000;
     private static final String LOG_TAG = "WebSettingsTest";
@@ -63,7 +63,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     private Context mContext;
 
     public WebSettingsTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @Override

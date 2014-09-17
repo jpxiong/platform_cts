@@ -52,7 +52,7 @@ import java.util.TreeSet;
 
 import junit.framework.Assert;
 
-public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
 
     // TODO Write additional tests to cover:
     // - test that the errors are correct
@@ -108,7 +108,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     private List<String> mProviders;
 
     public GeolocationTest() throws Exception {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     // Both this test and WebViewOnUiThread need to override some of the methods on WebViewClient,

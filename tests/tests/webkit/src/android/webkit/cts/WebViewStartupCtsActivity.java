@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-public class WebViewStartupStubActivity extends Activity {
+public class WebViewStartupCtsActivity extends Activity {
     private WebView mWebView;
 
     @Override
