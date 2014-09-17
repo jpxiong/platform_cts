@@ -27,8 +27,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsLocation2TestCases
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 # uncomment when Location.EXTRA_NO_GPS_LOCATION is removed
 #LOCAL_SDK_VERSION := curren
 
