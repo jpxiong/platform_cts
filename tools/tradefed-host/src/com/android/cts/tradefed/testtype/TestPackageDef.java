@@ -235,7 +235,7 @@ class TestPackageDef implements ITestPackageDef {
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (DEQP_TEST.equals(mTestType)) {
-            return new DeqpTest(mUri, mTests);
+            return new DeqpTest(mUri, mName, mTests);
         } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
         } else if (WRAPPED_NATIVE_TEST.equals(mTestType)) {

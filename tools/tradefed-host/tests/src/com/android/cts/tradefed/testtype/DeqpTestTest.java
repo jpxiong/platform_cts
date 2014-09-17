@@ -39,7 +39,7 @@ public class DeqpTestTest extends TestCase {
     private static final String CASE_LIST_FILE_NAME = "/sdcard/dEQP-TestCaseList.txt";
     private static final String LOG_FILE_NAME = "/sdcard/TestLog.qpa";
     private static final String INSTRUMENTATION_NAME =
-                "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
+            "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
 
     /**
      * {@inheritDoc}
@@ -47,6 +47,124 @@ public class DeqpTestTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+    }
+
+    /**
+     * Test version of OpenGL ES.
+     */
+    private void testGlesVersion(int requiredMajorVersion, int requiredMinorVersion, int majorVersion, int minorVersion) throws Exception {
+        final TestIdentifier testId = new TestIdentifier("dEQP-GLES"
+                + Integer.toString(requiredMajorVersion) + Integer.toString(requiredMinorVersion)
+                + ".info", "version");
+
+        final String testPath = "dEQP-GLES"
+                + Integer.toString(requiredMajorVersion) + Integer.toString(requiredMinorVersion)
+                +".info.version";
+
+        final String testTrie = "{dEQP-GLES"
+                + Integer.toString(requiredMajorVersion) + Integer.toString(requiredMinorVersion)
+                + "{info{version}}}";
+
+        final String resultCode = "Pass";
+
+        /* MultiLineReceiver expects "\r\n" line ending. */
+        final String output = "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=" + testPath + "\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Code=" + resultCode + "\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Details=Detail" + resultCode + "\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=TestCaseResult\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+
+        tests.add(testId);
+
+        DeqpTest deqpTest = new DeqpTest(URI,
+                "dEQP-GLES" + Integer.toString(requiredMajorVersion)
+                + (requiredMinorVersion > 0 ? Integer.toString(requiredMinorVersion) : ""),
+                tests);
+
+        int version = (majorVersion << 16) | minorVersion;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+            .andReturn(Integer.toString(version)).atLeastOnce();
+
+        if (majorVersion > requiredMajorVersion
+                || (majorVersion == requiredMajorVersion && minorVersion >= requiredMinorVersion)) {
+
+            EasyMock.expect(mockDevice.executeShellCommand(
+                    EasyMock.eq("rm " + CASE_LIST_FILE_NAME))).andReturn("").once();
+
+            EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
+                    .andReturn("").once();
+
+            EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME))
+                    .andReturn(true).once();
+
+            String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
+                    + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
+                    + "--deqp-gl-config-name=rgba8888d24s8\" "
+                    + INSTRUMENTATION_NAME;
+
+            mockDevice.executeShellCommand(EasyMock.eq(command),
+                    EasyMock.<IShellOutputReceiver>notNull());
+
+            EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+                @Override
+                public Object answer() {
+                    IShellOutputReceiver receiver
+                            = (IShellOutputReceiver)EasyMock.getCurrentArguments()[1];
+
+                    receiver.addOutput(output.getBytes(), 0, output.length());
+                    receiver.flush();
+
+                    return null;
+                }
+            });
+        }
+
+        mockListener.testRunStarted(URI, 1);
+        EasyMock.expectLastCall().once();
+
+        mockListener.testStarted(EasyMock.eq(testId));
+        EasyMock.expectLastCall().once();
+
+        mockListener.testEnded(EasyMock.eq(testId), EasyMock.<Map<String, String>>notNull());
+        EasyMock.expectLastCall().once();
+
+        mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
+        EasyMock.expectLastCall().once();
+
+        EasyMock.replay(mockDevice);
+        EasyMock.replay(mockListener);
+
+        deqpTest.setDevice(mockDevice);
+        deqpTest.run(mockListener);
+
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice);
     }
 
     /**
@@ -92,7 +210,11 @@ public class DeqpTestTest extends TestCase {
 
         tests.add(testId);
 
-        DeqpTest deqpTest = new DeqpTest(URI, tests);
+        DeqpTest deqpTest = new DeqpTest(URI, "dEQP-GLES3", tests);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+            .andReturn(Integer.toString(version)).atLeastOnce();
 
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
@@ -252,14 +374,19 @@ public class DeqpTestTest extends TestCase {
                 = "{dEQP-GLES3{info{vendor,renderer,version,shading_language_version,extensions,render_target}}}";
 
         ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
-        ITestInvocationListener mockListener = EasyMock.createStrictMock(ITestInvocationListener.class);
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
         Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
 
         for (TestIdentifier id : testIds) {
             tests.add(id);
         }
 
-        DeqpTest deqpTest = new DeqpTest(URI, tests);
+        DeqpTest deqpTest = new DeqpTest(URI, "dEQP-GLES3", tests);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+            .andReturn(Integer.toString(version)).atLeastOnce();
 
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
@@ -274,7 +401,6 @@ public class DeqpTestTest extends TestCase {
                 + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
                 + "--deqp-gl-config-name=rgba8888d24s8\" "
                 + INSTRUMENTATION_NAME;
-
 
         mockDevice.executeShellCommand(EasyMock.eq(command),
                 EasyMock.<IShellOutputReceiver>notNull());
@@ -316,6 +442,48 @@ public class DeqpTestTest extends TestCase {
 
         EasyMock.verify(mockListener);
         EasyMock.verify(mockDevice);
+    }
+
+    /**
+     * Test OpeGL ES3 tests on device with OpenGL ES2.
+     */
+    public void testRun_require30DeviceVersion20() throws Exception {
+        testGlesVersion(3, 0, 2, 0);
+    }
+
+    /**
+     * Test OpeGL ES3.1 tests on device with OpenGL ES2.
+     */
+    public void testRun_require31DeviceVersion20() throws Exception {
+        testGlesVersion(3, 1, 2, 0);
+    }
+
+    /**
+     * Test OpeGL ES3 tests on device with OpenGL ES3.
+     */
+    public void testRun_require30DeviceVersion30() throws Exception {
+        testGlesVersion(3, 0, 3, 0);
+    }
+
+    /**
+     * Test OpeGL ES3.1 tests on device with OpenGL ES3.
+     */
+    public void testRun_require31DeviceVersion30() throws Exception {
+        testGlesVersion(3, 1, 3, 0);
+    }
+
+    /**
+     * Test OpeGL ES3 tests on device with OpenGL ES3.1.
+     */
+    public void testRun_require30DeviceVersion31() throws Exception {
+        testGlesVersion(3, 0, 3, 1);
+    }
+
+    /**
+     * Test OpeGL ES3.1 tests on device with OpenGL ES3.1.
+     */
+    public void testRun_require31DeviceVersion31() throws Exception {
+        testGlesVersion(3, 1, 3, 1);
     }
 
     /**
