@@ -16,7 +16,7 @@
 
 package android.provider.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.provider.R;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -26,7 +26,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.cts.FileUtils;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
