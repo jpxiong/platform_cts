@@ -9,6 +9,7 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ByteArrayInputStreamSource;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.LogDataType;
@@ -42,6 +43,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     private ITestDevice mDevice;
 
     private final String mUri;
+    private final String mName;
     private Collection<TestIdentifier> mTests;
 
     private TestIdentifier mCurrentTestId;
@@ -50,8 +52,9 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
 
     private ITestInvocationListener mListener;
 
-    public DeqpTest(String uri, Collection<TestIdentifier> tests) {
+    public DeqpTest(String uri, String name, Collection<TestIdentifier> tests) {
         mUri = uri;
+        mName = name;
         mTests = tests;
         mLogData = false;
     }
@@ -398,39 +401,73 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     }
 
     /**
+     * Check if device supports OpenGL ES version.
+     */
+    static boolean isSupportedGles(ITestDevice device, int requiredMajorVersion, int requiredMinorVersion) throws DeviceNotAvailableException {
+        String roOpenglesVersion = device.getProperty("ro.opengles.version");
+
+        if (roOpenglesVersion == null)
+            return false;
+
+        int intValue = Integer.parseInt(roOpenglesVersion);
+
+        int majorVersion = ((intValue & 0xffff0000) >> 16);
+        int minorVersion = (intValue & 0xffff);
+
+        return (majorVersion > requiredMajorVersion)
+                || (majorVersion == requiredMajorVersion && minorVersion >= requiredMinorVersion);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
         mListener = listener;
 
-        while (!mTests.isEmpty()) {
-            executeTests(listener);
+        if ((mName.equals( "dEQP-GLES3") && isSupportedGles(mDevice, 3, 0))
+            || (mName.equals("dEQP-GLES31") && isSupportedGles(mDevice, 3, 1))) {
 
-            // Set test to failed if it didn't receive test result
-            if (mCurrentTestId != null) {
-                Map <String, String> emptyMap = Collections.emptyMap();
+            while (!mTests.isEmpty()) {
+                executeTests(listener);
 
-                if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
-                    ByteArrayInputStreamSource source
-                            = new ByteArrayInputStreamSource(mCurrentTestLog.getBytes());
+                // Set test to failed if it didn't receive test result
+                if (mCurrentTestId != null) {
+                    Map <String, String> emptyMap = Collections.emptyMap();
 
-                    mListener.testLog(mCurrentTestId.getClassName() + "."
-                            + mCurrentTestId.getTestName(), LogDataType.XML, source);
+                    if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
+                        ByteArrayInputStreamSource source
+                                = new ByteArrayInputStreamSource(mCurrentTestLog.getBytes());
 
-                    source.cancel();
+                        mListener.testLog(mCurrentTestId.getClassName() + "."
+                                + mCurrentTestId.getTestName(), LogDataType.XML, source);
+
+                        source.cancel();
+                    }
+
+
+                    if (!mGotTestResult) {
+                        mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
+                            "Log doesn't contain test result");
+                    }
+
+                    mListener.testEnded(mCurrentTestId, emptyMap);
+                    mCurrentTestId = null;
+                    mListener.testRunEnded(0, emptyMap);
                 }
-
-
-                if (!mGotTestResult) {
-                    mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
-                        "Log doesn't contain test result");
-                }
-
-                mListener.testEnded(mCurrentTestId, emptyMap);
-                mCurrentTestId = null;
-                mListener.testRunEnded(0, emptyMap);
             }
+        } else {
+            /* Pass all tests if OpenGL ES version is not supported */
+            Map <String, String> emptyMap = Collections.emptyMap();
+            mListener.testRunStarted(mUri, mTests.size());
+
+            for (TestIdentifier test : mTests) {
+                CLog.d("Skipping test '%s', Opengl ES version not supported", test.toString());
+                mListener.testStarted(test);
+                mListener.testEnded(test, emptyMap);
+            }
+
+            mListener.testRunEnded(0, emptyMap);
         }
     }
 
