@@ -629,9 +629,10 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             }
             if (result >= 0) {
                 int outputBufIndex = result;
+                int bufferSize = Math.min(frameWidth * frameHeight * 3 / 2, bufferInfo.size);
                 outPresentationTimeUs = bufferInfo.presentationTimeUs;
                 Log.v(TAG, "Writing buffer # " + outputFrameIndex +
-                        ". Size: " + bufferInfo.size +
+                        ". Size: " + bufferSize +
                         ". InTime: " + (inPresentationTimeUs + 500)/1000 +
                         ". OutTime: " + (outPresentationTimeUs + 500)/1000);
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -639,12 +640,12 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     Log.d(TAG, "   Output EOS for frame # " + outputFrameIndex);
                 }
 
-                if (bufferInfo.size > 0) {
+                if (bufferSize > 0) {
                     // Save decoder output to yuv file.
                     if (yuv != null) {
-                        byte[] frame = new byte[bufferInfo.size];
+                        byte[] frame = new byte[bufferSize];
                         outputBuffers[outputBufIndex].position(bufferInfo.offset);
-                        outputBuffers[outputBufIndex].get(frame, 0, bufferInfo.size);
+                        outputBuffers[outputBufIndex].get(frame, 0, bufferSize);
                         // Convert NV12 to YUV420 if necessary
                         if (frameColorFormat != CodecCapabilities.COLOR_FormatYUV420Planar) {
                             frame = NV12ToYUV420(frameWidth, frameHeight,
@@ -657,7 +658,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     // Update statistics - store presentation time delay in offset
                     long presentationTimeUsDelta = inPresentationTimeUs - outPresentationTimeUs;
                     MediaCodec.BufferInfo bufferInfoCopy = new MediaCodec.BufferInfo();
-                    bufferInfoCopy.set((int)presentationTimeUsDelta, bufferInfo.size,
+                    bufferInfoCopy.set((int)presentationTimeUsDelta, bufferSize,
                             outPresentationTimeUs, bufferInfo.flags);
                     bufferInfos.add(bufferInfoCopy);
                 }
