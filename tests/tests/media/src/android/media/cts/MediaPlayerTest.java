@@ -945,24 +945,24 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             // Waits until at least one subtitle is fired. Timeout is 1 sec.
             selectSubtitleTrack(0);
             mOnTimedTextCalled.reset();
-            assertTrue(mOnTimedTextCalled.waitForSignal(1000));
+            assertTrue(mOnTimedTextCalled.waitForSignal(1500));
 
             // Try deselecting track.
             deselectSubtitleTrack(0);
             mOnTimedTextCalled.reset();
-            assertFalse(mOnTimedTextCalled.waitForSignal(1000));
+            assertFalse(mOnTimedTextCalled.waitForSignal(1500));
         }
 
         // Run the same test for external subtitle track.
         for (int i = 0; i < 2; i++) {
             selectSubtitleTrack(2);
             mOnTimedTextCalled.reset();
-            assertTrue(mOnTimedTextCalled.waitForSignal(1000));
+            assertTrue(mOnTimedTextCalled.waitForSignal(1500));
 
             // Try deselecting track.
             deselectSubtitleTrack(2);
             mOnTimedTextCalled.reset();
-            assertFalse(mOnTimedTextCalled.waitForSignal(1000));
+            assertFalse(mOnTimedTextCalled.waitForSignal(1500));
         }
 
         try {
@@ -985,7 +985,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.setOnTimedTextListener(new MediaPlayer.OnTimedTextListener() {
             @Override
             public void onTimedText(MediaPlayer mp, TimedText text) {
-                final int toleranceMs = 150;
+                final int toleranceMs = 500;
                 final int durationMs = 500;
                 int posMs = mMediaPlayer.getCurrentPosition();
                 if (text != null) {
@@ -1030,19 +1030,19 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         // Waits until at least two subtitles are fired. Timeout is 2 sec.
         // Please refer the test srt files:
         // test_subtitle1_srt.3gp and test_subtitle2_srt.3gp
-        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2500) >= 2);
 
         selectSubtitleTrack(1);
         mOnTimedTextCalled.reset();
-        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2500) >= 2);
 
         selectSubtitleTrack(2);
         mOnTimedTextCalled.reset();
-        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2500) >= 2);
 
         selectSubtitleTrack(3);
         mOnTimedTextCalled.reset();
-        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2500) >= 2);
         mMediaPlayer.stop();
     }
 
