@@ -60,6 +60,14 @@
   names: [
     "android.hardware.camera2.cts.RobustnessTest#testMandatoryOutputCombinations"
   ],
-  bug: 16899526
+  bug: 17511208
+},
+{
+  description: "these tests require a good test scene, so they fail if run in random conditions",
+  names: [
+    "android.hardware.camera2.cts.AllocationTest#testBlackWhite",
+    "android.hardware.camera2.cts.AllocationTest#testParamSensitivity"
+  ],
+  bug: 17530117
 }
 ]
