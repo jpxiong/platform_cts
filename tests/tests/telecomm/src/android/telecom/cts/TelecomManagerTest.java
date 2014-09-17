@@ -51,13 +51,13 @@ public class TelecomManagerTest extends AndroidTestCase {
                 .build();
 
         TelecomManager tm = TelecomManager.from(getContext());
-        List<PhoneAccountHandle> handles = tm.getEnabledPhoneAccounts();
+        List<PhoneAccountHandle> handles = tm.getCallCapablePhoneAccounts();
 
         try {
             tm.registerPhoneAccount(phoneAccount);
             fail("This should have failed (CTS can't get the permission)");
         } catch (SecurityException e) {
-            assertEquals(handles, tm.getEnabledPhoneAccounts());
+            assertEquals(handles, tm.getCallCapablePhoneAccounts());
         }
     }
 }
