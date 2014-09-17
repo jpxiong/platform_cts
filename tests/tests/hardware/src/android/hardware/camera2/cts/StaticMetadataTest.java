@@ -31,14 +31,16 @@ import android.util.Size;
 import junit.framework.Assert;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
  * This class covers the {@link CameraCharacteristics} tests that are not
- * covered by {@link CaptureRequestTest} and {@link CameraCharacteristicsTest}
- * (auto-generated tests that only do the non-null checks).
+ * covered by {@link CaptureRequestTest} and {@link ExtendedCameraCharacteristicsTest}
  * </p>
  * <p>
  * Note that most of the tests in this class don't require camera open.
@@ -137,14 +139,79 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
      * @return {@code true} if request keys' presence match expectation. Otherwise {@code false}
      */
     private boolean validateRequestKeysPresence(String capabilityName,
-            List<CaptureRequest.Key<?>> requestKeys, boolean expectedPresence) {
+            Collection<CaptureRequest.Key<?>> requestKeys, boolean expectedPresence) {
         boolean actualPresence = mStaticInfo.areRequestKeysAvailable(requestKeys);
         if (expectedPresence != actualPresence) {
             if (expectedPresence) {
                 for (CaptureRequest.Key<?> key : requestKeys) {
                     if (!mStaticInfo.areKeysAvailable(key)) {
                         mCollector.addMessage(String.format(
-                                "Camera %s list capability %s but doesn't contain key %s",
+                                "Camera %s list capability %s but doesn't contain request key %s",
+                                mCameraId, capabilityName, key.getName()));
+                    }
+                }
+            } else {
+                Log.w(TAG, String.format(
+                        "Camera %s doesn't list capability %s but contain all required keys",
+                        mCameraId, capabilityName));
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if result keys' presence match expectation.
+     *
+     * @param capabilityName The name string of capability being tested. Used for output messages.
+     * @param resultKeys The capture result keys to be checked
+     * @param expectedPresence Expected presence of {@code resultKeys}. {@code true} for expecting
+     *        all keys are available. Otherwise {@code false}
+     * @return {@code true} if result keys' presence match expectation. Otherwise {@code false}
+     */
+    private boolean validateResultKeysPresence(String capabilityName,
+            Collection<CaptureResult.Key<?>> resultKeys, boolean expectedPresence) {
+        boolean actualPresence = mStaticInfo.areResultKeysAvailable(resultKeys);
+        if (expectedPresence != actualPresence) {
+            if (expectedPresence) {
+                for (CaptureResult.Key<?> key : resultKeys) {
+                    if (!mStaticInfo.areKeysAvailable(key)) {
+                        mCollector.addMessage(String.format(
+                                "Camera %s list capability %s but doesn't contain result key %s",
+                                mCameraId, capabilityName, key.getName()));
+                    }
+                }
+            } else {
+                Log.w(TAG, String.format(
+                        "Camera %s doesn't list capability %s but contain all required keys",
+                        mCameraId, capabilityName));
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if characteristics keys' presence match expectation.
+     *
+     * @param capabilityName The name string of capability being tested. Used for output messages.
+     * @param characteristicsKeys The characteristics keys to be checked
+     * @param expectedPresence Expected presence of {@code characteristicsKeys}. {@code true} for
+     *        expecting all keys are available. Otherwise {@code false}
+     * @return {@code true} if characteristics keys' presence match expectation.
+     *         Otherwise {@code false}
+     */
+    private boolean validateCharacteristicsKeysPresence(String capabilityName,
+            Collection<CameraCharacteristics.Key<?>> characteristicsKeys,
+            boolean expectedPresence) {
+        boolean actualPresence = mStaticInfo.areCharacteristicsKeysAvailable(characteristicsKeys);
+        if (expectedPresence != actualPresence) {
+            if (expectedPresence) {
+                for (CameraCharacteristics.Key<?> key : characteristicsKeys) {
+                    if (!mStaticInfo.areKeysAvailable(key)) {
+                        mCollector.addMessage(String.format(
+                                "Camera %s list capability %s but doesn't contain" +
+                                "characteristics key %s",
                                 mCameraId, capabilityName, key.getName()));
                     }
                 }
@@ -160,8 +227,8 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
 
     private void validateCapability(Integer capability, boolean isCapabilityAvailable) {
         List<CaptureRequest.Key<?>> requestKeys = new ArrayList<>();
-        /* Only test request keys in this test
-           Characteristics keys are tested in CameraCharacteristicsTest
+        /* For available capabilities, only check request keys in this test
+           Characteristics keys are tested in ExtendedCameraCharacteristicsTest
            Result keys are tested in CaptureResultTest */
         String capabilityName;
         switch (capability) {
@@ -239,38 +306,74 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.BLACK_LEVEL_LOCK);
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_RAW:
-                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_RAW";
-                boolean rawOutputSupported = mStaticInfo.getRawOutputSizesChecked().length > 0;
-                if (isCapabilityAvailable) {
-                    mCollector.expectTrue(
-                            "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
-                            rawOutputSupported);
-                }
-                requestKeys.add(CaptureRequest.HOT_PIXEL_MODE);
-                requestKeys.add(CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
-                break;
+                // RAW_CAPABILITY needs to check for not just capture request keys
+                validateRawCapability(isCapabilityAvailable);
+                return;
             default:
                 capabilityName = "Unknown";
                 Assert.fail(String.format("Unknown capability: %d", capability));
         }
+
         boolean matchExpectation =
                 validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
-
         // In case of isCapabilityAvailable == true, error has been filed in
         // validateRequestKeysPresence
         if (!matchExpectation && !isCapabilityAvailable) {
-            if (capability == REQUEST_AVAILABLE_CAPABILITIES_RAW) {
-                // RAW capability needs to also check raw output capability
-                boolean rawOutputSupported = mStaticInfo.getRawOutputSizesChecked().length > 0;
-                if (rawOutputSupported) {
-                    mCollector.addMessage(String.format(
-                            "Camera %s doesn't list capability %s but contain all required keys" +
-                            " and RAW format output",
-                            mCameraId, capabilityName));
-                }
+            mCollector.addMessage(String.format(
+                    "Camera %s doesn't list capability %s but contain all required keys",
+                    mCameraId, capabilityName));
+        }
+    }
+
+    private void validateRawCapability(boolean isCapabilityAvailable) {
+        String capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_RAW";
+
+        Set<CaptureRequest.Key<?>> requestKeys = new HashSet<>();
+        requestKeys.add(CaptureRequest.HOT_PIXEL_MODE);
+        requestKeys.add(CaptureRequest.STATISTICS_HOT_PIXEL_MAP_MODE);
+
+        Set<CameraCharacteristics.Key<?>> characteristicsKeys = new HashSet<>();
+        characteristicsKeys.add(HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES);
+        characteristicsKeys.add(SENSOR_BLACK_LEVEL_PATTERN);
+        characteristicsKeys.add(SENSOR_CALIBRATION_TRANSFORM1);
+        characteristicsKeys.add(SENSOR_CALIBRATION_TRANSFORM2);
+        characteristicsKeys.add(SENSOR_COLOR_TRANSFORM1);
+        characteristicsKeys.add(SENSOR_COLOR_TRANSFORM2);
+        characteristicsKeys.add(SENSOR_FORWARD_MATRIX1);
+        characteristicsKeys.add(SENSOR_FORWARD_MATRIX2);
+        characteristicsKeys.add(SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        characteristicsKeys.add(SENSOR_INFO_COLOR_FILTER_ARRANGEMENT);
+        characteristicsKeys.add(SENSOR_INFO_WHITE_LEVEL);
+        characteristicsKeys.add(SENSOR_REFERENCE_ILLUMINANT1);
+        characteristicsKeys.add(SENSOR_REFERENCE_ILLUMINANT2);
+        characteristicsKeys.add(STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES);
+
+        Set<CaptureResult.Key<?>> resultKeys = new HashSet<>();
+        resultKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
+        resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
+        resultKeys.add(CaptureResult.SENSOR_NOISE_PROFILE);
+
+        boolean rawOutputSupported = mStaticInfo.getRawOutputSizesChecked().length > 0;
+        boolean requestKeysPresent = mStaticInfo.areRequestKeysAvailable(requestKeys);
+        boolean characteristicsKeysPresent =
+                mStaticInfo.areCharacteristicsKeysAvailable(characteristicsKeys);
+        boolean resultKeysPresent = mStaticInfo.areResultKeysAvailable(resultKeys);
+        boolean expectCapabilityPresent = rawOutputSupported && requestKeysPresent &&
+                characteristicsKeysPresent && resultKeysPresent;
+
+        if (isCapabilityAvailable != expectCapabilityPresent) {
+            if (isCapabilityAvailable) {
+                mCollector.expectTrue(
+                        "REQUEST_AVAILABLE_CAPABILITIES_RAW should support RAW_SENSOR output",
+                        rawOutputSupported);
+                validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+                validateResultKeysPresence(capabilityName, resultKeys, isCapabilityAvailable);
+                validateCharacteristicsKeysPresence(capabilityName, characteristicsKeys,
+                        isCapabilityAvailable);
             } else {
                 mCollector.addMessage(String.format(
-                        "Camera %s doesn't list capability %s but contain all required keys",
+                        "Camera %s doesn't list capability %s but contain all required keys" +
+                        " and RAW format output",
                         mCameraId, capabilityName));
             }
         }
