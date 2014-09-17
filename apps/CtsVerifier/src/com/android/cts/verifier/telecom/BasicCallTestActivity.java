@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.SystemClock;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
+import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.RemoteConnection;
 import android.telecom.StatusHints;
@@ -100,9 +101,9 @@ public class BasicCallTestActivity extends TelecomBaseTestActivity {
             }
 
             @Override
-            public void onDisconnected(RemoteConnection connection, int disconnectCauseCode,
-                    String disconnectCauseMessage) {
-                setDisconnected(disconnectCauseCode, disconnectCauseMessage);
+            public void onDisconnected(
+                    RemoteConnection connection, DisconnectCause disconnectCause) {
+                setDisconnected(disconnectCause);
             }
 
             @Override
@@ -111,7 +112,8 @@ public class BasicCallTestActivity extends TelecomBaseTestActivity {
             }
 
             @Override
-            public void onAddressChanged(RemoteConnection connection, Uri address, int presentation) {
+            public void onAddressChanged(
+                    RemoteConnection connection, Uri address, int presentation) {
                 setAddress(address, presentation);
             }
 
