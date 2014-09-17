@@ -74,7 +74,19 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
             mUserId = createUser();
             installApp(PROFILE_OWNER_APK);
             setProfileOwner(PROFILE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
+            startManagedProfile();
         }
+    }
+
+    /**
+     * Initializes the user that underlies the managed profile.
+     * This is required so that apps can run on it.
+     */
+    private void startManagedProfile() throws Exception  {
+        String command = "am start-user " + mUserId;
+        String commandOutput = getDevice().executeShellCommand(command);
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
+        assertTrue(commandOutput.startsWith("Success:"));
     }
 
     @Override
@@ -109,12 +121,42 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
             return;
         }
         String[] testClassNames = {
-                "ProfileOwnerSetupTest"
+                "ProfileOwnerSetupTest",
         };
         for (String className : testClassNames) {
             String testClass = PROFILE_OWNER_PKG + "." + className;
             assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, testClass, mUserId));
         }
+    }
+
+    public void testCrossProfileIntentFilters() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        // Set up activities: ManagedProfileActivity will only be enabled in the managed profile and
+        // PrimaryUserActivity only in the primary one
+        disableActivityForUser("ManagedProfileActivity", 0);
+        disableActivityForUser("PrimaryUserActivity", mUserId);
+
+        assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG,
+                PROFILE_OWNER_PKG + ".ManagedProfileTest", mUserId));
+
+        // Set up filters from primary to managed profile
+        String command = "am start -W --user " + mUserId  + " " + PROFILE_OWNER_PKG
+                + "/.PrimaryUserFilterSetterActivity";
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+              + getDevice().executeShellCommand(command));
+        assertTrue(runDeviceTests(PROFILE_OWNER_PKG, PROFILE_OWNER_PKG + ".PrimaryUserTest"));
+        // TODO: Test with startActivity
+        // TODO: Test with CtsVerifier for disambiguation cases
+    }
+
+    private void disableActivityForUser(String activityName, int userId)
+            throws DeviceNotAvailableException {
+        String command = "pm disable --user " + userId + " " + PROFILE_OWNER_PKG + "/."
+                + activityName;
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+                + getDevice().executeShellCommand(command));
     }
 
     private boolean hasDeviceFeatures(String[] requiredFeatures)
@@ -204,7 +246,7 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
 
     private boolean runDeviceTests(String pkgName, @Nullable String testClassName,
             @Nullable String testMethodName, @Nullable Integer userId)
-            throws DeviceNotAvailableException {
+                    throws DeviceNotAvailableException {
         TestRunResult runResult = (userId == null)
                 ? doRunTests(pkgName, testClassName, testMethodName)
                 : doRunTestsAsUser(pkgName, testClassName, testMethodName, userId);
