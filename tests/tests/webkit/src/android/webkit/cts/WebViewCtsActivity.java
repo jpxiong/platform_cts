@@ -16,49 +16,41 @@
 
 package android.webkit.cts;
 
+import com.android.cts.webkit.R;
+
 import android.app.Activity;
 import android.os.Bundle;
-import android.webkit.CookieSyncManager;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 
-public class CookieSyncManagerStubActivity extends Activity {
+public class WebViewCtsActivity extends Activity {
     private WebView mWebView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         try {
-            CookieSyncManager.createInstance(this);
-
-            mWebView = new WebView(this);
-            setContentView(mWebView);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.webview_layout);
+            mWebView = (WebView) findViewById(R.id.web_page);
         } catch (Exception e) {
             NullWebViewUtils.determineIfWebViewAvailable(this, e);
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        try {
-            CookieSyncManager.getInstance().startSync();
-        } catch (Exception e) {
-            // May throw on a device with no webview, OK to ignore at this point.
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        try {
-            CookieSyncManager.getInstance().stopSync();
-        } catch (Exception e) {
-            // May throw on a device with no webview, OK to ignore at this point.
-        }
-    }
-
-    public WebView getWebView(){
+    public WebView getWebView() {
         return mWebView;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mWebView != null) {
+            ViewParent parent =  mWebView.getParent();
+            if (parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(mWebView);
+            }
+            mWebView.destroy();
+        }
+        super.onDestroy();
     }
 }

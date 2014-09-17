@@ -23,10 +23,10 @@ import android.webkit.WebView.WebViewTransport;
 
 
 public class WebView_WebViewTransportTest
-        extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+        extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
 
     public WebView_WebViewTransportTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super("com.android.cts.webkit", WebViewCtsActivity.class);
     }
 
     @UiThreadTest

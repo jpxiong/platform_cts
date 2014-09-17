@@ -28,7 +28,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
-public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebViewCtsActivity> {
     private static final long TEST_TIMEOUT = 5000L;
 
     private CtsTestServer mWebServer;
@@ -38,7 +38,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     private boolean mBlockWindowCreationAsync;
 
     public WebChromeClientTest() {
-        super(WebViewStubActivity.class);
+        super(WebViewCtsActivity.class);
     }
 
     @Override
