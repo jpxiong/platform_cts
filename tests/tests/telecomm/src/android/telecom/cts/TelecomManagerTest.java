@@ -17,17 +17,27 @@
 package android.telecom.cts;
 
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.PhoneCapabilities;
 import android.telecom.TelecomManager;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import java.util.List;
 
 public class TelecomManagerTest extends AndroidTestCase {
+    private static final String TAG = "TelecommManagerTest";
+
     public void testRegisterAccountsBlocked() {
+        PackageManager pm = getContext().getPackageManager();
+        if (!pm.hasSystemFeature(PackageManager.FEATURE_CONNECTION_SERVICE)) {
+            Log.d(TAG, "Skipping the test because FEATURE_CONNECTION_SERVICE is disabled.");
+            return;
+        }
+
         PhoneAccount phoneAccount = new PhoneAccount.Builder(
                 new PhoneAccountHandle(
                         new ComponentName(getContext(), TelecomManagerTest.class),
