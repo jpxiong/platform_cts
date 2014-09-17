@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <fcntl.h>
 #include <cutils/log.h>
 #include <linux/perf_event.h>
@@ -192,6 +193,17 @@ static jint android_security_cts_NativeCodeTest_doSockDiagTest(JNIEnv* env, jobj
     struct iovec iov;
     struct sock_diag_req* sock_diag_data;
 
+    int major, minor;
+    struct utsname uts;
+    if (uname(&uts) != -1 &&
+        sscanf(uts.release, "%d.%d", &major, &minor) == 2 &&
+        ((major > 3) || ((major == 3) && (minor > 8)))) {
+        // Kernels above 3.8 are patched against CVE-2013-1763
+        // This test generates false positives if run on > 3.8.
+        // b/17253473
+        return PASSED;
+    }
+
     fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
     if (fd == -1) {
         switch (errno) {
@@ -217,7 +229,11 @@ static jint android_security_cts_NativeCodeTest_doSockDiagTest(JNIEnv* env, jobj
     iov = { (void *) nlh, nlmsg_size };
     msg = { (void *) &nladdr, sizeof(nladdr), &iov, 1, NULL, 0, 0 };
     sock_diag_data = (sock_diag_req *) NLMSG_DATA(nlh);
-    sock_diag_data->sdiag_family = AF_MAX+1;
+
+    // AF_MAX changes in later kernels. Use hardcoded value instead
+    // to make sure we trigger the vulnerability in kernels <= 3.8
+    sock_diag_data->sdiag_family = 39+1; // AF_MAX+1, but don't rely on header file.
+
     if ((err = sendmsg(fd, &msg, 0)) == -1) {
         /* SELinux blocked it */
         if (errno == 22) {
