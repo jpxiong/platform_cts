@@ -21,7 +21,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application>
+    <application android:maxRecents="1">
         <uses-library android:name="android.test.runner" />
         <activity android:name="android.webgl.WebGLActivity" >
             <intent-filter>
