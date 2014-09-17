@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class WebGLActivity extends Activity {
 
     Semaphore mFinished = new Semaphore(0, false);
+    Semaphore mDestroyed = new Semaphore(0, false);
     String mWebGlHarnessUrl;
     WebView mWebView;
 
@@ -101,6 +102,17 @@ public class WebGLActivity extends Activity {
         synchronized(WebGLActivity.this) {
             message = mMessage.toString();
         }
+
+        // Destroy the webview and wait for it.
+        runOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.destroy();
+                finish();
+                mDestroyed.release();
+            }
+        });
+        mDestroyed.acquire();
+
         if (!finished)
             throw new Exception("\n" + url + "\n Test timed-out after 60 seconds: " + message);
         if(!mPassed)
