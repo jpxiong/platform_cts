@@ -504,6 +504,10 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
         }
 
+        if (!mStaticInfo.isManualLensShadingMapSupported()) {
+            waiverKeys.add(CaptureResult.SHADING_MODE);
+        }
+
         //Keys not required if manual sensor control is not supported
         if (!mStaticInfo.isCapabilitySupported(
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
@@ -531,7 +535,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.LENS_APERTURE);
         waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
         waiverKeys.add(CaptureResult.SENSOR_ROLLING_SHUTTER_SKEW);
-        waiverKeys.add(CaptureResult.SHADING_MODE);
         waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
         waiverKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
