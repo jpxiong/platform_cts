@@ -14,11 +14,11 @@
      limitations under the License.
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textStyle="italic"
+        android:textColor="?android:attr/textColorTertiary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/snsr_boxed_padding_bottom"
-        android:paddingTop="@dimen/snsr_boxed_padding_top"
+        android:paddingTop="@dimen/snsr_log_padding_top"
         android:paddingLeft="@dimen/snsr_boxed_padding_left"
-        android:paddingRight="@dimen/snsr_boxed_padding_right" />
+        android:paddingRight="@dimen/snsr_boxed_padding_right"
+        android:paddingBottom="@dimen/snsr_log_padding_bottom" />

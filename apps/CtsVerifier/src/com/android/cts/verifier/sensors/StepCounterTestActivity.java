@@ -29,8 +29,9 @@ import android.hardware.SensorManager;
 import android.hardware.cts.helpers.MovementDetectorHelper;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.SystemClock;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,10 @@ public class StepCounterTestActivity
     private final List<TestSensorEvent> mStepCounterEvents = new ArrayList<TestSensorEvent>();
     private final List<TestSensorEvent> mStepDetectorEvents = new ArrayList<TestSensorEvent>();
 
+    /**
+     * A flag that indicates if the test is interested in registering steps reported by the
+     * operator. The registration of events happens by tapping the screen throughout the test.
+     */
     private volatile boolean mCheckForMotion;
 
     @Override
@@ -74,16 +79,19 @@ public class StepCounterTestActivity
         mSensorStepCounter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mSensorStepDetector = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
-        View screen = findViewById(R.id.log_layout);
-        screen.setOnClickListener(new OnClickListener() {
+        ScrollView scrollView = (ScrollView) findViewById(R.id.log_scroll_view);
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
+                // during movement of the device, the ScrollView will detect user taps as attempts
+                // to scroll, when in reality they are taps in the layout
+                // to overcome the fact that a ScrollView cannot be disabled from scrolling, we
+                // listen for ACTION_UP events instead of click events in the child layout
                 long elapsedTime = SystemClock.elapsedRealtimeNanos();
-                if (mCheckForMotion) {
-                    playSound();
-                    mTimestampsUserReported.add(SystemClock.elapsedRealtimeNanos());
-                    appendText(getString(R.string.snsr_step_reported, elapsedTime));
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    logUserReportedStep(elapsedTime);
                 }
+                return false;
             }
         });
     }
@@ -123,8 +131,8 @@ public class StepCounterTestActivity
         mMoveDetected = false;
         mCheckForMotion = false;
 
-        appendText(instructionsResId);
-        waitForUser();
+        getTestLogger().logMessage(instructionsResId);
+        waitForUserToBegin();
 
         mCheckForMotion = (expectedSteps > 0);
         if (vibrate) {
@@ -299,16 +307,25 @@ public class StepCounterTestActivity
         int type = event.sensor.getType();
         if (type == Sensor.TYPE_STEP_COUNTER) {
             mStepCounterEvents.add(new TestSensorEvent(event, elapsedRealtimeNanos));
-            String counterMessage = getString(
+            getTestLogger().logMessage(
                     R.string.snsr_step_counter_event,
                     elapsedRealtimeNanos,
                     (int) event.values[0]);
-            appendText(counterMessage);
         } else if (type == Sensor.TYPE_STEP_DETECTOR) {
             mStepDetectorEvents.add(new TestSensorEvent(event, elapsedRealtimeNanos));
-            appendText(getString(R.string.snsr_step_detector_event, elapsedRealtimeNanos));
+            getTestLogger().logMessage(R.string.snsr_step_detector_event, elapsedRealtimeNanos);
 
         }
         // TODO: with delayed assertions check events of other types are tracked
+    }
+
+    private void logUserReportedStep(long timestamp) {
+        if (!mCheckForMotion) {
+            return;
+        }
+
+        playSound();
+        mTimestampsUserReported.add(timestamp);
+        getTestLogger().logMessage(R.string.snsr_step_reported, timestamp);
     }
 }

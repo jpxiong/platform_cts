@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * To execute these test cases, the following command can be used:
  * </p><pre>
  * adb shell am instrument -e class android.hardware.cts.SingleSensorTests \
- *     -w com.android.cts.hardware/android.test.InstrumentationCtsTestRunner
+ *     -w com.android.cts.hardware/android.test.AndroidJUnitRunner
  * </pre><p>
  * For each sensor that reports continuously, it takes a set of samples. The test suite verifies
  * that the event ordering, frequency, and jitter pass for the collected sensor events. It
@@ -86,9 +86,6 @@ import java.util.concurrent.TimeUnit;
 public class SingleSensorTests extends SensorTestCase {
     private static final String TAG = "SingleSensorTests";
 
-    private static final int BATCHING_OFF = 0;
-    private static final int BATCHING_5S = 5000000;
-
     private static final int RATE_200HZ = 5000;
     private static final int RATE_100HZ = 10000;
     private static final int RATE_50HZ = 20000;
@@ -98,17 +95,8 @@ public class SingleSensorTests extends SensorTestCase {
     private static final int RATE_5HZ = 200000;
     private static final int RATE_1HZ = 1000000;
 
-    private static final String[] STAT_KEYS = {
-        SensorStats.FREQUENCY_KEY,
-        SensorStats.JITTER_95_PERCENTILE_KEY,
-        SensorStats.EVENT_OUT_OF_ORDER_COUNT_KEY,
-        SensorStats.MAGNITUDE_KEY,
-        SensorStats.MEAN_KEY,
-        SensorStats.STANDARD_DEVIATION_KEY,
-    };
-
     /**
-     * This test verifies that the sensor's properties complies with the required properites set in
+     * This test verifies that the sensor's properties complies with the required properties set in
      * the CDD.
      * <p>
      * It checks that the sampling rate advertised by the sensor under test matches that which is
@@ -138,513 +126,414 @@ public class SingleSensorTests extends SensorTestCase {
     // TODO: Figure out if a better way to enumerate test cases programmatically exists that works
     // with CTS framework.
     public void testAccelerometer_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testAccelerometer_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_100HZ);
     }
 
     public void testAccelerometer_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_200HZ);
     }
 
     public void testAccelerometer_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_50HZ);
     }
 
     public void testAccelerometer_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_25HZ);
     }
 
     public void testAccelerometer_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_15HZ);
     }
 
     public void testAccelerometer_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_10HZ);
     }
 
     public void testAccelerometer_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_5HZ);
     }
 
     public void testAccelerometer_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testAccelerometer_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testAccelerometer_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_ACCELEROMETER, RATE_1HZ);
     }
 
     public void testMagneticField_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testMagneticField_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_200HZ);
     }
 
     public void testMagneticField_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_100HZ);
     }
 
     public void testMagneticField_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_50HZ);
     }
 
     public void testMagneticField_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_25HZ);
     }
 
     public void testMagneticField_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_15HZ);
     }
 
     public void testMagneticField_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_10HZ);
     }
 
     public void testMagneticField_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_5HZ);
     }
 
     public void testMagneticField_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testMagneticField_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testMagneticField_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD, RATE_1HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_200HZ);
     }
     @SuppressWarnings("deprecation")
     public void testOrientation_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_100HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_50HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_25HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_15HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_10HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_5HZ);
     }
 
     @SuppressWarnings("deprecation")
     public void testOrientation_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_1HZ, BATCHING_OFF);
-    }
-
-    @SuppressWarnings("deprecation")
-    public void testOrientation_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    @SuppressWarnings("deprecation")
-    public void testOrientation_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_ORIENTATION, RATE_1HZ);
     }
 
     public void testGyroscope_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testGyroscope_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_200HZ);
     }
 
     public void testGyroscope_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_100HZ);
     }
 
     public void testGyroscope_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_50HZ);
     }
 
     public void testGyroscope_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_25HZ);
     }
 
     public void testGyroscope_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_15HZ);
     }
 
     public void testGyroscope_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_10HZ);
     }
 
     public void testGyroscope_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_5HZ);
     }
 
     public void testGyroscope_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testGyroscope_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testGyroscope_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_GYROSCOPE, RATE_1HZ);
     }
 
     public void testPressure_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testPressure_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_200HZ);
     }
 
     public void testPressure_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_100HZ);
     }
 
     public void testPressure_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_50HZ);
     }
 
     public void testPressure_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_25HZ);
     }
 
     public void testPressure_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_15HZ);
     }
 
     public void testPressure_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_10HZ);
     }
 
     public void testPressure_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_5HZ);
     }
 
     public void testPressure_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testPressure_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testPressure_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_PRESSURE, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_PRESSURE, RATE_1HZ);
     }
 
     public void testGravity_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testGravity_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_200HZ);
     }
 
     public void testGravity_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_100HZ);
     }
 
     public void testGravity_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_50HZ);
     }
 
     public void testGravity_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_25HZ);
     }
 
     public void testGravity_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_15HZ);
     }
 
     public void testGravity_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_10HZ);
     }
 
     public void testGravity_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_5HZ);
     }
 
     public void testGravity_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testGravity_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testGravity_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GRAVITY, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_GRAVITY, RATE_1HZ);
     }
 
     public void testRotationVector_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testRotationVector_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_200HZ);
     }
 
     public void testRotationVector_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_100HZ);
     }
 
     public void testRotationVector_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_50HZ);
     }
 
     public void testRotationVector_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_25HZ);
     }
 
     public void testRotationVector_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_15HZ);
     }
 
     public void testRotationVector_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_10HZ);
     }
 
     public void testRotationVector_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_5HZ);
     }
 
     public void testRotationVector_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testRotationVector_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_5S);
-    }
-
-    public void testRotationVector_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_ROTATION_VECTOR, RATE_1HZ);
     }
 
     public void testMagneticFieldUncalibrated_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testMagneticFieldUncalibrated_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_200HZ);
     }
 
     public void testMagneticFieldUncalibrated_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_100HZ);
     }
 
     public void testMagneticFieldUncalibrated_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_50HZ);
     }
 
     public void testMagneticFieldUncalibrated_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_25HZ);
     }
 
     public void testMagneticFieldUncalibrated_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_15HZ);
     }
 
     public void testMagneticFieldUncalibrated_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_10HZ);
     }
 
     public void testMagneticFieldUncalibrated_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_5HZ);
     }
 
     public void testMagneticFieldUncalibrated_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testMagneticFieldUncalibrated_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_5S);
-    }
-
-    public void testMagneticFieldUncalibrated_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, RATE_1HZ);
     }
 
     public void testGameRotationVector_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testGameRotationVector_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_200HZ);
     }
 
     public void testGameRotationVector_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_100HZ);
     }
 
     public void testGameRotationVector_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_50HZ);
     }
 
     public void testGameRotationVector_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_25HZ);
     }
 
     public void testGameRotationVector_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_15HZ);
     }
 
     public void testGameRotationVector_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_10HZ);
     }
 
     public void testGameRotationVector_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_5HZ);
     }
 
     public void testGameRotationVector_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testGameRotationVector_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_5S);
-    }
-
-    public void testGameRotationVector_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_GAME_ROTATION_VECTOR, RATE_1HZ);
     }
 
     public void testGyroscopeUncalibrated_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void testGyroscopeUncalibrated_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_200HZ);
     }
 
     public void testGyroscopeUncalibrated_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_100HZ);
     }
 
     public void testGyroscopeUncalibrated_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_50HZ);
     }
 
     public void testGyroscopeUncalibrated_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_25HZ);
     }
 
     public void testGyroscopeUncalibrated_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_15HZ);
     }
 
     public void testGyroscopeUncalibrated_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_10HZ);
     }
 
     public void testGyroscopeUncalibrated_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_5HZ);
     }
 
     public void testGyroscopeUncalibrated_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_1HZ, BATCHING_OFF);
-    }
-
-    public void testGyroscopeUncalibrated_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_5S);
-    }
-
-    public void testGyroscopeUncalibrated_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_50HZ, BATCHING_5S);
+        runSensorTest(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, RATE_1HZ);
     }
 
     public void  testGeomagneticRotationVector_fastest() throws Throwable {
-        runSensorTest(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void  testLinearAcceleration_200hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_200HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_200HZ);
     }
 
     public void  testLinearAcceleration_100hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_100HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_100HZ);
     }
 
     public void testLinearAcceleration_50hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_50HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_50HZ);
     }
 
     public void testLinearAcceleration_25hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_25HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_25HZ);
     }
 
     public void testLinearAcceleration_15hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_15HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_15HZ);
     }
 
     public void testLinearAcceleration_10hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_10HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_10HZ);
     }
 
     public void testLinearAcceleration_5hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_5HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_5HZ);
     }
 
     public void testLinearAcceleration_1hz() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_1HZ, BATCHING_OFF);
+        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_1HZ);
     }
 
-    public void testLinearAcceleration_fastest_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, SensorManager.SENSOR_DELAY_FASTEST,
-                BATCHING_5S);
-    }
-
-    public void testLinearAcceleration_50hz_batching() throws Throwable {
-        runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_50HZ, BATCHING_5S);
-    }
-
-    private void runSensorTest(int sensorType, int rateUs, int maxBatchReportLatencyUs)
+    private void runSensorTest(int sensorType, int rateUs)
             throws Throwable {
         TestSensorOperation op = new TestSensorOperation(this.getContext(), sensorType,
-                rateUs, maxBatchReportLatencyUs, 5, TimeUnit.SECONDS);
-        op.setDefaultVerifications();
+                rateUs, 0 /* maxBatchReportLatencyUs */, 5, TimeUnit.SECONDS);
+        op.addDefaultVerifications();
         op.setLogEvents(true);
         try {
             op.execute();
@@ -659,9 +548,7 @@ public class SingleSensorTests extends SensorTestCase {
                 sensorRate = String.format("%.0fhz",
                         SensorCtsHelper.getFrequency(rateUs, TimeUnit.MICROSECONDS));
             }
-            String batching = maxBatchReportLatencyUs > 0 ? "_batching" : "";
-            String fileName = String.format("single_sensor_%s_%s%s.txt",
-                    sensorName, sensorRate, batching);
+            String fileName = String.format("single_sensor_%s_%s.txt", sensorName, sensorRate);
             SensorStats.logStatsToFile(fileName, op.getStats());
         }
     }
