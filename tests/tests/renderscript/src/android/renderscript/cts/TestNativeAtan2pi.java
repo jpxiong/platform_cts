@@ -79,7 +79,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                 CoreMathVerifier.computeNativeAtan2pi(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!valid) {
@@ -98,7 +98,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     message.append("Actual   output out: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -148,7 +148,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                 CoreMathVerifier.computeNativeAtan2pi(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!valid) {
@@ -167,7 +167,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     message.append("Actual   output out: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -217,7 +217,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                 CoreMathVerifier.computeNativeAtan2pi(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!valid) {
@@ -236,7 +236,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     message.append("Actual   output out: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -286,7 +286,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                 CoreMathVerifier.computeNativeAtan2pi(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!valid) {
@@ -305,7 +305,7 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     message.append("Actual   output out: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
