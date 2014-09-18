@@ -22,8 +22,6 @@ import com.android.internal.util.XmlUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.app.cts.MockActivity;
-import android.app.cts.MockReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -730,18 +728,18 @@ public class IntentTest extends AndroidTestCase {
         // Should only have one activity responding to narrow category
         final ComponentName target = intent.resolveActivity(mPm);
         assertEquals("com.android.cts.content", target.getPackageName());
-        assertEquals("android.app.cts.MockActivity", target.getClassName());
+        assertEquals("android.content.cts.MockActivity", target.getClassName());
     }
 
     public void testResolveActivityShortcutMatch() {
         final Intent intent = new Intent("com.android.cts.content.action.TEST_ACTION");
         intent.setComponent(
-                new ComponentName("com.android.cts.content", "android.app.cts.MockActivity2"));
+                new ComponentName("com.android.cts.content", "android.content.cts.MockActivity2"));
 
         // Multiple activities match, but we asked for explicit component
         final ComponentName target = intent.resolveActivity(mPm);
         assertEquals("com.android.cts.content", target.getPackageName());
-        assertEquals("android.app.cts.MockActivity2", target.getClassName());
+        assertEquals("android.content.cts.MockActivity2", target.getClassName());
     }
 
     public void testResolveActivityMultipleMatch() {

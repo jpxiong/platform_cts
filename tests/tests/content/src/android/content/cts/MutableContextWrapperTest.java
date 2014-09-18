@@ -16,7 +16,6 @@
 
 package android.content.cts;
 
-import android.app.cts.MockActivity;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.test.AndroidTestCase;

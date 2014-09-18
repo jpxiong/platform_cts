@@ -20,7 +20,7 @@ import android.content.res.Resources;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.TypedValue;
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 public class FractionTest extends AndroidTestCase {
 

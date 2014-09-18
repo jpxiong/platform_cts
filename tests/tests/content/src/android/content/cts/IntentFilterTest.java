@@ -33,7 +33,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import android.app.cts.MockActivity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;

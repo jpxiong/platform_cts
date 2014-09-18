@@ -16,19 +16,8 @@
 
 package android.content.cts;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
 import android.app.Activity;
-import android.os.Bundle;
 
-import com.android.cts.stub.R;
+public class MockActivity extends Activity {
 
-public class ContextWrapperStubActivity extends Activity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.local_sample);
-    }
 }
-

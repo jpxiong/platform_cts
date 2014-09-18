@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 public class Resources_ThemeTest extends AndroidTestCase {

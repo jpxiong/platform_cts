@@ -26,7 +26,7 @@ import android.test.AndroidTestCase;
  * Test {@link DisplayNameComparator}.
  */
 public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+    private static final String PACKAGE_NAME = "com.android.cts.content";
     DisplayNameComparator mDisplayNameComparator;
 
     @Override
