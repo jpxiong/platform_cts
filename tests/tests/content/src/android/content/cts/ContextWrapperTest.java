@@ -16,7 +16,7 @@
 
 package android.content.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 import android.content.ActivityNotFoundException;
@@ -79,8 +79,8 @@ public class ContextWrapperTest extends AndroidTestCase {
     private final static String MOCK_ACTION1 = ACTION_BROADCAST_TESTORDER + "1";
     private final static String MOCK_ACTION2 = ACTION_BROADCAST_TESTORDER + "2";
 
-    public static final String PERMISSION_GRANTED = "android.app.cts.permission.TEST_GRANTED";
-    public static final String PERMISSION_DENIED = "android.app.cts.permission.TEST_DENIED";
+    public static final String PERMISSION_GRANTED = "android.content.cts.permission.TEST_GRANTED";
+    public static final String PERMISSION_DENIED = "android.content.cts.permission.TEST_DENIED";
 
     private static final int BROADCAST_TIMEOUT = 10000;
 
@@ -402,7 +402,7 @@ public class ContextWrapperTest extends AndroidTestCase {
     }
 
     public void testStartActivity() {
-        Intent intent = new Intent(mContext, ContextWrapperStubActivity.class);
+        Intent intent = new Intent(mContext, ContextWrapperCtsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             mContextWrapper.startActivity(intent);
@@ -474,7 +474,7 @@ public class ContextWrapperTest extends AndroidTestCase {
     }
 
     public void testGetPackageName() {
-        assertEquals("com.android.cts.stub", mContextWrapper.getPackageName());
+        assertEquals("com.android.cts.content", mContextWrapper.getPackageName());
     }
 
     public void testGetCacheDir() {

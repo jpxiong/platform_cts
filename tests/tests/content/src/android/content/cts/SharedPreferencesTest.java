@@ -54,8 +54,8 @@ public class SharedPreferencesTest extends AndroidTestCase {
 
         // Duplicated from ContextImpl.java.  Not ideal, but there wasn't a better
         // way to reach into Context{Wrapper,Impl} to ask where this file lives.
-        mPrefsFile = new File("/data/data/com.android.cts.stub/shared_prefs",
-                              "com.android.cts.stub_preferences.xml");
+        mPrefsFile = new File("/data/data/com.android.cts.content/shared_prefs",
+                              "com.android.cts.content_preferences.xml");
         mPrefsFile.delete();
     }
 

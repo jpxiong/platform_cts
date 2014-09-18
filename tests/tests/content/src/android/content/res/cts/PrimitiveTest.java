@@ -21,7 +21,7 @@ import android.content.res.TypedArray;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.TypedValue;
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 public class PrimitiveTest extends AndroidTestCase {
     private Resources mResources;
