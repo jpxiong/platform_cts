@@ -32,11 +32,11 @@ import android.widget.LinearLayout.LayoutParams;
 /**
  * Test {@link TabWidget}.
  */
-public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubActivity> {
+public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostCtsActivity> {
     private Activity mActivity;
 
     public TabWidgetTest() {
-        super("com.android.cts.stub", TabHostStubActivity.class);
+        super("com.android.cts.widget", TabHostCtsActivity.class);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
 
     @UiThreadTest
     public void testSetCurrentTab() {
-        TabHostStubActivity activity = getActivity();
+        TabHostCtsActivity activity = getActivity();
         TabWidget tabWidget = activity.getTabWidget();
         tabWidget.addView(new TextView(mActivity));
 
@@ -97,7 +97,7 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
 
     @UiThreadTest
     public void testFocusCurrentTab() {
-        TabHostStubActivity activity = getActivity();
+        TabHostCtsActivity activity = getActivity();
         TabWidget tabWidget = activity.getTabWidget();
         tabWidget.addView(new TextView(mActivity));
 

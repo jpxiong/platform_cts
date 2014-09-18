@@ -21,7 +21,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.content.Context;

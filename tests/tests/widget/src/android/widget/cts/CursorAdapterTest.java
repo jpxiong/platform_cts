@@ -25,7 +25,6 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Looper;
-import android.os.cts.TestThread;
 import android.test.AndroidTestCase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +34,7 @@ import android.widget.Filter;
 import android.widget.FilterQueryProvider;
 import android.widget.TextView;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**

@@ -31,7 +31,7 @@ import android.widget.Filter;
 import android.widget.FilterQueryProvider;
 import android.widget.TextView;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**

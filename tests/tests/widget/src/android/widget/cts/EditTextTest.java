@@ -28,7 +28,7 @@ import android.util.Xml;
 import android.widget.EditText;
 import android.widget.TextView.BufferType;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 public class EditTextTest extends AndroidTestCase {

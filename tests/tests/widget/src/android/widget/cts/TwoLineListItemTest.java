@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -32,11 +32,11 @@ import android.widget.RelativeLayout.LayoutParams;
  * Test {@link TwoLineListItem}.
  */
 public class TwoLineListItemTest extends
-        ActivityInstrumentationTestCase<TwoLineListItemStubActivity> {
+        ActivityInstrumentationTestCase<TwoLineListItemCtsActivity> {
     private Activity mActivity;
 
     public TwoLineListItemTest() {
-        super("com.android.cts.stub", TwoLineListItemStubActivity.class);
+        super("com.android.cts.widget", TwoLineListItemCtsActivity.class);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -41,7 +41,7 @@ import java.io.OutputStream;
 /**
  * Test {@link VideoView}.
  */
-public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStubActivity> {
+public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCtsActivity> {
     /** Debug TAG. **/
     private static final String TAG = "VideoViewTest";
     /** The maximum time to wait for an operation. */
@@ -127,7 +127,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
      * Instantiates a new video view test.
      */
     public VideoViewTest() {
-        super("com.android.cts.stub", VideoViewStubActivity.class);
+        super("com.android.cts.widget", VideoViewCtsActivity.class);
     }
 
     /**

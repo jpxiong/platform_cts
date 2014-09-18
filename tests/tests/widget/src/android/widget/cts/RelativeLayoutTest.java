@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import com.android.internal.util.XmlUtils;
 
 
@@ -43,11 +43,11 @@ import java.io.IOException;
  * Test {@link RelativeLayout}.
  */
 public class RelativeLayoutTest extends
-        ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
+        ActivityInstrumentationTestCase2<RelativeLayoutCtsActivity> {
     private Activity mActivity;
 
     public RelativeLayoutTest() {
-        super("com.android.cts.stub", RelativeLayoutStubActivity.class);
+        super("com.android.cts.widget", RelativeLayoutCtsActivity.class);
     }
 
     @Override

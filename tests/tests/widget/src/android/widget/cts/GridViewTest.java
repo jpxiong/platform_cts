@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -51,13 +51,13 @@ import android.widget.AdapterView.OnItemClickListener;
 /**
  * Test {@link GridView}.
  */
-public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubActivity> {
+public class GridViewTest extends ActivityInstrumentationTestCase<GridViewCtsActivity> {
     private GridView mGridView;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
 
     public GridViewTest() {
-        super("com.android.cts.stub", GridViewStubActivity.class);
+        super("com.android.cts.widget", GridViewCtsActivity.class);
     }
 
     private GridView findGridViewById(int id) {

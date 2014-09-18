@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -43,14 +43,14 @@ import java.io.OutputStream;
  * Test {@link MediaController}.
  */
 public class MediaControllerTest extends
-        ActivityInstrumentationTestCase2<MediaControllerStubActivity> {
+        ActivityInstrumentationTestCase2<MediaControllerCtsActivity> {
     private MediaController mMediaController;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private static final long DEFAULT_TIMEOUT = 3000;
 
     public MediaControllerTest() {
-        super("com.android.cts.stub", MediaControllerStubActivity.class);
+        super("com.android.cts.widget", MediaControllerCtsActivity.class);
     }
 
     @Override

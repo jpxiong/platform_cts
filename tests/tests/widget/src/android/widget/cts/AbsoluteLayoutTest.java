@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -34,7 +34,7 @@ import android.widget.AbsoluteLayout.LayoutParams;
 import java.io.IOException;
 
 @SuppressWarnings("deprecation")
-public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private static final int DEFAULT_X      = 5;
     private static final int DEFAULT_Y      = 10;
     private static final int DEFAULT_WIDTH  = 20;
@@ -45,7 +45,7 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
     private LayoutParams mAbsoluteLayoutParams;
 
     public AbsoluteLayoutTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.widget", CtsActivity.class);
     }
 
     @Override

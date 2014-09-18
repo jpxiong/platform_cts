@@ -28,7 +28,7 @@ import android.widget.ListView;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**
