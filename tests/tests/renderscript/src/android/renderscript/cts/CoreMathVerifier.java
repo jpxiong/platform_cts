@@ -1332,6 +1332,9 @@ public class CoreMathVerifier {
             lgamma(in.max32()));
     }
 
+    /* TODO Until -0 handling is corrected in bionic & associated drivers, we temporarily
+     * disable the verification of -0.  We do this with a custom verifier.  Once bionic
+     * is fixed, we can restore computeLgamma and remove verifyLgamma.
     static public void computeLgamma(TestLgamma.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inX);
@@ -1340,13 +1343,33 @@ public class CoreMathVerifier {
         LgammaResult resultMax = lgamma2(in.max32());
         args.out = t.new32(result.lgamma, resultMin.lgamma, resultMax.lgamma);
         args.outY = result.gammaSign;
+    }
+    */
+    static public String verifyLgamma(TestLgamma.ArgumentsFloatIntFloat args, Target t) {
+        t.setPrecision(16, 128, false);
+        Target.Floaty in = t.new32(args.inX);
+        LgammaResult result = lgamma2(in.mid32());
+        LgammaResult resultMin = lgamma2(in.min32());
+        LgammaResult resultMax = lgamma2(in.max32());
+        Target.Floaty expectedOut = t.new32(result.lgamma, resultMin.lgamma, resultMax.lgamma);
+        boolean isNegativeZero = args.inX == 0.f && 1.f / args.inX < 0.f;
         /* TODO The current implementation of bionic does not handle the -0.f case correctly.
-         * It should set the sign to -1 but sets it to 1.  We correct the verifier here
-         * until bionic is fixed.
+         * It should set the sign to -1 but sets it to 1.
          */
-        if (args.inX == 0.f && 1.f / args.inX < 0.f) {
-            args.outY = -1;
+        if (!expectedOut.couldBe(args.out) ||
+            (args.outY != result.gammaSign && !isNegativeZero)) {
+            StringBuilder message = new StringBuilder();
+            message.append(String.format("Input in %14.8g {%8x}:\n", args.inX, Float.floatToRawIntBits(args.inX)));
+            message.append("Expected out: ");
+            message.append(expectedOut.toString());
+            message.append("\n");
+            message.append(String.format("Actual   out: %14.8g {%8x}", args.out, Float.floatToRawIntBits(args.out)));
+            message.append(String.format("Expected outY: %d\n", result.gammaSign));
+            message.append(String.format("Actual   outY: %d\n", args.outY));
+            return message.toString();
         }
+
+        return null;
     }
 
     // TODO The relaxed ulf for the various log are taken from the old tests.

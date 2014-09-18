@@ -278,7 +278,7 @@ public class TestLgamma extends RSBaseCompute {
     public class ArgumentsFloatIntFloat {
         public float inX;
         public int outY;
-        public Target.Floaty out;
+        public float out;
     }
 
     private void checkLgammaFloatIntFloat() {
@@ -315,42 +315,26 @@ public class TestLgamma extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
                 args.inX = arrayInX[i];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.outY = arrayOutY[i * 1 + j];
+                args.out = arrayOut[i * 1 + j];
+                // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
-                CoreMathVerifier.computeLgamma(args, target);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outY != arrayOutY[i * 1 + j]) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyLgamma(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append("Expected output outY: ");
+                    message.append("Output outY: ");
                     message.append(String.format("%d", args.outY));
                     message.append("\n");
-                    message.append("Actual   output outY: ");
-                    message.append(String.format("%d", arrayOutY[i * 1 + j]));
-                    if (args.outY != arrayOutY[i * 1 + j]) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkLgammaFloatIntFloat" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -392,42 +376,26 @@ public class TestLgamma extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
                 args.inX = arrayInX[i * 2 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.outY = arrayOutY[i * 2 + j];
+                args.out = arrayOut[i * 2 + j];
+                // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
-                CoreMathVerifier.computeLgamma(args, target);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outY != arrayOutY[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyLgamma(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append("Expected output outY: ");
+                    message.append("Output outY: ");
                     message.append(String.format("%d", args.outY));
                     message.append("\n");
-                    message.append("Actual   output outY: ");
-                    message.append(String.format("%d", arrayOutY[i * 2 + j]));
-                    if (args.outY != arrayOutY[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkLgammaFloat2Int2Float2" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -469,42 +437,26 @@ public class TestLgamma extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
                 args.inX = arrayInX[i * 4 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.outY = arrayOutY[i * 4 + j];
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
-                CoreMathVerifier.computeLgamma(args, target);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outY != arrayOutY[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyLgamma(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append("Expected output outY: ");
+                    message.append("Output outY: ");
                     message.append(String.format("%d", args.outY));
                     message.append("\n");
-                    message.append("Actual   output outY: ");
-                    message.append(String.format("%d", arrayOutY[i * 4 + j]));
-                    if (args.outY != arrayOutY[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkLgammaFloat3Int3Float3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
@@ -546,42 +498,26 @@ public class TestLgamma extends RSBaseCompute {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
                 args.inX = arrayInX[i * 4 + j];
-                // Figure out what the outputs should have been.
+                // Extract the outputs.
+                args.outY = arrayOutY[i * 4 + j];
+                args.out = arrayOut[i * 4 + j];
+                // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
-                CoreMathVerifier.computeLgamma(args, target);
-                // Validate the outputs.
-                boolean valid = true;
-                if (args.outY != arrayOutY[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                    valid = false;
-                }
+                String errorMessage = CoreMathVerifier.verifyLgamma(args, target);
+                boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append("Expected output outY: ");
+                    message.append("Output outY: ");
                     message.append(String.format("%d", args.outY));
                     message.append("\n");
-                    message.append("Actual   output outY: ");
-                    message.append(String.format("%d", arrayOutY[i * 4 + j]));
-                    if (args.outY != arrayOutY[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
+                    message.append("Output out: ");
+                    message.append(Float.toString(args.out));
                     message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(args.out.toString());
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
+                    message.append(errorMessage);
                     assertTrue("Incorrect output for checkLgammaFloat4Int4Float4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
