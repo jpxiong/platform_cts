@@ -858,16 +858,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- Used for PackageManager test, don't delete this MockContentProvider provider -->
-        <provider android:name="android.content.cts.MockContentProvider" android:authorities="ctstest"
-            android:multiprocess="false" />
-        <provider android:name="android.content.cts.DummyProvider"
-            android:authorities="android.content.cts.dummyprovider"
-            android:multiprocess="true" />
-        <provider android:name="android.content.cts.MockRemoteContentProvider"
-            android:authorities="remotectstest"
-            android:process=":remoteprovider" android:multiprocess="false" />
-
         <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
 
         <activity android:name="android.app.cts.LauncherActivityStub"
