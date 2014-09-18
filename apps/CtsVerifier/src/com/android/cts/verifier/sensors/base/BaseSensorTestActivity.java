@@ -402,6 +402,12 @@ public abstract class BaseSensorTestActivity
             textAppender.append();
         }
 
+        public void logMessage(int messageResId, Object ... params) {
+            TextAppender textAppender = new TextAppender(R.layout.snsr_message);
+            textAppender.setText(getString(messageResId, params));
+            textAppender.append();
+        }
+
         public void logTestDetails(SensorTestDetails testDetails) {
             String name = testDetails.getName();
             String summary = testDetails.getSummary();

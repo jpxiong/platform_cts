@@ -64,7 +64,7 @@ public class SensorTestDetails {
     public SensorTestDetails(Context context, String name, Result result) {
         this(context,
                 name,
-                result.getRunCount(),
+                result.getRunCount() - result.getFailureCount() - result.getIgnoreCount(),
                 result.getIgnoreCount(),
                 result.getFailureCount());
     }

@@ -760,6 +760,16 @@
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
         </activity>
 
+        <activity android:name=".sensors.SensorBatchingTestsActivity"
+                  android:label="@string/snsr_sensor_batching_tests"
+                  android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.cts.intent.category.MANUAL_TEST"/>
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+        </activity>
+
         <activity android:name=".sensors.SensorIntegrationTestsActivity"
                   android:label="@string/snsr_sensor_integration_tests">
             <intent-filter>

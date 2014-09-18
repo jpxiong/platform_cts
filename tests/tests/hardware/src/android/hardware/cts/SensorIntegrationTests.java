@@ -15,6 +15,9 @@
  */
 package android.hardware.cts;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -24,10 +27,8 @@ import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import java.util.Random;
 
@@ -225,7 +226,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                 100 /* event count */);
         tester.addVerification(new EventOrderingVerification());
 
-        TestSensorOperation testee = new TestSensorOperation(
+        VerifiableSensorOperation testee = new TestSensorOperation(
                 context,
                 mSensorTypeTestee,
                 SensorManager.SENSOR_DELAY_FASTEST,

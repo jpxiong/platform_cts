@@ -432,7 +432,6 @@
     <string name="snsr_executing_test">\nExecuting test case \'%1$s\'..\n</string>
     <string name="snsr_orientation_portrait">[Device orientation]: Portrait.</string>
     <string name="snsr_orientation_landscape">[Device orientation]: Landscape.</string>
-    <string name="snsr_register_listener">Expected to be able to register sensor listener. Found=%b.</string>
 
     <!-- Strings to interact with users in Sensor Tests -->
     <string name="snsr_test_play_sound">A sound will be played once the verification is complete...</string>
@@ -517,8 +516,6 @@
     <string name="snsr_batch_test">Sensor Batching Tests</string>
     <string name="snsr_batching_walking_needed">Once the test begins, you will have to walk.</string>
     <string name="snsr_batching_fifo_count">FifoReservedEventCount=%1$d. Expected to be at most FifoMaxEventCount=%2$d.</string>
-    <string name="snsr_batching_first_event_arrival">Batched events expected to arrive after %1$d ns. Found=%2$d ns.</string>
-    <string name="snsr_batching_flush_complete">Event \'onFlushComplete\' expected. Found=%1$b.</string>
 
     <!-- Sensor Synchronization -->
     <string name="snsr_synch_test">Sensor Synchronization Test</string>
@@ -555,6 +552,7 @@
     <string name="snsr_single_sensor_tests">CTS Single Sensor Tests</string>
     <string name="snsr_sensor_integration_tests">CTS Sensor Integration Tests</string>
     <string name="snsr_sensor_test">CTS Sensor Test</string>
+    <string name="snsr_sensor_batching_tests">CTS Sensor Batching Tests</string>
 
     <!-- Strings for Sample Test Activities -->
     <string name="share_button_text">Share</string>

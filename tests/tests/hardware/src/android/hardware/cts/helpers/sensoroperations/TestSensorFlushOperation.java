@@ -26,11 +26,10 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Provides methods to set test expectations as well as providing a set of default expectations
  * depending on sensor type.  When {{@link #execute()} is called, the sensor will collect the
- * events and then run all the tests.
+ * events, call flush, and then run all the tests.
  * </p>
  */
-public class TestSensorOperation extends VerifiableSensorOperation {
-    private final Integer mEventCount;
+public class TestSensorFlushOperation extends VerifiableSensorOperation {
     private final Long mDuration;
     private final TimeUnit mTimeUnit;
 
@@ -41,35 +40,17 @@ public class TestSensorOperation extends VerifiableSensorOperation {
      * @param sensorType the sensor type
      * @param rateUs the rate that
      * @param maxBatchReportLatencyUs the max batch report latency
-     * @param eventCount the number of events to gather
-     */
-    public TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, int eventCount) {
-        this(context, sensorType, rateUs, maxBatchReportLatencyUs, eventCount, null, null);
-    }
-
-    /**
-     * Create a {@link TestSensorOperation}.
-     *
-     * @param context the {@link Context}.
-     * @param sensorType the sensor type
-     * @param rateUs the rate that
-     * @param maxBatchReportLatencyUs the max batch report latency
-     * @param duration the duration to gather events for
+     * @param duration the duration to gather events before calling {@code SensorManager.flush()}
      * @param timeUnit the time unit of the duration
      */
-    public TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, long duration, TimeUnit timeUnit) {
-        this(context, sensorType, rateUs, maxBatchReportLatencyUs, null, duration, timeUnit);
-    }
-
-    /**
-     * Private helper constructor.
-     */
-    private TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, Integer eventCount, Long duration, TimeUnit timeUnit) {
+    public TestSensorFlushOperation(
+            Context context,
+            int sensorType,
+            int rateUs,
+            int maxBatchReportLatencyUs,
+            long duration,
+            TimeUnit timeUnit) {
         super(context, sensorType, rateUs, maxBatchReportLatencyUs);
-        mEventCount = eventCount;
         mDuration = duration;
         mTimeUnit = timeUnit;
     }
@@ -79,11 +60,7 @@ public class TestSensorOperation extends VerifiableSensorOperation {
      */
     @Override
     protected void doExecute(TestSensorEventListener listener) {
-        if (mEventCount != null) {
-            mSensorManager.runSensor(listener, mEventCount);
-        } else {
-            mSensorManager.runSensor(listener, mDuration, mTimeUnit);
-        }
+        mSensorManager.runSensorAndFlush(listener, mDuration, mTimeUnit);
     }
 
     /**
@@ -91,12 +68,12 @@ public class TestSensorOperation extends VerifiableSensorOperation {
      */
     @Override
     protected VerifiableSensorOperation doClone() {
-        if (mEventCount != null) {
-            return new TestSensorOperation(mContext, mSensorType, mRateUs,
-                    mMaxBatchReportLatencyUs, mEventCount);
-        } else {
-            return new TestSensorOperation(mContext, mSensorType, mRateUs,
-                    mMaxBatchReportLatencyUs, mDuration, mTimeUnit);
-        }
+        return new TestSensorFlushOperation(
+                mContext,
+                mSensorType,
+                mRateUs,
+                mMaxBatchReportLatencyUs,
+                mDuration,
+                mTimeUnit);
     }
 }
