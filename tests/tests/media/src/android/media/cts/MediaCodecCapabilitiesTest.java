@@ -212,6 +212,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                 continue;
             }
 
+            if (!supportsMimeType(codecInfo, mimeType)) {
+                continue;
+            }
+
             CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mimeType);
             for (CodecProfileLevel profileLevel : capabilities.profileLevels) {
                 if (profileLevel.profile == profile
@@ -221,6 +225,16 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             }
         }
 
+        return false;
+    }
+
+    private static boolean supportsMimeType(MediaCodecInfo codecInfo, String mimeType) {
+        String[] supportedMimeTypes = codecInfo.getSupportedTypes();
+        for (String supportedMimeType : supportedMimeTypes) {
+            if (mimeType.equalsIgnoreCase(supportedMimeType)) {
+                return true;
+            }
+        }
         return false;
     }
 
