@@ -25,7 +25,7 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 public class PluralResourcesTest extends AndroidTestCase {
     public static boolean DEBUG = false;

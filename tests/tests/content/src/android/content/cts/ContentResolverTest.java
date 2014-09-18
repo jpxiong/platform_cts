@@ -16,7 +16,7 @@
 
 package android.content.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 import android.accounts.Account;
@@ -75,7 +75,7 @@ public class ContentResolverTest extends AndroidTestCase {
     private static final int VALUE2 = 2;
     private static final int VALUE3 = 3;
 
-    private static final String TEST_PACKAGE_NAME = "com.android.cts.stub";
+    private static final String TEST_PACKAGE_NAME = "com.android.cts.content";
 
     private Context mContext;
     private ContentResolver mContentResolver;

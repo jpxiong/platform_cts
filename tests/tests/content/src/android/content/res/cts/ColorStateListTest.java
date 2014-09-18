@@ -27,7 +27,7 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 public class ColorStateListTest extends AndroidTestCase {

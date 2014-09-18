@@ -31,7 +31,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 public class ConfigTest extends AndroidTestCase {
     enum Properties {

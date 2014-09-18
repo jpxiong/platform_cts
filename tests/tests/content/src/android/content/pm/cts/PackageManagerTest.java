@@ -16,7 +16,7 @@
 
 package android.content.pm.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 
 import android.content.ComponentName;
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class PackageManagerTest extends AndroidTestCase {
     private PackageManager mPackageManager;
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+    private static final String PACKAGE_NAME = "com.android.cts.content";
     private static final String CONTENT_PKG_NAME = "com.android.cts.content";
     private static final String ACTIVITY_ACTION_NAME = "android.intent.action.PMTEST";
     private static final String MAIN_ACTION_NAME = "android.intent.action.MAIN";
@@ -395,7 +395,7 @@ public class PackageManagerTest extends AndroidTestCase {
 
     public void testOpPermission() {
         PermissionInfo permissionInfo = new PermissionInfo();
-        String permissionName = "com.android.cts.stub.permission.TEST_DYNAMIC.ADD";
+        String permissionName = "com.android.cts.content.permission.TEST_DYNAMIC.ADD";
         permissionInfo.name = permissionName;
         permissionInfo.labelRes = R.string.permlab_testDynamic;
         permissionInfo.nonLocalizedLabel = "Test Tree";
@@ -450,7 +450,7 @@ public class PackageManagerTest extends AndroidTestCase {
     public void testGetResources() throws NameNotFoundException {
         ComponentName componentName = new ComponentName(PACKAGE_NAME, ACTIVITY_NAME);
         int resourceId = R.xml.pm_test;
-        String xmlName = "com.android.cts.stub:xml/pm_test";
+        String xmlName = "com.android.cts.content:xml/pm_test";
         ApplicationInfo appInfo = mPackageManager.getApplicationInfo(PACKAGE_NAME, 0);
         assertNotNull(mPackageManager.getXml(PACKAGE_NAME, resourceId, appInfo));
         assertEquals(xmlName, mPackageManager.getResourcesForActivity(componentName)

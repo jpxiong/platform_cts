@@ -20,7 +20,7 @@ import android.content.res.Resources;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.android.cts.stub.R;
+import com.android.cts.content.R;
 
 public class ResourceNameTest extends AndroidTestCase {
 
@@ -29,10 +29,10 @@ public class ResourceNameTest extends AndroidTestCase {
         final Resources res = mContext.getResources();
 
         final String fullName = res.getResourceName(R.configVarying.simple);
-        assertEquals("com.android.cts.stub:configVarying/simple", fullName);
+        assertEquals("com.android.cts.content:configVarying/simple", fullName);
 
         final String packageName = res.getResourcePackageName(R.configVarying.simple);
-        assertEquals("com.android.cts.stub", packageName);
+        assertEquals("com.android.cts.content", packageName);
 
         final String typeName = res.getResourceTypeName(R.configVarying.simple);
         assertEquals("configVarying", typeName);
@@ -45,16 +45,16 @@ public class ResourceNameTest extends AndroidTestCase {
     public void testGetResourceIdentifier() {
         final Resources res = mContext.getResources();
         int resid = res.getIdentifier(
-                "com.android.cts.stub:configVarying/simple",
+                "com.android.cts.content:configVarying/simple",
                 null, null);
         assertEquals(R.configVarying.simple, resid);
 
         resid = res.getIdentifier("configVarying/simple", null,
-                "com.android.cts.stub");
+                "com.android.cts.content");
         assertEquals(R.configVarying.simple, resid);
 
         resid = res.getIdentifier("simple", "configVarying",
-                "com.android.cts.stub");
+                "com.android.cts.content");
         assertEquals(R.configVarying.simple, resid);
     }
 }
