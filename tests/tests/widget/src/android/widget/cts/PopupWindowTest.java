@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -41,7 +41,7 @@ import android.widget.TextView;
 import android.widget.PopupWindow.OnDismissListener;
 
 public class PopupWindowTest extends
-        ActivityInstrumentationTestCase2<MockPopupWindowStubActivity> {
+        ActivityInstrumentationTestCase2<MockPopupWindowCtsActivity> {
     private Instrumentation mInstrumentation;
     private Activity mActivity;
     /** The popup window. */
@@ -51,7 +51,7 @@ public class PopupWindowTest extends
      * Instantiates a new popup window test.
      */
     public PopupWindowTest() {
-        super("com.android.cts.stub", MockPopupWindowStubActivity.class);
+        super("com.android.cts.widget", MockPopupWindowCtsActivity.class);
     }
 
     /*

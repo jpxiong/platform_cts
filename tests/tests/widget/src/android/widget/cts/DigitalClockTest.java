@@ -30,19 +30,19 @@ import android.util.Xml;
 import android.widget.DigitalClock;
 import android.widget.LinearLayout;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import com.android.internal.util.XmlUtils;
 
 
 /**
  * Test {@link DigitalClock}.
  */
-public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClockStubActivity> {
+public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClockCtsActivity> {
     private Activity mActivity;
     private Context mContext;
 
     public DigitalClockTest() {
-        super("com.android.cts.stub", DigitalClockStubActivity.class);
+        super("com.android.cts.widget", DigitalClockCtsActivity.class);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
     private AttributeSet getAttributeSet(int resourceId) {
         XmlResourceParser parser = mActivity.getResources().getXml(resourceId);
         try {
-            XmlUtils.beginDocument(parser, "com.android.cts.stub.alarmclock.DigitalClock");
+            XmlUtils.beginDocument(parser, "com.android.cts.widget.alarmclock.DigitalClock");
         } catch (XmlPullParserException e) {
             fail("unexpected XmlPullParserException.");
         } catch (IOException e) {

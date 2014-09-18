@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -27,12 +27,12 @@ import android.util.AttributeSet;
 import android.util.Xml;
 import android.widget.AnalogClock;
 
-public class AnalogClockTest extends ActivityInstrumentationTestCase2<FrameLayoutStubActivity> {
+public class AnalogClockTest extends ActivityInstrumentationTestCase2<FrameLayoutCtsActivity> {
     private AttributeSet mAttrSet;
     private Activity mActivity;
 
     public AnalogClockTest() {
-        super("com.android.cts.stub", FrameLayoutStubActivity.class);
+        super("com.android.cts.widget", FrameLayoutCtsActivity.class);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -34,15 +34,15 @@ import android.widget.TabHost.TabSpec;
 /**
  * Test {@link TabHost}.
  */
-public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubActivity> {
+public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostCtsActivity> {
     private static final String TAG_TAB1 = "tab 1";
     private static final String TAG_TAB2 = "tab 2";
     private static final int TAB_HOST_ID = android.R.id.tabhost;
 
-    private TabHostStubActivity mActivity;
+    private TabHostCtsActivity mActivity;
 
     public TabHostTest() {
-        super("com.android.cts.stub", TabHostStubActivity.class);
+        super("com.android.cts.widget", TabHostCtsActivity.class);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
      * 2. no exception occurs when doing normal operation after setup().
      */
     public void testSetup1() throws Throwable {
-        final Activity activity = launchActivity("com.android.cts.stub", StubActivity.class, null);
+        final Activity activity = launchActivity("com.android.cts.widget", CtsActivity.class, null);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -102,7 +102,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
      * 2. no exception occurs when uses TabSpec.setContent(android.content.Intent) after setup().
      */
     public void testSetup2() throws Throwable {
-        final ActivityGroup activity = launchActivity("com.android.cts.stub",
+        final ActivityGroup activity = launchActivity("com.android.cts.widget",
                 ActivityGroup.class, null);
 
 
@@ -120,7 +120,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
                 TabSpec tabSpec = tabHost.newTabSpec(TAG_TAB1);
                 tabSpec.setIndicator(TAG_TAB1);
                 Intent intent = new Intent(Intent.ACTION_VIEW, null,
-                        mActivity, StubActivity.class);
+                        mActivity, CtsActivity.class);
                 tabSpec.setContent(intent);
                 tabHost.addTab(tabSpec);
                 tabHost.setCurrentTab(0);
@@ -249,7 +249,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
     public void testGetCurrentView() {
         TabHost tabHost = mActivity.getTabHost();
         TextView textView = (TextView) tabHost.getCurrentView();
-        assertEquals(TabHostStubActivity.INITIAL_VIEW_TEXT, textView.getText().toString());
+        assertEquals(TabHostCtsActivity.INITIAL_VIEW_TEXT, textView.getText().toString());
 
         TabSpec tabSpec = tabHost.newTabSpec(TAG_TAB2);
         tabSpec.setIndicator(TAG_TAB2);
@@ -272,7 +272,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         tabHost.setCurrentTabByTag(TAG_TAB2);
         assertEquals(1, tabHost.getCurrentTab());
 
-        tabHost.setCurrentTabByTag(TabHostStubActivity.INITIAL_TAB_TAG);
+        tabHost.setCurrentTabByTag(TabHostCtsActivity.INITIAL_TAB_TAG);
         assertEquals(0, tabHost.getCurrentTab());
 
         // exceptional value
@@ -294,7 +294,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertTrue(tabHost.getTabContentView().getChildAt(1) instanceof ListView);
         TextView child2 = (TextView) tabHost.getTabContentView().getChildAt(2);
         tabHost.setCurrentTab(0);
-        assertEquals(TabHostStubActivity.INITIAL_VIEW_TEXT, child2.getText().toString());
+        assertEquals(TabHostCtsActivity.INITIAL_VIEW_TEXT, child2.getText().toString());
 
         TabSpec tabSpec = tabHost.newTabSpec(TAG_TAB2);
         tabSpec.setIndicator(TAG_TAB2);
@@ -310,7 +310,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertTrue(tabHost.getTabContentView().getChildAt(1) instanceof ListView);
         child2 = (TextView) tabHost.getTabContentView().getChildAt(2);
         tabHost.setCurrentTab(0);
-        assertEquals(TabHostStubActivity.INITIAL_VIEW_TEXT, child2.getText().toString());
+        assertEquals(TabHostCtsActivity.INITIAL_VIEW_TEXT, child2.getText().toString());
     }
 
     @UiThreadTest
@@ -357,7 +357,7 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
     @UiThreadTest
     public void testGetCurrentTabTag() {
         TabHost tabHost = mActivity.getTabHost();
-        assertEquals(TabHostStubActivity.INITIAL_TAB_TAG, tabHost.getCurrentTabTag());
+        assertEquals(TabHostCtsActivity.INITIAL_TAB_TAG, tabHost.getCurrentTabTag());
 
         TabSpec tabSpec = tabHost.newTabSpec(TAG_TAB2);
         tabSpec.setIndicator(TAG_TAB2);

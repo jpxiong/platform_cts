@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -45,13 +45,13 @@ import android.widget.AutoCompleteTextView.Validator;
 import java.io.IOException;
 
 public class AutoCompleteTextViewTest extends
-        ActivityInstrumentationTestCase2<AutoCompleteStubActivity> {
+        ActivityInstrumentationTestCase2<AutoCompleteCtsActivity> {
 
     /**
      * Instantiates a new text view test.
      */
     public AutoCompleteTextViewTest() {
-        super("com.android.cts.stub", AutoCompleteStubActivity.class);
+        super("com.android.cts.widget", AutoCompleteCtsActivity.class);
     }
 
     /** The m activity. */

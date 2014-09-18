@@ -27,7 +27,7 @@ import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import org.xmlpull.v1.XmlPullParser;
 
 import static android.view.ViewGroup.LAYOUT_MODE_OPTICAL_BOUNDS;
@@ -36,7 +36,7 @@ import static android.widget.GridLayout.spec;
 /**
  * Test {@link android.widget.GridLayout}.
  */
-public class GridLayoutTest extends ActivityInstrumentationTestCase<GridLayoutStubActivity> {
+public class GridLayoutTest extends ActivityInstrumentationTestCase<GridLayoutCtsActivity> {
 
     // The size of the off-screen test container in which we we will testing layout.
     public static final int MAX_X = 2000;
@@ -117,7 +117,7 @@ public class GridLayoutTest extends ActivityInstrumentationTestCase<GridLayoutSt
     private Context mContext;
 
     public GridLayoutTest() {
-        super("com.android.cts.stub", GridLayoutStubActivity.class);
+        super("com.android.cts.widget", GridLayoutCtsActivity.class);
     }
 
     @Override

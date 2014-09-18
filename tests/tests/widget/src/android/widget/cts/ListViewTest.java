@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import com.google.android.collect.Lists;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -51,7 +51,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
+public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsActivity> {
     private final String[] mCountryList = new String[] {
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States"
     };
@@ -69,7 +69,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     private ArrayAdapter<String> mAdapter_empty;
 
     public ListViewTest() {
-        super("com.android.cts.stub", ListViewStubActivity.class);
+        super("com.android.cts.widget", ListViewCtsActivity.class);
     }
 
     protected void setUp() throws Exception {

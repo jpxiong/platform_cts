@@ -139,7 +139,7 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         AttributeSet attrs = null;
         try {
             parser = mTargetContext.getResources()
-                    .getXml(com.android.cts.stub.R.xml.base_attributes);
+                    .getXml(com.android.cts.widget.R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT

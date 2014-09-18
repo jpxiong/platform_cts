@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -32,12 +32,12 @@ import android.view.View.OnClickListener;
 import android.widget.ListView;
 import android.widget.ZoomButton;
 
-public class ZoomButtonTest extends ActivityInstrumentationTestCase2<ZoomButtonStubActivity> {
+public class ZoomButtonTest extends ActivityInstrumentationTestCase2<ZoomButtonCtsActivity> {
     private ZoomButton mZoomButton;
     private Activity mActivity;
 
     public ZoomButtonTest() {
-        super("com.android.cts.stub", ZoomButtonStubActivity.class);
+        super("com.android.cts.widget", ZoomButtonCtsActivity.class);
     }
 
     @Override

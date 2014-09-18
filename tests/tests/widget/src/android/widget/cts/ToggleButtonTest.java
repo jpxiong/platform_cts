@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 import android.util.Xml;
 import android.widget.ToggleButton;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**
