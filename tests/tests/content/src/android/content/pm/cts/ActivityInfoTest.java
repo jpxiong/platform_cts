@@ -17,7 +17,7 @@
 package android.content.pm.cts;
 
 
-import android.app.cts.MockActivity;
+import android.content.cts.MockActivity;
 import android.content.ComponentName;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;

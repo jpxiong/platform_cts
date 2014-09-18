@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ProviderInfoTest extends AndroidTestCase {
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+    private static final String PACKAGE_NAME = "com.android.cts.content";
     private static final String PROVIDER_NAME = "android.content.cts.MockContentProvider";
 
     public void testProviderInfo() throws NameNotFoundException {

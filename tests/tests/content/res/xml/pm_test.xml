@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package android.content.cts;
-
-import com.android.cts.stub.R;
-
-import android.app.Activity;
-import android.os.Bundle;
-
-/**
- * This is a stub activity for test available intents. We do not care about
- * what it layouts. We only need an activity even if it's empty for this test.
- */
-public class AvailableIntentsActivity extends Activity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.available_intents_layout);
-    }
-}
+ -->
+ <!-- This xml is just test for PackageManager Test -->
+<resources>
+</resources>
