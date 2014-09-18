@@ -32,6 +32,7 @@ LOCAL_SRC_FILES += \
     src/android/hardware/cts/SensorTestCase.java \
     src/android/hardware/cts/SingleSensorTests.java \
     src/android/hardware/cts/SensorIntegrationTests.java \
+    src/android/hardware/cts/SensorBatchingTests.java \
     src/android/hardware/cts/SensorTest.java \
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil
