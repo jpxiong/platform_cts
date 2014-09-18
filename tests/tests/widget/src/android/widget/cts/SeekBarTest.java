@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -30,7 +30,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 /**
  * Test {@link SeekBar}.
  */
-public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarStubActivity> {
+public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarCtsActivity> {
     private SeekBar mSeekBar;
 
     private Activity mActivity;
@@ -38,7 +38,7 @@ public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarStubAct
     private Instrumentation mInstrumentation;
 
     public SeekBarTest() {
-        super("com.android.cts.stub", SeekBarStubActivity.class);
+        super("com.android.cts.widget", SeekBarCtsActivity.class);
     }
 
     @Override

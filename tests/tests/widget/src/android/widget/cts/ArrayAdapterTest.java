@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 public class ArrayAdapterTest extends AndroidTestCase {

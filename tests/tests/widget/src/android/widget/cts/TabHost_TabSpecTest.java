@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -29,7 +29,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.text.style.cts.MockURLSpanTestActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -40,14 +39,14 @@ import android.widget.TabHost.TabSpec;
 /**
  * Test {@link TabSpec}.
  */
-public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHostStubActivity> {
+public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHostCtsActivity> {
     private static final String TAG_TAB2 = "tab 2";
 
     private TabHost mTabHost;
-    private TabHostStubActivity mActivity;
+    private TabHostCtsActivity mActivity;
 
     public TabHost_TabSpecTest() {
-        super("com.android.cts.stub", TabHostStubActivity.class);
+        super("com.android.cts.widget", TabHostCtsActivity.class);
     }
 
     @Override
@@ -138,7 +137,7 @@ public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHos
         TabSpec tabSpec2 = mTabHost.newTabSpec("tab spec 2");
         tabSpec2.setIndicator("tab 2");
         // TabContentFactory to create a TextView as the content of the tab.
-        tabSpec2.setContent(com.android.cts.stub.R.id.tabhost_textview);
+        tabSpec2.setContent(com.android.cts.widget.R.id.tabhost_textview);
         mTabHost.addTab(tabSpec2);
         mTabHost.setCurrentTab(1);
         TextView currentView = (TextView) mTabHost.getCurrentView();
@@ -148,7 +147,7 @@ public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHos
         TabSpec tabSpec3 = mTabHost.newTabSpec("tab spec 3");
         tabSpec3.setIndicator("tab 3");
         // TabContentFactory to create a ListView as the content of the tab.
-        tabSpec3.setContent(com.android.cts.stub.R.id.tabhost_listview);
+        tabSpec3.setContent(com.android.cts.widget.R.id.tabhost_listview);
         mTabHost.addTab(tabSpec3);
         mTabHost.setCurrentTab(2);
         assertTrue(mTabHost.getCurrentView() instanceof ListView);

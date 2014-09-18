@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.content.Context;
@@ -39,11 +39,11 @@ import android.widget.TextView;
 /**
  * Test {@link TableLayout}.
  */
-public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubActivity> {
+public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableCtsActivity> {
     private Context mContext;
 
     public TableLayoutTest() {
-        super("com.android.cts.stub", TableStubActivity.class);
+        super("com.android.cts.widget", TableCtsActivity.class);
     }
 
     @Override
@@ -58,15 +58,15 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
 
         new TableLayout(mContext, null);
 
-        TableStubActivity activity = getActivity();
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
+        TableCtsActivity activity = getActivity();
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_1);
         TableLayout tableLayout = (TableLayout) activity
-                .findViewById(com.android.cts.stub.R.id.table1);
+                .findViewById(com.android.cts.widget.R.id.table1);
         assertTrue(tableLayout.isColumnCollapsed(0));
         assertTrue(tableLayout.isColumnStretchable(2));
 
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_2);
-        tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table2);
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_2);
+        tableLayout = (TableLayout) activity.findViewById(com.android.cts.widget.R.id.table2);
         assertTrue(tableLayout.isColumnShrinkable(1));
     }
 
@@ -203,15 +203,15 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
     }
 
     public void testColumnStretchableEffect() {
-        final TableStubActivity activity = getActivity();
+        final TableCtsActivity activity = getActivity();
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
-                activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
+                activity.setContentView(com.android.cts.widget.R.layout.table_layout_1);
             }
         });
         getInstrumentation().waitForIdleSync();
         final TableLayout tableLayout =
-                (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table1);
+                (TableLayout) activity.findViewById(com.android.cts.widget.R.id.table1);
 
         // Preparation: remove Collapsed mark for column 0.
         getInstrumentation().runOnMainSync(new Runnable() {
@@ -554,7 +554,7 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
     public void testGenerateLayoutParams1() {
         TableLayout tableLayout = new TableLayout(mContext);
 
-        TableStubActivity activity = getActivity();
+        TableCtsActivity activity = getActivity();
         XmlResourceParser parser = activity.getResources().getLayout(R.layout.table_layout_1);
         AttributeSet attr = Xml.asAttributeSet(parser);
 

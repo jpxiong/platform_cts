@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.test.ActivityInstrumentationTestCase2;
@@ -29,10 +29,10 @@ import android.widget.RelativeLayout;
  * Test {@link RelativeLayout.LayoutParams}.
  */
 public class RelativeLayout_LayoutParamsTest extends
-        ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
+        ActivityInstrumentationTestCase2<RelativeLayoutCtsActivity> {
 
     public RelativeLayout_LayoutParamsTest() {
-        super("com.android.cts.stub", RelativeLayoutStubActivity.class);
+        super("com.android.cts.widget", RelativeLayoutCtsActivity.class);
     }
 
     public void testConstructor() {
@@ -53,7 +53,7 @@ public class RelativeLayout_LayoutParamsTest extends
 
         // Test RelativeLayout.Params which generated from the xml file.
         int rules[];
-        RelativeLayoutStubActivity activity = getActivity();
+        RelativeLayoutCtsActivity activity = getActivity();
 
         // test attributes used in RelativeLayout.
         RelativeLayout relativeLayout = (RelativeLayout) activity.findViewById(
@@ -160,7 +160,7 @@ public class RelativeLayout_LayoutParamsTest extends
 
         // Test RelativeLayout.Params which generated from the xml file.
         int rules[];
-        RelativeLayoutStubActivity activity = getActivity();
+        RelativeLayoutCtsActivity activity = getActivity();
 
         // test attributes used in RelativeLayout.
         RelativeLayout relativeLayout = (RelativeLayout) activity.findViewById(

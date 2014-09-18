@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.content.Context;
@@ -28,12 +28,12 @@ import android.widget.RatingBar.OnRatingBarChangeListener;
 /**
  * Test {@link RatingBar}.
  */
-public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStubActivity> {
+public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarCtsActivity> {
     private Context mContext;
-    private RatingBarStubActivity mActivity;
+    private RatingBarCtsActivity mActivity;
 
     public RatingBarTest() {
-        super("com.android.cts.stub", RatingBarStubActivity.class);
+        super("com.android.cts.widget", RatingBarCtsActivity.class);
     }
 
     @Override

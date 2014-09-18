@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -33,7 +33,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class ToastTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private static final String TEST_TOAST_TEXT = "test toast";
     private static final long TIME_FOR_UI_OPERATION  = 1000L;
     private static final long TIME_OUT = 5000L;
@@ -44,7 +44,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
 
     public ToastTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.widget", CtsActivity.class);
     }
 
     @Override

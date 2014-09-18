@@ -23,18 +23,17 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.view.InflateException;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.cts.NullWebViewUtils;
 import android.widget.RemoteViews;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 public class RemoteViewsActivityTest
-        extends ActivityInstrumentationTestCase2<RemoteViewsStubActivity> {
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+        extends ActivityInstrumentationTestCase2<RemoteViewsCtsActivity> {
+    private static final String PACKAGE_NAME = "com.android.cts.widget";
     private Activity mActivity;
 
     public RemoteViewsActivityTest() {
-        super(PACKAGE_NAME, RemoteViewsStubActivity.class);
+        super(PACKAGE_NAME, RemoteViewsCtsActivity.class);
     }
 
     @Override

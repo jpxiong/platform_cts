@@ -38,10 +38,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
-public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterViewStubActivity> {
+public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterViewCtsActivity> {
 
     private final static int INVALID_ID = -1;
 
@@ -54,7 +54,7 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
     private AdapterView<ListAdapter> mAdapterView;
 
     public AdapterViewTest() {
-        super("com.android.cts.stub", AdapterViewStubActivity.class);
+        super("com.android.cts.widget", AdapterViewCtsActivity.class);
     }
 
     @Override

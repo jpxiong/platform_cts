@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -44,14 +44,14 @@ import java.io.IOException;
  * Test {@link SlidingDrawer}.
  */
 public class SlidingDrawerTest
-        extends ActivityInstrumentationTestCase2<SlidingDrawerStubActivity> {
+        extends ActivityInstrumentationTestCase2<SlidingDrawerCtsActivity> {
 
     private static final long TEST_TIMEOUT = 5000L;
     private Activity mActivity;
     private Object mLock;
 
     public SlidingDrawerTest() {
-        super("com.android.cts.stub", SlidingDrawerStubActivity.class);
+        super("com.android.cts.widget", SlidingDrawerCtsActivity.class);
     }
 
     @Override

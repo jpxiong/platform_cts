@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -38,13 +38,13 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 public class CheckedTextViewTest extends
-        ActivityInstrumentationTestCase2<CheckedTextViewStubActivity> {
+        ActivityInstrumentationTestCase2<CheckedTextViewCtsActivity> {
     private Resources mResources;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
 
     public CheckedTextViewTest() {
-        super("com.android.cts.stub", CheckedTextViewStubActivity.class);
+        super("com.android.cts.widget", CheckedTextViewCtsActivity.class);
     }
 
     @Override
