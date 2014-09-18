@@ -75,7 +75,11 @@ import junit.framework.Assert;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import java.util.Collections;
 import java.util.Date;
@@ -84,6 +88,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -1288,6 +1293,94 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // Check the method is null input safe.
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(null, null, null, null, null);
         assertEquals("about:blank", mOnUiThread.getUrl());
+    }
+
+    private void deleteIfExists(File file) throws IOException {
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    private String readTextFile(File file, Charset encoding)
+            throws FileNotFoundException, IOException {
+        FileInputStream stream = new FileInputStream(file);
+        byte[] bytes = new byte[(int)file.length()];
+        stream.read(bytes);
+        stream.close();
+        return new String(bytes, encoding);
+    }
+
+    private void doSaveWebArchive(String baseName, boolean autoName, final String expectName)
+            throws Throwable {
+        final Semaphore saving = new Semaphore(0);
+        ValueCallback<String> callback = new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String savedName) {
+                assertEquals(expectName, savedName);
+                saving.release();
+            }
+        };
+
+        mOnUiThread.saveWebArchive(baseName, autoName, callback);
+        assertTrue(saving.tryAcquire(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+
+    public void testSaveWebArchive() throws Throwable {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final String testPage = "testSaveWebArchive test page";
+
+        File dir = getActivity().getFilesDir();
+        String dirStr = dir.toString();
+
+        File test = new File(dir, "test.mht");
+        deleteIfExists(test);
+        String testStr = test.getAbsolutePath();
+
+        File index = new File(dir, "index.mht");
+        deleteIfExists(index);
+        String indexStr = index.getAbsolutePath();
+
+        File index1 = new File(dir, "index-1.mht");
+        deleteIfExists(index1);
+        String index1Str = index1.getAbsolutePath();
+
+        mOnUiThread.loadDataAndWaitForCompletion(testPage, "text/html", "UTF-8");
+
+        try {
+            // Save test.mht
+            doSaveWebArchive(testStr, false, testStr);
+
+            // Check the contents of test.mht
+            String testMhtml = readTextFile(test, StandardCharsets.UTF_8);
+            assertTrue(testMhtml.contains(testPage));
+
+            // Save index.mht
+            doSaveWebArchive(dirStr + "/", true, indexStr);
+
+            // Check the contents of index.mht
+            String indexMhtml = readTextFile(index, StandardCharsets.UTF_8);
+            assertTrue(indexMhtml.contains(testPage));
+
+            // Save index-1.mht since index.mht already exists
+            doSaveWebArchive(dirStr + "/", true, index1Str);
+
+            // Check the contents of index-1.mht
+            String index1Mhtml = readTextFile(index1, StandardCharsets.UTF_8);
+            assertTrue(index1Mhtml.contains(testPage));
+
+            // Try a file in a bogus directory
+            doSaveWebArchive("/bogus/path/test.mht", false, null);
+
+            // Try a bogus directory
+            doSaveWebArchive("/bogus/path/", true, null);
+        } finally {
+            deleteIfExists(test);
+            deleteIfExists(index);
+            deleteIfExists(index1);
+        }
     }
 
     private static class WaitForFindResultsListener extends FutureTask<Integer>
