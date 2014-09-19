@@ -65,7 +65,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private static final int LEGACY = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     private static final int LIMITED = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED;
     private static final int FULL = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
-    private static final int OPT = -1;  // For keys that are optional on all hardware levels.
+    private static final int OPT = Integer.MAX_VALUE;  // For keys that are optional on all hardware levels.
 
     /*
      * Capabilities short hand
@@ -478,7 +478,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private static int remapHardwareLevel(int level) {
         switch (level) {
             case OPT:
-                return -1;
+                return Integer.MAX_VALUE;
             case LEGACY:
                 return 0; // lowest
             case LIMITED:
