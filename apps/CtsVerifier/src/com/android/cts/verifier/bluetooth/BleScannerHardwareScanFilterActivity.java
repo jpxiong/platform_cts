@@ -51,7 +51,6 @@ public class BleScannerHardwareScanFilterActivity extends PassFailButtons.Activi
         setPassFailButtonClickListeners();
         setInfoResources(R.string.ble_scanner_scan_filter_name,
                          R.string.ble_scanner_scan_filter_info, -1);
-        getPassButton().setEnabled(false);
 
         mScanResultListView = (ListView)findViewById(R.id.ble_scan_result_list);
         mAdapter = new MapAdapter();
