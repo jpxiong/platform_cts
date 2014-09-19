@@ -16,6 +16,7 @@
 
 package android.widget.cts;
 
+import android.test.UiThreadTest;
 import com.android.cts.widget.R;
 
 
@@ -76,8 +77,13 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
-        mRemoteViews = new RemoteViews(PACKAGE_NAME, R.layout.remoteviews_good);
-        mResult = mRemoteViews.apply(mActivity, null);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                mRemoteViews = new RemoteViews(PACKAGE_NAME, R.layout.remoteviews_good);
+                mResult = mRemoteViews.apply(mActivity, null);
+            }
+        });
     }
 
     public void testConstructor() {
@@ -307,6 +313,7 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
         mRemoteViews.describeContents();
     }
 
+    @UiThreadTest
     public void testWriteToParcel() {
         mRemoteViews.setTextViewText(R.id.remoteView_text, "This is content");
         mRemoteViews.setViewVisibility(R.id.remoteView_frame, View.GONE);
