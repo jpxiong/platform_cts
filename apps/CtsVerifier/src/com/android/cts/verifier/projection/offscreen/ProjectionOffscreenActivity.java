@@ -185,6 +185,13 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
         }
 
         Image image = reader.acquireLatestImage();
+
+        // No new images available
+        if (image == null) {
+            Log.w(TAG, "onImageAvailable called but no image!");
+            return;
+        }
+
         if (mTestStatus == TestStatus.RUNNING) {
             int ret = scanImage(image);
             if (ret == -1) {
@@ -244,9 +251,7 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
             offset += rowPadding;
         }
 
-        // Return a color if it represents more than one quarter of the pixels.
-        // We use this threshold in case the display is being letterboxed when
-        // mirroring so there might be large black bars on the sides, which is normal.
+        // Return a color if it represents all of the pixels.
         Log.d(TAG, "- Pixels: " + blackPixels + " black, "
                 + bluePixels + " blue, "
                 + otherPixels + " other");
