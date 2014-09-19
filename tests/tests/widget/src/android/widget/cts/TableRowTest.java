@@ -33,18 +33,18 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 /**
  * Test {@link TableRow}.
  */
-public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActivity> {
+public class TableRowTest extends ActivityInstrumentationTestCase2<TableCtsActivity> {
     Context mContext;
     Context mTargetContext;
 
     public TableRowTest() {
-        super("com.android.cts.stub", TableStubActivity.class);
+        super("com.android.cts.widget", TableCtsActivity.class);
     }
 
     @Override
@@ -82,10 +82,10 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
 
     @UiThreadTest
     public void testGetVirtualChildAt() {
-        TableStubActivity activity = getActivity();
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
+        TableCtsActivity activity = getActivity();
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_1);
         TableLayout tableLayout = (TableLayout) activity
-                .findViewById(com.android.cts.stub.R.id.table1);
+                .findViewById(com.android.cts.widget.R.id.table1);
 
         TableRow tableRow = (TableRow) tableLayout.getChildAt(0);
         Resources resources = activity.getResources();
@@ -96,8 +96,8 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertEquals(resources.getString(R.string.table_layout_third),
                 ((TextView) tableRow.getVirtualChildAt(2)).getText().toString());
 
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_2);
-        tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table2);
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_2);
+        tableLayout = (TableLayout) activity.findViewById(com.android.cts.widget.R.id.table2);
 
         tableRow = (TableRow) tableLayout.getChildAt(0);
         assertNull(tableRow.getVirtualChildAt(0));
@@ -113,16 +113,16 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
 
     @UiThreadTest
     public void testGetVirtualChildCount() {
-        TableStubActivity activity = getActivity();
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
+        TableCtsActivity activity = getActivity();
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_1);
         TableLayout tableLayout = (TableLayout) activity
-                .findViewById(com.android.cts.stub.R.id.table1);
+                .findViewById(com.android.cts.widget.R.id.table1);
 
         TableRow tableRow = (TableRow) tableLayout.getChildAt(0);
         assertEquals(3, tableRow.getVirtualChildCount());
 
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_2);
-        tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table2);
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_2);
+        tableLayout = (TableLayout) activity.findViewById(com.android.cts.widget.R.id.table2);
 
         tableRow = (TableRow) tableLayout.getChildAt(0);
         assertEquals(5, tableRow.getVirtualChildCount());

@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.AlertDialog;
@@ -31,11 +31,11 @@ import android.widget.Spinner;
 /**
  * Test {@link Spinner}.
  */
-public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
+public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutCtsActivity> {
     private Context mTargetContext;
 
     public SpinnerTest() {
-        super("com.android.cts.stub", RelativeLayoutStubActivity.class);
+        super("com.android.cts.widget", RelativeLayoutCtsActivity.class);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
 
         spinner = (Spinner) getActivity().findViewById(R.id.spinner1);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mTargetContext,
-                com.android.cts.stub.R.array.string, android.R.layout.simple_spinner_item);
+                com.android.cts.widget.R.array.string, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         assertTrue(spinner.getBaseline() > 0);

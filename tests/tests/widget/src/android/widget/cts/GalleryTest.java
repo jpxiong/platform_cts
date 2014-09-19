@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 
 
@@ -53,7 +53,7 @@ import java.io.IOException;
 /**
  * Test {@link Gallery}.
  */
-public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubActivity>  {
+public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActivity>  {
     private Gallery mGallery;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
@@ -61,7 +61,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
     private final static float DELTA = 0.01f;
 
     public GalleryTest() {
-        super("com.android.cts.stub", GalleryStubActivity.class);
+        super("com.android.cts.widget", GalleryCtsActivity.class);
     }
 
     @Override

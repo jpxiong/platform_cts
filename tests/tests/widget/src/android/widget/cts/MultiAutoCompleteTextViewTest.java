@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -38,13 +38,13 @@ import android.widget.MultiAutoCompleteTextView.CommaTokenizer;
 import android.widget.MultiAutoCompleteTextView.Tokenizer;
 
 public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCase2
-        <MultiAutoCompleteTextViewStubActivity> {
+        <MultiAutoCompleteTextViewCtsActivity> {
     private MultiAutoCompleteTextView mMultiAutoCompleteTextView_country;
     private MultiAutoCompleteTextView mMultiAutoCompleteTextView_name;
     private Activity mActivity;
 
     public MultiAutoCompleteTextViewTest() {
-        super("com.android.cts.stub", MultiAutoCompleteTextViewStubActivity.class);
+        super("com.android.cts.widget", MultiAutoCompleteTextViewCtsActivity.class);
     }
 
     @Override

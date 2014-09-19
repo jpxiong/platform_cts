@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 import com.android.internal.util.FastMath;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -69,7 +69,6 @@ import android.text.method.TextKeyListener.Capitalize;
 import android.text.method.TimeKeyListener;
 import android.text.method.TransformationMethod;
 import android.text.style.URLSpan;
-import android.text.style.cts.MockURLSpanTestActivity;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -98,7 +97,7 @@ import java.io.IOException;
 /**
  * Test {@link TextView}.
  */
-public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubActivity> {
+public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsActivity> {
 
     private TextView mTextView;
     private Activity mActivity;
@@ -112,7 +111,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     private CharSequence mTransformedText;
 
     public TextViewTest() {
-        super("com.android.cts.stub", TextViewStubActivity.class);
+        super("com.android.cts.widget", TextViewCtsActivity.class);
     }
 
     @Override
@@ -3294,7 +3293,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testResetTextAlignment() {
-        TextViewStubActivity activity = getActivity();
+        TextViewCtsActivity activity = getActivity();
 
         LinearLayout ll = (LinearLayout) activity.findViewById(R.id.layout_textviewtest);
         TextView tv = (TextView) activity.findViewById(R.id.textview_rtl);
@@ -3320,7 +3319,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         final int RIGHT = 2;
         final int BOTTOM = 3;
 
-        TextViewStubActivity activity = getActivity();
+        TextViewCtsActivity activity = getActivity();
 
         // Case 1.1: left / right drawable defined in default LTR mode
         TextView tv = (TextView) activity.findViewById(R.id.textview_drawable_1_1);
@@ -3464,7 +3463,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         final int RIGHT = 2;
         final int BOTTOM = 3;
 
-        TextViewStubActivity activity = getActivity();
+        TextViewCtsActivity activity = getActivity();
 
         // Case 1.1: left / right drawable defined in default LTR mode
         TextView tv = (TextView) activity.findViewById(R.id.textview_drawable_1_1);

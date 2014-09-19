@@ -22,13 +22,13 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Filter;
 import android.widget.Filter.FilterListener;
 
-public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
+public class FilterTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private static final long TIME_OUT = 10000;
     private static final String TEST_CONSTRAINT = "filter test";
     private MockFilter mMockFilter;
 
     public FilterTest() {
-        super("com.android.cts.stub", StubActivity.class);
+        super("com.android.cts.widget", CtsActivity.class);
     }
 
     public void testConstructor() {

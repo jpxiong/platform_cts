@@ -39,11 +39,11 @@ import org.xmlpull.v1.XmlPullParser;
  * Test {@link TableRow.LayoutParams}.
  */
 public class TableRow_LayoutParamsTest
-        extends ActivityInstrumentationTestCase2<TableStubActivity> {
+        extends ActivityInstrumentationTestCase2<TableCtsActivity> {
     Context mTargetContext;
 
     public TableRow_LayoutParamsTest() {
-        super("com.android.cts.stub", TableStubActivity.class);
+        super("com.android.cts.widget", TableCtsActivity.class);
     }
 
     @Override
@@ -91,9 +91,9 @@ public class TableRow_LayoutParamsTest
         assertEquals(0, layoutParams.column);
         assertEquals(0, layoutParams.span);
 
-        TableStubActivity activity = getActivity();
-        activity.setContentView(com.android.cts.stub.R.layout.table_layout_2);
-        int idTable = com.android.cts.stub.R.id.table2;
+        TableCtsActivity activity = getActivity();
+        activity.setContentView(com.android.cts.widget.R.layout.table_layout_2);
+        int idTable = com.android.cts.widget.R.id.table2;
         TableLayout tableLayout = (TableLayout) activity.findViewById(idTable);
         View vVitural1 = ((TableRow) tableLayout.getChildAt(0)).getVirtualChildAt(1);
         layoutParams = (TableRow.LayoutParams) vVitural1.getLayoutParams();
@@ -186,7 +186,7 @@ public class TableRow_LayoutParamsTest
         AttributeSet attrs = null;
         try {
             parser = mTargetContext.getResources()
-                    .getXml(com.android.cts.stub.R.xml.base_attributes);
+                    .getXml(com.android.cts.widget.R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT

@@ -21,7 +21,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.test.UiThreadTest;
 
-import com.android.cts.stub.R;
+import com.android.cts.widget.R;
 
 
 import android.app.Activity;
@@ -40,9 +40,9 @@ import android.widget.SeekBar;
 /**
  * Test {@link AbsSeekBar}.
  */
-public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBarStubActivity> {
+public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBarCtsActivity> {
     public AbsSeekBarTest() {
-        super("com.android.cts.stub", ProgressBarStubActivity.class);
+        super("com.android.cts.widget", ProgressBarCtsActivity.class);
     }
 
     private Activity mActivity;
