@@ -24,6 +24,7 @@ import android.util.Log;
 import android.webgl.cts.R;
 import android.webkit.WebView;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 import java.lang.Override;
 import java.io.InputStream;
@@ -54,6 +55,12 @@ public class WebGLActivity extends Activity {
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAllowFileAccessFromFileURLs(true);
         mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+                return false;
+            }
+        });
 
         mWebView.addJavascriptInterface(new Object() {
             @JavascriptInterface
