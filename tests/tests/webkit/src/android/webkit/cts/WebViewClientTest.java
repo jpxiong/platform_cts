@@ -373,7 +373,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewC
                 assertEquals(view, mOnUiThread.getWebView());
 
                 // Save the main page request; discard any other requests (e.g. for favicon.ico)
-                if (request.getUrl().toString().contains(mainPath)) {
+                if (request.getUrl().getPath().equals(mainPath)) {
                     assertNull(interceptRequest);
                     interceptRequest = request;
                 }
