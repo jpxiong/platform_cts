@@ -425,7 +425,7 @@ implements Runnable {
                     new MockListener.StringListResultCatcher() {
                 @Override
                 public void accept(List<String> result) {
-                    if (result.size() > 0 && result.contains(mTag1)) {
+                    if (result != null && result.size() > 0 && result.contains(mTag1)) {
                         mStatus[i] = PASS;
                     } else {
                         logWithStack("failed testNotificationRecieved");
@@ -444,7 +444,7 @@ implements Runnable {
             public void accept(List<String> result) {
                 boolean pass = false;
                 Set<String> found = new HashSet<String>();
-                if (result.size() > 0) {
+                if (result != null && result.size() > 0) {
                     pass = true;
                     for(String payloadData : result) {
                         try {
@@ -513,7 +513,7 @@ implements Runnable {
                     new MockListener.StringListResultCatcher() {
                 @Override
                 public void accept(List<String> result) {
-                    if (result.size() > 0 && result.contains(mTag1)) {
+                    if (result != null && result.size() > 0 && result.contains(mTag1)) {
                         mStatus[i] = PASS;
                         next();
                     } else {
@@ -546,7 +546,8 @@ implements Runnable {
                     new MockListener.StringListResultCatcher() {
                 @Override
                 public void accept(List<String> result) {
-                    if (result.size() == 2 && result.contains(mTag2) && result.contains(mTag3)) {
+                    if (result != null && result.size() == 2
+                            && result.contains(mTag2) && result.contains(mTag3)) {
                         mStatus[i] = PASS;
                         next();
                     } else {
