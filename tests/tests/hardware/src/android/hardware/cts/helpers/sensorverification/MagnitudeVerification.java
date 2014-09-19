@@ -16,12 +16,13 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,15 +61,16 @@ public class MagnitudeVerification extends AbstractSensorVerification {
     /**
      * Get the default {@link MagnitudeVerification} for a sensor.
      *
-     * @param sensor a {@link Sensor}
+     * @param environment the test environment
      * @return the verification or null if the verification does not apply to the sensor.
      */
-    public static MagnitudeVerification getDefault(Sensor sensor) {
-        if (!DEFAULTS.containsKey(sensor.getType())) {
+    public static MagnitudeVerification getDefault(TestSensorEnvironment environment) {
+        int sensorType = environment.getSensor().getType();
+        if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
-        Float expected = DEFAULTS.get(sensor.getType())[0];
-        Float threshold = DEFAULTS.get(sensor.getType())[1];
+        Float expected = DEFAULTS.get(sensorType)[0];
+        Float threshold = DEFAULTS.get(sensorType)[1];
         return new MagnitudeVerification(expected, threshold);
     }
 
@@ -79,7 +81,14 @@ public class MagnitudeVerification extends AbstractSensorVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        verify(stats);
+    }
+
+    /**
+     * Visible for unit tests only.
+     */
+    void verify(SensorStats stats) {
         if (mCount < 1) {
             stats.addValue(PASSED_KEY, true);
             return;

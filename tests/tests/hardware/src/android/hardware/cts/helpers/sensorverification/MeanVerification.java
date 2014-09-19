@@ -16,11 +16,12 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorStats;
-
-import junit.framework.Assert;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,15 +56,16 @@ public class MeanVerification extends AbstractMeanVerification {
     /**
      * Get the default {@link MeanVerification} for a sensor.
      *
-     * @param sensor a {@link Sensor}
+     * @param environment the test environment
      * @return the verification or null if the verification does not apply to the sensor.
      */
-    public static MeanVerification getDefault(Sensor sensor) {
-        if (!DEFAULTS.containsKey(sensor.getType())) {
+    public static MeanVerification getDefault(TestSensorEnvironment environment) {
+        int sensorType = environment.getSensor().getType();
+        if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
-        float[] expected = (float[]) DEFAULTS.get(sensor.getType())[0];
-        float[] threshold = (float[]) DEFAULTS.get(sensor.getType())[1];
+        float[] expected = (float[]) DEFAULTS.get(sensorType)[0];
+        float[] threshold = (float[]) DEFAULTS.get(sensorType)[1];
         return new MeanVerification(expected, threshold);
     }
 
@@ -74,7 +76,14 @@ public class MeanVerification extends AbstractMeanVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        verify(stats);
+    }
+
+    /**
+     * Visible for unit tests only.
+     */
+    void verify(SensorStats stats) {
         if (getCount() < 1) {
             stats.addValue(PASSED_KEY, true);
             return;

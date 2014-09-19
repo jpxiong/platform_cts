@@ -16,9 +16,9 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.Assert;
+
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Abstract class that calculates of the mean event values.

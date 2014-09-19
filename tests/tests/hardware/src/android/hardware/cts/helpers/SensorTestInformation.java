@@ -25,41 +25,8 @@ import android.hardware.Sensor;
 public class SensorTestInformation {
     private SensorTestInformation() {}
 
-    public enum SensorReportingMode {
-        CONTINUOUS,
-        ON_CHANGE,
-        ONE_SHOT,
-    }
-
-    @SuppressWarnings("deprecation")
-    public static SensorReportingMode getReportingMode(int sensorType) {
-        switch(sensorType) {
-            case Sensor.TYPE_ACCELEROMETER:
-            case Sensor.TYPE_MAGNETIC_FIELD:
-            case Sensor.TYPE_ORIENTATION:
-            case Sensor.TYPE_GYROSCOPE:
-            case Sensor.TYPE_PRESSURE:
-            case Sensor.TYPE_GRAVITY:
-            case Sensor.TYPE_LINEAR_ACCELERATION:
-            case Sensor.TYPE_ROTATION_VECTOR:
-            case Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED:
-            case Sensor.TYPE_GAME_ROTATION_VECTOR:
-            case Sensor.TYPE_GYROSCOPE_UNCALIBRATED:
-            case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
-                return SensorReportingMode.CONTINUOUS;
-            case Sensor.TYPE_LIGHT:
-            case Sensor.TYPE_TEMPERATURE:
-            case Sensor.TYPE_PROXIMITY:
-            case Sensor.TYPE_RELATIVE_HUMIDITY:
-            case Sensor.TYPE_AMBIENT_TEMPERATURE:
-            case Sensor.TYPE_STEP_DETECTOR:
-            case Sensor.TYPE_STEP_COUNTER:
-                return SensorReportingMode.ON_CHANGE;
-            case Sensor.TYPE_SIGNIFICANT_MOTION:
-                return SensorReportingMode.ONE_SHOT;
-            default:
-                return null;
-        }
+    public static String getSensorName(Sensor sensor) {
+        return getSensorName(sensor.getType());
     }
 
     public static String getSensorName(int sensorType) {

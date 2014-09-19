@@ -40,13 +40,10 @@ public class TestSensorEventListener implements SensorEventListener2 {
 
     private final SensorEventListener2 mListener;
 
-    private volatile CountDownLatch mEventLatch = null;
+    private volatile CountDownLatch mEventLatch;
     private volatile CountDownLatch mFlushLatch = new CountDownLatch(1);
-
-    private Sensor mSensor = null;
-    private int mRateUs = 0;
-    private int mMaxBatchReportLatencyUs = 0;
-    private boolean mLogEvents = false;
+    private volatile TestSensorEnvironment mEnvironment;
+    private volatile boolean mLogEvents;
 
     /**
      * Construct a {@link TestSensorEventListener}.
@@ -74,10 +71,8 @@ public class TestSensorEventListener implements SensorEventListener2 {
     /**
      * Set the sensor, rate, and batch report latency used for the assertions.
      */
-    public void setSensorInfo(Sensor sensor, int rateUs, int maxBatchReportLatencyUs) {
-        mSensor = sensor;
-        mRateUs = rateUs;
-        mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
+    public void setEnvironment(TestSensorEnvironment environment) {
+        mEnvironment = environment;
     }
 
     /**
@@ -111,7 +106,9 @@ public class TestSensorEventListener implements SensorEventListener2 {
 
             Log.v(LOG_TAG, String.format(
                     "Sensor %d: sensor_timestamp=%d, received_timestamp=%d, values=%s",
-                    mSensor.getType(), event.timestamp, System.nanoTime(),
+                    mEnvironment.getSensor().getType(),
+                    event.timestamp,
+                    System.nanoTime(),
                     Arrays.toString(event.values)));
         }
     }
@@ -146,9 +143,9 @@ public class TestSensorEventListener implements SensorEventListener2 {
         CountDownLatch latch = mFlushLatch;
         try {
             if(latch != null) {
-                String message = SensorCtsHelper.formatAssertionMessage(mSensor, "WaitForFlush",
-                        mRateUs, mMaxBatchReportLatencyUs);
-                Assert.assertTrue(message, latch.await(FLUSH_TIMEOUT_US, TimeUnit.MICROSECONDS));
+                Assert.assertTrue(
+                        SensorCtsHelper.formatAssertionMessage("WaitForFlush", mEnvironment),
+                        latch.await(FLUSH_TIMEOUT_US, TimeUnit.MICROSECONDS));
             }
         } catch(InterruptedException e) {
             // Ignore
@@ -163,14 +160,17 @@ public class TestSensorEventListener implements SensorEventListener2 {
     public void waitForEvents(int eventCount) {
         mEventLatch = new CountDownLatch(eventCount);
         try {
-            int rateUs = SensorCtsHelper.getDelay(mSensor, mRateUs);
+            int rateUs = mEnvironment.getExpectedSamplingPeriodUs();
             // Timeout is 2 * event count * expected period + batch timeout + default wait
             long timeoutUs = ((2 * eventCount * rateUs)
-                    + mMaxBatchReportLatencyUs + EVENT_TIMEOUT_US);
+                    + mEnvironment.getMaxReportLatencyUs()
+                    + EVENT_TIMEOUT_US);
 
-            String message = SensorCtsHelper.formatAssertionMessage(mSensor, "WaitForEvents",
-                    mRateUs, mMaxBatchReportLatencyUs, "count:%d, available:%d", eventCount,
-                    mEventLatch.getCount());
+            String message = SensorCtsHelper.formatAssertionMessage(
+                    "WaitForEvents",
+                    mEnvironment,
+                    "count:%d, available:%d",
+                    eventCount, mEventLatch.getCount());
             Assert.assertTrue(message, mEventLatch.await(timeoutUs, TimeUnit.MICROSECONDS));
         } catch(InterruptedException e) {
             // Ignore

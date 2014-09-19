@@ -16,12 +16,13 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.Assert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,18 +63,18 @@ public class JitterVerification extends AbstractSensorVerification {
     /**
      * Get the default {@link JitterVerification} for a sensor.
      *
-     * @param sensor a {@link Sensor}
-     * @param rateUs the desired rate of the sensor
+     * @param environment the test environment
      * @return the verification or null if the verification does not apply to the sensor.
      */
-    public static JitterVerification getDefault(Sensor sensor, int rateUs) {
-        if (!DEFAULTS.containsKey(sensor.getType())) {
+    public static JitterVerification getDefault(TestSensorEnvironment environment) {
+        int sensorType = environment.getSensor().getType();
+        if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
 
-        int expected = (int) TimeUnit.NANOSECONDS.convert(SensorCtsHelper.getDelay(sensor, rateUs),
-                TimeUnit.MICROSECONDS);
-        return new JitterVerification(expected, DEFAULTS.get(sensor.getType()));
+        int expected = (int) TimeUnit.NANOSECONDS
+                .convert(environment.getExpectedSamplingPeriodUs(), TimeUnit.MICROSECONDS);
+        return new JitterVerification(expected, DEFAULTS.get(sensorType));
     }
 
     /**
@@ -84,8 +85,9 @@ public class JitterVerification extends AbstractSensorVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
-        if (mTimestamps.size() < 2) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        if (mTimestamps.size() < 2 || environment.isSensorSamplingRateOverloaded()) {
+            // the verification is not reliable in environments under load
             stats.addValue(PASSED_KEY, true);
             return;
         }
