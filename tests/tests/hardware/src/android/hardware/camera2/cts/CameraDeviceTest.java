@@ -828,7 +828,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
         waitForSessionState(SESSION_ACTIVE, SESSION_READY_TIMEOUT_MS);
 
-        int expectedResultCount = len;
+        int expectedResultCount = requests.size();
         if (repeating) {
             expectedResultCount *= REPEATING_CAPTURE_EXPECTED_RESULT_COUNT;
         }
