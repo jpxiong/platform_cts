@@ -169,7 +169,7 @@ class CtsBuilder(object):
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-stable')
 
-    # CTS Flaky plan - inversion of CTS Stable
+    # CTS Flaky plan - list of tests known to be flaky in lab environment
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.android\.cts\.browserbench')
@@ -178,6 +178,144 @@ class CtsBuilder(object):
       plan.IncludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-flaky')
 
+    small_tests = BuildAospSmallSizeTestList()
+    medium_tests = BuildAospMediumSizeTestList()
+
+    # CTS - sub plan for public, small size tests
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in small_tests.iteritems():
+      plan.Include(package+'$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-kitkat-small')
+
+    # CTS - sub plan for public, medium size tests
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in medium_tests.iteritems():
+      plan.Include(package+'$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-kitkat-medium')
+
+    # CTS - sub plan for hardware tests which is public, large
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.hardware$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-hardware')
+
+    # CTS - sub plan for media tests which is public, large
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.media$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-media')
+
+    # CTS - sub plan for mediastress tests which is public, large
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.mediastress$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-mediastress')
+
+    #CTS - sub plan for new test packages added for staging
+    plan = tools.TestPlan(packages)
+    for package, test_list in small_tests.iteritems():
+      plan.Exclude(package+'$')
+    for package, test_list in medium_tests.iteritems():
+      plan.Exclude(package+'$')
+    plan.Exclude(r'android\.hardware$')
+    plan.Exclude(r'android\.media$')
+    plan.Exclude(r'android\.mediastress$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-staging')
+
+def BuildAospMediumSizeTestList():
+  """ Construct a defaultdic that lists package names of medium tests
+      already published to aosp. """
+  return {
+      'android.app' : [],
+      'android.core.tests.libcore.package.libcore' : [],
+      'android.core.tests.libcore.package.org' : [],
+      'android.core.vm-tests-tf' : [],
+      'android.dpi' : [],
+      'android.host.security' : [],
+      'android.net' : [],
+      'android.os' : [],
+      'android.security' : [],
+      'android.telephony' : [],
+      'android.webkit' : [],
+      'android.widget' : [],
+      'com.android.cts.browserbench' : []}
+
+def BuildAospSmallSizeTestList():
+  """ Construct a defaultdict that lists packages names of small tests
+      already published to aosp. """
+  return {
+      'android.aadb' : [],
+      'android.acceleration' : [],
+      'android.accessibility' : [],
+      'android.accessibilityservice' : [],
+      'android.accounts' : [],
+      'android.admin' : [],
+      'android.animation' : [],
+      'android.bionic' : [],
+      'android.bluetooth' : [],
+      'android.calendarcommon' : [],
+      'android.content' : [],
+      'android.core.tests.libcore.package.com' : [],
+      'android.core.tests.libcore.package.conscrypt' : [],
+      'android.core.tests.libcore.package.dalvik' : [],
+      'android.core.tests.libcore.package.sun' : [],
+      'android.core.tests.libcore.package.tests' : [],
+      'android.database' : [],
+      'android.dreams' : [],
+      'android.drm' : [],
+      'android.effect' : [],
+      'android.gesture' : [],
+      'android.graphics' : [],
+      'android.graphics2' : [],
+      'android.jni' : [],
+      'android.keystore' : [],
+      'android.location' : [],
+      'android.nativemedia.sl' : [],
+      'android.nativemedia.xa' : [],
+      'android.nativeopengl' : [],
+      'android.ndef' : [],
+      'android.opengl' : [],
+      'android.openglperf' : [],
+      'android.permission' : [],
+      'android.permission2' : [],
+      'android.preference' : [],
+      'android.preference2' : [],
+      'android.provider' : [],
+      'android.renderscript' : [],
+      'android.rscpp' : [],
+      'android.rsg' : [],
+      'android.sax' : [],
+      'android.speech' : [],
+      'android.tests.appsecurity' : [],
+      'android.text' : [],
+      'android.textureview' : [],
+      'android.theme' : [],
+      'android.usb' : [],
+      'android.util' : [],
+      'android.view' : [],
+      'com.android.cts.dram' : [],
+      'com.android.cts.filesystemperf' : [],
+      'com.android.cts.jank' : [],
+      'com.android.cts.opengl' : [],
+      'com.android.cts.simplecpu' : [],
+      'com.android.cts.ui' : [],
+      'com.android.cts.uihost' : [],
+      'com.android.cts.videoperf' : [],
+      'zzz.android.monkey' : []}
 
 def BuildCtsFlakyTestList():
   """ Construct a defaultdict that maps package name to a list of tests
