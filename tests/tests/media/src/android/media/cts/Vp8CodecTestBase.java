@@ -390,6 +390,32 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         return yuv;
     }
 
+    /**
+     * Packs YUV420 frame by moving it to a smaller size buffer with stride and slice
+     * height equal to the original frame width and height.
+     */
+    private static byte[] PackYUV420(int width, int height,
+            int stride, int sliceHeight, byte[] src) {
+        byte[] dst = new byte[width * height * 3 / 2];
+        // Y copy.
+        for (int i = 0; i < height; i++) {
+            System.arraycopy(src, i * stride, dst, i * width, width);
+        }
+        // U and V copy.
+        int u_src_offset = stride * sliceHeight;
+        int v_src_offset = u_src_offset + u_src_offset / 4;
+        int u_dst_offset = width * height;
+        int v_dst_offset = u_dst_offset + u_dst_offset / 4;
+        for (int i = 0; i < height / 2; i++) {
+            System.arraycopy(src, u_src_offset + i * (stride / 2),
+                    dst, u_dst_offset + i * (width / 2), width / 2);
+            System.arraycopy(src, v_src_offset + i * (stride / 2),
+                    dst, v_dst_offset + i * (width / 2), width / 2);
+        }
+        return dst;
+    }
+
+
     private static void imageUpscale1To2(byte[] src, int srcByteOffset, int srcStride,
             byte[] dst, int dstByteOffset, int dstWidth, int dstHeight) {
         for (int i = 0; i < dstHeight/2 - 1; i++) {
@@ -624,15 +650,16 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     }
                     Log.d(TAG, "Frame stride and slice height: " + frameStride +
                             " x " + frameSliceHeight);
+                    frameStride = Math.max(frameWidth, frameStride);
+                    frameSliceHeight = Math.max(frameHeight, frameSliceHeight);
                 }
                 result = decoder.dequeueOutputBuffer(bufferInfo, DEFAULT_DEQUEUE_TIMEOUT_US);
             }
             if (result >= 0) {
                 int outputBufIndex = result;
-                int bufferSize = Math.min(frameWidth * frameHeight * 3 / 2, bufferInfo.size);
                 outPresentationTimeUs = bufferInfo.presentationTimeUs;
                 Log.v(TAG, "Writing buffer # " + outputFrameIndex +
-                        ". Size: " + bufferSize +
+                        ". Size: " + bufferInfo.size +
                         ". InTime: " + (inPresentationTimeUs + 500)/1000 +
                         ". OutTime: " + (outPresentationTimeUs + 500)/1000);
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -640,25 +667,32 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     Log.d(TAG, "   Output EOS for frame # " + outputFrameIndex);
                 }
 
-                if (bufferSize > 0) {
+                if (bufferInfo.size > 0) {
                     // Save decoder output to yuv file.
                     if (yuv != null) {
-                        byte[] frame = new byte[bufferSize];
+                        byte[] frame = new byte[bufferInfo.size];
                         outputBuffers[outputBufIndex].position(bufferInfo.offset);
-                        outputBuffers[outputBufIndex].get(frame, 0, bufferSize);
-                        // Convert NV12 to YUV420 if necessary
+                        outputBuffers[outputBufIndex].get(frame, 0, bufferInfo.size);
+                        // Convert NV12 to YUV420 if necessary.
                         if (frameColorFormat != CodecCapabilities.COLOR_FormatYUV420Planar) {
                             frame = NV12ToYUV420(frameWidth, frameHeight,
                                     frameStride, frameSliceHeight, frame);
                         }
-                        yuv.write(frame);
+                        int writeLength = Math.min(frameWidth * frameHeight * 3 / 2, frame.length);
+                        // Pack frame if necessary.
+                        if (writeLength < frame.length &&
+                                (frameStride > frameWidth || frameSliceHeight > frameHeight)) {
+                            frame = PackYUV420(frameWidth, frameHeight,
+                                    frameStride, frameSliceHeight, frame);
+                        }
+                        yuv.write(frame, 0, writeLength);
                     }
                     outputFrameIndex++;
 
                     // Update statistics - store presentation time delay in offset
                     long presentationTimeUsDelta = inPresentationTimeUs - outPresentationTimeUs;
                     MediaCodec.BufferInfo bufferInfoCopy = new MediaCodec.BufferInfo();
-                    bufferInfoCopy.set((int)presentationTimeUsDelta, bufferSize,
+                    bufferInfoCopy.set((int)presentationTimeUsDelta, bufferInfo.size,
                             outPresentationTimeUs, bufferInfo.flags);
                     bufferInfos.add(bufferInfoCopy);
                 }
