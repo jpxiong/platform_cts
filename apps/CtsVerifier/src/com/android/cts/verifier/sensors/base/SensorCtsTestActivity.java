@@ -20,10 +20,11 @@ package com.android.cts.verifier.sensors.base;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
-import junit.framework.TestResult;
+import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.junit.internal.runners.JUnit38ClassRunner;
+import org.junit.internal.runners.SuiteMethod;
 import org.junit.runner.Computer;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
@@ -93,27 +94,35 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
     }
 
     /**
-     * A {@link RunnerBuilder} that is used to inject during execution a {@link SensorTestSuite}.
+     * A {@link RunnerBuilder} that is used to inject during execution a {@link SensorCtsTestSuite}.
      */
     private class SensorRunnerBuilder extends RunnerBuilder {
         @Override
         public Runner runnerForClass(Class<?> testClass) throws Throwable {
-            TestSuite testSuite = new SensorTestSuite(testClass);
-            return new JUnit38ClassRunner(testSuite);
+            TestSuite testSuite;
+            if (hasSuiteMethod(testClass)) {
+                Test test = SuiteMethod.testFromSuiteMethod(testClass);
+                if (test instanceof TestSuite) {
+                    testSuite = (TestSuite) test;
+                } else {
+                    throw new IllegalArgumentException(
+                            testClass.getName() + "#suite() did not return a TestSuite.");
+                }
+            } else {
+                testSuite = new TestSuite(testClass);
+            }
+            SensorCtsTestSuite sensorTestSuite =
+                    new SensorCtsTestSuite(getApplicationContext(), testSuite);
+            return new JUnit38ClassRunner(sensorTestSuite);
         }
-    }
 
-    /**
-     * A {@link TestSuite} that is used to inject during execution a {@link SensorCtsTestResult}.
-     */
-    private class SensorTestSuite extends TestSuite {
-        public SensorTestSuite(Class<?> testClass) {
-            super(testClass);
-        }
-
-        @Override
-        public void run(TestResult testResult) {
-            super.run(new SensorCtsTestResult(getApplicationContext(), testResult));
+        private boolean hasSuiteMethod(Class testClass) {
+            try {
+                testClass.getMethod("suite");
+                return true;
+            } catch (NoSuchMethodException e) {
+                return false;
+            }
         }
     }
 
