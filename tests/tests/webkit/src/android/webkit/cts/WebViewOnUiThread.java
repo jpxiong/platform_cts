@@ -732,6 +732,16 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void saveWebArchive(final String basename, final boolean autoname,
+                               final ValueCallback<String> callback) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.saveWebArchive(basename, autoname, callback);
+            }
+        });
+    }
+
     public WebView createWebView() {
         return getValue(new ValueGetter<WebView>() {
             @Override
