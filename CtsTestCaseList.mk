@@ -39,6 +39,7 @@ cts_support_packages := \
     CtsDeviceUi \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsProfileOwnerApp \
     CtsSomeAccessibilityServices \
     CtsTestStubs \
     CtsThemeDeviceApp \
@@ -136,6 +137,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
+    CtsDevicePolicyManagerTestCases \
     CtsHostJank \
     CtsHostUi \
     CtsMonkeyTestCases \
