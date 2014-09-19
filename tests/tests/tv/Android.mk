@@ -28,8 +28,6 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)
