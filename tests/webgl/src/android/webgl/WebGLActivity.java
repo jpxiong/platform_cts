@@ -25,6 +25,7 @@ import android.webgl.cts.R;
 import android.webkit.WebView;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebViewClient;
+import android.webkit.cts.NullWebViewUtils;
 import android.widget.Toast;
 import java.lang.Override;
 import java.io.InputStream;
@@ -51,7 +52,16 @@ public class WebGLActivity extends Activity {
         super.onCreate(icicle);
 
         mWebGlHarnessUrl = "file://" + getCacheDir() + "/harness.html";
-        mWebView = new WebView(this);
+        try {
+            mWebView = new WebView(this);
+        } catch (Exception e) {
+            NullWebViewUtils.determineIfWebViewAvailable(this, e);
+        }
+
+        if (mWebView == null) {
+            return;
+        }
+
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAllowFileAccessFromFileURLs(true);
         mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
@@ -92,6 +102,10 @@ public class WebGLActivity extends Activity {
     }
 
     public void navigateToTest(String url) throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         synchronized(WebGLActivity.this) {
             mWebGLTestUrl = url;
         }
