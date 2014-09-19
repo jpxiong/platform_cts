@@ -48,7 +48,9 @@ import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +79,14 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             CameraDevice.TEMPLATE_STILL_CAPTURE,
             CameraDevice.TEMPLATE_VIDEO_SNAPSHOT
     };
+
+    // Request templates that are unsupported by LEGACY mode.
+    private static Set<Integer> sLegacySkipTemplates = new HashSet<>();
+    static {
+        sLegacySkipTemplates.add(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
+        sLegacySkipTemplates.add(CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG);
+        sLegacySkipTemplates.add(CameraDevice.TEMPLATE_MANUAL);
+    }
 
     @Override
     public void setContext(Context context) {
@@ -744,11 +754,14 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         .onError(
                                 any(CameraDevice.class),
                                 anyInt());
-            }
-            finally {
+            } catch (Exception e) {
+                mCollector.addError(e);
+            } finally {
                 try {
                     closeSession();
-                } finally {
+                } catch (Exception e) {
+                    mCollector.addError(e);
+                }finally {
                     closeDevice(mCameraIds[i], mCameraMockListener);
                 }
             }
@@ -1294,7 +1307,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
                     // OK
-                }  else if (template == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT &&
+                } else if (sLegacySkipTemplates.contains(template) &&
                         mStaticInfo.isHardwareLevelLegacy()) {
                     // OK
                 } else {
