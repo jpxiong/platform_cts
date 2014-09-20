@@ -349,6 +349,8 @@ public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
                 return "400dpi";
             case 480:
                 return "xxhdpi";
+            case 560:
+                return "560dpi";
             case 640:
                 return "xxxhdpi";
             default:
