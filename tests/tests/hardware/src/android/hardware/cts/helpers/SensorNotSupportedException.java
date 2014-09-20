@@ -18,14 +18,11 @@ package android.hardware.cts.helpers;
 
 /**
  * Exception that indicates that a given sensor is not supported in the device.
- * This exception can be caught in tests to safely ignore test cases that are not necessary in a
- * given environment.
  */
-public class SensorNotSupportedException extends RuntimeException {
+public class SensorNotSupportedException extends SensorTestStateNotSupportedException {
     public SensorNotSupportedException(int sensorType) {
-        super(String.format(
-                "Sensor '%s' of type %d is not supported.",
+        super("Sensor '%s' of type %d is not supported.",
                 SensorTestInformation.getSensorName(sensorType),
-                sensorType));
+                sensorType);
     }
 }

@@ -27,6 +27,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.MovementDetectorHelper;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -78,6 +79,11 @@ public class StepCounterTestActivity
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorStepCounter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mSensorStepDetector = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+
+        if (mSensorStepCounter == null && mSensorStepDetector == null) {
+            throw new SensorTestStateNotSupportedException(
+                    "Sensors Step Counter/Detector are not supported.");
+        }
 
         ScrollView scrollView = (ScrollView) findViewById(R.id.log_scroll_view);
         scrollView.setOnTouchListener(new View.OnTouchListener() {
@@ -131,7 +137,7 @@ public class StepCounterTestActivity
         mMoveDetected = false;
         mCheckForMotion = false;
 
-        getTestLogger().logMessage(instructionsResId);
+        getTestLogger().logInstructions(instructionsResId);
         waitForUserToBegin();
 
         mCheckForMotion = (expectedSteps > 0);
@@ -148,7 +154,7 @@ public class StepCounterTestActivity
         return verifyMeasurements(expectedSteps);
     }
 
-    private void startMeasurements() throws Throwable {
+    private void startMeasurements() {
         if (mSensorStepCounter != null) {
             mSensorManager.registerListener(this, mSensorStepCounter,
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -168,7 +174,7 @@ public class StepCounterTestActivity
         mMovementDetectorHelper.start();
     }
 
-    private String verifyMeasurements(int stepsExpected) throws Throwable {
+    private String verifyMeasurements(int stepsExpected) {
         mSensorManager.unregisterListener(this);
         mMovementDetectorHelper.stop();
 
@@ -192,8 +198,12 @@ public class StepCounterTestActivity
     }
 
     private void verifyStepCounterMeasurements() {
-        final int userReportedSteps = mTimestampsUserReported.size();
+        if (mSensorStepCounter == null) {
+            // sensor not supported, so no-op
+            return;
+        }
 
+        final int userReportedSteps = mTimestampsUserReported.size();
         int totalStepsCounted = 0;
         int initialStepCount = -1;
         for (TestSensorEvent counterEvent : mStepCounterEvents) {
@@ -263,8 +273,12 @@ public class StepCounterTestActivity
     }
 
     private void verifyStepDetectorMeasurements() {
-        final int userReportedSteps = mTimestampsUserReported.size();
+        if (mSensorStepDetector == null) {
+            // sensor not supported, so no-op
+            return;
+        }
 
+        final int userReportedSteps = mTimestampsUserReported.size();
         int stepsDetected = mStepDetectorEvents.size();
         int stepsDetectedDelta = Math.abs(stepsDetected - userReportedSteps);
         String stepsDetectedMessage = getString(
