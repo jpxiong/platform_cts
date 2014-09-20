@@ -28,6 +28,13 @@
     <application>
         <uses-library android:name="android.test.runner" />
 
+        <activity android:name="android.accounts.cts.AccountDummyActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service android:name="MockAccountService" android:exported="true"
                  android:process="android.accounts.cts">
             <intent-filter>
