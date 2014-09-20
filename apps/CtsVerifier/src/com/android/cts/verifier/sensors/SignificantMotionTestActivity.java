@@ -26,7 +26,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
-import android.os.Bundle;
+import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.os.SystemClock;
 
 import java.util.concurrent.CountDownLatch;
@@ -144,9 +144,10 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
         }
 
         TriggerVerifier verifier = new TriggerVerifier();
+        boolean success = mSensorManager.requestTriggerSensor(verifier, mSensorSignificantMotion);
         Assert.assertTrue(
-                getString(R.string.snsr_significant_motion_registration),
-                mSensorManager.requestTriggerSensor(verifier, mSensorSignificantMotion));
+                getString(R.string.snsr_significant_motion_registration, success),
+                success);
         if (cancelEventNotification) {
             Assert.assertTrue(
                     getString(R.string.snsr_significant_motion_cancelation),
@@ -168,14 +169,13 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void activitySetUp() {
         mSensorManager = (SensorManager) getApplicationContext()
                 .getSystemService(Context.SENSOR_SERVICE);
-        mSensorSignificantMotion = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-
+        mSensorSignificantMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+        if (mSensorSignificantMotion == null) {
+            throw new SensorNotSupportedException(Sensor.TYPE_SIGNIFICANT_MOTION);
+        }
     }
 
     /**

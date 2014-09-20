@@ -19,7 +19,7 @@ package com.android.cts.verifier.sensors.base;
 
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
-import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -114,7 +114,7 @@ public abstract class SensorCtsVerifierTestActivity extends BaseSensorTestActivi
             // get the inner exception, because we use reflection APIs to execute the test
             Throwable cause = e.getCause();
             testSummary = cause.getMessage();
-            if (cause instanceof SensorNotSupportedException) {
+            if (cause instanceof SensorTestStateNotSupportedException) {
                 testResultCode = SensorTestDetails.ResultCode.SKIPPED;
                 ++mTestSkippedCounter;
             } else {
