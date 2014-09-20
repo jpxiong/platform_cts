@@ -54,7 +54,7 @@ public class FileUtils {
     public static final int S_IXOTH = 00001;
 
     static {
-        System.loadLibrary("cts_jni");
+        System.loadLibrary("ctsos_jni");
     }
 
     public static class FileStatus {

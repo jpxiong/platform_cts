@@ -19,8 +19,7 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)\
               $(call all-renderscript-files-under, src)\
-              src/android/app/cts/ISecondary.aidl\
-              src/android/os/cts/IEmptyService.aidl\
+              src/android/app/cts/ISecondary.aidl
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
