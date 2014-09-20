@@ -34,6 +34,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BleServerStartActivity extends PassFailButtons.Activity {
 
@@ -70,6 +71,7 @@ public class BleServerStartActivity extends PassFailButtons.Activity {
         filter.addAction(BleServerService.BLE_DESCRIPTOR_WRITE_REQUEST);
         filter.addAction(BleServerService.BLE_EXECUTE_WRITE);
         filter.addAction(BleServerService.BLE_SERVER_DISCONNECTED);
+        filter.addAction(BleServerService.BLE_OPEN_FAIL);
         registerReceiver(onBroadcast, filter);
     }
 
@@ -126,6 +128,15 @@ public class BleServerStartActivity extends PassFailButtons.Activity {
             } else if (action == BleServerService.BLE_SERVER_DISCONNECTED) {
                 mTestAdapter.setTestPass(7);
                 mAllPassed |= 0x80;
+            } else if (action == BleServerService.BLE_OPEN_FAIL) {
+                setTestResultAndFinish(false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(BleServerStartActivity.this, "Cannot open GattService",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             mTestAdapter.notifyDataSetChanged();
             if (mAllPassed == 0xFF) getPassButton().setEnabled(true);

@@ -65,6 +65,8 @@ public class BleServerService extends Service {
             "com.android.cts.verifier.bluetooth.BLE_DESCRIPTOR_WRITE_REQUEST";
     public static final String BLE_EXECUTE_WRITE =
             "com.android.cts.verifier.bluetooth.BLE_EXECUTE_WRITE";
+    public static final String BLE_OPEN_FAIL =
+            "com.android.cts.verifier.bluetooth.BLE_OPEN_FAIL";
 
     private static final UUID SERVICE_UUID =
             UUID.fromString("00009999-0000-1000-8000-00805f9b34fb");
@@ -90,11 +92,16 @@ public class BleServerService extends Service {
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mGattServer = mBluetoothManager.openGattServer(this, mCallbacks);
         mService = createService();
-        mGattServer.addService(mService);
+        if (mGattServer != null) {
+            mGattServer.addService(mService);
+        }
         mDevice = null;
         mReliableWriteValue = null;
 
         mHandler = new Handler();
+        if (mGattServer == null) {
+            notifyOpenFail();
+        }
     }
 
     @Override
@@ -110,6 +117,9 @@ public class BleServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mGattServer == null) {
+           return;
+        }
         if (mDevice != null) mGattServer.cancelConnection(mDevice);
         mGattServer.close();
     }
@@ -124,6 +134,12 @@ public class BleServerService extends Service {
         BluetoothGattDescriptor descriptor = getDescriptor();
         if (descriptor == null) return;
         descriptor.setValue(writeValue.getBytes());
+    }
+
+    private void notifyOpenFail() {
+        if (DEBUG) Log.d(TAG, "notifyOpenFail");
+        Intent intent = new Intent(BLE_OPEN_FAIL);
+        sendBroadcast(intent);
     }
 
     private void notifyConnected() {
@@ -216,6 +232,10 @@ public class BleServerService extends Service {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                if (mGattServer == null) {
+                    if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                    return;
+                }
                 BluetoothGattCharacteristic characteristic =
                         mService.getCharacteristic(UPDATE_CHARACTERISTIC_UUID);
                 if (characteristic == null) return;
@@ -268,7 +288,11 @@ public class BleServerService extends Service {
 
         @Override
         public void onCharacteristicReadRequest(BluetoothDevice device, int requestId,
-                            int offset, BluetoothGattCharacteristic characteristic) {
+                int offset, BluetoothGattCharacteristic characteristic) {
+            if (mGattServer == null) {
+                if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                return;
+            }
             if (DEBUG) Log.d(TAG, "onCharacteristicReadRequest()");
 
             notifyCharacteristicReadRequest();
@@ -278,9 +302,13 @@ public class BleServerService extends Service {
 
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
-                                                 BluetoothGattCharacteristic characteristic,
-                                                 boolean preparedWrite, boolean responseNeeded,
-                                                 int offset, byte[] value) {
+                BluetoothGattCharacteristic characteristic,
+                boolean preparedWrite, boolean responseNeeded,
+                int offset, byte[] value) {
+            if (mGattServer == null) {
+                if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                return;
+            }
             if (DEBUG) Log.d(TAG, "onCharacteristicWriteRequest: preparedWrite=" + preparedWrite);
 
             notifyCharacteristicWriteRequest();
@@ -293,7 +321,11 @@ public class BleServerService extends Service {
 
         @Override
         public void onDescriptorReadRequest(BluetoothDevice device, int requestId,
-                                            int offset, BluetoothGattDescriptor descriptor) {
+                int offset, BluetoothGattDescriptor descriptor) {
+            if (mGattServer == null) {
+                if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                return;
+            }
             if (DEBUG) Log.d(TAG, "onDescriptorReadRequest(): (descriptor == getDescriptor())="
                                   + (descriptor == getDescriptor()));
 
@@ -304,9 +336,13 @@ public class BleServerService extends Service {
 
         @Override
         public void onDescriptorWriteRequest(BluetoothDevice device, int requestId,
-                                             BluetoothGattDescriptor descriptor,
-                                             boolean preparedWrite, boolean responseNeeded,
-                                             int offset,  byte[] value) {
+                BluetoothGattDescriptor descriptor,
+                boolean preparedWrite, boolean responseNeeded,
+                int offset,  byte[] value) {
+            if (mGattServer == null) {
+                if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                return;
+            }
             if (DEBUG) Log.d(TAG, "onDescriptorWriteRequest(): (descriptor == getDescriptor())="
                                   + (descriptor == getDescriptor()));
 
@@ -318,6 +354,10 @@ public class BleServerService extends Service {
 
         @Override
         public void onExecuteWrite(BluetoothDevice device, int requestId, boolean execute) {
+            if (mGattServer == null) {
+                if (DEBUG) Log.d(TAG, "GattServer is null, return");
+                return;
+            }
             if (DEBUG) Log.d(TAG, "onExecuteWrite");
             if (execute) {
                 notifyExecuteWrite();
@@ -327,3 +367,4 @@ public class BleServerService extends Service {
         }
     };
 }
+
