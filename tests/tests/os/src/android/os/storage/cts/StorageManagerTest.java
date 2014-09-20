@@ -16,7 +16,7 @@
 
 package android.os.storage.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.os.R;
 
 import android.content.Context;
 import android.content.res.Resources;

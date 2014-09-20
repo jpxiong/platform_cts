@@ -20,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
-import android.app.cts.ActivityTestsBase;
-import android.app.cts.LocalService;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;

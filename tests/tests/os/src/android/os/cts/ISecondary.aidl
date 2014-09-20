@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,11 @@
 
 package android.os.cts;
 
-public class CpuInstructions {
+interface ISecondary {
 
-    static {
-        System.loadLibrary("cts_jni");
-    }
+    int getPid();
 
-    public static native boolean canReadCntvct();
-    public static native boolean hasSwp();
-    public static native boolean hasSetend();
-    public static native boolean hasCp15Barriers();
+    long getElapsedCpuTime();
+
+    String getTimeZoneID();
 }

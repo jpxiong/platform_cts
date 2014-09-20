@@ -16,7 +16,6 @@
 
 package android.os.cts;
 
-import android.app.cts.ISecondary;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;

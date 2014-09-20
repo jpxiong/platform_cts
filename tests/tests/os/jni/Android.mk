@@ -16,13 +16,13 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libcts_jni
+LOCAL_MODULE := libctsos_jni
 
 # Don't include this package in any configuration by default.
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := \
-		CtsJniOnLoad.cpp \
+		CtsOsJniOnLoad.cpp \
 		android_os_cts_CpuInstructions.cpp.arm \
 		android_os_cts_TaggedPointer.cpp \
 		android_os_cts_OSFeatures.cpp \

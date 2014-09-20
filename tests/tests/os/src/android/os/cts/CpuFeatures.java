@@ -41,7 +41,7 @@ public class CpuFeatures {
     public static final int HWCAP_IDIVT = (1 << 18);
 
     static {
-        System.loadLibrary("cts_jni");
+        System.loadLibrary("ctsos_jni");
     }
 
     public static native boolean isArmCpu();
