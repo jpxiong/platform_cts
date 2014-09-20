@@ -23,8 +23,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)\
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_JNI_SHARED_LIBRARIES := libcts_jni
-
 # Resource unit tests use a private locale and some densities
 LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c small -c normal -c large -c xlarge \
         -c 320dpi -c 240dpi -c 160dpi -c 32dpi \
