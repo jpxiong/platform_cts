@@ -630,10 +630,15 @@ public class StaticMetadata {
             checkTrueForKey(key, " value must be 0 if only OFF mode is supported in "
                     + "availableFaceDetectionModes", count == 0);
         } else {
-            int maxFaceCountAtLeat = STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST;
-            checkTrueForKey(key, " value must be no less than " + maxFaceCountAtLeat + " if SIMPLE"
+            int maxFaceCountAtLeast = STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST;
+
+            // Legacy mode may support fewer than STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST faces.
+            if (isHardwareLevelLegacy()) {
+                maxFaceCountAtLeast = 1;
+            }
+            checkTrueForKey(key, " value must be no less than " + maxFaceCountAtLeast + " if SIMPLE"
                     + "or FULL is also supported in availableFaceDetectionModes",
-                    count >= maxFaceCountAtLeat);
+                    count >= maxFaceCountAtLeast);
         }
 
         return count;
