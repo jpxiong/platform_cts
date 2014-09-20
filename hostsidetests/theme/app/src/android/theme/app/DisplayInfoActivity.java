@@ -68,6 +68,9 @@ public class DisplayInfoActivity extends Activity {
             case DisplayMetrics.DENSITY_XXHIGH:
                 return "xxhdpi";
 
+            case DisplayMetrics.DENSITY_560:
+                return "560dpi";
+
             case DisplayMetrics.DENSITY_XXXHIGH:
                 return "xxxhdpi";
 
