@@ -122,6 +122,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -228,6 +231,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -343,6 +349,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -510,6 +519,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -649,6 +661,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -765,6 +780,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -868,6 +886,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -967,6 +988,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -1055,6 +1079,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -1120,6 +1147,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1196,6 +1226,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1283,6 +1316,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
 
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
+
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
 
@@ -1347,6 +1383,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1420,6 +1459,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
+
+        // Wait for the session to be destroyed to isolate tests.
+        waitForPrinterDiscoverySessionDestroyCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1517,7 +1559,14 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 }
                 return null;
             }
-        }, null, null, null, null, null);
+        }, null, null, null, null, new Answer<Void>() {
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    // Take a note onDestroy was called.
+                    onPrinterDiscoverySessionDestroyCalled();
+                    return null;
+                }
+            });
         return createMockPrintServiceCallbacks(new Answer<PrinterDiscoverySessionCallbacks>() {
             @Override
             public PrinterDiscoverySessionCallbacks answer(InvocationOnMock invocation) {

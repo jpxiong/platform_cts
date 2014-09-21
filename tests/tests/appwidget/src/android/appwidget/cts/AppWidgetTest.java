@@ -40,7 +40,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.UserInfo;
 import android.cts.appwidget.R;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -136,6 +135,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
     public void testBindAppWidget() throws Exception {
         // Create a host and start listening.
         AppWidgetHost host = new AppWidgetHost(getInstrumentation().getTargetContext(), 0);
+        host.deleteHost();
         host.startListening();
 
         // Allocate an app widget id to bind.
@@ -150,7 +150,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
         assertFalse(widgetBound);
 
         // Well, app do not have this permission unless explicitly granted
-        // by the user. Now we will pretent for the user and grant it.
+        // by the user. Now we will pretend for the user and grant it.
         grantBindAppWidgetPermission();
 
         try {
@@ -163,36 +163,28 @@ public class AppWidgetTest extends InstrumentationTestCase {
             host.deleteAppWidgetId(appWidgetId);
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(appWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
     }
 
     public void testAppWidgetProviderCallbacks() throws Exception {
-        final AtomicInteger disabledCallCounter = new AtomicInteger();
+        AtomicInteger invocationCounter = new AtomicInteger();
 
         // Set a mock to intercept provider callbacks.
-        AppWidgetProviderCallbacks callbacks = mock(AppWidgetProviderCallbacks.class);
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                synchronized (mLock) {
-                    disabledCallCounter.incrementAndGet();
-                    mLock.notifyAll();
-                }
-                return null;
-            }
-        }).when(callbacks).onDeleted(any(Context.class), any(int[].class));
+        AppWidgetProviderCallbacks callbacks = createAppWidgetProviderCallbacks(invocationCounter);
         FirstAppWidgetProvider.setCallbacks(callbacks);
 
-        final int firstAppWidgetId;
-        final int secondAppWidgetId;
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         final Bundle firstOptions;
         final Bundle secondOptions;
 
         // Create a host and start listening.
         AppWidgetHost host = spy(new AppWidgetHost(getInstrumentation().getTargetContext(), 0));
+        host.deleteHost();
         host.startListening();
 
         // We want to bind a widget.
@@ -208,6 +200,9 @@ public class AppWidgetTest extends InstrumentationTestCase {
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
                     provider.getProfile(), provider.provider, null);
 
+            // Wait for onEnabled and onUpdate
+            waitForCallCount(invocationCounter, 2);
+
             // Update the first widget options.
             firstOptions = new Bundle();
             firstOptions.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 1);
@@ -216,12 +211,18 @@ public class AppWidgetTest extends InstrumentationTestCase {
             firstOptions.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 4);
             getAppWidgetManager().updateAppWidgetOptions(firstAppWidgetId, firstOptions);
 
+            // Wait for onAppWidgetOptionsChanged
+            waitForCallCount(invocationCounter, 3);
+
             // Allocate the second app widget id to bind.
             secondAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the second widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
                     provider.getProfile(), provider.provider, null);
+
+            // Wait for onUpdate
+            waitForCallCount(invocationCounter, 4);
 
             // Update the second widget options.
             secondOptions = new Bundle();
@@ -231,13 +232,20 @@ public class AppWidgetTest extends InstrumentationTestCase {
             secondOptions.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 8);
             getAppWidgetManager().updateAppWidgetOptions(secondAppWidgetId, secondOptions);
 
+            // Wait for onAppWidgetOptionsChanged
+            waitForCallCount(invocationCounter, 5);
+
             // Delete the first widget.
             host.deleteAppWidgetId(firstAppWidgetId);
+
+            // Wait for onDeleted
+            waitForCallCount(invocationCounter, 6);
 
             // Delete the second widget.
             host.deleteAppWidgetId(secondAppWidgetId);
 
-            waitForCallCount(disabledCallCounter, 1);
+            // Wait for onDeleted and onDisabled
+            waitForCallCount(invocationCounter, 8);
 
             // Make sure the provider callbacks are correct.
             InOrder inOrder = inOrder(callbacks);
@@ -260,38 +268,34 @@ public class AppWidgetTest extends InstrumentationTestCase {
             inOrder.verify(callbacks).onDisabled(any(Context.class));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
+            host.deleteHost();
             FirstAppWidgetProvider.setCallbacks(null);
             revokeBindAppWidgetPermission();
         }
     }
 
     public void testTwoAppWidgetProviderCallbacks() throws Exception {
-        final AtomicInteger disabledCallCounter = new AtomicInteger();
+        AtomicInteger invocationCounter = new AtomicInteger();
 
         // Set a mock to intercept first provider callbacks.
-        AppWidgetProviderCallbacks firstCallbacks = mock(AppWidgetProviderCallbacks.class);
+        AppWidgetProviderCallbacks firstCallbacks = createAppWidgetProviderCallbacks(
+                invocationCounter);
         FirstAppWidgetProvider.setCallbacks(firstCallbacks);
 
         // Set a mock to intercept second provider callbacks.
-        AppWidgetProviderCallbacks secondCallbacks = mock(AppWidgetProviderCallbacks.class);
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                synchronized (mLock) {
-                    disabledCallCounter.incrementAndGet();
-                    mLock.notifyAll();
-                }
-                return null;
-            }
-        }).when(firstCallbacks).onDisabled(any(Context.class));
+        AppWidgetProviderCallbacks secondCallbacks = createAppWidgetProviderCallbacks(
+                invocationCounter);
         SecondAppWidgetProvider.setCallbacks(secondCallbacks);
 
-        final int firstAppWidgetId;
-        final int secondAppWidgetId;
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         // Create a host and start listening.
         AppWidgetHost host = spy(new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0));
+        host.deleteHost();
         host.startListening();
 
         // We want to bind widgets.
@@ -310,6 +314,9 @@ public class AppWidgetTest extends InstrumentationTestCase {
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
                     firstProvider.getProfile(), firstProvider.provider, null);
 
+            // Wait for onEnabled and onUpdate
+            waitForCallCount(invocationCounter, 2);
+
             // Grab the second provider we defined to be bound.
             AppWidgetProviderInfo secondProvider = getSecondAppWidgetProviderInfo();
 
@@ -317,14 +324,20 @@ public class AppWidgetTest extends InstrumentationTestCase {
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
                     secondProvider.getProfile(), secondProvider.provider, null);
 
+            // Wait for onEnabled and onUpdate
+            waitForCallCount(invocationCounter, 4);
+
             // Delete the first widget.
             host.deleteAppWidgetId(firstAppWidgetId);
+
+            // Wait for onDeleted and onDisabled
+            waitForCallCount(invocationCounter, 6);
 
             // Delete the second widget.
             host.deleteAppWidgetId(secondAppWidgetId);
 
-            // Wait for all callbacks to settle.
-            waitForCallCount(disabledCallCounter, 1);
+            // Wait for onDeleted and onDisabled
+            waitForCallCount(invocationCounter, 8);
 
             // Make sure the first provider callbacks are correct.
             InOrder firstInOrder = inOrder(firstCallbacks);
@@ -345,6 +358,9 @@ public class AppWidgetTest extends InstrumentationTestCase {
             secondInOrder.verify(secondCallbacks).onDisabled(any(Context.class));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
+            host.deleteHost();
             FirstAppWidgetProvider.setCallbacks(null);
             SecondAppWidgetProvider.setCallbacks(null);
             revokeBindAppWidgetPermission();
@@ -358,7 +374,11 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // Create a host and start listening.
         AppWidgetHost host = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0);
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         try {
             // Grab the provider we defined to be bound.
@@ -369,14 +389,14 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertTrue(widgetsIds.length == 0);
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
                     provider.getProfile(), provider.provider, null);
 
             // Allocate the second widget id to bind.
-            final int secondAppWidgetId = host.allocateAppWidgetId();
+            secondAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the second widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
@@ -387,6 +407,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertTrue(Arrays.equals(widgetsIds, new int[]{firstAppWidgetId, secondAppWidgetId}));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -399,11 +421,14 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // Create a host and start listening.
         AppWidgetHost host = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0);
+        host.deleteHost();
         host.startListening();
+
+        int appWidgetId = 0;
 
         try {
             // Allocate an widget id to bind.
-            final int appWidgetId = host.allocateAppWidgetId();
+            appWidgetId = host.allocateAppWidgetId();
 
             // The widget is not bound, so no info.
             AppWidgetProviderInfo foundProvider = getAppWidgetManager()
@@ -435,6 +460,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertNotNull(previewImage);
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(appWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -447,14 +473,17 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // Create a host and start listening.
         AppWidgetHost host = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0);
+        host.deleteHost();
         host.startListening();
+
+        int appWidgetId = 0;
 
         try {
             // Grab the provider we defined to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate an widget id to bind.
-            final int appWidgetId = host.allocateAppWidgetId();
+            appWidgetId = host.allocateAppWidgetId();
 
             // Initially we have no options.
             Bundle foundOptions = getAppWidgetManager().getAppWidgetOptions(appWidgetId);
@@ -476,6 +505,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertTrue(equalOptions(setOptions, foundOptions));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(appWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -488,11 +518,14 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // Create a host and start listening.
         AppWidgetHost host = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0);
+        host.deleteHost();
         host.startListening();
+
+        int appWidgetId = 0;
 
         try {
             // Allocate an widget id to bind.
-            final int appWidgetId = host.allocateAppWidgetId();
+            appWidgetId = host.allocateAppWidgetId();
 
             // Grab the provider we defined to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
@@ -513,6 +546,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertTrue(widgetIds.length == 0);
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(appWidgetId);
+            host.deleteHost();
             revokeBindAppWidgetPermission();
         }
     }
@@ -524,26 +559,31 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // Create the first host and start listening.
         AppWidgetHost firstHost = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 0);
+        firstHost.deleteHost();
         firstHost.startListening();
 
         // Create the second host and start listening.
         AppWidgetHost secondHost = new AppWidgetHost(
                 getInstrumentation().getTargetContext(), 1);
+        secondHost.deleteHost();
         secondHost.startListening();
+
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         try {
             // Grab the provider we defined to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = firstHost.allocateAppWidgetId();
+            firstAppWidgetId = firstHost.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
                     provider.getProfile(), provider.provider, null);
 
             // Allocate the second widget id to bind.
-            final int secondAppWidgetId = secondHost.allocateAppWidgetId();
+            secondAppWidgetId = secondHost.allocateAppWidgetId();
 
             // Bind the second app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
@@ -561,6 +601,9 @@ public class AppWidgetTest extends InstrumentationTestCase {
             assertTrue(widgetIds.length == 0);
         } finally {
             // Clean up.
+            firstHost.deleteAppWidgetId(firstAppWidgetId);
+            secondHost.deleteAppWidgetId(secondAppWidgetId);
+            AppWidgetHost.deleteAllHosts();
             revokeBindAppWidgetPermission();
         }
     }
@@ -582,14 +625,17 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 }
             }
         };
+        host.deleteHost();
         host.startListening();
+
+        int appWidgetId = 0;
 
         try {
             // Grab the provider we defined to be bound.
             AppWidgetProviderInfo firstLookupProvider = getFirstAppWidgetProviderInfo();
 
             // Allocate a widget id to bind.
-            final int appWidgetId = host.allocateAppWidgetId();
+            appWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(appWidgetId,
@@ -609,7 +655,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             AppWidgetProviderInfo secondLookupProvider = getFirstAppWidgetProviderInfo();
             assertNull(secondLookupProvider);
 
-            // Enable the provider we disbaled.
+            // Enable the provider we disabled.
             packageManager.setComponentEnabledSetting(firstLookupProvider.provider,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
@@ -618,6 +664,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             waitForCallCount(onProvidersChangedCallCounter, 2);
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(appWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -638,14 +685,18 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 return new MyAppWidgetHostView(context);
             }
         };
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         try {
             // Grab the provider to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
@@ -659,7 +710,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             firstHostView.setOnUpdateAppWidgetListener(firstAppHostViewListener);
 
             // Allocate the second widget id to bind.
-            final int secondAppWidgetId = host.allocateAppWidgetId();
+            secondAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the second app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
@@ -702,6 +753,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
                             provider.provider.getPackageName())));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -722,14 +775,17 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 return new MyAppWidgetHostView(context);
             }
         };
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
 
         try {
             // Grab the provider to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
@@ -768,6 +824,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             ));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -788,14 +845,18 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 return new MyAppWidgetHostView(context);
             }
         };
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         try {
             // Grab the provider to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
@@ -809,7 +870,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             firstHostView.setOnUpdateAppWidgetListener(firstAppHostViewListener);
 
             // Allocate the second widget id to bind.
-            final int secondAppWidgetId = host.allocateAppWidgetId();
+            secondAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the second app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
@@ -854,6 +915,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
             );
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -874,15 +937,17 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 return new MyAppWidgetHostView(context);
             }
         };
-
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
 
         try {
             // Grab the provider to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
@@ -913,7 +978,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
 
             waitForCallCount(updateAppWidgetCallCount, 1);
 
-            // Partially update the content for all app widgets (pretent we changed somehting).
+            // Partially update the content for all app widgets (pretend we changed something).
             getAppWidgetManager().partiallyUpdateAppWidget(firstAppWidgetId, content);
 
             waitForCallCount(updateAppWidgetCallCount, 2);
@@ -925,6 +990,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
                             provider.provider.getPackageName())));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -946,14 +1012,18 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 return new MyAppWidgetHostView(context);
             }
         };
+        host.deleteHost();
         host.startListening();
+
+        int firstAppWidgetId = 0;
+        int secondAppWidgetId = 0;
 
         try {
             // Grab the provider to be bound.
             AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate the first widget id to bind.
-            final int firstAppWidgetId = host.allocateAppWidgetId();
+            firstAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the first app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(firstAppWidgetId,
@@ -977,7 +1047,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             firstHostView.setOnUpdateAppWidgetListener(firstAppHostViewListener);
 
             // Allocate the second widget id to bind.
-            final int secondAppWidgetId = host.allocateAppWidgetId();
+            secondAppWidgetId = host.allocateAppWidgetId();
 
             // Bind the second app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(secondAppWidgetId,
@@ -1010,7 +1080,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
             waitForCallCount(firstAppWidgetCallCounter, 1);
             waitForCallCount(secondAppWidgetCallCounter, 1);
 
-            // Partially update the content for all app widgets (pretend we changed somehting).
+            // Partially update the content for all app widgets (pretend we changed something).
             getAppWidgetManager().partiallyUpdateAppWidget(new int[] {firstAppWidgetId,
                     secondAppWidgetId}, content);
 
@@ -1029,6 +1099,8 @@ public class AppWidgetTest extends InstrumentationTestCase {
                             provider.provider.getPackageName())));
         } finally {
             // Clean up.
+            host.deleteAppWidgetId(firstAppWidgetId);
+            host.deleteAppWidgetId(secondAppWidgetId);
             host.deleteHost();
             revokeBindAppWidgetPermission();
         }
@@ -1038,16 +1110,20 @@ public class AppWidgetTest extends InstrumentationTestCase {
         // We want to bind widgets.
         grantBindAppWidgetPermission();
 
-        final AtomicInteger getViewCounter = new AtomicInteger();
+        final AtomicInteger invocationCounter = new AtomicInteger();
         final Context context = getInstrumentation().getTargetContext();
 
         // Create a host and start listening.
-        AppWidgetHost host = new AppWidgetHost(context, 0);
+        final AppWidgetHost host = new AppWidgetHost(context, 0);
+        host.deleteHost();
         host.startListening();
+
+        final int appWidgetId;
 
         try {
             // Configure the provider behavior.
-            AppWidgetProviderCallbacks callbacks = mock(AppWidgetProviderCallbacks.class);
+            AppWidgetProviderCallbacks callbacks = createAppWidgetProviderCallbacks(
+                    invocationCounter);
             doAnswer(new Answer<Void>() {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
@@ -1063,6 +1139,11 @@ public class AppWidgetTest extends InstrumentationTestCase {
 
                     getAppWidgetManager().updateAppWidget(appWidgetId, removeViews);
 
+                    synchronized (mLock) {
+                        invocationCounter.incrementAndGet();
+                        mLock.notifyAll();
+                    }
+
                     return null;
                 }
             }).when(callbacks).onUpdate(any(Context.class), any(AppWidgetManager.class),
@@ -1070,14 +1151,17 @@ public class AppWidgetTest extends InstrumentationTestCase {
             FirstAppWidgetProvider.setCallbacks(callbacks);
 
             // Grab the provider to be bound.
-            AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
+            final AppWidgetProviderInfo provider = getFirstAppWidgetProviderInfo();
 
             // Allocate a widget id to bind.
-            final int appWidgetId = host.allocateAppWidgetId();
+            appWidgetId = host.allocateAppWidgetId();
 
             // Bind the app widget.
             getAppWidgetManager().bindAppWidgetIdIfAllowed(appWidgetId,
                     provider.getProfile(), provider.provider, null);
+
+            // Wait for onEnabled and onUpdate
+            waitForCallCount(invocationCounter, 2);
 
             // Configure the app widget service behavior.
             RemoteViewsFactory factory = mock(RemoteViewsFactory.class);
@@ -1094,7 +1178,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
                             R.layout.collection_widget_item_layout);
                     remoteViews.setTextViewText(R.id.text_view, context.getText(R.string.foo));
                     synchronized (mLock) {
-                        getViewCounter.incrementAndGet();
+                        invocationCounter.incrementAndGet();
                     }
                     return remoteViews;
                 }
@@ -1107,10 +1191,15 @@ public class AppWidgetTest extends InstrumentationTestCase {
             }).when(factory).getViewTypeCount();
             MyAppWidgetService.setFactory(factory);
 
-            host.createView(context, appWidgetId, provider);
+            getInstrumentation().runOnMainSync(new Runnable() {
+                @Override
+                public void run() {
+                    host.createView(context, appWidgetId, provider);
+                }
+            });
 
             // Wait for the interactions to occur.
-            waitForCallCount(getViewCounter, 1);
+            waitForCallCount(invocationCounter, 3);
 
             // Verify the interactions.
             verify(factory, atLeastOnce()).hasStableIds();
@@ -1133,7 +1222,7 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
                 final long remainingTimeMillis = OPERATION_TIMEOUT - elapsedTimeMillis;
                 if (remainingTimeMillis <= 0) {
-                    fail("Did not get expected call to onUpdateAppWidget");
+                    fail("Did not get expected call");
                 }
                 try {
                     mLock.wait(remainingTimeMillis);
@@ -1289,15 +1378,98 @@ public class AppWidgetTest extends InstrumentationTestCase {
                 .getSystemService(Context.APPWIDGET_SERVICE);
     }
 
+    private AppWidgetProviderCallbacks createAppWidgetProviderCallbacks(
+            final AtomicInteger callCounter) {
+        // Set a mock to intercept provider callbacks.
+        AppWidgetProviderCallbacks callbacks = mock(AppWidgetProviderCallbacks.class);
+
+        // onEnabled
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onEnabled(any(Context.class));
+
+        // onUpdate
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onUpdate(any(Context.class), any(AppWidgetManager.class),
+                any(int[].class));
+
+        // onAppWidgetOptionsChanged
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onAppWidgetOptionsChanged(any(Context.class),
+                any(AppWidgetManager.class), any(int.class), any(Bundle.class));
+
+        // onDeleted
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onDeleted(any(Context.class), any(int[].class));
+
+        // onDisabled
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onDisabled(any(Context.class));
+
+        // onRestored
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                synchronized (mLock) {
+                    callCounter.incrementAndGet();
+                    mLock.notifyAll();
+                }
+                return null;
+            }
+        }).when(callbacks).onRestored(any(Context.class), any(int[].class),
+                any(int[].class));
+
+        return callbacks;
+    }
+
     private static boolean equalOptions(Bundle first, Bundle second) {
         return first.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
                        == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
                 && first.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
                        == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
                 && first.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-                        == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+                       == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
                 && first.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-                        == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
+                       == second.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
     }
 
     private static final class OptionsMatcher extends BaseMatcher<Bundle> {
