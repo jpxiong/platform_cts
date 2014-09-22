@@ -19,6 +19,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.animation.AccelerateInterpolator;
 
 import java.util.List;
@@ -55,7 +56,8 @@ public class AnimatorTest extends ActivityInstrumentationTestCase2<AnimationActi
         assertEquals(startDelay, mAnimator.getStartDelay());
     }
 
-    public void testStart() {
+    @UiThreadTest
+    public void testStart() throws Exception {
         mAnimator.start();
         assertTrue(mAnimator.isRunning());
         assertTrue(mAnimator.isStarted());
@@ -135,10 +137,20 @@ public class AnimatorTest extends ActivityInstrumentationTestCase2<AnimationActi
         assertFalse(listener.mEnd);
         assertTrue(listener.mRepeat >= 0);
 
-        mAnimator.cancel();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mAnimator.cancel();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertTrue(listener.mCancel);
 
-        mAnimator.end();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mAnimator.end();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertTrue(listener.mEnd);
     }
 
