@@ -23,16 +23,19 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
+public class CtsHostJankTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
 
     private static final String TAG = CtsHostJankTest.class.getSimpleName();
     private static final String DEVICE_LOCATION = "/data/local/tmp/";
+    // FIXME uiautomator is deprecated and does not support --abi flag
     private static final String RUN_UI_AUTOMATOR_CMD = "uiautomator runtest %s -c %s";
     private final String mHostTestClass;
     private final String mDeviceTestClass;
@@ -40,12 +43,18 @@ public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
     private final String mJarPath;
     protected ITestDevice mDevice;
     protected CtsBuildHelper mBuild;
+    protected IAbi mAbi;
 
     public CtsHostJankTest(String jarName, String deviceTestClass, String hostTestClass) {
         this.mHostTestClass = hostTestClass;
         this.mDeviceTestClass = deviceTestClass;
         this.mJarName = jarName;
         this.mJarPath = DEVICE_LOCATION + jarName;
+    }
+
+    @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
     }
 
     @Override
@@ -80,6 +89,7 @@ public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
                 new IShellOutputReceiver() {
                     private StringBuilder sb = new StringBuilder();
 
+                    @Override
                     public void addOutput(byte[] data, int offset, int length) {
                         byte[] raw = new byte[length];
                         for (int i = 0; i < length; i++) {
@@ -88,10 +98,12 @@ public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
                         sb.append(new String(raw));
                     }
 
+                    @Override
                     public void flush() {
                         Log.logAndDisplay(LogLevel.INFO, TAG, sb.toString());
                     }
 
+                    @Override
                     public boolean isCancelled() {
                         return false;
                     }
@@ -109,6 +121,7 @@ public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
                 results.put(parts[0], Double.parseDouble(parts[1]));
             }
         }
+        in.close();
         Log.logAndDisplay(LogLevel.INFO, TAG, "Results: " + results);
         assertEquals("Could not parse the results file: ", 4, results.size());
 
@@ -118,8 +131,8 @@ public class CtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
         double avgMaxAccFrames = results.get("average of max accumulated frames");
 
         // Create and deliver the report.
-        HostReportLog report =
-                new HostReportLog(mDevice.getSerialNumber(), mHostTestClass + "#" + testName);
+        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbi.getName(),
+                mHostTestClass + "#" + testName);
         report.printValue(
                 "Average Frame Rate", avgFrameRate, ResultType.HIGHER_BETTER, ResultUnit.COUNT);
         report.printValue("Average of Maximum Accumulated Frames", avgMaxAccFrames,

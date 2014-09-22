@@ -16,7 +16,6 @@
 
 package android.tests.getinfo;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
@@ -89,7 +88,7 @@ class GLESSurfaceView extends GLSurfaceView {
                     }
                 }
             }
-
+            scanner.close();
             mDone.countDown();
         }
 

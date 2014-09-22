@@ -49,7 +49,6 @@ public class ComparisonTask implements Callable<Boolean> {
 
     private final String mStoragePath;
 
-
     public ComparisonTask(ITestDevice device, File reference, String name) {
         mDevice = device;
         mReference = reference;

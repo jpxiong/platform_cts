@@ -18,6 +18,7 @@ package com.android.cts.uihost;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.util.HostReportLog;
+import com.android.cts.util.AbiUtils;
 import com.android.cts.util.MeasureRun;
 import com.android.cts.util.MeasureTime;
 import com.android.cts.util.ResultType;
@@ -28,6 +29,8 @@ import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
@@ -36,14 +39,20 @@ import java.io.File;
 /**
  * Test to measure installation time of a APK.
  */
-public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
+public class InstallTimeTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
+    private IAbi mAbi;
 
     private static final String TAG = "InstallTimeTest";
     static final String PACKAGE = "com.replica.replicaisland";
     static final String APK = "com.replica.replicaisland.apk";
     private static final double OUTLIER_THRESHOLD = 0.1;
+
+    @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -64,8 +73,8 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
     }
 
     public void testInstallTime() throws Exception {
-        HostReportLog report =
-                new HostReportLog(mDevice.getSerialNumber(), ReportLog.getClassMethodNames());
+        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbi.getName(),
+                ReportLog.getClassMethodNames());
         final int NUMBER_REPEAT = 10;
         final CtsBuildHelper build = mBuild;
         final ITestDevice device = mDevice;
@@ -77,7 +86,8 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
             @Override
             public void run(int i) throws Exception {
                 File app = build.getTestApp(APK);
-                device.installPackage(app, false);
+                String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+                device.installPackage(app, false, options);
             }
         });
         report.printArray("install time", result, ResultType.LOWER_BETTER,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.config.Option;
-import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.InstrumentationTest;
-import com.android.tradefed.util.AbiFormatter;
-
-import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,25 +32,32 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A {@link InstrumentationTest} that will install CTS apks
+ * An {@link InstrumentationTest} that will install CTS apks
  * before test execution, and uninstall on execution completion.
  */
-public class InstrumentationApkTest extends InstrumentationTest implements IBuildReceiver {
+public class CtsInstrumentationApkTest extends InstrumentationTest implements IBuildReceiver {
 
-    private static final String LOG_TAG = "InstrumentationApkTest";
+    private static final String LOG_TAG = "CtsInstrumentationApkTest";
 
     /** the file names of the CTS apks to install */
     private Collection<String> mInstallFileNames = new ArrayList<String>();
     private Collection<String> mUninstallPackages = new ArrayList<String>();
+    protected CtsBuildHelper mCtsBuild = null;
+    protected IAbi mAbi = null;
 
-    private CtsBuildHelper mCtsBuild = null;
+    /**
+     * @param abi the ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void setBuild(IBuildInfo build) {
-        mCtsBuild  = CtsBuildHelper.createBuildHelper(build);
+        mCtsBuild = CtsBuildHelper.createBuildHelper(build);
     }
 
     /**
@@ -76,11 +80,11 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
         ITestDevice mTestDevice = getDevice();
 
         if (mTestDevice == null) {
-            Log.e(LOG_TAG, String.format("Missing device."));
+            Log.e(LOG_TAG, "Missing device.");
             return;
         }
         if (mCtsBuild == null) {
-            Log.e(LOG_TAG, String.format("Missing build %s", mCtsBuild));
+            Log.e(LOG_TAG, "Missing build");
             return;
         }
 
@@ -90,14 +94,7 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
             try {
                 File apkFile = mCtsBuild.getTestApp(apkFileName);
                 String errorCode = null;
-                String[] options = {};
-                String forceAbi = getForceAbi();
-                if (forceAbi != null) {
-                    String abi = AbiFormatter.getDefaultAbi(mTestDevice, forceAbi);
-                    if (abi != null) {
-                        options = new String[]{String.format("--abi %s ", abi)};
-                    }
-                }
+                String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
                 Log.d(LOG_TAG, "installPackage options: " + options);
                 errorCode = mTestDevice.installPackage(apkFile, true, options);
                 if (errorCode != null) {

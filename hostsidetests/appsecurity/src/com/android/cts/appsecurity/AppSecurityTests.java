@@ -17,6 +17,7 @@
 package com.android.cts.appsecurity;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
@@ -29,6 +30,8 @@ import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestResult.TestStatus;
 import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
@@ -38,7 +41,7 @@ import java.util.Map;
 /**
  * Set of tests that verify various security checks involving multiple apps are properly enforced.
  */
-public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
+public class AppSecurityTests extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
 
     private static final String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
 
@@ -104,7 +107,13 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
     private static final String LOG_TAG = "AppSecurityTests";
 
+    private IAbi mAbi;
     private CtsBuildHelper mCtsBuild;
+
+    @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     /**
      * {@inheritDoc}
@@ -136,12 +145,13 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(SHARED_UI_PKG);
             getDevice().uninstallPackage(SHARED_UI_DIFF_CERT_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(getTestAppFile(SHARED_UI_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install shared uid app, Reason: %s", installResult),
                     installResult);
             installResult = getDevice().installPackage(getTestAppFile(SHARED_UI_DIFF_CERT_APK),
-                    false);
+                    false, options);
             assertNotNull("shared uid app with different cert than existing app installed " +
                     "successfully", installResult);
             assertEquals("INSTALL_FAILED_SHARED_USER_INCOMPATIBLE", installResult);
@@ -162,12 +172,13 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             // cleanup test app that might be installed from previous partial test run
             getDevice().uninstallPackage(SIMPLE_APP_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(getTestAppFile(SIMPLE_APP_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install simple app. Reason: %s", installResult),
                     installResult);
             installResult = getDevice().installPackage(getTestAppFile(SIMPLE_APP_DIFF_CERT_APK),
-                    true /* reinstall */);
+                    true /* reinstall */, options);
             assertNotNull("app upgrade with different cert than existing app installed " +
                     "successfully", installResult);
             assertEquals("INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES", installResult);
@@ -187,8 +198,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(APP_WITH_DATA_PKG);
             getDevice().uninstallPackage(APP_ACCESS_DATA_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install app with data. Reason: %s", installResult),
                     installResult);
             // run appwithdata's tests to create private data
@@ -196,7 +208,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
                     APP_WITH_DATA_CLASS, APP_WITH_DATA_CREATE_METHOD));
 
             installResult = getDevice().installPackage(getTestAppFile(APP_ACCESS_DATA_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install app access data. Reason: %s",
                     installResult), installResult);
             // run appaccessdata's tests which attempt to access appwithdata's private data
@@ -216,8 +228,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             wipePrimaryExternalStorage(getDevice());
 
             getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false, options));
             assertTrue("Failed external storage with no permissions",
                     runDeviceTests(EXTERNAL_STORAGE_APP_PKG));
         } finally {
@@ -235,8 +248,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             wipePrimaryExternalStorage(getDevice());
 
             getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false, options));
             assertTrue("Failed external storage with read permissions",
                     runDeviceTests(READ_EXTERNAL_STORAGE_APP_PKG));
         } finally {
@@ -254,8 +268,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             wipePrimaryExternalStorage(getDevice());
 
             getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false, options));
             assertTrue("Failed external storage with write permissions",
                     runDeviceTests(WRITE_EXTERNAL_STORAGE_APP_PKG));
         } finally {
@@ -274,12 +289,13 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
             getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
             getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false, options));
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false, options));
             assertNull(getDevice()
-                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false, options));
 
             assertTrue("Failed to write gifts", runDeviceTests(WRITE_EXTERNAL_STORAGE_APP_PKG,
                     WRITE_EXTERNAL_STORAGE_APP_CLASS, "doWriteGifts"));
@@ -305,8 +321,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             // cleanup test app that might be installed from previous partial test run
             getDevice().uninstallPackage(APP_WITH_DATA_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install app with data. Reason: %s", installResult),
                     installResult);
             // run appwithdata's tests to create private data
@@ -316,7 +333,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(APP_WITH_DATA_PKG);
 
             installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install app with data second time. Reason: %s",
                     installResult), installResult);
             // run appwithdata's 'check if file exists' test
@@ -339,14 +356,15 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(TARGET_INSTRUMENT_PKG);
             getDevice().uninstallPackage(INSTRUMENT_DIFF_CERT_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(
-                    getTestAppFile(TARGET_INSTRUMENT_APK), false);
+                    getTestAppFile(TARGET_INSTRUMENT_APK), false, options);
             assertNull(String.format("failed to install target instrumentation app. Reason: %s",
                     installResult), installResult);
 
             // the app will install, but will get error at runtime when starting instrumentation
             installResult = getDevice().installPackage(getTestAppFile(INSTRUMENT_DIFF_CERT_APK),
-                    false);
+                    false, options);
             assertNull(String.format(
                     "failed to install instrumentation app with diff cert. Reason: %s",
                     installResult), installResult);
@@ -374,19 +392,20 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(DECLARE_PERMISSION_COMPAT_PKG);
             getDevice().uninstallPackage(PERMISSION_DIFF_CERT_PKG);
 
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             String installResult = getDevice().installPackage(
-                    getTestAppFile(DECLARE_PERMISSION_APK), false);
+                    getTestAppFile(DECLARE_PERMISSION_APK), false, options);
             assertNull(String.format("failed to install declare permission app. Reason: %s",
                     installResult), installResult);
 
             installResult = getDevice().installPackage(
-                    getTestAppFile(DECLARE_PERMISSION_COMPAT_APK), false);
+                    getTestAppFile(DECLARE_PERMISSION_COMPAT_APK), false, options);
             assertNull(String.format("failed to install declare permission compat app. Reason: %s",
                     installResult), installResult);
 
             // the app will install, but will get error at runtime
             installResult = getDevice().installPackage(getTestAppFile(PERMISSION_DIFF_CERT_APK),
-                    false);
+                    false, options);
             assertNull(String.format("failed to install permission app with diff cert. Reason: %s",
                     installResult), installResult);
             // run PERMISSION_DIFF_CERT_PKG tests which try to access the permission
@@ -421,8 +440,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             // Install our test app
             getDevice().uninstallPackage(MULTIUSER_STORAGE_PKG);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
             final String installResult = getDevice()
-                    .installPackage(getTestAppFile(MULTIUSER_STORAGE_APK), false);
+                    .installPackage(getTestAppFile(MULTIUSER_STORAGE_APK), false, options);
             assertNull("Failed to install: " + installResult, installResult);
 
             // Clear data from previous tests

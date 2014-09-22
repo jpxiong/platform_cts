@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.UserManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -38,6 +39,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -71,6 +73,9 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         addResult(BUILD_FINGERPRINT, Build.FINGERPRINT);
         addResult(BUILD_ABI, Build.CPU_ABI);
         addResult(BUILD_ABI2, Build.CPU_ABI2);
+        addResult(BUILD_ABIS, TextUtils.join(",", Build.SUPPORTED_ABIS));
+        addResult(BUILD_ABIS_32, TextUtils.join(",", Build.SUPPORTED_32_BIT_ABIS));
+        addResult(BUILD_ABIS_64, TextUtils.join(",", Build.SUPPORTED_64_BIT_ABIS));
         addResult(SERIAL_NUMBER, Build.SERIAL);
 
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
@@ -163,7 +168,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
      * @param key the string of the key name.
      * @param value integer value.
      */
-    private void addResult(final String key, final int value){
+    static void addResult(final String key, final int value){
         mResults.putInt(key, value);
     }
 
@@ -173,7 +178,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
      * @param key the string of the key name.
      * @param value float value.
      */
-    private void addResult(final String key, final float value){
+    static void addResult(final String key, final float value){
         mResults.putFloat(key, value);
     }
 
@@ -361,7 +366,6 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
                 count, getContext().getExternalFilesDirs(Environment.DIRECTORY_PICTURES).length);
         count = Math.max(count, getContext().getObbDirs().length);
 
-        final String result;
         if (Environment.isExternalStorageEmulated()) {
             if (count == 1) {
                 return "1 emulated";
