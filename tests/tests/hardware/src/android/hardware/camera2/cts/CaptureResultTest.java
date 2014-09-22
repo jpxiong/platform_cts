@@ -538,6 +538,8 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
         waiverKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AE_TARGET_FPS_RANGE);
+        waiverKeys.add(CaptureResult.CONTROL_AF_TRIGGER);
 
         return waiverKeys;
     }
