@@ -38,7 +38,7 @@ public class LooperTest extends AndroidTestCase {
     public void testDump() {
         StringBuilderPrinter printer = new StringBuilderPrinter(new StringBuilder());
         final String prefix = "LooperTest";
-        Looper.myLooper().dump(printer, prefix);
+        Looper.getMainLooper().dump(printer, prefix);
     }
 
     public void testGetMainLooper() {
@@ -78,9 +78,6 @@ public class LooperTest extends AndroidTestCase {
     }
 
     public void testMyQueue() throws Throwable {
-        MessageQueue mq = Looper.myQueue();
-        assertNotNull(mq);
-
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 try {
@@ -89,6 +86,9 @@ public class LooperTest extends AndroidTestCase {
                 } catch (Throwable e) {
                     // expected
                 }
+                Looper.prepare();
+                MessageQueue mq = Looper.myQueue();
+                assertNotNull(mq);
             }
         });
 
@@ -96,13 +96,6 @@ public class LooperTest extends AndroidTestCase {
     }
 
     public void testPrepare() throws Throwable {
-        try {
-            Looper.prepare();
-            fail("should throw exception because current thread already has a looper");
-        } catch (RuntimeException e) {
-            //expected
-        }
-
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
@@ -191,7 +184,7 @@ public class LooperTest extends AndroidTestCase {
     }
 
     public void testToString() {
-        assertNotNull(Looper.myLooper().toString());
+        assertNotNull(Looper.getMainLooper().toString());
     }
 
     class MockPrinter implements Printer {

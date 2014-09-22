@@ -18,6 +18,7 @@ package android.os.cts;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -33,7 +34,7 @@ public class MessageTest extends AndroidTestCase {
     private Message mMessage;
     private boolean mMessageHandlerCalled;
 
-    private Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             mMessageHandlerCalled = true;
         }

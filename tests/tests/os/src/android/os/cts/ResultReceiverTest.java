@@ -16,16 +16,15 @@
 
 package android.os.cts;
 
-
-
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcel;
 import android.os.ResultReceiver;
 import android.test.AndroidTestCase;
 
 public class ResultReceiverTest extends AndroidTestCase {
-    private Handler mHandler = new Handler();
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     private static final long DURATION = 100l;
 
     public void testResultReceiver() throws InterruptedException {
