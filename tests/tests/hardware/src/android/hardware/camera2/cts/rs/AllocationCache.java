@@ -74,34 +74,30 @@ public class AllocationCache implements UncheckedCloseable {
      * @throws NullPointerException if type was null
      * @throws IllegalStateException if the cache was closed with {@link #close}
      */
-    public synchronized Allocation getOrCreateTyped(Type type, int usage) {
-        checkNotNull("type", type);
-        checkNotClosed();
+    public Allocation getOrCreateTyped(Type type, int usage) {
+        synchronized (this) {
+          checkNotNull("type", type);
+          checkNotClosed();
 
-        AllocationKey key = new AllocationKey(type, usage);
-        List<Allocation> list = mAllocationMap.get(key);
+          AllocationKey key = new AllocationKey(type, usage);
+          List<Allocation> list = mAllocationMap.get(key);
 
-        Allocation alloc;
-
-        if (list == null || list.isEmpty()) {
-            alloc = Allocation.createTyped(mRS, type, usage);
-
-            if (DEBUG) {
-                sDebugMisses++;
-                Log.d(TAG, String.format(
-                    "Cache MISS (%d): type = '%s', usage = '%x'", sDebugMisses, type, usage));
-            }
-        } else {
-            alloc = list.remove(list.size() - 1);
-
-            if (DEBUG) {
-                sDebugHits++;
-                Log.d(TAG, String.format(
-                    "Cache HIT (%d): type = '%s', usage = '%x'", sDebugHits, type, usage));
-            }
+          if (list != null && !list.isEmpty()) {
+              Allocation alloc = list.remove(list.size() - 1);
+              if (DEBUG) {
+                  sDebugHits++;
+                  Log.d(TAG, String.format(
+                      "Cache HIT (%d): type = '%s', usage = '%x'", sDebugHits, type, usage));
+              }
+              return alloc;
+          }
+          if (DEBUG) {
+              sDebugMisses++;
+              Log.d(TAG, String.format(
+                  "Cache MISS (%d): type = '%s', usage = '%x'", sDebugMisses, type, usage));
+          }
         }
-
-        return alloc;
+        return Allocation.createTyped(mRS, type, usage);
     }
 
     /**
