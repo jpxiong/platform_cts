@@ -584,7 +584,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
             SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
             CaptureRequest.Builder videoSnapshotRequestBuilder =
-                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
+                    mCamera.createCaptureRequest((mStaticInfo.isHardwareLevelLegacy()) ?
+                            CameraDevice.TEMPLATE_RECORD : CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
 
             // prepare preview surface by using video size.
             updatePreviewSurfaceWithVideoSize(videoSz);
