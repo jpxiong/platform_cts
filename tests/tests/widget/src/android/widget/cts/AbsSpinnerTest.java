@@ -52,7 +52,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         mContext = getInstrumentation().getTargetContext();
     }
 
-
+    @UiThreadTest
     public void testConstructor() {
         new Spinner(mContext);
 
@@ -139,6 +139,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         // There is neither limit in code nor description about it in javadoc.
     }
 
+    @UiThreadTest
     public void testRequestLayout() {
         AbsSpinner absSpinner = new Spinner(mContext);
         absSpinner.layout(0, 0, 200, 300);
@@ -176,6 +177,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
      * 1. Should return the position of the item which contains the specified point.
      * 2. Should return INVALID_POSITION if the point does not intersect an item
      */
+    @UiThreadTest
     public void testPointToPosition() {
         AbsSpinner absSpinner = new Gallery(mContext);
         MockSpinnerAdapter adapter = new MockSpinnerAdapter();
@@ -210,6 +212,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
      * 1. Should return the view corresponding to the currently selected item.
      * 2. Should return null if nothing is selected.
      */
+    @UiThreadTest
     public void testGetSelectedView() {
         AbsSpinner absSpinner = new Gallery(mContext);
         MockSpinnerAdapter adapter = new MockSpinnerAdapter();

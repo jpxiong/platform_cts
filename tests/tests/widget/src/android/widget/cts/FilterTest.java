@@ -18,12 +18,14 @@ package android.widget.cts;
 
 
 import android.cts.util.PollingCheck;
+import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Filter;
 import android.widget.Filter.FilterListener;
 
 public class FilterTest extends ActivityInstrumentationTestCase2<CtsActivity> {
     private static final long TIME_OUT = 10000;
+    private static final long RUN_TIME = 1000;
     private static final String TEST_CONSTRAINT = "filter test";
     private MockFilter mMockFilter;
 
@@ -31,16 +33,26 @@ public class FilterTest extends ActivityInstrumentationTestCase2<CtsActivity> {
         super("com.android.cts.widget", CtsActivity.class);
     }
 
-    public void testConstructor() {
-        new MockFilter();
+    public void testConstructor() throws Throwable {
+        TestThread t = new TestThread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                new MockFilter();
+            }
+        });
+        t.runTest(RUN_TIME);
     }
 
-    public void testConvertResultToString() {
-        final MockFilter filter = new MockFilter();
-        assertEquals("", filter.convertResultToString(null));
-
+    public void testConvertResultToString() throws Throwable {
         final String testStr = "Test";
-        assertEquals(testStr, filter.convertResultToString(testStr));
+        new TestThread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                MockFilter filter = new MockFilter();
+                assertEquals("", filter.convertResultToString(null));
+                assertEquals(testStr, filter.convertResultToString(testStr));
+            }
+        }).runTest(RUN_TIME);
     }
 
     public void testFilter1() {
