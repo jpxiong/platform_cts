@@ -17,18 +17,17 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.config.Option;
-import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
-import com.android.tradefed.util.AbiFormatter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,26 +37,31 @@ import java.io.FileNotFoundException;
  */
 public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
 
+    private static final String LOG_TAG = WrappedGTest.class.getSimpleName();
+
     private int mMaxTestTimeMs = 1 * 60 * 1000;
 
     private CtsBuildHelper mCtsBuild;
     private ITestDevice mDevice;
+    private IAbi mAbi;
 
     private final String mAppNameSpace;
     private final String mRunner;
     private final String mName;
     private final String mUri;
 
-    @Option(name = AbiFormatter.FORCE_ABI_STRING,
-            description = AbiFormatter.FORCE_ABI_DESCRIPTION,
-            importance = Importance.IF_UNSET)
-    private String mForceAbi = null;
-
     public WrappedGTest(String appNameSpace, String uri, String name, String runner) {
         mAppNameSpace = appNameSpace;
         mRunner = runner;
         mName = name;
         mUri = uri;
+    }
+
+    /**
+     * @param abi The ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
     }
 
     @Override
@@ -88,7 +92,9 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
     private boolean installTest() throws DeviceNotAvailableException {
         try {
             File testApp = mCtsBuild.getTestApp(String.format("%s.apk", mName));
-            String installCode = mDevice.installPackage(testApp, true);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+            CLog.d(LOG_TAG, "installPackage options: " + options);
+            String installCode = mDevice.installPackage(testApp, true, options);
 
             if (installCode != null) {
                 CLog.e("Failed to install %s.apk on %s. Reason: %s", mName,
@@ -107,13 +113,7 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
         WrappedGTestResultParser resultParser = new WrappedGTestResultParser(mUri, listener);
         resultParser.setFakePackagePrefix(mUri + ".");
         try {
-            String options = "";
-            if (mForceAbi != null) {
-                String abi = AbiFormatter.getDefaultAbi(getDevice(), mForceAbi);
-                if (abi != null) {
-                    options = String.format("--abi %s ", abi);
-                }
-            }
+            String options = mAbi == null ? "" : String.format("--abi %s ", mAbi);
             String command = String.format("am instrument -w %s%s/.%s", options, mAppNameSpace, mRunner);
             mDevice.executeShellCommand(command, resultParser, mMaxTestTimeMs, 0);
         } catch (DeviceNotAvailableException e) {

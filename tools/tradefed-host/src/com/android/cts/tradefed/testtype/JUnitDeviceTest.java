@@ -25,6 +25,7 @@ import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -52,10 +53,6 @@ public class JUnitDeviceTest implements IDeviceTest, IRemoteTest, IBuildReceiver
 
     private static final String TMP_DIR = "/data/local/tmp/";
 
-    @Option(name = AbiFormatter.FORCE_ABI_STRING, description = AbiFormatter.FORCE_ABI_DESCRIPTION,
-            importance = Importance.IF_UNSET)
-    private String mForceAbi = null;
-
     @Option(name = "junit-device-runtime",
             description = "The name of the runtime to use on the device",
             importance = Importance.ALWAYS)
@@ -79,11 +76,18 @@ public class JUnitDeviceTest implements IDeviceTest, IRemoteTest, IBuildReceiver
 
     private String mRuntimeArgs;
 
-
+    private IAbi mAbi;
 
     private static final String JUNIT_JAR = "cts-junit.jar";
 
     private Set<String> mTestJars = new HashSet<String>(Arrays.asList(JUNIT_JAR));
+
+    /**
+     * @param abi The ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     @Override
     public ITestDevice getDevice() {
@@ -127,7 +131,7 @@ public class JUnitDeviceTest implements IDeviceTest, IRemoteTest, IBuildReceiver
                         "com.android.cts.junit.SingleJUnitTestRunner %s#%s",
                         mDeviceTestTmpPath, mRuntimePath, jarPath, mRuntimeArgs,
                         testId.getClassName(), testId.getTestName());
-                String cmd = AbiFormatter.formatCmdForAbi(cmdLine, mForceAbi);
+                String cmd = AbiFormatter.formatCmdForAbi(cmdLine, mAbi.getBitness());
                 CLog.d("Running %s", cmd);
                 listener.testStarted(testId);
                 mDevice.executeShellCommand(cmd, resultParser, mMaxTimeToOutputResponse,

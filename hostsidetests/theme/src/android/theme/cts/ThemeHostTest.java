@@ -17,15 +17,17 @@
 package android.theme.cts;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
+import com.android.cts.util.TimeoutReq;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
-
-import com.android.cts.util.TimeoutReq;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +48,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Test to check the Holo theme has not been changed.
  */
-public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
+public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
 
     private static final String TAG = ThemeHostTest.class.getSimpleName();
 
@@ -172,6 +174,9 @@ public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
 
     private final HashMap<String, File> mReferences = new HashMap<String, File>();
 
+    /** The ABI to use. */
+    private IAbi mAbi;
+
     /** A reference to the build. */
     private CtsBuildHelper mBuild;
 
@@ -181,6 +186,11 @@ public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
     private ExecutorService mExecutionService;
 
     private ExecutorCompletionService<Boolean> mCompletionService;
+
+    @Override
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -197,8 +207,10 @@ public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
         mDevice.uninstallPackage(PACKAGE);
         // Get the APK from the build.
         File app = mBuild.getTestApp(APK);
+        // Get the ABI flag.
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
         // Install the APK on the device.
-        mDevice.installPackage(app, false);
+        mDevice.installPackage(app, false, options);
 
         final String densityProp;
 
@@ -328,6 +340,7 @@ public class ThemeHostTest extends DeviceTestCase implements IBuildReceiver {
                     }
                 }
             }
+            in.close();
         }
 
         return success;

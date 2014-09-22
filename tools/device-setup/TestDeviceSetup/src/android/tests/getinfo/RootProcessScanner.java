@@ -146,13 +146,13 @@ class RootProcessScanner {
         try {
             scanner = new Scanner(status);
 
-            scanner = findToken(scanner, "Name:");
+            findToken(scanner, "Name:");
             String name = scanner.next();
 
-            scanner = findToken(scanner, "Uid:");
+            findToken(scanner, "Uid:");
             boolean rootUid = hasRootId(scanner);
 
-            scanner = findToken(scanner, "Gid:");
+            findToken(scanner, "Gid:");
             boolean rootGid = hasRootId(scanner);
 
             return !ROOT_PROCESS_WHITELIST_PATTERN.matcher(name).matches()
@@ -182,13 +182,12 @@ class RootProcessScanner {
      *
      * @param scanner to call next() until the token is found
      * @param token to find like "Name:"
-     * @return scanner after finding token
      */
-    private static Scanner findToken(Scanner scanner, String token) {
+    private static void findToken(Scanner scanner, String token) {
         while (true) {
             String next = scanner.next();
             if (next.equals(token)) {
-                return scanner;
+                return;
             }
         }
 
@@ -214,7 +213,7 @@ class RootProcessScanner {
         File status = getProcessStatus(processDir);
         Scanner scanner = new Scanner(status);
         try {
-            scanner = findToken(scanner, "Name:");
+            findToken(scanner, "Name:");
             return scanner.next();
         } finally {
             scanner.close();

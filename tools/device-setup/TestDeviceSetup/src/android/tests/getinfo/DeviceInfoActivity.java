@@ -57,6 +57,7 @@ public class DeviceInfoActivity extends Activity {
             final CountDownLatch done = new CountDownLatch(1);
             final int version = i;
             DeviceInfoActivity.this.runOnUiThread(new Runnable() {
+                @Override
                 public void run() {
                     setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
                 }
@@ -121,6 +122,7 @@ public class DeviceInfoActivity extends Activity {
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
         final int glVersion = (info.reqGlEsVersion & 0xffff0000) >> 16;
         new Thread() {
+            @Override
             public void run() {
                 runIterations(glVersion);
             }
