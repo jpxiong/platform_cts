@@ -235,7 +235,7 @@ class TestPackageDef implements ITestPackageDef {
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (DEQP_TEST.equals(mTestType)) {
-            return new DeqpTest(mUri, mName, mTests);
+            return new DeqpTestRunner(mUri, mName, mTests);
         } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
         } else if (WRAPPED_NATIVE_TEST.equals(mTestType)) {
@@ -261,7 +261,7 @@ class TestPackageDef implements ITestPackageDef {
             // specialized instrumentation. Eventually this special case for signatureTest can be
             // removed, and it can be treated just like a normal InstrumentationTest
             CLog.d("Creating signature test %s", mName);
-            InstrumentationApkTest instrTest = new InstrumentationApkTest();
+            CtsInstrumentationApkTest instrTest = new CtsInstrumentationApkTest();
             instrTest.setPackageName(mAppNameSpace);
             instrTest.setRunnerName("android.test.InstrumentationTestRunner");
             instrTest.setClassName(SIGNATURE_TEST_CLASS);
@@ -285,7 +285,7 @@ class TestPackageDef implements ITestPackageDef {
             return jUnitDeviceTest;
         } else {
             CLog.d("Creating instrumentation test for %s", mName);
-            InstrumentationApkTest instrTest = new InstrumentationApkTest();
+            CtsInstrumentationApkTest instrTest = new CtsInstrumentationApkTest();
             if (mTimeoutInMins >= 0) {
                 // as timeout cannot be set for each test,
                 // increase the time-out of the whole package
@@ -309,13 +309,13 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
-     * Populates given {@link InstrumentationApkTest} with data from the package xml.
+     * Populates given {@link CtsInstrumentationApkTest} with data from the package xml.
      *
      * @param testCaseDir
      * @param instrTest
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
-    private InstrumentationTest setInstrumentationTest(InstrumentationApkTest instrTest,
+    private InstrumentationTest setInstrumentationTest(CtsInstrumentationApkTest instrTest,
             File testCaseDir) {
         instrTest.setRunName(getUri());
         instrTest.setPackageName(mAppNameSpace);

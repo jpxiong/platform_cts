@@ -24,19 +24,22 @@ import com.android.cts.util.ReportLog;
  */
 public class HostReportLog extends ReportLog {
     private String mDeviceSerial;
+    private String mAbi;
     private String mClassMethodName;
 
     /**
      * @param deviceSerial serial number of the device
+     * @param abi abi the test was run on
      * @param classMethodName class name and method name of the test in class#method format.
      *        Note that ReportLog.getClassMethodNames() provide this.
      */
-    public HostReportLog(String deviceSerial, String classMethodName) {
+    public HostReportLog(String deviceSerial, String abi, String classMethodName) {
         mDeviceSerial = deviceSerial;
+        mAbi = abi;
         mClassMethodName = classMethodName;
     }
 
     public void deliverReportToHost() {
-        CtsHostStore.storeCtsResult(mDeviceSerial, mClassMethodName, generateReport());
+        CtsHostStore.storeCtsResult(mDeviceSerial, mAbi, mClassMethodName, generateReport());
     }
 }

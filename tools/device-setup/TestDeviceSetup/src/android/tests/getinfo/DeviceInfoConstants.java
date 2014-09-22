@@ -51,6 +51,9 @@ public interface DeviceInfoConstants {
     public static final String VERSION_RELEASE = "buildVersion";
     public static final String BUILD_ABI = "build_abi";
     public static final String BUILD_ABI2 = "build_abi2";
+    public static final String BUILD_ABIS = "build_abis";
+    public static final String BUILD_ABIS_32 = "build_abis_32";
+    public static final String BUILD_ABIS_64 = "build_abis_64";
     public static final String BUILD_FINGERPRINT = "build_fingerprint";
     public static final String BUILD_TYPE = "build_type";
     public static final String BUILD_MODEL = "build_model";
