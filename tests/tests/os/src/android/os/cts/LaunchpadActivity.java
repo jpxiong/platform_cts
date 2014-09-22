@@ -79,36 +79,36 @@ public class LaunchpadActivity extends Activity {
     }
 
     // Also used as the Binder interface descriptor string in these tests
-    public static final String LAUNCH = "android.app.cts.activity.LAUNCH";
+    public static final String LAUNCH = "android.os.cts.activity.LAUNCH";
 
-    public static final String FORWARD_RESULT = "android.app.cts.activity.FORWARD_RESULT";
-    public static final String RETURNED_RESULT = "android.app.cts.activity.RETURNED_RESULT";
+    public static final String FORWARD_RESULT = "android.os.cts.activity.FORWARD_RESULT";
+    public static final String RETURNED_RESULT = "android.os.cts.activity.RETURNED_RESULT";
 
-    public static final String BAD_PARCELABLE = "android.app.cts.activity.BAD_PARCELABLE";
+    public static final String BAD_PARCELABLE = "android.os.cts.activity.BAD_PARCELABLE";
 
     public static final int LAUNCHED_RESULT = 1;
     public static final int FORWARDED_RESULT = 2;
 
-    public static final String LIFECYCLE_BASIC = "android.app.cts.activity.LIFECYCLE_BASIC";
-    public static final String LIFECYCLE_SCREEN = "android.app.cts.activity.LIFECYCLE_SCREEN";
-    public static final String LIFECYCLE_DIALOG = "android.app.cts.activity.LIFECYCLE_DIALOG";
+    public static final String LIFECYCLE_BASIC = "android.os.cts.activity.LIFECYCLE_BASIC";
+    public static final String LIFECYCLE_SCREEN = "android.os.cts.activity.LIFECYCLE_SCREEN";
+    public static final String LIFECYCLE_DIALOG = "android.os.cts.activity.LIFECYCLE_DIALOG";
 
-    public static final String BROADCAST_REGISTERED = "android.app.cts.activity.BROADCAST_REGISTERED";
-    public static final String BROADCAST_LOCAL = "android.app.cts.activity.BROADCAST_LOCAL";
-    public static final String BROADCAST_REMOTE = "android.app.cts.activity.BROADCAST_REMOTE";
-    public static final String BROADCAST_ALL = "android.app.cts.activity.BROADCAST_ALL";
-    public static final String BROADCAST_REPEAT = "android.app.cts.activity.BROADCAST_REPEAT";
-    public static final String BROADCAST_MULTI = "android.app.cts.activity.BROADCAST_MULTI";
-    public static final String BROADCAST_ABORT = "android.app.cts.activity.BROADCAST_ABORT";
+    public static final String BROADCAST_REGISTERED = "android.os.cts.activity.BROADCAST_REGISTERED";
+    public static final String BROADCAST_LOCAL = "android.os.cts.activity.BROADCAST_LOCAL";
+    public static final String BROADCAST_REMOTE = "android.os.cts.activity.BROADCAST_REMOTE";
+    public static final String BROADCAST_ALL = "android.os.cts.activity.BROADCAST_ALL";
+    public static final String BROADCAST_REPEAT = "android.os.cts.activity.BROADCAST_REPEAT";
+    public static final String BROADCAST_MULTI = "android.os.cts.activity.BROADCAST_MULTI";
+    public static final String BROADCAST_ABORT = "android.os.cts.activity.BROADCAST_ABORT";
 
     public static final String EXPANDLIST_SELECT = "EXPANDLIST_SELECT";
     public static final String EXPANDLIST_VIEW = "EXPANDLIST_VIEW";
     public static final String EXPANDLIST_CALLBACK = "EXPANDLIST_CALLBACK";
 
-    public static final String BROADCAST_STICKY1 = "android.app.cts.activity.BROADCAST_STICKY1";
-    public static final String BROADCAST_STICKY2 = "android.app.cts.activity.BROADCAST_STICKY2";
+    public static final String BROADCAST_STICKY1 = "android.os.cts.activity.BROADCAST_STICKY1";
+    public static final String BROADCAST_STICKY2 = "android.os.cts.activity.BROADCAST_STICKY2";
 
-    public static final String ALIAS_ACTIVITY = "android.app.cts.activity.ALIAS_ACTIVITY";
+    public static final String ALIAS_ACTIVITY = "android.os.cts.activity.ALIAS_ACTIVITY";
 
     public static final String RECEIVER_REG = "receiver-reg";
     public static final String RECEIVER_LOCAL = "receiver-local";
