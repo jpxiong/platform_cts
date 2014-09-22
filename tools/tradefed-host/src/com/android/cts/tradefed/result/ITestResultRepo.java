@@ -41,7 +41,7 @@ public interface ITestResultRepo {
     /**
      * Get the report directory for given result
      * @param sessionId
-     * @return
+     * @return A {@link File} representing the report directory for the given sessionId
      */
     public File getReportDir(int sessionId);
 

@@ -16,6 +16,7 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildProvider;
+import com.android.cts.util.AbiUtils;
 import com.android.tradefed.log.LogUtil.CLog;
 
 import org.kxml2.io.KXmlSerializer;
@@ -49,7 +50,7 @@ class TestResults extends AbstractXmlPullParser {
     static final String NOT_EXECUTED_ATTR = "notExecuted";
     static final String FAILED_ATTR = "failed";
 
-    private Map<String, TestPackageResult> mPackageMap =
+    private Map<String, TestPackageResult> mPackageResults =
             new LinkedHashMap<String, TestPackageResult>();
     private DeviceInfoResult mDeviceInfo = new DeviceInfoResult();
 
@@ -68,10 +69,10 @@ class TestResults extends AbstractXmlPullParser {
                     TestPackageResult.TAG)) {
                 TestPackageResult pkg = new TestPackageResult();
                 pkg.parse(parser);
-                if (pkg.getAppPackageName() != null) {
-                    mPackageMap.put(pkg.getAppPackageName(), pkg);
+                if (pkg.getId() != null) {
+                    mPackageResults.put(pkg.getId(), pkg);
                 } else {
-                    CLog.w("Found package with no app package name");
+                    CLog.w("Found package with no id");
                 }
             }
             eventType = parser.next();
@@ -82,17 +83,16 @@ class TestResults extends AbstractXmlPullParser {
      * @return the list of {@link TestPackageResult}.
      */
     public Collection<TestPackageResult> getPackages() {
-        return mPackageMap.values();
+        return mPackageResults.values();
     }
 
     /**
      * Count the number of tests with given status
-     * @param pass
-     * @return
+     * @param status
      */
     public int countTests(CtsTestStatus status) {
         int total = 0;
-        for (TestPackageResult result : mPackageMap.values()) {
+        for (TestPackageResult result : mPackageResults.values()) {
             total += result.countTests(status);
         }
         return total;
@@ -109,7 +109,7 @@ class TestResults extends AbstractXmlPullParser {
         serializeHostInfo(serializer);
         serializeTestSummary(serializer);
         // sort before serializing
-        List<TestPackageResult> pkgs = new ArrayList<TestPackageResult>(mPackageMap.values());
+        List<TestPackageResult> pkgs = new ArrayList<TestPackageResult>(mPackageResults.values());
         Collections.sort(pkgs, new PkgComparator());
         for (TestPackageResult r : pkgs) {
             r.serialize(serializer);
@@ -174,27 +174,25 @@ class TestResults extends AbstractXmlPullParser {
 
     private static class PkgComparator implements Comparator<TestPackageResult> {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        public int compare(TestPackageResult o1, TestPackageResult o2) {
-            return o1.getAppPackageName().compareTo(o2.getAppPackageName());
+        public int compare(TestPackageResult lhs, TestPackageResult rhs) {
+            return lhs.getId().compareTo(rhs.getId());
         }
-
     }
 
     /**
-     * Return existing package with given app package name. If not found, create a new one.
-     * @param name
+     * Return existing package with given id. If not found, create a new one.
+     * @param id
      * @return
      */
-    public TestPackageResult getOrCreatePackage(String appPackageName) {
-        TestPackageResult pkgResult = mPackageMap.get(appPackageName);
+    public TestPackageResult getOrCreatePackage(String id) {
+        TestPackageResult pkgResult = mPackageResults.get(id);
         if (pkgResult == null) {
             pkgResult = new TestPackageResult();
-            pkgResult.setAppPackageName(appPackageName);
-            mPackageMap.put(appPackageName, pkgResult);
+            String[] parts = AbiUtils.parseId(id);
+            pkgResult.setAbi(parts[0]);
+            pkgResult.setAppPackageName(parts[1]);
+            mPackageResults.put(id, pkgResult);
         }
         return pkgResult;
     }

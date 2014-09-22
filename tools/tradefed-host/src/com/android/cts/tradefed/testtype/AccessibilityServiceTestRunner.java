@@ -73,7 +73,6 @@ public class AccessibilityServiceTestRunner extends CtsInstrumentationApkTest {
     private void installApkAndAssert(String apkName) throws DeviceNotAvailableException {
         File file = FileUtil.getFileForPath(mCtsBuild.getTestCasesDir(), apkName);
         String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
-        Log.d(LOG_TAG, "installPackage options: " + options);
         String errorMessage = getDevice().installPackage(file, true, options);
         TestCase.assertNull("Error installing: " + apkName, errorMessage);
     }

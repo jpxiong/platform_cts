@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.ArrayUtil;
 import com.android.tradefed.util.xml.AbstractXmlParser;
@@ -29,9 +30,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of {@link TestPlan}.
@@ -39,18 +42,20 @@ import java.util.Map;
 public class TestPlan extends AbstractXmlParser implements ITestPlan {
 
     /**
-     * Map of uri names found in plan, and their excluded tests
+     * Map of ids found in plan, and their filters
      */
-    private Map<String, TestFilter> mUriExcludedTestsMap;
+    private Map<String, TestFilter> mIdFilterMap;
 
     private static final String ENTRY_TAG = "Entry";
     private static final String TEST_DELIM = ";";
     private static final String METHOD_DELIM = "#";
     private static final String EXCLUDE_ATTR = "exclude";
     private static final String INCLUDE_ATTR = "include";
-    private static final String URI_ATTR = "uri";
+    private static final String ABI_ATTR = "abi";
+    private static final String NAME_ATTR = "name";
 
     private final String mName;
+    private final Set<String> mAbis;
 
     /**
      * SAX callback object. Handles parsing data from the xml tags.
@@ -61,10 +66,17 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
         public void startElement(String uri, String localName, String name, Attributes attributes)
                 throws SAXException {
             if (ENTRY_TAG.equals(localName)) {
-                final String entryUriValue = attributes.getValue(URI_ATTR);
                 TestFilter filter = parseTestList(
                         attributes.getValue(EXCLUDE_ATTR), attributes.getValue(INCLUDE_ATTR));
-                mUriExcludedTestsMap.put(entryUriValue, filter);
+                final String entryNameValue = attributes.getValue(NAME_ATTR);
+                final String entryAbiValue = attributes.getValue(ABI_ATTR);
+                if (entryAbiValue != null) {
+                    mIdFilterMap.put(AbiUtils.createId(entryAbiValue, entryNameValue), filter);
+                } else {
+                    for (String abi : mAbis) {
+                        mIdFilterMap.put(AbiUtils.createId(abi, entryNameValue), filter);
+                    }
+                }
             }
         }
 
@@ -109,10 +121,11 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
         }
     }
 
-    public TestPlan(String name) {
+    public TestPlan(String name, Set<String> abis) {
         mName = name;
+        mAbis = abis;
         // Uses a LinkedHashMap to have predictable iteration order
-        mUriExcludedTestsMap = new LinkedHashMap<String, TestFilter>();
+        mIdFilterMap = new LinkedHashMap<String, TestFilter>();
     }
 
     /**
@@ -127,24 +140,26 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getTestUris() {
-        return mUriExcludedTestsMap.keySet();
+    public Collection<String> getTestIds() {
+        List<String> ids = new ArrayList<String>(mIdFilterMap.keySet());
+        Collections.sort(ids);
+        return ids;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TestFilter getExcludedTestFilter(String uri) {
-        return mUriExcludedTestsMap.get(uri);
+    public TestFilter getTestFilter(String id) {
+        return mIdFilterMap.get(id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addPackage(String uri) {
-        mUriExcludedTestsMap.put(uri, new TestFilter());
+    public void addPackage(String id) {
+        mIdFilterMap.put(id, new TestFilter());
     }
 
     /**
@@ -159,12 +174,12 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
      * {@inheritDoc}
      */
     @Override
-    public void addExcludedTest(String uri, TestIdentifier testToExclude) {
-        TestFilter filter = mUriExcludedTestsMap.get(uri);
+    public void addExcludedTest(String id, TestIdentifier testToExclude) {
+        TestFilter filter = mIdFilterMap.get(id);
         if (filter != null) {
             filter.addExcludedTest(testToExclude);
         } else {
-            throw new IllegalArgumentException(String.format("Could not find package %s", uri));
+            throw new IllegalArgumentException(String.format("Could not find package %s", id));
         }
     }
 
@@ -172,12 +187,12 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
      * {@inheritDoc}
      */
     @Override
-    public void addExcludedTests(String uri, Collection<TestIdentifier> excludedTests) {
-        TestFilter filter = mUriExcludedTestsMap.get(uri);
+    public void addExcludedTests(String id, Collection<TestIdentifier> excludedTests) {
+        TestFilter filter = mIdFilterMap.get(id);
         if (filter != null) {
             filter.getExcludedTests().addAll(excludedTests);
         } else {
-            throw new IllegalArgumentException(String.format("Could not find package %s", uri));
+            throw new IllegalArgumentException(String.format("Could not find package %s", id));
         }
     }
 
@@ -193,9 +208,11 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
                 "http://xmlpull.org/v1/doc/features.html#indent-output", true);
         serializer.startTag(null, "TestPlan");
         serializer.attribute(null, "version", "1.0");
-        for (Map.Entry<String, TestFilter> packageEntry : mUriExcludedTestsMap.entrySet()) {
+        for (Map.Entry<String, TestFilter> packageEntry : mIdFilterMap.entrySet()) {
             serializer.startTag(null, ENTRY_TAG);
-            serializer.attribute(null, "uri", packageEntry.getKey());
+            String[] parts = AbiUtils.parseId(packageEntry.getKey());
+            serializer.attribute(null, ABI_ATTR, parts[0]);
+            serializer.attribute(null, NAME_ATTR, parts[1]);
             serializeFilter(serializer, packageEntry.getValue());
             serializer.endTag(null, ENTRY_TAG);
         }
@@ -206,10 +223,10 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
     /**
      * Adds an xml attribute containing {@link TestFilter} contents.
      * <p/>
-     * If {@link TestFilter} is empty, no data will be outputted.
+     * If {@link TestFilter} is empty, no data will be output.
      *
      * @param serializer
-     * @param value
+     * @param testFilter
      * @throws IOException
      */
     private void serializeFilter(KXmlSerializer serializer, TestFilter testFilter)

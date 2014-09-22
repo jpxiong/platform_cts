@@ -46,15 +46,15 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
     private IAbi mAbi;
 
     private final String mAppNameSpace;
-    private final String mRunner;
+    private final String mPackageName;
     private final String mName;
-    private final String mUri;
+    private final String mRunner;
 
-    public WrappedGTest(String appNameSpace, String uri, String name, String runner) {
+    public WrappedGTest(String appNameSpace, String packageName, String name, String runner) {
         mAppNameSpace = appNameSpace;
-        mRunner = runner;
+        mPackageName = packageName;
         mName = name;
-        mUri = uri;
+        mRunner = runner;
     }
 
     /**
@@ -93,7 +93,6 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
         try {
             File testApp = mCtsBuild.getTestApp(String.format("%s.apk", mName));
             String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
-            CLog.d(LOG_TAG, "installPackage options: " + options);
             String installCode = mDevice.installPackage(testApp, true, options);
 
             if (installCode != null) {
@@ -110,8 +109,9 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
     }
 
     private void runTest(ITestRunListener listener) throws DeviceNotAvailableException {
-        WrappedGTestResultParser resultParser = new WrappedGTestResultParser(mUri, listener);
-        resultParser.setFakePackagePrefix(mUri + ".");
+        String id = AbiUtils.createId(mAbi.getName(), mPackageName);
+        WrappedGTestResultParser resultParser = new WrappedGTestResultParser(id, listener);
+        resultParser.setFakePackagePrefix(mPackageName + ".");
         try {
             String options = mAbi == null ? "" : String.format("--abi %s ", mAbi);
             String command = String.format("am instrument -w %s%s/.%s", options, mAppNameSpace, mRunner);

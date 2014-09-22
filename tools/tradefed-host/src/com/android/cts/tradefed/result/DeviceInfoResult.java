@@ -358,7 +358,8 @@ class DeviceInfoResult extends AbstractXmlPullParser {
                 DeviceInfoConstants.BUILD_MANUFACTURER, DeviceInfoConstants.BUILD_BOARD,
                 DeviceInfoConstants.BUILD_DEVICE, DeviceInfoConstants.PRODUCT_NAME,
                 DeviceInfoConstants.BUILD_ABI, DeviceInfoConstants.BUILD_ABI2,
-                DeviceInfoConstants.SCREEN_SIZE);
+                DeviceInfoConstants.BUILD_ABIS, DeviceInfoConstants.BUILD_ABIS_32,
+                DeviceInfoConstants.BUILD_ABIS_64, DeviceInfoConstants.SCREEN_SIZE);
     }
 
     private void combineMetrics(Map<String, String> metrics, String... keysToCombine) {
