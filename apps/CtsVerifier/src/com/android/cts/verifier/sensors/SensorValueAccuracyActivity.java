@@ -57,8 +57,6 @@ public class SensorValueAccuracyActivity
     private static final float RANGE_ATMOSPHERIC_PRESSURE = 35f;
     private static final float AMBIENT_TEMPERATURE_AVERAGE = 22.5f;
     private static final float AMBIENT_TEMPERATURE_THRESHOLD = 7.5f;
-    private static final float PROXIMITY_AVERAGE = 50f;
-    private static final float PROXIMITY_THRESHOLD = 50f;
     private static final double ONE_HUNDRED_EIGHTY_DEGREES = 180.0f;
 
     private static final double GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES = 10.0f;

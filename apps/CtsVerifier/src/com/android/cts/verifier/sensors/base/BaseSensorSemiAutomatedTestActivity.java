@@ -18,7 +18,7 @@ package com.android.cts.verifier.sensors.base;
 
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
-import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 
 /**
  * Base class to author a single Sensor semi-automated test case.
@@ -37,8 +37,8 @@ public abstract class BaseSensorSemiAutomatedTestActivity extends BaseSensorTest
         SensorTestDetails.ResultCode resultCode = SensorTestDetails.ResultCode.PASS;
         try {
             onRun();
-        } catch(SensorNotSupportedException e) {
-            // the sensor is not supported/available in the device, log a warning and skip the test
+        } catch(SensorTestStateNotSupportedException e) {
+            // the sensor state is not supported in the device, log a warning and skip the test
             resultCode = SensorTestDetails.ResultCode.SKIPPED;
             summary = e.getMessage();
         } catch(Throwable e) {

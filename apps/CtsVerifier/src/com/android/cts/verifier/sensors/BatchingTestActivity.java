@@ -61,15 +61,12 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
     protected void activitySetUp() throws InterruptedException {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "BatchingTests");
-
-        deactivateSensorFeatures();
         mWakeLock.acquire();
     }
 
     @Override
     protected void activityCleanUp() throws InterruptedException {
         mWakeLock.release();
-        restoreSensorFeatures();
     }
 
     // TODO: refactor to discover all available sensors of each type and dynamically generate test
