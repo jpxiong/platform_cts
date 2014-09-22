@@ -351,10 +351,14 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      * Test tone map modes and controls.
      */
     public void testToneMapControl() throws Exception {
-        for (int i = 0; i < mCameraIds.length; i++) {
+        for (String id : mCameraIds) {
             try {
-                openDevice(mCameraIds[i]);
-
+                openDevice(id);
+                if (!mStaticInfo.isManualToneMapSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " doesn't support tone mapping controls, skipping test");
+                    continue;
+                }
                 toneMapTestByCamera();
             } finally {
                 closeDevice();
@@ -369,7 +373,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isManualColorCorrectionSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " doesn't support color correction controls, skipping test");
+                    continue;
+                }
                 colorCorrectionTestByCamera();
             } finally {
                 closeDevice();
@@ -381,9 +389,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.getCharacteristics().getKeys().
-                        contains(CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES)) {
-                    Log.i(TAG, "Camera " + id + " doesn't support EDGE_MODE controls.");
+                if (!mStaticInfo.isEdgeModeControlSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " doesn't support EDGE_MODE controls, skipping test");
                     continue;
                 }
 
@@ -402,7 +410,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(id);
                 if (!mStaticInfo.hasFocuser()) {
-                    Log.i(TAG, "Camera " + id + " has no focuser");
+                    Log.i(TAG, "Camera " + id + " has no focuser, skipping test");
                     continue;
                 }
 
@@ -417,9 +425,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.getCharacteristics().getKeys().contains(
-                        CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES)) {
-                    Log.i(TAG, "Camera " + id + " doesn't support noise reduction mode");
+                if (!mStaticInfo.isNoiseReductionModeControlSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " doesn't support noise reduction mode, skipping test");
                     continue;
                 }
 
@@ -2041,9 +2049,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             fpsRange = fpsRanges[i];
             Size previewSz = getMaxPreviewSizeForFpsRange(fpsRange);
             // If unable to find a preview size, then log the failure, and skip this run.
-            if (!mCollector.expectTrue(String.format(
-                    "Unable to find a preview size supporting given fps range %s",
-                    fpsRange), previewSz != null)) {
+            if (previewSz == null && mStaticInfo.isCapabilitySupported(
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                mCollector.addMessage(String.format(
+                        "Unable to find a preview size supporting given fps range %s",
+                        fpsRange));
                 continue;
             }
 
