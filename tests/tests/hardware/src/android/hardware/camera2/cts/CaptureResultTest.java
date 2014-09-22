@@ -515,6 +515,11 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
             waiverKeys.add(CaptureResult.SENSOR_SENSITIVITY);
             waiverKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
+            waiverKeys.add(CaptureResult.LENS_FOCUS_RANGE);
+            waiverKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
+            waiverKeys.add(CaptureResult.LENS_STATE);
+            waiverKeys.add(CaptureResult.LENS_APERTURE);
+            waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
         }
 
         if (mStaticInfo.isHardwareLevelLimited()) {
@@ -529,11 +534,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.CONTROL_AWB_STATE);
         waiverKeys.add(CaptureResult.FLASH_STATE);
         waiverKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
-        waiverKeys.add(CaptureResult.LENS_FOCUS_RANGE);
-        waiverKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
-        waiverKeys.add(CaptureResult.LENS_STATE);
-        waiverKeys.add(CaptureResult.LENS_APERTURE);
-        waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
         waiverKeys.add(CaptureResult.SENSOR_ROLLING_SHUTTER_SKEW);
         waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
         waiverKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
