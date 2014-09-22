@@ -67,7 +67,7 @@ public class SampleHostTest extends DeviceTestCase implements IAbiReceiver, IBui
     /**
      * The ABI to use.
      */
-    private String mAbi;
+    private IAbi mAbi;
 
     /**
      * A reference to the build.
@@ -133,6 +133,7 @@ public class SampleHostTest extends DeviceTestCase implements IAbiReceiver, IBui
                 testString = line.split(":")[1].trim();
             }
         }
+        in.close();
         // Assert the logged string matches the test string.
         assertEquals("Incorrect test string", TEST_STRING, testString);
     }
