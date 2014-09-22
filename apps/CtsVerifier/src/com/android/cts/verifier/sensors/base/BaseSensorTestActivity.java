@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -143,12 +144,18 @@ public abstract class BaseSensorTestActivity
     @Override
     public void run() {
         SensorTestDetails testDetails = null;
+        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
         try {
             activitySetUp();
-        } catch (Throwable e) {
+        } catch (SensorTestStateNotSupportedException e) {
             testDetails = new SensorTestDetails(
                     getTestClassName(),
                     SensorTestDetails.ResultCode.SKIPPED,
+                    e.getMessage());
+        } catch (Throwable e) {
+            testDetails = new SensorTestDetails(
+                    getTestClassName(),
+                    SensorTestDetails.ResultCode.FAIL,
                     "[ActivitySetUp] " + e.getMessage());
         }
 
@@ -167,6 +174,7 @@ public abstract class BaseSensorTestActivity
                     SensorTestDetails.ResultCode.FAIL,
                     "[ActivityCleanUp] " + e.getMessage());
         }
+        mSensorFeaturesDeactivator.requestToRestoreFeatures();
         mTestLogger.logInstructions(R.string.snsr_test_complete);
 
         // log to screen and save the overall test summary (activity level)
@@ -198,26 +206,6 @@ public abstract class BaseSensorTestActivity
      * @return A {@link SensorTestDetails} object containing information about the executed tests.
      */
     protected abstract SensorTestDetails executeTests();
-
-    /**
-     * Guides the operator throughout the process of deactivating features that are known to use
-     * Sensor data.
-     *
-     * @throws InterruptedException
-     */
-    protected void deactivateSensorFeatures() throws InterruptedException {
-        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
-    }
-
-    /**
-     * Guides the operator throughout the process of restoring the state of features that are known
-     * to use Sensor data, to their original state.
-     *
-     * @throws InterruptedException
-     */
-    protected void restoreSensorFeatures() throws InterruptedException {
-        mSensorFeaturesDeactivator.requestToRestoreFeatures();
-    }
 
     /**
      * Guides the operator throughout the process of setting the Screen Off timeout to a required
@@ -545,11 +533,15 @@ public abstract class BaseSensorTestActivity
         }
 
         @Override
-        public void launchAndWaitForSubactivity(String action) throws InterruptedException {
+        public void launchAndWaitForSubactivity(String action) {
             mCountDownLatch = new CountDownLatch(1);
             Intent intent = new Intent(action);
             startActivityForResult(intent, SENSOR_FEATURES_DEACTIVATOR_RESULT);
-            mCountDownLatch.await();
+            try {
+                mCountDownLatch.await();
+            } catch (InterruptedException e) {
+                Log.e(LOG_TAG, "Error waiting for sub-activity.", e);
+            }
         }
 
         public void onActivityResult() {
