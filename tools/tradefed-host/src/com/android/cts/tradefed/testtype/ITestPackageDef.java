@@ -17,6 +17,7 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IRemoteTest;
 
 import java.io.File;
@@ -30,10 +31,16 @@ import java.util.Collection;
 public interface ITestPackageDef {
 
     /**
-     * Get the unique URI, aka the appPackageName, of the test package.
-     * @return the {@link String} uri
+     * Get the id of the test package.
+     * @return the {@link String} id
      */
-    public String getUri();
+    public String getId();
+
+    /**
+     * Get the appPackageName of the test package.
+     * @return the {@link String} appPackageName
+     */
+    public String getAppPackageName();
 
     /**
      * Creates a runnable {@link IRemoteTest} from info stored in this definition.
@@ -68,8 +75,7 @@ public interface ITestPackageDef {
     /**
      * Return the sha1sum of the binary file for this test package.
      * <p/>
-     * Will only return a valid value after {@link #createTest(File, String, String)} has been
-     * called.
+     * Will only return a valid value after {@link #createTest(File)} has been called.
      *
      * @return the sha1sum in {@link String} form
      */
@@ -81,11 +87,16 @@ public interface ITestPackageDef {
     public String getName();
 
     /**
-     * Set the filter to use to exclude tests
-     *
-     * @param excludedTestFilter
+     * @return the ABI of this test package.
      */
-    public void setExcludedTestFilter(TestFilter excludedTestFilter);
+    public IAbi getAbi();
+
+    /**
+     * Set the filter to use for tests
+     *
+     * @param testFilter
+     */
+    public void setTestFilter(TestFilter testFilter);
 
     /**
      * Restrict this test package to run a specific class and method name

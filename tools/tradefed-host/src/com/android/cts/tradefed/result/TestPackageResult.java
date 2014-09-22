@@ -15,10 +15,9 @@
  */
 package com.android.cts.tradefed.result;
 
-import android.tests.getinfo.DeviceInfoConstants;
-
-import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
+import com.android.cts.tradefed.util.CtsHostStore;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
 
@@ -31,33 +30,55 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Data structure for a CTS test package result.
  * <p/>
  * Provides methods to serialize to XML.
  */
-class TestPackageResult  extends AbstractXmlPullParser {
+class TestPackageResult extends AbstractXmlPullParser {
 
     static final String TAG = "TestPackage";
+
+    public static final String CTS_RESULT_KEY = "CTS_TEST_RESULT";
+    public static final String CTS_ABI_KEY = "CTS_TEST_ABI";
+
     private static final String DIGEST_ATTR = "digest";
     private static final String APP_PACKAGE_NAME_ATTR = "appPackageName";
     private static final String NAME_ATTR = "name";
+    private static final String ABI_ATTR = "abi";
     private static final String ns = CtsXmlResultReporter.ns;
     private static final String SIGNATURE_TEST_PKG = "android.tests.sigtest";
 
+    private static final Pattern mCtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
+
+    private String mDeviceSerial;
     private String mAppPackageName;
     private String mName;
+    private String mAbi;
     private String mDigest;
 
     private Map<String, String> mMetrics = new HashMap<String, String>();
+    private Map<TestIdentifier, Map<String, String>> mTestMetrics = new HashMap<TestIdentifier, Map<String, String>>();
 
     private TestSuite mSuiteRoot = new TestSuite(null);
+
+    public void setDeviceSerial(String deviceSerial) {
+        mDeviceSerial = deviceSerial;
+    }
+
+    public String getDeviceSerial() {
+        return mDeviceSerial;
+    }
+
+    public String getId() {
+        return AbiUtils.createId(getAbi(), getAppPackageName());
+    }
 
     public void setAppPackageName(String appPackageName) {
         mAppPackageName = appPackageName;
@@ -73,6 +94,14 @@ class TestPackageResult  extends AbstractXmlPullParser {
 
     public String getName() {
         return mName;
+    }
+
+    public void setAbi(String abi) {
+        mAbi = abi;
+    }
+
+    public String getAbi() {
+        return mAbi;
     }
 
     public void setDigest(String digest) {
@@ -94,7 +123,6 @@ class TestPackageResult  extends AbstractXmlPullParser {
      * Adds a test result to this test package
      *
      * @param testId
-     * @param testResult
      */
     public Test insertTest(TestIdentifier testId) {
         return findTest(testId, true);
@@ -109,8 +137,8 @@ class TestPackageResult  extends AbstractXmlPullParser {
             // should never happen
             classNameSegments.add("UnknownTestClass");
         }
-            String testCaseName = classNameSegments.remove(classNameSegments.size()-1);
-            return mSuiteRoot.findTest(classNameSegments, testCaseName, testId.getTestName(), insertIfMissing);
+        String testCaseName = classNameSegments.remove(classNameSegments.size()-1);
+        return mSuiteRoot.findTest(classNameSegments, testCaseName, testId.getTestName(), insertIfMissing);
     }
 
 
@@ -133,6 +161,7 @@ class TestPackageResult  extends AbstractXmlPullParser {
         serializer.startTag(ns, TAG);
         serializeAttribute(serializer, NAME_ATTR, mName);
         serializeAttribute(serializer, APP_PACKAGE_NAME_ATTR, mAppPackageName);
+        serializeAttribute(serializer, ABI_ATTR, mAbi);
         serializeAttribute(serializer, DIGEST_ATTR, getDigest());
         if (SIGNATURE_TEST_PKG.equals(mName)) {
             serializer.attribute(ns, "signatureCheck", "true");
@@ -170,6 +199,7 @@ class TestPackageResult  extends AbstractXmlPullParser {
         }
         setAppPackageName(getAttribute(parser, APP_PACKAGE_NAME_ATTR));
         setName(getAttribute(parser, NAME_ATTR));
+        setAbi(getAttribute(parser, ABI_ATTR));
         setDigest(getAttribute(parser, DIGEST_ATTR));
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -186,10 +216,10 @@ class TestPackageResult  extends AbstractXmlPullParser {
     }
 
     /**
-     * Return a list of {@link TestIdentifer}s contained in this result with the given status
+     * Return a list of {@link TestIdentifier}s contained in this result with the given status
      *
      * @param resultFilter the {@link CtsTestStatus} to filter by
-     * @return a collection of {@link TestIdentifer}s
+     * @return a collection of {@link TestIdentifier}s
      */
     public Collection<TestIdentifier> getTestsWithStatus(CtsTestStatus resultFilter) {
         Collection<TestIdentifier> tests = new LinkedList<TestIdentifier>();
@@ -200,63 +230,47 @@ class TestPackageResult  extends AbstractXmlPullParser {
 
     /**
      * Populate values in this package result from run metrics
-     * @param runResult
+     * @param metrics A map of metrics from the completed test run.
      */
     public void populateMetrics(Map<String, String> metrics) {
         String name = metrics.get(CtsTest.PACKAGE_NAME_METRIC);
         if (name != null) {
             setName(name);
         }
+        String abi = metrics.get(CtsTest.PACKAGE_ABI_METRIC);
+        if (abi != null) {
+            setAbi(abi);
+        }
         String digest = metrics.get(CtsTest.PACKAGE_DIGEST_METRIC);
         if (digest != null) {
             setDigest(digest);
         }
-        if (DeviceInfoCollector.APP_PACKAGE_NAME.equals(getAppPackageName())) {
-            storeDeviceMetrics(metrics);
-        } else {
-            mMetrics.putAll(metrics);
-        }
-    }
+        mMetrics.putAll(metrics);
 
-    /**
-     * Check that the provided device info metrics are consistent with the currently stored metrics.
-     * <p/>
-     * If any inconsistencies occur, logs errors and stores error messages in the metrics map
-     *
-     * @param metrics
-     */
-    private void storeDeviceMetrics(Map<String, String> metrics) {
-        // TODO centralize all the device metrics handling into a single class
-        if (mMetrics.isEmpty()) {
-            // nothing to check!
-            mMetrics.putAll(metrics);
-            return;
-        }
-        // ensure all the metrics we expect to be identical actually are
-        checkMetrics(metrics, DeviceInfoConstants.BUILD_FINGERPRINT,
-                DeviceInfoConstants.BUILD_MODEL, DeviceInfoConstants.BUILD_BRAND,
-                DeviceInfoConstants.BUILD_MANUFACTURER, DeviceInfoConstants.BUILD_BOARD,
-                DeviceInfoConstants.BUILD_DEVICE, DeviceInfoConstants.PRODUCT_NAME,
-                DeviceInfoConstants.BUILD_ABI, DeviceInfoConstants.BUILD_ABI2,
-                DeviceInfoConstants.SCREEN_SIZE);
-    }
-
-    private void checkMetrics(Map<String, String> metrics, String... keysToCheck) {
-        Set<String> keyCheckSet = new HashSet<String>();
-        Collections.addAll(keyCheckSet, keysToCheck);
-        for (Map.Entry<String, String> metricEntry : metrics.entrySet()) {
-            String currentValue = mMetrics.get(metricEntry.getKey());
-            if (keyCheckSet.contains(metricEntry.getKey()) && currentValue != null
-                    && !metricEntry.getValue().equals(currentValue)) {
-                CLog.e("Inconsistent info collected from devices. "
-                        + "Current result has %s='%s', Received '%s'. Are you sharding or " +
-                        "resuming a test run across different devices and/or builds?",
-                        metricEntry.getKey(), currentValue, metricEntry.getValue());
-                mMetrics.put(metricEntry.getKey(),
-                        String.format("ERROR: Inconsistent results: %s, %s",
-                                metricEntry.getValue(), currentValue));
-            } else {
-                mMetrics.put(metricEntry.getKey(), metricEntry.getValue());
+        // Collect performance results
+        for (TestIdentifier test : mTestMetrics.keySet()) {
+            // device test can have performance results in test metrics
+            String perfResult = null;
+            Map<String, String> map = mTestMetrics.get(test);
+            if(mAbi.equals(map.get(CTS_ABI_KEY))) {
+                perfResult = map.get(CTS_RESULT_KEY);
+            }
+            // host test should be checked in CtsHostStore.
+            if (perfResult == null) {
+                perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, mAbi, test.toString());
+            }
+            if (perfResult != null) {
+                // CTS result is passed in Summary++++Details format.
+                // Extract Summary and Details, and pass them.
+                Matcher m = mCtsLogPattern.matcher(perfResult);
+                if (m.find()) {
+                    Test result = findTest(test);
+                    result.setResultStatus(CtsTestStatus.PASS);
+                    result.setSummary(m.group(1));
+                    result.setDetails(m.group(2));
+                } else {
+                    CLog.e("CTS Result unrecognizable:" + perfResult);
+                }
             }
         }
     }
@@ -275,29 +289,18 @@ class TestPackageResult  extends AbstractXmlPullParser {
     }
 
     /**
-     * report performance result
-     * @param test
-     * @param status
-     * @param perf
-     */
-    public void reportPerformanceResult(TestIdentifier test, CtsTestStatus status, String summary, String details) {
-        Test result = findTest(test);
-        result.setResultStatus(status);
-        result.setSummary(summary);
-        result.setDetails(details);
-    }
-
-    /**
      * Report that the given test has completed.
      *
-     * @param test
+     * @param test The {@link TestIdentifier} of the completed test.
+     * @param testMetrics A map holding metrics about the completed test, if any.
      */
-    public void reportTestEnded(TestIdentifier test) {
+    public void reportTestEnded(TestIdentifier test, Map<String, String> testMetrics) {
         Test result = findTest(test);
         if (!result.getResult().equals(CtsTestStatus.FAIL)) {
             result.setResultStatus(CtsTestStatus.PASS);
         }
         result.updateEndTime();
+        mTestMetrics.put(test, testMetrics);
     }
 
     /**
@@ -311,9 +314,10 @@ class TestPackageResult  extends AbstractXmlPullParser {
     }
 
     /**
-     * @return
+     * @return A map holding the metrics from the test run.
      */
     public Map<String, String> getMetrics() {
         return mMetrics;
     }
+
 }

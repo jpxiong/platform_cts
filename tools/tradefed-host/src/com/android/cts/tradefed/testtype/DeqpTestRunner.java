@@ -1,5 +1,6 @@
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -32,7 +33,7 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
     private ITestDevice mDevice;
 
-    private final String mUri;
+    private final String mPackageName;
     private final String mName;
     private Collection<TestIdentifier> mTests;
     private IAbi mAbi;
@@ -43,8 +44,8 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
     private ITestInvocationListener mListener;
 
-    public DeqpTestRunner(String uri, String name, Collection<TestIdentifier> tests) {
-        mUri = uri;
+    public DeqpTestRunner(String packageName, String name, Collection<TestIdentifier> tests) {
+        mPackageName = packageName;
         mName = name;
         mTests = tests;
         mLogData = false;
@@ -168,7 +169,8 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
      * Handles beginning of dEQP session.
      */
     private void handleBeginSession(Map<String, String> values) {
-        mListener.testRunStarted(mUri, mTests.size());
+        String id = AbiUtils.createId(mAbi.getName(), mPackageName);
+        mListener.testRunStarted(id, mTests.size());
     }
 
     /**
@@ -457,7 +459,8 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
         } else {
             /* Pass all tests if OpenGL ES version is not supported */
             Map <String, String> emptyMap = Collections.emptyMap();
-            mListener.testRunStarted(mUri, mTests.size());
+            String id = AbiUtils.createId(mAbi.getName(), mPackageName);
+            mListener.testRunStarted(id, mTests.size());
 
             for (TestIdentifier test : mTests) {
                 CLog.d("Skipping test '%s', Opengl ES version not supported", test.toString());

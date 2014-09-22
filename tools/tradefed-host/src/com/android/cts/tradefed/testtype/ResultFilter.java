@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link ITestInvocationListener} that filters test results based on the set of expected tests
@@ -38,37 +39,35 @@ import java.util.Map;
  */
 class ResultFilter extends ResultForwarder {
 
-    private final Map<String, Collection<TestIdentifier>> mKnownTestsMap;
-    private final Map<String, Collection<TestIdentifier>> mRemainingTestsMap;
-    private String mCurrentTestRun = null;
+    private final Set<TestIdentifier> mKnownTests;
+    private final Set<TestIdentifier> mRemainingTests;
+    private final String mTestRun;
 
     /**
      * Create a {@link ResultFilter}.
      *
      * @param listener the real {@link ITestInvocationListener} to forward results to
      */
-    ResultFilter(ITestInvocationListener listener, List<TestPackage> testPackages) {
+    ResultFilter(ITestInvocationListener listener, TestPackage testPackage) {
         super(listener);
-
-        mKnownTestsMap = new HashMap<String, Collection<TestIdentifier>>();
+        mTestRun = testPackage.getTestRunName();
+        Collection<TestIdentifier> tests = testPackage.getKnownTests();
+        mKnownTests = new HashSet<TestIdentifier>(tests);
         // use LinkedHashMap for predictable test order
-        mRemainingTestsMap = new LinkedHashMap<String, Collection<TestIdentifier>>();
-
-        for (TestPackage testPkg : testPackages) {
-            mKnownTestsMap.put(testPkg.getTestRunName(), new HashSet<TestIdentifier>(
-                    testPkg.getKnownTests()));
-            mRemainingTestsMap.put(testPkg.getTestRunName(), new LinkedHashSet<TestIdentifier>(
-                    testPkg.getKnownTests()));
-        }
+        mRemainingTests = new LinkedHashSet<TestIdentifier>(tests);
     }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void testRunStarted(String runName, int testCount) {
-        super.testRunStarted(runName, testCount);
-        mCurrentTestRun = runName;
+        if (mTestRun.equals(runName)) {
+            super.testRunStarted(runName, testCount);
+        } else {
+            CLog.d("Skipping reporting unknown test run %s", runName);
+        }
     }
 
     /**
@@ -109,10 +108,7 @@ class ResultFilter extends ResultForwarder {
      * @return
      */
     private boolean isKnownTest(TestIdentifier test) {
-        if (mCurrentTestRun != null && mKnownTestsMap.containsKey(mCurrentTestRun)) {
-            return mKnownTestsMap.get(mCurrentTestRun).contains(test);
-        }
-        return false;
+        return mKnownTests.contains(test);
     }
 
     /**
@@ -120,26 +116,23 @@ class ResultFilter extends ResultForwarder {
      * @param test
      */
     private void removeExecutedTest(TestIdentifier test) {
-        if (mCurrentTestRun != null && mRemainingTestsMap.containsKey(mCurrentTestRun)) {
-             mRemainingTestsMap.get(mCurrentTestRun).remove(test);
-        }
+        mRemainingTests.remove(test);
     }
 
     /**
      * Report the set of expected tests that were not executed
      */
     public void reportUnexecutedTests() {
-        for (Map.Entry<String, Collection<TestIdentifier>> entry : mRemainingTestsMap.entrySet()) {
-            if (!entry.getValue().isEmpty()) {
-                super.testRunStarted(entry.getKey(), entry.getValue().size());
-                for (TestIdentifier test : entry.getValue()) {
-                    // an unexecuted test is currently reported as a 'testStarted' event without a
-                    // 'testEnded'. TODO: consider adding an explict API for reporting an unexecuted
-                    // test
-                    super.testStarted(test);
-                }
-                super.testRunEnded(0, new HashMap<String,String>());
-            }
+        if (mRemainingTests.isEmpty()) {
+            return;
         }
+        super.testRunStarted(mTestRun, mRemainingTests.size());
+        for (TestIdentifier test : mRemainingTests) {
+            // an unexecuted test is currently reported as a 'testStarted' event without a
+            // 'testEnded'. TODO: consider adding an explict API for reporting an unexecuted
+            // test
+            super.testStarted(test);
+        }
+        super.testRunEnded(0, new HashMap<String, String>());
     }
 }

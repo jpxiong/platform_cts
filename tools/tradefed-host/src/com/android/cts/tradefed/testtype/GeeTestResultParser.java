@@ -99,7 +99,7 @@ public class GeeTestResultParser extends MultiLineReceiver {
     private long mTotalRunTime = 0;
     private boolean mTestInProgress = false;
     private boolean mTestRunInProgress = false;
-    private final String mTestRunName;
+    private final String mTestRunId;
     private final Collection<ITestRunListener> mTestListeners;
 
     /** Fake adding a package prefix if the test listener needs it. */
@@ -200,24 +200,24 @@ public class GeeTestResultParser extends MultiLineReceiver {
     /**
      * Creates the GTestResultParser.
      *
-     * @param testRunName the test run name to provide to
+     * @param testRunId the test run id to provide to
      *            {@link ITestRunListener#testRunStarted(String, int)}
      * @param listeners informed of test results as the tests are executing
      */
-    public GeeTestResultParser(String testRunName, Collection<ITestRunListener> listeners) {
-        mTestRunName = testRunName;
+    public GeeTestResultParser(String testRunId, Collection<ITestRunListener> listeners) {
+        mTestRunId = testRunId;
         mTestListeners = new ArrayList<ITestRunListener>(listeners);
     }
 
     /**
      * Creates the GTestResultParser for a single listener.
      *
-     * @param testRunName the test run name to provide to
+     * @param testRunId the test run id to provide to
      *            {@link ITestRunListener#testRunStarted(String, int)}
      * @param listener informed of test results as the tests are executing
      */
-    public GeeTestResultParser(String testRunName, ITestRunListener listener) {
-        mTestRunName = testRunName;
+    public GeeTestResultParser(String testRunId, ITestRunListener listener) {
+        mTestRunId = testRunId;
         mTestListeners = new ArrayList<ITestRunListener>(1);
         mTestListeners.add(listener);
     }
@@ -355,7 +355,7 @@ public class GeeTestResultParser extends MultiLineReceiver {
         // if start test run not reported yet
         if (!mTestRunStartReported) {
             for (ITestRunListener listener : mTestListeners) {
-                listener.testRunStarted(mTestRunName, mNumTestsExpected);
+                listener.testRunStarted(mTestRunId, mNumTestsExpected);
             }
             mTestRunStartReported = true;
         }

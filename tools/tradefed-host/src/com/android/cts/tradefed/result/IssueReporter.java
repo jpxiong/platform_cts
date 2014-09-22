@@ -194,7 +194,7 @@ public class IssueReporter implements ITestInvocationListener {
     }
 
     @Override
-    public void testRunStarted(String name, int numTests) {
+    public void testRunStarted(String id, int numTests) {
     }
 
     @Override

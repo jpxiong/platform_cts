@@ -23,6 +23,7 @@ import com.android.cts.tradefed.result.PlanCreator;
 import com.android.cts.tradefed.result.TestResultRepo;
 import com.android.cts.tradefed.testtype.ITestPackageRepo;
 import com.android.cts.tradefed.testtype.TestPackageRepo;
+import com.android.cts.util.AbiUtils;
 import com.android.tradefed.command.Console;
 import com.android.tradefed.config.ArgsOptionParser;
 import com.android.tradefed.config.ConfigurationException;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Specialization of trade federation console that adds CTS commands to list plans and packages.
@@ -78,7 +80,7 @@ public class CtsConsole extends Console {
             public void run() {
                 CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
-                    listPackages(ctsBuild);
+                    listPackages(ctsBuild, AbiUtils.getAbisSupportedByCts());
                 }
             }
         }, LIST_PATTERN, "packages");
@@ -114,7 +116,8 @@ public class CtsConsole extends Console {
                 }
                 CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
-                    addDerivedPlan(ctsBuild, flatArgs);
+                    // FIXME may want to only add certain ABIs
+                    addDerivedPlan(ctsBuild, AbiUtils.getAbisSupportedByCts(), flatArgs);
                 }
             }
         };
@@ -190,10 +193,10 @@ public class CtsConsole extends Console {
         }
     }
 
-    private void listPackages(CtsBuildHelper ctsBuild) {
-        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir(), false);
-        for (String packageUri : testCaseRepo.getPackageNames()) {
-            printLine(packageUri);
+    private void listPackages(CtsBuildHelper ctsBuild, Set<String> abis) {
+        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir(), abis, false);
+        for (String packageName : testCaseRepo.getPackageNames()) {
+            printLine(packageName);
         }
     }
 
@@ -215,12 +218,12 @@ public class CtsConsole extends Console {
         tableFormatter.displayTable(table, new PrintWriter(System.out, true));
     }
 
-    private void addDerivedPlan(CtsBuildHelper ctsBuild, String[] flatArgs) {
+    private void addDerivedPlan(CtsBuildHelper ctsBuild, Set<String> abis, String[] flatArgs) {
         PlanCreator creator = new PlanCreator();
         try {
             ArgsOptionParser optionParser = new ArgsOptionParser(creator);
             optionParser.parse(Arrays.asList(flatArgs));
-            creator.createAndSerializeDerivedPlan(ctsBuild);
+            creator.createAndSerializeDerivedPlan(ctsBuild, abis);
         } catch (ConfigurationException e) {
             printLine("Error: " + e.getMessage());
             printLine(ArgsOptionParser.getOptionHelp(false, creator));

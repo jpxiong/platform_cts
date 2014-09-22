@@ -37,36 +37,36 @@ public interface ITestPlan {
     public void parse(InputStream xmlStream) throws ParseException;
 
     /**
-     * Gets the list of test uris contained in this plan.
+     * Gets a sorted list of test ids contained in this plan.
      */
-    public Collection<String> getTestUris();
+    public Collection<String> getTestIds();
 
     /**
-     * Gets the {@link TestFilter} that should be used to exclude tests from given package.
+     * Gets the {@link TestFilter} that should be used to filter tests from given package.
      */
-    public TestFilter getExcludedTestFilter(String uri);
+    public TestFilter getTestFilter(String id);
 
     /**
      * Add a package to this test plan
-     * @param uri
+     * @param id
      */
-    public void addPackage(String uri);
+    public void addPackage(String id);
 
     /**
      * Add a excluded test to this test plan
      *
-     * @param uri the package uri
+     * @param id the package id
      * @param testToExclude the test to exclude for given package
      */
-    public void addExcludedTest(String uri, TestIdentifier testToExclude);
+    public void addExcludedTest(String id, TestIdentifier testToExclude);
 
     /**
      * Adds the list of excluded tests for given package
      *
-     * @param pkgUri
+     * @param id
      * @param excludedTests
      */
-    public void addExcludedTests(String uri, Collection<TestIdentifier> excludedTests);
+    public void addExcludedTests(String id, Collection<TestIdentifier> excludedTests);
 
     /**
      * Serialize the contents of this test plan.
