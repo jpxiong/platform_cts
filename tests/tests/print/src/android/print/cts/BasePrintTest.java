@@ -39,8 +39,10 @@ import android.print.PrintDocumentAdapter.LayoutResultCallback;
 import android.print.PrintDocumentAdapter.WriteResultCallback;
 import android.print.PrintManager;
 import android.print.PrinterId;
+import android.print.cts.services.FirstPrintService;
 import android.print.cts.services.PrintServiceCallbacks;
 import android.print.cts.services.PrinterDiscoverySessionCallbacks;
+import android.print.cts.services.SecondPrintService;
 import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.print.pdf.PrintedPdfDocument;
 import android.printservice.PrintJob;
@@ -68,7 +70,7 @@ import java.util.concurrent.TimeoutException;
  */
 public abstract class BasePrintTest extends UiAutomatorTestCase {
 
-    private static final long OPERATION_TIMEOUT = 10000;
+    private static final long OPERATION_TIMEOUT = 100000000;
 
     private static final String ARG_PRIVILEGED_OPS = "ARG_PRIVILEGED_OPS";
 
