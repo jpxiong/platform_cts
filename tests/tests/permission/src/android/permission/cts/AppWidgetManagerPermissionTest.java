@@ -51,11 +51,11 @@ public class AppWidgetManagerPermissionTest extends AndroidTestCase {
         }
 
         try {
-            mAppWidgetManager.bindAppWidgetId(1, new ComponentName(mContext, "foo"));
-            fail("Was able to call bindAppWidgetId");
+            final boolean bound = mAppWidgetManager.bindAppWidgetIdIfAllowed(1,
+                    new ComponentName(mContext, "foo"));
+            assertFalse("Was able to call bindAppWidgetId", bound);
         } catch (SecurityException e) {
             // expected
         }
     }
 }
-
