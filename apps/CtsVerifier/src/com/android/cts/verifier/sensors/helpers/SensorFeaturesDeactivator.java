@@ -52,7 +52,7 @@ public class SensorFeaturesDeactivator {
         ContentResolver getContentResolver();
         void logInstructions(int instructionsResId, Object ... params);
         void waitForUser();
-        void launchAndWaitForSubactivity(String action) throws InterruptedException;
+        void launchAndWaitForSubactivity(String action);
         String getString(int resId, Object ... params);
     }
 
@@ -65,7 +65,7 @@ public class SensorFeaturesDeactivator {
         mLocationMode = new LocationModeSettingContainer();
     }
 
-    public synchronized void requestDeactivationOfFeatures() throws InterruptedException {
+    public synchronized void requestDeactivationOfFeatures() {
         captureInitialState();
 
         mAirplaneMode.requestToSetMode(true);
@@ -80,7 +80,7 @@ public class SensorFeaturesDeactivator {
         mActivityHandler.waitForUser();
     }
 
-    public synchronized void requestToRestoreFeatures() throws InterruptedException {
+    public synchronized void requestToRestoreFeatures() {
         if (!isInitialStateCaptured()) {
             return;
         }

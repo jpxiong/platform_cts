@@ -47,7 +47,7 @@ abstract class SensorSettingContainer {
         mCapturedModeOn = getCurrentSettingMode();
     }
 
-    public synchronized void requestToSetMode(boolean modeOn) throws InterruptedException {
+    public synchronized void requestToSetMode(boolean modeOn) {
         String settingName = mActivityHandler.getString(mSettingNameResId);
         if (getCurrentSettingMode() == modeOn) {
             mActivityHandler.logInstructions(R.string.snsr_setting_mode_set, settingName, modeOn);
@@ -66,7 +66,7 @@ abstract class SensorSettingContainer {
         }
     }
 
-    public synchronized void requestToResetMode() throws InterruptedException {
+    public synchronized void requestToResetMode() {
         try {
             requestToSetMode(mCapturedModeOn);
         } catch (IllegalStateException e) {

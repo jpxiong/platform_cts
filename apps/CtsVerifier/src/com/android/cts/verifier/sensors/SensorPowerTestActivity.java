@@ -62,7 +62,6 @@ public class SensorPowerTestActivity
     @Override
     protected void activitySetUp() throws InterruptedException {
         setScreenOffTimeout(15, TimeUnit.SECONDS);
-        deactivateSensorFeatures();
     }
 
     @Override
@@ -70,8 +69,6 @@ public class SensorPowerTestActivity
         if (mHostLink != null) {
             mHostLink.close();
         }
-
-        restoreSensorFeatures();
         resetScreenOffTimeout();
     }
 

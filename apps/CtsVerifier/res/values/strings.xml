@@ -545,7 +545,7 @@
     <string name="snsr_significant_motion_test_in_hand">Once you begin the test, hold the device in your hand while you perform natural hand movements.</string>
     <string name="snsr_significant_motion_test_sitting">Once you begin the test, keep the device in your pocket and move naturally while sitting in a chair.</string>
     <string name="snsr_significant_motion_test_deactivation">Once you begin the test, you will need to walk to ensure Significant Motion triggers only once.</string>
-    <string name="snsr_significant_motion_registration">Expected to be able to register for TriggerSensor. Found=%b.</string>
+    <string name="snsr_significant_motion_registration">Expected to be able to register for TriggerSensor. Found=%1$b.</string>
     <string name="snsr_significant_motion_cancelation">Expected to be able to cancel TriggerSensor. Found=%b.</string>
 
     <!-- Strings for Sensor CTS tests inside CtsVerifier -->
