@@ -30,8 +30,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsTelecomTestCases
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 # uncomment when b/13250611 is fixed
 #LOCAL_SDK_VERSION := current
 LOCAL_JAVA_LIBRARIES += android.test.runner
