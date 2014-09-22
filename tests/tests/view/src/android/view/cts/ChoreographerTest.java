@@ -16,16 +16,27 @@
 
 package android.view.cts;
 
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.view.Choreographer;
 
-public class ChoreographerTest extends AndroidTestCase {
+public class ChoreographerTest extends InstrumentationTestCase {
     private static final long NOMINAL_VSYNC_PERIOD = 16;
     private static final long DELAY_PERIOD = NOMINAL_VSYNC_PERIOD * 5;
     private static final long NANOS_PER_MS = 1000000;
     private static final Object TOKEN = new Object();
 
-    private Choreographer mChoreographer = Choreographer.getInstance();
+    private Choreographer mChoreographer;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                mChoreographer = Choreographer.getInstance();
+            }
+        });
+    }
 
     public void testFrameDelay() {
         assertTrue(Choreographer.getFrameDelay() > 0);
