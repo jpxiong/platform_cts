@@ -88,13 +88,18 @@ public class ObjectAnimatorTest extends
         int startColor = mActivity.view.RED;
         int endColor = mActivity.view.BLUE;
 
-        ObjectAnimator colorAnimator = ObjectAnimator.ofInt(object, property,
+        final ObjectAnimator colorAnimator = ObjectAnimator.ofInt(object, property,
                 startColor, endColor);
         colorAnimator.setDuration(1000);
         colorAnimator.setEvaluator(new ArgbEvaluator());
         colorAnimator.setRepeatCount(1);
         colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        colorAnimator.start();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                colorAnimator.start();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         startAnimation(mObjectAnimator, colorAnimator);
         Thread.sleep(100);
         Integer i = (Integer) colorAnimator.getAnimatedValue();
@@ -110,12 +115,17 @@ public class ObjectAnimatorTest extends
         int endColor = mActivity.view.BLUE;
         Object[] values = {new Integer(startColor), new Integer(endColor)};
         ArgbEvaluator evaluator = new ArgbEvaluator();
-        ObjectAnimator colorAnimator = ObjectAnimator.ofObject(object, property,
+        final ObjectAnimator colorAnimator = ObjectAnimator.ofObject(object, property,
                 evaluator, values);
         colorAnimator.setDuration(1000);
         colorAnimator.setRepeatCount(1);
         colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        colorAnimator.start();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                colorAnimator.start();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         startAnimation(mObjectAnimator, colorAnimator);
         Thread.sleep(100);
         Integer i = (Integer) colorAnimator.getAnimatedValue();
@@ -132,12 +142,17 @@ public class ObjectAnimatorTest extends
         int values[] = {startColor, endColor};
         ArgbEvaluator evaluator = new ArgbEvaluator();
         PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofInt(propertyName, values);
-        ObjectAnimator colorAnimator = ObjectAnimator.ofPropertyValuesHolder(object,
+        final ObjectAnimator colorAnimator = ObjectAnimator.ofPropertyValuesHolder(object,
             propertyValuesHolder);
         colorAnimator.setDuration(1000);
         colorAnimator.setRepeatCount(1);
         colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        colorAnimator.start();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                colorAnimator.start();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         startAnimation(mObjectAnimator, colorAnimator);
         Thread.sleep(100);
         Integer i = (Integer) colorAnimator.getAnimatedValue();
