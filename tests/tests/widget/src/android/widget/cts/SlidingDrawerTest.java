@@ -61,6 +61,7 @@ public class SlidingDrawerTest
         mLock = new Object();
     }
 
+    @UiThreadTest
     public void testConstructor() throws XmlPullParserException, IOException {
         XmlPullParser parser = mActivity.getResources().getLayout(R.layout.sliding_drawer_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);

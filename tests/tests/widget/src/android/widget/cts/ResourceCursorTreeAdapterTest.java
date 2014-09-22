@@ -23,6 +23,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,7 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
         mParent = (ViewGroup) layoutInflater.inflate(R.layout.cursoradapter_host, null);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         mResourceCursorTreeAdapter = new MockResourceCursorTreeAdapter(mContext, null,
                 mGroupLayout, mChildLayout);
@@ -95,6 +97,7 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     // The parameters Context and Cursor are never readin the method
+    @UiThreadTest
     public void testNewChildView() {
         mResourceCursorTreeAdapter = new MockResourceCursorTreeAdapter(mContext, null,
                 mGroupLayout, mChildLayout);
@@ -116,6 +119,7 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     // The parameters Context and Cursor are never readin the method
+    @UiThreadTest
     public void testNewGroupView() {
         mResourceCursorTreeAdapter = new MockResourceCursorTreeAdapter(mContext, null,
                 mGroupLayout, mChildLayout);

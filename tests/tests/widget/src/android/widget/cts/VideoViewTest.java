@@ -29,6 +29,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.util.Log;
 import android.view.View.MeasureSpec;
 import android.widget.MediaController;
@@ -62,7 +63,6 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private String mVideoPath;
-    private MediaController mMediaController;
 
     private static class MockListener {
         private boolean mTriggered;
@@ -180,10 +180,19 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
         mVideoPath = prepareSampleVideo();
         assertNotNull(mVideoPath);
         mVideoView = findVideoViewById(R.id.videoview);
-        mMediaController = new MediaController(mActivity);
-        mVideoView.setMediaController(mMediaController);
     }
 
+    private void makeVideoView() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                MediaController mediaController = new MediaController(mActivity);
+                mVideoView.setMediaController(mediaController);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    @UiThreadTest
     public void testConstructor() {
         new VideoView(mActivity);
 
@@ -193,6 +202,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
     }
 
     public void testPlayVideo1() throws Throwable {
+        makeVideoView();
         // Don't run the test if the codec isn't supported.
         if (!hasCodec(MIME_TYPE)) {
             Log.w(TAG, "Codec " + MIME_TYPE + " not supported. Return from testPlayVideo1.");
@@ -232,6 +242,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
     }
 
     public void testSetOnErrorListener() throws Throwable {
+        makeVideoView();
         final MockOnErrorListener listener = new MockOnErrorListener();
         mVideoView.setOnErrorListener(listener);
 
@@ -253,6 +264,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
     }
 
     public void testGetBufferPercentage() throws Throwable {
+        makeVideoView();
         // Don't run the test if the codec isn't supported.
         if (!hasCodec(MIME_TYPE)) {
             Log.w(TAG, MIME_TYPE + " not supported. Return from testGetBufferPercentage.");
@@ -279,6 +291,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
         assertTrue(percent >= 0 && percent <= 100);
     }
 
+    @UiThreadTest
     public void testResolveAdjustedSize() {
         mVideoView = new VideoView(mActivity);
 
@@ -310,6 +323,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewCts
         assertTrue(Math.abs(mVideoView.getDuration() - TEST_VIDEO_DURATION) < DURATION_DELTA);
     }
 
+    @UiThreadTest
     public void testSetMediaController() {
         final MediaController ctlr = new MediaController(mActivity);
         mVideoView.setMediaController(ctlr);

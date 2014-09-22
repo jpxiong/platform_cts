@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import android.content.Context;
 import android.database.DataSetObserver;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
@@ -29,7 +31,7 @@ import android.widget.TextView;
 import com.android.cts.widget.R;
 
 
-public class ArrayAdapterTest extends AndroidTestCase {
+public class ArrayAdapterTest extends InstrumentationTestCase {
 
     private static final int INVALD_ID = -1;
     private static final String STR1 = "string1";
@@ -37,10 +39,13 @@ public class ArrayAdapterTest extends AndroidTestCase {
     private static final String STR3 = "string3";
 
     private ArrayAdapter<String> mArrayAdapter;
+    private Context mContext;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-          mArrayAdapter = new ArrayAdapter<String>(mContext, R.layout.simple_dropdown_item_1line);
+        mContext = getInstrumentation().getTargetContext();
+        mArrayAdapter = new ArrayAdapter<String>(mContext, R.layout.simple_dropdown_item_1line);
     }
 
     public void testConstructor() {
@@ -167,6 +172,7 @@ public class ArrayAdapterTest extends AndroidTestCase {
         }
     }
 
+    @UiThreadTest
     public void testGetFilter() {
         Filter filter = mArrayAdapter.getFilter();
 

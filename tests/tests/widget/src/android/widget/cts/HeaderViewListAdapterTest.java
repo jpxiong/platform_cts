@@ -16,9 +16,10 @@
 
 package android.widget.cts;
 
-
+import android.content.Context;
 import android.database.DataSetObserver;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,13 +34,16 @@ import java.util.ArrayList;
 /**
  * Test {@link HeaderViewListAdapter}.
  */
-public class HeaderViewListAdapterTest extends AndroidTestCase {
+public class HeaderViewListAdapterTest extends InstrumentationTestCase {
 
+    private Context mContext;
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mContext = getInstrumentation().getTargetContext();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>();
         ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(5);
@@ -52,7 +56,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getHeadersCount());
 
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
         header.add(lv.new FixedViewInfo());
         headerViewListAdapter = new HeaderViewListAdapter(header, null, null);
@@ -63,13 +67,14 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getFootersCount());
 
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(4);
         footer.add(lv.new FixedViewInfo());
         headerViewListAdapter = new HeaderViewListAdapter(null, footer, null);
         assertEquals(1, headerViewListAdapter.getFootersCount());
     }
 
+    @UiThreadTest
     public void testIsEmpty() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertTrue(headerViewListAdapter.isEmpty());
@@ -84,10 +89,10 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     }
 
     public void testRemoveHeader() {
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
-        ListView lv1 = new ListView(getContext());
-        ListView lv2 = new ListView(getContext());
+        ListView lv1 = new ListView(mContext);
+        ListView lv2 = new ListView(mContext);
         ListView.FixedViewInfo info1 = lv.new FixedViewInfo();
         info1.view = lv1;
         ListView.FixedViewInfo info2 = lv.new FixedViewInfo();
@@ -96,7 +101,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         header.add(info2);
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(header, null, null);
         assertEquals(2, headerViewListAdapter.getHeadersCount());
-        assertFalse(headerViewListAdapter.removeHeader(new ListView(getContext())));
+        assertFalse(headerViewListAdapter.removeHeader(new ListView(mContext)));
         assertTrue(headerViewListAdapter.removeHeader(lv1));
         assertEquals(1, headerViewListAdapter.getHeadersCount());
 
@@ -110,10 +115,10 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     }
 
     public void testRemoveFooter() {
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(4);
-        ListView lv1 = new ListView(getContext());
-        ListView lv2 = new ListView(getContext());
+        ListView lv1 = new ListView(mContext);
+        ListView lv2 = new ListView(mContext);
         ListView.FixedViewInfo info1 = lv.new FixedViewInfo();
         info1.view = lv1;
         ListView.FixedViewInfo info2 = lv.new FixedViewInfo();
@@ -122,7 +127,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         footer.add(info2);
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, footer, null);
         assertEquals(2, headerViewListAdapter.getFootersCount());
-        assertFalse(headerViewListAdapter.removeFooter(new ListView(getContext())));
+        assertFalse(headerViewListAdapter.removeFooter(new ListView(mContext)));
         assertTrue(headerViewListAdapter.removeFooter(lv1));
         assertEquals(1, headerViewListAdapter.getFootersCount());
 
@@ -135,11 +140,12 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         }
     }
 
+    @UiThreadTest
     public void testGetCount() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getCount());
 
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
         Object data1 = new Object();
         Object data2 = new Object();
@@ -170,6 +176,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(5, headerViewListAdapter.getCount());
     }
 
+    @UiThreadTest
     public void testAreAllItemsEnabled() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertTrue(headerViewListAdapter.areAllItemsEnabled());
@@ -189,7 +196,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
             new HeaderViewListAdapter(null, null, fullAdapter);
         assertTrue(headerViewListAdapter.isEnabled(0));
         
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
         header.add(lv.new FixedViewInfo());
         headerViewListAdapter = new HeaderViewListAdapter(header, null, fullAdapter);
@@ -212,7 +219,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     }
 
     public void testGetItem() {
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
         Object data1 = new Object();
         Object data2 = new Object();
@@ -243,10 +250,10 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     }
 
     public void testGetItemId() {
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
-        ListView lv1 = new ListView(getContext());
-        ListView lv2 = new ListView(getContext());
+        ListView lv1 = new ListView(mContext);
+        ListView lv2 = new ListView(mContext);
         ListView.FixedViewInfo info1 = lv.new FixedViewInfo();
         info1.view = lv1;
         ListView.FixedViewInfo info2 = lv.new FixedViewInfo();
@@ -271,10 +278,10 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     }
 
     public void testGetView() {
-        ListView lv = new ListView(getContext());
+        ListView lv = new ListView(mContext);
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
-        ListView lv1 = new ListView(getContext());
-        ListView lv2 = new ListView(getContext());
+        ListView lv1 = new ListView(mContext);
+        ListView lv2 = new ListView(mContext);
         ListView.FixedViewInfo info1 = lv.new FixedViewInfo();
         info1.view = lv1;
         ListView.FixedViewInfo info2 = lv.new FixedViewInfo();
@@ -345,6 +352,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertNull(fullAdapter.getDataSetObserver());
     }
 
+    @UiThreadTest
     public void testGetFilter() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertNull(headerViewListAdapter.getFilter());
@@ -426,7 +434,7 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
     private class HeaderViewFullAdapter implements ListAdapter {
         private DataSetObserver mObserver;
         private Object mItem;
-        private final View mView = new View(getContext());
+        private final View mView = new View(mContext);
 
         public DataSetObserver getDataSetObserver() {
             return mObserver;

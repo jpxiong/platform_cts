@@ -24,6 +24,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.Gravity;
@@ -107,6 +108,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(0, newButton.getId() & 0xFF000000);
     }
 
+    @UiThreadTest
     public void testInternalCheckedStateTracker() {
         mDefaultRadioGroup = new RadioGroup(mContext);
         RadioButton newButton = new RadioButton(mContext);
@@ -138,6 +140,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertHaveNotCalledOnCheckedChanged(listener);
     }
 
+    @UiThreadTest
     public void testGetCheckedRadioButtonId() {
         assertEquals(-1, mDefaultRadioGroup.getCheckedRadioButtonId());
 
@@ -158,6 +161,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(-3, mDefaultRadioGroup.getCheckedRadioButtonId());
     }
 
+    @UiThreadTest
     public void testClearCheck() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -194,6 +198,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertOnCheckedChangedParams(listener, 0, mDefaultRadioGroup, -1);
     }
 
+    @UiThreadTest
     public void testCheck() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -238,6 +243,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         mDefaultRadioGroup.check(0);
     }
 
+    @UiThreadTest
     public void testSetOnCheckedChangeListener() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -333,6 +339,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(RadioGroup.LayoutParams.WRAP_CONTENT, p.height);
     }
 
+    @UiThreadTest
     public void testOnFinishInflate() {
         MockRadioGroup radioGroup = new MockRadioGroup(mContext);
         int checkId = 100;
@@ -371,6 +378,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertFalse(button.isChecked());
     }
 
+    @UiThreadTest
     public void testAddView() {
         mDefaultRadioGroup.check(BUTTON_ID_0);
         assertEquals(BUTTON_ID_0, mDefaultRadioGroup.getCheckedRadioButtonId());

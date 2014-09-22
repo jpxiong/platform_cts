@@ -25,6 +25,7 @@ import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
@@ -70,6 +71,7 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getTargetContext();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         mGroupCursor = createTestCursor(2, 20, "group");
         new MockSimpleCursorTreeAdapter(mContext, mGroupCursor,
@@ -85,6 +87,7 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
                 CHILD_LAYOUT, CHILD_LAYOUT, COLUMNS_CHILD_FROM, VIEWS_CHILD_TO);
     }
 
+    @UiThreadTest
     public void testBindChildView() {
         mGroupCursor = createTestCursor(2, 20, "group");
         mChildCursor = createTestCursor(3, 4, "child");
@@ -104,6 +107,7 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     // The param context and isExpanded is never readed.
+    @UiThreadTest
     public void testBindGroupView() {
         mGroupCursor = createTestCursor(2, 20, "group");
         mGroupCursor.moveToFirst();
@@ -120,6 +124,7 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
         assertEquals("group11", view.getText().toString());
     }
 
+    @UiThreadTest
     public void testSetViewImage() {
         mGroupCursor = createTestCursor(2, 20, "group");
         mSimpleCursorTreeAdapter = new MockSimpleCursorTreeAdapter(mContext, mGroupCursor,
