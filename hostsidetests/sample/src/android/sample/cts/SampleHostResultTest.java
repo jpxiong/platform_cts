@@ -24,11 +24,11 @@ import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.Stat;
-import com.android.ddmlib.Log;
 import com.android.ddmlib.IDevice;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.util.CommandResult;
@@ -68,13 +68,14 @@ public class SampleHostResultTest extends DeviceTestCase implements IAbiReceiver
      */
     private ITestDevice mDevice;
 
-    private String mAbiName;
-    private String mAbiBitness;
+    /**
+     * A reference to the ABI under test.
+     */
+    private IAbi mAbi;
 
     @Override
-    public void setAbi(String name, String bitness) {
-        mAbiName = name;
-        mAbiBitness = bitness;
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
     }
 
     @Override
@@ -132,7 +133,7 @@ public class SampleHostResultTest extends DeviceTestCase implements IAbiReceiver
         // Compute the stats.
         Stat.StatResult stat = Stat.getStat(result);
         // Get the report for this test and add the results to record.
-        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbiName,
+        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbi.getName(),
                 ReportLog.getClassMethodNames());
         report.printArray("Times", result, ResultType.LOWER_BETTER, ResultUnit.MS);
         report.printValue("Min", stat.mMin, ResultType.LOWER_BETTER, ResultUnit.MS);
