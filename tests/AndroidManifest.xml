@@ -158,14 +158,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.view.cts.ViewStubStubActivity"
-            android:label="ViewStubStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
         <activity android:name="android.widget.cts.ViewFlipperStubActivity"
             android:label="ViewFlipperStubActivity">
             <intent-filter>
@@ -199,20 +191,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.view.cts.UsingViewsStubActivity"
-            android:label="Using Views Test">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-        <activity android:name="android.view.cts.FocusHandlingStubActivity"
-            android:label="Focus Handling Test">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
         <activity android:name="android.app.cts.MockActivity" android:label="MockActivity">
             <meta-data android:name="android.app.alias"
                 android:resource="@xml/alias" />
@@ -328,36 +306,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.view.cts.ViewGroupStubActivity" android:label="ViewGroupStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-        <activity android:name="android.view.cts.ViewTestStubActivity"
-            android:label="ViewTestStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-        <activity android:name="android.view.cts.ViewLayoutPositionTestStubActivity"
-            android:label="ViewTestStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.view.cts.WindowStubActivity"
-            android:theme="@android:style/Theme.Holo.NoActionBar"
-            android:label="WindowStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
         <activity android:name="android.widget.cts.ViewGroupStubActivity"
             android:label="WidgetViewGroupStubActivity">
             <intent-filter>
@@ -367,7 +315,7 @@
         </activity>
 
         <activity android:name="android.widget.cts.VideoViewStubActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="VideoViewStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -629,14 +577,6 @@
                 android:resource="@xml/method" />
         </service>
 
-        <activity android:name="android.view.cts.MenuInflaterStubActivity"
-                                        android:label="MenuInflaterStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
         <activity android:name="android.text.method.cts.KeyListenerStubActivity"
             android:label="KeyListenerStubActivity"/>
 
@@ -672,14 +612,6 @@
 
         <activity android:name="android.widget.cts.ZoomButtonStubActivity"
             android:label="ZoomButtonStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.view.cts.SurfaceViewStubActivity"
-            android:label="SurfaceViewStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
@@ -817,18 +749,6 @@
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
             </intent-filter>
         </activity>
-
-        <activity android:name="android.view.cts.FocusFinderStubActivity"
-            android:label="FocusFinderStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.view.cts.GestureDetectorStubActivity"
-            android:label="GestureDetectorStubActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
 
         <!--Test for PackageManager-->
         <activity android:name="android.content.pm.cts.TestPmActivity"
