@@ -223,10 +223,10 @@ public class BuildDalvikSuite {
       String cmd = String.format("ANDROID_DATA=%s dalvikvm|#ABI#| -Xmx512M -Xss32K " +
               "-Djava.io.tmpdir=%s -classpath %s %s", TARGET_JAR_ROOT_PATH, TARGET_JAR_ROOT_PATH,
               classpath, mainclass);
-      return "String cmd = AbiFormatter.formatCmdForAbi(\"" + cmd + "\", mAbi.getBitness());\n" +
-          "String res = getDevice().executeShellCommand(cmd);\n" +
-          "// A sucessful adb shell command returns an empty string.\n" +
-          "assertEquals(cmd, \"\", res);";
+      return "    String cmd = AbiFormatter.formatCmdForAbi(\"" + cmd + "\", mAbi.getBitness());\n" +
+              "    String res = getDevice().executeShellCommand(cmd);\n" +
+              "    // A sucessful adb shell command returns an empty string.\n" +
+              "    assertEquals(cmd, \"\", res);";
     }
 
     private String getWarningMessage() {
@@ -257,8 +257,8 @@ public class BuildDalvikSuite {
 
         //"dot.junit.opcodes.add_double_2addr.Main_testN2";
         String mainclass = pName + ".Main_" + method;
-        curJunitFileData += "    " + getShellExecJavaLine(cp, mainclass);
-        curJunitFileData += "}\n\n";
+        curJunitFileData += getShellExecJavaLine(cp, mainclass);
+        curJunitFileData += "\n}\n\n";
     }
 
     private void handleTests() throws IOException {

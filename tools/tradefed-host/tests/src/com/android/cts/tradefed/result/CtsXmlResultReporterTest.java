@@ -17,6 +17,8 @@ package com.android.cts.tradefed.result;
 
 import static com.android.cts.tradefed.result.CtsXmlResultReporter.CTS_RESULT_FILE_VERSION;
 
+import com.android.cts.tradefed.UnitTests;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IFolderBuildInfo;
@@ -48,6 +50,7 @@ public class CtsXmlResultReporterTest extends TestCase {
             new ArrayList<>(Arrays.asList(new TestSummary("TEST_SUMMARY_URL")));
     private CtsXmlResultReporter mResultReporter;
     private ByteArrayOutputStream mOutputStream;
+    private File mBuildDir;
     private File mReportDir;
     private IFolderBuildInfo mMockBuild;
 
@@ -73,8 +76,16 @@ public class CtsXmlResultReporterTest extends TestCase {
         // TODO: use mock file dir instead
         mReportDir = FileUtil.createTempDir("foo");
         mResultReporter.setReportDir(mReportDir);
+        mBuildDir = FileUtil.createTempDir("build");
+        File ctsDir = new File(mBuildDir, "android-cts");
+        File repoDir = new File(ctsDir, "repository");
+        File casesDir = new File(repoDir, "testcases");
+        File plansDir = new File(repoDir, "plans");
+        assertTrue(casesDir.mkdirs());
+        assertTrue(plansDir.mkdirs());
         mMockBuild = EasyMock.createNiceMock(IFolderBuildInfo.class);
         EasyMock.expect(mMockBuild.getDeviceSerial()).andStubReturn(null);
+        EasyMock.expect(mMockBuild.getRootDir()).andStubReturn(mBuildDir);
         EasyMock.replay(mMockBuild);
     }
 
@@ -82,6 +93,9 @@ public class CtsXmlResultReporterTest extends TestCase {
     protected void tearDown() throws Exception {
         if (mReportDir != null) {
             FileUtil.recursiveDelete(mReportDir);
+        }
+        if (mBuildDir != null) {
+            FileUtil.recursiveDelete(mBuildDir);
         }
         super.tearDown();
     }
@@ -117,19 +131,18 @@ public class CtsXmlResultReporterTest extends TestCase {
         Map<String, String> emptyMap = Collections.emptyMap();
         final TestIdentifier testId = new TestIdentifier("com.foo.FooTest", "testFoo");
         mResultReporter.invocationStarted(mMockBuild);
-        mResultReporter.testRunStarted("run", 1);
+        mResultReporter.testRunStarted(AbiUtils.createId(UnitTests.ABI.getName(), "run"), 1);
         mResultReporter.testStarted(testId);
         mResultReporter.testEnded(testId, emptyMap);
         mResultReporter.testRunEnded(3000, emptyMap);
         mResultReporter.invocationEnded(1);
         mResultReporter.putSummary(SUMMARY_LIST);
         String output =  getOutput();
-        CLog.d("Actual output: %s", output);
-        System.out.println(output);
         // TODO: consider doing xml based compare
         assertTrue(output.contains(
-                "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"1\" />"));
-        assertTrue(output.contains("<TestPackage name=\"\" appPackageName=\"run\" digest=\"\">"));
+              "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"1\" />"));
+        assertTrue(output.contains("<TestPackage name=\"\" appPackageName=\"run\" abi=\"" +
+              UnitTests.ABI.getName() + "\" digest=\"\">"));
         assertTrue(output.contains("<TestCase name=\"FooTest\" priority=\"\">"));
 
         final String testCaseTag = String.format(
@@ -145,20 +158,19 @@ public class CtsXmlResultReporterTest extends TestCase {
         final TestIdentifier testId = new TestIdentifier("FooTest", "testFoo");
         final String trace = "this is a trace\nmore trace\nyet more trace";
         mResultReporter.invocationStarted(mMockBuild);
-        mResultReporter.testRunStarted("run", 1);
+        mResultReporter.testRunStarted(AbiUtils.createId(UnitTests.ABI.getName(), "run"), 1);
         mResultReporter.testStarted(testId);
         mResultReporter.testFailed(TestFailure.FAILURE, testId, trace);
         mResultReporter.testEnded(testId, emptyMap);
         mResultReporter.testRunEnded(3, emptyMap);
         mResultReporter.invocationEnded(1);
-        String output =  getOutput();
-        System.out.print(getOutput());
+        String output = getOutput();
         // TODO: consider doing xml based compare
         assertTrue(output.contains(
                 "<Summary failed=\"1\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />"));
         final String failureTag =
-            "<FailedScene message=\"this is a trace&#10;more trace\">     " +
-            "<StackTrace>this is a tracemore traceyet more trace</StackTrace>";
+                "<FailedScene message=\"this is a trace&#10;more trace\">     " +
+                "<StackTrace>this is a tracemore traceyet more trace</StackTrace>";
         assertTrue(output.contains(failureTag));
     }
 

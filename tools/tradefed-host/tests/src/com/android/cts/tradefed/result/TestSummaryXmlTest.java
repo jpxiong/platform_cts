@@ -38,7 +38,7 @@ public class TestSummaryXmlTest extends TestCase {
             "<Foo failed=\"1\" notExecuted=\"2\" pass=\"3\" timeout=\"4\"/>" +
         "</TestResult>";
 
-    public void testConstructor() throws ParseException  {
+    public void testConstructor()  {
         TestSummaryXml result = new TestSummaryXml(1, "2011-11-01");
         assertEquals(1, result.getId());
         assertEquals("2011-11-01", result.getTimestamp());

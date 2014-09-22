@@ -22,6 +22,7 @@ import com.android.cts.tradefed.testtype.ITestPackageRepo;
 import com.android.cts.tradefed.testtype.ITestPlan;
 import com.android.cts.tradefed.testtype.TestPackageRepo;
 import com.android.cts.tradefed.testtype.TestPlan;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -37,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Class for creating test plans from CTS result XML.
@@ -88,8 +90,9 @@ public class PlanCreator {
      * {@link Option} values must all be set before this is called.
      * @throws ConfigurationException
      */
-    public void createAndSerializeDerivedPlan(CtsBuildHelper build) throws ConfigurationException {
-        ITestPlan derivedPlan = createDerivedPlan(build);
+    public void createAndSerializeDerivedPlan(CtsBuildHelper build, Set<String> abis)
+            throws ConfigurationException {
+        ITestPlan derivedPlan = createDerivedPlan(build, abis);
         if (derivedPlan != null) {
             try {
                 derivedPlan.serialize(new BufferedOutputStream(new FileOutputStream(mPlanFile)));
@@ -110,25 +113,24 @@ public class PlanCreator {
      * @return test plan
      * @throws ConfigurationException
      */
-    public ITestPlan createDerivedPlan(CtsBuildHelper build) throws ConfigurationException {
+    public ITestPlan createDerivedPlan(CtsBuildHelper build, Set<String> abis)
+            throws ConfigurationException {
         checkFields(build);
         ITestPackageRepo pkgDefRepo = new TestPackageRepo(build.getTestCasesDir(),
-                mIncludeKnownFailures);
-        ITestPlan derivedPlan = new TestPlan(mPlanName);
+                abis, mIncludeKnownFailures);
+        ITestPlan derivedPlan = new TestPlan(mPlanName, abis);
         for (TestPackageResult pkg : mResult.getPackages()) {
             Collection<TestIdentifier> filteredTests = pkg.getTestsWithStatus(mResultFilter);
-            if (!filteredTests.isEmpty()) {
-                String pkgUri = pkg.getAppPackageName();
-                ITestPackageDef pkgDef = pkgDefRepo.getTestPackage(pkgUri);
-                if (pkgDef != null) {
-                    Collection<TestIdentifier> excludedTests = new LinkedHashSet<TestIdentifier>(
-                            pkgDef.getTests());
-                    excludedTests.removeAll(filteredTests);
-                    derivedPlan.addPackage(pkgUri);
-                    derivedPlan.addExcludedTests(pkgUri, excludedTests);
-                } else {
-                    CLog.e("Could not find package %s in repository", pkgUri);
-                }
+            String pkgId = pkg.getId();
+            ITestPackageDef pkgDef = pkgDefRepo.getTestPackage(pkgId);
+            if (pkgDef != null) {
+                Collection<TestIdentifier> excludedTests =
+                        new LinkedHashSet<TestIdentifier>(pkgDef.getTests());
+                excludedTests.removeAll(filteredTests);
+                derivedPlan.addPackage(pkgId);
+                derivedPlan.addExcludedTests(pkgId, excludedTests);
+            } else {
+                CLog.e("Could not find package %s in repository", pkgId);
             }
         }
         return derivedPlan;
