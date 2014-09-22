@@ -340,9 +340,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
     /**
      * Check key is present in characteristics if the hardware level is at least {@code hwLevel};
-     * check that the key is present if the actual capabilities are one of {@code capabilities};
-     * lastly check that {@code LEGACY} devices don't list any addition keys that they shouldn't
-     * be.
+     * check that the key is present if the actual capabilities are one of {@code capabilities}.
      *
      * @return value of the {@code key} from {@code c}
      */
@@ -387,23 +385,14 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     allKeys.contains(key));
         } else {
             if (actualHwLevel == LEGACY && hwLevel != OPT) {
-                mCollector.expectTrue(
-                        String.format("Key (%s) must not be in characteristics for LEGACY devices",
-                                key.getName()),
-                        value == null);
-
-                mCollector.expectTrue(
-                        String.format("Key (%s) must not be in characteristics list of keys" +
-                                "for LEGACY devices",
-                                key.getName()),
-                        !allKeys.contains(key));
-
-                // TODO: a few keys like aeLock, awbLock are optional in api1. Revisit this.
+                if (value != null || allKeys.contains(key)) {
+                    Log.w(TAG, String.format(
+                            "Key (%s) is not required for LEGACY devices but still appears",
+                            key.getName()));
+                }
             }
-
             // OK: Key may or may not be present.
         }
-
         return value;
     }
 
