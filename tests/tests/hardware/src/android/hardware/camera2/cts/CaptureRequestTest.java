@@ -1542,9 +1542,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             verifyCaptureResultForKey(CaptureResult.CONTROL_AF_MODE, mode, listener,
                     NUM_FRAMES_VERIFIED);
 
-            // Verify AF can finish a scan for CONTROL_AF_MODE_CONTINUOUS_* modes
-            if (mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE ||
-                    mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
+            // Verify AF can finish a scan for CONTROL_AF_MODE_CONTINUOUS_* modes.
+            // In LEGACY mode, a transition to one of the continuous AF modes does not necessarily
+            // result in a passive AF call if the camera has already been focused, and the scene has
+            // not changed enough to trigger an AF pass.  Skip this constraint for LEGACY.
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter() &&
+                    (mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE ||
+                    mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO)) {
                 List<Integer> afStateList = new ArrayList<Integer>();
                 afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED);
                 afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED);
