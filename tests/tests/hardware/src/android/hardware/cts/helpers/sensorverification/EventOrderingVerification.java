@@ -16,13 +16,12 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.SensorTestInformation.SensorReportingMode;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.Assert;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,14 +43,14 @@ public class EventOrderingVerification extends AbstractSensorVerification {
     /**
      * Get the default {@link EventOrderingVerification} for a sensor.
      *
-     * @param sensor a {@link Sensor}
+     * @param environment the test environment
      * @return the verification or null if the verification does not apply to the sensor.
      */
     @SuppressWarnings("deprecation")
-    public static EventOrderingVerification getDefault(Sensor sensor) {
-        SensorReportingMode mode = SensorTestInformation.getReportingMode(sensor.getType());
-        if (!SensorReportingMode.CONTINUOUS.equals(mode)
-                && !SensorReportingMode.ON_CHANGE.equals(mode)) {
+    public static EventOrderingVerification getDefault(TestSensorEnvironment environment) {
+        int reportingMode = environment.getSensor().getReportingMode();
+        if (reportingMode != Sensor.REPORTING_MODE_CONTINUOUS
+                && reportingMode != Sensor.REPORTING_MODE_ON_CHANGE) {
             return null;
         }
         return new EventOrderingVerification();
@@ -65,7 +64,14 @@ public class EventOrderingVerification extends AbstractSensorVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        verify(stats);
+    }
+
+    /**
+     * Visible for unit tests only.
+     */
+    void verify(SensorStats stats) {
         final int count = mOutOfOrderEvents.size();
         stats.addValue(PASSED_KEY, count == 0);
         stats.addValue(SensorStats.EVENT_OUT_OF_ORDER_COUNT_KEY, count);

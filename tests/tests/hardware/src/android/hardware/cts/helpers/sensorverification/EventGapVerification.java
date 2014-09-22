@@ -1,13 +1,11 @@
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.Sensor;
-import android.hardware.cts.helpers.SensorCtsHelper;
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.SensorTestInformation.SensorReportingMode;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.Assert;
+
+import android.hardware.Sensor;
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,23 +43,27 @@ public class EventGapVerification extends AbstractSensorVerification {
     /**
      * Get the default {@link EventGapVerification}.
      *
-     * @param sensor the {@link Sensor}
-     * @param rateUs the requested rate in us
+     * @param environment the test environment
      * @return the verification or null if the verification is not a continuous mode sensor.
      */
-    public static EventGapVerification getDefault(Sensor sensor, int rateUs) {
-        if (!SensorReportingMode.CONTINUOUS.equals(SensorTestInformation.getReportingMode(
-                sensor.getType()))) {
+    public static EventGapVerification getDefault(TestSensorEnvironment environment) {
+        if (environment.getSensor().getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
             return null;
         }
-        return new EventGapVerification(SensorCtsHelper.getDelay(sensor, rateUs));
+        return new EventGapVerification(environment.getExpectedSamplingPeriodUs());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        if (environment.isSensorSamplingRateOverloaded()) {
+            // the verification is not reliable on environments under load
+            stats.addValue(PASSED_KEY, true);
+            return;
+        }
+
         final int count = mEventGaps.size();
         stats.addValue(PASSED_KEY, count == 0);
         stats.addValue(SensorStats.EVENT_GAP_COUNT_KEY, count);

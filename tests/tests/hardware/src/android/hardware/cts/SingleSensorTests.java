@@ -16,11 +16,13 @@
 
 package android.hardware.cts;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 
 import java.util.HashMap;
@@ -110,15 +112,20 @@ public class SingleSensorTests extends SensorTestCase {
         expectedProperties.put(Sensor.TYPE_GYROSCOPE, new Object[]{10000});
         expectedProperties.put(Sensor.TYPE_MAGNETIC_FIELD, new Object[]{100000});
 
+        SensorManager sensorManager =
+                (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        assertNotNull("SensorManager not present in the system.", sensorManager);
         for (Entry<Integer, Object[]> entry : expectedProperties.entrySet()) {
-            Sensor sensor = SensorCtsHelper.getSensor(getContext(), entry.getKey());
-            String sensorName = SensorTestInformation.getSensorName(entry.getKey());
-            if (entry.getValue()[0] != null) {
-                int expected = (Integer) entry.getValue()[0];
-                String msg = String.format(
-                        "%s: min delay %dus expected to be less than or equal to %dus",
-                        sensorName, sensor.getMinDelay(), expected);
-                assertTrue(msg, sensor.getMinDelay() <= expected);
+            Sensor sensor = sensorManager.getDefaultSensor(entry.getKey());
+            if (sensor != null) {
+                String sensorName = SensorTestInformation.getSensorName(entry.getKey());
+                if (entry.getValue()[0] != null) {
+                    int expected = (Integer) entry.getValue()[0];
+                    String msg = String.format(
+                            "%s: min delay %dus expected to be less than or equal to %dus",
+                            sensorName, sensor.getMinDelay(), expected);
+                    assertTrue(msg, sensor.getMinDelay() <= expected);
+                }
             }
         }
     }
@@ -529,10 +536,13 @@ public class SingleSensorTests extends SensorTestCase {
         runSensorTest(Sensor.TYPE_LINEAR_ACCELERATION, RATE_1HZ);
     }
 
-    private void runSensorTest(int sensorType, int rateUs)
-            throws Throwable {
-        TestSensorOperation op = new TestSensorOperation(this.getContext(), sensorType,
-                rateUs, 0 /* maxBatchReportLatencyUs */, 5, TimeUnit.SECONDS);
+    private void runSensorTest(int sensorType, int rateUs) throws Throwable {
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getContext(),
+                sensorType,
+                shouldEmulateSensorUnderLoad(),
+                rateUs);
+        TestSensorOperation op = new TestSensorOperation(environment, 5, TimeUnit.SECONDS);
         op.addDefaultVerifications();
         op.setLogEvents(true);
         try {

@@ -16,11 +16,12 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.Assert;
+
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,15 +58,16 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
     /**
      * Get the default {@link StandardDeviationVerification} for a sensor.
      *
-     * @param sensor a {@link Sensor}
+     * @param environment the test environment
      * @return the verification or null if the verification does not apply to the sensor.
      */
-    public static StandardDeviationVerification getDefault(Sensor sensor) {
-        if (!DEFAULTS.containsKey(sensor.getType())) {
+    public static StandardDeviationVerification getDefault(TestSensorEnvironment environment) {
+        int sensorType = environment.getSensor().getType();
+        if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
 
-        return new StandardDeviationVerification(DEFAULTS.get(sensor.getType()));
+        return new StandardDeviationVerification(DEFAULTS.get(sensorType));
     }
 
     /**
@@ -75,7 +77,14 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        verify(stats);
+    }
+
+    /**
+     * Visible for unit tests only.
+     */
+    void verify(SensorStats stats) {
         if (mCount < 2) {
             stats.addValue(PASSED_KEY, true);
             return;

@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Tests for {@link SigNumVerification}.
@@ -27,7 +28,7 @@ import junit.framework.TestCase;
 public class SigNumVerificationTest extends TestCase {
 
     /**
-     * Test {@link SigNumVerification#verify(SensorStats)}.
+     * Test {@link SigNumVerification#verify(TestSensorEnvironment, SensorStats)}.
      */
     public void testVerify() {
         float[][] values = {{1.0f, 0.2f, 0.0f, -0.2f, -1.0f}};
@@ -65,7 +66,7 @@ public class SigNumVerificationTest extends TestCase {
     private void runVerification(boolean passed, int[] expected, float[] threshold,
             float[][] values) {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(expected, threshold, values);
+        SigNumVerification verification = getVerification(expected, threshold, values);
         if (passed) {
             verification.verify(stats);
         } else {

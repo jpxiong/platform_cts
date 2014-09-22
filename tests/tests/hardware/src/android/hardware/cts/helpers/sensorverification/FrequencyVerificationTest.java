@@ -16,15 +16,16 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import android.hardware.Sensor;
+import android.hardware.cts.SensorTestCase;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for {@link EventOrderingVerification}.
  */
-public class FrequencyVerificationTest extends TestCase {
+public class FrequencyVerificationTest extends SensorTestCase {
 
     /**
      * Test that the verifications passes/fails based on threshold given.
@@ -33,24 +34,24 @@ public class FrequencyVerificationTest extends TestCase {
         long[] timestamps = {0, 1000000, 2000000, 3000000, 4000000};  // 1000Hz
 
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(1000.0, 999.0, 1001.0, timestamps);
-        verification.verify(stats);
+        ISensorVerification verification = getVerification(999.0, 1001.0, timestamps);
+        verification.verify(getEnvironment(1000), stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(950.0, 850.0, 1050.0, timestamps);
-        verification.verify(stats);
+        verification = getVerification(850.0, 1050.0, timestamps);
+        verification.verify(getEnvironment(950), stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(1050.0, 950.0, 1150.0, timestamps);
-        verification.verify(stats);
+        verification = getVerification(950.0, 1150.0, timestamps);
+        verification.verify(getEnvironment(1050), stats);
         verifyStats(stats, true, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(950.0, 850.0, 975.0, timestamps);
+        verification = getVerification(850.0, 975.0, timestamps);
         try {
-            verification.verify(stats);
+            verification.verify(getEnvironment(950), stats);
             fail("Expected an AssertionError");
         } catch (AssertionError e) {
             // Expected;
@@ -58,9 +59,9 @@ public class FrequencyVerificationTest extends TestCase {
         verifyStats(stats, false, 1000.0);
 
         stats = new SensorStats();
-        verification = getVerification(1050.0, 1025.0, 1150.0, timestamps);
+        verification = getVerification(1025.0, 1150.0, timestamps);
         try {
-            verification.verify(stats);
+            verification.verify(getEnvironment(1050), stats);
             fail("Expected an AssertionError");
         } catch (AssertionError e) {
             // Expected;
@@ -68,10 +69,16 @@ public class FrequencyVerificationTest extends TestCase {
         verifyStats(stats, false, 1000.0);
     }
 
-    private ISensorVerification getVerification(double expected, double lowerThreshold,
-            double upperThreshold, long ... timestamps) {
-        ISensorVerification verification = new FrequencyVerification(expected, lowerThreshold,
-                upperThreshold, "Test sensor");
+    private TestSensorEnvironment getEnvironment(int rateUs) {
+        return new TestSensorEnvironment(getContext(), Sensor.TYPE_ALL, rateUs);
+    }
+
+    private ISensorVerification getVerification(
+            double lowerThreshold,
+            double upperThreshold,
+            long ... timestamps) {
+        ISensorVerification verification =
+                new FrequencyVerification(lowerThreshold, upperThreshold);
         for (long timestamp : timestamps) {
             verification.addSensorEvent(new TestSensorEvent(null, timestamp, 0, null));
         }

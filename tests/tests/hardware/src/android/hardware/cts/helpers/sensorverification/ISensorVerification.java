@@ -17,13 +17,15 @@
 package android.hardware.cts.helpers.sensorverification;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Interface describing the sensor verification. This class was designed for to handle streaming
  * events. The methods {@link #addSensorEvent(TestSensorEvent)} and
  * {@link #addSensorEvents(TestSensorEvent...)} should be called in the order that the events are
- * received. The method {@link #verify(SensorStats)} should be called after all events are added.
+ * received. The method {@link #verify(TestSensorEnvironment, SensorStats)} should be called after
+ * all events are added.
  */
 public interface ISensorVerification {
 
@@ -43,7 +45,7 @@ public interface ISensorVerification {
      * @param stats a {@link SensorStats} object used to keep track of the stats.
      * @throws AssertionError if the verification fails.
      */
-    public void verify(SensorStats stats);
+    public void verify(TestSensorEnvironment environment, SensorStats stats);
 
     /**
      * Clones the {@link ISensorVerification}

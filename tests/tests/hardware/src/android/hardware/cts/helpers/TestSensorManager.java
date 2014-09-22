@@ -53,21 +53,29 @@ public class TestSensorManager {
     private static final String LOG_TAG = "TestSensorManager";
 
     private final SensorManager mSensorManager;
-    private final Sensor mSensor;
-    private final int mRateUs;
-    private final int mMaxBatchReportLatencyUs;
+    private final TestSensorEnvironment mEnvironment;
 
-    private TestSensorEventListener mTestSensorEventListener = null;
+    private TestSensorEventListener mTestSensorEventListener;
+
+    /**
+     * @Deprecated Use {@link #TestSensorManager(TestSensorEnvironment)} instead.
+     */
+    @Deprecated
+    public TestSensorManager(
+            Context context,
+            int sensorType,
+            int rateUs,
+            int maxBatchReportLatencyUs) {
+        this(new TestSensorEnvironment(context, sensorType, rateUs, maxBatchReportLatencyUs));
+    }
 
     /**
      * Construct a {@link TestSensorManager}.
      */
-    public TestSensorManager(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs) {
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensor = SensorCtsHelper.getSensor(context, sensorType);
-        mRateUs = rateUs;
-        mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
+    public TestSensorManager(TestSensorEnvironment environment) {
+        mSensorManager =
+                (SensorManager) environment.getContext().getSystemService(Context.SENSOR_SERVICE);
+        mEnvironment = environment;
     }
 
     /**
@@ -83,12 +91,14 @@ public class TestSensorManager {
         }
 
         mTestSensorEventListener = listener != null ? listener : new TestSensorEventListener();
-        mTestSensorEventListener.setSensorInfo(mSensor, mRateUs, mMaxBatchReportLatencyUs);
+        mTestSensorEventListener.setEnvironment(mEnvironment);
 
-        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "registerListener",
-                mRateUs, mMaxBatchReportLatencyUs);
-        boolean result = mSensorManager.registerListener(mTestSensorEventListener, mSensor, mRateUs,
-                mMaxBatchReportLatencyUs);
+        String message = SensorCtsHelper.formatAssertionMessage("registerListener", mEnvironment);
+        boolean result = mSensorManager.registerListener(
+                mTestSensorEventListener,
+                mEnvironment.getSensor(),
+                mEnvironment.getRequestedSamplingPeriodUs(),
+                mEnvironment.getMaxReportLatencyUs());
         Assert.assertTrue(message, result);
     }
 
@@ -101,7 +111,9 @@ public class TestSensorManager {
             return;
         }
 
-        mSensorManager.unregisterListener(mTestSensorEventListener, mSensor);
+        mSensorManager.unregisterListener(
+                mTestSensorEventListener,
+                mEnvironment.getSensor());
         mTestSensorEventListener = null;
     }
 
@@ -140,9 +152,9 @@ public class TestSensorManager {
             return;
         }
 
-        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "Flush", mRateUs,
-                mMaxBatchReportLatencyUs);
-        Assert.assertTrue(message, mSensorManager.flush(mTestSensorEventListener));
+        Assert.assertTrue(
+                SensorCtsHelper.formatAssertionMessage("Flush", mEnvironment),
+                mSensorManager.flush(mTestSensorEventListener));
     }
 
     /**
@@ -233,12 +245,5 @@ public class TestSensorManager {
         } finally {
             unregisterListener();
         }
-    }
-
-    /**
-     * Get the sensor under test.
-     */
-    public Sensor getSensor() {
-        return mSensor;
     }
 }

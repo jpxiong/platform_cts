@@ -16,12 +16,12 @@
 
 package android.hardware.cts;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorFlushOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
@@ -255,36 +255,46 @@ public class SensorBatchingTests extends SensorTestCase {
 
     private void runBatchingSensorTest(int sensorType, int rateUs, int maxBatchReportLatencySec)
             throws Throwable {
-        Context context = getContext();
         int maxBatchReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(maxBatchReportLatencySec);
         int testDurationSec = maxBatchReportLatencySec + BATCHING_PADDING_TIME_S;
-        TestSensorOperation operation = new TestSensorOperation(
-                context,
+
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getContext(),
+                sensorType,
+                shouldEmulateSensorUnderLoad(),
+                rateUs,
+                maxBatchReportLatencyUs);
+        TestSensorOperation operation =
+                new TestSensorOperation(environment, testDurationSec, TimeUnit.SECONDS);
+
+        executeTest(
+                operation,
                 sensorType,
                 rateUs,
                 maxBatchReportLatencyUs,
-                testDurationSec,
-                TimeUnit.SECONDS);
-
-        boolean flushExpected = false;
-        executeTest(operation, sensorType, rateUs, maxBatchReportLatencyUs, flushExpected);
+                false /* flushExpected */);
     }
 
     private void runFlushSensorTest(int sensorType, int rateUs, int maxBatchReportLatencySec)
             throws Throwable {
-        Context context = getContext();
         int maxBatchReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(maxBatchReportLatencySec);
         int flushDurationSec = maxBatchReportLatencySec / 2;
-        TestSensorFlushOperation operation = new TestSensorFlushOperation(
-                context,
+
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getContext(),
+                sensorType,
+                shouldEmulateSensorUnderLoad(),
+                rateUs,
+                maxBatchReportLatencyUs);
+        TestSensorFlushOperation operation =
+                new TestSensorFlushOperation(environment, flushDurationSec, TimeUnit.SECONDS);
+
+        executeTest(
+                operation,
                 sensorType,
                 rateUs,
                 maxBatchReportLatencyUs,
-                flushDurationSec,
-                TimeUnit.SECONDS);
-
-        boolean flushExpected = true;
-        executeTest(operation, sensorType, rateUs, maxBatchReportLatencyUs, flushExpected);
+                true /* flushExpected */);
     }
 
     private void executeTest(

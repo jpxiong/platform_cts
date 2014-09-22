@@ -16,9 +16,10 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-
 import junit.framework.Assert;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 
 /**
  * A {@link ISensorVerification} which verifies that the sign of each of the sensor values is
@@ -60,7 +61,14 @@ public class SigNumVerification extends AbstractMeanVerification {
      * @throws AssertionError if the verification failed.
      */
     @Override
-    public void verify(SensorStats stats) {
+    public void verify(TestSensorEnvironment environment, SensorStats stats) {
+        verify(stats);
+    }
+
+    /**
+     * Visible for unit tests only.
+     */
+    void verify(SensorStats stats) {
         if (getCount() < 1) {
             stats.addValue(PASSED_KEY, true);
             return;

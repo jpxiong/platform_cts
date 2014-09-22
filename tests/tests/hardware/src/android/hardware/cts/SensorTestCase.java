@@ -22,8 +22,11 @@ import com.android.cts.util.ResultUnit;
 
 import android.app.Instrumentation;
 import android.cts.util.DeviceReportLog;
+import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -33,6 +36,17 @@ import android.util.Log;
 public abstract class SensorTestCase extends AndroidTestCase {
     // TODO: consolidate all log tags
     protected final String LOG_TAG = "TestRunner";
+
+    /**
+     * By default tests need to run in a {@link TestSensorEnvironment} that assumes each sensor is
+     * running with a load of several listeners, requesting data at different rates.
+     *
+     * In a better world the component acting as builder of {@link ISensorOperation} would compute
+     * this value based on the tests composed.
+     *
+     * Ideally, each {@link Sensor} object would expose this information to clients.
+     */
+    private volatile boolean mEmulateSensorUnderLoad = true;
 
     protected SensorTestCase() {}
 
@@ -44,6 +58,14 @@ public abstract class SensorTestCase extends AndroidTestCase {
             // the sensor state is not supported in the device, log a warning and skip the test
             Log.w(LOG_TAG, e.getMessage());
         }
+    }
+
+    public void setEmulateSensorUnderLoad(boolean value) {
+        mEmulateSensorUnderLoad = value;
+    }
+
+    protected boolean shouldEmulateSensorUnderLoad() {
+        return mEmulateSensorUnderLoad;
     }
 
     /**
