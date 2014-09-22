@@ -34,7 +34,7 @@ public class CharacterPickerDialogTest extends
     private Activity mActivity;
 
     public CharacterPickerDialogTest() {
-        super("com.android.cts.stub", CtsActivity.class);
+        super("com.android.cts.text", CtsActivity.class);
     }
 
     @Override

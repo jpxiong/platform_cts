@@ -28,7 +28,7 @@ import android.widget.EditText;
 public class SingleLineTransformationMethodTest
         extends ActivityInstrumentationTestCase2<CtsActivity> {
     public SingleLineTransformationMethodTest() {
-        super("com.android.cts.stub", CtsActivity.class);
+        super("com.android.cts.text", CtsActivity.class);
     }
 
     public void testConstructor() {

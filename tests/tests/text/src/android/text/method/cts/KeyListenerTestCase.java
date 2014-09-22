@@ -53,7 +53,7 @@ public abstract class KeyListenerTestCase extends
     protected TextView mTextView;
 
     public KeyListenerTestCase() {
-        super("com.android.cts.stub", KeyListenerCtsActivity.class);
+        super("com.android.cts.text", KeyListenerCtsActivity.class);
     }
 
     @Override

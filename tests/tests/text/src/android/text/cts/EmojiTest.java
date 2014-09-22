@@ -31,7 +31,7 @@ import android.widget.EditText;
 public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiCtsActivity> {
 
     public EmojiTest() {
-        super("com.android.cts.stub", EmojiCtsActivity.class);
+        super("com.android.cts.text", EmojiCtsActivity.class);
     }
 
     protected void setUp() throws Exception {
