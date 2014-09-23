@@ -208,17 +208,17 @@ public class MessageQueueTest extends AndroidTestCase {
     public void testReleaseSyncBarrierThrowsIfTokenNotValid() throws Exception {
         // Invalid token
         try {
-            Looper.myLooper().removeSyncBarrier(-1);
+            Looper.getMainLooper().removeSyncBarrier(-1);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
         }
 
         // Token already removed.
-        int barrierToken = Looper.myLooper().postSyncBarrier();
-        Looper.myLooper().removeSyncBarrier(barrierToken);
+        int barrierToken = Looper.getMainLooper().postSyncBarrier();
+        Looper.getMainLooper().removeSyncBarrier(barrierToken);
         try {
-            Looper.myLooper().removeSyncBarrier(barrierToken);
+            Looper.getMainLooper().removeSyncBarrier(barrierToken);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
