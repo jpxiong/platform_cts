@@ -18,7 +18,6 @@ package android.app.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
@@ -38,6 +37,7 @@ import android.os.Debug;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.view.InputQueue;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -58,6 +58,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
     private Intent mIntent;
     private boolean mRunOnMainSyncResult;
     private Context mContext;
+    private MockActivity mMockActivity;
 
     @Override
     protected void setUp() throws Exception {
@@ -254,14 +255,19 @@ public class InstrumentationTest extends InstrumentationTestCase {
     }
 
     public void testInvokeContextMenuAction() throws Exception {
-        MockActivity activity = new MockActivity();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mMockActivity = new MockActivity();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         final int id = 1;
         final int flag = 2;
-        mInstrumentation.invokeContextMenuAction(activity, id, flag);
+        mInstrumentation.invokeContextMenuAction(mMockActivity, id, flag);
         mInstrumentation.waitForIdleSync();
 
-        assertEquals(id, activity.mWindow.mId);
-        assertEquals(flag, activity.mWindow.mFlags);
+        assertEquals(id, mMockActivity.mWindow.mId);
+        assertEquals(flag, mMockActivity.mWindow.mFlags);
     }
 
     public void testSendStringSync() {
@@ -365,6 +371,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(KeyEvent.KEYCODE_0, mActivity.getKeyDownList().get(0).getKeyCode());
     }
 
+    @UiThreadTest
     public void testNewActivity() throws Exception {
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

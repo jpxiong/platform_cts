@@ -17,23 +17,31 @@
 package android.app.cts;
 
 import android.app.AliasActivity;
+import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 
-public class AliasActivityTest extends AndroidTestCase {
+public class AliasActivityTest extends InstrumentationTestCase {
 
     private static final long SLEEP_TIME = 1000;
 
-    public void testAliasActivity() throws InterruptedException {
-        new AliasActivity();
+    public void testAliasActivity() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                new AliasActivity();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        Context context = getInstrumentation().getTargetContext();
 
         Intent intent = new Intent();
-        intent.setClass(getContext(), AliasActivityStub.class);
+        intent.setClass(context, AliasActivityStub.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         assertFalse(ChildActivity.isStarted);
         assertFalse(AliasActivityStub.isOnCreateCalled);
-        getContext().startActivity(intent);
+        context.startActivity(intent);
         Thread.sleep(SLEEP_TIME);
         assertTrue(AliasActivityStub.isOnCreateCalled);
         assertTrue(ChildActivity.isStarted);

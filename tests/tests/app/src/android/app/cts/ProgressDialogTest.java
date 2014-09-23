@@ -48,7 +48,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     private Context mContext;
     private Instrumentation mInstrumentation;
     private MockActivity mActivity;
-    private ProgressDialog mProgressDialog;
 
     public ProgressDialogTest() {
         super("com.android.cts.stub", MockActivity.class);
@@ -62,19 +61,21 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         mInstrumentation = getInstrumentation();
         mActivity = getActivity();
         mContext = mActivity;
-        mProgressDialog = new ProgressDialog(mContext);
         mDrawable = getActivity().getResources().getDrawable(
                 com.android.cts.stub.R.drawable.yellow);
     }
 
+    @UiThreadTest
     public void testProgressDialog1(){
         new ProgressDialog(mContext);
     }
 
+    @UiThreadTest
     public void testProgressDialog2(){
         new ProgressDialog(mContext, com.android.cts.stub.R.style.Theme_AlertDialog);
     }
 
+    @UiThreadTest
     public void testOnStartCreateStop() {
         MockProgressDialog pd = new MockProgressDialog(mContext);
 
@@ -91,21 +92,22 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @UiThreadTest
     public void testShow1() {
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        ProgressDialog.show(mContext, TITLE, MESSAGE);
     }
 
     @UiThreadTest
     public void testShow2() {
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, false);
+        ProgressDialog dialog = buildDialog();
+        dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, false);
 
         /*
          * note: the progress bar's style only supports indeterminate mode,
          * so can't change indeterminate
          */
-        assertTrue(mProgressDialog.isIndeterminate());
+        assertTrue(dialog.isIndeterminate());
 
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true);
-        assertTrue(mProgressDialog.isIndeterminate());
+        dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true);
+        assertTrue(dialog.isIndeterminate());
     }
 
     public void testShow3() throws Throwable {
@@ -118,10 +120,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         // cancelable is false
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false);
+                ProgressDialog dialog = buildDialog();
+                dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false);
 
-                mProgressDialog.setOnCancelListener(cL);
-                mProgressDialog.onBackPressed();
+                dialog.setOnCancelListener(cL);
+                dialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -131,11 +134,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         // cancelable is true
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true);
-
+                ProgressDialog dialog = buildDialog();
+                dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true);
                 assertFalse(mCanceled);
-                mProgressDialog.setOnCancelListener(cL);
-                mProgressDialog.onBackPressed();
+                dialog.setOnCancelListener(cL);
+                dialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -153,9 +156,10 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         // cancelable is false
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false, cL);
+                ProgressDialog dialog = buildDialog();
+                dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false, cL);
 
-                mProgressDialog.onBackPressed();
+                dialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -165,10 +169,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         // cancelable is true
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true, cL);
+                ProgressDialog dialog = buildDialog();
+                dialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true, cL);
 
                 assertFalse(mCanceled);
-                mProgressDialog.onBackPressed();
+                dialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -178,180 +183,152 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @UiThreadTest
     public void testAccessMax() {
-        // mProgress is null
-        mProgressDialog.setMax(2008);
-        assertEquals(2008, mProgressDialog.getMax());
+        // progressDialog is null
+        ProgressDialog progressDialog = buildDialog();
+        progressDialog.setMax(2008);
+        assertEquals(2008, progressDialog.getMax());
 
-        // mProgress is not null
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-        mProgressDialog.setMax(2009);
-        assertEquals(2009, mProgressDialog.getMax());
+        // progressDialog is not null
+        progressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        progressDialog.setMax(2009);
+        assertEquals(2009, progressDialog.getMax());
     }
 
     @UiThreadTest
     public void testAccessProgress() {
-        // mProgress is null
-        mProgressDialog.setProgress(11);
-        assertEquals(11, mProgressDialog.getProgress());
+        // progressDialog is null
+        ProgressDialog progressDialog = buildDialog();
+        progressDialog.setProgress(11);
+        assertEquals(11, progressDialog.getProgress());
 
-        /* mProgress is not null
+        /* progressDialog is not null
          * note: the progress bar's style only supports indeterminate mode,
          * so can't change progress
          */
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-        mProgressDialog.setProgress(12);
-        assertEquals(0, mProgressDialog.getProgress());
+        progressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        progressDialog.setProgress(12);
+        assertEquals(0, progressDialog.getProgress());
     }
 
     @UiThreadTest
     public void testAccessSecondaryProgress() {
-        // mProgress is null
-        mProgressDialog.setSecondaryProgress(17);
-        assertEquals(17, mProgressDialog.getSecondaryProgress());
+        // dialog is null
+        ProgressDialog dialog = buildDialog();
+        dialog.setSecondaryProgress(17);
+        assertEquals(17, dialog.getSecondaryProgress());
 
         /* mProgress is not null
          * note: the progress bar's style only supports indeterminate mode,
          * so can't change secondary progress
          */
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-        mProgressDialog.setSecondaryProgress(18);
-        assertEquals(0, mProgressDialog.getSecondaryProgress());
+        dialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        dialog.setSecondaryProgress(18);
+        assertEquals(0, dialog.getSecondaryProgress());
     }
 
     @UiThreadTest
     public void testSetIndeterminate() {
-        // mProgress is null
-        mProgressDialog.setIndeterminate(true);
-        assertTrue(mProgressDialog.isIndeterminate());
-        mProgressDialog.setIndeterminate(false);
-        assertFalse(mProgressDialog.isIndeterminate());
+        // progress is null
+        ProgressDialog dialog = buildDialog();
+        dialog.setIndeterminate(true);
+        assertTrue(dialog.isIndeterminate());
+        dialog.setIndeterminate(false);
+        assertFalse(dialog.isIndeterminate());
 
         /* mProgress is not null
          * note: the progress bar's style only supports indeterminate mode,
          * so can't change indeterminate
          */
-        mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-        mProgressDialog.setIndeterminate(true);
-        assertTrue(mProgressDialog.isIndeterminate());
-        mProgressDialog.setIndeterminate(false);
-        assertTrue(mProgressDialog.isIndeterminate());
+        dialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        dialog.setIndeterminate(true);
+        assertTrue(dialog.isIndeterminate());
+        dialog.setIndeterminate(false);
+        assertTrue(dialog.isIndeterminate());
     }
 
+    @UiThreadTest
     public void testIncrementProgressBy() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mProgressDialog = new ProgressDialog(mContext);
-                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                mProgressDialog.show();
-                mProgressDialog.setProgress(10);
-                mProgress1 = mProgressDialog.getProgress();
-                mProgressDialog.incrementProgressBy(60);
-                mProgress2 = mProgressDialog.getProgress();
-                mProgressDialog.cancel();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.show();
+        dialog.setProgress(10);
+        mProgress1 = dialog.getProgress();
+        dialog.incrementProgressBy(60);
+        mProgress2 = dialog.getProgress();
+        dialog.cancel();
 
         assertEquals(10, mProgress1);
         assertEquals(70, mProgress2);
     }
 
+    @UiThreadTest
     public void testIncrementSecondaryProgressBy() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mProgressDialog = new ProgressDialog(mContext);
-                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                mProgressDialog.show();
-                mProgressDialog.setSecondaryProgress(10);
-                mProgress1 = mProgressDialog.getSecondaryProgress();
-                mProgressDialog.incrementSecondaryProgressBy(60);
-                mProgress2 = mProgressDialog.getSecondaryProgress();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.show();
+        dialog.setSecondaryProgress(10);
+        mProgress1 = dialog.getSecondaryProgress();
+        dialog.incrementSecondaryProgressBy(60);
+        mProgress2 = dialog.getSecondaryProgress();
 
         assertEquals(10, mProgress1);
         assertEquals(70, mProgress2);
     }
 
+    @UiThreadTest
     public void testSetProgressDrawable() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-                final Window w = mProgressDialog.getWindow();
-                final ProgressBar progressBar = (ProgressBar) w.findViewById(android.R.id.progress);
+        ProgressDialog dialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        Window w = dialog.getWindow();
+        ProgressBar progressBar = (ProgressBar) w.findViewById(android.R.id.progress);
 
-                mProgressDialog.setProgressDrawable(mDrawable);
-                mActualDrawable = progressBar.getProgressDrawable();
+        dialog.setProgressDrawable(mDrawable);
+        mActualDrawable = progressBar.getProgressDrawable();
 
-                mProgressDialog.setProgressDrawable(null);
-                mActualDrawableNull = progressBar.getProgressDrawable();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        dialog.setProgressDrawable(null);
+        mActualDrawableNull = progressBar.getProgressDrawable();
         assertEquals(mDrawable, mActualDrawable);
         assertEquals(null, mActualDrawableNull);
     }
 
+    @UiThreadTest
     public void testSetIndeterminateDrawable() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-                final Window w = mProgressDialog.getWindow();
-                mProgressBar = (ProgressBar) w.findViewById(android.R.id.progress);
+        ProgressDialog dialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        Window w = dialog.getWindow();
+        mProgressBar = (ProgressBar) w.findViewById(android.R.id.progress);
 
-                mProgressDialog.setIndeterminateDrawable(mDrawable);
-                mActualDrawable = mProgressBar.getIndeterminateDrawable();
-                assertEquals(mDrawable, mActualDrawable);
+        dialog.setIndeterminateDrawable(mDrawable);
+        mActualDrawable = mProgressBar.getIndeterminateDrawable();
+        assertEquals(mDrawable, mActualDrawable);
 
-                mProgressDialog.setIndeterminateDrawable(null);
-                mActualDrawableNull = mProgressBar.getIndeterminateDrawable();
-                assertEquals(null, mActualDrawableNull);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        dialog.setIndeterminateDrawable(null);
+        mActualDrawableNull = mProgressBar.getIndeterminateDrawable();
+        assertEquals(null, mActualDrawableNull);
     }
 
+    @UiThreadTest
     public void testSetMessage() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                // mProgress is null
-                mProgressDialog = new ProgressDialog(mContext);
-                mProgressDialog.setMessage(MESSAGE);
-                mProgressDialog.show();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                // mProgress is not null
-                mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-                mProgressDialog.setMessage("Bruce Li");
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog = new ProgressDialog(mContext);
+        dialog.setMessage(MESSAGE);
+        dialog.show();
+        // dialog is not null
+        dialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
+        dialog.setMessage("Chuck Norris");
     }
 
+    @UiThreadTest
     public void testSetProgressStyle() throws Throwable {
-        setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-
-        setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        setProgressStyle(100);
+        ProgressDialog dialog = new ProgressDialog(mContext);
+        setProgressStyle(dialog, ProgressDialog.STYLE_HORIZONTAL);
+        setProgressStyle(dialog, ProgressDialog.STYLE_SPINNER);
+        setProgressStyle(dialog, 100);
     }
 
-    private void setProgressStyle(final int style) throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mProgressDialog = new ProgressDialog(mContext);
-                mProgressDialog.setProgressStyle(style);
-
-                mProgressDialog.show();
-                mProgressDialog.setProgress(10);
-                mProgressDialog.setMax(100);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+    private void setProgressStyle(ProgressDialog dialog, int style) {
+        dialog.setProgressStyle(style);
+        dialog.show();
+        dialog.setProgress(10);
+        dialog.setMax(100);
     }
 
     private static class MockProgressDialog extends ProgressDialog {
@@ -380,5 +357,9 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
             super.onStop();
             mIsOnStopCalled = true;
         }
+    }
+
+    private ProgressDialog buildDialog() {
+        return new ProgressDialog(mContext);
     }
 }

@@ -21,6 +21,7 @@ import android.app.Instrumentation;
 import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 
 public class LocalActivityManagerTest extends InstrumentationTestCase implements CTSResult {
 
@@ -46,6 +47,7 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
         mInstrumentation.getTargetContext().startActivity(intent);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new LocalActivityManager(new Activity(), true);
         new LocalActivityManager(new Activity(), false);
