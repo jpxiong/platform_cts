@@ -19,11 +19,11 @@ package android.widget.cts;
 import com.android.cts.widget.R;
 import com.android.internal.util.XmlUtils;
 
-
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.os.Parcelable;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.util.Xml;
@@ -33,7 +33,16 @@ import android.widget.DatePicker;
 /**
  * Test {@link DatePicker}.
  */
-public class DatePickerTest extends AndroidTestCase {
+public class DatePickerTest extends InstrumentationTestCase {
+
+    private Context mContext;
+
+    @Override
+    public void setUp() {
+        mContext = getInstrumentation().getTargetContext();
+    }
+
+    @UiThreadTest
     public void testConstructor() {
         new DatePicker(mContext);
 
@@ -53,6 +62,7 @@ public class DatePickerTest extends AndroidTestCase {
         }
     }
 
+    @UiThreadTest
     public void testSetEnabled() {
         MockDatePicker datePicker = createDatePicker();
 
@@ -65,6 +75,7 @@ public class DatePickerTest extends AndroidTestCase {
         assertTrue(datePicker.isEnabled());
     }
 
+    @UiThreadTest
     public void testInit() {
         MockOnDateChangedListener onDateChangedListener = new MockOnDateChangedListener();
         DatePicker datePicker = createDatePicker();
@@ -78,6 +89,7 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(15, datePicker.getDayOfMonth());
     }
 
+    @UiThreadTest
     public void testAccessDate() {
         DatePicker datePicker = createDatePicker();
 
@@ -96,6 +108,7 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(19, datePicker.getDayOfMonth());
     }
 
+    @UiThreadTest
     public void testUpdateDate() {
         DatePicker datePicker = createDatePicker();
 
@@ -109,6 +122,7 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(19, datePicker.getDayOfMonth());
     }
 
+    @UiThreadTest
     public void testOnSaveInstanceState() {
         MockDatePicker datePicker = createDatePicker();
 

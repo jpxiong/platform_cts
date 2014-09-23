@@ -36,12 +36,14 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getContext();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new ZoomControls(mContext);
 
         new ZoomControls(mContext, null);
     }
 
+    @UiThreadTest
     public void testSetOnZoomInClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -59,6 +61,7 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         }
     }
 
+    @UiThreadTest
     public void testSetOnZoomOutClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -70,6 +73,7 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         zoomControls.setOnZoomOutClickListener(null);
     }
 
+    @UiThreadTest
     public void testSetZoomSpeed() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -82,6 +86,7 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         // onTouchEvent() is implementation details, do NOT test
     }
 
+    @UiThreadTest
     public void testShowAndHide() {
         final ZoomControls zoomControls = new ZoomControls(mContext);
         assertEquals(View.VISIBLE, zoomControls.getVisibility());
@@ -93,12 +98,14 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         assertEquals(View.VISIBLE, zoomControls.getVisibility());
     }
 
+    @UiThreadTest
     public void testSetIsZoomInEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
         zoomControls.setIsZoomInEnabled(false);
         zoomControls.setIsZoomInEnabled(true);
     }
 
+    @UiThreadTest
     public void testSetIsZoomOutEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
         zoomControls.setIsZoomOutEnabled(false);

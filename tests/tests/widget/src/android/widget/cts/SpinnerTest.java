@@ -44,6 +44,7 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         mTargetContext = getInstrumentation().getTargetContext();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new Spinner(mTargetContext);
 
@@ -69,6 +70,7 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         assertTrue(spinner.getBaseline() > 0);
     }
 
+    @UiThreadTest
     public void testSetOnItemClickListener() {
         Spinner spinner = new Spinner(mTargetContext);
 
@@ -89,6 +91,7 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         // Or do UI check?
     }
 
+    @UiThreadTest
     public void testOnClick() {
         Spinner spinner = new Spinner(mTargetContext);
         // normal value
@@ -129,7 +132,8 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         // TODO: find the dialog and get its title to assert whether setPrompt() takes effect?
     }
 
-    public void testsetPromptId() {
+    @UiThreadTest
+    public void testSetPromptId() {
         Spinner spinner = new Spinner(mTargetContext);
 
         spinner.setPromptId(R.string.hello_world);

@@ -73,6 +73,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         mGallery = (Gallery) mActivity.findViewById(R.id.gallery_test);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new Gallery(mContext);
 
@@ -154,6 +155,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertEquals(alpha, t.getAlpha(), DELTA);
     }
 
+    @UiThreadTest
     public void testGenerateLayoutParams() throws XmlPullParserException, IOException {
         final int width = 320;
         final int height = 240;
@@ -187,6 +189,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         // how to check whether the context menu is showing.
     }
 
+    @UiThreadTest
     public void testDispatchKeyEvent() {
         mGallery = new Gallery(mContext);
         final KeyEvent validKeyEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER);
@@ -222,6 +225,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         mInstrumentation.waitForIdleSync();
     }
 
+    @UiThreadTest
     public void testCheckLayoutParams() {
         MyGallery gallery = new MyGallery(mContext);
         ViewGroup.LayoutParams p1 = new ViewGroup.LayoutParams(320, 480);
@@ -231,6 +235,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertTrue(gallery.checkLayoutParams(p2));
     }
 
+    @UiThreadTest
     public void testComputeHorizontalScrollExtent() {
         MyGallery gallery = new MyGallery(mContext);
 
@@ -238,6 +243,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertEquals(1, gallery.computeHorizontalScrollExtent());
     }
 
+    @UiThreadTest
     public void testComputeHorizontalScrollOffset() {
         MyGallery gallery = new MyGallery(mContext);
         assertEquals(AdapterView.INVALID_POSITION, gallery.computeHorizontalScrollOffset());
@@ -247,6 +253,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertEquals(gallery.getSelectedItemPosition(), gallery.computeHorizontalScrollOffset());
     }
 
+    @UiThreadTest
     public void testComputeHorizontalScrollRange() {
         MyGallery gallery = new MyGallery(mContext);
         ImageAdapter adapter = new ImageAdapter(mActivity);
@@ -270,6 +277,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertFalse(gallery.getChildAt(1).isPressed());
     }
 
+    @UiThreadTest
     public void testGenerateDefaultLayoutParams() {
         MyGallery gallery = new MyGallery(mContext);
         ViewGroup.LayoutParams p = gallery.generateDefaultLayoutParams();
@@ -296,6 +304,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryCtsActi
         assertEquals(index + 1, gallery.getChildDrawingOrder(childCount, index));
     }
 
+    @UiThreadTest
     public void testGetContextMenuInfo() {
         MockOnCreateContextMenuListener listener = new MockOnCreateContextMenuListener();
         MyGallery gallery = new MyGallery(mContext);

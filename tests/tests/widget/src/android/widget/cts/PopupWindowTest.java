@@ -27,6 +27,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -366,6 +367,7 @@ public class PopupWindowTest extends
         assertTrue(maxAvailableHeight <= avaliable);
     }
 
+    @UiThreadTest
     public void testDismiss() {
         mPopupWindow = createPopupWindow(createPopupContent());
         assertFalse(mPopupWindow.isShowing());
@@ -447,7 +449,13 @@ public class PopupWindowTest extends
         int[] sndXY = new int[2];
         int[] viewInWindowXY = new int[2];
 
-        mPopupWindow = createPopupWindow(createPopupContent());
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow = createPopupWindow(createPopupContent());
+            }
+        });
+
+        mInstrumentation.waitForIdleSync();
         // Do not update if it is not shown
         assertFalse(mPopupWindow.isShowing());
         assertEquals(100, mPopupWindow.getWidth());
@@ -492,30 +500,54 @@ public class PopupWindowTest extends
     }
 
     public void testUpdateDimensionAndAlignAnchorView() {
-        mPopupWindow = createPopupWindow(createPopupContent());
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow = createPopupWindow(createPopupContent());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
 
-        View anchorView = mActivity.findViewById(R.id.anchor_upper);
+        final View anchorView = mActivity.findViewById(R.id.anchor_upper);
         mPopupWindow.update(anchorView, 50, 50);
         // Do not update if it is not shown
         assertFalse(mPopupWindow.isShowing());
         assertEquals(100, mPopupWindow.getWidth());
         assertEquals(100, mPopupWindow.getHeight());
 
-        mPopupWindow.showAsDropDown(anchorView);
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow.showAsDropDown(anchorView);
+            }
+        });
         mInstrumentation.waitForIdleSync();
         // update if it is shown
-        mPopupWindow.update(anchorView, 50, 50);
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow.update(anchorView, 50, 50);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         assertTrue(mPopupWindow.isShowing());
         assertEquals(50, mPopupWindow.getWidth());
         assertEquals(50, mPopupWindow.getHeight());
 
         // ignore if width or height is -1
-        mPopupWindow.update(anchorView, -1, -1);
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow.update(anchorView, -1, -1);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         assertTrue(mPopupWindow.isShowing());
         assertEquals(50, mPopupWindow.getWidth());
         assertEquals(50, mPopupWindow.getHeight());
 
-        mPopupWindow.dismiss();
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow.dismiss();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     public void testUpdateDimensionAndAlignAnchorViewWithOffsets() {
@@ -633,7 +665,12 @@ public class PopupWindowTest extends
     }
 
     public void testIsAboveAnchor() {
-        mPopupWindow = createPopupWindow(createPopupContent());
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mPopupWindow = createPopupWindow(createPopupContent());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         final View upperAnchor = mActivity.findViewById(R.id.anchor_upper);
 
         mInstrumentation.runOnMainSync(new Runnable() {

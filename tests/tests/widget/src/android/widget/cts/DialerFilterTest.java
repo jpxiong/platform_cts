@@ -64,6 +64,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         mDialerFilter = (DialerFilter) mActivity.findViewById(R.id.dialer_filter);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         final XmlPullParser parser = mActivity.getResources().getXml(R.layout.dialerfilter_layout);
         final AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -72,6 +73,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         new DialerFilter(mActivity, attrs);
     }
 
+    @UiThreadTest
     public void testIsQwertyKeyboard() {
         // Simply call the method. Return value may depend on the default keyboard.
         mDialerFilter.isQwertyKeyboard();
@@ -81,7 +83,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         // The exact behavior depends on the implementation of DialerKeyListener and
         // TextKeyListener, but even that may be changed. Simply assert basic scenarios.
 
-        mInstrumentation.runOnMainSync(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mDialerFilter.setMode(DialerFilter.DIGITS_ONLY);
                 mDialerFilter.requestFocus();
@@ -95,7 +97,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         assertEquals("", mDialerFilter.getLetters().toString());
         assertEquals("123", mDialerFilter.getDigits().toString());
 
-        mInstrumentation.runOnMainSync(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mDialerFilter.clearText();
                 mDialerFilter.setMode(DialerFilter.LETTERS_ONLY);
@@ -116,7 +118,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         assertEquals("", mDialerFilter.getDigits().toString());
 
-        mInstrumentation.runOnMainSync(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mDialerFilter.clearText();
                 mDialerFilter.setMode(DialerFilter.DIGITS_AND_LETTERS);
@@ -135,7 +137,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         // A, D, K may map to numbers on some keyboards. Don't test.
 
-        mInstrumentation.runOnMainSync(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mDialerFilter.clearText();
                 mDialerFilter.setMode(DialerFilter.DIGITS_AND_LETTERS);
