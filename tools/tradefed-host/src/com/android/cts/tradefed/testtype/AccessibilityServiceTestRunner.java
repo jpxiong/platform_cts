@@ -16,8 +16,8 @@
 
 package com.android.cts.tradefed.testtype;
 
-import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.tradefed.build.IBuildInfo;
+import com.android.cts.util.AbiUtils;
+import com.android.ddmlib.Log;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.util.FileUtil;
@@ -39,7 +39,10 @@ import java.io.File;
  * maintained so cts-tradefed can run against older CTS builds that still
  * require this class.
  */
-public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
+@Deprecated
+public class AccessibilityServiceTestRunner extends CtsInstrumentationApkTest {
+
+    private static final String LOG_TAG = AccessibilityServiceTestRunner.class.getSimpleName();
 
     private static final String DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME =
         "android.accessibilityservice.delegate";
@@ -49,14 +52,6 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
 
     private static final String DELEGATING_ACCESSIBLITY_SERVICE_APK =
         "CtsDelegatingAccessibilityService.apk";
-
-    private CtsBuildHelper mCtsBuild;
-
-    @Override
-    public void setBuild(IBuildInfo build) {
-        super.setBuild(build);
-        mCtsBuild  = CtsBuildHelper.createBuildHelper(build);
-    }
 
     @Override
     public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
@@ -77,7 +72,9 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
 
     private void installApkAndAssert(String apkName) throws DeviceNotAvailableException {
         File file = FileUtil.getFileForPath(mCtsBuild.getTestCasesDir(), apkName);
-        String errorMessage = getDevice().installPackage(file, true);
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+        Log.d(LOG_TAG, "installPackage options: " + options);
+        String errorMessage = getDevice().installPackage(file, true, options);
         TestCase.assertNull("Error installing: " + apkName, errorMessage);
     }
 

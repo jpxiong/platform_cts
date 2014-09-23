@@ -272,7 +272,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
         String perfResult = CtsReportUtil.getCtsResultFromMetrics(testMetrics);
         // host test should be checked in CtsHostStore.
         if (perfResult == null) {
-            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, test.toString());
+            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, "armeabi-v7a", test.toString());
         }
         if (perfResult != null) {
             // CTS result is passed in Summary++++Details format.

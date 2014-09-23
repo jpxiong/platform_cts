@@ -23,6 +23,7 @@ import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -47,6 +48,7 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
 
     private CtsBuildHelper mCtsBuild;
     private ITestDevice mDevice;
+    private IAbi mAbi;
 
     private final String mPackageName;
     private final String mExeName;
@@ -54,6 +56,13 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
     public GeeTest(String packageName, String exeName) {
         mPackageName = packageName;
         mExeName = exeName;
+    }
+
+    /**
+     * @param abi The ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
     }
 
     @Override

@@ -23,8 +23,9 @@ import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
-
 import com.android.tradefed.testtype.DeviceTestResult.RuntimeDeviceNotAvailableException;
+import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -59,8 +60,15 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
     private String mRunName;
     private CtsBuildHelper mCtsBuild = null;
     private IBuildInfo mBuildInfo = null;
-
+    private IAbi mAbi;
     private ClassLoader mClassLoader;
+
+    /**
+     * @param abi the ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
+    }
 
     /**
      * {@inheritDoc}
@@ -133,7 +141,7 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
      * Tests that take longer than this amount will be failed with a {@link TestTimeoutException}
      * as the cause.
      *
-     * @param testTimeout
+     * @param testTimeoutMs
      */
     void setTimeout(long testTimeoutMs) {
         mTimeoutMs = testTimeoutMs;
@@ -190,14 +198,6 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
     }
 
     /**
-     * setOptions sets options to the tests invoked from this test.
-     * It is used to passing options from JarHostTest to the tests started by JarHostTest.
-     * The default implementation does nothing.
-     */
-    protected void setOptions(Test junitTest) throws ConfigurationException {
-    }
-
-    /**
      * Run test with timeout support.
      */
     private void runTest(TestIdentifier testId, final Test junitTest, final TestResult junitResult) {
@@ -210,13 +210,11 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
             deviceTest.setDevice(getDevice().getIDevice());
             deviceTest.setTestAppPath(mCtsBuild.getTestCasesDir().getAbsolutePath());
         }
+        if (junitTest instanceof IAbiReceiver) {
+            ((IAbiReceiver)junitTest).setAbi(mAbi);
+        }
         if (junitTest instanceof IBuildReceiver) {
             ((IBuildReceiver)junitTest).setBuild(mBuildInfo);
-        }
-        try {
-            setOptions(junitTest);
-        } catch (ConfigurationException e) {
-            Log.e(LOG_TAG, e.toString());
         }
         TestRunnable testRunnable = new TestRunnable(junitTest, junitResult);
 

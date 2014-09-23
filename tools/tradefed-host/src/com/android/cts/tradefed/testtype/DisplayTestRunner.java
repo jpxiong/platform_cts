@@ -25,7 +25,7 @@ import com.android.tradefed.result.ITestInvocationListener;
  * Secure settings cannot be changed from device CTS tests since system signature permission is
  * required. Such settings can be modified by the shell user, so a host side test is used.
  */
-public class DisplayTestRunner extends InstrumentationApkTest {
+public class DisplayTestRunner extends CtsInstrumentationApkTest {
     private static final String OVERLAY_DISPLAY_DEVICES_SETTING_NAME = "overlay_display_devices";
 
     // Use a non-standard pattern, must match values in tests/tests/display/.../DisplayTest.java

@@ -14,7 +14,7 @@
 package com.android.cts.jank.ui;
 
 import com.android.cts.jank.CtsHostJankTest;
-
+import com.android.cts.util.AbiUtils;
 import java.io.File;
 
 public class CtsHostJankUi extends CtsHostJankTest {
@@ -36,7 +36,8 @@ public class CtsHostJankUi extends CtsHostJankTest {
         // Install the app.
         mDevice.uninstallPackage(APK_PACKAGE);
         File app = mBuild.getTestApp(APK);
-        mDevice.installPackage(app, false);
+        String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+        mDevice.installPackage(app, false, options);
     }
 
     @Override

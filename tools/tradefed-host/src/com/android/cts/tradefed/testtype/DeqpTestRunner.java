@@ -1,28 +1,18 @@
 package com.android.cts.tradefed.testtype;
 
-import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ByteArrayInputStreamSource;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.LogDataType;
-import com.android.tradefed.testtype.IBuildReceiver;
+import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +25,7 @@ import java.util.Map;
  *
  * Supports running drawElements Quality Program tests found under external/deqp.
  */
-public class DeqpTest implements IDeviceTest, IRemoteTest {
+public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
     final private int TESTCASE_BATCH_LIMIT = 1000;
 
     private boolean mLogData;
@@ -45,6 +35,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     private final String mUri;
     private final String mName;
     private Collection<TestIdentifier> mTests;
+    private IAbi mAbi;
 
     private TestIdentifier mCurrentTestId;
     private boolean mGotTestResult;
@@ -52,11 +43,18 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
 
     private ITestInvocationListener mListener;
 
-    public DeqpTest(String uri, String name, Collection<TestIdentifier> tests) {
+    public DeqpTestRunner(String uri, String name, Collection<TestIdentifier> tests) {
         mUri = uri;
         mName = name;
         mTests = tests;
         mLogData = false;
+    }
+
+    /**
+     * @param abi the ABI to run the test on
+     */
+    public void setAbi(IAbi abi) {
+        mAbi = abi;
     }
 
     /**
@@ -70,14 +68,14 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
      * dEQP instrumentation parser
      */
     class InstrumentationParser extends MultiLineReceiver {
-        private DeqpTest mDeqpTests;
+        private DeqpTestRunner mDeqpTests;
 
         private Map<String, String> mValues;
         private String mCurrentName;
         private String mCurrentValue;
 
 
-        public InstrumentationParser(DeqpTest tests) {
+        public InstrumentationParser(DeqpTestRunner tests) {
             mDeqpTests = tests;
         }
 
@@ -86,8 +84,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
          */
         @Override
         public void processNewLines(String[] lines) {
-            for (String line : lines)
-            {
+            for (String line : lines) {
                 if (mValues == null) mValues = new HashMap<String, String>();
 
                 if (line.startsWith("INSTRUMENTATION_STATUS_CODE: ")) {
@@ -151,8 +148,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     /**
      * Converts dEQP testcase path to TestIdentifier.
      */
-    private TestIdentifier pathToIdentifier(String testPath)
-    {
+    private TestIdentifier pathToIdentifier(String testPath) {
         String[] components = testPath.split("\\.");
         String name = components[components.length - 1];
         String className = null;
@@ -286,8 +282,9 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     public void handleStatus(Map<String, String> values) {
         String eventType = values.get("dEQP-EventType");
 
-        if (eventType == null)
+        if (eventType == null) {
             return;
+        }
 
         if (eventType.compareTo("BeginSession") == 0) {
             handleBeginSession(values);
@@ -330,7 +327,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
         }
 
         if (!tests.isEmpty()) {
-            HashMap<String, ArrayList<String> > testGroups = new HashMap();
+            HashMap<String, ArrayList<String> > testGroups = new HashMap<>();
 
             // Collect all sub testgroups
             for (String test : tests) {
@@ -338,7 +335,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
                 ArrayList<String> testGroup = testGroups.get(components[0]);
 
                 if (testGroup == null) {
-                    testGroup = new ArrayList();
+                    testGroup = new ArrayList<String>();
                     testGroups.put(components[0], testGroup);
                 }
 
@@ -360,10 +357,10 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
     }
 
     /**
-     * Generates testacase trie from TestIdentifiers.
+     * Generates testcase trie from TestIdentifiers.
      */
     private String generateTestCaseTrie(Collection<TestIdentifier> tests) {
-        ArrayList<String> testPaths = new ArrayList();
+        ArrayList<String> testPaths = new ArrayList<String>();
 
         for (TestIdentifier test : tests) {
             testPaths.add(test.getClassName() + "." + test.getTestName());
@@ -391,6 +388,7 @@ public class DeqpTest implements IDeviceTest, IRemoteTest {
 
         String instrumentationName =
                 "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
+        // TODO run the test with the given ABI
         String command = "am instrument -w -e deqpLogFileName \"" + logFileName
                 + "\" -e deqpCmdLine \"--deqp-caselist-file=" + caseListFileName + " "
                 + "--deqp-gl-config-name=rgba8888d24s8\" "

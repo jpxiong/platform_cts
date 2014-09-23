@@ -29,6 +29,7 @@ import com.android.ddmlib.IDevice;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.util.CommandResult;
 import com.android.tradefed.util.CommandStatus;
@@ -41,7 +42,7 @@ import java.lang.Exception;
 /**
  * Test to measure the transfer time of a file from the host to the device.
  */
-public class SampleHostResultTest extends DeviceTestCase implements IBuildReceiver {
+public class SampleHostResultTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
 
     private static final String TAG = SampleHostResultTest.class.getSimpleName();
 
@@ -66,6 +67,15 @@ public class SampleHostResultTest extends DeviceTestCase implements IBuildReceiv
      * A reference to the device under test.
      */
     private ITestDevice mDevice;
+
+    private String mAbiName;
+    private String mAbiBitness;
+
+    @Override
+    public void setAbi(String name, String bitness) {
+        mAbiName = name;
+        mAbiBitness = bitness;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -122,7 +132,7 @@ public class SampleHostResultTest extends DeviceTestCase implements IBuildReceiv
         // Compute the stats.
         Stat.StatResult stat = Stat.getStat(result);
         // Get the report for this test and add the results to record.
-        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(),
+        HostReportLog report = new HostReportLog(mDevice.getSerialNumber(), mAbiName,
                 ReportLog.getClassMethodNames());
         report.printArray("Times", result, ResultType.LOWER_BETTER, ResultUnit.MS);
         report.printValue("Min", stat.mMin, ResultType.LOWER_BETTER, ResultUnit.MS);
