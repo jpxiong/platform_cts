@@ -43,16 +43,16 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.DEVICE_POWER" />
-    <uses-permission android:name="android.app.cts.permission.TEST_GRANTED" />
+    <uses-permission android:name="android.os.cts.permission.TEST_GRANTED" />
 
     <application>
-        <activity android:name="android.app.os.LaunchpadActivity"
+        <activity android:name="android.os.cts.LaunchpadActivity"
                   android:configChanges="keyboardHidden|orientation|screenSize"
                   android:multiprocess="true">
         </activity>
 
-        <activity android:name="android.app.os.AliasActivityStub">
-            <meta-data android:name="android.app.alias"
+        <activity android:name="android.os.cts.AliasActivityStub">
+            <meta-data android:name="android.os.alias"
                 android:resource="@xml/alias" />
         </activity>
 
