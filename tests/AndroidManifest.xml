@@ -428,14 +428,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.view.animation.cts.AnimationTestStubActivity"
-            android:label="AnimationTestStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
         <activity android:name="android.view.animation.cts.GridLayoutAnimStubActivity"
             android:label="GridLayoutAnimStubActivity">
             <intent-filter>
