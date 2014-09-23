@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.widget.TabHost;
 
 public class TabActivityTest extends InstrumentationTestCase {
@@ -53,9 +54,13 @@ public class TabActivityTest extends InstrumentationTestCase {
     }
 
     public void testTabActivity() throws Throwable {
-        // Test constructor
-        new TabActivity();
-
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                // Test constructor
+                new TabActivity();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         final String packageName = "com.android.cts.stub";
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -77,6 +82,7 @@ public class TabActivityTest extends InstrumentationTestCase {
         assertNotNull(tabHost.getTabWidget());
     }
 
+    @UiThreadTest
     public void testChildTitleCallback() throws Exception {
         final Context context = mInstrumentation.getTargetContext();
         final Intent intent = new Intent(context, MockTabActivity.class);
