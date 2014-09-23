@@ -55,7 +55,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
     private int mScaledTouchSlop;
 
     public ScrollingMovementMethodTest() {
-        super("com.android.cts.stub", CtsActivity.class);
+        super("com.android.cts.text", CtsActivity.class);
     }
 
     @Override

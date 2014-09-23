@@ -20,9 +20,8 @@
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <application>
-        <uses-library android:name="android.test.runner"
-            android:maxRecents="1"/>
+    <application android:maxRecents="1">
+        <uses-library android:name="android.test.runner" />
 
         <activity android:name="android.text.cts.EmojiCtsActivity"
             android:label="AvailableIntentsActivity">

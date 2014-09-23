@@ -25,7 +25,7 @@ import android.widget.TextView;
 public class MyanmarTest extends ActivityInstrumentationTestCase2<Activity> {
 
     public MyanmarTest() {
-        super("com.android.cts.stub", Activity.class);
+        super("com.android.cts.text", Activity.class);
     }
 
     protected void setUp() throws Exception {

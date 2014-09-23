@@ -33,7 +33,7 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanCtsActi
     private Activity mActivity;
 
     public URLSpanTest() {
-        super("com.android.cts.stub", URLSpanCtsActivity.class);
+        super("com.android.cts.text", URLSpanCtsActivity.class);
     }
 
     @Override
