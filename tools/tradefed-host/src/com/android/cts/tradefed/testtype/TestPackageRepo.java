@@ -161,10 +161,10 @@ public class TestPackageRepo implements ITestPackageRepo {
     @Override
     public Set<String> findPackageIdsForTest(String testClassName) {
         Set<String> ids = new HashSet<String>();
-        for (Map<String, TestPackageDef> map : mTestMap.values()) {
-            for (Entry<String, TestPackageDef> entry : map.entrySet()) {
-                if (entry.getValue().isKnownTestClass(testClassName)) {
-                    ids.add(entry.getKey());
+        for (String abi : mTestMap.keySet()) {
+            for (String name : mTestMap.get(abi).keySet()) {
+                if (mTestMap.get(abi).get(name).isKnownTestClass(testClassName)) {
+                    ids.add(AbiUtils.createId(abi, name));
                 }
             }
         }
