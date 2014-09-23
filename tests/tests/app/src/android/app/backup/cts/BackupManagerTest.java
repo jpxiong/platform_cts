@@ -26,7 +26,7 @@ public class BackupManagerTest extends AndroidTestCase {
         // Check that these don't crash as if they were called in an app...
         BackupManager backupManager = new BackupManager(mContext);
         backupManager.dataChanged();
-        BackupManager.dataChanged("com.android.cts.stub");
+        BackupManager.dataChanged("com.android.cts.app");
 
         // Backup isn't expected to work in this test but check for obvious bugs...
         int result = backupManager.requestRestore(new RestoreObserver() {});
