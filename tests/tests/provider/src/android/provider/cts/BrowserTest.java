@@ -36,7 +36,7 @@ import java.util.List;
 
 public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubActivity> {
     public BrowserTest() {
-        super("com.android.cts.stub", BrowserStubActivity.class);
+        super("com.android.cts.provider", BrowserStubActivity.class);
     }
 
     private Context mContext;
