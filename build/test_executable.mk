@@ -41,5 +41,4 @@ $(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPE
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
 						-b $(CTS_UNSUPPORTED_ABIS) \
-						-a $(TARGET_ARCH) \
 						-o $@
