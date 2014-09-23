@@ -25,7 +25,7 @@
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.telecom"
                      android:label="CTS tests of android.telecom">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
