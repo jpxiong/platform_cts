@@ -23,9 +23,9 @@ import com.android.cts.util.ReportLog;
  * Note that setTestInfo should be set before throwing report
  */
 public class HostReportLog extends ReportLog {
-    private String mDeviceSerial;
-    private String mAbiName;
-    private String mClassMethodName;
+    private final String mDeviceSerial;
+    private final String mAbiName;
+    private final String mClassMethodName;
 
     /**
      * @param deviceSerial serial number of the device
