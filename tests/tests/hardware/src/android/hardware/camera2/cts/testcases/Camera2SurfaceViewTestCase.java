@@ -34,6 +34,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
@@ -679,8 +680,12 @@ public class Camera2SurfaceViewTestCase extends
             Long minDuration = mMinPreviewFrameDurationMap.get(size);
             if (minDuration == null ||
                     minDuration == 0) {
-                throw new IllegalArgumentException(
-                        "No min frame duration available for the selected format.");
+                if (mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    throw new IllegalArgumentException(
+                            "No min frame duration available for the size " + size);
+                }
+                continue;
             }
             if (minDuration <= frameDurationRange[0]) {
                 return size;
