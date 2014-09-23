@@ -239,7 +239,6 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.CONTROL_AE_LOCK);
                 requestKeys.add(CaptureRequest.CONTROL_AE_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
-                requestKeys.add(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER);
                 requestKeys.add(CaptureRequest.CONTROL_AF_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_AF_TRIGGER);
                 requestKeys.add(CaptureRequest.CONTROL_AWB_LOCK);
@@ -255,7 +254,6 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.JPEG_QUALITY);
                 requestKeys.add(CaptureRequest.JPEG_THUMBNAIL_QUALITY);
                 requestKeys.add(CaptureRequest.JPEG_THUMBNAIL_SIZE);
-                requestKeys.add(CaptureRequest.LENS_FOCUS_DISTANCE);
                 requestKeys.add(CaptureRequest.SCALER_CROP_REGION);
                 requestKeys.add(CaptureRequest.STATISTICS_FACE_DETECT_MODE);
                 if (mStaticInfo.getAeMaxRegionsChecked() > 0) {
