@@ -58,7 +58,7 @@ public class PasswordTransformationMethodTest extends
     private CharSequence mTransformedText;
 
     public PasswordTransformationMethodTest() {
-        super("com.android.cts.stub", CtsActivity.class);
+        super("com.android.cts.text", CtsActivity.class);
     }
 
     @Override
