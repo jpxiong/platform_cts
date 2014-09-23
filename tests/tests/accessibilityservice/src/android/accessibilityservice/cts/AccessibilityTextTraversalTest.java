@@ -4532,7 +4532,7 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.ACTION_PASTE));
 
         // Verify the content.
-        assertEquals(editText.getText().toString(), textContent + " " + textContent);
+        assertEquals(editText.getText().toString(), textContent + textContent);
 
         // Select all text.
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
