@@ -15,11 +15,14 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.UnitTests;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.testtype.IAbi;
 
 import junit.framework.TestCase;
 
@@ -28,14 +31,14 @@ import org.easymock.IAnswer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
- * Unit tests for {@link DeqpTest}.
+ * Unit tests for {@link DeqpTestRunner}.
  */
-public class DeqpTestTest extends TestCase {
-    private static final String URI = "dEQP-GLES3";
+public class DeqpTestRunnerTest extends TestCase {
+    private static final String NAME = "dEQP-GLES3";
+    private static final String ID = AbiUtils.createId(UnitTests.ABI.getName(), NAME);
     private static final String CASE_LIST_FILE_NAME = "/sdcard/dEQP-TestCaseList.txt";
     private static final String LOG_FILE_NAME = "/sdcard/TestLog.qpa";
     private static final String INSTRUMENTATION_NAME =
@@ -102,10 +105,11 @@ public class DeqpTestTest extends TestCase {
 
         tests.add(testId);
 
-        DeqpTest deqpTest = new DeqpTest(URI,
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME,
                 "dEQP-GLES" + Integer.toString(requiredMajorVersion)
                 + (requiredMinorVersion > 0 ? Integer.toString(requiredMinorVersion) : ""),
                 tests);
+        deqpTest.setAbi(UnitTests.ABI);
 
         int version = (majorVersion << 16) | minorVersion;
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
@@ -145,7 +149,7 @@ public class DeqpTestTest extends TestCase {
             });
         }
 
-        mockListener.testRunStarted(URI, 1);
+        mockListener.testRunStarted(ID, 1);
         EasyMock.expectLastCall().once();
 
         mockListener.testStarted(EasyMock.eq(testId));
@@ -210,11 +214,12 @@ public class DeqpTestTest extends TestCase {
 
         tests.add(testId);
 
-        DeqpTest deqpTest = new DeqpTest(URI, "dEQP-GLES3", tests);
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests);
+        deqpTest.setAbi(UnitTests.ABI);
 
         int version = 3 << 16;
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
-            .andReturn(Integer.toString(version)).atLeastOnce();
+                .andReturn(Integer.toString(version)).atLeastOnce();
 
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
@@ -246,7 +251,7 @@ public class DeqpTestTest extends TestCase {
             }
         });
 
-        mockListener.testRunStarted(URI, 1);
+        mockListener.testRunStarted(ID, 1);
         EasyMock.expectLastCall().once();
 
         mockListener.testStarted(EasyMock.eq(testId));
@@ -382,11 +387,12 @@ public class DeqpTestTest extends TestCase {
             tests.add(id);
         }
 
-        DeqpTest deqpTest = new DeqpTest(URI, "dEQP-GLES3", tests);
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests);
+        deqpTest.setAbi(UnitTests.ABI);
 
         int version = 3 << 16;
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
-            .andReturn(Integer.toString(version)).atLeastOnce();
+                .andReturn(Integer.toString(version)).atLeastOnce();
 
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
@@ -418,7 +424,7 @@ public class DeqpTestTest extends TestCase {
             }
         });
 
-        mockListener.testRunStarted(URI, testPaths.length);
+        mockListener.testRunStarted(ID, testPaths.length);
         EasyMock.expectLastCall().once();
 
         for (int i = 0; i < testPaths.length; i++) {

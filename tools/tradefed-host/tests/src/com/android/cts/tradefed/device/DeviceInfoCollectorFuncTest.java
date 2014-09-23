@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.device;
 
+import com.android.cts.tradefed.UnitTests;
 import com.android.tradefed.build.BuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.CollectingTestListener;
@@ -34,7 +35,7 @@ public class DeviceInfoCollectorFuncTest extends DeviceTestCase {
         CollectingTestListener testListener = new CollectingTestListener();
 
         testListener.invocationStarted(new BuildInfo());
-        DeviceInfoCollector.collectDeviceInfo(getDevice(), new File(
+        DeviceInfoCollector.collectDeviceInfo(getDevice(), UnitTests.ABI.getName(), new File(
                 System.getProperty("java.io.tmpdir")), testListener);
         assertNotNull(testListener.getCurrentRunResults());
         assertTrue(testListener.getCurrentRunResults().getRunMetrics().size() > 0);

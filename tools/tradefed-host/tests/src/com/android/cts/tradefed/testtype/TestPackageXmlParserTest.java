@@ -16,6 +16,8 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.command.CtsConsole;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
@@ -68,67 +70,76 @@ public class TestPackageXmlParserTest extends TestCase {
      * Test parsing test case xml containing an instrumentation test definition.
      */
     public void testParse_instrPackage() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser(true);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                true);
         parser.parse(getStringAsStream(INSTR_TEST_DATA));
-        TestPackageDef def = parser.getTestPackageDef();
-        assertEquals("com.example", def.getAppNameSpace());
-        assertEquals("android.example", def.getUri());
-        assertEquals("android.test.InstrumentationTestRunner", def.getRunner());
+        for (TestPackageDef def : parser.getTestPackageDefs()) {
+            assertEquals("com.example", def.getAppNameSpace());
+            assertEquals("android.example", def.getAppPackageName());
+            assertEquals("android.test.InstrumentationTestRunner", def.getRunner());
+            assertTrue(AbiUtils.isAbiSupportedByCts(def.getAbi().getName()));
+        }
     }
 
     /**
      * Test parsing test case xml containing an host test attribute and test data.
      */
     public void testParse_hostTest() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser(true);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                true);
         parser.parse(getStringAsStream(HOST_TEST_DATA));
-        TestPackageDef def = parser.getTestPackageDef();
-        assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
-        assertEquals(3, def.getTests().size());
-        Iterator<TestIdentifier> iterator = def.getTests().iterator();
+        for (TestPackageDef def : parser.getTestPackageDefs()) {
+            assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
+            assertEquals(3, def.getTests().size());
+            Iterator<TestIdentifier> iterator = def.getTests().iterator();
 
-        TestIdentifier firstTest = iterator.next();
-        assertEquals("com.example.ExampleTest", firstTest.getClassName());
-        assertEquals("testFoo", firstTest.getTestName());
+            TestIdentifier firstTest = iterator.next();
+            assertEquals("com.example.ExampleTest", firstTest.getClassName());
+            assertEquals("testFoo", firstTest.getTestName());
 
-        TestIdentifier secondTest = iterator.next();
-        assertEquals("com.example.ExampleTest", secondTest.getClassName());
-        assertEquals("testFoo2", secondTest.getTestName());
+            TestIdentifier secondTest = iterator.next();
+            assertEquals("com.example.ExampleTest", secondTest.getClassName());
+            assertEquals("testFoo2", secondTest.getTestName());
 
-        TestIdentifier thirdTest = iterator.next();
-        assertEquals("com.example2.Example2Test", thirdTest.getClassName());
-        assertEquals("testFoo", thirdTest.getTestName());
+            TestIdentifier thirdTest = iterator.next();
+            assertEquals("com.example2.Example2Test", thirdTest.getClassName());
+            assertEquals("testFoo", thirdTest.getTestName());
 
-        assertFalse(iterator.hasNext());
+            assertFalse(iterator.hasNext());
+        }
     }
 
     public void testParse_hostTest_noKnownFailures() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser(false);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                false);
         parser.parse(getStringAsStream(HOST_TEST_DATA));
-        TestPackageDef def = parser.getTestPackageDef();
-        assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
-        assertEquals(2, def.getTests().size());
-        Iterator<TestIdentifier> iterator = def.getTests().iterator();
+        for (TestPackageDef def : parser.getTestPackageDefs()) {
+            assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
+            assertEquals(2, def.getTests().size());
+            Iterator<TestIdentifier> iterator = def.getTests().iterator();
 
-        TestIdentifier firstTest = iterator.next();
-        assertEquals("com.example.ExampleTest", firstTest.getClassName());
-        assertEquals("testFoo", firstTest.getTestName());
+            TestIdentifier firstTest = iterator.next();
+            assertEquals("com.example.ExampleTest", firstTest.getClassName());
+            assertEquals("testFoo", firstTest.getTestName());
 
-        TestIdentifier thirdTest = iterator.next();
-        assertEquals("com.example2.Example2Test", thirdTest.getClassName());
-        assertEquals("testFoo", thirdTest.getTestName());
+            TestIdentifier thirdTest = iterator.next();
+            assertEquals("com.example2.Example2Test", thirdTest.getClassName());
+            assertEquals("testFoo", thirdTest.getTestName());
 
-        assertFalse(iterator.hasNext());
+            assertFalse(iterator.hasNext());
+        }
     }
 
     /**
      * Test parsing test case xml containing an invalid host test attribute.
      */
     public void testParse_badHostTest() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser(true);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                true);
         parser.parse(getStringAsStream(BAD_HOST_TEST_DATA));
-        TestPackageDef def = parser.getTestPackageDef();
-        assertFalse(TestPackageDef.HOST_SIDE_ONLY_TEST.equals(def.getTestType()));
+        for (TestPackageDef def : parser.getTestPackageDefs()) {
+            assertFalse(TestPackageDef.HOST_SIDE_ONLY_TEST.equals(def.getTestType()));
+        }
     }
 
     public void testParse_vmHostTest() throws ParseException  {
@@ -140,19 +151,22 @@ public class TestPackageXmlParserTest extends TestCase {
     }
 
     private void assertTestType(String expectedType, String xml) throws ParseException {
-        TestPackageXmlParser parser = new TestPackageXmlParser(true);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                true);
         parser.parse(getStringAsStream(xml));
-        TestPackageDef def = parser.getTestPackageDef();
-        assertEquals(expectedType, def.getTestType());
+        for (TestPackageDef def : parser.getTestPackageDefs()) {
+            assertEquals(expectedType, def.getTestType());
+        }
     }
 
     /**
      * Test parsing a test case xml with no test package data.
      */
     public void testParse_noData() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser(true);
+        TestPackageXmlParser parser = new TestPackageXmlParser(AbiUtils.getAbisSupportedByCts(),
+                true);
         parser.parse(getStringAsStream(NO_TEST_DATA));
-        assertNull(parser.getTestPackageDef());
+        assertTrue(parser.getTestPackageDefs().isEmpty());
     }
 
     private InputStream getStringAsStream(String input) {
