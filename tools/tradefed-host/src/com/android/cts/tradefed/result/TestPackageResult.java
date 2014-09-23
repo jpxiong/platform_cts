@@ -46,7 +46,6 @@ class TestPackageResult extends AbstractXmlPullParser {
     static final String TAG = "TestPackage";
 
     public static final String CTS_RESULT_KEY = "CTS_TEST_RESULT";
-    public static final String CTS_ABI_KEY = "CTS_TEST_ABI";
 
     private static final String DIGEST_ATTR = "digest";
     private static final String APP_PACKAGE_NAME_ATTR = "appPackageName";
@@ -250,11 +249,7 @@ class TestPackageResult extends AbstractXmlPullParser {
         // Collect performance results
         for (TestIdentifier test : mTestMetrics.keySet()) {
             // device test can have performance results in test metrics
-            String perfResult = null;
-            Map<String, String> map = mTestMetrics.get(test);
-            if(mAbi.equals(map.get(CTS_ABI_KEY))) {
-                perfResult = map.get(CTS_RESULT_KEY);
-            }
+            String perfResult = mTestMetrics.get(test).get(CTS_RESULT_KEY);
             // host test should be checked in CtsHostStore.
             if (perfResult == null) {
                 perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, mAbi, test.toString());
@@ -300,7 +295,11 @@ class TestPackageResult extends AbstractXmlPullParser {
             result.setResultStatus(CtsTestStatus.PASS);
         }
         result.updateEndTime();
+        if (mTestMetrics.containsKey(test)) {
+            CLog.e("Test metrics already contains key: " + test);
+        }
         mTestMetrics.put(test, testMetrics);
+        CLog.i("Test metrics:" + testMetrics);
     }
 
     /**

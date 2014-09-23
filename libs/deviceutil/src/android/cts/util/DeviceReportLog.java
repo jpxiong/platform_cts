@@ -24,12 +24,12 @@ import com.android.cts.util.ReportLog;
 
 public class DeviceReportLog extends ReportLog {
     private static final String TAG = "DeviceCtsReport";
-    private static final String CTS_RESULT = "CTS_TEST_RESULT";
+    private static final String CTS_RESULT_KEY = "CTS_TEST_RESULT";
     private static final int INST_STATUS_IN_PROGRESS = 2;
     private static final int BASE_DEPTH = 4;
 
     public DeviceReportLog() {
-        mDepth = BASE_DEPTH;
+        this(0);
     }
 
     public DeviceReportLog(int depth) {
@@ -46,7 +46,7 @@ public class DeviceReportLog extends ReportLog {
         String report = generateReport();
         if (!report.equals("")) {
             Bundle output = new Bundle();
-            output.putString(CTS_RESULT, report);
+            output.putString(CTS_RESULT_KEY, report);
             instrumentation.sendStatus(INST_STATUS_IN_PROGRESS, output);
         }
     }
