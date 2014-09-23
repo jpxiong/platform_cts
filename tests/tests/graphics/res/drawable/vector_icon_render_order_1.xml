@@ -21,65 +21,65 @@
 
     <group
         android:name="FirstLevelGroup"
-        android:alpha="0.9"
         android:translateX="100.0"
         android:translateY="0.0" >
         <path
             android:fillColor="#FFFF0000"
+            android:fillAlpha="0.9"
             android:pathData="@string/rectangle200" />
 
         <group
             android:name="SecondLevelGroup1"
-            android:alpha="0.9"
             android:translateX="-100.0"
             android:translateY="50.0" >
             <path
                 android:fillColor="#FF00FF00"
+                android:fillAlpha="0.81"
                 android:pathData="@string/rectangle200" />
 
             <group
                 android:name="ThridLevelGroup1"
-                android:alpha="0.9"
                 android:translateX="-100.0"
                 android:translateY="50.0" >
                 <path
                     android:fillColor="#FF0000FF"
+                    android:fillAlpha="0.729"
                     android:pathData="@string/rectangle200" />
             </group>
             <group
                 android:name="ThridLevelGroup2"
-                android:alpha="0.8"
                 android:translateX="100.0"
                 android:translateY="50.0" >
                 <path
+                    android:fillAlpha="0.72"
                     android:fillColor="#FF000000"
                     android:pathData="@string/rectangle200" />
             </group>
         </group>
         <group
             android:name="SecondLevelGroup2"
-            android:alpha="0.8"
             android:translateX="100.0"
             android:translateY="50.0" >
             <path
                 android:fillColor="#FF0000FF"
+                android:fillAlpha="0.72"
                 android:pathData="@string/rectangle200" />
 
             <group
                 android:name="ThridLevelGroup3"
-                android:alpha="0.9"
                 android:translateX="-100.0"
                 android:translateY="50.0" >
                 <path
+                    android:fillAlpha="0.648"
                     android:fillColor="#FFFF0000"
                     android:pathData="@string/rectangle200" />
             </group>
             <group
                 android:name="ThridLevelGroup4"
-                android:alpha="0.8"
                 android:translateX="100.0"
                 android:translateY="50.0" >
                 <path
+                    android:fillAlpha="0.576"
                     android:fillColor="#FF00FF00"
                     android:pathData="@string/rectangle200" />
             </group>
