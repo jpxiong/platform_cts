@@ -37,6 +37,7 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         mActivity = getActivity();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new Chronometer(mActivity);
 

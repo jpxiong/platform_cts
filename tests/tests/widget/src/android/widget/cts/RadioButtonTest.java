@@ -21,6 +21,7 @@ import com.android.cts.widget.R;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.widget.RadioButton;
 
@@ -66,6 +67,7 @@ public class RadioButtonTest extends InstrumentationTestCase {
         new RadioButton(mContext, attrs, Integer.MIN_VALUE);
     }
 
+    @UiThreadTest
     public void testToggle() {
         RadioButton button = new RadioButton(mContext);
         assertFalse(button.isChecked());

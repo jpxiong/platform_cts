@@ -48,6 +48,7 @@ public class ZoomButtonTest extends ActivityInstrumentationTestCase2<ZoomButtonC
         mActivity = getActivity();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new ZoomButton(mActivity);
 

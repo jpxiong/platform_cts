@@ -21,7 +21,8 @@ import org.xmlpull.v1.XmlPullParser;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.widget.ToggleButton;
@@ -32,7 +33,7 @@ import com.android.cts.widget.R;
 /**
  * Test {@link ToggleButton}.
  */
-public class ToggleButtonTest extends AndroidTestCase {
+public class ToggleButtonTest extends InstrumentationTestCase {
     private static final String TEXT_OFF = "text off";
     private static final String TEXT_ON = "text on";
     ToggleButton mToggleButton;
@@ -43,7 +44,7 @@ public class ToggleButtonTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        mContext = getContext();
+        mContext = getInstrumentation().getTargetContext();
         XmlPullParser parser = mContext.getResources().getXml(R.layout.togglebutton_layout);
         mAttrSet = Xml.asAttributeSet(parser);
         mToggleButton = new ToggleButton(mContext, mAttrSet);
@@ -88,6 +89,7 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertEquals("", mToggleButton.getTextOff());
     }
 
+    @UiThreadTest
     public void testDrawableStateChanged() {
         MockToggleButton toggleButton = new MockToggleButton(mContext);
 
@@ -111,6 +113,7 @@ public class ToggleButtonTest extends AndroidTestCase {
         toggleButton.onFinishInflate();
     }
 
+    @UiThreadTest
     public void testSetChecked() {
         assertFalse(mToggleButton.isChecked());
 
@@ -121,6 +124,7 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertFalse(mToggleButton.isChecked());
     }
 
+    @UiThreadTest
     public void testToggleText() {
         mToggleButton.setText("default text");
         mToggleButton.setTextOn(TEXT_ON);

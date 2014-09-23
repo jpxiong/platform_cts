@@ -104,6 +104,7 @@ public class AutoCompleteTextViewTest extends
         }
     }
 
+    @UiThreadTest
     public void testConstructor() {
         XmlPullParser parser;
 
@@ -159,6 +160,7 @@ public class AutoCompleteTextViewTest extends
         assertFalse(mAutoCompleteTextView.enoughToFilter());
     }
 
+    @UiThreadTest
     public void testAccessAdapter() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -222,6 +224,7 @@ public class AutoCompleteTextViewTest extends
         assertNull(mAutoCompleteTextView.getOnItemSelectedListener());
     }
 
+    @UiThreadTest
     public void testConvertSelectionToString() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -234,6 +237,7 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_TEST, autoCompleteTextView.convertSelectionToString(STRING_TEST));
     }
 
+    @UiThreadTest
     public void testOnTextChanged() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -287,6 +291,7 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_VALIDATED, mAutoCompleteTextView.getText().toString());
     }
 
+    @UiThreadTest
     public void testReplaceText() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -303,6 +308,7 @@ public class AutoCompleteTextViewTest extends
         assertTrue(autoCompleteTextView.isOnTextChanged());
     }
 
+    @UiThreadTest
     public void testSetFrame() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 

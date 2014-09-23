@@ -60,6 +60,7 @@ public class MediaControllerTest extends
         mInstrumentation = getInstrumentation();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new MediaController(mActivity, null);
 
@@ -109,7 +110,12 @@ public class MediaControllerTest extends
     }
 
     public void testShow() {
-        mMediaController = new MediaController(mActivity, true);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mMediaController = new MediaController(mActivity, true);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         assertFalse(mMediaController.isShowing());
 
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
@@ -185,7 +191,12 @@ public class MediaControllerTest extends
     }
 
     public void testOnTrackballEvent() {
-        mMediaController = new MediaController(mActivity);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mMediaController = new MediaController(mActivity);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
         mMediaController.setMediaPlayer(mediaPlayerControl);
 
@@ -238,6 +249,7 @@ public class MediaControllerTest extends
         assertFalse(mMediaController.isEnabled());
     }
 
+    @UiThreadTest
     public void testSetPrevNextListeners() {
         final View videoView = mActivity.findViewById(R.id.mediacontroller_videoview);
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
