@@ -18,7 +18,9 @@ package android.view.cts;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 
@@ -50,11 +52,13 @@ public class GestureDetectorTest extends
         mActivity.onSingleTapConfirmed = false;
     }
 
+    @UiThreadTest
     public void testConstructor() {
 
-        new GestureDetector(mContext, new SimpleOnGestureListener(), new Handler());
+        new GestureDetector(
+                mContext, new SimpleOnGestureListener(), new Handler(Looper.getMainLooper()));
         new GestureDetector(mContext, new SimpleOnGestureListener());
-        new GestureDetector(new SimpleOnGestureListener(), new Handler());
+        new GestureDetector(new SimpleOnGestureListener(), new Handler(Looper.getMainLooper()));
         new GestureDetector(new SimpleOnGestureListener());
 
         try {
