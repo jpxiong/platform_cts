@@ -55,6 +55,7 @@ public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceVie
         mMockSurfaceView = activity.getSurfaceView();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new SurfaceView(mContext);
         new SurfaceView(mContext, null);
