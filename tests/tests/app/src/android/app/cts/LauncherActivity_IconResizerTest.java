@@ -16,7 +16,7 @@
 
 package android.app.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 
 import android.app.LauncherActivity;
@@ -27,7 +27,7 @@ import android.test.ActivityInstrumentationTestCase2;
 public class LauncherActivity_IconResizerTest extends
         ActivityInstrumentationTestCase2<LauncherActivityStub> {
 
-    private static final String PACKAGE = "com.android.cts.stub";
+    private static final String PACKAGE = "com.android.cts.app";
     private LauncherActivityStub mActivity;
 
     public LauncherActivity_IconResizerTest() {

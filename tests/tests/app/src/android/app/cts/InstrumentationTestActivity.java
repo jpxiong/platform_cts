@@ -29,7 +29,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 public class InstrumentationTestActivity extends Activity {
 

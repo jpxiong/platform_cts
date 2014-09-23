@@ -69,5 +69,23 @@
     "android.hardware.camera2.cts.AllocationTest#testParamSensitivity"
   ],
   bug: 17530117
+},
+{
+  description: "these tests locks the screen with an emtpy password or swipe-to-unlock, blocking subsequent test to dismiss keyguard",
+  names: [
+    "android.admin.cts.DevicePolicyManagerTest#testPasswordQuality_something",
+    "android.admin.cts.DevicePolicyManagerTest#testPasswordQuality_numeric",
+    "android.admin.cts.DevicePolicyManagerTest#testPasswordQuality_alphabetic",
+    "android.admin.cts.DevicePolicyManagerTest#testPasswordQuality_alphanumeric",
+    "android.admin.cts.DevicePolicyManagerTest#testGetMaximumFailedPasswordsForWipe"
+  ],
+  bug: 17496766
+},
+{
+  description: "instrumentation target context and test context are the same after move test target inside the test itself",
+  names: [
+    "android.app.cts.InstrumentationTest#testContext"
+  ],
+  bug: 17614217
 }
 ]

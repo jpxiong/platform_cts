@@ -16,7 +16,7 @@
 
 package android.app.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 import android.app.Activity;
 import android.app.Application;
