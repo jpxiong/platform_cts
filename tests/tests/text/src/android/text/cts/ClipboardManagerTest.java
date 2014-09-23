@@ -18,36 +18,45 @@ package android.text.cts;
 
 
 import android.content.Context;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.text.ClipboardManager;
 
 /**
  * Test {@link ClipboardManager}.
  */
-public class ClipboardManagerTest extends AndroidTestCase {
-    private ClipboardManager mClipboardManager;
+public class ClipboardManagerTest extends InstrumentationTestCase {
+
+    private Context mContext;
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mClipboardManager = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+    public void setUp() {
+        mContext = getInstrumentation().getContext();
     }
 
+    @UiThreadTest
     public void testAccessText() {
+        ClipboardManager clipboardManager =
+                (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+
         // set the expected value
         CharSequence expected = "test";
-        mClipboardManager.setText(expected);
-        assertEquals(expected, mClipboardManager.getText());
+        clipboardManager.setText(expected);
+        assertEquals(expected, clipboardManager.getText());
     }
 
+    @UiThreadTest
     public void testHasText() {
-        mClipboardManager.setText("");
-        assertFalse(mClipboardManager.hasText());
+        ClipboardManager clipboardManager =
+                (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
 
-        mClipboardManager.setText("test");
-        assertTrue(mClipboardManager.hasText());
+        clipboardManager.setText("");
+        assertFalse(clipboardManager.hasText());
 
-        mClipboardManager.setText(null);
-        assertFalse(mClipboardManager.hasText());
+        clipboardManager.setText("test");
+        assertTrue(clipboardManager.hasText());
+
+        clipboardManager.setText(null);
+        assertFalse(clipboardManager.hasText());
     }
 }
