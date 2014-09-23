@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.method.CharacterPickerDialog;
@@ -43,6 +44,7 @@ public class CharacterPickerDialogTest extends
         mActivity = getActivity();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         final CharSequence str = "123456";
         final Editable content = Editable.Factory.getInstance().newEditable(str);
@@ -61,6 +63,7 @@ public class CharacterPickerDialogTest extends
         // Do not test. Implementation details.
     }
 
+    @UiThreadTest
     public void testOnItemClick() {
         final Gallery parent = new Gallery(mActivity);
         final CharSequence str = "123456";
@@ -102,6 +105,7 @@ public class CharacterPickerDialogTest extends
         assertFalse(insertPickerDialog.isShowing());
     }
 
+    @UiThreadTest
     public void testOnClick() {
         final CharSequence str = "123456";
         final Editable content = Editable.Factory.getInstance().newEditable(str);

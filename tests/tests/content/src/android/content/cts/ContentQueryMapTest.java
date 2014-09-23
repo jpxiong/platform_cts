@@ -20,11 +20,13 @@ package android.content.cts;
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 
 import java.util.Map;
 import java.util.Observable;
@@ -33,7 +35,7 @@ import java.util.Observer;
 /**
  * Test {@link ContentQueryMap}.
  */
-public class ContentQueryMapTest extends AndroidTestCase {
+public class ContentQueryMapTest extends InstrumentationTestCase {
     private static final int TEST_TIME_OUT = 5000;
 
     private static final String NAME0  = "name0";
@@ -52,10 +54,12 @@ public class ContentQueryMapTest extends AndroidTestCase {
     private ContentResolver mResolver;
     private Cursor mCursor;
     private ContentQueryMap mContentQueryMap;
+    private Context mContext;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mContext = getInstrumentation().getTargetContext();
         mResolver = mContext.getContentResolver();
 
         ContentValues values0 = new ContentValues();
@@ -88,6 +92,7 @@ public class ContentQueryMapTest extends AndroidTestCase {
         super.tearDown();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new ContentQueryMap(mCursor, DummyProvider.NAME, true, null);
 
@@ -106,6 +111,7 @@ public class ContentQueryMapTest extends AndroidTestCase {
         }
     }
 
+    @UiThreadTest
     public void testGetRows() {
         // handler can be null
         mContentQueryMap = new ContentQueryMap(mCursor, DummyProvider.NAME, true, null);

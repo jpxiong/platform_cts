@@ -28,28 +28,31 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.UiThreadTest;
 
 import java.util.List;
 
 /**
  * Verify the location access without specific permissions.
  */
-public class NoLocationPermissionTest extends AndroidTestCase {
+public class NoLocationPermissionTest extends InstrumentationTestCase {
     private static final String TEST_PROVIDER_NAME = "testProvider";
 
     private LocationManager mLocationManager;
     private List<String> mAllProviders;
     private boolean mHasTelephony;
+    private Context mContext;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mLocationManager = (LocationManager) getContext().getSystemService(
+        mContext = getInstrumentation().getTargetContext();
+        mLocationManager = (LocationManager) mContext.getSystemService(
                 Context.LOCATION_SERVICE);
         mAllProviders = mLocationManager.getAllProviders();
-        mHasTelephony = getContext().getPackageManager().hasSystemFeature(
+        mHasTelephony = mContext.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_TELEPHONY);
 
         assertNotNull(mLocationManager);
@@ -66,13 +69,13 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * Requires Permission: {@link
      * android.Manifest.permission#ACCESS_COARSE_LOCATION.}
      */
-    @SmallTest
+    @UiThreadTest
     public void testListenCellLocation() {
         if (!mHasTelephony) {
             return;
         }
 
-        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
+        TelephonyManager telephonyManager = (TelephonyManager) mContext.getSystemService(
                 Context.TELEPHONY_SERVICE);
         PhoneStateListener phoneStateListener = new PhoneStateListener();
         try {
@@ -97,13 +100,13 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * Requires Permission: {@link
      * android.Manifest.permission#ACCESS_COARSE_LOCATION.}
      */
-    @SmallTest
+    @UiThreadTest
     public void testListenCellLocation2() {
         if (!mHasTelephony) {
             return;
         }
 
-        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
+        TelephonyManager telephonyManager = (TelephonyManager) mContext.getSystemService(
                 Context.TELEPHONY_SERVICE);
         PhoneStateListener phoneStateListener = new PhoneStateListener();
 
@@ -159,7 +162,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * Requires Permission:
      * {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
-    @SmallTest
+    @UiThreadTest
     public void testRequestLocationUpdatesNetwork() {
         checkRequestLocationUpdates(LocationManager.NETWORK_PROVIDER);
     }
@@ -170,7 +173,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * Requires Permission:
      * {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
-    @SmallTest
+    @UiThreadTest
     public void testRequestLocationUpdatesGps() {
         checkRequestLocationUpdates(LocationManager.GPS_PROVIDER);
     }
@@ -183,7 +186,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testAddProximityAlert() {
-        PendingIntent mockPendingIntent = PendingIntent.getBroadcast(getContext(),
+        PendingIntent mockPendingIntent = PendingIntent.getBroadcast(mContext,
                 0, new Intent("mockIntent"), PendingIntent.FLAG_ONE_SHOT);
         try {
             mLocationManager.addProximityAlert(0, 0, 100, -1, mockPendingIntent);

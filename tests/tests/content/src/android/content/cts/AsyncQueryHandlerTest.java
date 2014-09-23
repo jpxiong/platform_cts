@@ -25,14 +25,15 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 
 /**
  * Test {@link AsyncQueryHandler} and {@link WorkerHandler}}.
  *
  * @see DummyProvider
  */
-public class AsyncQueryHandlerTest extends AndroidTestCase {
+public class AsyncQueryHandlerTest extends InstrumentationTestCase {
     private static final long TEST_TIME_OUT = DummyProvider.MOCK_OPERATION_SLEEP_TIME + 5000;
 
     private static final int INSERT_TOKEN_1    = 100;
@@ -74,7 +75,7 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        mResolver = mContext.getContentResolver();
+        mResolver = getInstrumentation().getTargetContext().getContentResolver();
 
         ContentValues values0 = new ContentValues();
         values0.put(DummyProvider.NAME, NAME0);
@@ -96,9 +97,9 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         super.tearDown();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new AsyncQueryHandler(mResolver) {};
-
         new AsyncQueryHandler(null) {};
     }
 
@@ -257,9 +258,10 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         }
     }
 
+    @UiThreadTest
     public void testCreateHandler() {
         MockAsyncQueryHandler wrapper = new MockAsyncQueryHandler(mResolver);
-        Handler result = wrapper.createHandler(Looper.myLooper());
+        Handler result = wrapper.createHandler(Looper.getMainLooper());
         assertNotNull(result);
         assertSame(Looper.myLooper(), result.getLooper());
 
