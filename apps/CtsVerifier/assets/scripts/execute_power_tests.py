@@ -30,10 +30,10 @@ import Queue
 signal_exit_q = Queue.Queue()
 signal_abort = Queue.Queue()
 
-# let this script know about the power monitor impementations
+# let this script know about the power monitor implementations
 sys.path = [os.path.basename(__file__)] + sys.path
-available_monitors = [name for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__),'power_monitors')])
-                      if not name.startswith('_')]
+available_monitors = [name for _, name, _ in pkgutil.iter_modules(
+    [os.path.join(os.path.dirname(__file__),'power_monitors')]) if not name.startswith('_')]
 
 APK = os.path.join( os.path.dirname(__file__), '..', "CtsVerifier.apk")
 
@@ -77,18 +77,28 @@ class PowerTest:
     SAMPLE_COUNT_NOMINAL = 1000
     RATE_NOMINAL = 100
 
-    QUERY_EXTERNAL_STORAGE = "EXTERNAL STORAGE?"
-    
+    REQUEST_EXTERNAL_STORAGE = "EXTERNAL STORAGE?"
+    REQUEST_EXIT = "EXIT"
+    REQUEST_RAISE = "RAISE %s %s"
+    REQUEST_USER_RESPONSE = "USER RESPONSE %s"
+    REQUEST_SET_TEST_RESULT = "SET TEST RESULT %s %s %s"
+    REQUEST_SENSOR_SWITCH = "SENSOR %s %s"
+    REQUEST_SENSOR_AVAILABILITY = "SENSOR? %s"
+    REQUEST_SCREEN_OFF = "SCREEN OFF"
+    REQUEST_SHOW_MESSAGE = "MESSAGE %s"
+
+
     def __init__(self):
         power_monitors = do_import("power_monitors.%s" % FLAGS.power_monitor)
         testid = time.strftime("%d_%m_%Y__%H__%M_%S")
         self._power_monitor = power_monitors.Power_Monitor(log_file_id = testid)
         print ("Establishing connection to device...")
-        self.setUSBEnabled(True)
+        self.setUsbEnabled(True)
         status = self._power_monitor.GetStatus()
         self._native_hz = status["sampleRate"] * 1000
         self._current_test = "None"
-        self._external_storage = self.executeOnDevice(PowerTest.QUERY_EXTERNAL_STORAGE, reportErrors=True )
+        self._external_storage = self.executeOnDevice(PowerTest.REQUEST_EXTERNAL_STORAGE,
+                                                      reportErrors=True)
 
     def __del__(self):
         self.finalize()
@@ -97,7 +107,7 @@ class PowerTest:
         """To be called upon termination of host connection to device"""
         if PowerTest.PORT > 0:
             # tell device side to exit connection loop, and remove the forwarding connection
-            self.executeOnDevice("EXIT", reportErrors=False)
+            self.executeOnDevice(PowerTest.REQUEST_EXIT, reportErrors=False)
             self.executeLocal("adb forward --remove tcp:%d" % PowerTest.PORT)
         PowerTest.PORT = 0
         if self._power_monitor:
@@ -105,18 +115,19 @@ class PowerTest:
             self._power_monitor = None
 
     def _send(self, msg, report_errors=True):
-        """Connect to the device, send the given commmand, and then disconnect"""
+        """Connect to the device, send the given command, and then disconnect"""
         if PowerTest.PORT == 0:
             # on first attempt to send a command, connect to device via any open port number,
             # forwarding that port to a local socket on the device via adb
             logging.debug("Seeking port for communication...")
-            # discover an open port        
+            # discover an open port
             dummysocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             dummysocket.bind(("localhost", 0))
             (_, PowerTest.PORT) = dummysocket.getsockname()
             dummysocket.close()
             assert(PowerTest.PORT > 0)
-            status = self.executeLocal("adb forward tcp:%d localabstract:%s" % (PowerTest.PORT, PowerTest.DOMAIN_NAME))
+            status = self.executeLocal("adb forward tcp:%d localabstract:%s" %
+                    (PowerTest.PORT, PowerTest.DOMAIN_NAME))
             if report_errors:
                 self.reportErrorIf(status != 0, msg="Unable to forward requests to client over adb")
             logging.info("Forwarding requests over local port %d" % PowerTest.PORT)
@@ -139,11 +150,11 @@ class PowerTest:
         return response
 
     def queryDevice(self, query):
-        """Post a yes/no query to the device, return True upon successful query,
-        False otherwise"""
+        """Post a yes/no query to the device, return True upon successful query, False otherwise"""
         logging.info("Querying device with '%s'" % query)
         return self._send(query) == "OK"
 
+    # TODO: abstract device communication (and string commands) into its own class
     def executeOnDevice(self, cmd , reportErrors=True):
         """Execute a (string) command on the remote device"""
         return self._send(cmd , reportErrors)
@@ -164,7 +175,7 @@ class PowerTest:
         if condition:
             try:
                 logging.error("Exiting on error: %s" % msg)
-                self.executeOnDevice("RAISE " + self._current_test + " " + msg , False)
+                self.executeOnDevice(PowerTest.REQUEST_RAISE % (self._current_test, msg), False)
             except:
 
                 logging.error("Unable to communicate with device to report error: %s" % msg)
@@ -172,7 +183,7 @@ class PowerTest:
                 sys.exit(msg)
             raise Exception(msg)
 
-    def setUSBEnabled(self, enabled, verbose=True):
+    def setUsbEnabled(self, enabled, verbose=True):
         if enabled:
             val = 1
         else:
@@ -180,7 +191,7 @@ class PowerTest:
         self._power_monitor.SetUsbPassthrough(val)
         tries = 0
 
-        # Sometimes command won't go through first time, paricularly if immediately after a data
+        # Sometimes command won't go through first time, particularly if immediately after a data
         # collection, so allow for retries
         status = self._power_monitor.GetStatus()
         while status is None and tries < 5:
@@ -199,7 +210,8 @@ class PowerTest:
             if verbose: logging.info("...USB disabled")
         # re-establish port forwarding
         if enabled and PowerTest.PORT > 0:
-            status = self.executeLocal("adb forward tcp:%d localabstract:%s" % (PowerTest.PORT, PowerTest.DOMAIN_NAME))
+            status = self.executeLocal("adb forward tcp:%d localabstract:%s" %
+                                       (PowerTest.PORT, PowerTest.DOMAIN_NAME))
             self.reportErrorIf(status != 0, msg="Unable to forward requests to client over adb")
 
     def waitForScreenOff(self):
@@ -211,13 +223,13 @@ class PowerTest:
 
         # need at least 100 sequential clean low-power measurements to know screen is off
         THRESHOLD_COUNT_LOW_POWER = 100
-        CURRENT_LOW_POWER_THRESHOLD = 0.060  # mAmps
-        TIMEOUT_SCREEN_OFF = 30 #this many tries at most
+        CURRENT_LOW_POWER_THRESHOLD = 0.060  # Amps
+        TIMEOUT_SCREEN_OFF = 30 # this many tries at most
         count_good = 0
         tries = 0
         print("Waiting for screen off and application processor in suspend mode...")
         while count_good < THRESHOLD_COUNT_LOW_POWER:
-            measurements = self.collectMeasurements( THRESHOLD_COUNT_LOW_POWER,
+            measurements = self.collectMeasurements(THRESHOLD_COUNT_LOW_POWER,
                                                       PowerTest.RATE_NOMINAL,
                                                       ensure_screen_off=False,
                                                       verbose=False)
@@ -225,20 +237,19 @@ class PowerTest:
                                if m < CURRENT_LOW_POWER_THRESHOLD])
             tries += 1
             if count_good < THRESHOLD_COUNT_LOW_POWER and measurements:
-                print("This current high: %.2f mAmps. Device is probably not in suspend mode.  Waiting..."%\
+                print("Current usage: %.2f mAmps. Device is probably not in suspend mode.   Waiting..." %
                       (1000.0*(sum(measurements)/len(measurements))))
             if tries >= TIMEOUT_SCREEN_OFF:
                 # TODO: dump the state of sensor service to identify if there are features using sensors
-                self.reportErrorIf(tries>=TIMEOUT_SCREEN_OFF, msg="Unable to determine application processor suspend mode status.")
+                self.reportErrorIf(tries>=TIMEOUT_SCREEN_OFF,
+                    msg="Unable to determine application processor suspend mode status.")
                 break
         if DELAY_SCREEN_OFF:
             # add additional delay time if necessary
             time.sleep(DELAY_SCREEN_OFF)
         print("...Screen off and device in suspend mode.")
- 
-    def collectMeasurements(self, measurementCount, rate ,
-                             ensure_screen_off=True,
-                             verbose=True,
+
+    def collectMeasurements(self, measurementCount, rate , ensure_screen_off=True, verbose=True,
                              plot_data = False):
         assert(measurementCount > 0)
         decimate_by = self._native_hz / rate  or 1
@@ -253,11 +264,10 @@ class PowerTest:
         try:
             while len(measurements) < measurementCount and tries < 5:
                 if tries:
-                    #logging.error("Failed attempt %d" % tries)
                     self._power_monitor.StopDataCollection()
                     self._power_monitor.StartDataCollection()
                     time.sleep(1.0)
-                tries += 1 
+                tries += 1
                 additional = self._power_monitor.CollectData()
                 if additional is not None:
                     tries = 0
@@ -278,7 +288,7 @@ class PowerTest:
 
     def request_user_acknowledgment(self, msg):
         """Post message to user on screen and wait for acknowledgment"""
-        response = self.executeOnDevice("REQUEST USER RESPONSE " + msg)
+        response = self.executeOnDevice(PowerTest.REQUEST_USER_RESPONSE % msg)
         self.reportErrorIf(response != "OK", "Unable to request user acknowledgment")
 
     def setTestResult (self, testname, condition, msg):
@@ -289,19 +299,21 @@ class PowerTest:
         else:
             val = condition
         print ("Test %s : %s" % (testname, val))
-        response = self.executeOnDevice("SET TEST RESULT %s %s %s" % (testname, val, msg))
+        response = self.executeOnDevice(PowerTest.REQUEST_SET_TEST_RESULT % (testname, val, msg))
         self.reportErrorIf(response != "OK", "Unable to send test status to Verifier")
 
     def setPowerOn(self, sensor, powered_on):
-        response = self.executeOnDevice("SENSOR %s %s" % ({True:"ON", False:"OFF"}[powered_on], sensor))
-        self.reportErrorIf(response == "ERR", "Unable to set sensor %s state"%sensor)
+        response = self.executeOnDevice(PowerTest.REQUEST_SENSOR_SWITCH %
+                                        ({True:"ON", False:"OFF"}[powered_on], sensor))
+        self.reportErrorIf(response == "ERR", "Unable to set sensor %s state" % sensor)
         logging.info("Set %s %s" % (sensor, {True:"ON", False:"OFF"}[powered_on]))
         return response
 
     def runPowerTest(self, sensor, max_power_allowed, user_request = None):
         if not signal_abort.empty():
             sys.exit( signal_abort.get() )
-        self._current_test = "%s_Power_Test_While_%s" % (sensor, {True:"Under_Motion", False:"Still"}[user_request is not None])
+        self._current_test = "%s_Power_Test_While_%s" % (sensor,
+                                    {True:"Under_Motion", False:"Still"}[user_request is not None])
         try:
             print ("\n\n---------------------------------")
             if user_request is not None:
@@ -309,9 +321,10 @@ class PowerTest:
             else:
                 print ("Running power test on %s while device is still." % sensor)
             print ("---------------------------------")
-            response = self.executeOnDevice("SENSOR? %s"%sensor)
+            response = self.executeOnDevice(PowerTest.REQUEST_SENSOR_AVAILABILITY % sensor)
             if response == "UNAVAILABLE":
-                self.setTestResult(self._current_test, condition="SKIPPED", msg="Sensor %s not available on this platform"%sensor)
+                self.setTestResult(self._current_test, condition="SKIPPED",
+                    msg="Sensor %s not available on this platform"%sensor)
             self.setPowerOn("ALL", False)
             if response == "UNAVAILABLE":
                 self.setTestResult(self._current_test, condition="SKIPPED",
@@ -321,8 +334,8 @@ class PowerTest:
             self.reportErrorIf(response != "OK", "Unable to set all sensor off")
             if not signal_abort.empty():
                 sys.exit( signal_abort.get() )
-            self.executeOnDevice("MESSAGE: \nPlease turn screen off or wait for screen to turn off. Do not interact with the device until screen is turned on again.") 
-            self.setUSBEnabled(False)
+            self.executeOnDevice(PowerTest.REQUEST_SCREEN_OFF)
+            self.setUsbEnabled(False)
             print("Collecting background measurements...")
             measurements = self.collectMeasurements( PowerTest.SAMPLE_COUNT_NOMINAL,
                                                      PowerTest.RATE_NOMINAL,
@@ -334,17 +347,16 @@ class PowerTest:
                         f.write( "%.4f\n"%m)
             self.reportErrorIf(not measurements, "No background measurements could be taken")
             backgnd = sum(measurements) / len(measurements)
-            self.setUSBEnabled( True )
-            self.setPowerOn( sensor, True )
+            self.setUsbEnabled(True)
+            self.setPowerOn(sensor, True)
             if user_request is not None:
                 print("===========================================\n" +
                       "==> Please follow the instructions presented on the device\n" +
                       "==========================================="
                      )
                 self.request_user_acknowledgment(user_request)
-            else:
-                self.executeOnDevice("MESSAGE: Turn screen off or wait for screen to turn off and do not interact with the device until screen is turned on again.") 
-            self.setUSBEnabled(False)
+            self.executeOnDevice(PowerTest.REQUEST_SCREEN_OFF)
+            self.setUsbEnabled(False)
             self.reportErrorIf(response != "OK", "Unable to set sensor %s ON" % sensor)
             print ("Collecting sensor %s measurements" % sensor)
             measurements = self.collectMeasurements(PowerTest.SAMPLE_COUNT_NOMINAL,
@@ -355,11 +367,13 @@ class PowerTest:
                    {True:"Under_Motion", False:"Still"}[user_request is not None] ),'w') as f:
                     for m in measurements:
                         f.write( "%.4f\n"%m)
-                    self.setUSBEnabled(True, verbose = False)
+                    self.setUsbEnabled(True, verbose = False)
                     print("Saving raw data files to device...")
-                    self.executeLocal("adb shell mkdir -p %s/ctsVerifierData/sensor_power_test_data"%self._external_storage, False)
-                    self.executeLocal("adb push %s %s/ctsVerifierData/sensor_power_test_data/."%(f.name, self._external_storage))
-                    self.setUSBEnabled(False, verbose = False)
+                    self.executeLocal("adb shell mkdir -p %s/ctsVerifierData/sensor_power_test_data"
+                                      % self._external_storage, False)
+                    self.executeLocal("adb push %s %s/ctsVerifierData/sensor_power_test_data/." %
+                                      (f.name, self._external_storage))
+                    self.setUsbEnabled(False, verbose = False)
             self.reportErrorIf(not measurements, "No measurements could be taken for %s" % sensor)
             avg = sum(measurements) / len(measurements)
             squared = [(m-avg)*(m-avg) for m in measurements]
@@ -367,7 +381,7 @@ class PowerTest:
             import math
             stddev = math.sqrt(sum(squared)/len(squared))
             current_diff = avg - backgnd
-            self.setUSBEnabled(True)
+            self.setUsbEnabled(True)
             max_power = max(measurements) - avg
             if current_diff <= max_power_allowed:
                 # TODO: fail the test of background > current
@@ -383,27 +397,24 @@ class PowerTest:
         except:
             import traceback
             traceback.print_exc()
-            self.setTestResult(self._current_test, condition="FAIL", msg="Exception occurred during run of test.")
+            self.setTestResult(self._current_test, condition="FAIL",
+                               msg="Exception occurred during run of test.")
 
 
     @staticmethod
     def run_tests():
         testrunner = None
         try:
-            GENERIC_MOTION_REQUEST = "\n===> Please press Next and when the screen is off, keep the device under motion with only tiny, slow movements" + \
-                 " until the screen turns on again.\n" + \
-                 "Please refrain from interacting with the screen or pressing any side buttons " + \
-                 "while measurements are taken."
-            USER_STEPS_REQUEST = "\n===> Please press Next and when the screen is off, then move the device to simulate step motion" + \
-                 " until the screen turns on again.\n" + \
-                 "Please refrain from interacting with the screen or pressing any side buttons " + \
-                 "while measurements are taken."
+            GENERIC_MOTION_REQUEST = "\n===> Please press Next and when the screen is off, keep " + \
+                "the device under motion with only tiny, slow movements until the screen turns " + \
+                "on again.\nPlease refrain from interacting with the screen or pressing any side " + \
+                "buttons while measurements are taken."
+            USER_STEPS_REQUEST = "\n===> Please press Next and when the screen is off, then move " + \
+                "the device to simulate step motion until the screen turns on again.\nPlease " + \
+                "refrain from interacting with the screen or pressing any side buttons while " + \
+                "measurements are taken."
             testrunner = PowerTest()
-            testrunner.reportErrorIf(not testrunner.queryDevice("AIRPLANE MODE ON?"),
-                                      "Airplane mode not off as expected")
-            #testrunner.reportErrorIf(int(testrunner.executeOnDevice("SCREEN OFF TIMEOUT?")) > 15000,
-            #                          "Screen sleep time not set to 15 seconds")
-            testrunner.executeOnDevice("MESSAGE: Connected.  Running tests...")
+            testrunner.executeOnDevice(PowerTest.REQUEST_SHOW_MESSAGE % "Connected.  Running tests...")
             testrunner.runPowerTest("SIGNIFICANT_MOTION", PowerTest.MAX_SIGMO_POWER, user_request = GENERIC_MOTION_REQUEST)
             testrunner.runPowerTest("STEP_DETECTOR", PowerTest.MAX_STEP_DETECTOR_POWER, user_request = USER_STEPS_REQUEST)
             testrunner.runPowerTest("STEP_COUNTER", PowerTest.MAX_STEP_COUNTER_POWER, user_request = USER_STEPS_REQUEST)
@@ -426,9 +437,10 @@ class PowerTest:
                 try:
                     testrunner.finalize()
                 except socket.error:
-                    sys.exit("============================\nUnable to connect to device under test. Make sure the device is connected via the usb passthrough,"+\
-                             " the CtsVerifier app is running the SensorPowerTest on the device, and USB passthrough is enabled."
-                             "\n===========================")
+                    sys.exit("============================\nUnable to connect to device under " + \
+                             "test. Make sure the device is connected via the usb pass-through, " + \
+                             "the CtsVerifier app is running the SensorPowerTest on the device, " + \
+                             "and USB pass-through is enabled.\n===========================")
 
 
 def main(argv):
@@ -455,9 +467,8 @@ def main(argv):
         sys.exit("Aborting.")
 
   if not FLAGS.power_monitor:
-      sys.exit("You must specify a '--power_monitor' option to specify which power monitor type you are using.\n"+
-               "One of:\n  " +
-               "\n  ".join(available_monitors))
+      sys.exit("You must specify a '--power_monitor' option to specify which power monitor type " + \
+               "you are using.\nOne of:\n  \n  ".join(available_monitors))
   power_monitors = do_import('power_monitors.%s' % FLAGS.power_monitor)
   try:
       mon = power_monitors.Power_Monitor(device=FLAGS.device)
@@ -489,7 +500,7 @@ def main(argv):
       mon.SetUsbPassthrough(2)
     else:
       mon.Close()
-      sys.exit('bad passthrough flag: %s' % FLAGS.usbpassthrough)
+      sys.exit('bad pass-through flag: %s' % FLAGS.usbpassthrough)
 
   if FLAGS.samples:
     # Make sure state is normal
