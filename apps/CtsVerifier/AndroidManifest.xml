@@ -47,7 +47,6 @@
     <uses-feature android:name="android.hardware.usb.accessory" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-feature android:name="android.software.connectionservice" android:required="false" />
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -1148,67 +1147,6 @@
         <service android:name=".projection.ProjectionService"
                  android:label="@string/projection_service_name"
                  android:process=":projectionservice" />
-
-        <activity android:name=".telecom.TelecomTestActivity"
-                  android:label="@string/telecom_test_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
-            <meta-data android:name="test_required_features" android:value="android.software.connectionservice"/>
-        </activity>
-
-        <activity android:name=".telecom.CancelCallTestActivity"
-                  android:label="@string/telecom_cancel_call_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecom.TelecomTestActivity" />
-        </activity>
-
-        <service android:name=".telecom.CancelCallTestActivity$ConnectionService"
-                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.telecom.ConnectionService" />
-            </intent-filter>
-        </service>
-
-        <activity android:name=".telecom.FailedCallTestActivity"
-                  android:label="@string/telecom_failed_call_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecom.TelecomTestActivity" />
-        </activity>
-
-        <service android:name=".telecom.FailedCallTestActivity$ConnectionService"
-                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.telecom.ConnectionService" />
-            </intent-filter>
-        </service>
-
-        <activity android:name=".telecom.BasicCallTestActivity"
-                  android:label="@string/telecom_basic_call_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/test_category_telecom" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.telecom.TelecomTestActivity" />
-        </activity>
-
-        <service android:name=".telecom.BasicCallTestActivity$ConnectionService"
-                 android:permission="android.permission.BIND_CONNECTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.telecom.ConnectionService" />
-            </intent-filter>
-        </service>
 
    </application>
 
