@@ -38,6 +38,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -86,7 +87,8 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
     }
 
-    public void testConstructor(){
+    @UiThreadTest
+    public void testConstructor() {
         new Dialog(mContext);
         Dialog d = new Dialog(mContext, 0);
         // According to javadoc of constructors, it will set theme to system default theme,
@@ -151,7 +153,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         assertTrue(d.isOnStopCalled);
     }
 
-    public void testAccessOwnerActivity() {
+    public void testAccessOwnerActivity() throws Throwable {
         startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         Dialog d = mActivity.getDialog();
         assertNotNull(d);
@@ -166,8 +168,13 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
             // expected
         }
 
-        d = new Dialog(mContext);
-        assertNull(d.getOwnerActivity());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                Dialog dialog = new Dialog(mContext);
+                assertNull(dialog.getOwnerActivity());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     public void testShow() throws Throwable {
