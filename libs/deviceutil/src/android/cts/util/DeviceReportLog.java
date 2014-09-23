@@ -24,7 +24,7 @@ import com.android.cts.util.ReportLog;
 
 public class DeviceReportLog extends ReportLog {
     private static final String TAG = "DeviceCtsReport";
-    private static final String CTS_RESULT = "CTS_RESULT";
+    private static final String CTS_RESULT = "CTS_TEST_RESULT";
     private static final int INST_STATUS_IN_PROGRESS = 2;
     private static final int BASE_DEPTH = 4;
 
