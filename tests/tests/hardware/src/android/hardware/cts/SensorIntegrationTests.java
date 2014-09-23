@@ -23,6 +23,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
@@ -87,7 +88,7 @@ public class SensorIntegrationTests extends SensorTestCase {
     public void testSensorsWithSeveralClients() throws Throwable {
         final int ITERATIONS = 50;
         final int MAX_REPORTING_LATENCY_IN_SECONDS = 5;
-        final Context context = this.getContext();
+        final Context context = getContext();
 
         int sensorTypes[] = {
                 Sensor.TYPE_ACCELEROMETER,
@@ -96,21 +97,25 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         ParallelSensorOperation operation = new ParallelSensorOperation();
         for(int sensorType : sensorTypes) {
-            TestSensorOperation continuousOperation = new TestSensorOperation(
+            TestSensorEnvironment environment = new TestSensorEnvironment(
                     context,
                     sensorType,
-                    SensorManager.SENSOR_DELAY_FASTEST,
-                    0 /* reportLatencyInUs */,
-                    100 /* event count */);
+                    shouldEmulateSensorUnderLoad(),
+                    SensorManager.SENSOR_DELAY_FASTEST);
+            TestSensorOperation continuousOperation =
+                    new TestSensorOperation(environment, 100 /* eventCount */);
             continuousOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(continuousOperation, ITERATIONS));
 
-            TestSensorOperation batchingOperation = new TestSensorOperation(
+            Sensor sensor = TestSensorEnvironment.getSensor(context, sensorType);
+            TestSensorEnvironment batchingEnvironment = new TestSensorEnvironment(
                     context,
                     sensorType,
-                    SensorCtsHelper.getSensor(getContext(), sensorType).getMinDelay(),
-                    SensorCtsHelper.getSecondsAsMicroSeconds(MAX_REPORTING_LATENCY_IN_SECONDS),
-                    100);
+                    shouldEmulateSensorUnderLoad(),
+                    sensor.getMinDelay(),
+                    SensorCtsHelper.getSecondsAsMicroSeconds(MAX_REPORTING_LATENCY_IN_SECONDS));
+            TestSensorOperation batchingOperation =
+                    new TestSensorOperation(batchingEnvironment, 100 /* eventCount */);
             batchingOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
@@ -150,16 +155,19 @@ public class SensorIntegrationTests extends SensorTestCase {
                 Sensor.TYPE_MAGNETIC_FIELD,
                 Sensor.TYPE_GYROSCOPE };
 
+        Context context = getContext();
         for(int sensorType : sensorTypes) {
             for(int instance = 0; instance < INSTANCES_TO_USE; ++instance) {
                 SequentialSensorOperation sequentialOperation = new SequentialSensorOperation();
                 for(int iteration = 0; iteration < ITERATIONS_TO_EXECUTE; ++iteration) {
-                    TestSensorOperation sensorOperation = new TestSensorOperation(
-                            this.getContext(),
+                    TestSensorEnvironment environment = new TestSensorEnvironment(
+                            context,
                             sensorType,
-                            this.generateSamplingRateInUs(sensorType),
-                            this.generateReportLatencyInUs(),
-                            100);
+                            shouldEmulateSensorUnderLoad(),
+                            generateSamplingRateInUs(sensorType),
+                            generateReportLatencyInUs());
+                    TestSensorOperation sensorOperation =
+                            new TestSensorOperation(environment, 100 /* eventCount */);
                     sensorOperation.addVerification(new EventOrderingVerification());
                     sequentialOperation.add(sensorOperation);
                 }
@@ -216,22 +224,24 @@ public class SensorIntegrationTests extends SensorTestCase {
      * of several clients can lead to the failing state.
      */
     public void testSensorStoppingInteraction() throws Throwable {
-        Context context = this.getContext();
+        Context context = getContext();
 
-        TestSensorOperation tester = new TestSensorOperation(
+        TestSensorEnvironment testerEnvironment = new TestSensorEnvironment(
                 context,
                 mSensorTypeTester,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
+                shouldEmulateSensorUnderLoad(),
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorOperation tester =
+                new TestSensorOperation(testerEnvironment, 100 /* event count */);
         tester.addVerification(new EventOrderingVerification());
 
-        VerifiableSensorOperation testee = new TestSensorOperation(
+        TestSensorEnvironment testeeEnvironment = new TestSensorEnvironment(
                 context,
                 mSensorTypeTestee,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
+                shouldEmulateSensorUnderLoad(),
+                SensorManager.SENSOR_DELAY_FASTEST);
+        VerifiableSensorOperation testee =
+                new TestSensorOperation(testeeEnvironment, 100 /* event count */);
         testee.addVerification(new EventOrderingVerification());
 
         ParallelSensorOperation operation = new ParallelSensorOperation();
@@ -256,8 +266,8 @@ public class SensorIntegrationTests extends SensorTestCase {
                 rate = SensorManager.SENSOR_DELAY_FASTEST;
                 break;
             default:
-                int maxSamplingRate = SensorCtsHelper.getSensor(getContext(), sensorType)
-                        .getMinDelay();
+                Sensor sensor = TestSensorEnvironment.getSensor(getContext(), sensorType);
+                int maxSamplingRate = sensor.getMinDelay();
                 rate = maxSamplingRate * mGenerator.nextInt(10);
         }
         return rate;

@@ -18,11 +18,10 @@ package android.hardware.cts.helpers.sensoroperations;
 
 import junit.framework.Assert;
 
-import android.content.Context;
-import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
 import android.hardware.cts.helpers.ValidatingSensorEventListener;
@@ -48,10 +47,7 @@ import java.util.HashSet;
  */
 public abstract class VerifiableSensorOperation extends AbstractSensorOperation {
     protected final TestSensorManager mSensorManager;
-    protected final Context mContext;
-    protected final int mSensorType;
-    protected final int mRateUs;
-    protected final int mMaxBatchReportLatencyUs;
+    protected final TestSensorEnvironment mEnvironment;
 
     private final Collection<ISensorVerification> mVerifications =
             new HashSet<ISensorVerification>();
@@ -61,22 +57,11 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
     /**
      * Create a {@link TestSensorOperation}.
      *
-     * @param context the {@link Context}.
-     * @param sensorType the sensor type
-     * @param rateUs the rate that
-     * @param maxBatchReportLatencyUs the max batch report latency
+     * @param environment the test environment
      */
-    public VerifiableSensorOperation(
-            Context context,
-            int sensorType,
-            int rateUs,
-            int maxBatchReportLatencyUs) {
-        mContext = context;
-        mSensorType = sensorType;
-        mRateUs = rateUs;
-        mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
-        mSensorManager = new TestSensorManager(mContext, mSensorType, mRateUs,
-                mMaxBatchReportLatencyUs);
+    public VerifiableSensorOperation(TestSensorEnvironment environment) {
+        mEnvironment = environment;
+        mSensorManager = new TestSensorManager(mEnvironment);
     }
 
     /**
@@ -90,15 +75,14 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
      * Set all of the default test expectations.
      */
     public void addDefaultVerifications() {
-        Sensor sensor = mSensorManager.getSensor();
-        addVerification(EventGapVerification.getDefault(sensor, mRateUs));
-        addVerification(EventOrderingVerification.getDefault(sensor));
-        addVerification(FrequencyVerification.getDefault(sensor, mRateUs));
-        addVerification(JitterVerification.getDefault(sensor, mRateUs));
-        addVerification(MagnitudeVerification.getDefault(sensor));
-        addVerification(MeanVerification.getDefault(sensor));
+        addVerification(EventGapVerification.getDefault(mEnvironment));
+        addVerification(EventOrderingVerification.getDefault(mEnvironment));
+        addVerification(FrequencyVerification.getDefault(mEnvironment));
+        addVerification(JitterVerification.getDefault(mEnvironment));
+        addVerification(MagnitudeVerification.getDefault(mEnvironment));
+        addVerification(MeanVerification.getDefault(mEnvironment));
         // Skip SigNumVerification since it has no default
-        addVerification(StandardDeviationVerification.getDefault(sensor));
+        addVerification(StandardDeviationVerification.getDefault(mEnvironment));
     }
 
     public void addVerification(ISensorVerification verification) {
@@ -112,7 +96,9 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
      */
     @Override
     public void execute() {
-        getStats().addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
+        getStats().addValue(
+                "sensor_name",
+                SensorTestInformation.getSensorName(mEnvironment.getSensor()));
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
         listener.setLogEvents(mLogEvents);
@@ -126,8 +112,8 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
         }
 
         if (failed) {
-            String msg = SensorCtsHelper.formatAssertionMessage(mSensorManager.getSensor(),
-                    "VerifySensorOperation", mRateUs, mMaxBatchReportLatencyUs, sb.toString());
+            String msg = SensorCtsHelper
+                    .formatAssertionMessage("VerifySensorOperation", mEnvironment, sb.toString());
             getStats().addValue(SensorStats.ERROR, msg);
             Assert.fail(msg);
         }
@@ -160,7 +146,7 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
      */
     private boolean evaluateResults(ISensorVerification verification, StringBuilder sb) {
         try {
-            verification.verify(getStats());
+            verification.verify(mEnvironment, getStats());
         } catch (AssertionError e) {
             if (sb.length() > 0) {
                 sb.append(", ");

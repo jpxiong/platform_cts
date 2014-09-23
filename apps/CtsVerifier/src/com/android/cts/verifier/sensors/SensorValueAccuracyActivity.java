@@ -27,6 +27,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensorverification.ISensorVerification;
@@ -172,12 +173,10 @@ public class SensorValueAccuracyActivity
         appendText(instructionsResId);
         waitForUser();
 
-        TestSensorOperation verifyNormOperation = new TestSensorOperation(
-                getApplicationContext(),
-                sensorType,
-                SENSOR_RATE,
-                0 /* reportLatencyInUs */,
-                EVENTS_TO_COLLECT);
+        TestSensorEnvironment environment =
+                new TestSensorEnvironment(getApplicationContext(), sensorType, SENSOR_RATE);
+        TestSensorOperation verifyNormOperation =
+                new TestSensorOperation(environment, EVENTS_TO_COLLECT);
 
         // TODO: add event ordering and timestamp > 0 verifications
         ISensorVerification magnitudeVerification =

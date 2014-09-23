@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Tests for {@link EventGapVerification}.
@@ -65,12 +66,13 @@ public class EventGapVerificationTest extends TestCase {
             int[] indices) {
         SensorStats stats = new SensorStats();
         ISensorVerification verification = getVerification(expected, timestamps);
+        TestSensorEnvironment environment = new TestSensorEnvironment(null, null, false, 0, 0);
         if (pass) {
-            verification.verify(stats);
+            verification.verify(environment, stats);
         } else {
             boolean failed = false;
             try {
-                verification.verify(stats);
+                verification.verify(environment, stats);
             } catch (AssertionError e) {
                 // Expected;
                 failed = true;

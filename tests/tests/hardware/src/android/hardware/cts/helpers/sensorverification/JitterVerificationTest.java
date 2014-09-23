@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 import java.util.List;
 
@@ -31,6 +32,14 @@ public class JitterVerificationTest extends TestCase {
 
     public void testVerify() {
         final int SAMPLE_SIZE = 100;
+        // for unit testing the verification, only the parameter 'sensorMightHaveMoreListeners' is
+        // required
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                null /* context */,
+                null /* sensor */,
+                false /* sensorMightHaveMoreListeners */,
+                0 /*samplingPeriodUs */,
+                0 /* maxReportLatencyUs */);
 
         // 100 samples at 1000Hz
         long[] timestamps = new long[SAMPLE_SIZE];
@@ -39,7 +48,7 @@ public class JitterVerificationTest extends TestCase {
         }
         SensorStats stats = new SensorStats();
         ISensorVerification verification = getVerification(1000, 1, timestamps);
-        verification.verify(stats);
+        verification.verify(environment, stats);
         verifyStats(stats, true, 0.0);
 
         // 90 samples at 1000Hz, 10 samples at 2000Hz
@@ -51,7 +60,7 @@ public class JitterVerificationTest extends TestCase {
         stats = new SensorStats();
         verification = getVerification(1000, 1, timestamps);
         try {
-            verification.verify(stats);
+            verification.verify(environment, stats);
             fail("Expected an AssertionError");
         } catch (AssertionError e) {
             // Expected;
