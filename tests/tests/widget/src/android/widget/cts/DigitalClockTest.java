@@ -52,6 +52,7 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
         mContext = getInstrumentation().getContext();
     }
 
+    @UiThreadTest
     public void testConstructor() {
         // new the DigitalClock instance
         new DigitalClock(mContext);

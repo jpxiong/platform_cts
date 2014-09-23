@@ -59,6 +59,7 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
                 .findViewById(R.id.name_edit);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources()
                 .getXml(R.layout.multi_auto_complete_text_view_layout);
@@ -151,6 +152,7 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         assertEquals(str + ", ", mMultiAutoCompleteTextView_country.getText().toString());
     }
 
+    @UiThreadTest
     public void testPerformFiltering() {
         MyMultiAutoCompleteTextView multiAutoCompleteTextView =
             new MyMultiAutoCompleteTextView(mActivity);
@@ -175,6 +177,7 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         assertNotNull(multiAutoCompleteTextView.getFilter());
     }
 
+    @UiThreadTest
     public void testReplaceText() {
         MyMultiAutoCompleteTextView multiAutoCompleteTextView =
             new MyMultiAutoCompleteTextView(mActivity);

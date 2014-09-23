@@ -23,6 +23,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -342,6 +343,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertEquals("", view.getText().toString());
     }
 
+    @UiThreadTest
     public void testGetFilter() {
         assertNotNull(mSimpleAdapter.getFilter());
     }

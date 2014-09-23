@@ -23,6 +23,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.View;
@@ -45,6 +46,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
         assertNotNull(mActivity);
     }
 
+    @UiThreadTest
     public void testConstructor() {
         new ViewFlipper(mActivity);
 
@@ -61,6 +63,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
         }
     }
 
+    @UiThreadTest
     public void testSetFlipInterval() {
         ViewFlipper viewFlipper = new ViewFlipper(mActivity);
         viewFlipper.setFlipInterval(0);
