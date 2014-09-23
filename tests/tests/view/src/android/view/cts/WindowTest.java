@@ -36,6 +36,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
@@ -68,6 +69,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivi
     private Context mContext;
     private Instrumentation mInstrumentation;
     private WindowCtsActivity mActivity;
+    private SurfaceView surfaceView;
 
     private static final int VIEWGROUP_LAYOUT_HEIGHT = 100;
     private static final int VIEWGROUP_LAYOUT_WIDTH = 200;
@@ -97,6 +99,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivi
         super.tearDown();
     }
 
+    @UiThreadTest
     public void testConstructor() throws Exception {
         mWindow = new MockWindow(mContext);
         assertSame(mContext, mWindow.getContext());
@@ -652,7 +655,13 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivi
      * Test setLocalFocus together with injectInputEvent.
      */
     public void testSetLocalFocus() throws Throwable {
-        final SurfaceView surfaceView = new SurfaceView(mContext);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                surfaceView = new SurfaceView(mContext);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
         final Semaphore waitingSemaphore = new Semaphore(0);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -676,6 +685,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivi
                 mWindow.setContentView(surfaceView);
             }
         });
+        mInstrumentation.waitForIdleSync();
         assertTrue(waitingSemaphore.tryAcquire(5, TimeUnit.SECONDS));
         assertNotNull(mVirtualDisplay);
         assertNotNull(mPresentation);

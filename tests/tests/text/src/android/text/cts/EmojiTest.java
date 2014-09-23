@@ -105,7 +105,7 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiCtsActivity
     /**
      * Tests EditText handles Emoji
      */
-    public void testEmojiEditable() {
+    public void testEmojiEditable() throws Throwable {
         int testedCodePoints[] = {
             0xAE,    // registered mark
             0x2764,    // heavy black heart
@@ -118,15 +118,21 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiCtsActivity
         for (int i = 0; i < testedCodePoints.length; i++) {
             origStr = "Test character  ";
             // cannot reuse CaptureTextView as 2nd setText call throws NullPointerException
-            EditText editText = new EditText(getInstrumentation().getContext());
+            final EditText editText = new EditText(getInstrumentation().getContext());
             editText.setText(origStr + String.valueOf(Character.toChars(testedCodePoints[i])));
 
             // confirm the emoji is added.
             newStr = editText.getText().toString();
             assertEquals(newStr.codePointCount(0, newStr.length()), origStr.length() + 1);
 
-            // Delete added character by sending KEYCODE_DEL event
-            editText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    // Delete added character by sending KEYCODE_DEL event
+                    editText.dispatchKeyEvent(
+                            new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                }
+            });
+            getInstrumentation().waitForIdleSync();
 
             newStr = editText.getText().toString();
             assertEquals(newStr.codePointCount(0, newStr.length()), origStr.length() + 1);
