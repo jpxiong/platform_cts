@@ -331,6 +331,10 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         // Set up outputs
         List<Object> outputTargets = new ArrayList<>();
         List<Surface> outputSurfaces = new ArrayList<>();
+        List<SurfaceTexture> privTargets = new ArrayList<SurfaceTexture>();
+        List<ImageReader> jpegTargets = new ArrayList<ImageReader>();
+        List<ImageReader> yuvTargets = new ArrayList<ImageReader>();
+        List<ImageReader> rawTargets = new ArrayList<ImageReader>();
         for (int i = 0; i < config.length; i += 2) {
             int format = config[i];
             int sizeLimit = config[i + 1];
@@ -342,6 +346,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     target.setDefaultBufferSize(targetSize.getWidth(), targetSize.getHeight());
                     outputTargets.add(target);
                     outputSurfaces.add(new Surface(target));
+                    privTargets.add(target);
                     break;
                 }
                 case JPEG: {
@@ -350,6 +355,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                         targetSize.getWidth(), targetSize.getHeight(), JPEG, MIN_RESULT_COUNT);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
+                    jpegTargets.add(target);
                     break;
                 }
                 case YUV: {
@@ -358,6 +364,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                         targetSize.getWidth(), targetSize.getHeight(), YUV, MIN_RESULT_COUNT);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
+                    yuvTargets.add(target);
                     break;
                 }
                 case RAW: {
@@ -366,6 +373,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                         targetSize.getWidth(), targetSize.getHeight(), RAW, MIN_RESULT_COUNT);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
+                    rawTargets.add(target);
                     break;
                 }
                 default:
@@ -416,6 +424,19 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     String.format("Closing down for output combination %s failed due to: %s",
                             MaxOutputSizes.configToString(config), e.getMessage()));
             }
+        }
+
+        for (SurfaceTexture target : privTargets) {
+            target.release();
+        }
+        for (ImageReader target : jpegTargets) {
+            target.close();
+        }
+        for (ImageReader target : yuvTargets) {
+            target.close();
+        }
+        for (ImageReader target : rawTargets) {
+            target.close();
         }
     }
 

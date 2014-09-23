@@ -680,8 +680,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             dumpFile(rawFileName, rawBuffer);
         }
 
-        verifyRawCaptureResult(rawRequest, resultListener.getCaptureResultForRequest(rawRequest,
-                NUM_RESULTS_WAIT_TIMEOUT));
         stopPreview();
     }
 
