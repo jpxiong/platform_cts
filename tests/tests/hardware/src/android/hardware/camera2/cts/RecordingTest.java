@@ -78,7 +78,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
     private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
     private static final int SLOWMO_SLOW_FACTOR = 4;
-
+    private static final int MAX_NUM_FRAME_DROP_ALLOWED = 3;
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
     private MediaRecorder mMediaRecorder;
@@ -867,8 +867,18 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                                     mVideoSize.getWidth(), mVideoSize.getHeight(),
                                     durationMs, expectedDurationMs
                             ),
-                            durationMs < (expectedDurationMs * 2)
+                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_ALLOWED)
                     );
+                    // Log a warning is there is any frame drop detected.
+                    if (durationMs >= expectedDurationMs * 2) {
+                        Log.w(TAG, String.format(
+                                "Video %dx%d Frame drop detected before video snapshot: " +
+                                        "duration %dms (expected %dms)",
+                                mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                durationMs, expectedDurationMs
+                        ));
+                    }
+
                     durationMs = (int) (nextTS - currentTS) / 1000000;
                     mCollector.expectTrue(
                             String.format(
@@ -877,8 +887,17 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                                     mVideoSize.getWidth(), mVideoSize.getHeight(),
                                     durationMs, expectedDurationMs
                             ),
-                            durationMs < (expectedDurationMs * 2)
+                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_ALLOWED)
                     );
+                    // Log a warning is there is any frame drop detected.
+                    if (durationMs >= expectedDurationMs * 2) {
+                        Log.w(TAG, String.format(
+                                "Video %dx%d Frame drop detected after video snapshot: " +
+                                        "duration %dms (expected %dms)",
+                                mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                durationMs, expectedDurationMs
+                        ));
+                    }
                 }
                 return;
             }
