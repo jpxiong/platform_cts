@@ -22,6 +22,7 @@ import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorFlushOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
@@ -132,17 +133,16 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
         getTestLogger().logInstructions(instructionsResId);
         waitForUserToBegin();
 
-        Context context = getApplicationContext();
         int maxBatchReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(maxBatchReportLatencySec);
-        int testDurationSec = maxBatchReportLatencySec + BATCHING_PADDING_TIME_S;
-        TestSensorOperation operation = new TestSensorOperation(
-                context,
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
                 sensorType,
                 SENSOR_BATCHING_RATE_US,
-                maxBatchReportLatencyUs,
-                testDurationSec,
-                TimeUnit.SECONDS);
+                maxBatchReportLatencyUs);
 
+        int testDurationSec = maxBatchReportLatencySec + BATCHING_PADDING_TIME_S;
+        TestSensorOperation operation =
+                new TestSensorOperation(environment, testDurationSec,TimeUnit.SECONDS);
         return executeTest(operation);
     }
 
@@ -151,17 +151,16 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
         getTestLogger().logInstructions(instructionsResId);
         waitForUserToBegin();
 
-        Context context = getApplicationContext();
         int maxBatchReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(maxBatchReportLatencySec);
-        int flushDurationSec = maxBatchReportLatencySec / 2;
-        TestSensorFlushOperation operation = new TestSensorFlushOperation(
-                context,
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
                 sensorType,
                 SENSOR_BATCHING_RATE_US,
-                maxBatchReportLatencyUs,
-                flushDurationSec,
-                TimeUnit.SECONDS);
+                maxBatchReportLatencyUs);
 
+        int flushDurationSec = maxBatchReportLatencySec / 2;
+        TestSensorFlushOperation operation =
+                new TestSensorFlushOperation(environment, flushDurationSec, TimeUnit.SECONDS);
         return executeTest(operation);
     }
 

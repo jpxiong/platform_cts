@@ -16,7 +16,7 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import android.content.Context;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 
 import java.util.concurrent.TimeUnit;
@@ -37,38 +37,36 @@ public class TestSensorOperation extends VerifiableSensorOperation {
     /**
      * Create a {@link TestSensorOperation}.
      *
-     * @param context the {@link Context}.
-     * @param sensorType the sensor type
-     * @param rateUs the rate that
-     * @param maxBatchReportLatencyUs the max batch report latency
+     * @param environment the test environment
      * @param eventCount the number of events to gather
      */
-    public TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, int eventCount) {
-        this(context, sensorType, rateUs, maxBatchReportLatencyUs, eventCount, null, null);
+    public TestSensorOperation(TestSensorEnvironment environment, int eventCount) {
+        this(environment, eventCount, null /* duration */, null /* timeUnit */);
     }
 
     /**
      * Create a {@link TestSensorOperation}.
      *
-     * @param context the {@link Context}.
-     * @param sensorType the sensor type
-     * @param rateUs the rate that
-     * @param maxBatchReportLatencyUs the max batch report latency
+     * @param environment the test environment
      * @param duration the duration to gather events for
      * @param timeUnit the time unit of the duration
      */
-    public TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, long duration, TimeUnit timeUnit) {
-        this(context, sensorType, rateUs, maxBatchReportLatencyUs, null, duration, timeUnit);
+    public TestSensorOperation(
+            TestSensorEnvironment environment,
+            long duration,
+            TimeUnit timeUnit) {
+        this(environment, null /* eventCount */, duration, timeUnit);
     }
 
     /**
      * Private helper constructor.
      */
-    private TestSensorOperation(Context context, int sensorType, int rateUs,
-            int maxBatchReportLatencyUs, Integer eventCount, Long duration, TimeUnit timeUnit) {
-        super(context, sensorType, rateUs, maxBatchReportLatencyUs);
+    private TestSensorOperation(
+            TestSensorEnvironment environment,
+            Integer eventCount,
+            Long duration,
+            TimeUnit timeUnit) {
+        super(environment);
         mEventCount = eventCount;
         mDuration = duration;
         mTimeUnit = timeUnit;
@@ -92,11 +90,9 @@ public class TestSensorOperation extends VerifiableSensorOperation {
     @Override
     protected VerifiableSensorOperation doClone() {
         if (mEventCount != null) {
-            return new TestSensorOperation(mContext, mSensorType, mRateUs,
-                    mMaxBatchReportLatencyUs, mEventCount);
+            return new TestSensorOperation(mEnvironment, mEventCount);
         } else {
-            return new TestSensorOperation(mContext, mSensorType, mRateUs,
-                    mMaxBatchReportLatencyUs, mDuration, mTimeUnit);
+            return new TestSensorOperation(mEnvironment, mDuration, mTimeUnit);
         }
     }
 }

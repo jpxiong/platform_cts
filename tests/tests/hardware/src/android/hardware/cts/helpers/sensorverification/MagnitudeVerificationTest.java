@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Tests for {@link MagnitudeVerification}.
@@ -27,7 +28,7 @@ import junit.framework.TestCase;
 public class MagnitudeVerificationTest extends TestCase {
 
     /**
-     * Test {@link MagnitudeVerification#verify(SensorStats)}.
+     * Test {@link MagnitudeVerification#verify(TestSensorEnvironment, SensorStats)}.
      */
     public void testVerify() {
         float[][] values = {
@@ -47,7 +48,7 @@ public class MagnitudeVerificationTest extends TestCase {
 
     private void runStats(float expected, float threshold, float[][] values, boolean pass, float magnitude) {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(expected, threshold, values);
+        MagnitudeVerification verification = getVerification(expected, threshold, values);
         if (pass) {
             verification.verify(stats);
         } else {
@@ -62,9 +63,9 @@ public class MagnitudeVerificationTest extends TestCase {
         assertEquals(magnitude, (Float) stats.getValue(SensorStats.MAGNITUDE_KEY), 0.01);
     }
 
-    private ISensorVerification getVerification(float expected, float threshold,
+    private MagnitudeVerification getVerification(float expected, float threshold,
             float[] ... values) {
-        ISensorVerification verification = new MagnitudeVerification(expected, threshold);
+        MagnitudeVerification verification = new MagnitudeVerification(expected, threshold);
         for (float[] value : values) {
             verification.addSensorEvent(new TestSensorEvent(null, 0, 0, value));
         }

@@ -16,7 +16,7 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import android.content.Context;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 
 import java.util.concurrent.TimeUnit;
@@ -36,21 +36,15 @@ public class TestSensorFlushOperation extends VerifiableSensorOperation {
     /**
      * Create a {@link TestSensorOperation}.
      *
-     * @param context the {@link Context}.
-     * @param sensorType the sensor type
-     * @param rateUs the rate that
-     * @param maxBatchReportLatencyUs the max batch report latency
+     * @param environment the test environment
      * @param duration the duration to gather events before calling {@code SensorManager.flush()}
      * @param timeUnit the time unit of the duration
      */
     public TestSensorFlushOperation(
-            Context context,
-            int sensorType,
-            int rateUs,
-            int maxBatchReportLatencyUs,
+            TestSensorEnvironment environment,
             long duration,
             TimeUnit timeUnit) {
-        super(context, sensorType, rateUs, maxBatchReportLatencyUs);
+        super(environment);
         mDuration = duration;
         mTimeUnit = timeUnit;
     }
@@ -68,12 +62,6 @@ public class TestSensorFlushOperation extends VerifiableSensorOperation {
      */
     @Override
     protected VerifiableSensorOperation doClone() {
-        return new TestSensorFlushOperation(
-                mContext,
-                mSensorType,
-                mRateUs,
-                mMaxBatchReportLatencyUs,
-                mDuration,
-                mTimeUnit);
+        return new TestSensorFlushOperation(mEnvironment, mDuration,mTimeUnit);
     }
 }

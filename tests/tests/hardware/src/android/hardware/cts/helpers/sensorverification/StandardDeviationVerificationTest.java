@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Tests for {@link StandardDeviationVerification}.
@@ -27,7 +28,7 @@ import junit.framework.TestCase;
 public class StandardDeviationVerificationTest extends TestCase {
 
     /**
-     * Test {@link StandardDeviationVerification#verify(SensorStats)}.
+     * Test {@link StandardDeviationVerification#verify(TestSensorEnvironment, SensorStats)}.
      */
     public void testVerify() {
         // Stddev should be {sqrt(2.5), sqrt(2.5), sqrt(2.5)}
@@ -58,7 +59,7 @@ public class StandardDeviationVerificationTest extends TestCase {
     private void runVerification(float[] threshold, float[][] values, boolean pass,
             float[] standardDeviations) {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(threshold, values);
+        StandardDeviationVerification verification = getVerification(threshold, values);
         if (pass) {
             verification.verify(stats);
         } else {
@@ -78,8 +79,8 @@ public class StandardDeviationVerificationTest extends TestCase {
         }
     }
 
-    private ISensorVerification getVerification(float[] threshold, float[] ... values) {
-        ISensorVerification verification = new StandardDeviationVerification(threshold);
+    private StandardDeviationVerification getVerification(float[] threshold, float[] ... values) {
+        StandardDeviationVerification verification = new StandardDeviationVerification(threshold);
         for (float[] value : values) {
             verification.addSensorEvent(new TestSensorEvent(null, 0, 0, value));
         }
