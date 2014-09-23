@@ -22,6 +22,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.Handler.Callback;
+import android.test.UiThreadTest;
 import android.util.Printer;
 
 public class HandlerTest extends TestCase {
@@ -35,8 +36,9 @@ public class HandlerTest extends TestCase {
     static final long DELAYED = RUNTIME + 50;
 
     // Handler
-    Handler mHandler = new Handler();
-    MockHandler mHandler1 = new MockHandler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private final MockHandler mHandler1 = new MockHandler(Looper.getMainLooper());
+    private final Object mLock = new Object();
 
     @Override
     protected void tearDown() throws Exception {
@@ -44,18 +46,24 @@ public class HandlerTest extends TestCase {
         super.tearDown();
     }
 
-    public void testConstructor() {
-        Callback cb = new Callback() {
+    public void testConstructor() throws Throwable {
+        final Callback cb = new Callback() {
             public boolean handleMessage(Message msg) {
                 return false;
             }
         };
 
+        new TestThread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                new Handler();
+                new Handler(cb);
+            }
+        }).runTest(RUNTIME);
+
         // new the Handler instance
-        new Handler();
-        new Handler(Looper.myLooper());
-        new Handler(cb);
-        new Handler(Looper.myLooper(), cb);
+        new Handler(Looper.getMainLooper());
+        new Handler(Looper.getMainLooper(), cb);
     }
 
     public void testPostAtTime1() {
@@ -162,9 +170,9 @@ public class HandlerTest extends TestCase {
 
     public void testGetLooper() {
         // new the Handler instance
-        Looper looper = Looper.myLooper();
-        mHandler = new Handler(looper);
-        assertSame(looper, mHandler.getLooper());
+        Looper looper = Looper.getMainLooper();
+        Handler handler = new Handler(looper);
+        assertSame(looper, handler.getLooper());
     }
 
     public void testRemoveCallbacks() {
@@ -280,7 +288,7 @@ public class HandlerTest extends TestCase {
 
     public void testObtainMessageWithInt() {
          // new the Handler instance
-         Handler handler = new Handler();
+         Handler handler = new Handler(Looper.getMainLooper());
          Message msg = handler.obtainMessage();
          msg.what = 100;
          Message msg1 = mHandler.obtainMessage(msg.what);
@@ -291,7 +299,7 @@ public class HandlerTest extends TestCase {
 
     public void testObtainMessageWithIntObject() {
         // new the Handler instance
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         Message msg = handler.obtainMessage();
         msg.what = 100;
         msg.obj = new Object();
@@ -304,7 +312,7 @@ public class HandlerTest extends TestCase {
 
     public void testObtainMessageWithMutiInt() {
         // new the Handler instance
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         Message msg = handler.obtainMessage();
         msg.what = 100;
         msg.arg1 = 101;
@@ -319,7 +327,7 @@ public class HandlerTest extends TestCase {
 
     public void testObtainMessageWithMutiIntObject() {
         // new the Handler instance
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         Message msg = handler.obtainMessage();
         msg.what = 100;
         msg.arg1 = 1000;
@@ -463,6 +471,14 @@ public class HandlerTest extends TestCase {
     private class MockHandler extends Handler {
         public Message message;
         public int what;
+
+        MockHandler() {
+            super(Looper.getMainLooper());
+        }
+
+        MockHandler(Looper looper) {
+            super(looper);
+        }
 
         @Override
         public void handleMessage(Message msg) {

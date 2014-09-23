@@ -43,7 +43,7 @@ public class MessengerTest extends AndroidTestCase {
     private static final int MSG_ARG1 = 100;
     private static final int MSG_ARG2 = 1000;
     private static final int WHAT = 2008;
-    private Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
             mResult = true;
