@@ -1052,8 +1052,11 @@ public class StaticMetadata {
         }
 
         List<Integer> modesList = Arrays.asList(CameraTestUtils.toObject(afModes));
-        checkTrueForKey(key, " All camera devices must support OFF mode",
-                modesList.contains(CameraMetadata.CONTROL_AF_MODE_OFF));
+        if (isHardwareLevelLimitedOrBetter()) {
+            // Some LEGACY mode devices do not support AF OFF
+            checkTrueForKey(key, " All camera devices must support OFF mode",
+                    modesList.contains(CameraMetadata.CONTROL_AF_MODE_OFF));
+        }
         if (hasFocuser()) {
             checkTrueForKey(key, " Camera devices that have focuser units must support AUTO mode",
                     modesList.contains(CameraMetadata.CONTROL_AF_MODE_AUTO));
