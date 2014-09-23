@@ -414,6 +414,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
+                if (!mStaticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    Log.i(TAG, "Camera " + id +
+                            " does not support MANUAL_SENSOR, skipping test");
+                    continue;
+                }
+
                 focusDistanceTestByCamera();
             } finally {
                 closeDevice();
