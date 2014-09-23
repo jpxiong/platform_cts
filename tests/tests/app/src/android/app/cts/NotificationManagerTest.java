@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.provider.Telephony.Threads;
 import android.test.AndroidTestCase;
 
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 
 public class NotificationManagerTest extends AndroidTestCase {

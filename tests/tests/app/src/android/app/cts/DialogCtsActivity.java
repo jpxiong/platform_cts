@@ -16,7 +16,7 @@
 
 package android.app.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,7 +43,7 @@ import android.widget.TimePicker;
 /*
  * Stub class for  Dialog, AlertDialog, DatePickerDialog, TimePickerDialog etc.
  */
-public class DialogStubActivity extends Activity {
+public class DialogCtsActivity extends Activity {
     public static final int TEST_DIALOG_WITHOUT_THEME = 0;
     public static final int TEST_DIALOG_WITH_THEME = 1;
     public static final int TEST_ALERTDIALOG = 2;
@@ -71,7 +71,7 @@ public class DialogStubActivity extends Activity {
 
     public static final String DEFAULT_ALERTDIALOG_TITLE = "AlertDialog";
     public static final String DEFAULT_ALERTDIALOG_MESSAGE = "AlertDialog message";
-    private static final String LOG_TAG = "DialogStubActivity";
+    private static final String LOG_TAG = "DialogCtsActivity";
 
     public boolean isPositiveButtonClicked = false;
     public boolean isNegativeButtonClicked = false;
@@ -235,8 +235,8 @@ public class DialogStubActivity extends Activity {
 
     @SuppressWarnings("deprecation")
     private AlertDialog getAlertDialogInstance(boolean deprecated) {
-        mAlertDialog = new AlertDialog.Builder(DialogStubActivity.this).create();
-        mAlertDialog.setIcon(com.android.cts.stub.R.drawable.pass);
+        mAlertDialog = new AlertDialog.Builder(DialogCtsActivity.this).create();
+        mAlertDialog.setIcon(com.android.cts.app.R.drawable.pass);
         mAlertDialog.setTitle(DEFAULT_ALERTDIALOG_TITLE);
         mAlertDialog.setMessage(DEFAULT_ALERTDIALOG_MESSAGE);
         mAlertDialog.setInverseBackgroundForced(true);
@@ -267,7 +267,7 @@ public class DialogStubActivity extends Activity {
         final LayoutInflater inflate = getLayoutInflater();
         final View customTitleViewCustom = inflate.inflate(R.layout.alertdialog_custom_title, null);
         final View textEntryView = inflate.inflate(R.layout.alert_dialog_text_entry_2, null);
-        mAlertDialog = new AlertDialog.Builder(DialogStubActivity.this).create();
+        mAlertDialog = new AlertDialog.Builder(DialogCtsActivity.this).create();
         mAlertDialog.setCustomTitle(customTitleViewCustom);
         mAlertDialog.setMessage(DEFAULT_ALERTDIALOG_MESSAGE);
         if (withSpacing) {
