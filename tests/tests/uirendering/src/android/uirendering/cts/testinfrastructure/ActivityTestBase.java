@@ -28,6 +28,7 @@ import android.uirendering.cts.util.BitmapDumper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,6 +43,7 @@ public abstract class ActivityTestBase extends
     public static final boolean USE_RS = false;
     public static final int TEST_WIDTH = 180;
     public static final int TEST_HEIGHT = 180; //The minimum height and width of a device
+    public static final int MAX_SCREEN_SHOTS = 100;
 
     private int[] mHardwareArray = new int[TEST_HEIGHT * TEST_WIDTH];
     private int[] mSoftwareArray = new int[TEST_HEIGHT * TEST_WIDTH];
@@ -114,7 +116,16 @@ public abstract class ActivityTestBase extends
     }
 
     public Bitmap takeScreenshot() {
-        return getInstrumentation().getUiAutomation().takeScreenshot();
+        getInstrumentation().waitForIdleSync();
+        Bitmap bitmap1 = getInstrumentation().getUiAutomation().takeScreenshot();
+        Bitmap bitmap2;
+        int count = 0;
+        do  {
+            bitmap2 = bitmap1;
+            bitmap1 = getInstrumentation().getUiAutomation().takeScreenshot();
+            count++;
+        } while (count < MAX_SCREEN_SHOTS && !Arrays.equals(bitmap2.mBuffer, bitmap1.mBuffer));
+        return bitmap1;
     }
 
     /**
