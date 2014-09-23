@@ -136,9 +136,15 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         }
 
         if (frontCameraId > -1) {
-            assertAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+            assertTrue("Device has front-facing camera but does not report either " +
+                    "the FEATURE_CAMERA_FRONT or FEATURE_CAMERA_EXTERNAL feature",
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) ||
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_EXTERNAL));
         } else {
-            assertNotAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+            assertFalse("Device does not have front-facing camera but reports either " +
+                    "the FEATURE_CAMERA_FRONT or FEATURE_CAMERA_EXTERNAL feature",
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) ||
+                    mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_EXTERNAL));
         }
     }
 
