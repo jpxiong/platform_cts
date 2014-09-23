@@ -16,10 +16,11 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.TestSensorEvent;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 
 /**
  * Tests for {@link MeanVerification}.
@@ -27,7 +28,7 @@ import junit.framework.TestCase;
 public class MeanVerificationTest extends TestCase {
 
     /**
-     * Test {@link MeanVerification#verify(SensorStats)}.
+     * Test {@link MeanVerification#verify(TestSensorEnvironment, SensorStats)}.
      */
     public void testVerify() {
         float[][] values = {
@@ -41,7 +42,7 @@ public class MeanVerificationTest extends TestCase {
         float[] expected = {2.0f, 3.0f, 6.0f};
         float[] threshold = {0.1f, 0.1f, 0.1f};
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(expected, threshold, values);
+        MeanVerification verification = getVerification(expected, threshold, values);
         verification.verify(stats);
         verifyStats(stats, true, new float[]{2.0f, 3.0f, 6.0f});
 
@@ -76,7 +77,6 @@ public class MeanVerificationTest extends TestCase {
         }
         verifyStats(stats, false, new float[]{2.0f, 3.0f, 6.0f});
 
-        threshold = new float[]{2.5f, 2.5f, 5.5f};
         threshold = new float[]{0.6f, 0.6f, 0.1f};
         stats = new SensorStats();
         verification = getVerification(expected, threshold, values);
@@ -89,9 +89,9 @@ public class MeanVerificationTest extends TestCase {
         verifyStats(stats, false, new float[]{2.0f, 3.0f, 6.0f});
     }
 
-    private ISensorVerification getVerification(float[] expected, float[] threshold,
+    private MeanVerification getVerification(float[] expected, float[] threshold,
             float[] ... values) {
-        ISensorVerification verification = new MeanVerification(expected, threshold);
+        MeanVerification verification = new MeanVerification(expected, threshold);
         for (float[] value : values) {
             verification.addSensorEvent(new TestSensorEvent(null, 0, 0, value));
         }

@@ -21,6 +21,7 @@ import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensorverification.MeanVerification;
 
@@ -91,12 +92,12 @@ public class AccelerometerMeasurementTestActivity extends SensorCtsVerifierTestA
      */
     private String verifyMeasurements(float ... expectations) throws Throwable {
         Thread.sleep(500 /*ms*/);
-        TestSensorOperation verifyMeasurements = new TestSensorOperation(
+        TestSensorEnvironment environment = new TestSensorEnvironment(
                 getApplicationContext(),
                 Sensor.TYPE_ACCELEROMETER,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorOperation verifyMeasurements =
+                new TestSensorOperation(environment, 100 /* event count */);
         verifyMeasurements.addVerification(new MeanVerification(
                 expectations,
                 new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */));

@@ -21,6 +21,7 @@ import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensorverification.SigNumVerification;
 
@@ -119,12 +120,13 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
         waitForUser();
 
         Thread.sleep(500 /*ms*/);
-        TestSensorOperation verifySignum = new TestSensorOperation(
+
+        TestSensorEnvironment environment = new TestSensorEnvironment(
                 getApplicationContext(),
                 Sensor.TYPE_GYROSCOPE,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorOperation verifySignum =
+                new TestSensorOperation(environment, 100 /* event count */);
         verifySignum.addVerification(new SigNumVerification(
                 expectations,
                 new float[]{0.2f, 0.2f, 0.2f} /*noiseThreshold*/));

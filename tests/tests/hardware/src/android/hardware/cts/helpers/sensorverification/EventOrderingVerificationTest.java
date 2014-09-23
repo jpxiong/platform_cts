@@ -16,10 +16,10 @@
 
 package android.hardware.cts.helpers.sensorverification;
 
+import junit.framework.TestCase;
+
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class EventOrderingVerificationTest extends TestCase {
      */
     public void testNoEvents() {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification();
+        EventOrderingVerification verification = getVerification();
         verification.verify(stats);
         verifyStats(stats, true, 0);
     }
@@ -44,7 +44,7 @@ public class EventOrderingVerificationTest extends TestCase {
      */
     public void testSameTimestamp() {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(0, 0, 0, 0, 0);
+        EventOrderingVerification verification = getVerification(0, 0, 0, 0, 0);
         verification.verify(stats);
         verifyStats(stats, true, 0);
     }
@@ -54,7 +54,7 @@ public class EventOrderingVerificationTest extends TestCase {
      */
     public void testSequentialTimestamp() {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(0, 1, 2, 3, 4);
+        EventOrderingVerification verification = getVerification(0, 1, 2, 3, 4);
         verification.verify(stats);
         verifyStats(stats, true, 0);
     }
@@ -64,7 +64,7 @@ public class EventOrderingVerificationTest extends TestCase {
      */
     public void testSingleOutofOrder() {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(0, 2, 1, 3, 4);
+        EventOrderingVerification verification = getVerification(0, 2, 1, 3, 4);
         try {
             verification.verify(stats);
             fail("Expected an AssertionError");
@@ -81,7 +81,7 @@ public class EventOrderingVerificationTest extends TestCase {
      */
     public void testMultipleOutOfOrder() {
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(4, 0, 1, 2, 3);
+        EventOrderingVerification verification = getVerification(4, 0, 1, 2, 3);
         try {
             verification.verify(stats);
             fail("Expected an AssertionError");
@@ -96,8 +96,8 @@ public class EventOrderingVerificationTest extends TestCase {
         assertTrue(indices.contains(4));
     }
 
-    private ISensorVerification getVerification(long ... timestamps) {
-        ISensorVerification verification = new EventOrderingVerification();
+    private EventOrderingVerification getVerification(long ... timestamps) {
+        EventOrderingVerification verification = new EventOrderingVerification();
         for (long timestamp : timestamps) {
             verification.addSensorEvent(new TestSensorEvent(null, timestamp, 0, null));
         }

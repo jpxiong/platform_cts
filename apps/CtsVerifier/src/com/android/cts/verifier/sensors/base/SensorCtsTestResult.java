@@ -124,6 +124,7 @@ class SensorCtsTestResult extends TestResult {
         if (testCase instanceof SensorTestCase) {
             SensorTestCase sensorTestCase = (SensorTestCase) testCase;
             sensorTestCase.setContext(mContext);
+            sensorTestCase.setEmulateSensorUnderLoad(false);
             // TODO: set delayed assertion provider
         } else {
             throw new IllegalStateException("TestCase must be an instance of SensorTestCase.");

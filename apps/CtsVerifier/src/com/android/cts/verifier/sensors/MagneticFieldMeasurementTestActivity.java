@@ -24,6 +24,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
@@ -77,9 +78,11 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
             public void onFlushCompleted(Sensor sensor) {}
         };
 
-        TestSensorManager magnetometer = new TestSensorManager(
-                this.getApplicationContext(), Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_NORMAL, 0);
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        TestSensorManager magnetometer = new TestSensorManager(environment);
         try {
             magnetometer.registerListener(new TestSensorEventListener(listener));
             waitForUser();
@@ -109,16 +112,17 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
      * - the values sampled from the sensor
      */
     private String verifyNorm() throws Throwable {
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorOperation verifyNorm =
+                new TestSensorOperation(environment, 100 /* event count */);
+
         float expectedMagneticFieldEarth =
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
         float magneticFieldEarthThreshold =
                 expectedMagneticFieldEarth - SensorManager.MAGNETIC_FIELD_EARTH_MIN;
-        TestSensorOperation verifyNorm = new TestSensorOperation(
-                this.getApplicationContext(),
-                Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
         verifyNorm.addVerification(new MagnitudeVerification(
                 expectedMagneticFieldEarth,
                 magneticFieldEarthThreshold));
@@ -150,12 +154,12 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
      * the failure to help track down the issue.
      */
     private String verifyStandardDeviation() throws Throwable {
-        TestSensorOperation verifyStdDev = new TestSensorOperation(
-                this.getApplicationContext(),
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_FASTEST,
-                0 /*reportLatencyInUs*/,
-                100 /* event count */);
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorOperation verifyStdDev =
+                new TestSensorOperation(environment, 100 /* event count */);
         verifyStdDev.addVerification(new StandardDeviationVerification(
                 new float[]{2f, 2f, 2f} /* uT */));
         verifyStdDev.execute();
