@@ -28,7 +28,7 @@ import android.widget.TimePicker;
 /**
  * Test {@link TimePickerDialog}.
  */
-public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
+public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivity> {
     private static final String HOUR = "hour";
     private static final String MINUTE = "minute";
     private static final String IS_24_HOUR = "is24hour";
@@ -42,10 +42,10 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     private OnTimeSetListener mOnTimeSetListener;
 
     private Context mContext;
-    private DialogStubActivity mActivity;
+    private DialogCtsActivity mActivity;
 
     public TimePickerDialogTest() {
-        super("com.android.cts.stub", DialogStubActivity.class);
+        super("com.android.cts.app", DialogCtsActivity.class);
     }
 
     @Override
@@ -74,8 +74,9 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
         int minute = 13;
         tD = new TimePickerDialog(
-                mContext, com.android.cts.stub.R.style.Theme_AlertDialog,
+                mContext, com.android.cts.app.R.style.Theme_AlertDialog,
                     mOnTimeSetListener, TARGET_HOUR, minute, false);
+
         b = tD.onSaveInstanceState();
 
         assertEquals(TARGET_HOUR, b.getInt(HOUR));
@@ -94,7 +95,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     public void testOnTimeChanged() throws Throwable {
         final int minute = 34;
-        startDialogActivity(DialogStubActivity.TEST_TIMEPICKERDIALOG);
+        startDialogActivity(DialogCtsActivity.TEST_TIMEPICKERDIALOG);
         final TimePickerDialog d = (TimePickerDialog) mActivity.getDialog();
 
         runTestOnUiThread(new Runnable() {
@@ -139,7 +140,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     private void startDialogActivity(int dialogNumber) {
-        mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
+        mActivity = DialogCtsActivity.startDialogActivity(this, dialogNumber);
     }
 
     private TimePickerDialog buildDialog() {

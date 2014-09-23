@@ -80,5 +80,12 @@
     "android.admin.cts.DevicePolicyManagerTest#testGetMaximumFailedPasswordsForWipe"
   ],
   bug: 17496766
+},
+{
+  description: "instrumentation target context and test context are the same after move test target inside the test itself",
+  names: [
+    "android.app.cts.InstrumentationTest#testContext"
+  ],
+  bug: 17614217
 }
 ]

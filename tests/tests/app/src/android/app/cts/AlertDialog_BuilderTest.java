@@ -47,7 +47,7 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 
-public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
+public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<DialogCtsActivity> {
     private Builder mBuilder;
     private Context mContext;
     private Instrumentation mInstrumentation;
@@ -127,7 +127,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
     }
 
     public AlertDialog_BuilderTest() {
-        super("com.android.cts.stub", DialogStubActivity.class);
+        super("com.android.cts.app", DialogCtsActivity.class);
     }
 
     public void testConstructor() {
@@ -208,14 +208,14 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
-                mBuilder.setNegativeButton(com.android.cts.stub.R.string.notify, mOnClickListener);
+                mBuilder.setNegativeButton(com.android.cts.app.R.string.notify, mOnClickListener);
                 mDialog = mBuilder.show();
                 mButton = mDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
                 mButton.performClick();
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals(mContext.getText(com.android.cts.stub.R.string.notify), mButton.getText());
+        assertEquals(mContext.getText(com.android.cts.app.R.string.notify), mButton.getText());
         assertTrue(mResult);
     }
 
@@ -223,14 +223,14 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
-                mBuilder.setNeutralButton(com.android.cts.stub.R.string.notify, mOnClickListener);
+                mBuilder.setNeutralButton(com.android.cts.app.R.string.notify, mOnClickListener);
                 mDialog = mBuilder.show();
                 mButton = mDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
                 mButton.performClick();
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals(mContext.getText(com.android.cts.stub.R.string.notify), mButton.getText());
+        assertEquals(mContext.getText(com.android.cts.app.R.string.notify), mButton.getText());
         assertTrue(mResult);
     }
 
@@ -321,7 +321,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
-                mBuilder.setItems(com.android.cts.stub.R.array.difficultyLevel, mOnClickListener);
+                mBuilder.setItems(com.android.cts.app.R.array.difficultyLevel, mOnClickListener);
                 mDialog = mBuilder.show();
                 mListView = mDialog.getListView();
             }
@@ -329,13 +329,13 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mInstrumentation.waitForIdleSync();
 
         final CharSequence[] levels = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
         assertEquals(levels[0], mListView.getItemAtPosition(0));
     }
 
     public void testSetItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] expect = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -386,12 +386,12 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
     public void testSetMultiChoiceItemsWithParamInt() throws Throwable {
 
         final CharSequence[] items = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
-                mBuilder.setMultiChoiceItems(com.android.cts.stub.R.array.difficultyLevel, null,
+                mBuilder.setMultiChoiceItems(com.android.cts.app.R.array.difficultyLevel, null,
                         mOnMultiChoiceClickListener);
                 mDialog = mBuilder.show();
                 mListView = mDialog.getListView();
@@ -409,7 +409,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
 
     public void testSetMultiChoiceItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -454,12 +454,12 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
 
     public void testSetSingleChoiceItemsWithParamInt() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
-                mBuilder.setSingleChoiceItems(com.android.cts.stub.R.array.difficultyLevel, 0,
+                mBuilder.setSingleChoiceItems(com.android.cts.app.R.array.difficultyLevel, 0,
                         mOnClickListener);
                 mDialog = mBuilder.show();
                 mListView = mDialog.getListView();
@@ -507,7 +507,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
 
     public void testSetSingleChoiceItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -527,7 +527,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
 
     public void testSetSingleChoiceItems() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
-                com.android.cts.stub.R.array.difficultyLevel);
+                com.android.cts.app.R.array.difficultyLevel);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -552,7 +552,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
                 mBuilder.setOnItemSelectedListener(mOnItemSelectedListener);
-                mBuilder.setItems(com.android.cts.stub.R.array.difficultyLevel, mOnClickListener);
+                mBuilder.setItems(com.android.cts.app.R.array.difficultyLevel, mOnClickListener);
                 mDialog = mBuilder.show();
                 mListView = mDialog.getListView();
                 mListView.pointToPosition(0, 0);

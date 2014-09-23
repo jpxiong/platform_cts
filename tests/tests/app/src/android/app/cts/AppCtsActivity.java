@@ -26,12 +26,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 
-import com.android.cts.stub.R;
+import com.android.cts.app.R;
 
 /**
  * A minimal "Hello, World!" application.
  */
-public class AppStubActivity extends Activity {
+public class AppCtsActivity extends Activity {
     private Dialog mDialog;
     public boolean mOnPrepareDialog;
     public boolean mOnOptionsMenuClosedCalled;
@@ -47,7 +47,7 @@ public class AppStubActivity extends Activity {
     public boolean mCreateContextMenuCalled;
     public boolean mRequestWinFeatureRet = false;
 
-    public AppStubActivity() {
+    public AppCtsActivity() {
 
     }
 
