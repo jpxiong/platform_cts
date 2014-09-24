@@ -387,31 +387,36 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             int res = codec.dequeueOutputBuffer(info, VIDEO_CODEC_WAIT_TIME_US);
             if (res >= 0) {
                 int outputBufIndex = res;
-                ByteBuffer buf = codecOutputBuffers[outputBufIndex];
-                if (VERBOSE && (outFrameCount == 0)) {
-                    printByteBuffer("Y ", buf, 0, 20);
-                    printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
-                    printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
-                }
-                Point origin = getOrigin(outFrameCount);
-                for (int i = 0; i < PIXEL_CHECK_PER_FRAME; i++) {
-                    int w = mRandom.nextInt(mVideoWidth);
-                    int h = mRandom.nextInt(mVideoHeight);
-                    getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
-                    getPixelValuesFromOutputBuffer(buf, w, h, decoded);
-                    if (VERBOSE) {
-                        Log.i(TAG, outFrameCount + "-" + i + "- th round expcted " + expected.mY +
-                                "," + expected.mU + "," + expected.mV + "  decoded " + decoded.mY +
-                                "," + decoded.mU + "," + decoded.mV);
+
+                // only do YUV compare on EOS frame if the buffer size is none-zero
+                if (info.size > 0) {
+                    ByteBuffer buf = codecOutputBuffers[outputBufIndex];
+                    if (VERBOSE && (outFrameCount == 0)) {
+                        printByteBuffer("Y ", buf, 0, 20);
+                        printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
+                        printByteBuffer("UV ", buf,
+                                mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
                     }
-                    totalErrorSquared += expected.calcErrorSquared(decoded);
+                    Point origin = getOrigin(outFrameCount);
+                    for (int i = 0; i < PIXEL_CHECK_PER_FRAME; i++) {
+                        int w = mRandom.nextInt(mVideoWidth);
+                        int h = mRandom.nextInt(mVideoHeight);
+                        getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
+                        getPixelValuesFromOutputBuffer(buf, w, h, decoded);
+                        if (VERBOSE) {
+                            Log.i(TAG, outFrameCount + "-" + i + "- th round expcted " + expected.mY
+                                    + "," + expected.mU + "," + expected.mV + "  decoded "
+                                    + decoded.mY + "," + decoded.mU + "," + decoded.mV);
+                        }
+                        totalErrorSquared += expected.calcErrorSquared(decoded);
+                    }
+                    outFrameCount++;
                 }
                 codec.releaseOutputBuffer(outputBufIndex, false /* render */);
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d(TAG, "saw output EOS.");
                     sawOutputEOS = true;
                 }
-                outFrameCount++;
             } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 codecOutputBuffers = codec.getOutputBuffers();
                 Log.d(TAG, "output buffers have changed.");
