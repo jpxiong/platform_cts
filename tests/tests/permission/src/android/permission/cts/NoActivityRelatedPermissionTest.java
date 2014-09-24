@@ -27,6 +27,8 @@ import android.test.suitebuilder.annotation.Suppress;
 import android.view.WindowManager;
 import android.view.WindowManager.BadTokenException;
 
+import java.util.List;
+
 /**
  * Verify the Activity related operations require specific permissions.
  */
@@ -54,18 +56,16 @@ public class NoActivityRelatedPermissionTest
     public void testGetTask() {
         ActivityManager manager = (ActivityManager) getActivity()
                 .getSystemService(Context.ACTIVITY_SERVICE);
-        try {
-            manager.getRunningTasks(1);
-            fail("Activity.getRunningTasks did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // Expected
-        }
+        List<ActivityManager.RunningTaskInfo> runningTasks =  manager.getRunningTasks(10);
+        // Current implementation should only return tasks for home and the caller.
+        // We'll be done and task this to mean it shouldn't return more than 2.
+        assertTrue("Found tasks: " + runningTasks,
+                runningTasks == null || runningTasks.size() <= 2);
 
-        try {
-            manager.getRecentTasks(1, 0);
-            fail("Activity.getRunningTasks did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // Expected
-        }
+        List<ActivityManager.RecentTaskInfo> recentTasks = manager.getRecentTasks(10,
+                ActivityManager.RECENT_WITH_EXCLUDED);
+        // Current implementation should only return tasks for home and the caller.
+        // We'll be done and task this to mean it shouldn't return more than 2.
+        assertTrue("Found tasks: " + recentTasks, recentTasks == null || recentTasks.size() <= 2);
     }
 }
