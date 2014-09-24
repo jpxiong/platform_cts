@@ -26,13 +26,11 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -159,7 +157,7 @@ public class TestPackageRepo implements ITestPackageRepo {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> findPackageIdsForTest(String testClassName) {
+    public List<String> findPackageIdsForTest(String testClassName) {
         Set<String> ids = new HashSet<String>();
         for (String abi : mTestMap.keySet()) {
             for (String name : mTestMap.get(abi).keySet()) {
@@ -168,14 +166,16 @@ public class TestPackageRepo implements ITestPackageRepo {
                 }
             }
         }
-        return ids;
+        List<String> idList = new ArrayList<String>(ids);
+        Collections.sort(idList);
+        return idList;
     }
 
     /**
-     * @return list of all package ids found in repo
+     * {@inheritDoc}
      */
     @Override
-    public Collection<String> getPackageIds() {
+    public List<String> getPackageIds() {
         Set<String> ids = new HashSet<String>();
         for (String abi : mAbis) {
             for (String name : mTestMap.get(abi).keySet()) {
@@ -188,10 +188,10 @@ public class TestPackageRepo implements ITestPackageRepo {
     }
 
     /**
-     * @return list of all package names found in repo
+     * {@inheritDoc}
      */
     @Override
-    public Collection<String> getPackageNames() {
+    public List<String> getPackageNames() {
         Set<String> names = new HashSet<String>();
         for (String abi : mAbis) {
             names.addAll(mTestMap.get(abi).keySet());

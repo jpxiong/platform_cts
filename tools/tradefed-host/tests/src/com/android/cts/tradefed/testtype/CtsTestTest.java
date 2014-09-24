@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,8 +47,8 @@ public class CtsTestTest extends TestCase {
     private static final String PLAN_NAME = "CTS";
     private static final String PACKAGE_NAME = "test-name";
     private static final String ID = AbiUtils.createId(UnitTests.ABI.getName(), PACKAGE_NAME);
-    private static final Set<String> NAMES = new HashSet<>();
-    private static final Set<String> IDS = new HashSet<>();
+    private static final List<String> NAMES = new ArrayList<>();
+    private static final List<String> IDS = new ArrayList<>();
     static {
         NAMES.add(PACKAGE_NAME);
         IDS.add(ID);

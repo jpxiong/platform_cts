@@ -189,9 +189,9 @@ class TestResults extends AbstractXmlPullParser {
         TestPackageResult pkgResult = mPackageResults.get(id);
         if (pkgResult == null) {
             pkgResult = new TestPackageResult();
-            String[] parts = AbiUtils.parseId(id);
-            pkgResult.setAbi(parts[0]);
-            pkgResult.setAppPackageName(parts[1]);
+            String[] abiAndName = AbiUtils.parseId(id);
+            pkgResult.setAbi(abiAndName[0]);
+            pkgResult.setAppPackageName(abiAndName[1]);
             mPackageResults.put(id, pkgResult);
         }
         return pkgResult;

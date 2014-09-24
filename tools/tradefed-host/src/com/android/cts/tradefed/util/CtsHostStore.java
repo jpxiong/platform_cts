@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CtsHostStore {
 
-    // needs concurrent verion as there can be multiple client accessing this.
+    // needs concurrent version as there can be multiple client accessing this.
     // But there is no additional protection for the same key as that should not happen.
     private static final ConcurrentHashMap<String, String> mMap =
             new ConcurrentHashMap<String, String>();
@@ -50,7 +50,7 @@ public class CtsHostStore {
     }
 
     /**
-     * return test key in the form of device_serial#abi#class_name#method_name
+     * @return test key in the form of device_serial#abi#class_name#method_name
      */
     private static String generateTestKey(String deviceSerial, String abi, String classMethodName) {
         return String.format("%s#%s#%s", deviceSerial, abi, classMethodName);
