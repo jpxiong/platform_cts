@@ -205,7 +205,7 @@ class TestPlan(object):
     for package in self.all_packages:
       if self.map[package]:
         entry = doc.createElement('Entry')
-        entry.setAttribute('uri', package)
+        entry.setAttribute('name', package)
         if package in self.excludedTestsMap:
           entry.setAttribute('exclude', ';'.join(self.excludedTestsMap[package]))
         if package in self.includedTestsMap:

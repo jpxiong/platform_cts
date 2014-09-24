@@ -647,7 +647,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         } else if (mClassName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test class %s", mClassName));
             // try to find packages to run from class name
-            Set<String> packageIds = testRepo.findPackageIdsForTest(mClassName);
+            List<String> packageIds = testRepo.findPackageIdsForTest(mClassName);
             if (!packageIds.isEmpty()) {
                 for (String packageId: packageIds) {
                     ITestPackageDef testPackageDef = testRepo.getTestPackage(packageId);
