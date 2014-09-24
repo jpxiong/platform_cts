@@ -549,9 +549,26 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
                             " must be one of the camera device supported video size!",
                             mSupportedVideoSizes.contains(videoSz));
+            assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
+                            " must be one of the camera device supported JPEG sizes!",
+                            mStaticInfo.isHardwareLevelLegacy() ||
+                            mOrderedStillSizes.contains(videoSz));
 
             Size maxPreviewSize = mOrderedPreviewSizes.get(0);
-            Size videoSnapshotSz = videoSz;
+
+            // For LEGACY, find closest supported smaller or equal JPEG size to the current video
+            // size; if no size is smaller than the video, pick the smallest JPEG size.  The assert
+            // for video size above guarantees that for LIMITED or FULL, we select videoSz here.
+            Size videoSnapshotSz = mOrderedStillSizes.get(mOrderedStillSizes.size() - 1);
+            for (int i = mOrderedStillSizes.size() - 2; i >= 0; i--) {
+                Size candidateSize = mOrderedStillSizes.get(i);
+                if (candidateSize.getWidth() > videoSz.getWidth() ||
+                        candidateSize.getHeight() > videoSz.getHeight()) {
+                    break;
+                }
+                videoSnapshotSz = candidateSize;
+            }
+
             /**
              * Only test full res snapshot when below conditions are all true.
              * 1. Camera is a FULL device
