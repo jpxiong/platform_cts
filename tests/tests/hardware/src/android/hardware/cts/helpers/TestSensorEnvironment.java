@@ -218,6 +218,42 @@ public class TestSensorEnvironment {
     }
 
     /**
+     * @return The maximum latency of a given sensor, on top of {@link #getMaxReportLatencyUs()}.
+     *
+     * NOTE: The latency is defined as the time between the event happens and the time the event is
+     * generated.
+     *
+     * - At time event_time (reported in the sensor event), the physical event happens
+     * - At time event_time + detection_latency, the physical event is detected and the event is
+     *   saved in the hardware fifo
+     * - At time event_time + detection_latency + report_latency, the event is reported through the
+     *   HAL
+     *
+     * Soon after that, the event is piped through the framework to the application. This time may
+     * vary depending on the CPU load. The time 'detection_latency' must be less than
+     * {@link #getSensorMaxDetectionLatencyNs(Sensor)}, and 'report_latency' must be less than
+     * {@link #getMaxReportLatencyUs()} passed through batch() at the HAL level.
+     */
+    // TODO: when all tests are moved to use the Sensor test framework, make this method non-static
+    public static long getSensorMaxDetectionLatencyNs(Sensor sensor) {
+        int reportLatencySec;
+        switch (sensor.getType()) {
+            case Sensor.TYPE_STEP_DETECTOR:
+                reportLatencySec = 2;
+                break;
+            case Sensor.TYPE_STEP_COUNTER:
+                reportLatencySec = 10;
+                break;
+            case Sensor.TYPE_SIGNIFICANT_MOTION:
+                reportLatencySec = 10;
+                break;
+            default:
+                reportLatencySec = 0;
+        }
+        return TimeUnit.SECONDS.toNanos(reportLatencySec);
+    }
+
+    /**
      * Return true if {@link #getRequestedSamplingPeriodUs()} is not one of
      * {@link SensorManager#SENSOR_DELAY_GAME}, {@link SensorManager#SENSOR_DELAY_UI}, or
      * {@link SensorManager#SENSOR_DELAY_NORMAL}.

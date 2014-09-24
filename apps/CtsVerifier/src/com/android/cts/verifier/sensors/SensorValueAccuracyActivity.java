@@ -52,7 +52,7 @@ public class SensorValueAccuracyActivity
     private static final int EVENTS_TO_COLLECT = 100;
     private static final int SENSOR_RATE = SensorManager.SENSOR_DELAY_FASTEST;
 
-    private static final float MAGNETIC_FIELD_CALIBRATED_UNCALIBRATED_THRESHOLD_UT = 1f;
+    private static final float MAGNETIC_FIELD_CALIBRATED_UNCALIBRATED_THRESHOLD_UT = 3f;
     private static final float GYROSCOPE_CALIBRATED_UNCALIBRATED_THRESHOLD_RAD_SEC = 0.01f;
 
     private static final float RANGE_ATMOSPHERIC_PRESSURE = 35f;
