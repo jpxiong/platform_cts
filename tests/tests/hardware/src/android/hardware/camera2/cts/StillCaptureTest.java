@@ -993,8 +993,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     EXIF_TEST_DATA[i].thumbnailQuality,
                     stillResult.get(CaptureResult.JPEG_THUMBNAIL_QUALITY));
 
-            // Validate other exif tags.
-            jpegTestExifExtraTags(exif, maxStillSz, stillResult);
+            // Validate other exif tags for all non-legacy devices
+            if (!mStaticInfo.isHardwareLevelLegacy()) {
+                jpegTestExifExtraTags(exif, maxStillSz, stillResult);
+            }
         }
     }
 

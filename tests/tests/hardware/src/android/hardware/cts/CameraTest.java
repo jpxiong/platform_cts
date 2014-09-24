@@ -905,7 +905,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
         assertBitmapAndJpegSizeEqual(mJpegData, exif);
-        assertTrue(failedCause.toString(), extraExiftestPassed);
         // Reset the rotation to prevent from affecting other tests.
         parameters.setRotation(0);
         mCamera.setParameters(parameters);
