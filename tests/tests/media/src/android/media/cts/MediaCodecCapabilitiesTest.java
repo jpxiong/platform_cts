@@ -39,7 +39,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline)) {
           return;
         }
-        if (supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel1)) {
             throw new RuntimeException("AVCLevel1 support is required by CDD");
         }
