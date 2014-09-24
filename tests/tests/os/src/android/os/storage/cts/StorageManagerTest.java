@@ -29,8 +29,13 @@ import android.test.AndroidTestCase;
 import android.test.ComparisonFailure;
 import android.util.Log;
 
+import libcore.io.Streams;
+import org.junit.Assert;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +48,7 @@ public class StorageManagerTest extends AndroidTestCase {
     private static final long WAIT_TIME_INCR = 5*1000;
 
     private static final String OBB_MOUNT_PREFIX = "/mnt/obb/";
+    private static final String TEST1_CONTENTS = "1\n";
 
     private StorageManager mStorageManager;
 
@@ -52,7 +58,7 @@ public class StorageManagerTest extends AndroidTestCase {
         mStorageManager = (StorageManager) mContext.getSystemService(Context.STORAGE_SERVICE);
     }
 
-    public void testMountAndUnmountObbNormal() {
+    public void testMountAndUnmountObbNormal() throws IOException {
         for (File target : getTargetFiles()) {
             target = new File(target, "test1.obb");
             Log.d(TAG, "Testing path " + target);
@@ -60,17 +66,22 @@ public class StorageManagerTest extends AndroidTestCase {
         }
     }
 
-    private void doMountAndUnmountObbNormal(File outFile) {
+    private void doMountAndUnmountObbNormal(File outFile) throws IOException {
         final String canonPath = mountObb(R.raw.test1, outFile, OnObbStateChangeListener.MOUNTED);
 
         mountObb(R.raw.test1, outFile, OnObbStateChangeListener.ERROR_ALREADY_MOUNTED);
 
-        final String mountPath = checkMountedPath(canonPath);
-        final File mountDir = new File(mountPath);
+        try {
+            final String mountPath = checkMountedPath(canonPath);
+            final File mountDir = new File(mountPath);
+            final File testFile = new File(mountDir, "test1.txt");
 
-        assertTrue("OBB mounted path should be a directory", mountDir.isDirectory());
-
-        unmountObb(outFile, OnObbStateChangeListener.UNMOUNTED);
+            assertTrue("OBB mounted path should be a directory", mountDir.isDirectory());
+            assertTrue("test1.txt does not exist in OBB dir", testFile.exists());
+            assertFileContains(testFile, TEST1_CONTENTS);
+        } finally {
+            unmountObb(outFile, OnObbStateChangeListener.UNMOUNTED);
+        }
     }
 
     public void testAttemptMountNonObb() {
@@ -110,7 +121,7 @@ public class StorageManagerTest extends AndroidTestCase {
                 mStorageManager.getMountedObbPath(outFile.getPath()));
     }
 
-    public void testMountAndUnmountTwoObbs() {
+    public void testMountAndUnmountTwoObbs() throws IOException {
         for (File target : getTargetFiles()) {
             Log.d(TAG, "Testing target " + target);
             final File test1 = new File(target, "test1.obb");
@@ -119,7 +130,7 @@ public class StorageManagerTest extends AndroidTestCase {
         }
     }
 
-    private void doMountAndUnmountTwoObbs(File file1, File file2) {
+    private void doMountAndUnmountTwoObbs(File file1, File file2) throws IOException {
         ObbObserver oo1 = mountObbWithoutWait(R.raw.test1, file1);
         ObbObserver oo2 = mountObbWithoutWait(R.raw.test1, file2);
 
@@ -128,22 +139,36 @@ public class StorageManagerTest extends AndroidTestCase {
         Log.d(TAG, "Waiting for OBB #2 to complete mount");
         waitForObbActionCompletion(file2, oo2, OnObbStateChangeListener.MOUNTED);
 
-        final String mountPath1 = checkMountedPath(oo1.getPath());
-        final File mountDir1 = new File(mountPath1);
-        assertTrue("OBB mounted path should be a directory", mountDir1.isDirectory());
+        try {
+            final String mountPath1 = checkMountedPath(oo1.getPath());
+            final File mountDir1 = new File(mountPath1);
+            final File testFile1 = new File(mountDir1, "test1.txt");
+            assertTrue("OBB mounted path should be a directory", mountDir1.isDirectory());
+            assertTrue("test1.txt does not exist in OBB dir", testFile1.exists());
+            assertFileContains(testFile1, TEST1_CONTENTS);
 
-        final String mountPath2 = checkMountedPath(oo2.getPath());
-        final File mountDir2 = new File(mountPath2);
-        assertTrue("OBB mounted path should be a directory", mountDir2.isDirectory());
-
-        unmountObb(file1, OnObbStateChangeListener.UNMOUNTED);
-        unmountObb(file2, OnObbStateChangeListener.UNMOUNTED);
+            final String mountPath2 = checkMountedPath(oo2.getPath());
+            final File mountDir2 = new File(mountPath2);
+            final File testFile2 = new File(mountDir2, "test1.txt");
+            assertTrue("OBB mounted path should be a directory", mountDir2.isDirectory());
+            assertTrue("test1.txt does not exist in OBB dir", testFile2.exists());
+            assertFileContains(testFile2, TEST1_CONTENTS);
+        } finally {
+            unmountObb(file1, OnObbStateChangeListener.UNMOUNTED);
+            unmountObb(file2, OnObbStateChangeListener.UNMOUNTED);
+        }
     }
 
     private static void assertStartsWith(String message, String prefix, String actual) {
         if (!actual.startsWith(prefix)) {
             throw new ComparisonFailure(message, prefix, actual);
         }
+    }
+
+    private static void assertFileContains(File file, String contents) throws IOException {
+        byte[] actual = Streams.readFully(new FileInputStream(file));
+        byte[] expected = contents.getBytes("UTF-8");
+        Assert.assertArrayEquals(expected, actual);
     }
 
     private static class ObbObserver extends OnObbStateChangeListener {
