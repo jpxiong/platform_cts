@@ -562,11 +562,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             Size videoSnapshotSz = mOrderedStillSizes.get(mOrderedStillSizes.size() - 1);
             for (int i = mOrderedStillSizes.size() - 2; i >= 0; i--) {
                 Size candidateSize = mOrderedStillSizes.get(i);
-                if (candidateSize.getWidth() > videoSz.getWidth() ||
-                        candidateSize.getHeight() > videoSz.getHeight()) {
-                    break;
+                if (candidateSize.getWidth() <= videoSz.getWidth() &&
+                        candidateSize.getHeight() <= videoSz.getHeight()) {
+                    videoSnapshotSz = candidateSize;
                 }
-                videoSnapshotSz = candidateSize;
             }
 
             /**
