@@ -572,8 +572,11 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         if (canSetAfRegion) {
             MeteringRectangle[] resultAfRegions =
                     getValueNotNull(result, CaptureResult.CONTROL_AF_REGIONS);
-            mCollector.expectEquals("AF regions in result and request should be same",
-                    afRegions, resultAfRegions);
+            mCollector.expectMeteringRegionsAreSimilar(
+                    "AF regions in result and request should be similar",
+                    afRegions,
+                    resultAfRegions,
+                    METERING_REGION_ERROR_PERCENT_DELTA);
         }
 
         if (hasFocuser) {
