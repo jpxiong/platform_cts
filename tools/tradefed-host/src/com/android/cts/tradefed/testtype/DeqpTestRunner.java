@@ -389,11 +389,13 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
         String instrumentationName =
                 "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
-        // TODO run the test with the given ABI
-        String command = "am instrument -w -e deqpLogFileName \"" + logFileName
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + caseListFileName + " "
-                + "--deqp-gl-config-name=rgba8888d24s8\" "
-                + (mLogData ? "-e deqpLogData \"true\" " : "") + instrumentationName;
+
+        String command = String.format(
+                "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
+                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                    + " -e deqpLogData \"%s\" %s",
+                AbiUtils.createAbiFlag(mAbi.getName()), logFileName, caseListFileName, mLogData,
+                instrumentationName);
 
         mDevice.executeShellCommand(command, parser);
         parser.flush();
