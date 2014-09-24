@@ -43,22 +43,19 @@ public class ReportLog {
     /**
      * print array of values to output log
      */
-    public void printArray(String message, double[] values, ResultType type,
-            ResultUnit unit) {
+    public void printArray(String message, double[] values, ResultType type, ResultUnit unit) {
         doPrintArray(message, values, type, unit);
     }
 
     /**
      * Print a value to output log
      */
-    public void printValue(String message, double value, ResultType type,
-            ResultUnit unit) {
+    public void printValue(String message, double value, ResultType type, ResultUnit unit) {
         double[] vals = { value };
         doPrintArray(message, vals, type, unit);
     }
 
-    private void doPrintArray(String message, double[] values, ResultType type,
-    ResultUnit unit) {
+    private void doPrintArray(String message, double[] values, ResultType type, ResultUnit unit) {
         StringBuilder builder = new StringBuilder();
         // note mDepth + 1 as this function will be called by printVaue or printArray
         // and we need caller of printValue / printArray
@@ -104,17 +101,19 @@ public class ReportLog {
     /**
      * For standard report summary without target value.
      * Note that this function will not fail as there is no target.
-     * @param messsage
+     * @param message
      * @param value
      * @param type type of the value
      * @param unit unit of the data
      */
-    public void printSummary(String message, double value, ResultType type,
-            ResultUnit unit) {
+    public void printSummary(String message, double value, ResultType type, ResultUnit unit) {
         mSummary = message + LOG_ELEM_SEPARATOR + " " + LOG_ELEM_SEPARATOR + type.getXmlString() +
                 LOG_ELEM_SEPARATOR + unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
     }
 
+    /**
+     * @return a string representation of this report.
+     */
     protected String generateReport() {
         if ((mSummary == null) && mMessages.isEmpty()) {
             // just return empty string
