@@ -20,6 +20,8 @@ import com.android.cts.media.R;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.graphics.ImageFormat;
+import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
@@ -1326,12 +1328,19 @@ public class DecoderTest extends MediaPlayerTestBase {
                     if ((checkFlags & (CHECKFLAG_SETCHECKSUM | CHECKFLAG_COMPARECHECKSUM)) != 0) {
                         long sum = 0;   // note: checksum is 0 if buffer format unrecognized
                         if (dochecksum) {
-                            // TODO: add stride - right now just use info.size (as before)
-                            //sum = checksum(codecOutputBuffers[outputBufIndex], width, height,
-                            //        stride);
-                            ByteBuffer outputBuffer = codecOutputBuffers[outputBufIndex];
-                            outputBuffer.position(info.offset);
-                            sum = checksum(outputBuffer, info.size);
+                            Image image = codec.getOutputImage(outputBufIndex);
+                            // use image to do crc if it's available
+                            // fall back to buffer if image is not available
+                            if (image != null) {
+                                sum = checksum(image);
+                            } else {
+                                // TODO: add stride - right now just use info.size (as before)
+                                //sum = checksum(codecOutputBuffers[outputBufIndex], width, height,
+                                //        stride);
+                                ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufIndex);
+                                outputBuffer.position(info.offset);
+                                sum = checksum(outputBuffer, info.size);
+                            }
                         }
                         if ((checkFlags & CHECKFLAG_COMPARECHECKSUM) != 0) {
                             assertTrue("number of frames (" + numframes
@@ -1506,13 +1515,13 @@ public class DecoderTest extends MediaPlayerTestBase {
             if (true) { // this {} is 80x times faster than else {} below.
                 byte[] bb = new byte[width]; // local line buffer
                 for (int i = 0; i < height; i += lineinterval) {
-                    buf.position(i * stride);
+                    buf.position(pos + i * stride);
                     buf.get(bb, 0, width);
                     crc.update(bb, 0, width);
                 }
             } else {
                 for (int i = 0; i < height; i += lineinterval) {
-                    buf.position(i * stride);
+                    buf.position(pos + i * stride);
                     for (int j = 0; j < width; ++j) {
                         crc.update(buf.get());
                     }
@@ -1522,6 +1531,75 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
         //tm = System.nanoTime() - tm;
         //Log.d(TAG, "checksum time " + tm);
+        return crc.getValue();
+    }
+
+    private static long checksum(Image image) {
+        int format = image.getFormat();
+        assertEquals("unsupported image format", ImageFormat.YUV_420_888, format);
+
+        CRC32 crc = new CRC32();
+
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+
+        Image.Plane[] planes = image.getPlanes();
+        for (int i = 0; i < planes.length; ++i) {
+            ByteBuffer buf = planes[i].getBuffer();
+
+            int width, height, rowStride, pixelStride, x, y;
+            rowStride = planes[i].getRowStride();
+            pixelStride = planes[i].getPixelStride();
+            if (i == 0) {
+                width = imageWidth;
+                height = imageHeight;
+            } else {
+                width = imageWidth / 2;
+                height = imageHeight /2;
+            }
+            // local contiguous pixel buffer
+            byte[] bb = new byte[width * height];
+            if (buf.hasArray()) {
+                byte b[] = buf.array();
+                int offs = buf.arrayOffset();
+                if (pixelStride == 1) {
+                    for (y = 0; y < height; ++y) {
+                        System.arraycopy(bb, y * width, b, y * rowStride + offs, width);
+                    }
+                } else {
+                    // do it pixel-by-pixel
+                    for (y = 0; y < height; ++y) {
+                        int lineOffset = offs + y * rowStride;
+                        for (x = 0; x < width; ++x) {
+                            bb[y * width + x] = b[lineOffset + x * pixelStride];
+                        }
+                    }
+                }
+            } else { // almost always ends up here due to direct buffers
+                int pos = buf.position();
+                if (pixelStride == 1) {
+                    for (y = 0; y < height; ++y) {
+                        buf.position(pos + y * rowStride);
+                        buf.get(bb, y * width, width);
+                    }
+                } else {
+                    // local line buffer
+                    byte[] lb = new byte[rowStride];
+                    // do it pixel-by-pixel
+                    for (y = 0; y < height; ++y) {
+                        buf.position(pos + y * rowStride);
+                        // we're only guaranteed to have pixelStride * (width - 1) + 1 bytes
+                        buf.get(lb, 0, pixelStride * (width - 1) + 1);
+                        for (x = 0; x < width; ++x) {
+                            bb[y * width + x] = lb[x * pixelStride];
+                        }
+                    }
+                }
+                buf.position(pos);
+            }
+            crc.update(bb, 0, width * height);
+        }
+
         return crc.getValue();
     }
 
