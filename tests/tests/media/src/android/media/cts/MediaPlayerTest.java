@@ -46,6 +46,8 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * Tests for the MediaPlayer API and local video/audio playback.
  *
@@ -1006,9 +1008,18 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
-    public void testDeselectTrack() throws Exception {
+    public void testDeselectTrack() throws Throwable {
         loadResource(R.raw.testvideo_with_2_subtitles);
-        loadSubtitleSource(R.raw.test_subtitle1_srt);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    loadSubtitleSource(R.raw.test_subtitle1_srt);
+                } catch (Exception e) {
+                    throw new AssertionFailedError(e.getMessage());
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -1068,7 +1079,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.stop();
     }
 
-    public void testChangeSubtitleTrack() throws Exception {
+    public void testChangeSubtitleTrack() throws Throwable {
         loadResource(R.raw.testvideo_with_2_subtitles);
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
@@ -1104,13 +1115,31 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         mMediaPlayer.prepare();
         assertFalse(mMediaPlayer.isPlaying());
-        readTimedTextTracks();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    readTimedTextTracks();
+                } catch (Exception e) {
+                    throw new AssertionFailedError(e.getMessage());
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertEquals(getTimedTextTrackCount(), 2);
 
-        // Adds two more external subtitle files.
-        loadSubtitleSource(R.raw.test_subtitle1_srt);
-        loadSubtitleSource(R.raw.test_subtitle2_srt);
-        readTimedTextTracks();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    // Adds two more external subtitle files.
+                    loadSubtitleSource(R.raw.test_subtitle1_srt);
+                    loadSubtitleSource(R.raw.test_subtitle2_srt);
+                    readTimedTextTracks();
+                } catch (Exception e) {
+                    throw new AssertionFailedError(e.getMessage());
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertEquals(getTimedTextTrackCount(), 4);
 
         selectSubtitleTrack(0);
@@ -1138,10 +1167,19 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.stop();
     }
 
-    public void testGetTrackInfo() throws Exception {
+    public void testGetTrackInfo() throws Throwable {
         loadResource(R.raw.testvideo_with_2_subtitles);
-        loadSubtitleSource(R.raw.test_subtitle1_srt);
-        loadSubtitleSource(R.raw.test_subtitle2_srt);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    loadSubtitleSource(R.raw.test_subtitle1_srt);
+                    loadSubtitleSource(R.raw.test_subtitle2_srt);
+                } catch (Exception e) {
+                    throw new AssertionFailedError(e.getMessage());
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         mMediaPlayer.prepare();
         mMediaPlayer.start();
 
