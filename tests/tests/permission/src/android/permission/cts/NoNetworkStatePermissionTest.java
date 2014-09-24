@@ -27,9 +27,8 @@ import java.net.InetAddress;
  */
 public class NoNetworkStatePermissionTest extends AndroidTestCase {
     private ConnectivityManager mConnectivityManager;
-    private static final int TEST_NETWORK_TYPE = 1;
-    private static final int TEST_PREFERENCE = 1;
-    private static final String TEST_FEATURE = "feature";
+    private static final int TEST_NETWORK_TYPE = ConnectivityManager.TYPE_MOBILE;
+    private static final String TEST_FEATURE = "enableHIPRI";
 
     @Override
     protected void setUp() throws Exception {
@@ -37,22 +36,6 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
         mConnectivityManager = (ConnectivityManager) mContext.getSystemService(
                 Context.CONNECTIVITY_SERVICE);
         assertNotNull(mConnectivityManager);
-    }
-
-    /**
-     * Verify that ConnectivityManager#getNetworkPreference() requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testGetNetworkPreference() {
-        try {
-            mConnectivityManager.getNetworkPreference();
-            fail("ConnectivityManager.getNetworkPreference didn't throw SecurityException as"
-                    + " expected");
-        } catch (SecurityException e) {
-            // expected
-        }
     }
 
     /**
@@ -104,22 +87,6 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that ConnectivityManager#setNetworkPreference() requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testSetNetworkPreference() {
-        try {
-            mConnectivityManager.setNetworkPreference(TEST_PREFERENCE);
-            fail("ConnectivityManager.setNetworkPreference didn't throw SecurityException as"
-                    + " expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
      * Verify that ConnectivityManager#startUsingNetworkFeature() requires permissions.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
@@ -129,22 +96,6 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
         try {
             mConnectivityManager.startUsingNetworkFeature(TEST_NETWORK_TYPE, TEST_FEATURE);
             fail("ConnectivityManager.startUsingNetworkFeature didn't throw SecurityException as"
-                    + " expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that ConnectivityManager#stopUsingNetworkFeature() requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testStopUsingNetworkFeature() {
-        try {
-            mConnectivityManager.stopUsingNetworkFeature(TEST_NETWORK_TYPE, TEST_FEATURE);
-            fail("ConnectivityManager.stopUsingNetworkFeature didn't throw SecurityException as"
                     + " expected");
         } catch (SecurityException e) {
             // expected
