@@ -55,22 +55,6 @@ public class ConnectivityManagerPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that calling {@link ConnectivityManager#getNetworkPreference()}
-     * requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testGetNetworkPreference() {
-        try {
-            mConnectivityManager.getNetworkPreference();
-            fail("Was able to call getNetworkPreference");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
      * Verify that calling {@link ConnectivityManager#requestRouteToHost(int, int)}
      * requires permissions.
      * <p>Tests Permission:
@@ -81,38 +65,6 @@ public class ConnectivityManagerPermissionTest extends AndroidTestCase {
         try {
             mConnectivityManager.requestRouteToHost(ConnectivityManager.TYPE_MOBILE, 1);
             fail("Was able to call requestRouteToHost");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that calling {@link ConnectivityManager#setNetworkPreference(int)}
-     * requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testSetNetworkPreference() {
-        try {
-            mConnectivityManager.setNetworkPreference(ConnectivityManager.TYPE_MOBILE);
-            fail("Was able to call setNetworkPreference");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that calling {@link ConnectivityManager#setNetworkPreference(int)}
-     * requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testStartUsingNetworkPreference() {
-        try {
-            mConnectivityManager.setNetworkPreference(ConnectivityManager.TYPE_MOBILE);
-            fail("Was able to call setNetworkPreference");
         } catch (SecurityException e) {
             // expected
         }
