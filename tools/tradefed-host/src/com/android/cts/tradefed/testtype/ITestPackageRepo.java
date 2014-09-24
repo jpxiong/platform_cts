@@ -18,7 +18,7 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.util.AbiUtils;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,7 +36,7 @@ public interface ITestPackageRepo {
     public ITestPackageDef getTestPackage(String id);
 
     /**
-     * Get a set of {@link TestPackageDef} given a name
+     * Get a {@link Set} of {@link TestPackageDef} given a name
      *
      * @param name the string package name
      * @return a {@link Set} of {@link TestPackageDef}
@@ -47,18 +47,18 @@ public interface ITestPackageRepo {
      * Attempt to find the package ids for a given test class name
      *
      * @param testClassName the test class name
-     * @return a {@link Set} of package ids.
+     * @return a {@link List} of package ids.
      */
-    public Set<String> findPackageIdsForTest(String testClassName);
+    public List<String> findPackageIdsForTest(String testClassName);
 
     /**
-     * return a sorted {@link Collection} of all package ids found in repo.
+     * @return a sorted {@link List} of all package ids found in repo.
      */
-    public Collection<String> getPackageIds();
+    public List<String> getPackageIds();
 
     /**
-     * return a sorted {@link Collection} of all package names found in repo.
+     * @return a sorted {@link List} of all package names found in repo.
      */
-    public Collection<String> getPackageNames();
+    public List<String> getPackageNames();
 
 }

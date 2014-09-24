@@ -136,7 +136,7 @@ class TestPackageResult extends AbstractXmlPullParser {
             // should never happen
             classNameSegments.add("UnknownTestClass");
         }
-        String testCaseName = classNameSegments.remove(classNameSegments.size()-1);
+        String testCaseName = classNameSegments.remove(classNameSegments.size() - 1);
         return mSuiteRoot.findTest(classNameSegments, testCaseName, testId.getTestName(), insertIfMissing);
     }
 
