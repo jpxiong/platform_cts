@@ -500,7 +500,8 @@
     <string name="snsr_mag_verify_std_dev">Verifying the Standard Deviation...</string>
     <string name="snsr_mag_calibration_description">Please calibrate the Magnetometer by moving
         it in 8 shapes in different orientations.</string>
-    <string name="snsr_mag_calibration_complete">When done, leave the device in a flat surface.</string>
+    <string name="snsr_mag_calibration_complete">When done, leave the device in a flat surface, far
+        from all metallic objects (if the test does not pass, try re-running it outdoors).</string>
 
     <!-- Sensor Value Accuracy -->
     <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
