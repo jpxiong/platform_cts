@@ -24,7 +24,7 @@ LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_MODULE := cts-tradefed
 LOCAL_MODULE_TAGS := optional
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt hosttestlib
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt hosttestlib
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib
 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk

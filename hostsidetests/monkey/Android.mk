@@ -22,7 +22,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := CtsMonkeyTestCases
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt
 
 # prefix zzz intentional to run this last
 LOCAL_CTS_TEST_PACKAGE := zzz.android.monkey

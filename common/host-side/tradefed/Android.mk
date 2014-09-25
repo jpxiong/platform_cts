@@ -28,7 +28,7 @@ LOCAL_MODULE := compatibility-tradefed_v2
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt hosttestlib compatibility-common-util-hostsidelib_v2
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt hosttestlib compatibility-common-util-hostsidelib_v2
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 
@@ -44,7 +44,7 @@ LOCAL_MODULE := compatibility-tradefed-tests_v2
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt compatibility-tradefed_v2 junit
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt compatibility-tradefed_v2 junit
 
 LOCAL_STATIC_JAVA_LIBRARIES := easymock
 
