@@ -233,12 +233,16 @@
     <string name="ble_advertiser_service_name">Bluetooth LE Advertiser Handler Service</string>
     <string name="ble_privacy_mac_name">BLE Privacy Mac</string>
     <string name="ble_privacy_mac_info">BLE Advertiser should advertise in non-repeating MAC address.</string>
+    <string name="ble_advertiser_privacy_mac_instruction">Click start to start advertising, you can disconnect USB and lock the screen of advertiser. Counts and mac address will show on scanner. You may receive message that this device does not support BLE advertising.</string>
     <string name="ble_power_level_name">BLE Tx Power Level</string>
     <string name="ble_power_level_info">BLE Advertiser advertises in 4 different power levels. Scanner should receive them in different strength of Rssi, cannot receive weak signals beyond several feet.</string>
+    <string name="ble_advertiser_power_level_instruction">Click start to start multi-advertising. Data packets are advertised in 4 different power levels. You may receive message that this device does not support multi advertising. If advertiser does not advertise in 4 power levels, neither you receive the error message, you may not stop the advertising in previous test, or this device does not support 4 advertisers at the same time. Try rebooting the device and run the test to free those advertisers in use.</string>
     <string name="ble_advertiser_scan_filter_name">BLE Hardware Scan Filter</string>
     <string name="ble_advertiser_scan_filter_info">BLE Advertiser advertises with 2 different data separately. One can wake up the scanner, the other cannot.</string>
     <string name="ble_advertiser_scannable">Scannable advertising</string>
+    <string name="ble_advertiser_scannable_instruction">Start scannable advertising, expect scanner consume more power on Monsoon monitor, or see log of GattService from scanner logcat.</string>
     <string name="ble_advertiser_unscannable">Unscannble advertising</string>
+    <string name="ble_advertiser_unscannable_instruction">Start unscannable advertising, expect scanner stay calm on Monsoon monitor, no log of GattService from scanner logcat.</string>
     <string name="ble_advertiser_start">Start</string>
     <string name="ble_advertiser_stop">Stop</string>
 
@@ -247,12 +251,15 @@
     <string name="ble_scanner_service_name">Bluetooth LE Scanner Handler Service</string>
     <string name="ble_scanner_test_info">The BLE test must be done simultaneously on two devices, an advertiser and a scanner. This device is the scanner.</string>
     <string name="ble_scanner_privacy_mac">Hold for 15 min to see if receive a different MAC address from advertiser.</string>
+    <string name="ble_scanner_privacy_mac_instruction">Mac address, counts are shown on screen. It should continuously receive data packet from advertiser. Every 15 min, a new mac address should show up, which prevents mac address disclosure.</string>
     <string name="ble_ultra_low">Ultra low</string>
     <string name="ble_low">Low</string>
     <string name="ble_medium">Medium</string>
     <string name="ble_high">High</string>
+    <string name="ble_scanner_power_level_instruction">Count: Ultra low &lt; low &lt; medium &lt; high\nRssi: Ultra low &lt; low &lt; medium &lt; high\nDistance to see count freezing: Ultra low &lt; low &lt; medium &lt; high\nA common error is ultra low, low and medium behave similarly, with similar rssi, freeze at similar distance.</string>
     <string name="ble_scanner_scan_filter_name">BLE Hardware Scan Filter</string>
     <string name="ble_scanner_scan_filter_info">Lock the screen of scanner, and connect to monsoon. It will not wake up when advertiser is advertising unscannable, and scanner is scanning with filter.</string>
+    <string name="ble_scanner_scan_filter_instruction">For monsoon test:\n\tClick scan with filter, lock the screen, connect to monsoon. It will not wake up when advertiser is advertising unscannable data packets, but will show a peak in power usage when advertiser is advertising scannable data.\nFor logcat test:\n\tClick scan with filter, logcat the scanner. No data will be received by GattService when advertiser is advertising unscannable data.</string>
     <string name="ble_scan_with_filter">Scan with filter</string>
     <string name="ble_scan_without_filter">Scan without filter</string>
 
