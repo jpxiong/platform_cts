@@ -30,7 +30,6 @@ import android.test.ComparisonFailure;
 import android.util.Log;
 
 import libcore.io.Streams;
-import org.junit.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -168,7 +167,10 @@ public class StorageManagerTest extends AndroidTestCase {
     private static void assertFileContains(File file, String contents) throws IOException {
         byte[] actual = Streams.readFully(new FileInputStream(file));
         byte[] expected = contents.getBytes("UTF-8");
-        Assert.assertArrayEquals(expected, actual);
+        assertEquals("unexpected size", expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals("unexpected value at offset " + i, expected[i], actual[i]);
+        }
     }
 
     private static class ObbObserver extends OnObbStateChangeListener {
