@@ -30,7 +30,6 @@ import com.android.cts.tradefed.testtype.TestPackageDefTest;
 import com.android.cts.tradefed.testtype.TestPackageXmlParserTest;
 import com.android.cts.tradefed.testtype.TestPlanTest;
 import com.android.cts.tradefed.testtype.WrappedGTestResultParserTest;
-import com.android.cts.util.AbiUtils;
 import com.android.tradefed.testtype.IAbi;
 
 import junit.framework.Test;
