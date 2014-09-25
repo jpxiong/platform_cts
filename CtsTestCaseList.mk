@@ -31,6 +31,7 @@ cts_security_apps_list := \
 
 cts_support_packages := \
     CtsAccelerationTestStubs \
+    CtsAppTestStubs \
     CtsDeviceAdmin \
     CtsDeviceOpenGl \
     CtsDeviceTaskswitchingAppA \

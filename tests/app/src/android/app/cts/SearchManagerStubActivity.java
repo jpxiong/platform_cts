@@ -25,9 +25,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-public class SearchManagerCtsActivity extends Activity {
+public class SearchManagerStubActivity extends Activity {
 
-    private static final String TAG = "SearchManagerCtsActivity";
+    private static final String TAG = "SearchManagerStubActivity";
 
     public static final String TEST_STOP_SEARCH = "stopSearch";
     public static final String TEST_ON_DISMISSLISTENER = "setOnDismissListener";
