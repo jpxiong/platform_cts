@@ -28,6 +28,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.MovementDetectorHelper;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -232,19 +233,15 @@ public class StepCounterTestActivity
                         counterEvent.timestamp);
                 Assert.assertTrue(eventTriggered, countDelta > 0);
 
-                long systemTimestamp = counterEvent.receivedTimestamp;
-                long timestamp = counterEvent.timestamp;
-                long timestampDelta = Math.abs(timestamp - systemTimestamp);
-                String eventTimestampMessage = getString(
-                        R.string.snsr_event_time,
-                        systemTimestamp,
-                        timestamp,
-                        timestampDelta,
-                        TIMESTAMP_SYNCHRONIZATION_THRESHOLD_NANOS,
-                        sensorName);
-                Assert.assertTrue(
-                        eventTimestampMessage,
-                        timestampDelta < TIMESTAMP_SYNCHRONIZATION_THRESHOLD_NANOS);
+                // TODO: abstract this into an ISensorVerification
+
+                long deltaThreshold = TIMESTAMP_SYNCHRONIZATION_THRESHOLD_NANOS
+                        + TestSensorEnvironment.getSensorMaxDetectionLatencyNs(counterEvent.sensor);
+                assertTimestampSynchronization(
+                        counterEvent.timestamp,
+                        counterEvent.receivedTimestamp,
+                        deltaThreshold,
+                        counterEvent.sensor.getName());
 
                 totalStepsCounted = stepsCounted;
             }
