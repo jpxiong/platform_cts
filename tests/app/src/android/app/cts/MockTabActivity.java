@@ -46,7 +46,7 @@ public class MockTabActivity extends TabActivity {
                 .setContent(new Intent(this, MockActivity.class)));
 
         tabHost.addTab(tabHost.newTabSpec(TAB3).setIndicator(TAB3).setContent(
-                new Intent(this, AppCtsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+                new Intent(this, AppStubActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
     }
 

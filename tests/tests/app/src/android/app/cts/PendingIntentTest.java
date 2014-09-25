@@ -95,11 +95,11 @@ public class PendingIntentTest extends AndroidTestCase {
     }
 
     public void testGetActivity() throws InterruptedException, CanceledException {
-        PendingIntentCtsActivity.status = PendingIntentCtsActivity.INVALIDATE;
+        PendingIntentStubActivity.status = PendingIntentStubActivity.INVALIDATE;
         mPendingIntent = null;
         mIntent = new Intent();
 
-        mIntent.setClass(mContext, PendingIntentCtsActivity.class);
+        mIntent.setClass(mContext, PendingIntentStubActivity.class);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
@@ -109,7 +109,7 @@ public class PendingIntentTest extends AndroidTestCase {
 
         Thread.sleep(WAIT_TIME);
         assertNotNull(mPendingIntent);
-        assertEquals(PendingIntentCtsActivity.status, PendingIntentCtsActivity.ON_CREATE);
+        assertEquals(PendingIntentStubActivity.status, PendingIntentStubActivity.ON_CREATE);
 
         // test getActivity return null
         mPendingIntent.cancel();

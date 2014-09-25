@@ -61,7 +61,7 @@ public class TabActivityTest extends InstrumentationTestCase {
             }
         });
         mInstrumentation.waitForIdleSync();
-        final String packageName = "com.android.cts.app";
+        final String packageName = "com.android.cts.app.stub";
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClassName(packageName, MockTabActivity.class.getName());

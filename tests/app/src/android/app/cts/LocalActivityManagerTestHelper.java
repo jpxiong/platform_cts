@@ -87,7 +87,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
 
     private void testRemoveAllActivity() {
         final String id = "id_remove_activity";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id, intent);
 
@@ -98,7 +98,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
         }
 
         if (!activity.getClass().getName().equals("android.app.cts."
-                    + "LocalActivityManagerCtsActivity")) {
+                    + "LocalActivityManagerStubActivity")) {
             fail();
             return;
         }
@@ -115,27 +115,27 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
     private void testDispatchDestroy() {
         final String id1 = "id_dispatch_destroy1";
         final String id2 = "id_dispatch_destroy2";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id1, intent);
 
-        LocalActivityManagerCtsActivity.sIsOnDestroyCalled = false;
+        LocalActivityManagerStubActivity.sIsOnDestroyCalled = false;
         mLocalActivityManager.dispatchDestroy(false);
         if (mLocalActivityManager.getCurrentActivity().isFinishing()){
             fail();
             return;
         }
 
-        if (!LocalActivityManagerCtsActivity.sIsOnDestroyCalled) {
+        if (!LocalActivityManagerStubActivity.sIsOnDestroyCalled) {
             fail();
             return;
         }
 
         mLocalActivityManager.startActivity(id2, intent);
-        LocalActivityManagerCtsActivity.sIsOnDestroyCalled = false;
+        LocalActivityManagerStubActivity.sIsOnDestroyCalled = false;
         mLocalActivityManager.dispatchDestroy(true);
 
-        if (!LocalActivityManagerCtsActivity.sIsOnDestroyCalled) {
+        if (!LocalActivityManagerStubActivity.sIsOnDestroyCalled) {
             fail();
             return;
         }
@@ -157,7 +157,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
         }
 
         final String id = "id_dispatch_pause";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id, intent);
 
@@ -176,12 +176,12 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
 
     private void testDispatchPauseFalse() {
         final String id = "id_dispatch_pause";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id, intent);
-        LocalActivityManagerCtsActivity.sIsOnPauseCalled = false;
+        LocalActivityManagerStubActivity.sIsOnPauseCalled = false;
         mLocalActivityManager.dispatchPause(false);
-        if (!LocalActivityManagerCtsActivity.sIsOnPauseCalled) {
+        if (!LocalActivityManagerStubActivity.sIsOnPauseCalled) {
             fail();
             return;
         }
@@ -190,12 +190,12 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
 
     private void testDispatchPauseTrue() {
         final String id = "id_dispatch_pause";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id, intent);
-        LocalActivityManagerCtsActivity.sIsOnPauseCalled = false;
+        LocalActivityManagerStubActivity.sIsOnPauseCalled = false;
         mLocalActivityManager.dispatchPause(true);
-        if (!LocalActivityManagerCtsActivity.sIsOnPauseCalled) {
+        if (!LocalActivityManagerStubActivity.sIsOnPauseCalled) {
             fail();
             return;
         }
@@ -204,7 +204,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
 
     private void testDispatchStop() {
         final String id = "id_dispatch_stop";
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity(id, intent);
         if (mLocalActivityManager.getCurrentActivity() == null) {
@@ -212,10 +212,10 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             return;
         }
 
-        LocalActivityManagerCtsActivity.sIsOnStopCalled = false;
+        LocalActivityManagerStubActivity.sIsOnStopCalled = false;
         mLocalActivityManager.dispatchStop();
 
-        if (!LocalActivityManagerCtsActivity.sIsOnStopCalled) {
+        if (!LocalActivityManagerStubActivity.sIsOnStopCalled) {
             fail();
             return;
         }
@@ -226,7 +226,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
         final Bundle EXPECTED = new Bundle();
         final String id = "id";
 
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity("_id" + System.currentTimeMillis(), intent);
         final Bundle bundle = mLocalActivityManager.saveInstanceState();
@@ -261,7 +261,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
     }
 
     private void testStartActivity() {
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         final String id = "_id_resume_test";
         final Window w = mLocalActivityManager.startActivity(id, intent);
@@ -315,13 +315,13 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
     }
 
     private void testDispatchResume() {
-        final Intent intent = new Intent(this, LocalActivityManagerCtsActivity.class);
+        final Intent intent = new Intent(this, LocalActivityManagerStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mLocalActivityManager.startActivity("_id_resume_test", intent);
         mLocalActivityManager.dispatchStop();
-        LocalActivityManagerCtsActivity.sIsOnResumeCalled = false;
+        LocalActivityManagerStubActivity.sIsOnResumeCalled = false;
         mLocalActivityManager.dispatchResume();
-        if (LocalActivityManagerCtsActivity.sIsOnResumeCalled) {
+        if (LocalActivityManagerStubActivity.sIsOnResumeCalled) {
             pass();
         } else {
             fail();
