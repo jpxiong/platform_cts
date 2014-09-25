@@ -77,9 +77,9 @@ public class CtsInstrumentationApkTest extends InstrumentationTest implements IB
     @Override
     public void run(final ITestInvocationListener listener)
             throws DeviceNotAvailableException {
-        ITestDevice mTestDevice = getDevice();
+        ITestDevice testDevice = getDevice();
 
-        if (mTestDevice == null) {
+        if (testDevice == null) {
             Log.e(LOG_TAG, "Missing device.");
             return;
         }
@@ -87,28 +87,32 @@ public class CtsInstrumentationApkTest extends InstrumentationTest implements IB
             Log.e(LOG_TAG, "Missing build");
             return;
         }
-
+        boolean success = true;
         for (String apkFileName : mInstallFileNames) {
             Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
-                    mTestDevice.getSerialNumber()));
+                    testDevice.getSerialNumber()));
             try {
                 File apkFile = mCtsBuild.getTestApp(apkFileName);
                 String errorCode = null;
                 String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
-                errorCode = mTestDevice.installPackage(apkFile, true, options);
+                errorCode = testDevice.installPackage(apkFile, true, options);
                 if (errorCode != null) {
                     Log.e(LOG_TAG, String.format("Failed to install %s on %s. Reason: %s",
-                          apkFileName, mTestDevice.getSerialNumber(), errorCode));
+                          apkFileName, testDevice.getSerialNumber(), errorCode));
+                    success = false;
                 }
             } catch (FileNotFoundException e) {
                 Log.e(LOG_TAG, String.format("Could not find file %s", apkFileName));
+                success = false;
             }
         }
-        super.run(listener);
+        if (success) {
+            super.run(listener);
+        }
         for (String packageName : mUninstallPackages) {
             Log.d(LOG_TAG, String.format("Uninstalling %s on %s", packageName,
-                    mTestDevice.getSerialNumber()));
-            mTestDevice.uninstallPackage(packageName);
+                    testDevice.getSerialNumber()));
+            testDevice.uninstallPackage(packageName);
         }
     }
 }
