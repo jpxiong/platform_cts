@@ -78,7 +78,7 @@ if [ -z ${CTS_ROOT} ]; then
 fi;
 
 JAR_DIR=${CTS_ROOT}/android-cts/tools
-JARS="ddmlib-prebuilt.jar tradefed-prebuilt.jar hosttestlib.jar cts-tradefed.jar"
+JARS="tradefed-prebuilt.jar hosttestlib.jar cts-tradefed.jar"
 
 for JAR in $JARS; do
     checkFile ${JAR_DIR}/${JAR}
