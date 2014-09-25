@@ -51,6 +51,7 @@ import java.lang.InterruptedException;
 import java.lang.Math;
 import java.lang.Thread;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -344,9 +345,10 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
             new ArrayAdapter<String>(
                 this, R.layout.cf_format_list_item, availableSizeNames));
 
-        // Get preview formats
+        // Get preview formats, removing duplicates
 
-        mPreviewFormats =  p.getSupportedPreviewFormats();
+        HashSet<Integer> formatSet = new HashSet<>(p.getSupportedPreviewFormats());
+        mPreviewFormats = new ArrayList<Integer>(formatSet);
 
         String[] availableFormatNames = new String[mPreviewFormats.size()];
         for (int i = 0; i < mPreviewFormats.size(); i++) {
@@ -600,9 +602,11 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
             mCamera = Camera.open(i);
             Camera.Parameters p = mCamera.getParameters();
 
+            HashSet<Integer> formatSet = new HashSet<>(p.getSupportedPreviewFormats());
+
             allCombinationsSize +=
                     p.getSupportedPreviewSizes().size() *   // resolutions
-                    p.getSupportedPreviewFormats().size();  // formats
+                    formatSet.size();  // unique formats
         }
 
         return allCombinationsSize;
