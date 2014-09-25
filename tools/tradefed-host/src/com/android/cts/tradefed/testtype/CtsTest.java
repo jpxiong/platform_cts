@@ -568,10 +568,14 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @throws DeviceNotAvailableException
      */
     private List<TestPackage> buildTestsToRun() throws DeviceNotAvailableException {
+        Set<String> abis = getAbis();
+        if (abis == null || abis.isEmpty()) {
+            throw new IllegalArgumentException("could not get device's ABIs");
+        }
         List<TestPackage> testPkgList = new LinkedList<TestPackage>();
         try {
-            ITestPackageRepo testRepo = createTestCaseRepo();
-            Collection<ITestPackageDef> testPkgDefs = getTestPackagesToRun(testRepo);
+            ITestPackageRepo testRepo = createTestCaseRepo(abis);
+            Collection<ITestPackageDef> testPkgDefs = getTestPackagesToRun(testRepo, abis);
             for (ITestPackageDef testPkgDef : testPkgDefs) {
                 addTestPackage(testPkgList, testPkgDef);
             }
@@ -609,16 +613,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @throws ParseException
      * @throws FileNotFoundException
      * @throws ConfigurationException
-     * @throws DeviceNotAvailableException
      */
-    private Collection<ITestPackageDef> getTestPackagesToRun(ITestPackageRepo testRepo)
-            throws ParseException, FileNotFoundException, ConfigurationException, DeviceNotAvailableException {
+    private Collection<ITestPackageDef> getTestPackagesToRun(ITestPackageRepo testRepo,
+            Set<String> abis) throws ParseException, FileNotFoundException, ConfigurationException {
         // use LinkedHashSet to have predictable iteration order
         Set<ITestPackageDef> testPkgDefs = new LinkedHashSet<ITestPackageDef>();
         if (mPlanName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
             File ctsPlanFile = mCtsBuild.getTestPlanFile(mPlanName);
-            ITestPlan plan = createPlan(mPlanName);
+            ITestPlan plan = createPlan(mPlanName, abis);
             plan.parse(createXmlStream(ctsPlanFile));
             for (String id : plan.getTestIds()) {
                 if (!mExcludedPackageNames.contains(AbiUtils.parseId(id)[1])) {
@@ -666,7 +669,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             String uniquePlanName = Long.toString(System.currentTimeMillis());
             PlanCreator planCreator = new PlanCreator(uniquePlanName, mContinueSessionId,
                     CtsTestStatus.NOT_EXECUTED);
-            ITestPlan plan = createPlan(planCreator);
+            ITestPlan plan = createPlan(planCreator, abis);
             for (String id : plan.getTestIds()) {
                 if (!mExcludedPackageNames.contains(AbiUtils.parseId(id)[1])) {
                     ITestPackageDef testPackageDef = testRepo.getTestPackage(id);
@@ -812,20 +815,18 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * Factory method for creating a {@link ITestPackageRepo}.
      * <p/>
      * Exposed for unit testing
-     * @throws DeviceNotAvailableException
      */
-    ITestPackageRepo createTestCaseRepo() throws DeviceNotAvailableException {
-        return new TestPackageRepo(mCtsBuild.getTestCasesDir(), getAbis(), mIncludeKnownFailures);
+    ITestPackageRepo createTestCaseRepo(Set<String> abis) {
+        return new TestPackageRepo(mCtsBuild.getTestCasesDir(), abis, mIncludeKnownFailures);
     }
 
     /**
      * Factory method for creating a {@link TestPlan}.
      * <p/>
      * Exposed for unit testing
-     * @throws DeviceNotAvailableException
      */
-    ITestPlan createPlan(String planName) throws DeviceNotAvailableException {
-        return new TestPlan(planName, getAbis());
+    ITestPlan createPlan(String planName, Set<String> abis) {
+        return new TestPlan(planName, abis);
     }
 
     /**
@@ -852,11 +853,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * <p/>
      * Exposed for unit testing
      * @throws ConfigurationException
-     * @throws DeviceNotAvailableException
      */
-    ITestPlan createPlan(PlanCreator planCreator)
-            throws ConfigurationException, DeviceNotAvailableException {
-        return planCreator.createDerivedPlan(mCtsBuild, getAbis());
+    ITestPlan createPlan(PlanCreator planCreator, Set<String> abis)
+            throws ConfigurationException {
+        return planCreator.createDerivedPlan(mCtsBuild, abis);
     }
 
     /**
