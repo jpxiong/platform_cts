@@ -96,6 +96,7 @@
   bug: 17508787
 },
 {
+
   description: "These tests fail on some devices.",
   names: [
     "android.uirendering.cts.testclasses.ExactCanvasTests#testBlueRect",
@@ -107,5 +108,12 @@
     "android.uirendering.cts.testclasses.InfrastructureTests#testViewInitializer"
   ],
   bug: 17511118
+},
+{
+  description: "This test failed on devices that use effect off loading. In addition it uses hidden apis",
+  names: [
+    "android.meida.cts.AudioEffectTest#test1_1ConstructorFromUuid"
+  ],
+  bug: 17605875
 }
 ]
