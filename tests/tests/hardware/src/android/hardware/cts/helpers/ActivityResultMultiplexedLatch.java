@@ -111,7 +111,7 @@ public class ActivityResultMultiplexedLatch {
     public void onActivityResult(int requestCode, int resultCode) {
         Entry entry;
         synchronized (mActivityEntries) {
-            entry = mActivityEntries.get(requestCode);
+            entry = mActivityEntries.remove(requestCode);
         }
         if (entry == null) {
             return;
