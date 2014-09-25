@@ -169,42 +169,11 @@ public class AudioEffectTest extends AndroidTestCase {
         }
     }
 
-    //Test case 1.1: test constructor from effect uuid
-    public void test1_1ConstructorFromUuid() throws Exception {
-        AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
-        assertTrue("no effects found", (desc.length != 0));
-        for (int i = 0; i < desc.length; i++) {
-            try {
-                int sessionId;
-                AudioRecord ar = null;
-                if (AudioEffect.EFFECT_PRE_PROCESSING.equals(desc[i].connectMode)) {
-                    ar =  getAudioRecord();
-                    sessionId = ar.getAudioSessionId();
-                } else {
-                    sessionId = 0;
-                }
-                AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_NULL,
-                        desc[i].uuid,
-                        0,
-                        sessionId);
-                assertNotNull("could not create AudioEffect", effect);
-                try {
-                    assertTrue("invalid effect ID", (effect.getId() != 0));
-                } catch (IllegalStateException e) {
-                    fail("AudioEffect not initialized");
-                } finally {
-                    effect.release();
-                    if (ar != null) {
-                        ar.release();
-                    }
-                }
-            } catch (IllegalArgumentException e) {
-                fail("Effect not found: "+desc[i].name);
-            } catch (UnsupportedOperationException e) {
-                fail("Effect library not loaded");
-            }
-        }
-    }
+//    //Test case 1.1: test constructor from effect uuid
+//    public void test1_1ConstructorFromUuid() ...
+//    Note: This test was removed because:
+//     1. will fail in devices that offload effects
+//     2. it used hidden api's.
 
     //Test case 1.2: test constructor failure from unknown type
     public void test1_2ConstructorUnknownType() throws Exception {
