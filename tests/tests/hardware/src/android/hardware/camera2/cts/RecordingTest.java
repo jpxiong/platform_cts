@@ -546,13 +546,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
             Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
-            assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
-                            " must be one of the camera device supported video size!",
-                            mSupportedVideoSizes.contains(videoSz));
-            assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
-                            " must be one of the camera device supported JPEG sizes!",
-                            mStaticInfo.isHardwareLevelLegacy() ||
-                            mOrderedStillSizes.contains(videoSz));
+            if (!mSupportedVideoSizes.contains(videoSz)) {
+                mCollector.addMessage("Video size " + videoSz.toString() + " for profile ID " +
+                        profileId + " must be one of the camera device supported video size!");
+                continue;
+            }
 
             Size maxPreviewSize = mOrderedPreviewSizes.get(0);
 
