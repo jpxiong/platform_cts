@@ -27,7 +27,7 @@ public class KeyguardManagerTest
     private static final String TAG = "KeyguardManagerTest";
 
     public KeyguardManagerTest() {
-        super("com.android.cts.app", KeyguardManagerActivity.class);
+        super("com.android.cts.app.stub", KeyguardManagerActivity.class);
     }
 
     public void testNewKeyguardLock() {

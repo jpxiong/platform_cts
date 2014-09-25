@@ -82,13 +82,6 @@
   bug: 17496766
 },
 {
-  description: "instrumentation target context and test context are the same after move test target inside the test itself",
-  names: [
-    "android.app.cts.InstrumentationTest#testContext"
-  ],
-  bug: 17614217
-},
-{
   description: "Current implementation of uninstallAllUserCaCerts does not throw expected security exception, wait for fix from framework",
   names: [
     "android.admin.cts.DevicePolicyManagerTest#testUninstallAllUserCaCerts_failIfNotProfileOwner"

@@ -15,7 +15,7 @@
  */
 package android.app.cts;
 
-import com.android.cts.app.R;
+import com.android.cts.app.stub.R;
 
 import android.app.Dialog;
 import android.app.Instrumentation;
@@ -50,10 +50,10 @@ import android.widget.LinearLayout;
 
 import java.lang.ref.WeakReference;
 
-public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivity> {
+public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
 
     protected static final long SLEEP_TIME = 200;
-    private static final String STUB_ACTIVITY_PACKAGE = "com.android.cts.app";
+    private static final String STUB_ACTIVITY_PACKAGE = "com.android.cts.app.stub";
     private static final long TEST_TIMEOUT = 1000L;
 
     /**
@@ -69,11 +69,11 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
 
     private Instrumentation mInstrumentation;
     private Context mContext;
-    private DialogCtsActivity mActivity;
+    private DialogStubActivity mActivity;
 
 
     public DialogTest() {
-        super(STUB_ACTIVITY_PACKAGE, DialogCtsActivity.class);
+        super(STUB_ACTIVITY_PACKAGE, DialogStubActivity.class);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     private void startDialogActivity(int dialogNumber) {
-        mActivity = DialogCtsActivity.startDialogActivity(this, dialogNumber);
+        mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
     }
 
     @UiThreadTest
@@ -106,14 +106,14 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testConstructor_protectedCancellable() {
-        startDialogActivity(DialogCtsActivity.TEST_PROTECTED_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_PROTECTED_CANCELABLE);
         mActivity.onCancelListenerCalled = false;
         sendKeys(KeyEvent.KEYCODE_BACK);
         assertTrue(mActivity.onCancelListenerCalled);
     }
 
     public void testConstructor_protectedNotCancellable() {
-        startDialogActivity(DialogCtsActivity.TEST_PROTECTED_NOT_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_PROTECTED_NOT_CANCELABLE);
         mActivity.onCancelListenerCalled = false;
         sendKeys(KeyEvent.KEYCODE_BACK);
         assertFalse(mActivity.onCancelListenerCalled);
@@ -142,7 +142,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnStartCreateStop(){
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
 
         assertTrue(d.isOnStartCalled);
@@ -154,7 +154,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testAccessOwnerActivity() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         Dialog d = mActivity.getDialog();
         assertNotNull(d);
         assertSame(mActivity, d.getOwnerActivity());
@@ -178,7 +178,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testShow() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
         final View decor = d.getWindow().getDecorView();
 
@@ -206,7 +206,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnSaveInstanceState() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
 
         assertFalse(d.isOnSaveInstanceStateCalled);
@@ -226,7 +226,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testGetCurrentFocus() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         assertNull(d.getCurrentFocus());
         runTestOnUiThread(new Runnable() {
@@ -243,7 +243,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testSetContentView() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
         assertNotNull(d);
 
@@ -317,7 +317,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
 
     public void testSetTitle() {
         final String expectedTitle = "Test Dialog Without theme";
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
 
         assertNotNull(mActivity.getDialog());
         mActivity.setUpTitle(expectedTitle);
@@ -333,7 +333,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnKeyDownKeyUp() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         assertFalse(d.isOnKeyDownCalled);
         assertFalse(d.isOnKeyUpCalled);
@@ -352,7 +352,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
      public void testOnKeyMultiple() {
-         startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+         startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
          final TestDialog d = (TestDialog) mActivity.getDialog();
 
          assertNull(d.keyMultipleEvent);
@@ -364,7 +364,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
      }
 
     public void testTouchEvent() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
 
         assertNull(d.onTouchEvent);
@@ -415,7 +415,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testTrackballEvent() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         long eventTime = SystemClock.uptimeMillis();
         final MotionEvent trackBallEvent = MotionEvent.obtain(eventTime, eventTime,
@@ -444,7 +444,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnWindowAttributesChanged() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
 
         assertTrue(d.isOnWindowAttributesChangedCalled);
@@ -464,7 +464,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnContentChanged() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         assertNotNull(d);
 
@@ -481,7 +481,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testOnWindowFocusChanged() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         assertTrue(d.isOnWindowFocusChangedCalled);
         d.isOnWindowFocusChangedCalled = false;
@@ -489,7 +489,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
         // show a new dialog, the new dialog get focus
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mActivity.showDialog(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+                mActivity.showDialog(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -503,7 +503,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testDispatchKeyEvent() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
 
         sendKeys(KeyEvent.KEYCODE_0);
@@ -551,7 +551,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
      * the user canceling the menu with the back/menu button, or when an item is selected).
      */
     public void testContextMenu() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         final LinearLayout parent = new LinearLayout(mContext);
         final MockView v = new MockView(mContext);
@@ -627,7 +627,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testTakeKeyEvents() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         final View v = d.getWindow().getDecorView();
         assertNull(d.getCurrentFocus());
@@ -654,13 +654,13 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testRequestWindowFeature() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         // called requestWindowFeature at TestDialog onCreate method
         assertTrue(((TestDialog) mActivity.getDialog()).isRequestWindowFeature);
     }
 
     public void testSetFeatureDrawableResource() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mActivity.getDialog().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,
@@ -671,28 +671,28 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testSetFeatureDrawableUri() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         mActivity.getDialog().setFeatureDrawableUri(0, Uri.parse("http://www.google.com"));
     }
 
     public void testSetFeatureDrawable() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         mActivity.getDialog().setFeatureDrawable(0, new MockDrawable());
     }
 
     public void testSetFeatureDrawableAlpha() {
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         mActivity.getDialog().setFeatureDrawableAlpha(0, 0);
     }
 
     public void testGetLayoutInflater() {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
         assertEquals(d.getWindow().getLayoutInflater(), d.getLayoutInflater());
     }
 
     public void testSetCancelable_true() {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         d.setCancelable(true);
@@ -702,7 +702,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testSetCancellable_false() {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         d.setCancelable(false);
@@ -717,7 +717,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
      * 2. Set a listener to be invoked when the dialog is canceled.
      */
     public void testCancel_listener() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         assertTrue(d.isShowing());
@@ -734,7 +734,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testCancel_noListener() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         assertTrue(d.isShowing());
@@ -748,7 +748,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
 
     public void testSetCancelMessage() throws Exception {
         mCalledCallback = false;
-        startDialogActivity(DialogCtsActivity.TEST_ONSTART_AND_ONSTOP);
+        startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
         final HandlerThread ht = new HandlerThread("DialogTest");
         ht.start();
@@ -775,7 +775,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
      */
     public void testSetOnDismissListener_listener() throws Throwable {
         mCalledCallback = false;
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         d.setOnDismissListener(new OnDismissListener() {
@@ -792,7 +792,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
     }
 
     public void testSetOnDismissListener_noListener() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
         assertTrue(d.isShowing());
         mCalledCallback = false;
@@ -804,7 +804,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivi
 
     public void testSetDismissMessage() throws Throwable {
         mCalledCallback = false;
-        startDialogActivity(DialogCtsActivity.TEST_DIALOG_WITHOUT_THEME);
+        startDialogActivity(DialogStubActivity.TEST_DIALOG_WITHOUT_THEME);
         final Dialog d = mActivity.getDialog();
 
         final HandlerThread ht = new HandlerThread("DialogTest");
