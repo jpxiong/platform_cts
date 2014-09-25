@@ -27,6 +27,7 @@ import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 import android.hardware.cts.helpers.SensorNotSupportedException;
+import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.os.SystemClock;
 
 import java.util.concurrent.CountDownLatch;
@@ -236,10 +237,12 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                     sensorName);
             Assert.assertEquals(valuesMessage, EXPECTED_EVENT_VALUE, value);
 
+            long deltaThreshold = MAX_ACCEPTABLE_EVENT_TIME_DELAY_NANOS
+                    + TestSensorEnvironment.getSensorMaxDetectionLatencyNs(event.sensor);
             return assertTimestampSynchronization(
                     event.timestamp,
                     registry.realtimeTimestampNanos,
-                    MAX_ACCEPTABLE_EVENT_TIME_DELAY_NANOS,
+                    deltaThreshold,
                     sensorName);
         }
 
