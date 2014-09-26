@@ -27,25 +27,55 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.PowerManager;
 import android.text.TextUtils;
 
 /**
  * A class that provides functionality to manipulate the state of the device's screen.
+ *
+ * The implementation uses a simple state machine with 3 states: keep-screen-off, keep-screen-on,
+ * and a free-state where the class does not affect the system's state.
+ *
+ * The list of transitions and their handlers are:
+ *      keep-screen-on --(turnScreenOff)--> keep-screen-off
+ *      keep-screen-on --(releaseScreenOn)--> free-state
+ *
+ *      keep-screen-off --(turnScreenOn)--> keep-screen-on
+ *      keep-screen-off --(wakeUpScreen)--> free-state
+ *
+ *      free-state --(turnScreenOff)--> keep-screen-off
+ *      free-state --(turnScreenOn)--> keep-screen-on
+ *
+ * NOTES:
+ * - the operator still can turn on/off the screen by pressing the power button
+ * - this class must be used by a single client, that can manage the state of the instance, likely
+ * - in a single-threaded environment
  */
 public class SensorTestScreenManipulator {
 
     private final Context mContext;
     private final DevicePolicyManager mDevicePolicyManager;
     private final ComponentName mComponentName;
+    private final PowerManager.WakeLock mWakeUpScreenWakeLock;
+    private final PowerManager.WakeLock mKeepScreenWakeLock;
 
-    private volatile InternalBroadcastReceiver mBroadcastReceiver;
-    private volatile boolean mTurnOffScreenOnPowerDisconnected;
+    private InternalBroadcastReceiver mBroadcastReceiver;
+    private boolean mTurnOffScreenOnPowerDisconnected;
 
     public SensorTestScreenManipulator(Context context) {
         mContext = context;
         mComponentName = SensorDeviceAdminReceiver.getComponentName(context);
         mDevicePolicyManager =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        int levelAndFlags = PowerManager.FULL_WAKE_LOCK
+                | PowerManager.ON_AFTER_RELEASE
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP;
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        mWakeUpScreenWakeLock = powerManager.newWakeLock(levelAndFlags, "SensorTestWakeUpScreen");
+        mWakeUpScreenWakeLock.setReferenceCounted(false);
+        mKeepScreenWakeLock = powerManager.newWakeLock(levelAndFlags, "SensorTestKeepScreenOn");
+        mWakeUpScreenWakeLock.setReferenceCounted(false);
     }
 
     /**
@@ -90,7 +120,45 @@ public class SensorTestScreenManipulator {
      */
     public synchronized void turnScreenOff() {
         ensureDeviceAdminInitialized();
+        releaseScreenOn();
         mDevicePolicyManager.lockNow();
+    }
+
+    /**
+     * Instruct the device to wake up the screen immediately, the screen will remain on for a bit,
+     * but the system might turn the screen off in the near future.
+     */
+    public synchronized void wakeUpScreen() {
+        mWakeUpScreenWakeLock.acquire();
+        // release right away, the screen still remains on for a bit, but not indefinitely
+        mWakeUpScreenWakeLock.release();
+    }
+
+    /**
+     * Instructs the device to turn on the screen immediately.
+     *
+     * The screen will remain on until the client invokes {@link #releaseScreenOn()}, or the user
+     * presses the device's power button.
+     */
+    public synchronized void turnScreenOn() {
+        if (mKeepScreenWakeLock.isHeld()) {
+            // recover from cases when we could get out of sync, this can happen because the user
+            // can press the power button, and other wake-locks can prevent intents to be received
+            mKeepScreenWakeLock.release();
+        }
+        mKeepScreenWakeLock.acquire();
+    }
+
+    /**
+     * Indicates that the client does not require the screen to remain on anymore.
+     *
+     * See {@link #turnScreenOn()} for more information.
+     */
+    public synchronized void releaseScreenOn() {
+        if (!mKeepScreenWakeLock.isHeld()) {
+            return;
+        }
+        mKeepScreenWakeLock.release();
     }
 
     /**
@@ -124,14 +192,14 @@ public class SensorTestScreenManipulator {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (mTurnOffScreenOnPowerDisconnected &&
-                    TextUtils.equals(action, Intent.ACTION_POWER_DISCONNECTED)) {
-                turnScreenOff();
-
-                // reset the flag after it has triggered once, we try to avoid cases when the test
-                // might leave the receiver enabled after itself,
-                // this approach still provides a way to multiplex one time requests
-                mTurnOffScreenOnPowerDisconnected = false;
+            if (TextUtils.equals(action, Intent.ACTION_POWER_DISCONNECTED)) {
+                if (mTurnOffScreenOnPowerDisconnected) {
+                    turnScreenOff();
+                    // reset the flag after it has triggered once, we try to avoid cases when the test
+                    // might leave the receiver enabled after itself,
+                    // this approach still provides a way to multiplex one time requests
+                    mTurnOffScreenOnPowerDisconnected = false;
+                }
             }
         }
     }
