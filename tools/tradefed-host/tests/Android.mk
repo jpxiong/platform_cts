@@ -21,7 +21,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := cts-tradefed-tests
 LOCAL_MODULE_TAGS := optional
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt cts-tradefed
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt cts-tradefed
 LOCAL_STATIC_JAVA_LIBRARIES := easymock
 
 include $(BUILD_HOST_JAVA_LIBRARY)

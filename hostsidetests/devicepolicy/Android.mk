@@ -22,7 +22,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := junit ddmlib-prebuilt tradefed-prebuilt tools-common-prebuilt cts-tradefed
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt tools-common-prebuilt cts-tradefed
 
 LOCAL_CTS_TEST_PACKAGE := android.adminhostside
 

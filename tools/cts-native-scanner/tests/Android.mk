@@ -21,7 +21,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := cts-native-scanner-tests
 LOCAL_MODULE_TAGS := optional
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt cts-native-scanner
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt cts-native-scanner
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 
