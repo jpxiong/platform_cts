@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.MediaDescription;
 import android.media.MediaMetadata;
 import android.media.Rating;
 import android.media.VolumeProvider;
@@ -30,6 +31,7 @@ import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.test.AndroidTestCase;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class MediaSessionTest extends AndroidTestCase {
@@ -121,7 +123,24 @@ public class MediaSessionTest extends AndroidTestCase {
         assertNotNull(tags);
         assertTrue(tags.contains(val));
 
-        // TODO test Queue APIs after fixing b/17205016
+        // test setQueue and setQueueTitle
+        ArrayList<MediaSession.QueueItem> queue = new ArrayList<MediaSession.QueueItem>();
+        MediaSession.QueueItem item = new MediaSession.QueueItem(new MediaDescription.Builder()
+                .setMediaId(val).setTitle("title").build(), 11);
+        queue.add(item);
+        session.setQueue(queue);
+        session.setQueueTitle(val);
+
+        assertEquals(val, controller.getQueueTitle());
+        assertEquals(1, controller.getQueue().size());
+        assertEquals(11, controller.getQueue().get(0).getQueueId());
+        assertEquals(val, controller.getQueue().get(0).getDescription().getMediaId());
+
+        session.setQueue(null);
+        session.setQueueTitle(null);
+
+        assertNull(controller.getQueueTitle());
+        assertNull(controller.getQueue());
 
         // test setSessionActivity
         Intent intent = new Intent("cts.MEDIA_SESSION_ACTION");
