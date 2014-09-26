@@ -20,6 +20,8 @@ import java.io.File;
 
 import android.content.Context;
 import android.cts.util.PollingCheck;
+import android.cts.util.ReadElf;
+import android.cts.util.TestThread;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;

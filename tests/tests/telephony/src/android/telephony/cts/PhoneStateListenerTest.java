@@ -16,6 +16,8 @@
 package android.telephony.cts;
 
 import android.content.Context;
+import android.cts.util.ReadElf;
+import android.cts.util.TestThread;
 import android.os.Looper;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;

@@ -16,6 +16,7 @@
 
 package android.os.cts;
 
+import android.cts.util.TestThread;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;

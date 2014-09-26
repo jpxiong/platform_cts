@@ -17,6 +17,7 @@
 package android.text.cts;
 
 import android.content.Context;
+import android.cts.util.NullWebViewUtils;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.EditText;
+import android.webkit.cts.WebViewOnUiThread;
 
 public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiCtsActivity> {
 

@@ -16,6 +16,7 @@
 package android.os.cts;
 
 import junit.framework.TestCase;
+import android.cts.util.TestThread;
 import android.os.ConditionVariable;
 
 public class ConditionVariableTest extends TestCase {

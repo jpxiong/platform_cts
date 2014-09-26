@@ -21,6 +21,7 @@ import com.android.cts.provider.R;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.cts.util.FileCopyHelper;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Video;

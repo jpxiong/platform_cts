@@ -24,6 +24,7 @@ import org.xmlpull.v1.XmlPullParser;
 import android.app.Activity;
 import android.content.Context;
 import android.cts.util.PollingCheck;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;

@@ -21,12 +21,12 @@ import com.android.cts.media.R;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.cts.util.FileCopyHelper;
 import android.cts.util.PollingCheck;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
 import android.os.IBinder;
-import android.provider.cts.FileCopyHelper;
 import android.test.AndroidTestCase;
 
 import java.io.File;

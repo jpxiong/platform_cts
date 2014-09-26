@@ -17,6 +17,7 @@
 package android.widget.cts;
 
 import android.content.res.ColorStateList;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;

@@ -19,6 +19,7 @@ package android.widget.cts;
 import com.android.cts.widget.R;
 
 import android.app.Activity;
+import android.cts.util.NullWebViewUtils;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 

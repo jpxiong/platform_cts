@@ -22,6 +22,7 @@ import com.android.cts.widget.R;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.cts.util.WidgetTestUtils;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;

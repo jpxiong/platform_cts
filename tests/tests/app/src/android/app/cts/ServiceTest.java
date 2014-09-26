@@ -20,6 +20,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.cts.util.IBinderParcelable;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;

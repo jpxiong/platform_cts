@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import android.cts.util.NullWebViewUtils;
 import android.cts.util.PollingCheck;
 import android.net.Uri;
 import android.net.http.SslCertificate;

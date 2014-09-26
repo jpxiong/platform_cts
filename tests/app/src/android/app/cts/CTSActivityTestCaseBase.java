@@ -16,6 +16,7 @@
 
 package android.app.cts;
 
+import android.cts.util.CTSResult;
 import android.test.InstrumentationTestCase;
 
 public class CTSActivityTestCaseBase extends InstrumentationTestCase implements CTSResult {

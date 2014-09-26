@@ -19,7 +19,7 @@ package android.media.cts;
 import com.android.cts.media.R;
 
 import android.app.Activity;
-import android.app.cts.CTSResult;
+import android.cts.util.CTSResult;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;

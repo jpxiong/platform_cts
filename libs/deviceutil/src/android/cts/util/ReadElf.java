@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.os.cts;
+package android.cts.util;
 
 import java.io.File;
 import java.io.IOException;
