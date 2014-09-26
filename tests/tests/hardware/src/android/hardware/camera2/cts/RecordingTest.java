@@ -289,15 +289,17 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     // Start recording
                     startSlowMotionRecording(/*useMediaRecorder*/true, videoFramerate, captureRate,
                             fpsRange);
+                    long startTime = SystemClock.elapsedRealtime();
 
                     // Record certain duration.
                     SystemClock.sleep(RECORDING_DURATION_MS);
 
                     // Stop recording and preview
                     stopRecording(/*useMediaRecorder*/true);
+                    int duration = (int) (SystemClock.elapsedRealtime() - startTime);
 
                     // Validation.
-                    validateRecording(size, RECORDING_DURATION_MS * SLOWMO_SLOW_FACTOR);
+                    validateRecording(size, duration * SLOWMO_SLOW_FACTOR);
 
                 }
 
@@ -414,15 +416,17 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
+            long startTime = SystemClock.elapsedRealtime();
 
             // Record certain duration.
             SystemClock.sleep(RECORDING_DURATION_MS);
 
             // Stop recording and preview
             stopRecording(/* useMediaRecorder */true);
+            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
 
             // Validation.
-            validateRecording(videoSz, RECORDING_DURATION_MS);
+            validateRecording(videoSz, duration);
         }
     }
 
@@ -455,15 +459,17 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             // Start recording
             startRecording(/* useMediaRecorder */true);
+            long startTime = SystemClock.elapsedRealtime();
 
             // Record certain duration.
             SystemClock.sleep(RECORDING_DURATION_MS);
 
             // Stop recording and preview
             stopRecording(/* useMediaRecorder */true);
+            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
 
             // Validation.
-            validateRecording(sz, RECORDING_DURATION_MS);
+            validateRecording(sz, duration);
         }
     }
 
@@ -608,6 +614,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             // Start recording
             startRecording(/* useMediaRecorder */true, resultListener);
+            long startTime = SystemClock.elapsedRealtime();
 
             // Record certain duration.
             SystemClock.sleep(RECORDING_DURATION_MS / 2);
@@ -630,9 +637,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             // Stop recording and preview
             stopRecording(/* useMediaRecorder */true);
+            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
 
             // Validation recorded video
-            validateRecording(videoSz, RECORDING_DURATION_MS);
+            validateRecording(videoSz, duration);
 
             if (burstTest) {
                 for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
