@@ -18,13 +18,13 @@ public abstract class HceService extends HostApduService {
     final static int STATE_FAILED = 2;
 
     // Variables below only used on main thread
-    String[] mCommandApdus = null;
+    CommandApdu[] mCommandApdus = null;
     String[] mResponseApdus = null;
     int mApduIndex = 0;
     int mState = STATE_IDLE;
     long mStartTime;
 
-    public void initialize(String[] commandApdus, String[] responseApdus) {
+    public void initialize(CommandApdu[] commandApdus, String[] responseApdus) {
        mCommandApdus = commandApdus;
        mResponseApdus = responseApdus;
     }
@@ -62,12 +62,27 @@ public abstract class HceService extends HostApduService {
             mStartTime = System.currentTimeMillis();
         }
 
+
+        if (mApduIndex >= mCommandApdus.length) {
+	        // Skip all APDUs which aren't supposed to reach us
+            return null;
+        }
+
+        do {
+            if (!mCommandApdus[mApduIndex].isReachable()) {
+                mApduIndex++;
+            } else {
+                break;
+            }
+        } while (mApduIndex < mCommandApdus.length);
+
         if (mApduIndex >= mCommandApdus.length) {
             Log.d(TAG, "Ignoring command APDU; protocol complete.");
             // Ignore new APDUs after completion
             return null;
         } else {
-            if (!Arrays.equals(HceUtils.hexStringToBytes(mCommandApdus[mApduIndex]), arg0)) {
+
+            if (!Arrays.equals(HceUtils.hexStringToBytes(mCommandApdus[mApduIndex].getApdu()), arg0)) {
                 Log.d(TAG, "Unexpected command APDU: " + HceUtils.getHexBytes("", arg0));
                 onApduSequenceError();
                 return null;

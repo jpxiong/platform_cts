@@ -1,20 +1,16 @@
 package com.android.cts.verifier.nfc.hce;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.nfc.cardemulation.CardEmulation;
 import android.os.Bundle;
 
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.nfc.NfcDialogs;
 
 @TargetApi(19)
-public class ChangeDefaultEmulatorActivity extends BaseEmulatorActivity implements OnClickListener {
+public class ChangeDefaultEmulatorActivity extends BaseEmulatorActivity {
     final static int STATE_IDLE = 0;
     final static int STATE_SERVICE1_SETTING_UP = 1;
     final static int STATE_SERVICE2_SETTING_UP = 2;
@@ -48,22 +44,14 @@ public class ChangeDefaultEmulatorActivity extends BaseEmulatorActivity implemen
             setupServices(this, PaymentService1.COMPONENT, PaymentService2.COMPONENT);
             return;
         }
-        // Verify HCE service 2 is the default
-        if (!mCardEmulation.isDefaultServiceForCategory(
-                PaymentService2.COMPONENT, CardEmulation.CATEGORY_PAYMENT)) {
-            mState = STATE_MAKING_SERVICE2_DEFAULT;
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Note");
-            builder.setMessage(R.string.nfc_hce_change_preinstalled_wallet);
-            builder.setPositiveButton("OK", this);
-            builder.show();
-        } else {
+        if (!makePaymentDefault(PaymentService2.COMPONENT,
+                R.string.nfc_hce_change_preinstalled_wallet)) {
+            // Service 2 is already default, make one default now
             mState = STATE_MAKING_SERVICE1_DEFAULT;
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Note");
-            builder.setMessage(R.string.nfc_hce_change_default_help);
-            builder.setPositiveButton("OK", this);
-            builder.show();
+            makePaymentDefault(PaymentService1.COMPONENT, R.string.nfc_hce_change_default_help);
+        } else {
+            mState = STATE_MAKING_SERVICE2_DEFAULT;
+            // will get callback when 2 is made default
         }
     }
 
@@ -94,56 +82,16 @@ public class ChangeDefaultEmulatorActivity extends BaseEmulatorActivity implemen
     }
 
     @Override
-    public void onClick(DialogInterface dialog, int which) {
-        if (mState == STATE_MAKING_SERVICE1_DEFAULT) {
-            Intent changeDefault = new Intent(CardEmulation.ACTION_CHANGE_DEFAULT);
-            changeDefault.putExtra(CardEmulation.EXTRA_CATEGORY, CardEmulation.CATEGORY_PAYMENT);
-            changeDefault.putExtra(CardEmulation.EXTRA_SERVICE_COMPONENT, PaymentService1.COMPONENT);
-            startActivityForResult(changeDefault, 0);
-        } else if (mState == STATE_MAKING_SERVICE2_DEFAULT) {
-            Intent changeDefault = new Intent(CardEmulation.ACTION_CHANGE_DEFAULT);
-            changeDefault.putExtra(CardEmulation.EXTRA_CATEGORY, CardEmulation.CATEGORY_PAYMENT);
-            changeDefault.putExtra(CardEmulation.EXTRA_SERVICE_COMPONENT, PaymentService2.COMPONENT);
-            startActivityForResult(changeDefault, 0);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (mState == STATE_MAKING_SERVICE1_DEFAULT) {
-            if (!mCardEmulation.isDefaultServiceForCategory(
-                    PaymentService1.COMPONENT, CardEmulation.CATEGORY_PAYMENT)) {
-                // Popup dialog-box, fail test
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Test failed.");
-                builder.setMessage("PaymentService1 is not the default service according " +
-                        "to CardEmulation.getDefaultServiceForCategory(), verify the make " +
-                        "default implementation is correct.");
-                builder.setPositiveButton("OK", null);
-                builder.show();
-            } else {
+    void onPaymentDefaultResult(ComponentName component, boolean success) {
+        if (mState == STATE_MAKING_SERVICE2_DEFAULT) {
+            if (success) {
+                mState = STATE_MAKING_SERVICE1_DEFAULT;
+	            makePaymentDefault(PaymentService1.COMPONENT, R.string.nfc_hce_change_default_help);
+            }
+        } else if (mState == STATE_MAKING_SERVICE1_DEFAULT) {
+            if (success) {
                 mState = STATE_DEFAULT_CHANGED;
                 NfcDialogs.createHceTapReaderDialog(this, null).show();
-            }
-        } else if (mState == STATE_MAKING_SERVICE2_DEFAULT) {
-            if (!mCardEmulation.isDefaultServiceForCategory(
-                    PaymentService2.COMPONENT, CardEmulation.CATEGORY_PAYMENT)) {
-                // Popup dialog-box, fail test
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Test failed.");
-                builder.setMessage("PaymentService2 is not the default service according " +
-                        "to CardEmulation.getDefaultServiceForCategory(), verify the make " +
-                        "default implementation is correct.");
-                builder.setPositiveButton("OK", null);
-                builder.show();
-            } else {
-                mState = STATE_MAKING_SERVICE1_DEFAULT;
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Note");
-                builder.setMessage(R.string.nfc_hce_change_default_help);
-                builder.setPositiveButton("OK", this);
-                builder.show();
             }
         }
     }

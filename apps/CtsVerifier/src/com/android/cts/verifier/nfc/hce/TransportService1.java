@@ -7,9 +7,9 @@ public class TransportService1 extends HceService {
             new ComponentName("com.android.cts.verifier",
             TransportService1.class.getName());
 
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu(HceUtils.TRANSPORT_AID),
-        "80CA01E000"
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu(HceUtils.TRANSPORT_AID, true),
+        HceUtils.buildCommandApdu("80CA01E000", true)
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {

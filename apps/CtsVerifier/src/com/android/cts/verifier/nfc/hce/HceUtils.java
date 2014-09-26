@@ -14,9 +14,13 @@ public final class HceUtils {
 
     public static final String PPSE_AID = "325041592E5359532E4444463031";
     public static final String MC_AID = "A0000000041010";
+    public static final String VISA_AID = "A0000000030000";
 
     public static final String TRANSPORT_AID = "F001020304";
     public static final String ACCESS_AID = "F005060708";
+
+    public static final String TRANSPORT_PREFIX_AID = "F001020304";
+    public static final String ACCESS_PREFIX_AID = "F005060708";
 
     public static void enableComponent(PackageManager pm, ComponentName component) {
         pm.setComponentEnabledSetting(
@@ -58,11 +62,15 @@ public final class HceUtils {
         return data;
     }
 
-    public static final String buildSelectApdu(String aid) {
+    public static final CommandApdu buildCommandApdu(String apdu, boolean reachable) {
+        return new CommandApdu(apdu, reachable);
+    }
+
+    public static final CommandApdu buildSelectApdu(String aid, boolean reachable) {
         StringBuilder sb = new StringBuilder();
         sb.append("00A40400");
         sb.append(String.format("%02X", aid.length() / 2));
         sb.append(aid);
-        return sb.toString();
+        return new CommandApdu(sb.toString(), reachable);
     }
 }

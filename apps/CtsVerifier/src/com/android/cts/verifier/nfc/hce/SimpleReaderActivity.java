@@ -9,6 +9,7 @@ import android.nfc.NfcAdapter.ReaderCallback;
 import android.nfc.tech.IsoDep;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +35,7 @@ public class SimpleReaderActivity extends PassFailButtons.Activity implements Re
     public static final String EXTRA_LABEL = "label";
 
     NfcAdapter mAdapter;
-    String[] mApdus;
+    CommandApdu[] mApdus;
     String[] mResponses;
 
     TextView mTextView;
@@ -76,7 +77,15 @@ public class SimpleReaderActivity extends PassFailButtons.Activity implements Re
         mAdapter.enableReaderMode(this, this, NfcAdapter.FLAG_READER_NFC_A |
                 NfcAdapter.FLAG_READER_NFC_BARCODE | NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null);
         Intent intent = getIntent();
-        mApdus = intent.getStringArrayExtra(EXTRA_APDUS);
+        Parcelable[] apdus = intent.getParcelableArrayExtra(EXTRA_APDUS);
+        if (apdus != null) {
+	        mApdus = new CommandApdu[apdus.length];
+	        for (int i = 0; i < apdus.length; i++) {
+	            mApdus[i] = (CommandApdu) apdus[i];
+	        }
+        } else {
+            mApdus = null;
+        }
         mResponses = intent.getStringArrayExtra(EXTRA_RESPONSES);
     }
 
@@ -95,11 +104,11 @@ public class SimpleReaderActivity extends PassFailButtons.Activity implements Re
             int count = 0;
             boolean success = true;
             long startTime = System.currentTimeMillis();
-            for (String apdu: mApdus) {
+            for (CommandApdu apdu: mApdus) {
                 sb.append("Request APDU:\n");
-                sb.append(apdu + "\n\n");
+                sb.append(apdu.getApdu() + "\n\n");
                 long apduStartTime = System.currentTimeMillis();
-                byte[] response = isoDep.transceive(HceUtils.hexStringToBytes(apdu));
+                byte[] response = isoDep.transceive(HceUtils.hexStringToBytes(apdu.getApdu()));
                 long apduEndTime = System.currentTimeMillis();
                 sb.append("Response APDU (in " + Long.toString(apduEndTime - apduStartTime) +
                         " ms):\n");
