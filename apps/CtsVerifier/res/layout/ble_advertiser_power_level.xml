@@ -20,6 +20,10 @@
         android:padding="10dip"
         >
 
+    <TextView android:text="@string/ble_advertiser_power_level_instruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    />
     <LinearLayout android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

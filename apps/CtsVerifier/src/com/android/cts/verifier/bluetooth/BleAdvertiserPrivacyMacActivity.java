@@ -36,7 +36,7 @@ public class BleAdvertiserPrivacyMacActivity extends PassFailButtons.Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ble_privacy_mac);
+        setContentView(R.layout.ble_advertiser_privacy_mac);
         setPassFailButtonClickListeners();
         setInfoResources(R.string.ble_privacy_mac_name,
                          R.string.ble_privacy_mac_info, -1);
