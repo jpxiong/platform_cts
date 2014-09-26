@@ -7,9 +7,9 @@ public class PaymentService2 extends HceService {
             new ComponentName("com.android.cts.verifier",
             PaymentService2.class.getName());
 
-    public static final String[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu(HceUtils.PPSE_AID),
-        HceUtils.buildSelectApdu(HceUtils.MC_AID)
+    public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
+        HceUtils.buildSelectApdu(HceUtils.PPSE_AID, true),
+        HceUtils.buildSelectApdu(HceUtils.MC_AID, true)
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {
