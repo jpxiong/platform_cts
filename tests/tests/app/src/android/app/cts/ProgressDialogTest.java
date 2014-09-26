@@ -50,7 +50,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     private MockActivity mActivity;
 
     public ProgressDialogTest() {
-        super("com.android.cts.app", MockActivity.class);
+        super("com.android.cts.app.stub", MockActivity.class);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         mActivity = getActivity();
         mContext = mActivity;
         mDrawable = getActivity().getResources().getDrawable(
-                com.android.cts.app.R.drawable.yellow);
+                com.android.cts.app.stub.R.drawable.yellow);
     }
 
     @UiThreadTest
@@ -72,7 +72,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @UiThreadTest
     public void testProgressDialog2(){
-        new ProgressDialog(mContext, com.android.cts.app.R.style.Theme_AlertDialog);
+        new ProgressDialog(mContext, com.android.cts.app.stub.R.style.Theme_AlertDialog);
     }
 
     @UiThreadTest

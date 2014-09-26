@@ -21,14 +21,15 @@ LOCAL_MODULE_TAGS := optional
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
+LOCAL_PROGUARD_ENABLED := disabled
+
 LOCAL_JAVA_LIBRARIES := android.test.runner telephony-common voip-common
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner ctstestserver
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
+              src/android/app/cts/ISecondary.aidl
 
-LOCAL_PACKAGE_NAME := CtsAppTestCases
+LOCAL_PACKAGE_NAME := CtsAppTestStubs
 
-LOCAL_INSTRUMENTATION_FOR := CtsAppTestStubs
-
-include $(BUILD_CTS_PACKAGE)
+include $(BUILD_PACKAGE)

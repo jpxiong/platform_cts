@@ -24,25 +24,25 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
         Intent intent = new Intent();
         intent.setAction(action);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setClass(getInstrumentation().getTargetContext(), SearchManagerCtsActivity.class);
+        intent.setClass(getInstrumentation().getTargetContext(), SearchManagerStubActivity.class);
         getInstrumentation().getTargetContext().startActivity(intent);
     }
 
     public void testStopSearch() throws InterruptedException {
-        SearchManagerCtsActivity.setCTSResult(this);
-        setupActivity(SearchManagerCtsActivity.TEST_STOP_SEARCH);
+        SearchManagerStubActivity.setCTSResult(this);
+        setupActivity(SearchManagerStubActivity.TEST_STOP_SEARCH);
         waitForResult();
     }
 
     public void testSetOnDismissListener() throws InterruptedException {
-        SearchManagerCtsActivity.setCTSResult(this);
-        setupActivity(SearchManagerCtsActivity.TEST_ON_DISMISSLISTENER);
+        SearchManagerStubActivity.setCTSResult(this);
+        setupActivity(SearchManagerStubActivity.TEST_ON_DISMISSLISTENER);
         waitForResult();
     }
 
     public void testSetOnCancelListener() throws InterruptedException {
-        SearchManagerCtsActivity.setCTSResult(this);
-        setupActivity(SearchManagerCtsActivity.TEST_ON_CANCELLISTENER);
+        SearchManagerStubActivity.setCTSResult(this);
+        setupActivity(SearchManagerStubActivity.TEST_ON_CANCELLISTENER);
         waitForResult();
     }
 }

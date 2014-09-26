@@ -35,7 +35,7 @@ import android.content.pm.ConfigurationInfo;
 import android.test.InstrumentationTestCase;
 
 public class ActivityManagerTest extends InstrumentationTestCase {
-    private static final String STUB_PACKAGE_NAME = "com.android.cts.app";
+    private static final String STUB_PACKAGE_NAME = "com.android.cts.app.stub";
     private static final int WAITFOR_MSEC = 5000;
     private static final String SERVICE_NAME = "android.app.cts.MockService";
     private static final int WAIT_TIME = 2000;
@@ -222,13 +222,13 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         assertTrue(hasSystemProcess && hasTestProcess);
 
         for (RunningAppProcessInfo ra : list) {
-            if (ra.processName.equals("com.android.cts.app:remote")) {
-                fail("should be no process named com.android.cts.app:remote");
+            if (ra.processName.equals("com.android.cts.app.stub:remote")) {
+                fail("should be no process named com.android.cts.app.stub:remote");
             }
         }
         // start a new process
         mIntent = new Intent("android.app.REMOTESERVICE");
-        mIntent.setPackage("com.android.cts.app");
+        mIntent.setPackage("com.android.cts.app.stub");
         mInstrumentation.getTargetContext().startService(mIntent);
         Thread.sleep(WAITFOR_MSEC);
 
@@ -236,11 +236,11 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         assertTrue(list.size() <= listNew.size());
 
         for (RunningAppProcessInfo ra : listNew) {
-            if (ra.processName.equals("com.android.cts.app:remote")) {
+            if (ra.processName.equals("com.android.cts.app.stub:remote")) {
                 return;
             }
         }
-        fail("com.android.cts.app:remote process should be available");
+        fail("com.android.cts.app.stub:remote process should be available");
     }
 
     public void testGetProcessInErrorState() throws Exception {
