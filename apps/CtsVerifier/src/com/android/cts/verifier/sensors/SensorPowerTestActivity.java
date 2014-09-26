@@ -18,50 +18,54 @@ package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 import com.android.cts.verifier.sensors.helpers.PowerTestHostLink;
+import com.android.cts.verifier.sensors.helpers.SensorTestScreenManipulator;
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
 import junit.framework.Assert;
 
-import java.util.concurrent.TimeUnit;
-
 public class SensorPowerTestActivity
         extends SensorCtsVerifierTestActivity
         implements PowerTestHostLink.HostToDeviceInterface {
-    public class TestExecutionException extends Exception {
-        public TestExecutionException(final String message) {
-            super(message);
-        }
-    }
+
+    private PowerTestHostLink mHostLink;
+    private SensorTestScreenManipulator mScreenManipulator;
 
     public SensorPowerTestActivity() {
         super(SensorPowerTestActivity.class);
     }
 
-    private PowerTestHostLink mHostLink;
 
-    /** HostToDeviceInterface implementation **/
+    @Override
     public void waitForUserAcknowledgement(final String message) {
         appendText(message);
         waitForUser();
     }
 
-    /* channel for host to raise an exception on the device if needed */
+    @Override
     public void raiseError(String testName, String message) throws Exception {
         getTestLogger().logTestFail(testName, message);
-        throw new TestExecutionException(message);
+        throw new RuntimeException(message);
     }
 
+    @Override
     public void logText(String text) {
         appendText(text);
     }
 
+    @Override
     public void logTestResult(SensorTestDetails testDetails) {
         getTestLogger().logTestDetails(testDetails);
     }
 
     @Override
-    protected void activitySetUp() throws InterruptedException {
-        setScreenOffTimeout(15, TimeUnit.SECONDS);
+    public void turnScreenOff() {
+        mScreenManipulator.turnScreenOffOnNextPowerDisconnect();
+    }
+
+    @Override
+    protected void activitySetUp() {
+        mScreenManipulator = new SensorTestScreenManipulator(getApplicationContext());
+        mScreenManipulator.initialize(this);
     }
 
     @Override
@@ -69,7 +73,7 @@ public class SensorPowerTestActivity
         if (mHostLink != null) {
             mHostLink.close();
         }
-        resetScreenOffTimeout();
+        mScreenManipulator.close();
     }
 
     public String testSensorsPower() throws Throwable {

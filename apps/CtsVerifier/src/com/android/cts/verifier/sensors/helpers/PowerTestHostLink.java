@@ -25,8 +25,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
-import android.os.PowerManager;
-import android.provider.Settings;
 import android.util.Log;
 
 import java.io.IOException;
@@ -38,13 +36,14 @@ import java.util.StringTokenizer;
 /**
  * This class handles communication with the host to respond to commands.
  * The command/response link is through a TCP socket on the host side, forwarded via adb to a local
- * socket on the device.  The system uses a standard "accept-read_command-send_response-close" to
- * execute commands sent from the host.  
- * 
+ * socket on the device. The system uses a standard "accept-read_command-send_response-close" to
+ * execute commands sent from the host.
+ *
  * CAUTION: The local socket name (SOCKET_NAME below) must match that used by the host to set up
  * the adb-forwarding.
  */
 public class PowerTestHostLink {
+    private static final String TAG = "PowerTestHostLink";
 
     /**
      * Host-to-device bridge will use a Listener instance to drive the test via the CtsVerifier
@@ -55,17 +54,15 @@ public class PowerTestHostLink {
         void raiseError(String testName, String message) throws Exception;
         void waitForUserAcknowledgement(String message);
         void logText(String text);
-    };
+        void turnScreenOff();
+    }
 
     /** This is a data-only message to communicate result of a power test */
     public class PowerTestResult{
         public int passedCount = 0;
         public int skippedCount = 0;
         public int failedCount = 0;
-    };
-
-
-    public final String TAG = "PowerTestHostLink";
+    }
 
     /**
      * Standard response types back to host. Host-side code must match these definitions.
@@ -79,35 +76,15 @@ public class PowerTestHostLink {
      */
     public final static String SOCKET_NAME = "/android/cts/powertest";
 
-    private LocalServerSocket mServerSocket;
     private volatile boolean mStopThread;
     private final SensorManager mSensorManager;
-    private final PowerManager mPowerManager;
-    private final Context mContext;
     private final HostToDeviceInterface mHostToDeviceExecutor;
-    private PowerTestResult mTestResult;
+    private final PowerTestResult mTestResult = new PowerTestResult();
 
-    public PowerTestHostLink(Context context, final HostToDeviceInterface listener) {
+    public PowerTestHostLink(Context context, HostToDeviceInterface listener) {
         Log.d(TAG, " +++ Begin of localSocketServer() +++ ");
         mHostToDeviceExecutor = listener;
-        mContext = context;
-        try {
-            mServerSocket = new LocalServerSocket(SOCKET_NAME);
-            Log.i(TAG, "OKAY");
-
-        } catch (IOException e) {
-            Log.e(TAG, "The local Socket Server create failed");
-            e.printStackTrace();
-        }
-        if (mServerSocket != null) {
-            Log.d(TAG, "Bound to local server socket");
-        } else {
-            Log.e(TAG, "Unable to bind to local socket ");
-        }
-        mStopThread = false;
-
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     }
 
     /**
@@ -124,15 +101,15 @@ public class PowerTestHostLink {
      * @throws Exception
      */
     public PowerTestResult run() throws Exception {
-        mTestResult = new PowerTestResult();
         // define buffer to receive data from host
         final int BUFFER_SIZE = 4096;
         byte[] buffer = new byte[BUFFER_SIZE];
 
-        if (null == mServerSocket) {
-            Log.d(TAG, "The localSocketServer is NULL !!!");
+        LocalServerSocket serverSocket = createSocket();
+        if (null == serverSocket) {
             mStopThread = true;
         }
+
         InputStream streamIn;
         OutputStream streamOut;
         LocalSocket receiverSocket;
@@ -140,7 +117,7 @@ public class PowerTestHostLink {
 
             try {
                 Log.d(TAG, "localSocketServer accept...");
-                receiverSocket = mServerSocket.accept();
+                receiverSocket = serverSocket.accept();
                 Log.d(TAG, "Got new connection");
             } catch (IOException e) {
                 Log.d(TAG, "localSocketServer accept() failed !!!", e);
@@ -188,7 +165,7 @@ public class PowerTestHostLink {
                             Log.d(TAG, "Sending response " + response);
                             streamOut.write(response.getBytes(), 0, response.length());
                         }
-                        // null response means response is defered awaiting user response
+                        // null response means response is deferred awaiting user response
                     } catch (Exception e) {
                         Log.e(TAG, "Error executing " + clientRequest, e);
                         streamOut.write(RESPONSE_ERR.getBytes(), 0, RESPONSE_ERR.length());
@@ -196,75 +173,80 @@ public class PowerTestHostLink {
                 }
                 receiverSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "There is an exception when reading from or writing tosocket", e);
+                Log.e(TAG, "There is an exception when reading from or writing to socket", e);
                 break;
             }
         }
         Log.d(TAG, "The LocalSocketServer thread is going to stop !!!");
 
-        if (mServerSocket != null) {
+        if (serverSocket != null) {
             try {
-                mServerSocket.close();
+                serverSocket.close();
             } catch (IOException e) {
                 Log.d(TAG, "Exception on close of server socket", e);
             }
         }
         mHostToDeviceExecutor.logText("Device disconnected.");
-        Log.d(TAG, "Returning " + mTestResult.passedCount + "passed " + mTestResult.skippedCount + "skipped " +
-        mTestResult.failedCount + "failed.");
+        Log.d(TAG, "Returning " + mTestResult.passedCount + "passed " + mTestResult.skippedCount +
+                "skipped " + mTestResult.failedCount + "failed.");
         return mTestResult;
     }
 
-    protected String processClientRequest(String request) throws Exception {
-        final String USER_REQUEST = "REQUEST USER RESPONSE";
+    private  String processClientRequest(String request) throws Exception {
+        // the following constants need to match the definitions in execute_power_tests.py
+        final String REQUEST_EXTERNAL_STORAGE = "EXTERNAL STORAGE?";
+        final String REQUEST_EXIT = "EXIT";
+        final String REQUEST_RAISE = "RAISE ";
+        final String REQUEST_USER_RESPONSE = "USER RESPONSE ";
+        final String REQUEST_SET_TEST_RESULT = "SET TEST RESULT ";
+        final String REQUEST_SENSOR_ON = "SENSOR ON ";
+        final String REQUEST_SENSOR_OFF = "SENSOR OFF";
+        final String REQUEST_SENSOR_AVAILABILITY = "SENSOR? ";
+        final String REQUEST_SCREEN_OFF = "SCREEN OFF";
+        final String REQUEST_SHOW_MESSAGE = "MESSAGE ";
+
         String response = RESPONSE_ERR;
         // Queries must appear first and then commands to direct actions after in these statements
-        if (request.startsWith("SCREEN OFF TIMEOUT?")) {
-            int timeout = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.SCREEN_OFF_TIMEOUT);
-            response = "" + timeout;
-        } else if (request.startsWith("AIRPLANE MODE ON?")) {
-            boolean airplaneModeOn = Settings.Global.getInt
-                    (mContext.getContentResolver(),
-                            Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-            response = airplaneModeOn ? RESPONSE_OK : RESPONSE_ERR;
-        } else if (request.startsWith("SENSOR?")) {
-            final String sensor = request.substring(9);
+        if (request.startsWith(REQUEST_SENSOR_AVAILABILITY)) {
+            final String sensor = request.substring(REQUEST_SENSOR_AVAILABILITY.length());
             final int sensorId = getSensorId(sensor);
             if (mSensorManager.getDefaultSensor(sensorId) == null) {
                 response = RESPONSE_UNAVAILABLE;
             } else {
                 response = RESPONSE_OK;
             }
-        } else if (request.startsWith("EXTERNAL STORAGE?")){
+        } else if (request.startsWith(REQUEST_EXTERNAL_STORAGE)){
             response = System.getenv("EXTERNAL_STORAGE");
             Log.d(TAG,"External storage is " + response);
-        } else if (request.startsWith("SCREEN OFF?")) {
-            boolean screenOn = mPowerManager.isScreenOn();
-            response = screenOn ? RESPONSE_ERR : RESPONSE_OK;
-        } else if (request.startsWith("SCREEN ON?")) {
-            boolean screenOn = mPowerManager.isScreenOn();
-            response = screenOn ? RESPONSE_OK : RESPONSE_ERR;
-        } else if (request.startsWith("SENSOR ON ")) {
-            String sensorList = request.substring(10).trim();
-            response = handleSensorSensorSwitchCmd(sensorList, true);
-        } else if (request.startsWith("SENSOR OFF")) {
-            String sensorList = request.substring(10).trim();
-            response = handleSensorSensorSwitchCmd(sensorList, false);
-        } else if (request.startsWith("MESSAGE")) {
-            final String message = request.substring(8);
+        } else if (request.startsWith(REQUEST_SCREEN_OFF)) {
+            try {
+                mHostToDeviceExecutor.turnScreenOff();
+                response = RESPONSE_OK;
+            } catch (SecurityException e) {
+                Log.e(TAG, "Error Turning screen off", e);
+                response = RESPONSE_ERR;
+            }
+        } else if (request.startsWith(REQUEST_SENSOR_ON)) {
+            String sensorList = request.substring(REQUEST_SENSOR_ON.length()).trim();
+            response = handleSensorSwitchCommand(sensorList, true);
+        } else if (request.startsWith(REQUEST_SENSOR_OFF)) {
+            String sensorList = request.substring(REQUEST_SENSOR_ON.length()).trim();
+            response = handleSensorSwitchCommand(sensorList, false);
+        } else if (request.startsWith(REQUEST_SHOW_MESSAGE)) {
+            final String message = request.substring(REQUEST_SHOW_MESSAGE.length());
             mHostToDeviceExecutor.logText(message);
             response = RESPONSE_OK;
-        } else if (request.startsWith(USER_REQUEST)) {
-            final String message = request.substring(USER_REQUEST.length() + 1);
+        } else if (request.startsWith(REQUEST_USER_RESPONSE)) {
+            String message = request.substring(REQUEST_USER_RESPONSE.length());
             mHostToDeviceExecutor.waitForUserAcknowledgement(message);
             response = RESPONSE_OK;
-        } else if (request.startsWith("SET TEST RESULT")) {
-            response = handleSetTestResultCmd(request);
-        } else if (request.startsWith("RAISE")) {
-            StringTokenizer tokenizer = new StringTokenizer(request);
+        } else if (request.startsWith(REQUEST_SET_TEST_RESULT)) {
+            String testResult = request.substring(REQUEST_SET_TEST_RESULT.length());
+            response = handleSetTestResultCmd(testResult);
+        } else if (request.startsWith(REQUEST_RAISE)) {
+            String command = request.substring(REQUEST_RAISE.length());
+            StringTokenizer tokenizer = new StringTokenizer(command);
             try {
-                tokenizer.nextToken();/* RAISE */
                 final String testName = tokenizer.nextToken();
                 final String message = request.substring(7 + testName.length());
                 mHostToDeviceExecutor.raiseError(testName, message);
@@ -273,7 +255,7 @@ public class PowerTestHostLink {
                 Log.e(TAG, "Invalid RAISE command received (bad arguments): " + request);
                 response = RESPONSE_ERR;
             }
-        } else if (request.startsWith("EXIT")) {
+        } else if (request.startsWith(REQUEST_EXIT)) {
             mStopThread = true;
             response = RESPONSE_OK;
         } else {
@@ -282,7 +264,7 @@ public class PowerTestHostLink {
         return response;
     }
 
-    protected String handleSetTestResultCmd(final String request) {
+    private String handleSetTestResultCmd(final String request) {
         String response;
         StringTokenizer tokenizer = new StringTokenizer(request, " ");
         String testName = "";
@@ -290,9 +272,6 @@ public class PowerTestHostLink {
         String message = "";
 
         try {
-            tokenizer.nextToken();/* SET */
-            tokenizer.nextToken();/* TEST */
-            tokenizer.nextToken();/* RESULT */
             testName = tokenizer.nextToken();
             final String resultToken = tokenizer.nextToken();
 
@@ -328,7 +307,7 @@ public class PowerTestHostLink {
         return response;
     }
 
-    protected String handleSensorSensorSwitchCmd(String sensorList, boolean switchOn) {
+    private String handleSensorSwitchCommand(String sensorList, boolean switchOn) {
         String response;
         try {
             StringTokenizer tokenizer = new StringTokenizer(sensorList, " ");
@@ -360,7 +339,7 @@ public class PowerTestHostLink {
         return response;
     }
 
-    protected int getSensorId(String sensorName) {
+    private static int getSensorId(String sensorName) {
         int sensorId = -1;
 
         if (sensorName.compareToIgnoreCase("ACCELEROMETER") == 0) {
@@ -398,11 +377,11 @@ public class PowerTestHostLink {
         return sensorId;
     }
 
-    protected String switchSensor(int sensorId, boolean switchOn) {
+    private String switchSensor(int sensorId, boolean switchOn) {
         return switchSensor(sensorId, switchOn, "SENSOR_DELAY_NORMAL");
     }
 
-    protected String switchSensor(int sensorId, boolean switchOn, String requestFrequency) {
+    private String switchSensor(int sensorId, boolean switchOn, String requestFrequency) {
         String response;
         int rateUs = SensorManager.SENSOR_DELAY_NORMAL;
 
@@ -429,7 +408,7 @@ public class PowerTestHostLink {
         return response;
     }
 
-    protected String switchAllSensors(boolean on) {
+    private String switchAllSensors(boolean on) {
         List<Sensor> allSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         String response = RESPONSE_OK;
         for (Sensor sensor : allSensors) {
@@ -441,13 +420,20 @@ public class PowerTestHostLink {
         return response;
     }
 
+    private LocalServerSocket createSocket() {
+        try {
+            return new LocalServerSocket(SOCKET_NAME);
+        } catch (IOException e) {
+            Log.e(TAG, "LocalSocketServer creation failure.", e);
+            return null;
+        }
+    }
+
     private SensorEventListener mSensorEventListener = new SensorEventListener() {
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
         @Override
-        public void onSensorChanged(SensorEvent event) {
-        }
+        public void onSensorChanged(SensorEvent event) {}
     };
 }

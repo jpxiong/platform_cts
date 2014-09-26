@@ -62,8 +62,6 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
     protected void activitySetUp() {
         getTestLogger().logInstructions(R.string.snsr_no_interaction);
         waitForUserToBegin();
-
-        // TODO: deactivate Sensor features?
     }
 
     /**
