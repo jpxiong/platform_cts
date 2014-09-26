@@ -2,22 +2,26 @@ package com.android.cts.verifier.nfc.hce;
 
 import android.content.ComponentName;
 
-public class TransportService2 extends HceService {
+public class PrefixPaymentService1 extends HceService {
+    static final String TAG = "PrefixPaymentService1";
+
     static final ComponentName COMPONENT =
             new ComponentName("com.android.cts.verifier",
-            TransportService2.class.getName());
+            PrefixPaymentService1.class.getName());
 
     public static final CommandApdu[] APDU_COMMAND_SEQUENCE = {
-        HceUtils.buildSelectApdu(HceUtils.TRANSPORT_AID, true),
-        HceUtils.buildCommandApdu("80CA01E100", true)
+        HceUtils.buildSelectApdu(HceUtils.PPSE_AID, true),
+        HceUtils.buildSelectApdu(HceUtils.MC_AID, true),
+        HceUtils.buildCommandApdu("80CA01F000", true)
     };
 
     public static final String[] APDU_RESPOND_SEQUENCE = {
-        "81CA9000",
-        "7483624748FEFE9000"
+        "F1239000",
+        "F4569000",
+        "F789FFAABB9000"
     };
 
-    public TransportService2() {
+    public PrefixPaymentService1() {
         initialize(APDU_COMMAND_SEQUENCE, APDU_RESPOND_SEQUENCE);
     }
 

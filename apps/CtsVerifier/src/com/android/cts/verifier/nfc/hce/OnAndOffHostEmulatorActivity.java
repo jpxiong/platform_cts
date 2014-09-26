@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.android.cts.verifier.R;
 import com.android.cts.verifier.nfc.NfcDialogs;
+import com.android.cts.verifier.R;
 
 @TargetApi(19)
 public class OnAndOffHostEmulatorActivity extends BaseEmulatorActivity {
@@ -32,7 +32,7 @@ public class OnAndOffHostEmulatorActivity extends BaseEmulatorActivity {
 
     public static Intent buildReaderIntent(Context context) {
         // Combine command/response APDU arrays
-        String[] commandSequences = new String[OffHostService.APDU_COMMAND_SEQUENCE.length +
+        CommandApdu[] commandSequences = new CommandApdu[OffHostService.APDU_COMMAND_SEQUENCE.length +
                                                AccessService.APDU_COMMAND_SEQUENCE.length];
         System.arraycopy(OffHostService.APDU_COMMAND_SEQUENCE, 0, commandSequences, 0,
                 OffHostService.APDU_COMMAND_SEQUENCE.length);
