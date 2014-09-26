@@ -19,7 +19,6 @@ LOCAL_PATH := $(call my-dir)
 # Build image analysis library
 
 include $(CLEAR_VARS)
-include external/stlport/libstlport.mk
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libcolorchecker
@@ -35,8 +34,9 @@ LOCAL_SRC_FILES += testingimage.cpp \
                    whitebalancetest.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker
-LOCAL_SHARED_LIBRARIES := libstlport \
-                          libcutils \
-                          libutils
+LOCAL_CXX_STL := stlport
+LOCAL_SHARED_LIBRARIES := \
+    libcutils \
+    libutils \
 
 include $(BUILD_STATIC_LIBRARY)
