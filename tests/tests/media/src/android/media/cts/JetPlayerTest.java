@@ -24,6 +24,7 @@ import android.media.JetPlayer;
 import android.media.JetPlayer.OnJetEventListener;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import java.io.File;
@@ -39,15 +40,8 @@ public class JetPlayerTest extends AndroidTestCase {
     private boolean mOnJetNumQueuedSegmentUpdateCalled;
     private boolean mOnJetEventCalled;
     private String mJetFile;
-
-    /*
-     * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
-     * for the current thread. However, since we don't actually call loop() in the test,
-     * any messages queued with that looper will never be consumed. By instantiating the
-     * handler and the JetPlayer in the constructor, before setUp(), they will not be bound
-     * to the nonfunctional looper.
-     */
-    private Handler mHandler = new Handler();
+    /* JetPlayer and Handler will be on the Main Looper */
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     private final JetPlayer mJetPlayer = JetPlayer.getJetPlayer();
 
     @Override
