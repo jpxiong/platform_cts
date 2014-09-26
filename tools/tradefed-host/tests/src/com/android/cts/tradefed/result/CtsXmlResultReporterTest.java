@@ -19,7 +19,6 @@ import static com.android.cts.tradefed.result.CtsXmlResultReporter.CTS_RESULT_FI
 
 import com.android.cts.tradefed.UnitTests;
 import com.android.cts.util.AbiUtils;
-import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.log.LogUtil.CLog;
@@ -160,7 +159,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         mResultReporter.invocationStarted(mMockBuild);
         mResultReporter.testRunStarted(AbiUtils.createId(UnitTests.ABI.getName(), "run"), 1);
         mResultReporter.testStarted(testId);
-        mResultReporter.testFailed(TestFailure.FAILURE, testId, trace);
+        mResultReporter.testFailed(testId, trace);
         mResultReporter.testEnded(testId, emptyMap);
         mResultReporter.testRunEnded(3, emptyMap);
         mResultReporter.invocationEnded(1);
