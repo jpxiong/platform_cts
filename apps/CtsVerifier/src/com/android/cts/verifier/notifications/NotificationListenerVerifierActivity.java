@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.nls;
+package com.android.cts.verifier.notifications;
 
-import static com.android.cts.verifier.nls.MockListener.JSON_FLAGS;
-import static com.android.cts.verifier.nls.MockListener.JSON_ICON;
-import static com.android.cts.verifier.nls.MockListener.JSON_ID;
-import static com.android.cts.verifier.nls.MockListener.JSON_PACKAGE;
-import static com.android.cts.verifier.nls.MockListener.JSON_TAG;
-import static com.android.cts.verifier.nls.MockListener.JSON_WHEN;
+import static com.android.cts.verifier.notifications.MockListener.JSON_FLAGS;
+import static com.android.cts.verifier.notifications.MockListener.JSON_ICON;
+import static com.android.cts.verifier.notifications.MockListener.JSON_ID;
+import static com.android.cts.verifier.notifications.MockListener.JSON_PACKAGE;
+import static com.android.cts.verifier.notifications.MockListener.JSON_TAG;
+import static com.android.cts.verifier.notifications.MockListener.JSON_WHEN;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,33 +59,37 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class NotificationListenerVerifierActivity extends PassFailButtons.Activity
 implements Runnable {
-    static final String TAG = TagVerifierActivity.class.getSimpleName();
+    private static final String TAG = TagVerifierActivity.class.getSimpleName();
     private static final String STATE = "state";
-    private static final String LISTENER_PATH = "com.android.cts.verifier/" + 
-            "com.android.cts.verifier.nls.MockListener";
-    private static final int SETUP = 0;
-    private static final int PASS = 1;
-    private static final int FAIL = 2;
-    private static final int WAIT_FOR_USER = 3;
-    private static final int CLEARED = 4;
-    private static final int READY = 5;
-    private static final int RETRY = 6;
-    private static final int NOTIFICATION_ID = 1001;
     private static LinkedBlockingQueue<String> sDeletedQueue = new LinkedBlockingQueue<String>();
 
-    private int mState;
-    private int[] mStatus;
+    protected static final String LISTENER_PATH = "com.android.cts.verifier/" +
+            "com.android.cts.verifier.notifications.MockListener";
+    protected static final int SETUP = 0;
+    protected static final int PASS = 1;
+    protected static final int FAIL = 2;
+    protected static final int WAIT_FOR_USER = 3;
+    protected static final int CLEARED = 4;
+    protected static final int READY = 5;
+    protected static final int RETRY = 6;
+
+    protected static final int NOTIFICATION_ID = 1001;
+
+    protected int mState;
+    protected int[] mStatus;
+    protected PackageManager mPackageManager;
+    protected NotificationManager mNm;
+    protected Context mContext;
+    protected Runnable mRunner;
+    protected View mHandler;
+    protected String mPackageString;
+
     private LayoutInflater mInflater;
     private ViewGroup mItemList;
-    private PackageManager mPackageManager;
+
     private String mTag1;
     private String mTag2;
     private String mTag3;
-    private NotificationManager mNm;
-    private Context mContext;
-    private Runnable mRunner;
-    private View mHandler;
-    private String mPackageString;
     private int mIcon1;
     private int mIcon2;
     private int mIcon3;
@@ -112,6 +117,11 @@ implements Runnable {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        onCreate(savedInstanceState, R.layout.nls_main);
+        setInfoResources(R.string.nls_test, R.string.nls_info, -1);
+    }
+
+    protected void onCreate(Bundle savedInstanceState, int layoutId) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -122,7 +132,7 @@ implements Runnable {
         mNm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mPackageManager = getPackageManager();
         mInflater = getLayoutInflater();
-        View view = mInflater.inflate(R.layout.nls_main, null);
+        View view = mInflater.inflate(layoutId, null);
         mItemList = (ViewGroup) view.findViewById(R.id.nls_test_items);
         mHandler = mItemList;
         createTestItems();
@@ -130,8 +140,6 @@ implements Runnable {
         setContentView(view);
 
         setPassFailButtonClickListeners();
-        setInfoResources(R.string.nls_test, R.string.nls_info, -1);
-
         getPassButton().setEnabled(false);
     }
 
@@ -148,48 +156,59 @@ implements Runnable {
 
     // Interface Utilities
 
-    private void createTestItems() {
-        createUserItem(R.string.nls_enable_service);
+    protected void createTestItems() {
+        createNlsSettingsItem(R.string.nls_enable_service);
         createAutoItem(R.string.nls_service_started);
         createAutoItem(R.string.nls_note_received);
         createAutoItem(R.string.nls_payload_intact);
         createAutoItem(R.string.nls_clear_one);
         createAutoItem(R.string.nls_clear_all);
-        createUserItem(R.string.nls_disable_service);
+        createNlsSettingsItem(R.string.nls_disable_service);
         createAutoItem(R.string.nls_service_stopped);
         createAutoItem(R.string.nls_note_missed);
     }
 
-    private void setItemState(int index, boolean passed) {
+    protected void setItemState(int index, boolean passed) {
         ViewGroup item = (ViewGroup) mItemList.getChildAt(index);
         ImageView status = (ImageView) item.findViewById(R.id.nls_status);
         status.setImageResource(passed ? R.drawable.fs_good : R.drawable.fs_error);
-        View button = item.findViewById(R.id.nls_launch_settings);
+        View button = item.findViewById(R.id.nls_action_button);
         button.setClickable(false);
         button.setEnabled(false);
         status.invalidate();
     }
 
-    private void markItemWaiting(int index) {
+    protected void markItemWaiting(int index) {
         ViewGroup item = (ViewGroup) mItemList.getChildAt(index);
         ImageView status = (ImageView) item.findViewById(R.id.nls_status);
         status.setImageResource(R.drawable.fs_warning);
         status.invalidate();
     }
 
-    private View createUserItem(int stringId) {
+    protected View createNlsSettingsItem(int messageId) {
+        return createUserItem(messageId, R.string.nls_start_settings);
+    }
+
+    protected View createRetryItem(int messageId) {
+        return createUserItem(messageId, R.string.attention_ready);
+    }
+
+    protected View createUserItem(int messageId, int actionId) {
         View item = mInflater.inflate(R.layout.nls_item, mItemList, false);
         TextView instructions = (TextView) item.findViewById(R.id.nls_instructions);
-        instructions.setText(stringId);
+        instructions.setText(messageId);
+        Button button = (Button) item.findViewById(R.id.nls_action_button);
+        button.setText(actionId);
         mItemList.addView(item);
+        button.setTag(actionId);
         return item;
     }
 
-    private View createAutoItem(int stringId) {
+    protected View createAutoItem(int stringId) {
         View item = mInflater.inflate(R.layout.nls_item, mItemList, false);
         TextView instructions = (TextView) item.findViewById(R.id.nls_instructions);
         instructions.setText(stringId);
-        View button = item.findViewById(R.id.nls_launch_settings);
+        View button = item.findViewById(R.id.nls_action_button);
         button.setVisibility(View.GONE);
         mItemList.addView(item);
         return item;
@@ -214,33 +233,37 @@ implements Runnable {
             markItemWaiting(mState);
         }
 
+        updateStateMachine();
+    }
+
+    protected void updateStateMachine() {
         switch (mState) {
             case 0:
-                testIsEnabled(0);
+                testIsEnabled(mState);
                 break;
             case 1:
-                testIsStarted(1);
+                testIsStarted(mState);
                 break;
             case 2:
-                testNotificationRecieved(2);
+                testNotificationRecieved(mState);
                 break;
             case 3:
-                testDataIntact(3);
+                testDataIntact(mState);
                 break;
             case 4:
-                testDismissOne(4);
+                testDismissOne(mState);
                 break;
             case 5:
-                testDismissAll(5);
+                testDismissAll(mState);
                 break;
             case 6:
-                testIsDisabled(6);
+                testIsDisabled(mState);
                 break;
             case 7:
-                testIsStopped(7);
+                testIsStopped(mState);
                 break;
             case 8:
-                testNotificationNotRecieved(8);
+                testNotificationNotRecieved(mState);
                 break;
             case 9:
                 getPassButton().setEnabled(true);
@@ -249,12 +272,25 @@ implements Runnable {
         }
     }
 
-    public void launchSettings(View button) {
+    public void launchSettings() {
         startActivity(
                 new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
     }
 
-    private PendingIntent makeIntent(int code, String tag) {
+    public void actionPressed(View v) {
+        Object tag = v.getTag();
+        if (tag instanceof Integer) {
+            int id = ((Integer) tag).intValue();
+            if (id == R.string.nls_start_settings) {
+                launchSettings();
+            } else if (id == R.string.attention_ready) {
+                mStatus[mState] = READY;
+                next();
+            }
+        }
+    }
+
+    protected PendingIntent makeIntent(int code, String tag) {
         Intent intent = new Intent(tag);
         intent.setComponent(new ComponentName(mContext, DismissService.class));
         PendingIntent pi = PendingIntent.getService(mContext, code, intent,
@@ -263,7 +299,7 @@ implements Runnable {
     }
 
     @SuppressLint("NewApi")
-    private void sendNotificaitons() {
+    private void sendNotifications() {
         mTag1 = UUID.randomUUID().toString();
         mTag2 = UUID.randomUUID().toString();
         mTag3 = UUID.randomUUID().toString();
@@ -325,18 +361,27 @@ implements Runnable {
     /**
      * Return to the state machine to progress through the tests.
      */
-    private void next() {
+    protected void next() {
+        mHandler.removeCallbacks(mRunner);
         mHandler.post(mRunner);
     }
 
     /**
      * Wait for things to settle before returning to the state machine.
      */
-    private void delay() {
-        mHandler.postDelayed(mRunner, 2000);
+    protected void delay() {
+        delay(2000);
     }
 
-    boolean checkEquals(long expected, long actual, String message) {
+    /**
+     * Wait for some time.
+     */
+    protected void delay(long waitTime) {
+        mHandler.removeCallbacks(mRunner);
+        mHandler.postDelayed(mRunner, waitTime);
+    }
+
+    protected boolean checkEquals(long expected, long actual, String message) {
         if (expected == actual) {
             return true;
         }
@@ -344,7 +389,7 @@ implements Runnable {
         return false;
     }
 
-    boolean checkEquals(String expected, String actual, String message) {
+    protected boolean checkEquals(String expected, String actual, String message) {
         if (expected.equals(actual)) {
             return true;
         }
@@ -352,7 +397,7 @@ implements Runnable {
         return false;
     }
 
-    boolean checkFlagSet(int expected, int actual, String message) {
+    protected boolean checkFlagSet(int expected, int actual, String message) {
         if ((expected & actual) != 0) {
             return true;
         }
@@ -360,7 +405,7 @@ implements Runnable {
         return false;
     };
 
-    private void logWithStack(String message) {
+    protected void logWithStack(String message) {
         Throwable stackTrace = new Throwable();
         stackTrace.fillInStackTrace();
         Log.e(TAG, message, stackTrace);
@@ -394,7 +439,7 @@ implements Runnable {
             delay();
         } else {
             MockListener.probeListenerStatus(mContext,
-                    new MockListener.IntegerResultCatcher() {
+                    new MockListener.StatusCatcher() {
                 @Override
                 public void accept(int result) {
                     if (result == Activity.RESULT_OK) {
@@ -416,7 +461,7 @@ implements Runnable {
             // wait for intent to move through the system
             delay();
         } else if (mStatus[i] == CLEARED) {
-            sendNotificaitons();
+            sendNotifications();
             mStatus[i] = READY;
             // wait for notifications to move through the system
             delay();
@@ -450,38 +495,38 @@ implements Runnable {
                         try {
                             JSONObject payload = new JSONObject(payloadData);
                             pass &= checkEquals(mPackageString, payload.getString(JSON_PACKAGE),
-                                    "data integrity test fail: notificaiton package (%s, %s)");
+                                    "data integrity test fail: notification package (%s, %s)");
                             String tag = payload.getString(JSON_TAG);
                             if (mTag1.equals(tag)) {
                                 found.add(mTag1);
                                 pass &= checkEquals(mIcon1, payload.getInt(JSON_ICON),
-                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                        "data integrity test fail: notification icon (%d, %d)");
                                 pass &= checkFlagSet(mFlag1, payload.getInt(JSON_FLAGS),
-                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                        "data integrity test fail: notification flags (%d, %d)");
                                 pass &= checkEquals(mId1, payload.getInt(JSON_ID),
-                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                        "data integrity test fail: notification ID (%d, %d)");
                                 pass &= checkEquals(mWhen1, payload.getLong(JSON_WHEN),
-                                        "data integrity test fail: notificaiton when (%d, %d)");
+                                        "data integrity test fail: notification when (%d, %d)");
                             } else if (mTag2.equals(tag)) {
                                 found.add(mTag2);
                                 pass &= checkEquals(mIcon2, payload.getInt(JSON_ICON),
-                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                        "data integrity test fail: notification icon (%d, %d)");
                                 pass &= checkFlagSet(mFlag2, payload.getInt(JSON_FLAGS),
-                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                        "data integrity test fail: notification flags (%d, %d)");
                                 pass &= checkEquals(mId2, payload.getInt(JSON_ID),
-                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                        "data integrity test fail: notification ID (%d, %d)");
                                 pass &= checkEquals(mWhen2, payload.getLong(JSON_WHEN),
-                                        "data integrity test fail: notificaiton when (%d, %d)");
+                                        "data integrity test fail: notification when (%d, %d)");
                             } else if (mTag3.equals(tag)) {
                                 found.add(mTag3);
                                 pass &= checkEquals(mIcon3, payload.getInt(JSON_ICON),
-                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                        "data integrity test fail: notification icon (%d, %d)");
                                 pass &= checkFlagSet(mFlag3, payload.getInt(JSON_FLAGS),
-                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                        "data integrity test fail: notification flags (%d, %d)");
                                 pass &= checkEquals(mId3, payload.getInt(JSON_ID),
-                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                        "data integrity test fail: notification ID (%d, %d)");
                                 pass &= checkEquals(mWhen3, payload.getLong(JSON_WHEN),
-                                        "data integrity test fail: notificaiton when (%d, %d)");
+                                        "data integrity test fail: notification when (%d, %d)");
                             } else {
                                 pass = false;
                                 logWithStack("failed on unexpected notification tag: " + tag);
@@ -587,7 +632,7 @@ implements Runnable {
             delay();
         } else {
             MockListener.probeListenerStatus(mContext,
-                    new MockListener.IntegerResultCatcher() {
+                    new MockListener.StatusCatcher() {
                 @Override
                 public void accept(int result) {
                     if (result == Activity.RESULT_OK) {
@@ -610,7 +655,7 @@ implements Runnable {
             delay();
         } else if (mStatus[i] == CLEARED) {
             // setup for testNotificationRecieved
-            sendNotificaitons();
+            sendNotifications();
             mStatus[i] = READY;
             delay();
         } else {
