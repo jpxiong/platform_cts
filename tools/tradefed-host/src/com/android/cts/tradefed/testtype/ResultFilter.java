@@ -86,9 +86,9 @@ class ResultFilter extends ResultForwarder {
      * {@inheritDoc}
      */
     @Override
-    public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+    public void testFailed(TestIdentifier test, String trace) {
         if (isKnownTest(test)) {
-            super.testFailed(status, test, trace);
+            super.testFailed(test, trace);
         }
     }
 

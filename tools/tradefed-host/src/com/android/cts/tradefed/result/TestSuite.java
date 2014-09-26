@@ -16,7 +16,6 @@
 package com.android.cts.tradefed.result;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;

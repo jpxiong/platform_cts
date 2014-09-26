@@ -2,7 +2,6 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.MultiLineReceiver;
-import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -200,7 +199,7 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
         Map <String, String> emptyMap = Collections.emptyMap();
 
         if (!mGotTestResult) {
-            mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
+            mListener.testFailed(mCurrentTestId,
                     "Log doesn't contain test result");
         }
 
@@ -236,11 +235,11 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
         } else if (code.compareTo("Fail") == 0 || code.compareTo("ResourceError") == 0
                 || code.compareTo("InternalError") == 0 || code.compareTo("Crash") == 0
                 || code.compareTo("Timeout") == 0) {
-            mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
+            mListener.testFailed(mCurrentTestId,
                     code + ":" + details);
             mGotTestResult = true;
         } else {
-            mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
+            mListener.testFailed(mCurrentTestId,
                     "Unknown result code: " + code + ":" + details);
             mGotTestResult = true;
         }
@@ -253,7 +252,7 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
         Map <String, String> emptyMap = Collections.emptyMap();
 
         String reason = values.get("dEQP-TerminateTestCase-Reason");
-        mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
+        mListener.testFailed(mCurrentTestId,
                 "Terminated: " + reason);
         mListener.testEnded(mCurrentTestId, emptyMap);
 
@@ -444,12 +443,10 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
                         source.cancel();
                     }
-
-
-                    if (!mGotTestResult) {
-                        mListener.testFailed(ITestRunListener.TestFailure.ERROR, mCurrentTestId,
-                            "Log doesn't contain test result");
-                    }
+                if (!mGotTestResult) {
+                    mListener.testFailed(mCurrentTestId,
+                        "Log doesn't contain test result");
+                }
 
                     mListener.testEnded(mCurrentTestId, emptyMap);
                     mCurrentTestId = null;
