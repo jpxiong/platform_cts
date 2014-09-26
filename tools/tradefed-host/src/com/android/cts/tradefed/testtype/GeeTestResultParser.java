@@ -311,6 +311,7 @@ public class GeeTestResultParser extends MultiLineReceiver {
      *
      * @see IShellOutputReceiver#isCancelled()
      */
+    @Override
     public boolean isCancelled() {
         return mIsCancelled;
     }
@@ -548,14 +549,12 @@ public class GeeTestResultParser extends MultiLineReceiver {
             // If the test name of the result changed from what we started with, report that
             // the last known test failed, regardless of whether we received a pass or fail tag.
             for (ITestRunListener listener : mTestListeners) {
-                listener.testFailed(ITestRunListener.TestFailure.ERROR, testId,
-                                mCurrentTestResult.getTrace());
+                listener.testFailed(testId, mCurrentTestResult.getTrace());
             }
         }
         else if (!testPassed) {  // test failed
             for (ITestRunListener listener : mTestListeners) {
-                listener.testFailed(ITestRunListener.TestFailure.FAILURE, testId,
-                                mCurrentTestResult.getTrace());
+                listener.testFailed(testId, mCurrentTestResult.getTrace());
             }
         }
         // For all cases (pass or fail), we ultimately need to report test has ended
@@ -629,8 +628,7 @@ public class GeeTestResultParser extends MultiLineReceiver {
                 testRunStackTrace = mCurrentTestResult.getTrace();
             }
             for (ITestRunListener listener : mTestListeners) {
-                listener.testFailed(ITestRunListener.TestFailure.ERROR, testId,
-                        "No test results.\r\n" + testRunStackTrace);
+                listener.testFailed(testId, "No test results.\r\n" + testRunStackTrace);
                 listener.testEnded(testId, emptyMap);
             }
             clearCurrentTestResult();

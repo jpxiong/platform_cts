@@ -21,14 +21,13 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.ddmlib.testrunner.TestResult;
+import com.android.ddmlib.testrunner.TestResult.TestStatus;
+import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
-import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.CollectingTestListener;
-import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestResult.TestStatus;
-import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
@@ -170,7 +169,7 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
                 ? doRunTests(pkgName, testClassName, testMethodName)
                 : doRunTestsAsUser(pkgName, testClassName, testMethodName, userId);
         printTestResult(runResult);
-        return !runResult.hasFailedTests() && runResult.getNumPassedTests() > 0;
+        return !runResult.hasFailedTests() && runResult.getNumTestsInState(TestStatus.PASSED) > 0;
     }
 
     /** Helper method to run tests and return the listener that collected the results. */
