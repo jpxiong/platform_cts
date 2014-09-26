@@ -36,7 +36,7 @@ public class LauncherActivityTest
     private LauncherActivityStub mActivity;
 
     public LauncherActivityTest() {
-        super("com.android.cts.app", LauncherActivityStub.class);
+        super("com.android.cts.app.stub", LauncherActivityStub.class);
     }
 
     @Override

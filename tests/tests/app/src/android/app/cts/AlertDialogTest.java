@@ -35,17 +35,17 @@ import android.widget.Button;
 /*
  * Test AlertDialog
  */
-public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsActivity> {
+public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
     private static final String ALERTDIALOG_CUSTOM_TITLE = "Hello, World!";
 
     private Instrumentation mInstrumentation;
-    private DialogCtsActivity mActivity;
+    private DialogStubActivity mActivity;
     private Button mPositiveButton;
     private Button mNegativeButton;
     private Button mNeutralButton;
 
     public AlertDialogTest() {
-        super("com.android.cts.app", DialogCtsActivity.class);
+        super("com.android.cts.app.stub", DialogStubActivity.class);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     protected void startDialogActivity(int dialogNumber) {
-        mActivity = DialogCtsActivity.startDialogActivity(this, dialogNumber);
+        mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
         new PollingCheck() {
             @Override
             protected boolean check() {
@@ -65,7 +65,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     public void testAlertDialog() throws Throwable {
-        doTestAlertDialog(DialogCtsActivity.TEST_ALERTDIALOG);
+        doTestAlertDialog(DialogStubActivity.TEST_ALERTDIALOG);
     }
 
     private void doTestAlertDialog(int index) throws Throwable {
@@ -75,17 +75,17 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_POSITIVE);
         assertNotNull(mPositiveButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_positive),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_positive),
                 mPositiveButton.getText());
         mNeutralButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_NEUTRAL);
         assertNotNull(mNeutralButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_neutral),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_neutral),
                 mNeutralButton.getText());
         mNegativeButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_NEGATIVE);
         assertNotNull(mNegativeButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_negative),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_negative),
                 mNegativeButton.getText());
 
         assertFalse(mActivity.isPositiveButtonClicked);
@@ -102,40 +102,40 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     public void testAlertDialogDeprecatedAPI() throws Throwable {
-        doTestAlertDialog(DialogCtsActivity.TEST_ALERTDIALOG_DEPRECATED);
+        doTestAlertDialog(DialogStubActivity.TEST_ALERTDIALOG_DEPRECATED);
     }
 
     public void testAlertDialogDeprecatedAPIWithMessage() throws Throwable {
-        startDialogActivity(DialogCtsActivity.TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE);
         assertTrue(mActivity.getDialog().isShowing());
 
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_POSITIVE);
         assertNotNull(mPositiveButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_positive),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_positive),
                 mPositiveButton.getText());
         mNegativeButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_NEGATIVE);
         assertNotNull(mNegativeButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_negative),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_negative),
                 mNegativeButton.getText());
         mNeutralButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_NEUTRAL);
         assertNotNull(mNeutralButton);
-        assertEquals(mActivity.getString(com.android.cts.app.R.string.alert_dialog_neutral),
+        assertEquals(mActivity.getString(com.android.cts.app.stub.R.string.alert_dialog_neutral),
                 mNeutralButton.getText());
 
-        DialogCtsActivity.buttonIndex = 0;
+        DialogStubActivity.buttonIndex = 0;
         performClick(mPositiveButton);
-        assertEquals(DialogInterface.BUTTON_POSITIVE, DialogCtsActivity.buttonIndex);
+        assertEquals(DialogInterface.BUTTON_POSITIVE, DialogStubActivity.buttonIndex);
 
-        DialogCtsActivity.buttonIndex = 0;
+        DialogStubActivity.buttonIndex = 0;
         performClick(mNeutralButton);
-        assertEquals(DialogInterface.BUTTON_NEUTRAL, DialogCtsActivity.buttonIndex);
+        assertEquals(DialogInterface.BUTTON_NEUTRAL, DialogStubActivity.buttonIndex);
 
-        DialogCtsActivity.buttonIndex = 0;
+        DialogStubActivity.buttonIndex = 0;
         performClick(mNegativeButton);
-        assertEquals(DialogInterface.BUTTON_NEGATIVE, DialogCtsActivity.buttonIndex);
+        assertEquals(DialogInterface.BUTTON_NEGATIVE, DialogStubActivity.buttonIndex);
     }
 
     private void performClick(final Button button) throws Throwable {
@@ -148,18 +148,18 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     public void testCustomAlertDialog() {
-        startDialogActivity(DialogCtsActivity.TEST_CUSTOM_ALERTDIALOG);
+        startDialogActivity(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
     public void testCustomAlertDialogView() {
-        startDialogActivity(DialogCtsActivity.TEST_CUSTOM_ALERTDIALOG_VIEW);
+        startDialogActivity(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG_VIEW);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
 
     public void testCallback() {
-        startDialogActivity(DialogCtsActivity.TEST_ALERTDIALOG_CALLBACK);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_CALLBACK);
         assertTrue(mActivity.onCreateCalled);
 
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_0);
@@ -169,12 +169,12 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     public void testAlertDialogTheme() throws Exception {
-        startDialogActivity(DialogCtsActivity.TEST_ALERTDIALOG_THEME);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_THEME);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
     public void testAlertDialogCancelable() throws Exception {
-        startDialogActivity(DialogCtsActivity.TEST_ALERTDIALOG_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_CANCELABLE);
         assertTrue(mActivity.getDialog().isShowing());
         assertFalse(mActivity.onCancelCalled);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
@@ -183,7 +183,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogCtsA
     }
 
     public void testAlertDialogNotCancelable() throws Exception {
-        startDialogActivity(DialogCtsActivity.TEST_ALERTDIALOG_NOT_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_NOT_CANCELABLE);
         assertTrue(mActivity.getDialog().isShowing());
         assertFalse(mActivity.onCancelCalled);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
