@@ -236,6 +236,23 @@ class CtsBuilder(object):
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
 
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.core\.tests\.libcore\.')
+    plan.Include(r'android\.jdwp')
+    self.__WritePlan(plan, 'CTS-ART')
+
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'com\.drawelements\.')
+    self.__WritePlan(plan, 'CTS-DEQP')
+
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.webgl')
+    self.__WritePlan(plan, 'CTS-webview')
+
+
 def BuildAospMediumSizeTestList():
   """ Construct a defaultdic that lists package names of medium tests
       already published to aosp. """
