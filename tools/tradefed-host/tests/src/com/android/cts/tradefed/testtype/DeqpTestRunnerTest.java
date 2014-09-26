@@ -258,7 +258,7 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expectLastCall().once();
 
         if (!pass) {
-            mockListener.testFailed(ITestRunListener.TestFailure.ERROR, testId,
+            mockListener.testFailed(testId,
                     resultCode + ":Detail" + resultCode);
 
             EasyMock.expectLastCall().once();
