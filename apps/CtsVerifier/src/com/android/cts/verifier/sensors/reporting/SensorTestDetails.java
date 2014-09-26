@@ -81,6 +81,10 @@ public class SensorTestDetails {
         return mSummary;
     }
 
+    public SensorTestDetails cloneAndChangeResultCode(ResultCode resultCode) {
+        return new SensorTestDetails(mName, resultCode, mSummary);
+    }
+
     @Override
     public String toString() {
         return String.format("%s|%s|%s", mName, mResultCode.name(), mSummary);
