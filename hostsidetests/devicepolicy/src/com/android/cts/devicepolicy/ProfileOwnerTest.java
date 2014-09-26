@@ -32,6 +32,7 @@ import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -89,12 +90,31 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
         super.tearDown();
     }
 
+    /**
+     *  wipData() test removes the managed profile, so it needs to separated from other tests.
+     */
+    public void testWipeData() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        assertTrue(listUsers().contains(mUserId));
+        assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, PROFILE_OWNER_PKG + ".WipeDataTest", mUserId));
+        // Note: the managed profile is removed by this test, which will make removeUserCommand in
+        // tearDown() to complain, but that should be OK since its result is not asserted.
+        assertFalse(listUsers().contains(mUserId));
+    }
+
     public void testProfileOwner() throws Exception {
         if (!mHasFeature) {
             return;
         }
-        // Runs all tests classes from the package, as the profile user.
-        assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, null /*testClassName*/, mUserId));
+        String[] testClassNames = {
+                "ProfileOwnerSetupTest"
+        };
+        for (String className : testClassNames) {
+            String testClass = PROFILE_OWNER_PKG + "." + className;
+            assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, testClass, mUserId));
+        }
     }
 
     private boolean hasDeviceFeatures(String[] requiredFeatures)
@@ -141,6 +161,26 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
         assertTrue(tokens.length > 0);
         assertEquals("Success:", tokens[0]);
         return Integer.parseInt(tokens[tokens.length-1]);
+    }
+
+    private ArrayList<Integer> listUsers() throws DeviceNotAvailableException {
+        String command = "pm list users";
+        String commandOutput = getDevice().executeShellCommand(command);
+
+        // Extract the id of all existing users.
+        String[] lines = commandOutput.split("\\r?\\n");
+        assertTrue(lines.length >= 1);
+        assertEquals(lines[0], "Users:");
+
+        ArrayList<Integer> users = new ArrayList<Integer>();
+        for (int i = 1; i < lines.length; i++) {
+            // Individual user is printed out like this:
+            // \tUserInfo{$id$:$name$:$Integer.toHexString(flags)$} [running]
+            String[] tokens = lines[i].split("\\{|\\}|:");
+            assertTrue(tokens.length == 4 || tokens.length == 5);
+            users.add(Integer.parseInt(tokens[1]));
+        }
+        return users;
     }
 
     private void setProfileOwner(String componentName) throws DeviceNotAvailableException {
