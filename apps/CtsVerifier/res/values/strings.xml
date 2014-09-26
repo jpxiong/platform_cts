@@ -470,8 +470,6 @@
     <string name="snsr_test_skipped">SKIPPED</string>
     <string name="snsr_test_fail">FAIL</string>
     <string name="snsr_executing_test">\nExecuting test case \'%1$s\'..\n</string>
-    <string name="snsr_orientation_portrait">[Device orientation]: Portrait.</string>
-    <string name="snsr_orientation_landscape">[Device orientation]: Landscape.</string>
 
     <!-- Strings to interact with users in Sensor Tests -->
     <string name="snsr_test_play_sound">A sound will be played once the verification is complete...</string>
@@ -500,12 +498,18 @@
     <string name="snsr_accel_test">Accelerometer Test</string>
     <string name="snsr_accel_test_info">This test verifies that the accelerometer is working properly. As you move the device around through space, the triangle should always point down (i.e. in the direction of gravity.) If it does not, the accelerometer is improperly configured.</string>
     <string name="snsr_accel_m_test">Accelerometer Measurement Tests</string>
-    <string name="snsr_accel_test_face_up">Place the device in a flat surface with the screen facing the ceiling.</string>
-    <string name="snsr_accel_test_face_down">Place the device in a flat surface with the screen facing it.</string>
-    <string name="snsr_accel_test_right_side">Place the device in a flat surface resting vertically on its right side.</string>
-    <string name="snsr_accel_test_left_side">Place the device in a flat surface resting vertically on its left side.</string>
-    <string name="snsr_accel_test_top_side">Place the device in a flat surface resting vertically on its top side.</string>
-    <string name="snsr_accel_test_bottom_side">Place the device in a flat surface resting vertically on its bottom side.</string>
+    <string name="snsr_accel_test_face_up">Place the device on a flat surface with the screen
+        facing the ceiling.</string>
+    <string name="snsr_accel_test_face_down">Place the device on a flat surface with the screen
+        facing it.</string>
+    <string name="snsr_accel_test_right_side">Place the device resting vertically on its right
+        side.</string>
+    <string name="snsr_accel_test_left_side">Place the device resting vertically on its left
+        side.</string>
+    <string name="snsr_accel_test_top_side">Place the device resting vertically on its top
+        side.</string>
+    <string name="snsr_accel_test_bottom_side">Place the device resting vertically on its bottom
+        side.</string>
 
     <!-- Gyroscope -->
     <string name="snsr_gyro_test">Gyroscope Test</string>
@@ -517,17 +521,13 @@
     <string name="snsr_gyro_test_degrees_message">These values looks like degrees per second. These should be radians per second!</string>
     <string name="snsr_gyro_m_test">Gyroscope Measurement Test</string>
     <string name="snsr_gyro_device_placement">Place the device in a flat surface with the screen
-        facing the ceiling, make sure the device aligns with the orientation specified for each
-        scenario. Then follow the instructions:</string>
+        facing the ceiling. Read the instructions for each scenario, before you perform the
+        test.</string>
     <string name="snsr_gyro_device_static">Leave the device static.</string>
     <string name="snsr_gyro_rotate_clockwise">Rotate the device clockwise.</string>
-    <string name="snsr_gyro_rotate_counter_clockwise">Rotate the device counter clockwise.</string>
-    <string name="snsr_gyro_rotate_right_side">Rotate the device on its right side until it stands on its side.</string>
-    <string name="snsr_gyro_rotate_left_side">Rotate the device on its left side until it stands on its side.</string>
-    <string name="snsr_gyro_rotate_top_side">Rotate the device on its top side until it stands perpendicular.</string>
-    <string name="snsr_gyro_rotate_bottom_side">Rotate the device on its bottom side util it stands perpendicular.</string>
-    <string name="snsr_gyro_rotate_clockwise_integration">Once you begin the test, you will need
-            to rotate the device %1$f degrees counter-clockwise.</string>
+    <string name="snsr_gyro_rotate_device">Once you begin the test, you will need to rotate the
+        device 360deg (one time) in the direction show by the animation, then place it back on the
+        flat surface.</string>
 
     <!-- Heart Rate -->
     <string name="snsr_heartrate_test">Heart Rate Test</string>
@@ -566,7 +566,6 @@
     <string name="snsr_step_counter_test">Step Counter and Detector Tests</string>
     <string name="snsr_step_counter_test_walking">Once the test begins, you will need to walk, and tap on the screen with each step you take.</string>
     <string name="snsr_step_counter_test_still">Once the test begins, you will need to remain still and hold the device still in your hand.</string>
-    <string name="snsr_step_counter_test_waving">Once the test begins, you will need to wave the device in your hand throughout the test.</string>
     <string name="snsr_step_counter_expected_steps">At least %1$d steps are expected to be reported. Reported=%2$d.</string>
     <string name="snsr_step_counter_detected_reported">Steps reported by user=%1$d. Steps counted=%2$d. Delta=%3$d. Tolerance=%4$d.</string>
     <string name="snsr_step_detector_detected_reported">Steps reported by user=%1$d. Steps detected=%2$d. Delta=%3$d. Tolerance=%4$d.</string>

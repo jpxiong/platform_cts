@@ -20,8 +20,6 @@ import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.base.BaseSensorTestActivity;
 import com.android.cts.verifier.sensors.base.ISensorTestStateContainer;
 
-import android.util.Log;
-
 /**
  * A helper class for {@link SensorFeaturesDeactivator}. It abstracts the responsibility of handling
  * device settings that affect sensors.
@@ -29,7 +27,6 @@ import android.util.Log;
  * This class is not thread safe. It is meant to be used only by {@link SensorFeaturesDeactivator}.
  */
 abstract class SensorSettingContainer {
-    private static final String TAG = "SensorSettingContainer";
     private final String mAction;
     private final int mSettingNameResId;
 
@@ -47,8 +44,23 @@ abstract class SensorSettingContainer {
     public synchronized void requestToSetMode(
             ISensorTestStateContainer stateContainer,
             boolean modeOn) {
+        trySetMode(stateContainer, modeOn);
+        if (getCurrentSettingMode() != modeOn) {
+            String message = stateContainer.getString(
+                    R.string.snsr_setting_mode_not_set,
+                    getSettingName(stateContainer),
+                    modeOn);
+            throw new IllegalStateException(message);
+        }
+    }
+
+    public synchronized void requestToResetMode(ISensorTestStateContainer stateContainer) {
+        trySetMode(stateContainer, mCapturedModeOn);
+    }
+
+    private void trySetMode(ISensorTestStateContainer stateContainer, boolean modeOn) {
         BaseSensorTestActivity.SensorTestLogger logger = stateContainer.getTestLogger();
-        String settingName = stateContainer.getString(mSettingNameResId);
+        String settingName = getSettingName(stateContainer);
         if (getCurrentSettingMode() == modeOn) {
             logger.logInstructions(R.string.snsr_setting_mode_set, settingName, modeOn);
             return;
@@ -57,25 +69,15 @@ abstract class SensorSettingContainer {
         logger.logInstructions(R.string.snsr_setting_mode_request, settingName, modeOn);
         logger.logInstructions(R.string.snsr_on_complete_return);
         stateContainer.waitForUserToContinue();
-
         stateContainer.executeActivity(mAction);
-        if (getCurrentSettingMode() != modeOn) {
-            String message = stateContainer
-                    .getString(R.string.snsr_setting_mode_not_set, settingName, modeOn);
-            throw new IllegalStateException(message);
-        }
-    }
-
-    public synchronized void requestToResetMode(ISensorTestStateContainer stateContainer) {
-        try {
-            requestToSetMode(stateContainer, mCapturedModeOn);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Error restoring state of action: " + mAction, e);
-        }
     }
 
     private boolean getCurrentSettingMode() {
         return getSettingMode() != 0;
+    }
+
+    private String getSettingName(ISensorTestStateContainer stateContainer) {
+        return stateContainer.getString(mSettingNameResId);
     }
 
     protected abstract int getSettingMode();

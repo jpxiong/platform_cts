@@ -742,7 +742,7 @@
 
         <activity android:name=".sensors.AccelerometerMeasurementTestActivity"
                   android:label="@string/snsr_accel_m_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
@@ -765,7 +765,7 @@
 
         <activity android:name=".sensors.GyroscopeMeasurementTestActivity"
                   android:label="@string/snsr_gyro_m_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
@@ -789,7 +789,7 @@
 
         <activity android:name=".sensors.MagneticFieldMeasurementTestActivity"
                   android:label="@string/snsr_mag_m_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -801,7 +801,7 @@
 
         <activity android:name=".sensors.SensorValueAccuracyActivity"
                   android:label="@string/snsr_val_acc_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -813,7 +813,7 @@
 
         <activity android:name=".sensors.RotationVectorTestActivity"
                   android:label="@string/snsr_rot_vec_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -825,7 +825,7 @@
 
         <activity android:name=".sensors.BatchingTestActivity"
                   android:label="@string/snsr_batch_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -838,7 +838,7 @@
         <!-- TODO: enable test when a more reliable way to identify time synchronization is available -->
         <!--activity android:name=".sensors.SensorSynchronizationTestActivity"
                   android:label="@string/snsr_synch_test"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -850,7 +850,7 @@
 
         <activity android:name=".sensors.SingleSensorTestsActivity"
                   android:label="@string/snsr_single_sensor_tests"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
@@ -860,7 +860,7 @@
 
         <activity android:name=".sensors.SensorBatchingTestsActivity"
                   android:label="@string/snsr_sensor_batching_tests"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
@@ -869,7 +869,8 @@
         </activity>
 
         <activity android:name=".sensors.SensorIntegrationTestsActivity"
-                  android:label="@string/snsr_sensor_integration_tests">
+                  android:label="@string/snsr_sensor_integration_tests"
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
@@ -878,13 +879,16 @@
         </activity>
 
         <activity android:name=".sensors.SensorTestActivity"
-                  android:label="@string/snsr_sensor_test">
+                  android:label="@string/snsr_sensor_test"
+                  android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
         </activity>
+
+        <!-- End sensor tests definitions -->
 
         <activity android:name=".location.LocationModeOffTestActivity"
                 android:label="@string/location_mode_off_test">

@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.hardware.cts.helpers.ActivityResultMultiplexedLatch;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.media.MediaPlayer;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -86,6 +87,9 @@ public abstract class BaseSensorTestActivity
     private Button mPassButton;
     private Button mFailButton;
 
+    private GLSurfaceView mGLSurfaceView;
+    private boolean mUsingGlSurfaceView;
+
     /**
      * Constructor to be used by subclasses.
      *
@@ -93,7 +97,7 @@ public abstract class BaseSensorTestActivity
      *                  implemented by subclasses.
      */
     protected BaseSensorTestActivity(Class testClass) {
-        this(testClass, R.layout.snsr_semi_auto_test);
+        this(testClass, R.layout.sensor_test);
     }
 
     /**
@@ -102,7 +106,7 @@ public abstract class BaseSensorTestActivity
      * @param testClass The class that contains the tests. It is dependant on test executor
      *                  implemented by subclasses.
      * @param layoutId The Id of the layout to use for the test UI. The layout must contain all the
-     *                 elements in the base layout {@code R.layout.snsr_semi_auto_test}.
+     *                 elements in the base layout {@code R.layout.sensor_test}.
      */
     protected BaseSensorTestActivity(Class testClass, int layoutId) {
         mTestClass = testClass;
@@ -121,9 +125,26 @@ public abstract class BaseSensorTestActivity
         mNextButton.setOnClickListener(this);
         mPassButton = (Button) findViewById(R.id.pass_button);
         mFailButton = (Button) findViewById(R.id.fail_button);
+        mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
 
         updateNextButton(false /*enabled*/);
         new Thread(this).start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mUsingGlSurfaceView) {
+            mGLSurfaceView.onPause();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mUsingGlSurfaceView) {
+            mGLSurfaceView.onResume();
+        }
     }
 
     @Override
@@ -147,6 +168,7 @@ public abstract class BaseSensorTestActivity
     @Override
     public void run() {
         SensorTestDetails testDetails = null;
+
         try {
             mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
             activitySetUp();
@@ -316,6 +338,38 @@ public abstract class BaseSensorTestActivity
         return latch.await();
     }
 
+    /**
+     * Initializes and shows the {@link GLSurfaceView} available to tests.
+     * NOTE: initialization can be performed only once, usually inside {@link #activitySetUp()}.
+     */
+    protected void initializeGlSurfaceView(final GLSurfaceView.Renderer renderer) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mGLSurfaceView.setVisibility(View.VISIBLE);
+                mGLSurfaceView.setRenderer(renderer);
+                mUsingGlSurfaceView = true;
+            }
+        });
+    }
+
+    /**
+     * Closes and hides the {@link GLSurfaceView}.
+     */
+    protected void closeGlSurfaceView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!mUsingGlSurfaceView) {
+                    return;
+                }
+                mGLSurfaceView.setVisibility(View.GONE);
+                mGLSurfaceView.onPause();
+                mUsingGlSurfaceView = false;
+            }
+        });
+    }
+
     protected void playSound() {
         MediaPlayer player = MediaPlayer.create(this, Settings.System.DEFAULT_NOTIFICATION_URI);
         if (player == null) {
@@ -441,6 +495,10 @@ public abstract class BaseSensorTestActivity
             TextAppender textAppender = new TextAppender(R.layout.snsr_message);
             textAppender.setText(getString(messageResId, params));
             textAppender.append();
+        }
+
+        public void logWaitForSound() {
+            logInstructions(R.string.snsr_test_play_sound);
         }
 
         public void logTestDetails(SensorTestDetails testDetails) {
