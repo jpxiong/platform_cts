@@ -284,7 +284,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 int numFrameVerified = repeating ? NUM_FRAME_VERIFIED : 1;
 
                 // Validate images.
-                validateImage(sz, format, numFrameVerified);
+                validateImage(sz, format, numFrameVerified, repeating);
 
                 // Validate capture result.
                 validateCaptureResult(format, sz, listener, numFrameVerified);
@@ -385,25 +385,43 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         return captureBuilder;
     }
 
-    private void validateImage(Size sz, int format, int captureCount) throws Exception {
+    private void validateImage(Size sz, int format, int captureCount,  boolean repeating)
+            throws Exception {
         // TODO: Add more format here, and wrap each one as a function.
         Image img;
-
-        for (int i = 0; i < captureCount; i++) {
+        final int MAX_RETRY_COUNT = 20;
+        int numImageVerified = 0;
+        int reTryCount = 0;
+        while (numImageVerified < captureCount) {
             assertNotNull("Image listener is null", mListener);
             if (VERBOSE) Log.v(TAG, "Waiting for an Image");
             mListener.waitForAnyImageAvailable(CAPTURE_WAIT_TIMEOUT_MS);
-            /**
-             * Acquire the latest image in case the validation is slower than
-             * the image producing rate.
-             */
-            img = mReader.acquireLatestImage();
+            if (repeating) {
+                /**
+                 * Acquire the latest image in case the validation is slower than
+                 * the image producing rate.
+                 */
+                img = mReader.acquireLatestImage();
+                /**
+                 * Sometimes if multiple onImageAvailable callbacks being queued,
+                 * acquireLatestImage will clear all buffer before corresponding callback is
+                 * executed. Wait for a new frame in that case.
+                 */
+                if (img == null && reTryCount < MAX_RETRY_COUNT) {
+                    reTryCount++;
+                    continue;
+                }
+            } else {
+                img = mReader.acquireNextImage();
+            }
             assertNotNull("Unable to acquire the latest image", img);
             if (VERBOSE) Log.v(TAG, "Got the latest image");
             CameraTestUtils.validateImage(img, sz.getWidth(), sz.getHeight(), format,
                     DEBUG_FILE_NAME_BASE);
-            if (VERBOSE) Log.v(TAG, "finish vaildation of image " + i);
+            if (VERBOSE) Log.v(TAG, "finish vaildation of image " + numImageVerified);
             img.close();
+            numImageVerified++;
+            reTryCount = 0;
         }
 
         // Return all pending images to the ImageReader as the validateImage may
