@@ -85,17 +85,17 @@ public class CtsTestTest extends TestCase {
 
         mCtsTest = new CtsTest() {
             @Override
-            ITestPackageRepo createTestCaseRepo() {
+            ITestPackageRepo createTestCaseRepo(Set<String> abis) {
                 return mMockRepo;
             }
 
             @Override
-            ITestPlan createPlan(String planName) {
+            ITestPlan createPlan(String planName, Set<String> abis) {
                 return mMockPlan;
             }
 
             @Override
-            ITestPlan createPlan(PlanCreator planCreator) {
+            ITestPlan createPlan(PlanCreator planCreator, Set<String> abis) {
                 return mMockPlan;
             }
 
