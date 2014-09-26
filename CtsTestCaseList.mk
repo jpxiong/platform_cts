@@ -42,7 +42,6 @@ cts_support_packages := \
     CtsMonkeyApp2 \
     CtsProfileOwnerApp \
     CtsSomeAccessibilityServices \
-    CtsTestStubs \
     CtsThemeDeviceApp \
     SignatureTest \
     TestDeviceSetup \
