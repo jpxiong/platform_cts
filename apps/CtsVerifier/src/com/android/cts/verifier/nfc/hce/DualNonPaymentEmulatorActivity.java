@@ -31,7 +31,7 @@ public class DualNonPaymentEmulatorActivity extends BaseEmulatorActivity {
     public static Intent buildReaderIntent(Context context) {
         Intent readerIntent = new Intent(context, SimpleReaderActivity.class);
         // Combine command/response APDU arrays
-        String[] commandSequences = new String[TransportService2.APDU_COMMAND_SEQUENCE.length +
+        CommandApdu[] commandSequences = new CommandApdu[TransportService2.APDU_COMMAND_SEQUENCE.length +
                                                AccessService.APDU_COMMAND_SEQUENCE.length];
         System.arraycopy(TransportService2.APDU_COMMAND_SEQUENCE, 0, commandSequences, 0,
                 TransportService2.APDU_COMMAND_SEQUENCE.length);

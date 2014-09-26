@@ -23,6 +23,9 @@ import com.android.cts.verifier.TestListAdapter.TestListItem;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
+import android.nfc.cardemulation.CardEmulation;
+import android.os.Build;
 import android.os.Bundle;
 
 /** Activity that lists all the NFC HCE emulator tests. */
@@ -37,6 +40,8 @@ public class HceEmulatorTestActivity extends PassFailButtons.TestListActivity {
 
         ArrayTestListAdapter adapter = new ArrayTestListAdapter(this);
 
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
             adapter.add(TestListItem.newCategory(this, R.string.nfc_hce_emulator_tests));
 
@@ -62,6 +67,9 @@ public class HceEmulatorTestActivity extends PassFailButtons.TestListActivity {
                     ChangeDefaultEmulatorActivity.class.getName(),
                     new Intent(this, ChangeDefaultEmulatorActivity.class), null));
 
+            adapter.add(TestListItem.newTest(this, R.string.nfc_hce_foreground_payment_emulator,
+                    ForegroundPaymentEmulatorActivity.class.getName(),
+                    new Intent(this, ForegroundPaymentEmulatorActivity.class), null));
 
             adapter.add(TestListItem.newTest(this, R.string.nfc_hce_single_non_payment_emulator,
                     SingleNonPaymentEmulatorActivity.class.getName(),
@@ -74,6 +82,10 @@ public class HceEmulatorTestActivity extends PassFailButtons.TestListActivity {
             adapter.add(TestListItem.newTest(this, R.string.nfc_hce_conflicting_non_payment_emulator,
                     ConflictingNonPaymentEmulatorActivity.class.getName(),
                     new Intent(this, ConflictingNonPaymentEmulatorActivity.class), null));
+
+            adapter.add(TestListItem.newTest(this, R.string.nfc_hce_foreground_non_payment_emulator,
+                    ForegroundNonPaymentEmulatorActivity.class.getName(),
+                    new Intent(this, ForegroundNonPaymentEmulatorActivity.class), null));
 
             adapter.add(TestListItem.newTest(this, R.string.nfc_hce_throughput_emulator,
                     ThroughputEmulatorActivity.class.getName(),
@@ -91,6 +103,29 @@ public class HceEmulatorTestActivity extends PassFailButtons.TestListActivity {
                     OnAndOffHostEmulatorActivity.class.getName(),
                     new Intent(this, OnAndOffHostEmulatorActivity.class), null));
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
+                adapter.add(TestListItem.newTest(this, R.string.nfc_hce_payment_dynamic_aids_emulator,
+                        DynamicAidEmulatorActivity.class.getName(),
+                        new Intent(this, DynamicAidEmulatorActivity.class), null));
+
+                if (cardEmulation.supportsAidPrefixRegistration()) {
+                    adapter.add(TestListItem.newTest(this, R.string.nfc_hce_payment_prefix_aids_emulator,
+                            PrefixPaymentEmulatorActivity.class.getName(),
+                            new Intent(this, PrefixPaymentEmulatorActivity.class), null));
+
+                    adapter.add(TestListItem.newTest(this, R.string.nfc_hce_payment_prefix_aids_emulator_2,
+                            PrefixPaymentEmulator2Activity.class.getName(),
+                            new Intent(this, PrefixPaymentEmulator2Activity.class), null));
+
+                    adapter.add(TestListItem.newTest(this, R.string.nfc_hce_other_prefix_aids_emulator,
+                            DualNonPaymentPrefixEmulatorActivity.class.getName(),
+                            new Intent(this, DualNonPaymentPrefixEmulatorActivity.class), null));
+
+                    adapter.add(TestListItem.newTest(this, R.string.nfc_hce_other_conflicting_prefix_aids_emulator,
+                            ConflictingNonPaymentPrefixEmulatorActivity.class.getName(),
+                            new Intent(this, ConflictingNonPaymentPrefixEmulatorActivity.class), null));
+                }
+            }
         }
 
         setTestListAdapter(adapter);
