@@ -632,14 +632,28 @@
             <meta-data android:name="android.nfc.cardemulation.off_host_apdu_service" android:resource="@xml/offhost_aid_list"/>
         </service>
 
-        <activity android:name=".sensors.AccelerometerTestActivity" android:label="@string/snsr_accel_test"
+        <!--
+            A DeviceAdmin receiver for sensor tests, it allows sensor tests to turn off the screen.
+        -->
+        <receiver android:name=".sensors.helpers.SensorDeviceAdminReceiver"
+                android:label="@string/snsr_device_admin_receiver">
+            <meta-data android:name="android.app.device_admin"
+                       android:resource="@xml/sensor_device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".sensors.AccelerometerTestActivity"
+                  android:label="@string/snsr_accel_test"
                 android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.sensor.accelerometer" />
         </activity>
 
         <activity android:name=".sensors.AccelerometerMeasurementTestActivity"
@@ -661,7 +675,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.sensor.gyroscope" />
         </activity>
 
         <activity android:name=".sensors.GyroscopeMeasurementTestActivity"

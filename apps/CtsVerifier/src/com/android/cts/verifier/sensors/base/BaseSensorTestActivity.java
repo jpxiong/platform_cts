@@ -25,9 +25,9 @@ import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 import junit.framework.Assert;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.cts.helpers.ActivityResultMultiplexedLatch;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -41,9 +41,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.security.InvalidParameterException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A base Activity that is used to build different methods to execute tests inside CtsVerifier.
@@ -67,18 +65,19 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseSensorTestActivity
         extends Activity
-        implements View.OnClickListener, Runnable {
+        implements View.OnClickListener, Runnable, ISensorTestStateContainer {
     @Deprecated
     protected static final String LOG_TAG = "SensorTest";
 
     protected final Class mTestClass;
 
     private final int mLayoutId;
-    private final DeactivatorActivityHandler mDeactivatorActivityHandler;
     private final SensorFeaturesDeactivator mSensorFeaturesDeactivator;
 
     private final Semaphore mSemaphore = new Semaphore(0);
     private final SensorTestLogger mTestLogger = new SensorTestLogger();
+    private final ActivityResultMultiplexedLatch mActivityResultMultiplexedLatch =
+            new ActivityResultMultiplexedLatch();
 
     private ScrollView mLogScrollView;
     private LinearLayout mLogLayout;
@@ -105,8 +104,7 @@ public abstract class BaseSensorTestActivity
     protected BaseSensorTestActivity(Class testClass, int layoutId) {
         mTestClass = testClass;
         mLayoutId = layoutId;
-        mDeactivatorActivityHandler = new DeactivatorActivityHandler();
-        mSensorFeaturesDeactivator = new SensorFeaturesDeactivator(mDeactivatorActivityHandler);
+        mSensorFeaturesDeactivator = new SensorFeaturesDeactivator(this);
     }
 
     @Override
@@ -130,7 +128,7 @@ public abstract class BaseSensorTestActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mDeactivatorActivityHandler.onActivityResult();
+        mActivityResultMultiplexedLatch.onActivityResult(requestCode, resultCode);
     }
 
     /**
@@ -207,31 +205,8 @@ public abstract class BaseSensorTestActivity
      */
     protected abstract SensorTestDetails executeTests();
 
-    /**
-     * Guides the operator throughout the process of setting the Screen Off timeout to a required
-     * value.
-     *
-     * @param timeout The expected timeout.
-     * @param timeUnit The unit of the provided timeout.
-     *
-     * @throws InterruptedException
-     */
-    protected void setScreenOffTimeout(long timeout, TimeUnit timeUnit)
-            throws InterruptedException {
-        mSensorFeaturesDeactivator.requestToSetScreenOffTimeout(timeout, timeUnit);
-    }
-
-    /**
-     * Guides the operator throughout the process of restoring the state of the Screen Off timeout
-     * to its original state.
-     *
-     * @throws InterruptedException
-     */
-    protected void resetScreenOffTimeout() throws InterruptedException {
-        mSensorFeaturesDeactivator.requestToResetScreenOffTimeout();
-    }
-
-    protected SensorTestLogger getTestLogger() {
+    @Override
+    public SensorTestLogger getTestLogger() {
         return mTestLogger;
     }
 
@@ -290,9 +265,35 @@ public abstract class BaseSensorTestActivity
         waitForUser(R.string.snsr_wait_to_begin);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void waitForUserToContinue() {
+        waitForUser(R.string.snsr_wait_for_user);
+    }
+
     @Deprecated
     protected void waitForUser() {
-        waitForUser(R.string.snsr_wait_for_user);
+        waitForUserToContinue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int executeActivity(String action) {
+        return executeActivity(new Intent(action));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int executeActivity(Intent intent) {
+        ActivityResultMultiplexedLatch.Latch latch = mActivityResultMultiplexedLatch.bindThread();
+        startActivityForResult(intent, latch.getRequestCode());
+        return latch.await();
     }
 
     protected void playSound() {
@@ -370,12 +371,12 @@ public abstract class BaseSensorTestActivity
     }
 
     // a logger available until sensor reporting is in place
-    protected class SensorTestLogger {
+    public class SensorTestLogger {
         private static final String SUMMARY_SEPARATOR = " | ";
 
         private final StringBuilder mOverallSummaryBuilder = new StringBuilder();
 
-        public void logTestStart(String testName) {
+        void logTestStart(String testName) {
             // TODO: log the sensor information and expected execution time of each test
             TextAppender textAppender = new TextAppender(R.layout.snsr_test_title);
             textAppender.setText(testName);
@@ -415,7 +416,7 @@ public abstract class BaseSensorTestActivity
             }
         }
 
-        public void logTestPass(String testName, String testSummary) {
+        void logTestPass(String testName, String testSummary) {
             testSummary = getValidTestSummary(testSummary, R.string.snsr_test_pass);
             logTestEnd(R.layout.snsr_success, testSummary);
             Log.d(LOG_TAG, testSummary);
@@ -429,14 +430,14 @@ public abstract class BaseSensorTestActivity
             saveResult(testName, SensorTestDetails.ResultCode.FAIL, testSummary);
         }
 
-        public void logTestSkip(String testName, String testSummary) {
+        void logTestSkip(String testName, String testSummary) {
             testSummary = getValidTestSummary(testSummary, R.string.snsr_test_skipped);
             logTestEnd(R.layout.snsr_warning, testSummary);
             Log.i(LOG_TAG, testSummary);
             saveResult(testName, SensorTestDetails.ResultCode.SKIPPED, testSummary);
         }
 
-        public String getOverallSummary() {
+        String getOverallSummary() {
             return mOverallSummaryBuilder.toString();
         }
 
@@ -509,48 +510,6 @@ public abstract class BaseSensorTestActivity
         @Override
         public void run() {
             mButtonView.setEnabled(mButtonEnabled);
-        }
-    }
-
-    private class DeactivatorActivityHandler implements SensorFeaturesDeactivator.ActivityHandler {
-        private static final int SENSOR_FEATURES_DEACTIVATOR_RESULT = 0;
-
-        private CountDownLatch mCountDownLatch;
-
-        @Override
-        public ContentResolver getContentResolver() {
-            return BaseSensorTestActivity.this.getContentResolver();
-        }
-
-        @Override
-        public void logInstructions(int instructionsResId, Object ... params) {
-            mTestLogger.logInstructions(instructionsResId, params);
-        }
-
-        @Override
-        public void waitForUser() {
-            BaseSensorTestActivity.this.waitForUser(R.string.snsr_wait_for_user);
-        }
-
-        @Override
-        public void launchAndWaitForSubactivity(String action) {
-            mCountDownLatch = new CountDownLatch(1);
-            Intent intent = new Intent(action);
-            startActivityForResult(intent, SENSOR_FEATURES_DEACTIVATOR_RESULT);
-            try {
-                mCountDownLatch.await();
-            } catch (InterruptedException e) {
-                Log.e(LOG_TAG, "Error waiting for sub-activity.", e);
-            }
-        }
-
-        public void onActivityResult() {
-            mCountDownLatch.countDown();
-        }
-
-        @Override
-        public String getString(int resId, Object ... params) {
-            return BaseSensorTestActivity.this.getString(resId, params);
         }
     }
 }
