@@ -19,6 +19,7 @@ package com.android.cts.tradefed.testtype;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,8 +84,7 @@ public class SingleJUnitTestResultParser extends MultiLineReceiver {
         // If test failed.
         if (!testPassed) {
             for (ITestRunListener listener : mTestListeners) {
-                listener.testFailed(ITestRunListener.TestFailure.FAILURE, mTestId,
-                        mStackTrace.toString());
+                listener.testFailed(mTestId, mStackTrace.toString());
             }
         }
         Map<String, String> emptyMap = Collections.emptyMap();

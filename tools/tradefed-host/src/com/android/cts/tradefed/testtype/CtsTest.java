@@ -223,8 +223,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
 
         @Override
-        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-            super.testFailed(status, test, trace);
+        public void testFailed(TestIdentifier test, String trace) {
+            super.testFailed(test, trace);
             InputStreamSource bugSource = mDevice.getBugreport();
             super.testLog(String.format("bug-%s_%s", test.getClassName(), test.getTestName()),
                     LogDataType.TEXT, bugSource);
@@ -247,8 +247,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
 
         @Override
-        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-            super.testFailed(status, test, trace);
+        public void testFailed(TestIdentifier test, String trace) {
+            super.testFailed(test, trace);
             // sleep a small amount of time to ensure test failure stack trace makes it into logcat
             // capture
             RunUtil.getDefault().sleep(10);
@@ -272,8 +272,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
 
         @Override
-        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-            super.testFailed(status, test, trace);
+        public void testFailed(TestIdentifier test, String trace) {
+            super.testFailed(test, trace);
 
             try {
                 InputStreamSource screenSource = mDevice.getScreenshot();
