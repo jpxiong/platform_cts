@@ -38,8 +38,6 @@ LOCAL_SDK_VERSION := current
 
 LOCAL_DEX_PREOPT := false
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
 include $(BUILD_PACKAGE)
 
 # Builds and launches CTS Verifier on a device.
