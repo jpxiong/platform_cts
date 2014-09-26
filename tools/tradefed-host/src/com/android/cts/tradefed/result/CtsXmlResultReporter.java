@@ -239,8 +239,25 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
      * {@inheritDoc}
      */
     @Override
-    public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+    public void testFailed(TestIdentifier test, String trace) {
         mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testAssumptionFailure(TestIdentifier test, String trace) {
+        // TODO: do something different here?
+        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testIgnored(TestIdentifier test) {
+        // TODO: ??
     }
 
     /**
