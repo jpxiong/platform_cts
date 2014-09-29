@@ -40,7 +40,7 @@
         android:text="@string/nls_enable_service" />
 
     <Button
-        android:id="@+id/nls_launch_settings"
+        android:id="@+id/nls_action_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -48,7 +48,7 @@
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
         android:layout_toRightOf="@id/nls_status"
-        android:onClick="launchSettings"
+        android:onClick="actionPressed"
         android:text="@string/nls_start_settings" />
 
 </RelativeLayout>

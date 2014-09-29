@@ -934,10 +934,35 @@
         itself according to the current rotation of the device.</string>
 
     <string name="test_category_notifications">Notifications</string>
+    <string name="attention_test">Notification Attention Management Test</string>
+    <string name="attention_info">This test checks that the NotificationManagerService is
+        respecting user preferences about notification ranking and filtering.
+    </string>
+    <string name="attention_ready">I\'m done</string>
+    <string name="attention_filter_all">Please set the notification filter to \"All\" in the dialog
+        that appears when you change the device\'s volume.</string>
+    <string name="attention_filter_priority">Please set the notification filter to \"Priority\" in
+        the dialog that appears when you change the device\'s volume, and allow messages from
+        starred contacts.</string>
+    <string name="attention_filter_none">Please set the notification filter to \"None\" in the dialog
+        that appears when you change the device\'s volume.</string>
+    <string name="attention_create_contacts">Create contacts for notification annotations.</string>
+    <string name="attention_delete_contacts">Delete test contacts.</string>
+    <string name="attention_default_order">Check that ranker defaults to time order.</string>
+    <string name="attention_priority_order">Check that ranker respects developers priorities.</string>
+    <string name="attention_ambient_bit">Check that the ambient bit is set appropriately.</string>
+    <string name="attention_lookup_order">Check that ranker respects Lookup URIs for contacts.</string>
+    <string name="attention_email_order">Check that ranker respects mailto URIs for contacts.</string>
+    <string name="attention_phone_order">Check that ranker respects telephone URIs for contacts.</string>
+    <string name="attention_interruption_order">Check that ranker temporarily boosts interruptions.
+    This test takes 15 seconds to complete.</string>
+    <string name="attention_none_are_filtered">Check that \"All\" mode doesn\'t filter any notifications.</string>
+    <string name="attention_some_are_filtered">Check that \"Priority\" mode doesn\'t filter priority notifications.</string>
+    <string name="attention_all_are_filtered">Check that \"None\" mode filters all notifications.</string>
     <string name="nls_test">Notification Listener Test</string>
     <string name="nls_service_name">Notification Listener for CTS Verifier</string>
     <string name="nls_info">This test checks that a NotificationListenerService can be enabled
-        and disabled, and that once enabled the service is able to receive notificaitons and
+        and disabled, and that once enabled the service is able to receive notifications and
         dismiss them.
     </string>
     <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\"
