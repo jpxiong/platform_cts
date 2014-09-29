@@ -33,6 +33,9 @@ CTS_EXPECTATIONS := cts/tests/expectations/knownfailures.txt
 # File indicating which tests should be blacklisted due to unsupported abi.
 CTS_UNSUPPORTED_ABIS := cts/tests/expectations/unsupportedabis.txt
 
+# Holds the target architecture to build for.
+CTS_TARGET_ARCH := $(TARGET_ARCH)
+
 # Functions to get the paths of the build outputs.
 
 define cts-get-lib-paths
