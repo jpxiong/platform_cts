@@ -180,6 +180,7 @@ class CtsBuilder(object):
 
     small_tests = BuildAospSmallSizeTestList()
     medium_tests = BuildAospMediumSizeTestList()
+    new_test_packages = BuildCtsVettedNewPackagesList()
 
     # CTS - sub plan for public, small size tests
     plan = tools.TestPlan(packages)
@@ -223,11 +224,22 @@ class CtsBuilder(object):
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-mediastress')
 
+    # CTS - sub plan for new tests that is vetted for L launch
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in new_test_packages.iteritems():
+      plan.Include(package+'$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-l-tests')
+
     #CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
     for package, test_list in small_tests.iteritems():
       plan.Exclude(package+'$')
     for package, test_list in medium_tests.iteritems():
+      plan.Exclude(package+'$')
+    for package, tests_list in new_test_packages.iteritems():
       plan.Exclude(package+'$')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
@@ -333,6 +345,36 @@ def BuildAospSmallSizeTestList():
       'com.android.cts.uihost' : [],
       'com.android.cts.videoperf' : [],
       'zzz.android.monkey' : []}
+
+def BuildCtsVettedNewPackagesList():
+  """ Construct a defaultdict that maps package names that is vetted for L. """
+  return {
+      'android.appwidget' : [],
+      'android.core.tests.libcore.package.harmony_annotation' : [],
+      'android.core.tests.libcore.package.harmony_beans' : [],
+      'android.core.tests.libcore.package.harmony_java_io' : [],
+      'android.core.tests.libcore.package.harmony_java_lang' : [],
+      'android.core.tests.libcore.package.harmony_java_math' : [],
+      'android.core.tests.libcore.package.harmony_java_net' : [],
+      'android.core.tests.libcore.package.harmony_java_nio' : [],
+      'android.core.tests.libcore.package.harmony_java_util' : [],
+      'android.core.tests.libcore.package.harmony_javax_security' : [],
+      'android.core.tests.libcore.package.harmony_logging' : [],
+      'android.core.tests.libcore.package.harmony_prefs' : [],
+      'android.core.tests.libcore.package.harmony_sql' : [],
+      'android.core.tests.libcore.package.jsr166' : [],
+      'android.core.tests.libcore.package.okhttp' : [],
+      'android.display' : [],
+      'android.host.theme' : [],
+      'android.jdwp' : [],
+      'android.location2' : [],
+      'android.print' : [],
+      'android.renderscriptlegacy' : [],
+      'android.tests.sigtest' : [],
+      'android.tv' : [],
+      'android.uiautomation' : [],
+      'android.uirendering' : [],
+      'android.webgl' : []}
 
 def BuildCtsFlakyTestList():
   """ Construct a defaultdict that maps package name to a list of tests
