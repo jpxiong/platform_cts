@@ -462,7 +462,10 @@
     <!-- Strings for Sensor Test Activities -->
     <string name="snsr_device_admin_receiver">Sensor Tests Device Admin Receiver</string>
     <string name="snsr_test_summary">Tests passed: %1$d, Tests skipped: %2$d, Tests failed: %3$d</string>
-    <string name="snsr_test_complete">Test completed.</string>
+    <string name="snsr_test_complete">Test completed without errors.</string>
+    <string name="snsr_test_complete_with_errors">Test completed with errors: those errors
+        might degrade the user experience and might cause some applications to misbehave. They are
+        not required for Android Compatibility at this time, but will in a future release.</string>
     <string name="snsr_test_pass">PASS</string>
     <string name="snsr_test_skipped">SKIPPED</string>
     <string name="snsr_test_fail">FAIL</string>
@@ -491,6 +494,7 @@
     <string name="snsr_setting_keep_screen_on">Stay awake</string>
     <string name="snsr_setting_location_mode">Location</string>
     <string name="snsr_setting_auto_screen_off_mode">Display Sleep</string>
+    <string name="snsr_pass_on_error">Pass Anyway</string>
 
     <!-- Accelerometer -->
     <string name="snsr_accel_test">Accelerometer Test</string>
