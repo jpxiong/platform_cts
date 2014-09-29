@@ -189,6 +189,26 @@ public class CtsTestTest extends TestCase {
     }
 
     /**
+     * Test normal case {@link CtsTest#run(ITestInvocationListener)} when running a class.
+     */
+    @SuppressWarnings("unchecked")
+    public void testRun_test() throws DeviceNotAvailableException {
+        final String className = "className";
+        final String methodName = "methodName";
+        final String testName = String.format("%s#%s", className, methodName);
+        mCtsTest.setTestName(testName);
+
+        EasyMock.expect(mMockRepo.findPackageIdsForTest(className)).andReturn(IDS);
+        mMockPackageDef.setClassName(className, methodName);
+
+        setCreateAndRunTestExpectations();
+
+        replayMocks();
+        mCtsTest.run(mMockListener);
+        verifyMocks();
+    }
+
+    /**
      * Test {@link CtsTest#run(ITestInvocationListener)} when --excluded-package is specified
      */
     public void testRun_excludedPackage() throws DeviceNotAvailableException, ParseException {
