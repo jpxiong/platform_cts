@@ -100,6 +100,9 @@ public class AbiUtils {
      * @return a new Set containing the ABIs.
      */
     public static Set<String> getAbisForArch(String arch) {
+        if (arch == null || arch.isEmpty() || !ARCH_TO_ABIS.containsKey(arch)) {
+            return getAbisSupportedByCts();
+        }
         return new HashSet<String>(ARCH_TO_ABIS.get(arch));
     }
 

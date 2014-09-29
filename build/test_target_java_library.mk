@@ -41,5 +41,6 @@ $(cts_library_xml): $(TARGET_OUT_JAVA_LIBRARIES)/$(LOCAL_MODULE).jar $(CTS_EXPEC
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
 						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(CTS_TARGET_ARCH) \
 						-x "runtimeArgs->$(PRIVATE_RUNTIME_ARGS)" \
 						-o $@
