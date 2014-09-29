@@ -32,17 +32,29 @@
     </ScrollView>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/snsr_view_padding_bottom"
         android:paddingTop="@dimen/snsr_view_padding_top" >
 
         <Button android:id="@+id/next_button"
-                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="@string/next_button_text" />
+
+        <Button android:id="@+id/pass_button"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/fs_good"/>
+
+        <Button android:id="@+id/fail_button"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/fs_error"/>
 
     </LinearLayout>
 
