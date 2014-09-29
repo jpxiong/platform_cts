@@ -36,10 +36,10 @@ public class CtsXmlGenerator {
 
     private static void usage(String[] args) {
         System.err.println("Arguments: " + Arrays.asList(args));
-        System.err.println("Usage: cts-xml-generator -p PACKAGE_NAME -n NAME [-s APP_NAME_SPACE]"
-                + " [-t TEST_TYPE] [-j JAR_PATH] [-i INSTRUMENTATION] [-m MANIFEST_FILE]"
-                + " [-e EXPECTATION_FILE] [-b UNSUPPORTED_ABI_FILE] [-o OUTPUT_FILE]"
-                + " [-x ADDITIONAL_ATTRIBUTE_KEY->VALUE]");
+        System.err.println("Usage: cts-xml-generator -p PACKAGE_NAME -n NAME [-t TEST_TYPE]"
+                + " [-j JAR_PATH] [-i INSTRUMENTATION] [-m MANIFEST_FILE] [-e EXPECTATION_FILE]"
+                + " [-b UNSUPPORTED_ABI_FILE] [-a ARCHITECTURE] [-o OUTPUT_FILE]"
+                + " [-s APP_NAME_SPACE] [-x ADDITIONAL_ATTRIBUTE_KEY->VALUE]");
         System.exit(1);
     }
 
@@ -49,6 +49,7 @@ public class CtsXmlGenerator {
         String outputPath = null;
         Set<File> expectationFiles = new HashSet<File>();
         Set<File> abiFiles = new HashSet<File>();
+        String architecture = null;
         File manifestFile = null;
         String instrumentation = null;
         String testType = null;
@@ -75,6 +76,8 @@ public class CtsXmlGenerator {
                         "Missing value for expectation store")));
             } else if ("-b".equals(args[i])) {
                 abiFiles.add(new File(getArg(args, ++i, "Missing value for abi store")));
+            } else if ("-a".equals(args[i])) {
+                architecture = getArg(args, ++i, "Missing value for architecture");
             } else if ("-o".equals(args[i])) {
                 outputPath = getArg(args, ++i, "Missing value for output file");
             } else if ("-s".equals(args[i])) {
@@ -124,9 +127,9 @@ public class CtsXmlGenerator {
 
         ExpectationStore failuresStore = ExpectationStore.parse(expectationFiles, ModeId.DEVICE);
         ExpectationStore abiStore = ExpectationStore.parse(abiFiles, ModeId.DEVICE);
-        XmlGenerator generator = new XmlGenerator(failuresStore, abiStore, appNameSpace,
-                appPackageName, name, runner, instrumentation, targetNameSpace, jarPath, testType,
-                outputPath, additionalAttributes);
+        XmlGenerator generator = new XmlGenerator(failuresStore, abiStore, architecture,
+                appNameSpace, appPackageName, name, runner, instrumentation, targetNameSpace,
+                jarPath, testType, outputPath, additionalAttributes);
         generator.writePackageXml();
     }
 

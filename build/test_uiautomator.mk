@@ -49,4 +49,5 @@ $(cts_library_xml): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))
 						-r $(PRIVATE_TEST_APP_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
 						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(CTS_TARGET_ARCH) \
 						-o $@
