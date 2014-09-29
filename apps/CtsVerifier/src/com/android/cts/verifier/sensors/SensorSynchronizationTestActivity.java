@@ -1,7 +1,7 @@
 
 package com.android.cts.verifier.sensors;
 
-import com.android.cts.verifier.sensors.base.BaseSensorSemiAutomatedTestActivity;
+import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import junit.framework.Assert;
 
@@ -25,8 +25,11 @@ import java.util.List;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class SensorSynchronizationTestActivity
-        extends BaseSensorSemiAutomatedTestActivity
+        extends SensorCtsVerifierTestActivity
         implements SensorEventListener {
+    public SensorSynchronizationTestActivity() {
+        super(SensorSynchronizationTestActivity.class);
+    }
 
     private final double NANOS_PER_MILLI = 1e6;
     private final int DATA_COLLECTION_TIME_IN_MS = 5000;
@@ -132,7 +135,7 @@ public class SensorSynchronizationTestActivity
         Assert.assertTrue("Gyroscope did not detect any movement", gyrMovementDetected);
     }
 
-    private void executeCrossSensorTest() throws Throwable {
+    public String testCrossSensorSynchronization() throws Throwable {
         appendText("This test provides a rough indication of cross-sensor timestamp synchronization.");
         appendText("Hold device still in hand and click 'Next'");
         waitForUser();
@@ -144,6 +147,7 @@ public class SensorSynchronizationTestActivity
 
         stopDataCollection();
         analyzeData();
+        return null;
     }
 
     protected double angleBetweenVecsDegrees(float[] vec1, float[] vec2) {
@@ -153,11 +157,6 @@ public class SensorSynchronizationTestActivity
 
     protected double normVec(float[] vec1) {
         return Math.sqrt(vec1[0] * vec1[0] + vec1[1] * vec1[1] + vec1[2] * vec1[2]);
-    }
-
-    @Override
-    protected void onRun() throws Throwable {
-        executeCrossSensorTest();
     }
 
     @Override

@@ -67,7 +67,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                 false /* vibrate */);
     }
 
-    public String testNotTriggerAfterCancell() throws Throwable {
+    public String testNotTriggerAfterCancel() throws Throwable {
         return runTest(
                 R.string.snsr_significant_motion_test_cancel,
                 false /* isMotionExpected */,
@@ -107,12 +107,13 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
     }
 
     public String testTriggerDeactivation() throws Throwable {
-        appendText(R.string.snsr_significant_motion_test_deactivation);
-        waitForUser();
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(R.string.snsr_significant_motion_test_deactivation);
+        waitForUserToBegin();
 
         TriggerVerifier verifier = new TriggerVerifier();
         mSensorManager.requestTriggerSensor(verifier, mSensorSignificantMotion);
-        appendText(R.string.snsr_test_play_sound);
+        logger.logWaitForSound();
 
         // wait for the first event to trigger
         verifier.verifyEventTriggered();
@@ -137,8 +138,9 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
             boolean isMotionExpected,
             boolean cancelEventNotification,
             boolean vibrate) throws Throwable {
-        appendText(instructionsResId);
-        waitForUser();
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(instructionsResId);
+        waitForUserToBegin();
 
         if (vibrate) {
             vibrate(VIBRATE_DURATION_MILLIS);
@@ -154,7 +156,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                     getString(R.string.snsr_significant_motion_cancelation),
                     mSensorManager.cancelTriggerSensor(verifier, mSensorSignificantMotion));
         }
-        appendText(R.string.snsr_test_play_sound);
+        logger.logWaitForSound();
 
         String result;
         try {

@@ -504,14 +504,14 @@
         facing the ceiling.</string>
     <string name="snsr_accel_test_face_down">Place the device on a flat surface with the screen
         facing it.</string>
-    <string name="snsr_accel_test_right_side">Place the device resting vertically on its right
-        side.</string>
-    <string name="snsr_accel_test_left_side">Place the device resting vertically on its left
-        side.</string>
-    <string name="snsr_accel_test_top_side">Place the device resting vertically on its top
-        side.</string>
-    <string name="snsr_accel_test_bottom_side">Place the device resting vertically on its bottom
-        side.</string>
+    <string name="snsr_accel_test_right_side">Place the device in a flat surface resting vertically
+        on its right side.</string>
+    <string name="snsr_accel_test_left_side">Place the device in a flat surface resting vertically
+        on its left side.</string>
+    <string name="snsr_accel_test_top_side">Place the device in a flat surface resting vertically
+        on its top side.</string>
+    <string name="snsr_accel_test_bottom_side">Place the device in a flat surface resting vertically
+        on its bottom side.</string>
 
     <!-- Gyroscope -->
     <string name="snsr_gyro_test">Gyroscope Test</string>
@@ -558,7 +558,8 @@
 
     <!-- Sensor Batching -->
     <string name="snsr_batch_test">Sensor Batching Tests</string>
-    <string name="snsr_batching_walking_needed">Once the test begins, you will have to walk.</string>
+    <string name="snsr_batching_walking_needed">Once the test begins, you will have to take the
+        device in your hand and walk.</string>
     <string name="snsr_batching_fifo_count">FifoReservedEventCount=%1$d. Expected to be at most FifoMaxEventCount=%2$d.</string>
 
     <!-- Sensor Synchronization -->
