@@ -76,19 +76,19 @@ public class CameraTestUtils extends Assert {
     // Only test the preview size that is no larger than 1080p.
     public static final Size PREVIEW_SIZE_BOUND = SIZE_BOUND_1080P;
     // Default timeouts for reaching various states
-    public static final int CAMERA_OPEN_TIMEOUT_MS = 2000;
-    public static final int CAMERA_CLOSE_TIMEOUT_MS = 2000;
-    public static final int CAMERA_IDLE_TIMEOUT_MS = 2000;
+    public static final int CAMERA_OPEN_TIMEOUT_MS = 3000;
+    public static final int CAMERA_CLOSE_TIMEOUT_MS = 3000;
+    public static final int CAMERA_IDLE_TIMEOUT_MS = 3000;
     public static final int CAMERA_ACTIVE_TIMEOUT_MS = 1000;
     public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
     public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
-    public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
+    public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 3000;
     public static final int CAPTURE_RESULT_TIMEOUT_MS = 3000;
     public static final int CAPTURE_IMAGE_TIMEOUT_MS = 3000;
 
-    public static final int SESSION_CONFIGURE_TIMEOUT_MS = 2000;
-    public static final int SESSION_CLOSE_TIMEOUT_MS = 2000;
-    public static final int SESSION_READY_TIMEOUT_MS = 2000;
+    public static final int SESSION_CONFIGURE_TIMEOUT_MS = 3000;
+    public static final int SESSION_CLOSE_TIMEOUT_MS = 3000;
+    public static final int SESSION_READY_TIMEOUT_MS = 3000;
     public static final int SESSION_ACTIVE_TIMEOUT_MS = 1000;
 
     public static final int MAX_READER_IMAGES = 5;
