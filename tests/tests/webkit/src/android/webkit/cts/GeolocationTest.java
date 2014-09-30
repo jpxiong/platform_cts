@@ -166,6 +166,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewCts
                     break;
                 }
             }
+            mProviders.add(LocationManager.FUSED_PROVIDER);
             addTestProviders();
         }
     }
