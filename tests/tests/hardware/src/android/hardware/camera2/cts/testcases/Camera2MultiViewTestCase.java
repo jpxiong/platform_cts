@@ -63,8 +63,6 @@ public class Camera2MultiViewTestCase extends
 
 
     private static final long SHORT_SLEEP_WAIT_TIME_MS = 100;
-    // Default timeouts for reaching various camera states
-    private static final int CAMERA_CLOSE_TIMEOUT_MS = 2000;
 
     protected TextureView[] mTextureView = new TextureView[2];
     protected String[] mCameraIds;
