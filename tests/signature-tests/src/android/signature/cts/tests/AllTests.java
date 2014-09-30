@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest;
+package android.signature.cts.tests;
 
-import android.util.Log;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public class SignatureTestLog {
-    private static final String TAG = "CTSSignatureTest";
+/**
+ * Finds all instrumentation and unit tests for this application.
+ */
+public class AllTests extends TestSuite {
 
-    public static void e(String msg, Exception e) {
-        Log.e(TAG, msg, e);
+    public AllTests() {
+        super();
+
+        addTestSuite(JDiffClassDescriptionTest.class);
     }
 
-    public static void d(String msg) {
-        Log.d(TAG, msg);
+    public static Test suite() {
+        return new AllTests();
     }
 }

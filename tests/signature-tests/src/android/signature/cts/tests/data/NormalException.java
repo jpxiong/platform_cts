@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2007 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest.tests.data;
+package android.signature.cts.tests.data;
+
+import java.lang.Exception;
 
 /**
-* This class is used as reference data for the JDiffClassDescriptionTest tests.
-*/
-public abstract class AbstractClass {
+ * This class is used as reference data for the JDiffClassDescriptionTest tests.
+ */
+public class NormalException extends Exception {
 
 }

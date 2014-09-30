@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest;
+package android.signature.cts;
 
 import android.content.res.Resources;
+import android.signature.R;
+import android.signature.cts.JDiffClassDescription.JDiffConstructor;
+import android.signature.cts.JDiffClassDescription.JDiffField;
+import android.signature.cts.JDiffClassDescription.JDiffMethod;
 import android.test.AndroidTestCase;
-import android.tests.sigtest.JDiffClassDescription.JDiffConstructor;
-import android.tests.sigtest.JDiffClassDescription.JDiffField;
-import android.tests.sigtest.JDiffClassDescription.JDiffMethod;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,6 +38,8 @@ import java.util.HashSet;
  * Performs the signature check via a JUnit test.
  */
 public class SignatureTest extends AndroidTestCase {
+
+    private static final String TAG = SignatureTest.class.getSimpleName();
 
     private static final String TAG_ROOT = "api";
     private static final String TAG_PACKAGE = "package";
@@ -70,26 +74,12 @@ public class SignatureTest extends AndroidTestCase {
     private HashSet<String> mKeyTagSet;
     private TestResultObserver mResultObserver;
 
-    /**
-     * Define the type of the signature check failures.
-     */
-    public static enum FAILURE_TYPE {
-        MISSING_CLASS,
-        MISSING_INTERFACE,
-        MISSING_METHOD,
-        MISSING_FIELD,
-        MISMATCH_CLASS,
-        MISMATCH_INTERFACE,
-        MISMATCH_METHOD,
-        MISMATCH_FIELD,
-        CAUGHT_EXCEPTION,
-    }
-
     private class TestResultObserver implements ResultObserver {
         boolean mDidFail = false;
         StringBuilder mErrorString = new StringBuilder();
 
-        public void notifyFailure(FAILURE_TYPE type, String name, String errorMessage) {
+        @Override
+        public void notifyFailure(FailureType type, String name, String errorMessage) {
             mDidFail = true;
             mErrorString.append("\n");
             mErrorString.append(type.toString().toLowerCase());
@@ -116,12 +106,14 @@ public class SignatureTest extends AndroidTestCase {
     public void testSignature() {
         Resources r = getContext().getResources();
         Class rClass = R.xml.class;
+        logd(String.format("Class: %s", rClass.toString()));
         Field[] fs = rClass.getFields();
         for (Field f : fs) {
+            logd(String.format("Field: %s", fs.toString()));
             try {
                 start(r.getXml(f.getInt(rClass)));
             } catch (Exception e) {
-                mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION, e.getMessage(),
+                mResultObserver.notifyFailure(FailureType.CAUGHT_EXCEPTION, e.getMessage(),
                         e.getMessage());
             }
         }
@@ -150,6 +142,11 @@ public class SignatureTest extends AndroidTestCase {
      * Signature test entry point.
      */
     private void start(XmlPullParser parser) throws XmlPullParserException, IOException {
+        logd(String.format("Parser: %s", parser.getName()));
+        logd(String.format("Parser: %s", parser.getNamespace()));
+        logd(String.format("Parser: %s", parser.getLineNumber()));
+        logd(String.format("Parser: %s", parser.getColumnNumber()));
+        logd(String.format("Parser: %s", parser.getPositionDescription()));
         JDiffClassDescription currentClass = null;
         String currentPackage = "";
         JDiffMethod currentMethod = null;
@@ -331,5 +328,13 @@ public class SignatureTest extends AndroidTestCase {
                     parser.getAttributeValue(i));
         }
         return modifier;
+    }
+
+    public static void loge(String msg, Exception e) {
+        Log.e(TAG, msg, e);
+    }
+
+    public static void logd(String msg) {
+        Log.d(TAG, msg);
     }
 }
