@@ -17,3 +17,4 @@
 -dontwarn android.test.AndroidTestRunner
 -dontwarn java.util.concurrent.ConcurrentLinkedDeque
 -dontwarn android.cts.util.**
+-dontwarn junit.**
