@@ -19,10 +19,10 @@ LOCAL_WHOLE_STATIC_LIBRARIES += \
 LOCAL_STATIC_LIBRARIES += \
     libtinyxml2 \
     liblog \
-    libgtest \
-    libgtest_main \
+    libgtest_libc++ \
+    libgtest_main_libc++ \
 
-LOCAL_CXX_STL := stlport
+LOCAL_CXX_STL := libc++
 
 LOCAL_CTS_TEST_PACKAGE := android.bionic
 include $(BUILD_CTS_EXECUTABLE)
@@ -43,6 +43,8 @@ LOCAL_LDLIBS += \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
+
+LOCAL_CXX_STL := libc++
 
 include $(BUILD_HOST_NATIVE_TEST)
 endif  # ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x86_64))
