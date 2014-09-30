@@ -18,119 +18,153 @@ package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
+import com.android.cts.verifier.sensors.renderers.GLRotationGuideRenderer;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
-import android.hardware.cts.helpers.sensorverification.SigNumVerification;
+import android.hardware.cts.helpers.sensorverification.GyroscopeIntegrationVerification;
+
+import java.util.concurrent.TimeUnit;
 
 /**
- * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
+ * Semi-automated test that focuses on characteristics associated with Gyroscope measurements.
  */
 public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActivity {
+    private static final float THRESHOLD_AXIS_UNDER_ROTATION_DEG = 10.0f;
+    private static final float THRESHOLD_AXIS_UNDER_NO_ROTATION_DEG = 50.0f;
+    private static final int ROTATE_360_DEG = 360;
+    private static final int ROTATION_COLLECTION_SEC = 10;
+
+    private static final int X_AXIS = 0;
+    private static final int Y_AXIS = 1;
+    private static final int Z_AXIS = 2;
+
+    private final GLRotationGuideRenderer mRenderer = new GLRotationGuideRenderer();
+
     public GyroscopeMeasurementTestActivity() {
         super(GyroscopeMeasurementTestActivity.class);
     }
 
     @Override
     protected void activitySetUp() {
-        appendText(R.string.snsr_gyro_device_placement);
+        getTestLogger().logInstructions(R.string.snsr_gyro_device_placement);
+        waitForUserToContinue();
+        initializeGlSurfaceView(mRenderer);
+    }
+
+    @Override
+    protected void activityCleanUp() {
+        closeGlSurfaceView();
     }
 
     public String testDeviceStatic() throws Throwable {
         return verifyMeasurements(
                 R.string.snsr_gyro_device_static,
-                true /*portrait*/,
-                0, 0, 0);
+                -1 /* rotationAxis */,
+                0 /* expectationDeg */);
     }
 
     public String testRotateClockwise() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_clockwise,
-                true /*portrait*/,
-                0, 0, -1);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, Z_AXIS, -ROTATE_360_DEG);
     }
 
     public String testRotateCounterClockwise() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_counter_clockwise,
-                true /*portrait*/,
-                0, 0, +1);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, Z_AXIS, ROTATE_360_DEG);
     }
 
     public String testRotateRightSide() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_right_side,
-                true /*portrait*/,
-                0, +1, 0);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, Y_AXIS, ROTATE_360_DEG);
     }
 
     public String testRotateLeftSide() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_left_side,
-                true /*portrait*/,
-                0, -1, 0);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, Y_AXIS, -ROTATE_360_DEG);
     }
 
     public String testRotateTopSide() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_top_side,
-                false /*portrait*/,
-                -1, 0, 0);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, X_AXIS, -ROTATE_360_DEG);
     }
 
     public String testRotateBottomSide() throws Throwable {
-        return verifyMeasurements(
-                R.string.snsr_gyro_rotate_bottom_side,
-                false /*portrait*/,
-                +1, 0, 0);
+        return verifyMeasurements(R.string.snsr_gyro_rotate_device, X_AXIS, ROTATE_360_DEG);
     }
 
     /**
-     * This test verifies that the Gyroscope measures angular speeds with the right direction.
-     * The test does not measure the range or scale, apart from filtering small readings that
-     * deviate from zero.
+     * This test verifies that the Gyroscope measures the appropriate angular position.
      *
-     * The test takes a set of samples from the sensor under test and calculates the mean of each
-     * axis that the sensor data collects. It then compares it against the test expectations that
-     * are represented by signed values. It verifies that the readings have the right direction.
-
-     * The reference values are coupled to the orientation of the device. The test is susceptible to
-     * errors when the device is not oriented properly, the device has moved to slowly, or it has
-     * moved in more than the direction conducted.
-     *
-     * The error message associated with the test provides the required data needed to identify any
-     * possible issue. It provides:
-     * - the thread id on which the failure occurred
-     * - the sensor type and sensor handle that caused the failure
-     * - the values representing the expectation of the test
-     * - the mean of values sampled from the sensor
+     * The test takes a set of samples from the sensor under test and calculates the angular
+     * position for each axis that the sensor data collects. It then compares it against the test
+     * expectations that are represented by signed values. It verifies that the readings have the
+     * right magnitude.
      */
-    private String verifyMeasurements(
-            int scenarioInstructionsResId,
-            boolean usePortraitOrientation,
-            int ... expectations) throws Throwable {
-        if (usePortraitOrientation) {
-            appendText(R.string.snsr_orientation_portrait);
-        } else {
-            appendText(R.string.snsr_orientation_landscape);
-        }
-        appendText(scenarioInstructionsResId);
-        waitForUser();
-
-        Thread.sleep(500 /*ms*/);
+    private String verifyMeasurements(int instructionsResId, int rotationAxis, int expectationDeg)
+            throws Throwable {
+        SensorTestLogger logger = getTestLogger();
+        setRendererRotation(rotationAxis, expectationDeg >= 0);
+        logger.logInstructions(instructionsResId);
+        waitForUserToBegin();
+        logger.logWaitForSound();
 
         TestSensorEnvironment environment = new TestSensorEnvironment(
                 getApplicationContext(),
                 Sensor.TYPE_GYROSCOPE,
                 SensorManager.SENSOR_DELAY_FASTEST);
-        TestSensorOperation verifySignum =
-                new TestSensorOperation(environment, 100 /* event count */);
-        verifySignum.addVerification(new SigNumVerification(
-                expectations,
-                new float[]{0.2f, 0.2f, 0.2f} /*noiseThreshold*/));
-        verifySignum.execute();
+        TestSensorOperation sensorOperation =
+                new TestSensorOperation(environment, ROTATION_COLLECTION_SEC, TimeUnit.SECONDS);
+
+        int gyroscopeAxes = environment.getSensorAxesCount();
+        int[] expectationsDeg = getExpectationsDeg(gyroscopeAxes, rotationAxis, expectationDeg);
+        float[] thresholdsDeg = getThresholdsDeg(gyroscopeAxes, rotationAxis);
+        GyroscopeIntegrationVerification integrationVerification =
+                new GyroscopeIntegrationVerification(expectationsDeg, thresholdsDeg);
+        sensorOperation.addVerification(integrationVerification);
+
+        try {
+            sensorOperation.execute();
+        } finally {
+            playSound();
+        }
         return null;
+    }
+
+    private int[] getExpectationsDeg(int axes, int rotationAxis, int expectationDeg) {
+        int[] expectationsDeg = new int[axes];
+        for (int i = 0; i < axes; ++i) {
+            // tests assume that rotation is expected on one axis at a time
+            expectationsDeg[i] = (i == rotationAxis) ? expectationDeg : 0;
+        }
+        return expectationsDeg;
+    }
+
+    private float[] getThresholdsDeg(int axes, int rotationAxis) {
+        float[] thresholdsDeg = new float[axes];
+        for (int i = 0; i < axes; ++i) {
+            // tests set a high threshold on the axes where rotation is not expected, to account
+            // for movement from the operator
+            // the rotation axis has a lower threshold to ensure the gyroscope's accuracy
+            thresholdsDeg[i] = (i == rotationAxis)
+                    ? THRESHOLD_AXIS_UNDER_ROTATION_DEG
+                    : THRESHOLD_AXIS_UNDER_NO_ROTATION_DEG;
+        }
+        return thresholdsDeg;
+    }
+
+    private void setRendererRotation(int rotationAxis, boolean positiveRotation) {
+        int axis1 = 0;
+        int axis2 = 0;
+        int axis3 = 0;
+        switch (rotationAxis) {
+            case X_AXIS:
+                axis1 = positiveRotation ? 1 : -1;
+                break;
+            case Y_AXIS:
+                axis2 = positiveRotation ? 1 : -1;
+                break;
+            case Z_AXIS:
+                axis3 = positiveRotation ? 1 : -1;
+                break;
+        }
+        mRenderer.setRotation(axis1, axis2, axis3);
     }
 }

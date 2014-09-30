@@ -58,9 +58,6 @@ public class SensorValueAccuracyActivity
     private static final float RANGE_ATMOSPHERIC_PRESSURE = 35f;
     private static final float AMBIENT_TEMPERATURE_AVERAGE = 22.5f;
     private static final float AMBIENT_TEMPERATURE_THRESHOLD = 7.5f;
-    private static final double ONE_HUNDRED_EIGHTY_DEGREES = 180.0f;
-
-    private static final double GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES = 10.0f;
 
     private SensorManager mSensorManager;
 
@@ -104,60 +101,6 @@ public class SensorValueAccuracyActivity
                 Sensor.TYPE_GYROSCOPE,
                 Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
                 GYROSCOPE_CALIBRATED_UNCALIBRATED_THRESHOLD_RAD_SEC);
-    }
-
-    /**
-     * Verifies that the measurements of the gyroscope correspond to predefined angular positions.
-     * The test uses a routine to integrate gyroscope's readings on a predefined rotation to
-     * ensure that it corresponds to the expected angular position.
-     */
-    // TODO: refactor the integration routine into a SensorTestVerification
-    // TODO: use the new verification in GyroscopeMeasurement tests
-    public String testGyroscopeIntegration() throws Throwable {
-        Sensor gyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        if (gyroscope == null) {
-            throw new SensorNotSupportedException(Sensor.TYPE_GYROSCOPE);
-        }
-
-        appendText(R.string.snsr_no_interaction);
-        String rotationInstructions = getString(
-                R.string.snsr_gyro_rotate_clockwise_integration,
-                ONE_HUNDRED_EIGHTY_DEGREES);
-        appendText(rotationInstructions);
-        waitForUser();
-
-        startDataCollection(gyroscope);
-        appendText(R.string.snsr_test_play_sound);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(10));
-        stopDataCollection();
-        playSound();
-
-        // run the verification
-        double integratedGyroscope = 0;
-        long lastTimestamp = 0;
-        for (TestSensorEvent event : mSensorEvents) {
-            float[] eventValues = event.values.clone();
-            long eventTimestamp = event.timestamp;
-            if (lastTimestamp != 0) {
-                long timeDeltaNs = eventTimestamp - lastTimestamp;
-                long nanosecondsInOneSecond = TimeUnit.SECONDS.toNanos(1);
-                integratedGyroscope += eventValues[2] * timeDeltaNs / nanosecondsInOneSecond;
-            }
-            lastTimestamp = eventTimestamp;
-        }
-        integratedGyroscope = Math.toDegrees(integratedGyroscope);
-
-        String integrationMessage = String.format(
-                "Gyroscope integration expected to be=%fdeg. Found=%fdeg, Tolerance=%fdeg",
-                ONE_HUNDRED_EIGHTY_DEGREES,
-                integratedGyroscope,
-                GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES);
-        Assert.assertEquals(
-                integrationMessage,
-                ONE_HUNDRED_EIGHTY_DEGREES,
-                integratedGyroscope,
-                GYROSCOPE_INTEGRATION_THRESHOLD_DEGREES);
-        return integrationMessage;
     }
 
     /**
