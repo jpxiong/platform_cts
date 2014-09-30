@@ -36,6 +36,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 
 import java.util.List;
 import java.lang.Thread;
@@ -223,6 +224,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         return false;
     }
 
+    @UiThreadTest
     public void testGpsStatusListener() {
         try {
             mManager.addGpsStatusListener(new MockGpsStatusListener());
