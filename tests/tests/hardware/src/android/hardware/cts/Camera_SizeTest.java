@@ -22,6 +22,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.cts.helpers.CameraUtils;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.util.Log;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -40,6 +41,8 @@ public class Camera_SizeTest extends CtsAndroidTestCase {
     private final int WIDTH3 = 480;
 
     private static final float ASPECT_RATIO_TOLERANCE = 0.05f;
+
+    private static final String TAG = "Camera_SizeTest";
 
     public void testConstructor() {
         if (Camera.getNumberOfCameras() < 1) {
@@ -88,12 +91,13 @@ public class Camera_SizeTest extends CtsAndroidTestCase {
                 float previewAspect =
                         largestPreviewDimen.width / (float) largestPreviewDimen.height;
 
-                assertTrue("Largest preview dimension (w=" + largestPreviewDimen.width + ", h=" +
-                                largestPreviewDimen.height + ") must have the same aspect ratio " +
-                                "as the largest Jpeg dimension (w=" + largestJpegDimen.width +
-                                ", h=" + largestJpegDimen.height + ")",
-                        Math.abs(jpegAspect - previewAspect) < ASPECT_RATIO_TOLERANCE
-                );
+                if (Math.abs(jpegAspect - previewAspect) >= ASPECT_RATIO_TOLERANCE) {
+                    Log.w(TAG,
+                            "Largest preview dimension (w=" + largestPreviewDimen.width + ", h=" +
+                            largestPreviewDimen.height + ") should have the same aspect ratio " +
+                            "as the largest Jpeg dimension (w=" + largestJpegDimen.width +
+                            ", h=" + largestJpegDimen.height + ")");
+                }
 
 
                 camera.release();
@@ -113,4 +117,3 @@ public class Camera_SizeTest extends CtsAndroidTestCase {
         testSuite.addTest(test);
     }
 }
-
