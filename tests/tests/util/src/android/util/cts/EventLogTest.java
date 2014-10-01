@@ -69,7 +69,8 @@ public class EventLogTest extends TestCase {
         EventLog.writeEvent(ANSWER_TAG, 12345L, longString.toString());
         EventLog.writeEvent(ANSWER_TAG, longString.toString(), longString.toString());
         EventLog.writeEvent(ANSWER_TAG, longArray);
-
+        // Give the message some time to show up in the log
+        Thread.sleep(10);
         List<Event> events = getEventsAfterMarker(markerData, ANSWER_TAG);
         assertEquals(6, events.size());
 
