@@ -177,6 +177,16 @@
 
         <activity android:name="android.content.cts.ClipboardManagerListenerActivity"/>
 
+        <activity android:name="com.android.cts.content.ImageCaptureActivity"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.action.IMAGE_CAPTURE" />
+                <action android:name="android.media.action.IMAGE_CAPTURE_SECURE" />
+                <action android:name="android.media.action.VIDEO_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
