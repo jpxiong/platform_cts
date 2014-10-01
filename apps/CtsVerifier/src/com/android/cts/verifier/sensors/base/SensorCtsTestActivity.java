@@ -18,6 +18,7 @@
 package com.android.cts.verifier.sensors.base;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.helpers.SensorTestScreenManipulator;
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
 import junit.framework.Test;
@@ -36,7 +37,11 @@ import org.junit.runner.notification.RunListener;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.hardware.cts.SensorTestCase;
+import android.os.PowerManager;
+import android.view.WindowManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +54,9 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
 
+    private SensorTestScreenManipulator mScreenManipulator;
+    private PowerManager.WakeLock mWakeLock;
+
     /**
      * Constructor for a CTS test executor. It will execute a standalone CTS test class.
      *
@@ -60,8 +68,33 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
 
     @Override
     protected void activitySetUp() {
-        getTestLogger().logInstructions(R.string.snsr_no_interaction);
+        mScreenManipulator = new SensorTestScreenManipulator(getApplicationContext());
+        mScreenManipulator.initialize(this);
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock =  powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SensorCtsTests");
+
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(R.string.snsr_no_interaction);
+        logger.logInstructions(R.string.snsr_run_automated_tests);
         waitForUserToBegin();
+
+        // automated CTS tests run with the USB connected, so the AP doesn't go to sleep
+        // here we are not connected to USB, so we need to hold a wake-lock to avoid going to sleep
+        mWakeLock.acquire();
+        mScreenManipulator.turnScreenOff();
+    }
+
+    @Override
+    protected void activityCleanUp() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        mScreenManipulator.turnScreenOn();
+        mWakeLock.release();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mScreenManipulator.releaseScreenOn();
     }
 
     /**
@@ -150,7 +183,6 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
             if (!mCurrentTestReported) {
                 getTestLogger().logTestPass(description.getMethodName(), null /* testSummary */);
             }
-            playSound();
         }
 
         public void testFailure(Failure failure) throws Exception {
