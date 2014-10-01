@@ -663,20 +663,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             }
         } else if (mClassName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test class %s", mClassName));
-            // try to find packages to run from class name
-            List<String> packageIds = testRepo.findPackageIdsForTest(mClassName);
-            if (!packageIds.isEmpty()) {
-                for (String packageId: packageIds) {
-                    ITestPackageDef testPackageDef = testRepo.getTestPackage(packageId);
-                    if (testPackageDef != null) {
-                        testPackageDef.setClassName(mClassName, mMethodName);
-                        testPkgDefs.add(testPackageDef);
-                    }
-                }
-            } else {
-                Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
-                        "Could not find package for test class %s", mClassName));
-            }
+            testPkgDefs.addAll(buildTestPackageDefSet(testRepo, mClassName, mMethodName));
         } else if (mTestName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test %s", mTestName));
             String [] split = mTestName.split("#");
@@ -686,20 +673,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             } else {
                 String className = split[0];
                 String methodName = split[1];
-                // try to find packages to run from class name
-                List<String> packageIds = testRepo.findPackageIdsForTest(className);
-                if (!packageIds.isEmpty()) {
-                    for (String packageId: packageIds) {
-                        ITestPackageDef testPackageDef = testRepo.getTestPackage(packageId);
-                        if (testPackageDef != null) {
-                            testPackageDef.setClassName(className, methodName);
-                            testPkgDefs.add(testPackageDef);
-                        }
-                    }
-                } else {
-                    Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
-                            "Could not find package for test class %s", mTestName));
-                }
+                testPkgDefs.addAll(buildTestPackageDefSet(testRepo, className, methodName));
             }
         } else if (mContinueSessionId != null) {
             // create an in-memory derived plan that contains the notExecuted tests from previous
@@ -737,6 +711,29 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             }
         }
         return pkgNames;
+    }
+
+    /**
+     * @return a {@link Set} containing {@ITestPackageDef}s pertaining to the given
+     *     {@code className} and {@code methodName}.
+     */
+    private static Set<ITestPackageDef> buildTestPackageDefSet(
+            ITestPackageRepo testRepo, String className, String methodName) {
+        Set<ITestPackageDef> testPkgDefs = new LinkedHashSet<ITestPackageDef>();
+        // try to find packages to run from class name
+        List<String> packageIds = testRepo.findPackageIdsForTest(className);
+        if (packageIds.isEmpty()) {
+            Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
+                    "Could not find package for test class %s", className));
+        }
+        for (String packageId: packageIds) {
+            ITestPackageDef testPackageDef = testRepo.getTestPackage(packageId);
+            if (testPackageDef != null) {
+                testPackageDef.setClassName(className, methodName);
+                testPkgDefs.add(testPackageDef);
+            }
+        }
+        return testPkgDefs;
     }
 
     /**
