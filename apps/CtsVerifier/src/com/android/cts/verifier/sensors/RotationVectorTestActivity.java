@@ -18,6 +18,7 @@ package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
+import com.android.cts.verifier.sensors.renderers.GLArrowSensorTestRenderer;
 
 import junit.framework.Assert;
 
@@ -27,10 +28,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorNotSupportedException;
-import android.opengl.GLSurfaceView;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,10 +46,9 @@ public class RotationVectorTestActivity
         extends SensorCtsVerifierTestActivity
         implements SensorEventListener {
     public RotationVectorTestActivity() {
-        super(RotationVectorTestActivity.class, R.layout.snsr_rotvec);
+        super(RotationVectorTestActivity.class);
     }
 
-    private GLSurfaceView mGLSurfaceView;
     private SensorManager mSensorManager;
     private SensorEventListener mListener;
 
@@ -82,10 +81,11 @@ public class RotationVectorTestActivity
                 && mSensor[GEOMAGNETIC_ROTATION_VECTOR_INDEX] == null
                 && mSensor[GAME_ROTATION_VECTOR_INDEX] == null) {
             // if none of the sensors is supported, skip the test by throwing an exception
-            throw new IllegalStateException("Rotation vectors are not supported.");
+            throw new SensorTestStateNotSupportedException("Rotation vectors are not supported.");
         }
 
         // TODO: take reference value automatically when device is 'still'
+        clearText();
         appendText(R.string.snsr_rotation_vector_set_reference);
         waitForUser();
 
@@ -107,12 +107,7 @@ public class RotationVectorTestActivity
         waitForUser();
 
         clearText();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mGLSurfaceView.setVisibility(View.GONE);
-            }
-        });
+        closeGlSurfaceView();
 
         float[] finalVector = new float[16];
         for (int i = 0; i < MAX_SENSORS_AVAILABLE; ++i) {
@@ -183,8 +178,7 @@ public class RotationVectorTestActivity
                 new GLArrowSensorTestRenderer(this, Sensor.TYPE_ROTATION_VECTOR);
         mListener = renderer;
 
-        mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
-        mGLSurfaceView.setRenderer(renderer);
+        initializeGlSurfaceView(renderer);
     }
 
     @Override
@@ -192,13 +186,11 @@ public class RotationVectorTestActivity
         super.onPause();
         mSensorManager.unregisterListener(mListener);
         mSensorManager.unregisterListener(this);
-        mGLSurfaceView.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mGLSurfaceView.onResume();
 
         // listener for rendering
         boolean renderListenerRegistered = false;

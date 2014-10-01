@@ -18,6 +18,7 @@ package com.android.cts.verifier.sensors;
 
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.sensors.renderers.GLArrowSensorTestRenderer;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -44,7 +45,8 @@ public class AccelerometerTestActivity extends PassFailButtons.Activity {
 
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
-        GLArrowSensorTestRenderer renderer = new GLArrowSensorTestRenderer(this, Sensor.TYPE_ACCELEROMETER);
+        GLArrowSensorTestRenderer renderer =
+                new GLArrowSensorTestRenderer(this, Sensor.TYPE_ACCELEROMETER);
         mListener = renderer;
 
         setContentView(R.layout.pass_fail_gl);

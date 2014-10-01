@@ -117,13 +117,6 @@ public class StepCounterTestActivity
                 true /* vibrate */);
     }
 
-    public String testWaving() throws Throwable {
-       return runTest(
-               R.string.snsr_step_counter_test_waving,
-               0 /* expectedSteps */,
-               false /* vibrate */);
-    }
-
     /**
      * @param instructionsResId Resource ID containing instruction to be shown to testers
      * @param expectedSteps Number of steps expected in this test

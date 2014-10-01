@@ -39,10 +39,7 @@ public abstract class SensorCtsVerifierTestActivity extends BaseSensorTestActivi
     private volatile int mTestFailedCounter;
 
     /**
-     * Constructor for a CtsVerifier test executor. It executes tests defined in the same class.
-     *
-     * @param testClass The test class to execute, this is the same subclass implementing the
-     *                  executor. It must be a subclass of {@link SensorCtsVerifierTestActivity}
+     * {@inheritDoc}
      */
     protected SensorCtsVerifierTestActivity(
             Class<? extends SensorCtsVerifierTestActivity> testClass) {
@@ -50,12 +47,7 @@ public abstract class SensorCtsVerifierTestActivity extends BaseSensorTestActivi
     }
 
     /**
-     * Constructor for a CtsVerifier test executor. It executes tests defined in the same class.
-     *
-     * @param testClass The test class to execute, this is the same subclass implementing the
-     *                  executor. It must be a subclass of {@link SensorCtsVerifierTestActivity}
-     * @param layoutId The Id of the layout to use for the test UI. The layout must contain all the
-     *                 elements in the base layout {@code R.layout.snsr_semi_auto_test}.
+     * {@inheritDoc}
      */
     protected SensorCtsVerifierTestActivity(
             Class<? extends SensorCtsVerifierTestActivity> testClass,
