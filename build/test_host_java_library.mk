@@ -36,4 +36,5 @@ $(cts_library_xml): $(HOST_OUT_JAVA_LIBRARIES)/$(LOCAL_MODULE).jar $(CTS_EXPECTA
 						-p $(PRIVATE_TEST_PACKAGE) \
 						-e $(CTS_EXPECTATIONS) \
 						-b $(CTS_UNSUPPORTED_ABIS) \
+						-a $(CTS_TARGET_ARCH) \
 						-o $@
