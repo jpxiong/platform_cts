@@ -36,6 +36,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -81,7 +82,9 @@ public abstract class BaseSensorTestActivity
 
     private ScrollView mLogScrollView;
     private LinearLayout mLogLayout;
-    private View mNextView;
+    private Button mNextButton;
+    private Button mPassButton;
+    private Button mFailButton;
 
     /**
      * Constructor to be used by subclasses.
@@ -114,10 +117,12 @@ public abstract class BaseSensorTestActivity
 
         mLogScrollView = (ScrollView) findViewById(R.id.log_scroll_view);
         mLogLayout = (LinearLayout) findViewById(R.id.log_layout);
-        mNextView = findViewById(R.id.next_button);
-        mNextView.setOnClickListener(this);
+        mNextButton = (Button) findViewById(R.id.next_button);
+        mNextButton.setOnClickListener(this);
+        mPassButton = (Button) findViewById(R.id.pass_button);
+        mFailButton = (Button) findViewById(R.id.fail_button);
 
-        updateButton(false /*enabled*/);
+        updateNextButton(false /*enabled*/);
         new Thread(this).start();
     }
 
@@ -142,8 +147,8 @@ public abstract class BaseSensorTestActivity
     @Override
     public void run() {
         SensorTestDetails testDetails = null;
-        mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
         try {
+            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
             activitySetUp();
         } catch (SensorTestStateNotSupportedException e) {
             testDetails = new SensorTestDetails(
@@ -166,19 +171,34 @@ public abstract class BaseSensorTestActivity
 
         try {
             activityCleanUp();
+            mSensorFeaturesDeactivator.requestToRestoreFeatures();
         } catch (Throwable e) {
             testDetails = new SensorTestDetails(
                     getTestClassName(),
                     SensorTestDetails.ResultCode.FAIL,
                     "[ActivityCleanUp] " + e.getMessage());
         }
-        mSensorFeaturesDeactivator.requestToRestoreFeatures();
-        mTestLogger.logInstructions(R.string.snsr_test_complete);
+        mTestLogger.logTestDetails(testDetails);
 
-        // log to screen and save the overall test summary (activity level)
-        setTestResult(testDetails);
-        waitForUser(R.string.snsr_wait_to_complete);
-        finish();
+        // because we cannot enforce test failures in several devices, set the test UI so the
+        // operator can report the result of the test
+        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.FAIL) {
+            mTestLogger.logInstructions(R.string.snsr_test_complete_with_errors);
+            enableTestResultButton(
+                    mPassButton,
+                    R.string.snsr_pass_on_error,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
+            enableTestResultButton(
+                    mFailButton,
+                    R.string.fail_button_text,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.FAIL));
+        } else {
+            mTestLogger.logInstructions(R.string.snsr_test_complete);
+            enableTestResultButton(
+                    mPassButton,
+                    R.string.pass_button_text,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
+        }
     }
 
     /**
@@ -249,13 +269,13 @@ public abstract class BaseSensorTestActivity
      */
     protected void waitForUser(int waitMessageResId) {
         mTestLogger.logInstructions(waitMessageResId);
-        updateButton(true);
+        updateNextButton(true);
         try {
             mSemaphore.acquire();
         } catch (InterruptedException e)  {
             Log.e(LOG_TAG, "Error on waitForUser", e);
         }
-        updateButton(false);
+        updateNextButton(false);
     }
 
     /**
@@ -349,8 +369,6 @@ public abstract class BaseSensorTestActivity
     }
 
     private void setTestResult(SensorTestDetails testDetails) {
-        mTestLogger.logTestDetails(testDetails);
-
         String summary = mTestLogger.getOverallSummary();
         String name = testDetails.getName();
         switch(testDetails.getResultCode()) {
@@ -366,15 +384,43 @@ public abstract class BaseSensorTestActivity
         }
     }
 
-    private void updateButton(boolean enabled) {
-        runOnUiThread(new ButtonEnabler(this.mNextView, enabled));
+    private void updateNextButton(final boolean enabled) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mNextButton.setEnabled(enabled);
+            }
+        });
+    }
+
+    private void enableTestResultButton(
+            final Button button,
+            final int textResId,
+            final SensorTestDetails testDetails) {
+        final View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTestResult(testDetails);
+                finish();
+            }
+        };
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mNextButton.setVisibility(View.GONE);
+                button.setText(textResId);
+                button.setOnClickListener(listener);
+                button.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     // a logger available until sensor reporting is in place
     public class SensorTestLogger {
         private static final String SUMMARY_SEPARATOR = " | ";
 
-        private final StringBuilder mOverallSummaryBuilder = new StringBuilder();
+        private final StringBuilder mOverallSummaryBuilder = new StringBuilder("\n");
 
         void logTestStart(String testName) {
             // TODO: log the sensor information and expected execution time of each test
@@ -495,21 +541,6 @@ public abstract class BaseSensorTestActivity
                     });
                 }
             });
-        }
-    }
-
-    private class ButtonEnabler implements Runnable {
-        private final View mButtonView;
-        private final boolean mButtonEnabled;
-
-        public ButtonEnabler(View buttonView, boolean buttonEnabled) {
-            mButtonView = buttonView;
-            mButtonEnabled = buttonEnabled;
-        }
-
-        @Override
-        public void run() {
-            mButtonView.setEnabled(mButtonEnabled);
         }
     }
 }
