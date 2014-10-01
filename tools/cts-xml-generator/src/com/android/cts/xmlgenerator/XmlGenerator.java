@@ -79,12 +79,14 @@ class XmlGenerator {
     /** ExpectationStore to filter out unsupported abis. */
     private final ExpectationStore mUnsupportedAbis;
 
+    private final String mArchitecture;
+
     private final Map<String, String> mAdditionalAttributes;
 
     XmlGenerator(ExpectationStore knownFailures, ExpectationStore unsupportedAbis,
-            String appNameSpace, String appPackageName, String name, String runner,
-            String targetBinaryName, String targetNameSpace, String jarPath, String testType,
-            String outputPath, Map<String, String> additionalAttributes) {
+            String architecture, String appNameSpace, String appPackageName, String name,
+            String runner, String targetBinaryName, String targetNameSpace, String jarPath,
+            String testType, String outputPath, Map<String, String> additionalAttributes) {
         mAppNamespace = appNameSpace;
         mAppPackageName = appPackageName;
         mName = name;
@@ -96,6 +98,7 @@ class XmlGenerator {
         mOutputPath = outputPath;
         mKnownFailures = knownFailures;
         mUnsupportedAbis = unsupportedAbis;
+        mArchitecture = architecture;
         mAdditionalAttributes = additionalAttributes;
     }
 
@@ -202,7 +205,7 @@ class XmlGenerator {
             String className = nameCollector.toString();
             nameCollector.append('#').append(test.getName());
             writer.append("<Test name=\"").append(test.getName()).append("\"");
-            String abis = getSupportedAbis(mUnsupportedAbis, className).toString();
+            String abis = getSupportedAbis(mUnsupportedAbis, mArchitecture, className).toString();
             writer.append(" abis=\"" + abis.substring(1, abis.length() - 1) + "\"");
             if (isKnownFailure(mKnownFailures, nameCollector.toString())) {
                 writer.append(" expectation=\"failure\"");
@@ -229,8 +232,8 @@ class XmlGenerator {
 
     // Returns the list of ABIs supported by this TestCase on this architecture.
     public static Set<String> getSupportedAbis(ExpectationStore expectationStore,
-            String className) {
-        Set<String> supportedAbis = AbiUtils.getAbisSupportedByCts();
+            String architecture, String className) {
+        Set<String> supportedAbis = AbiUtils.getAbisForArch(architecture);
         Expectation e = (expectationStore == null) ? null : expectationStore.get(className);
         if (e != null && !e.getDescription().isEmpty()) {
             // Description should be written in the form "blah blah: abi1, abi2..."
