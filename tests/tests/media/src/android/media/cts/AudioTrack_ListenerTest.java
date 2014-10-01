@@ -35,7 +35,7 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
     private final int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT;
     private final int TEST_MODE = AudioTrack.MODE_STREAM;
     private final int TEST_STREAM_TYPE1 = AudioManager.STREAM_MUSIC;
-    private Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             mIsHandleMessageCalled = true;
