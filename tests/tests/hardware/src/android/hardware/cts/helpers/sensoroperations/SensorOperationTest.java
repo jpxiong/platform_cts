@@ -16,9 +16,9 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import android.hardware.cts.helpers.SensorStats;
-
 import junit.framework.TestCase;
+
+import android.hardware.cts.helpers.SensorStats;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * {@link SequentialSensorOperation}.
  */
 public class SensorOperationTest extends TestCase {
-    private static final int THRESHOLD_MS = 50;
+    private static final long TEST_DURATION_THRESHOLD_MS = TimeUnit.SECONDS.toMillis(5);
 
     /**
      * Test that the {@link FakeSensorOperation} functions correctly. Other tests in this class
@@ -44,7 +44,7 @@ public class SensorOperationTest extends TestCase {
         long start = System.currentTimeMillis();
         op.execute();
         long duration = System.currentTimeMillis() - start;
-        assertTrue(Math.abs(opDurationMs - duration) < THRESHOLD_MS);
+        assertTrue(Math.abs(opDurationMs - duration) < TEST_DURATION_THRESHOLD_MS);
         assertTrue(op.getStats().flatten().containsKey("executed"));
 
         op = new FakeSensorOperation(true, 0, TimeUnit.MILLISECONDS);
@@ -67,10 +67,11 @@ public class SensorOperationTest extends TestCase {
         FakeSensorOperation subOp = new FakeSensorOperation(subOpDurationMs, TimeUnit.MILLISECONDS);
         ISensorOperation op = new DelaySensorOperation(subOp, opDurationMs, TimeUnit.MILLISECONDS);
 
-        long start = System.currentTimeMillis();
+        long startMs = System.currentTimeMillis();
         op.execute();
-        long duration = System.currentTimeMillis() - start;
-        assertTrue(Math.abs(opDurationMs + subOpDurationMs - duration) < THRESHOLD_MS);
+        long dirationMs = System.currentTimeMillis() - startMs;
+        long durationDeltaMs = Math.abs(opDurationMs + subOpDurationMs - dirationMs);
+        assertTrue(durationDeltaMs < TEST_DURATION_THRESHOLD_MS);
     }
 
     /**
@@ -92,8 +93,18 @@ public class SensorOperationTest extends TestCase {
 
         long start = System.currentTimeMillis();
         op.execute();
-        long duration = System.currentTimeMillis() - start;
-        assertTrue(Math.abs(subOpDurationMs - duration) < THRESHOLD_MS);
+        long durationMs = System.currentTimeMillis() - start;
+        long durationDeltaMs = Math.abs(subOpDurationMs - durationMs);
+        String message = String.format(
+                "Expected duration=%sms, observed=%sms, delta=%sms, thresold=%sms",
+                subOpDurationMs,
+                durationMs,
+                durationDeltaMs,
+                TEST_DURATION_THRESHOLD_MS);
+        // starting threads might have an impact in the order of 100s ms, depending on the load of
+        // the system, so we relax the benchmark part of the test, and we just expect all operations
+        // to complete
+        assertTrue(message, durationDeltaMs < TEST_DURATION_THRESHOLD_MS);
 
         statsKeys = op.getStats().flatten().keySet();
         assertEquals(subOpCount, statsKeys.size());
@@ -151,9 +162,9 @@ public class SensorOperationTest extends TestCase {
     public void testParallelSensorOperation_timeout() {
         final int subOpCount = 100;
 
-        ParallelSensorOperation op = new ParallelSensorOperation(100, TimeUnit.MILLISECONDS);
+        ParallelSensorOperation op = new ParallelSensorOperation(1, TimeUnit.SECONDS);
         for (int i = 0; i < subOpCount; i++) {
-            // Trigger timeouts in the 5th, 55th operations (5 seconds vs 0 seconds)
+            // Trigger timeouts in the 5th, 55th operations (5 seconds vs 1 seconds)
             ISensorOperation subOp = new FakeSensorOperation(i % 50 == 5 ? 5 : 0, TimeUnit.SECONDS);
             op.add(subOp);
         }
@@ -196,7 +207,7 @@ public class SensorOperationTest extends TestCase {
         long start = System.currentTimeMillis();
         op.execute();
         long duration = System.currentTimeMillis() - start;
-        assertTrue(Math.abs(subOpDurationMs * iterations - duration) < THRESHOLD_MS);
+        assertTrue(Math.abs(subOpDurationMs * iterations - duration) < TEST_DURATION_THRESHOLD_MS);
 
         statsKeys = op.getStats().flatten().keySet();
         assertEquals(iterations, statsKeys.size());
@@ -285,7 +296,7 @@ public class SensorOperationTest extends TestCase {
         long start = System.currentTimeMillis();
         op.execute();
         long duration = System.currentTimeMillis() - start;
-        assertTrue(Math.abs(subOpDurationMs * subOpCount - duration) < THRESHOLD_MS);
+        assertTrue(Math.abs(subOpDurationMs * subOpCount - duration) < TEST_DURATION_THRESHOLD_MS);
 
         statsKeys = op.getStats().flatten().keySet();
         assertEquals(subOpCount, statsKeys.size());
