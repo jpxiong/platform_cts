@@ -16,18 +16,17 @@
 
 package android.hardware.cts.helpers;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import android.hardware.cts.helpers.sensoroperations.SensorOperationTest;
+import android.hardware.cts.helpers.sensorverification.EventGapVerificationTest;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerificationTest;
 import android.hardware.cts.helpers.sensorverification.FrequencyVerificationTest;
 import android.hardware.cts.helpers.sensorverification.JitterVerificationTest;
 import android.hardware.cts.helpers.sensorverification.MagnitudeVerificationTest;
 import android.hardware.cts.helpers.sensorverification.MeanVerificationTest;
-import android.hardware.cts.helpers.sensorverification.EventGapVerificationTest;
-import android.hardware.cts.helpers.sensorverification.SigNumVerificationTest;
 import android.hardware.cts.helpers.sensorverification.StandardDeviationVerificationTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Unit test suite for the CTS sensor framework.
@@ -48,7 +47,6 @@ public class FrameworkUnitTests extends TestSuite {
         addTestSuite(MagnitudeVerificationTest.class);
         addTestSuite(MeanVerificationTest.class);
         addTestSuite(EventGapVerificationTest.class);
-        addTestSuite(SigNumVerificationTest.class);
         addTestSuite(StandardDeviationVerificationTest.class);
 
         // sensorOperations

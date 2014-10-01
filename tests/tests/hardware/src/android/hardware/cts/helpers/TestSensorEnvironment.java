@@ -197,6 +197,19 @@ public class TestSensorEnvironment {
     }
 
     /**
+     * @return The number of axes in the coordinate system of the sensor under test.
+     */
+    public int getSensorAxesCount() {
+        switch (mSensor.getType()) {
+            case Sensor.TYPE_GYROSCOPE:
+                return 3;
+            default:
+                throw new IllegalStateException("Axes count needs to be defined for sensor type: "
+                        + mSensor.getStringType());
+        }
+    }
+
+    /**
      * Get the default sensor for a given type.
      *
      * @deprecated Used for historical reasons, sensor tests must be written around Sensor objects,
