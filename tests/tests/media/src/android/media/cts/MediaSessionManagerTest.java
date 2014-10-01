@@ -18,17 +18,18 @@ package android.media.cts;
 import android.content.Context;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
 
 import java.util.List;
 
-public class MediaSessionManagerTest extends AndroidTestCase {
+public class MediaSessionManagerTest extends InstrumentationTestCase {
     private MediaSessionManager mSessionManager;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mSessionManager = (MediaSessionManager) mContext
+        mSessionManager = (MediaSessionManager) getInstrumentation().getTargetContext()
                 .getSystemService(Context.MEDIA_SESSION_SERVICE);
     }
 
@@ -42,6 +43,7 @@ public class MediaSessionManagerTest extends AndroidTestCase {
         // TODO enable a notification listener, test again, disable, test again
     }
 
+    @UiThreadTest
     public void testAddOnActiveSessionsListener() throws Exception {
         try {
             mSessionManager.addOnActiveSessionsChangedListener(null, null);
