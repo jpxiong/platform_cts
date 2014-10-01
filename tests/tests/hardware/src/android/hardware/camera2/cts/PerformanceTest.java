@@ -195,6 +195,11 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(id);
 
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skipping test on legacy devices");
+                    continue;
+                }
+
                 boolean partialsExpected = mStaticInfo.getPartialResultCount() > 1;
                 long startTimeMs;
                 boolean isPartialTimingValid = partialsExpected;
