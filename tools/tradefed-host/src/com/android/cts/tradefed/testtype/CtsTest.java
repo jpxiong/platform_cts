@@ -78,6 +78,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String PACKAGE_OPTION = "package";
     private static final String CLASS_OPTION = "class";
     private static final String METHOD_OPTION = "method";
+    private static final String TEST_OPTION = "test";
     public static final String CONTINUE_OPTION = "continue-session";
     public static final String RUN_KNOWN_FAILURES_OPTION = "run-known-failures";
 
@@ -106,6 +107,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             description = "run a specific test method, from given --class.",
             importance = Importance.IF_UNSET)
     private String mMethodName = null;
+
+    @Option(name = TEST_OPTION, shortName = 't', description = "run a specific test",
+            importance = Importance.IF_UNSET)
+    private String mTestName = null;
 
     @Option(name = CONTINUE_OPTION,
             description = "continue a previous test session.",
@@ -362,6 +367,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      */
     void setMethodName(String methodName) {
         mMethodName = methodName;
+    }
+
+    /**
+     * Set the test name to run e.g. android.test.cts.SampleTest#testSample
+     * <p/>
+     * Exposed for unit testing
+     */
+    void setTestName(String testName) {
+        mTestName = testName;
     }
 
     /**
@@ -663,6 +677,30 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
                         "Could not find package for test class %s", mClassName));
             }
+        } else if (mTestName != null) {
+            Log.i(LOG_TAG, String.format("Executing CTS test %s", mTestName));
+            String [] split = mTestName.split("#");
+            if (split.length != 2) {
+                Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
+                        "Could not parse class and method from test %s", mTestName));
+            } else {
+                String className = split[0];
+                String methodName = split[1];
+                // try to find packages to run from class name
+                List<String> packageIds = testRepo.findPackageIdsForTest(className);
+                if (!packageIds.isEmpty()) {
+                    for (String packageId: packageIds) {
+                        ITestPackageDef testPackageDef = testRepo.getTestPackage(packageId);
+                        if (testPackageDef != null) {
+                            testPackageDef.setClassName(className, methodName);
+                            testPkgDefs.add(testPackageDef);
+                        }
+                    }
+                } else {
+                    Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
+                            "Could not find package for test class %s", mTestName));
+                }
+            }
         } else if (mContinueSessionId != null) {
             // create an in-memory derived plan that contains the notExecuted tests from previous
             // session use timestamp as plan name so it will hopefully be unique
@@ -869,10 +907,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     private void checkFields() {
-        // for simplicity of command line usage, make --plan, --package, and --class mutually
+        // for simplicity of command line usage, make --plan, --package, --test and --class mutually
         // exclusive
         boolean mutualExclusiveArgs = xor(mPlanName != null, mPackageNames.size() > 0,
-                mClassName != null, mContinueSessionId != null);
+                mClassName != null, mContinueSessionId != null, mTestName != null);
 
         if (!mutualExclusiveArgs) {
             throw new IllegalArgumentException(String.format(
