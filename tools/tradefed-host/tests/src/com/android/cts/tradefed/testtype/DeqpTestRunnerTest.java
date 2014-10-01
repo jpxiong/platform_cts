@@ -127,10 +127,12 @@ public class DeqpTestRunnerTest extends TestCase {
             EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME))
                     .andReturn(true).once();
 
-            String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
-                    + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
-                    + "--deqp-gl-config-name=rgba8888d24s8\" "
-                    + INSTRUMENTATION_NAME;
+            String command = String.format(
+                    "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
+                        + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                        + "-e deqpLogData \"%s\" %s",
+                    AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
+                    CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
 
             mockDevice.executeShellCommand(EasyMock.eq(command),
                     EasyMock.<IShellOutputReceiver>notNull());
@@ -230,10 +232,12 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME)).andReturn(true)
                 .once();
 
-        String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
-                + "--deqp-gl-config-name=rgba8888d24s8\" "
-                + INSTRUMENTATION_NAME;
+        String command = String.format(
+                "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
+                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                    + "-e deqpLogData \"%s\" %s",
+                AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
+                CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
 
         mockDevice.executeShellCommand(EasyMock.eq(command),
                 EasyMock.<IShellOutputReceiver>notNull());
@@ -403,10 +407,12 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME))
                 .andReturn(true).once();
 
-        String command = "am instrument -w -e deqpLogFileName \"" + LOG_FILE_NAME
-                + "\" -e deqpCmdLine \"--deqp-caselist-file=" + CASE_LIST_FILE_NAME + " "
-                + "--deqp-gl-config-name=rgba8888d24s8\" "
-                + INSTRUMENTATION_NAME;
+        String command = String.format(
+                "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
+                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                    + "-e deqpLogData \"%s\" %s",
+                AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
+                CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
 
         mockDevice.executeShellCommand(EasyMock.eq(command),
                 EasyMock.<IShellOutputReceiver>notNull());
