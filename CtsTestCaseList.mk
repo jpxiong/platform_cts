@@ -39,6 +39,7 @@ cts_support_packages := \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
+    CtsIntentReceiverApp \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
