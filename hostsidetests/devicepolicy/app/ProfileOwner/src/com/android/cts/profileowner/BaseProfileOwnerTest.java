@@ -32,7 +32,7 @@ public class BaseProfileOwnerTest extends AndroidTestCase {
     public static class BasicAdminReceiver extends DeviceAdminReceiver {
     }
 
-    static final ComponentName ADMIN_RECEIVER_COMPONENT = new ComponentName(
+    public static final ComponentName ADMIN_RECEIVER_COMPONENT = new ComponentName(
             BasicAdminReceiver.class.getPackage().getName(), BasicAdminReceiver.class.getName());
 
     protected DevicePolicyManager mDevicePolicyManager;

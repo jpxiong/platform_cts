@@ -30,6 +30,32 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+        <activity android:name=".PrimaryUserFilterSetterActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.android.cts.profileowner.ACTION_TEST_SET_FILTERS" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ManagedProfileActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.android.cts.profileowner.ACTION_TEST_MANAGED_ACTIVITY" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PrimaryUserActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.android.cts.profileowner.ACTION_TEST_PRIMARY_ACTIVITY" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".AllUsersActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.android.cts.profileowner.ACTION_TEST_ALL_ACTIVITY" />
+            </intent-filter>
+        </activity>
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
