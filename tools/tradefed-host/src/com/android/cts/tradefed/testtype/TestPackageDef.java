@@ -438,7 +438,7 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
-     * Get the collection of tests in this test package.
+     * {@inheritDoc}
      */
     @Override
     public Collection<TestIdentifier> getTests() {
