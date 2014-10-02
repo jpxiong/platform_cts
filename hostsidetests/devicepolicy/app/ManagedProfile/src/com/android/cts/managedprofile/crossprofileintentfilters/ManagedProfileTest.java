@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.profileowner;
+package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
@@ -27,7 +27,7 @@ import android.content.pm.PackageManager;
  * in the primary profile, one to {@code ManagedProfileActivity.ACTION} in the secondary profile,
  * and one to {@code AllUsersActivity.ACTION} in both profiles.
  */
-public class ManagedProfileTest extends BaseProfileOwnerTest {
+public class ManagedProfileTest extends BaseManagedProfileTest {
 
     private PackageManager mPackageManager;
 

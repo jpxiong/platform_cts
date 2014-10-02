@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.profileowner;
+package com.android.cts.managedprofile;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
 /**
- * Activity that lives in both primary user and its profile.
+ * Activity that lives in the managed profile.
  */
-public class AllUsersActivity extends Activity {
-    private static final String TAG = AllUsersActivity.class.getName();
+public class ManagedProfileActivity extends Activity {
+    private static final String TAG = ManagedProfileActivity.class.getName();
 
     public static final String ACTION =
-            "com.android.cts.profileowner.ACTION_TEST_ALL_ACTIVITY";
+            "com.android.cts.managedprofile.ACTION_TEST_MANAGED_ACTIVITY";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

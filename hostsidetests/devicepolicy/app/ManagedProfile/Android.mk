@@ -16,7 +16,7 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_PACKAGE_NAME := CtsProfileOwnerApp
+LOCAL_PACKAGE_NAME := CtsManagedProfileApp
 
 LOCAL_MODULE_TAGS := optional
 
