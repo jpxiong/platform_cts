@@ -1,8 +1,10 @@
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
@@ -10,9 +12,12 @@ import com.android.tradefed.result.ByteArrayInputStreamSource;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,8 +30,12 @@ import java.util.Map;
  *
  * Supports running drawElements Quality Program tests found under external/deqp.
  */
-public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
-    final private int TESTCASE_BATCH_LIMIT = 1000;
+public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest {
+
+    private static final String DEQP_ONDEVICE_APK = "com.drawelements.deqp.apk";
+    private static final String DEQP_ONDEVICE_PKG = "com.drawelements.deqp";
+
+    private final int TESTCASE_BATCH_LIMIT = 1000;
 
     private boolean mLogData;
 
@@ -36,6 +45,7 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
     private final String mName;
     private Collection<TestIdentifier> mTests;
     private IAbi mAbi;
+    private CtsBuildHelper mCtsBuild;
 
     private TestIdentifier mCurrentTestId;
     private boolean mGotTestResult;
@@ -55,6 +65,14 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
      */
     public void setAbi(IAbi abi) {
         mAbi = abi;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setBuild(IBuildInfo buildInfo) {
+        mCtsBuild = CtsBuildHelper.createBuildHelper(buildInfo);
     }
 
     /**
@@ -420,6 +438,29 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
     }
 
     /**
+     * Install dEQP OnDevice Package
+     */
+    private void installTestApk() throws DeviceNotAvailableException {
+        try {
+            File apkFile = mCtsBuild.getTestApp(DEQP_ONDEVICE_APK);
+            String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
+            String errorCode = getDevice().installPackage(apkFile, true, options);
+            if (errorCode != null) {
+                CLog.e("Failed to install %s. Reason: %s", DEQP_ONDEVICE_APK, errorCode);
+            }
+        } catch (FileNotFoundException e) {
+            CLog.e("Could not find test apk %s", DEQP_ONDEVICE_APK);
+        }
+    }
+
+    /**
+     * Uninstall dEQP OnDevice Package
+     */
+    private void uninstallTestApk() throws DeviceNotAvailableException {
+        getDevice().uninstallPackage(DEQP_ONDEVICE_PKG);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -428,6 +469,10 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
         if ((mName.equals( "dEQP-GLES3") && isSupportedGles(mDevice, 3, 0))
             || (mName.equals("dEQP-GLES31") && isSupportedGles(mDevice, 3, 1))) {
+
+            // Make sure there is no pre-existing package form earlier interrupted test run.
+            uninstallTestApk();
+            installTestApk();
 
             while (!mTests.isEmpty()) {
                 executeTests(listener);
@@ -445,16 +490,18 @@ public class DeqpTestRunner implements IDeviceTest, IRemoteTest {
 
                         source.cancel();
                     }
-                if (!mGotTestResult) {
-                    mListener.testFailed(mCurrentTestId,
-                        "Log doesn't contain test result");
-                }
+                    if (!mGotTestResult) {
+                        mListener.testFailed(mCurrentTestId,
+                            "Log doesn't contain test result");
+                    }
 
                     mListener.testEnded(mCurrentTestId, emptyMap);
                     mCurrentTestId = null;
                     mListener.testRunEnded(0, emptyMap);
                 }
             }
+
+            uninstallTestApk();
         } else {
             /* Pass all tests if OpenGL ES version is not supported */
             Map <String, String> emptyMap = Collections.emptyMap();
