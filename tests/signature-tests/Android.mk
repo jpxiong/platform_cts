@@ -16,12 +16,11 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# Only compile source java files in this lib.
+# Include all test java files.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_MODULE := cts-tradefed-tests
+LOCAL_MODULE := signature-tests
 LOCAL_MODULE_TAGS := optional
-LOCAL_JAVA_LIBRARIES := tradefed-prebuilt cts-tradefed
-LOCAL_STATIC_JAVA_LIBRARIES := easymock
+LOCAL_JAVA_LIBRARIES := tradefed-prebuilt cts-tradefed signature-hostside
 
 include $(BUILD_HOST_JAVA_LIBRARY)

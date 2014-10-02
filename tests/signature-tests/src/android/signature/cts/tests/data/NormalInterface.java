@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest.tests.data;
-
-import java.lang.Exception;
+package android.signature.cts.tests.data;
 
 /**
- * This class is used as reference data for the JDiffClassDescriptionTest tests.
+ * This class is used as reference data for the
+ * JDiffClassDescriptionTest tests.  These classes will actually be
+ * examined through reflection and Class.forName as part of testing
+ * JDiffClassDescription.  That is why there is no implementation for
+ * any of these methods.
  */
-public class NormalException extends Exception {
-
+public interface NormalInterface {
+    void doSomething();
 }
