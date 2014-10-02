@@ -107,10 +107,11 @@ public class AccelerometerMeasurementTestActivity extends SensorCtsVerifierTestA
 
     private String delayedVerifyMeasurements(int descriptionResId, float ... expectations)
             throws Throwable {
-        appendText(descriptionResId);
-        appendText(R.string.snsr_test_play_sound);
-        waitForUser();
-        Thread.sleep(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS));
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(descriptionResId);
+        logger.logWaitForSound();
+        waitForUserToBegin();
+        Thread.sleep(TimeUnit.MILLISECONDS.convert(7, TimeUnit.SECONDS));
 
         try {
             return verifyMeasurements(expectations);
@@ -121,9 +122,10 @@ public class AccelerometerMeasurementTestActivity extends SensorCtsVerifierTestA
 
     private String verifyMeasurements(int descriptionResId, float ... expectations)
             throws Throwable {
-        appendText(descriptionResId);
-        appendText(R.string.snsr_device_steady);
-        waitForUser();
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(descriptionResId);
+        logger.logInstructions(R.string.snsr_device_steady);
+        waitForUserToBegin();
 
         return verifyMeasurements(expectations);
     }

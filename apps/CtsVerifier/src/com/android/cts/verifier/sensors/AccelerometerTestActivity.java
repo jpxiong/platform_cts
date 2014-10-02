@@ -31,7 +31,10 @@ import android.os.Bundle;
  * CTS Verifier case for verifying correct integration of accelerometer.
  * Displays a wedge using OpenGL that, on a correctly-integrated device, always
  * points down.
+ *
+ * @deprecated It has been replaced by {@link AccelerometerMeasurementTestActivity}
  */
+@Deprecated
 public class AccelerometerTestActivity extends PassFailButtons.Activity {
     private GLSurfaceView mGLSurfaceView;
 

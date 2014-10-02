@@ -237,11 +237,6 @@ public abstract class BaseSensorTestActivity
     }
 
     @Deprecated
-    protected void appendText(int resId, int textColor) {
-        mTestLogger.logInstructions(resId);
-    }
-
-    @Deprecated
     protected void appendText(String text, int textColor) {
         appendText(text);
     }

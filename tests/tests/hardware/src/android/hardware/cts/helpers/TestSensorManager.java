@@ -58,7 +58,7 @@ public class TestSensorManager {
     private TestSensorEventListener mTestSensorEventListener;
 
     /**
-     * @Deprecated Use {@link #TestSensorManager(TestSensorEnvironment)} instead.
+     * @deprecated Use {@link #TestSensorManager(TestSensorEnvironment)} instead.
      */
     @Deprecated
     public TestSensorManager(
