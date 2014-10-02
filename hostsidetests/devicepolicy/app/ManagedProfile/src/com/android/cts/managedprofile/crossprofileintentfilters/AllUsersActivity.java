@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.profileowner;
+package com.android.cts.managedprofile;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
 
-public class ProfileOwnerSetupTest extends BaseProfileOwnerTest {
+/**
+ * Activity that lives in both primary user and its profile.
+ */
+public class AllUsersActivity extends Activity {
+    private static final String TAG = AllUsersActivity.class.getName();
 
-    // This test verifies that the setUp assertions on the base class are working to verify
-    // we are the profile owner and have a valid active admin.
-    public void testProfileOwnerSetup() {
-        // Empty test. We just want the assertions from super.setUp() to be executed.
+    public static final String ACTION =
+            "com.android.cts.managedprofile.ACTION_TEST_ALL_ACTIVITY";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "Roger that!");
     }
-
 }

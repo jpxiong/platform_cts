@@ -15,14 +15,14 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cts.profileowner">
+    package="com.android.cts.managedprofile">
 
     <uses-sdk android:minSdkVersion="20"/>
 
     <application>
         <uses-library android:name="android.test.runner" />
         <receiver
-            android:name="com.android.cts.profileowner.BaseProfileOwnerTest$BasicAdminReceiver"
+            android:name="com.android.cts.managedprofile.BaseManagedProfileTest$BasicAdminReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data android:name="android.app.device_admin"
                        android:resource="@xml/device_admin" />
@@ -33,7 +33,7 @@
         <activity android:name=".PrimaryUserFilterSetterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.android.cts.profileowner.ACTION_TEST_SET_FILTERS" />
+                <action android:name="com.android.cts.managedprofile.ACTION_TEST_SET_FILTERS" />
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -41,24 +41,24 @@
         <activity android:name=".ManagedProfileActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="com.android.cts.profileowner.ACTION_TEST_MANAGED_ACTIVITY" />
+                <action android:name="com.android.cts.managedprofile.ACTION_TEST_MANAGED_ACTIVITY" />
             </intent-filter>
         </activity>
         <activity android:name=".PrimaryUserActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="com.android.cts.profileowner.ACTION_TEST_PRIMARY_ACTIVITY" />
+                <action android:name="com.android.cts.managedprofile.ACTION_TEST_PRIMARY_ACTIVITY" />
             </intent-filter>
         </activity>
         <activity android:name=".AllUsersActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="com.android.cts.profileowner.ACTION_TEST_ALL_ACTIVITY" />
+                <action android:name="com.android.cts.managedprofile.ACTION_TEST_ALL_ACTIVITY" />
             </intent-filter>
         </activity>
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.android.cts.profileowner"
-                     android:label="Profile Owner CTS Tests"/>
+                     android:targetPackage="com.android.cts.managedprofile"
+                     android:label="Managed Profile CTS Tests"/>
 </manifest>
