@@ -140,11 +140,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 Log.i(TAG, "Testing JPEG exif for Camera " + mCameraIds[i]);
                 openDevice(mCameraIds[i]);
 
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
-
                 jpegExifTestByCamera();
             } finally {
                 closeDevice();
