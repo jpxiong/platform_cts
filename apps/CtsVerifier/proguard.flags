@@ -10,6 +10,9 @@
 -keepclassmembers class * extends com.android.cts.verifier.sensors.base.BaseSensorTestActivity {
     public <methods>;
 }
+-keepclassmembers class * extends android.hardware.cts.SensorTestCase {
+    public <methods>;
+}
 
 -keepclasseswithmembers class * extends com.android.cts.verifier.location.LocationModeTestActivity
 
