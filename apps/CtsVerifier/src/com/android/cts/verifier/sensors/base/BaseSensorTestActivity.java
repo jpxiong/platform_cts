@@ -167,60 +167,44 @@ public abstract class BaseSensorTestActivity
      */
     @Override
     public void run() {
-        SensorTestDetails testDetails = null;
+        String testName = getTestClassName();
 
-        try {
-            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
-            activitySetUp();
-        } catch (SensorTestStateNotSupportedException e) {
-            testDetails = new SensorTestDetails(
-                    getTestClassName(),
-                    SensorTestDetails.ResultCode.SKIPPED,
-                    e.getMessage());
-        } catch (Throwable e) {
-            testDetails = new SensorTestDetails(
-                    getTestClassName(),
-                    SensorTestDetails.ResultCode.FAIL,
-                    "[ActivitySetUp] " + e.getMessage());
-        }
-
-        // TODO: implement execution filters:
-        //      - execute all tests and report results officially
-        //      - execute single tests or failed tests only
-        if (testDetails == null) {
-            testDetails = executeTests();
-        }
-
-        try {
-            activityCleanUp();
-            mSensorFeaturesDeactivator.requestToRestoreFeatures();
-        } catch (Throwable e) {
-            testDetails = new SensorTestDetails(
-                    getTestClassName(),
-                    SensorTestDetails.ResultCode.FAIL,
-                    "[ActivityCleanUp] " + e.getMessage());
+        // guarantee the proper clean up of tests based on the operations that successfully ran
+        SensorTestDetails testDetails = deactivateSensorFeatures();
+        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.PASS) {
+            // sensor features
+            testDetails = executeActivitySetUp();
+            if (testDetails.getResultCode() == SensorTestDetails.ResultCode.PASS) {
+                // activity set up
+                // TODO: implement execution filters:
+                //      - execute all tests and report results officially
+                //      - execute single test or failed tests only
+                testDetails = executeTests();
+                try {
+                    activityCleanUp();
+                } catch (Throwable e) {
+                    testDetails = new SensorTestDetails(
+                            testName,
+                            SensorTestDetails.ResultCode.FAIL,
+                            "[ActivityCleanUp] " + e.getMessage());
+                }
+                // end activity set up
+            }
+            try {
+                mSensorFeaturesDeactivator.requestToRestoreFeatures();
+            } catch (Throwable e) {
+                testDetails = new SensorTestDetails(
+                        testName,
+                        SensorTestDetails.ResultCode.FAIL,
+                        "[RestoreSensorFeatures] " + e.getMessage());
+            }
+            // end sensor features
         }
         mTestLogger.logTestDetails(testDetails);
 
         // because we cannot enforce test failures in several devices, set the test UI so the
         // operator can report the result of the test
-        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.FAIL) {
-            mTestLogger.logInstructions(R.string.snsr_test_complete_with_errors);
-            enableTestResultButton(
-                    mPassButton,
-                    R.string.snsr_pass_on_error,
-                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
-            enableTestResultButton(
-                    mFailButton,
-                    R.string.fail_button_text,
-                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.FAIL));
-        } else {
-            mTestLogger.logInstructions(R.string.snsr_test_complete);
-            enableTestResultButton(
-                    mPassButton,
-                    R.string.pass_button_text,
-                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
-        }
+        promptUserToSetResult(testDetails);
     }
 
     /**
@@ -435,6 +419,63 @@ public abstract class BaseSensorTestActivity
             case FAIL:
                 TestResult.setFailedResult(this, name, summary);
                 break;
+        }
+    }
+
+    private SensorTestDetails deactivateSensorFeatures() {
+        String testName = getTestClassName();
+        try {
+            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+        } catch (Throwable e) {
+            return new SensorTestDetails(
+                    testName,
+                    SensorTestDetails.ResultCode.FAIL,
+                    "[DeactivateSensorFeatures] " + e.getMessage());
+        }
+        return new SensorTestDetails(
+                testName,
+                SensorTestDetails.ResultCode.PASS,
+                null /* summary */);
+    }
+
+    private SensorTestDetails executeActivitySetUp() {
+        String testName = getTestClassName();
+        try {
+            activitySetUp();
+        } catch (SensorTestStateNotSupportedException e) {
+            return new SensorTestDetails(
+                    testName,
+                    SensorTestDetails.ResultCode.SKIPPED,
+                    e.getMessage());
+        } catch (Throwable e) {
+            return new SensorTestDetails(
+                    testName,
+                    SensorTestDetails.ResultCode.FAIL,
+                    "[ActivitySetUp] " + e.getMessage());
+        }
+        return new SensorTestDetails(
+                testName,
+                SensorTestDetails.ResultCode.PASS,
+                null /* summary */);
+    }
+
+    private void promptUserToSetResult(SensorTestDetails testDetails) {
+        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.FAIL) {
+            mTestLogger.logInstructions(R.string.snsr_test_complete_with_errors);
+            enableTestResultButton(
+                    mPassButton,
+                    R.string.snsr_pass_on_error,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
+            enableTestResultButton(
+                    mFailButton,
+                    R.string.fail_button_text,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.FAIL));
+        } else {
+            mTestLogger.logInstructions(R.string.snsr_test_complete);
+            enableTestResultButton(
+                    mPassButton,
+                    R.string.pass_button_text,
+                    testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.PASS));
         }
     }
 
