@@ -82,6 +82,7 @@ public class NotificationAttentionManagementVerifierActivity
         createAutoItem(R.string.nls_service_started);
         createAutoItem(R.string.attention_create_contacts);
         createRetryItem(R.string.attention_filter_none);
+        createAutoItem(R.string.attention_all_are_filtered);
         createRetryItem(R.string.attention_filter_all);
         createAutoItem(R.string.attention_none_are_filtered);
         createAutoItem(R.string.attention_default_order);
@@ -114,42 +115,45 @@ public class NotificationAttentionManagementVerifierActivity
                 testModeNone(mState);
                 break;
             case 4:
-                testModeAll(mState);
+                testNoneInterceptsAll(mState);
                 break;
             case 5:
-                testALLInterceptsNothing(mState);
+                testModeAll(mState);
                 break;
             case 6:
-                testDefaultOrder(mState);
+                testAllInterceptsNothing(mState);
                 break;
             case 7:
-                testInterruptionOrder(mState);
+                testDefaultOrder(mState);
                 break;
             case 8:
-                testPrioritytOrder(mState);
+                testInterruptionOrder(mState);
                 break;
             case 9:
-                testAmbientBits(mState);
+                testPrioritytOrder(mState);
                 break;
             case 10:
-                testLookupUriOrder(mState);
+                testAmbientBits(mState);
                 break;
             case 11:
-                testEmailOrder(mState);
+                testLookupUriOrder(mState);
                 break;
             case 12:
-                testPhoneOrder(mState);
+                testEmailOrder(mState);
                 break;
             case 13:
-                testModePriority(mState);
+                testPhoneOrder(mState);
                 break;
             case 14:
-                testPriorityInterceptsSome(mState);
+                testModePriority(mState);
                 break;
             case 15:
-                testDeleteContacts(mState);
+                testPriorityInterceptsSome(mState);
                 break;
             case 16:
+                testDeleteContacts(mState);
+                break;
+            case 17:
                 getPassButton().setEnabled(true);
                 mNm.cancelAll();
                 break;
@@ -678,7 +682,7 @@ public class NotificationAttentionManagementVerifierActivity
     }
 
     // Nothing should be filtered when mode is ALL
-    private void testALLInterceptsNothing(final int i) {
+    private void testAllInterceptsNothing(final int i) {
         if (mStatus[i] == SETUP) {
             mNm.cancelAll();
             MockListener.resetListenerData(this);
@@ -762,6 +766,59 @@ public class NotificationAttentionManagementVerifierActivity
                                         } else if (ALICE.equals(tag)) {
                                             found.add(ALICE);
                                             pass &= payload.getBoolean(JSON_MATCHES_ZEN_FILTER);
+                                        } else if (BOB.equals(tag)) {
+                                            found.add(BOB);
+                                            pass &= !payload.getBoolean(JSON_MATCHES_ZEN_FILTER);
+                                        } else if (CHARLIE.equals(tag)) {
+                                            found.add(CHARLIE);
+                                            pass &= !payload.getBoolean(JSON_MATCHES_ZEN_FILTER);
+                                        }
+                                    } catch (JSONException e) {
+                                        pass = false;
+                                        Log.e(TAG, "failed to unpack data from mocklistener", e);
+                                    }
+                                }
+                            }
+                            pass &= found.size() == 3;
+                            mStatus[i] = pass ? PASS : FAIL;
+                            next();
+                        }
+                    });
+        }
+    }
+
+    // Nothing should get through when mode is None.
+    private void testNoneInterceptsAll(final int i) {
+        if (mStatus[i] == SETUP) {
+            mNm.cancelAll();
+            MockListener.resetListenerData(this);
+            mStatus[i] = CLEARED;
+            // wait for intent to move through the system
+            delay();
+        } else if (mStatus[i] == CLEARED) {
+            sendNotifications(MODE_URI, false, false);
+            mStatus[i] = READY;
+            // wait for notifications to move through the system
+            delay();
+        } else {
+            MockListener.probeListenerPayloads(mContext,
+                    new MockListener.StringListResultCatcher() {
+                        @Override
+                        public void accept(List<String> result) {
+                            boolean pass = false;
+                            Set<String> found = new HashSet<String>();
+                            if (result != null && result.size() > 0) {
+                                pass = true;
+                                for (String payloadData : result) {
+                                    try {
+                                        JSONObject payload = new JSONObject(payloadData);
+                                        String tag = payload.getString(JSON_TAG);
+                                        if (found.contains(tag)) {
+                                            // multiple entries for same notification!
+                                            pass = false;
+                                        } else if (ALICE.equals(tag)) {
+                                            found.add(ALICE);
+                                            pass &= !payload.getBoolean(JSON_MATCHES_ZEN_FILTER);
                                         } else if (BOB.equals(tag)) {
                                             found.add(BOB);
                                             pass &= !payload.getBoolean(JSON_MATCHES_ZEN_FILTER);
