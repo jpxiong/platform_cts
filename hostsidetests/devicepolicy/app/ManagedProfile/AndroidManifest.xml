@@ -76,6 +76,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+        <activity android:name=".TestActivity" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
