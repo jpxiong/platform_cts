@@ -641,7 +641,8 @@ public class ContextWrapperTest extends AndroidTestCase {
     }
 
     public void testCheckCallingOrSelfPermission() {
-        int retValue = mContextWrapper.checkCallingOrSelfPermission("android.permission.GET_TASKS");
+        int retValue = mContextWrapper.checkCallingOrSelfPermission(
+                "android.permission.SET_WALLPAPER");
         assertEquals(PackageManager.PERMISSION_GRANTED, retValue);
     }
 
@@ -705,7 +706,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
 
         // Test with invalid uid and included granted permission.
-        returnValue = mContextWrapper.checkPermission("android.permission.GET_TASKS", 1, -11);
+        returnValue = mContextWrapper.checkPermission("android.permission.SET_WALLPAPER", 1, -11);
         assertEquals(PackageManager.PERMISSION_DENIED, returnValue);
     }
 
