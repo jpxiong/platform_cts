@@ -21,9 +21,12 @@ import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
+import android.net.ConnectivityManager;
+import android.test.InstrumentationTestCase;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
-public class PhoneStateListenerTest extends AndroidTestCase {
+public class PhoneStateListenerTest extends  AndroidTestCase{
 
     public static final long WAIT_TIME = 1000;
 
@@ -38,21 +41,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
     private TelephonyManager mTelephonyManager;
     private PhoneStateListener mListener;
     private final Object mLock = new Object();
-    private Looper mLooper;
+    private static final String TAG = "android.telephony.cts.PhoneStateListenerTest";
+    private static ConnectivityManager mCm;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        Context context = getContext();
-        mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyManager =
+                (TelephonyManager)getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        mCm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (mLooper != null) {
-            mLooper.quit();
-        }
         if (mListener != null) {
             // unregister the listener
             mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_NONE);
@@ -60,6 +62,12 @@ public class PhoneStateListenerTest extends AndroidTestCase {
     }
 
     public void testPhoneStateListener() {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
+        Looper.prepare();
         new PhoneStateListener();
     }
 
@@ -69,10 +77,15 @@ public class PhoneStateListenerTest extends AndroidTestCase {
      */
 
     public void testOnServiceStateChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
-                mLooper = Looper.myLooper();
+
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onServiceStateChanged(ServiceState serviceState) {
@@ -96,22 +109,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnServiceStateChangedCalled);
     }
 
-    private void quitLooper() {
-        mLooper.quit();
-        mLooper = null;
-    }
-
     public void testOnSignalStrengthChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onSignalStrengthChanged(int asu) {
@@ -135,17 +146,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnSignalStrengthChangedCalled);
     }
 
     public void testOnMessageWaitingIndicatorChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onMessageWaitingIndicatorChanged(boolean mwi) {
@@ -170,17 +184,21 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnMessageWaitingIndicatorChangedCalled);
     }
 
     public void testOnCallForwardingIndicatorChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
+            @Override
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onCallForwardingIndicatorChanged(boolean cfi) {
@@ -205,17 +223,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnCallForwardingIndicatorChangedCalled);
     }
 
     public void testOnCellLocationChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onCellLocationChanged(CellLocation location) {
@@ -239,17 +260,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnCellLocationChangedCalled);
     }
 
     public void testOnCallStateChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onCallStateChanged(int state, String incomingNumber) {
@@ -273,17 +297,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnCallStateChangedCalled);
     }
 
     public void testOnDataConnectionStateChanged() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onDataConnectionStateChanged(int state) {
@@ -308,17 +335,20 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnDataConnectionStateChangedCalled);
     }
 
     public void testOnDataActivity() throws Throwable {
+        if (mCm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) == null) {
+            Log.d(TAG, "Skipping test that requires ConnectivityManager.TYPE_MOBILE");
+            return;
+        }
+
         TestThread t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
 
-                mLooper = Looper.myLooper();
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onDataActivity(int direction) {
@@ -342,7 +372,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
                 mLock.wait();
             }
         }
-        quitLooper();
         t.checkException();
         assertTrue(mOnDataActivityCalled);
     }
