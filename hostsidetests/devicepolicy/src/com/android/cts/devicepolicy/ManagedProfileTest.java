@@ -81,34 +81,34 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         assertFalse(listUsers().contains(mUserId));
     }
 
-// TODO: Reinstate once we find another way of disabling an activity for a user (adb pm disable does
-//   not work at the moment on non-eng builds.
-//    public void testCrossProfileIntentFilters() throws Exception {
-//        if (!mHasFeature) {
-//            return;
-//        }
-//        // Set up activities: ManagedProfileActivity will only be enabled in the managed profile and
-//        // PrimaryUserActivity only in the primary one
-//        disableActivityForUser("ManagedProfileActivity", 0);
-//        disableActivityForUser("PrimaryUserActivity", mUserId);
-//
-//        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-//                MANAGED_PROFILE_PKG + ".ManagedProfileTest", mUserId));
-//
-//        // Set up filters from primary to managed profile
-//        String command = "am start -W --user " + mUserId  + " " + MANAGED_PROFILE_PKG
-//                + "/.PrimaryUserFilterSetterActivity";
-//        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
-//              + getDevice().executeShellCommand(command));
-//        assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, MANAGED_PROFILE_PKG + ".PrimaryUserTest"));
-//        // TODO: Test with startActivity
-//        // TODO: Test with CtsVerifier for disambiguation cases
-//    }
+    public void testCrossProfileIntentFilters() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        // Set up activities: ManagedProfileActivity will only be enabled in the managed profile and
+        // PrimaryUserActivity only in the primary one
+        disableActivityForUser("ManagedProfileActivity", 0);
+        disableActivityForUser("PrimaryUserActivity", mUserId);
+
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
+                MANAGED_PROFILE_PKG + ".ManagedProfileTest", mUserId));
+
+        // Set up filters from primary to managed profile
+        String command = "am start -W --user " + mUserId  + " " + MANAGED_PROFILE_PKG
+                + "/.PrimaryUserFilterSetterActivity";
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+              + getDevice().executeShellCommand(command));
+        assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, MANAGED_PROFILE_PKG + ".PrimaryUserTest"));
+        // TODO: Test with startActivity
+        // TODO: Test with CtsVerifier for disambiguation cases
+    }
 
     private void disableActivityForUser(String activityName, int userId)
             throws DeviceNotAvailableException {
-        String command = "pm disable --user " + userId + " " + MANAGED_PROFILE_PKG + "/."
-                + activityName;
+        String command = "am start -W --user " + userId
+                + " --es extra-package " + MANAGED_PROFILE_PKG
+                + " --es extra-class-name " + MANAGED_PROFILE_PKG + "." + activityName + " "
+                + MANAGED_PROFILE_PKG + "/.ComponentDisablingActivity ";
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
                 + getDevice().executeShellCommand(command));
     }
