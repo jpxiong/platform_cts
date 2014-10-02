@@ -25,4 +25,8 @@ LOCAL_DONT_DELETE_JAR_META_INF := true
 
 LOCAL_JNI_SHARED_LIBRARIES := libjavacoretests
 
+# Include both the 32 and 64 bit versions of libjavacoretests,
+# where applicable.
+LOCAL_MULTILIB := both
+
 include $(BUILD_PACKAGE)
