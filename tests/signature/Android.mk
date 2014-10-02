@@ -20,11 +20,11 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := SignatureTest
+LOCAL_PACKAGE_NAME := CtsSignatureTestCases
 
 LOCAL_SDK_VERSION := current
 
-LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
 # To be passed in on command line
 CTS_API_VERSION ?= current
@@ -84,5 +84,18 @@ signature_res_dir :=
 android_api_description :=
 CTS_API_VERSION :=
 
-# Use the following include to make our test apk.
-include $(call all-makefiles-under,$(LOCAL_PATH))
+# signature-hostside java library (for testing)
+# ============================================================
+
+include $(CLEAR_VARS)
+
+# These files are for device-side only, so filter-out for host library
+LOCAL_DEVICE_ONLY_SOURCES := %/SignatureTest.java
+
+LOCAL_SRC_FILES := $(filter-out $(LOCAL_DEVICE_ONLY_SOURCES), $(call all-java-files-under, src))
+
+LOCAL_MODULE := signature-hostside
+
+LOCAL_MODULE_TAGS := optional
+
+include $(BUILD_HOST_JAVA_LIBRARY)
