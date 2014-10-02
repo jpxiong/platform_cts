@@ -139,7 +139,7 @@ public class StepCounterTestActivity
             vibrate(VIBRATE_PATTERN);
         }
         startMeasurements();
-        appendText(R.string.snsr_test_play_sound);
+        getTestLogger().logWaitForSound();
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(TEST_DURATION_SECONDS));
         mCheckForMotion = false;
