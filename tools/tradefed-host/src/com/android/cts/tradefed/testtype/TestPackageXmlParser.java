@@ -82,7 +82,6 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String packageName = attributes.getValue("name");
                 final String runnerName = attributes.getValue("runner");
                 final String jarPath = attributes.getValue("jarPath");
-                final boolean signatureCheck = parseBoolean(attributes.getValue("signatureCheck"));
                 final String javaPackageFilter = attributes.getValue("javaPackageFilter");
                 final String targetBinaryName = attributes.getValue("targetBinaryName");
                 final String targetNameSpace = attributes.getValue("targetNameSpace");
@@ -98,7 +97,6 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                     packageDef.setRunner(runnerName);
                     packageDef.setTestType(testType);
                     packageDef.setJarPath(jarPath);
-                    packageDef.setIsSignatureCheck(signatureCheck);
                     packageDef.setRunTimeArgs(runTimeArgs);
                     if (!"".equals(javaPackageFilter)) {
                         packageDef.setTestPackageName(javaPackageFilter);

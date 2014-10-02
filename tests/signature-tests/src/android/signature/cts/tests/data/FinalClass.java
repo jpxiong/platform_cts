@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest.tests.data;
+package android.signature.cts.tests.data;
 
 /**
  * This class is used as reference data for the
@@ -23,6 +23,7 @@ package android.tests.sigtest.tests.data;
  * JDiffClassDescription.  That is why there is no implementation for
  * any of these methods.
  */
-public interface NormalInterface {
-    void doSomething();
+public final class FinalClass {
+    public final void finalMethod() { }
+    public void nonFinalMethod() { }
 }

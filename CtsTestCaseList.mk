@@ -44,7 +44,6 @@ cts_support_packages := \
     CtsMonkeyApp2 \
     CtsSomeAccessibilityServices \
     CtsThemeDeviceApp \
-    SignatureTest \
     TestDeviceSetup \
     CtsUiAutomatorApp \
     CtsUsbSerialTestApp \
@@ -114,6 +113,7 @@ cts_test_packages := \
     CtsRsCppTestCases \
     CtsSaxTestCases \
     CtsSecurityTestCases \
+    CtsSignatureTestCases \
     CtsSpeechTestCases \
     CtsTelephonyTestCases \
     CtsTextTestCases \

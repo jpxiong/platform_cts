@@ -13,6 +13,5 @@ fi
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'
 echo '<classpath>'
-cat $ANDROID_BUILD_TOP/cts/development/ide/eclipse/.classpath | grep classpathentry
-cat $ANDROID_BUILD_TOP/development/ide/eclipse/.classpath | grep classpathentry
+cat $ANDROID_BUILD_TOP/cts/development/ide/eclipse/.classpath $ANDROID_BUILD_TOP/development/ide/eclipse/.classpath | grep classpathentry | sort
 echo '</classpath>'
