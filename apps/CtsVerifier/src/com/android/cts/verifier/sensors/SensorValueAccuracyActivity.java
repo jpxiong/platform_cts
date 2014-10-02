@@ -96,7 +96,7 @@ public class SensorValueAccuracyActivity
     }
 
     public String testGyroscopeCalibratedUncalibrated() throws Throwable {
-        appendText(R.string.snsr_keep_device_rotating_clockwise);
+        getTestLogger().logInstructions(R.string.snsr_keep_device_rotating_clockwise);
         return verifyCalibratedUncalibrated(
                 Sensor.TYPE_GYROSCOPE,
                 Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
@@ -113,8 +113,8 @@ public class SensorValueAccuracyActivity
             int instructionsResId,
             float expectedNorm,
             float threshold) {
-        appendText(instructionsResId);
-        waitForUser();
+        getTestLogger().logInstructions(instructionsResId);
+        waitForUserToBegin();
 
         TestSensorEnvironment environment =
                 new TestSensorEnvironment(getApplicationContext(), sensorType, SENSOR_RATE);
@@ -151,8 +151,9 @@ public class SensorValueAccuracyActivity
             int calibratedSensorType,
             int uncalibratedSensorType,
             float threshold) throws Throwable {
-        appendText(R.string.snsr_no_interaction);
-        waitForUser();
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(R.string.snsr_no_interaction);
+        waitForUserToBegin();
 
         Sensor calibratedSensor = mSensorManager.getDefaultSensor(calibratedSensorType);
         if (calibratedSensor == null) {
@@ -167,7 +168,7 @@ public class SensorValueAccuracyActivity
         final long timeout = TimeUnit.SECONDS.toMillis(10);
         startDataCollection(calibratedSensor);
         startDataCollection(uncalibratedSensor);
-        appendText(R.string.snsr_test_play_sound);
+        logger.logWaitForSound();
         Thread.sleep(timeout);
         stopDataCollection();
 

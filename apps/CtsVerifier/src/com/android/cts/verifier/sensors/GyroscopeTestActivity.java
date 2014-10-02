@@ -36,7 +36,10 @@ import android.widget.TextView;
  * Manual test for testing the gyroscope sensor. This test consists of 6 steps for all the
  * different ways to rotate the device along the x, y, and z axis. It also raises a warning
  * if the values seem to high and may be degrees.
+ *
+ * @deprecated It has been replaced by {@link GyroscopeMeasurementTestActivity}
  */
+@Deprecated
 public class GyroscopeTestActivity extends PassFailButtons.Activity {
 
     private static final int NUM_STAGES = 6;
