@@ -84,7 +84,14 @@ public class TestPackageRepo implements ITestPackageRepo {
             Set<TestPackageDef> defs = parser.getTestPackageDefs();
             if (!defs.isEmpty()) {
                 for (TestPackageDef def : defs) {
-                    mTestMap.get(def.getAbi().getName()).put(def.getAppPackageName(), def);
+                    String name = def.getAppPackageName();
+                    String abi = def.getAbi().getName();
+                    if (def.getTests().size() > 0) {
+                        mTestMap.get(abi).put(name, def);
+                    } else {
+                        Log.i(LOG_TAG, String.format("No tests in %s for %s, skipping",
+                                name, abi));
+                    }
                 }
             } else {
                 Log.w(LOG_TAG, String.format("Could not find test package info in xml file %s",
