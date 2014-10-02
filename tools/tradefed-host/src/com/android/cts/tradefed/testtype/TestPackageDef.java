@@ -60,9 +60,6 @@ class TestPackageDef implements ITestPackageDef {
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
     public static final String JUNIT_DEVICE_TEST = "jUnitDeviceTest";
 
-    private static final String SIGNATURE_TEST_METHOD = "testSignature";
-    private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SignatureTest";
-
     private String mAppPackageName = null;
     private String mAppNameSpace = null;
     private String mName = null;
@@ -70,7 +67,6 @@ class TestPackageDef implements ITestPackageDef {
     private String mTestType = null;
     private String mJarPath = null;
     private String mRunTimeArgs = null;
-    private boolean mIsSignatureTest = false;
     private String mTestPackageName = null;
     private String mDigest = null;
     private IAbi mAbi = null;
@@ -174,14 +170,6 @@ class TestPackageDef implements ITestPackageDef {
 
     String getJarPath() {
         return mJarPath;
-    }
-
-    void setIsSignatureCheck(boolean isSignatureCheckTest) {
-        mIsSignatureTest = isSignatureCheckTest;
-    }
-
-    boolean isSignatureCheck() {
-        return mIsSignatureTest;
     }
 
     void setTestPackageName(String testPackageName) {
@@ -288,26 +276,6 @@ class TestPackageDef implements ITestPackageDef {
         } else if (UIAUTOMATOR_TEST.equals(mTestType)) {
             UiAutomatorJarTest uiautomatorTest = new UiAutomatorJarTest();
             return setUiAutomatorTest(uiautomatorTest);
-        } else if (mIsSignatureTest) {
-            // TODO: hardcode the runner/class/method for now, since current package xml points to
-            // specialized instrumentation. Eventually this special case for signatureTest can be
-            // removed, and it can be treated just like a normal InstrumentationTest
-            CLog.d("Creating signature test %s", mName);
-            CtsInstrumentationApkTest instrTest = new CtsInstrumentationApkTest();
-            instrTest.setPackageName(mAppNameSpace);
-            instrTest.setRunnerName("android.test.InstrumentationTestRunner");
-            instrTest.setClassName(SIGNATURE_TEST_CLASS);
-            instrTest.setMethodName(SIGNATURE_TEST_METHOD);
-            instrTest.setAbi(mAbi);
-            mTests.clear();
-            // set expected tests to the single signature test
-            TestIdentifier t = new TestIdentifier(
-                    SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD);
-            mTests.add(t);
-            // mName means 'apk file name' for instrumentation tests
-            instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
-            mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
-            return instrTest;
         } else if (JUNIT_DEVICE_TEST.equals(mTestType)){
             CLog.d("Creating JUnit device test %s", mName);
             JUnitDeviceTest jUnitDeviceTest = new JUnitDeviceTest();

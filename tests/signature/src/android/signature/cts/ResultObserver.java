@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008 The Android Open Source Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest.tests;
-
-import android.test.TestSuiteProvider;
-import android.test.suitebuilder.TestSuiteBuilder;
-
-import junit.framework.TestSuite;
+package android.signature.cts;
 
 /**
- * Finds all instrumentation and unit tests for this application.
+ * Interface for saving signature test result.
  */
-public class AllTests implements TestSuiteProvider {
-    public TestSuite getTestSuite() {
-        return new TestSuiteBuilder(getClass()).includeAllPackagesUnderHere().build();
-    }
+public interface ResultObserver {
+    /**
+     * Notify failure.
+     * @param type Failure type.
+     * @param name Name of the failed element (interface/class/method/field)
+     * @param errorMessage a descriptive message indicating why it failed.
+     */
+    void notifyFailure(FailureType type, String name, String errorMessage);
+
 }

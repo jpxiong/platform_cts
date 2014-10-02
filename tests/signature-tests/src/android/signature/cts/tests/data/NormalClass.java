@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.tests.sigtest.tests.data;
+package android.signature.cts.tests.data;
 
 /**
  * This class is used as reference data for the

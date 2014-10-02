@@ -78,9 +78,6 @@ class CtsBuilder(object):
     """Generate test descriptions for all packages."""
     pool = Pool(processes=2)
 
-    # individually generate descriptions not following conventions
-    pool.apply_async(GenerateSignatureCheckDescription, [self.test_repository])
-
     # generate test descriptions for android tests
     results = []
     pool.close()
@@ -118,7 +115,7 @@ class CtsBuilder(object):
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'SDK')
 
-    plan.Exclude(r'android\.tests\.sigtest')
+    plan.Exclude(r'android\.signature')
     plan.Exclude(r'android\.core.*')
     self.__WritePlan(plan, 'Android')
 
@@ -135,10 +132,6 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.core\.vm-tests-tf')
     self.__WritePlan(plan, 'VM-TF')
-
-    plan = tools.TestPlan(packages)
-    plan.Include(r'android\.tests\.sigtest')
-    self.__WritePlan(plan, 'Signature')
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.tests\.appsecurity')
@@ -328,6 +321,7 @@ def BuildAospSmallSizeTestList():
       'android.rscpp' : [],
       'android.rsg' : [],
       'android.sax' : [],
+      'android.signature' : [],
       'android.speech' : [],
       'android.tests.appsecurity' : [],
       'android.text' : [],
@@ -370,7 +364,7 @@ def BuildCtsVettedNewPackagesList():
       'android.location2' : [],
       'android.print' : [],
       'android.renderscriptlegacy' : [],
-      'android.tests.sigtest' : [],
+      'android.signature' : [],
       'android.tv' : [],
       'android.uiautomation' : [],
       'android.uirendering' : [],
@@ -433,18 +427,6 @@ def BuildCtsFlakyTestList():
 
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name
-
-def GenerateSignatureCheckDescription(test_repository):
-  """Generate the test description for the signature check."""
-  LogGenerateDescription('android.tests.sigtest')
-  package = tools.TestPackage('SignatureTest', 'android.tests.sigtest')
-  package.AddAttribute('appNameSpace', 'android.tests.sigtest')
-  package.AddAttribute('signatureCheck', 'true')
-  package.AddAttribute('runner', '.InstrumentationRunner')
-  package.AddTest('android.tests.sigtest.SignatureTest.testSignature')
-  description = open(os.path.join(test_repository, 'SignatureTest.xml'), 'w')
-  package.WriteDescription(description)
-  description.close()
 
 if __name__ == '__main__':
   builder = CtsBuilder(sys.argv)
