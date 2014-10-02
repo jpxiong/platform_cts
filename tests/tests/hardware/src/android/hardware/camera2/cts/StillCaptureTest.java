@@ -65,8 +65,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     // 60 second to accommodate the possible long exposure time.
     private static final int EXIF_DATETIME_ERROR_MARGIN_SEC = 60;
     private static final float EXIF_FOCAL_LENGTH_ERROR_MARGIN = 0.001f;
-    // TODO: exposure time error margin need to be scaled with exposure time.
-    private static final float EXIF_EXPOSURE_TIME_ERROR_MARGIN_SEC = 0.002f;
+    private static final float EXIF_EXPOSURE_TIME_ERROR_MARGIN_RATIO = 0.05f;
+    private static final float EXIF_EXPOSURE_TIME_MIN_ERROR_MARGIN_SEC = 0.002f;
     private static final float EXIF_APERTURE_ERROR_MARGIN = 0.001f;
     private static final Location sTestLocation0 = new Location(LocationManager.GPS_PROVIDER);
     private static final Location sTestLocation1 = new Location(LocationManager.GPS_PROVIDER);
@@ -1121,8 +1121,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 double exposureTimeValue = Double.parseDouble(exposureTime);
                 long expTimeResult = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
                 double expected = expTimeResult / 1e9;
+                double tolerance = expected * EXIF_EXPOSURE_TIME_ERROR_MARGIN_RATIO;
+                tolerance = Math.max(tolerance, EXIF_EXPOSURE_TIME_MIN_ERROR_MARGIN_SEC);
                 mCollector.expectEquals("Exif exposure time doesn't match", expected,
-                        exposureTimeValue, EXIF_EXPOSURE_TIME_ERROR_MARGIN_SEC);
+                        exposureTimeValue, tolerance);
             }
         }
 
