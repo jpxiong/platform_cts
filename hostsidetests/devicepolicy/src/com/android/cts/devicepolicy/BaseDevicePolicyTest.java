@@ -39,25 +39,20 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Set of tests for Profile Owner use cases.
+ * Base class for device policy tests. It offers utility methods to run tests, set device or profile
+ * owner, etc.
  */
-public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
+public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiver {
 
     private static final String RUNNER = "android.test.InstrumentationTestRunner";
-
-    private static final String PROFILE_OWNER_PKG = "com.android.cts.profileowner";
-    private static final String PROFILE_OWNER_APK = "CtsProfileOwnerApp.apk";
-
-    private static final String ADMIN_RECEIVER_TEST_CLASS =
-            PROFILE_OWNER_PKG + ".BaseProfileOwnerTest$BasicAdminReceiver";
 
     private static final String[] REQUIRED_DEVICE_FEATURES = new String[] {
         "android.software.managed_users",
         "android.software.device_admin" };
 
     private CtsBuildHelper mCtsBuild;
-    private int mUserId;
-    private boolean mHasFeature;
+
+    protected boolean mHasFeature;
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -68,144 +63,38 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
     protected void setUp() throws Exception {
         super.setUp();
         assertNotNull(mCtsBuild);  // ensure build has been set before test is run.
-        mHasFeature = hasDeviceFeatures(REQUIRED_DEVICE_FEATURES);
-
-        if (mHasFeature) {
-            mUserId = createUser();
-            installApp(PROFILE_OWNER_APK);
-            setProfileOwner(PROFILE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
-            startManagedProfile();
-        }
+        mHasFeature = getDevice().getApiLevel() >= 21 /* Build.VERSION_CODES.L */
+                && hasDeviceFeatures(REQUIRED_DEVICE_FEATURES);
     }
 
-    /**
-     * Initializes the user that underlies the managed profile.
-     * This is required so that apps can run on it.
-     */
-    private void startManagedProfile() throws Exception  {
-        String command = "am start-user " + mUserId;
-        String commandOutput = getDevice().executeShellCommand(command);
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput.startsWith("Success:"));
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        if (mHasFeature) {
-            // Remove the user that we created on setUp(), and the app that we installed.
-            String removeUserCommand = "pm remove-user " + mUserId;
-            CLog.logAndDisplay(LogLevel.INFO, "Output for command " + removeUserCommand + ": "
-                    + getDevice().executeShellCommand(removeUserCommand));
-            getDevice().uninstallPackage(PROFILE_OWNER_PKG);
-        }
-
-        super.tearDown();
-    }
-
-    /**
-     *  wipData() test removes the managed profile, so it needs to separated from other tests.
-     */
-    public void testWipeData() throws Exception {
-        if (!mHasFeature) {
-            return;
-        }
-        assertTrue(listUsers().contains(mUserId));
-        assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, PROFILE_OWNER_PKG + ".WipeDataTest", mUserId));
-        // Note: the managed profile is removed by this test, which will make removeUserCommand in
-        // tearDown() to complain, but that should be OK since its result is not asserted.
-        assertFalse(listUsers().contains(mUserId));
-    }
-
-    public void testProfileOwner() throws Exception {
-        if (!mHasFeature) {
-            return;
-        }
-        String[] testClassNames = {
-                "ProfileOwnerSetupTest",
-        };
-        for (String className : testClassNames) {
-            String testClass = PROFILE_OWNER_PKG + "." + className;
-            assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG, testClass, mUserId));
-        }
-    }
-
-    public void testCrossProfileIntentFilters() throws Exception {
-        if (!mHasFeature) {
-            return;
-        }
-        // Set up activities: ManagedProfileActivity will only be enabled in the managed profile and
-        // PrimaryUserActivity only in the primary one
-        disableActivityForUser("ManagedProfileActivity", 0);
-        disableActivityForUser("PrimaryUserActivity", mUserId);
-
-        assertTrue(runDeviceTestsAsUser(PROFILE_OWNER_PKG,
-                PROFILE_OWNER_PKG + ".ManagedProfileTest", mUserId));
-
-        // Set up filters from primary to managed profile
-        String command = "am start -W --user " + mUserId  + " " + PROFILE_OWNER_PKG
-                + "/.PrimaryUserFilterSetterActivity";
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
-              + getDevice().executeShellCommand(command));
-        assertTrue(runDeviceTests(PROFILE_OWNER_PKG, PROFILE_OWNER_PKG + ".PrimaryUserTest"));
-        // TODO: Test with startActivity
-        // TODO: Test with CtsVerifier for disambiguation cases
-    }
-
-    private void disableActivityForUser(String activityName, int userId)
-            throws DeviceNotAvailableException {
-        String command = "pm disable --user " + userId + " " + PROFILE_OWNER_PKG + "/."
-                + activityName;
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
-                + getDevice().executeShellCommand(command));
-    }
-
-    private boolean hasDeviceFeatures(String[] requiredFeatures)
-            throws DeviceNotAvailableException {
-        // TODO: Move this logic to ITestDevice.
-        String command = "pm list features";
-        String commandOutput = getDevice().executeShellCommand(command);
-
-        // Extract the id of the new user.
-        HashSet<String> availableFeatures = new HashSet<String>();
-        for (String feature: commandOutput.split("\\s+")) {
-            // Each line in the output of the command has the format "feature:{FEATURE_VALUE}".
-            String[] tokens = feature.split(":");
-            assertTrue(tokens.length > 1);
-            assertEquals("feature", tokens[0]);
-            availableFeatures.add(tokens[1]);
-        }
-
-        for (String requiredFeature : requiredFeatures) {
-            if(!availableFeatures.contains(requiredFeature)) {
-                CLog.logAndDisplay(LogLevel.INFO, "Device doesn't have required feature "
-                        + requiredFeature + ". Tests won't run.");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void installApp(String fileName)
+    protected void installApp(String fileName)
             throws FileNotFoundException, DeviceNotAvailableException {
         String installResult = getDevice().installPackage(mCtsBuild.getTestApp(fileName), true);
         assertNull(String.format("Failed to install %s, Reason: %s", fileName, installResult),
                 installResult);
     }
 
-    private int createUser() throws DeviceNotAvailableException {
-        String command =
-                "pm create-user --profileOf 0 --managed TestProfile_" + System.currentTimeMillis();
+    /** Initializes the user with the given id. This is required so that apps can run on it. */
+    protected void startUser(int userId) throws DeviceNotAvailableException {
+        String command = "am start-user " + userId;
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-
-        // Extract the id of the new user.
-        String[] tokens = commandOutput.split("\\s+");
-        assertTrue(tokens.length > 0);
-        assertEquals("Success:", tokens[0]);
-        return Integer.parseInt(tokens[tokens.length-1]);
+        assertTrue(commandOutput.startsWith("Success:"));
     }
 
-    private ArrayList<Integer> listUsers() throws DeviceNotAvailableException {
+    protected int getMaxNumberOfUsersSupported() throws DeviceNotAvailableException {
+        // TODO: move this to ITestDevice once it supports users
+        String command = "pm get-max-users";
+        String commandOutput = getDevice().executeShellCommand(command);
+        try {
+            return Integer.parseInt(commandOutput.substring(commandOutput.lastIndexOf(" ")).trim());
+        } catch (NumberFormatException e) {
+            fail("Failed to parse result: " + commandOutput);
+        }
+        return 0;
+    }
+
+    protected ArrayList<Integer> listUsers() throws DeviceNotAvailableException {
         String command = "pm list users";
         String commandOutput = getDevice().executeShellCommand(command);
 
@@ -225,21 +114,21 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
         return users;
     }
 
-    private void setProfileOwner(String componentName) throws DeviceNotAvailableException {
-        String command = "dpm set-profile-owner '" + componentName + "' " + mUserId;
-        String commandOutput = getDevice().executeShellCommand(command);
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput.startsWith("Success:"));
+    protected void removeUser(int userId) throws DeviceNotAvailableException  {
+        String removeUserCommand = "pm remove-user " + userId;
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + removeUserCommand + ": "
+                + getDevice().executeShellCommand(removeUserCommand));
     }
 
     /** Returns true if the specified tests passed. Tests are run as user owner. */
-    private boolean runDeviceTests(String pkgName, @Nullable String testClassName)
+    protected boolean runDeviceTests(String pkgName, @Nullable String testClassName)
             throws DeviceNotAvailableException {
         return runDeviceTests(pkgName, testClassName, null /*testMethodName*/, null /*userId*/);
     }
 
     /** Returns true if the specified tests passed. Tests are run as given user. */
-    private boolean runDeviceTestsAsUser(String pkgName, @Nullable String testClassName, int userId)
+    protected boolean runDeviceTestsAsUser(
+            String pkgName, @Nullable String testClassName, int userId)
             throws DeviceNotAvailableException {
         return runDeviceTests(pkgName, testClassName, null /*testMethodName*/, userId);
     }
@@ -256,8 +145,8 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
 
     /** Helper method to run tests and return the listener that collected the results. */
     private TestRunResult doRunTests(
-            String pkgName, @Nullable String testClassName, @Nullable String testMethodName)
-            throws DeviceNotAvailableException {
+            String pkgName, String testClassName,
+            String testMethodName) throws DeviceNotAvailableException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(
                 pkgName, RUNNER, getDevice().getIDevice());
         if (testClassName != null && testMethodName != null) {
@@ -304,5 +193,31 @@ public class ProfileOwnerTest extends DeviceTestCase implements IBuildReceiver {
                 CLog.logAndDisplay(LogLevel.WARN, testResult.getStackTrace());
             }
         }
+    }
+
+    private boolean hasDeviceFeatures(String[] requiredFeatures)
+            throws DeviceNotAvailableException {
+        // TODO: Move this logic to ITestDevice.
+        String command = "pm list features";
+        String commandOutput = getDevice().executeShellCommand(command);
+
+        // Extract the id of the new user.
+        HashSet<String> availableFeatures = new HashSet<String>();
+        for (String feature: commandOutput.split("\\s+")) {
+            // Each line in the output of the command has the format "feature:{FEATURE_VALUE}".
+            String[] tokens = feature.split(":");
+            assertTrue(tokens.length > 1);
+            assertEquals("feature", tokens[0]);
+            availableFeatures.add(tokens[1]);
+        }
+
+        for (String requiredFeature : requiredFeatures) {
+            if(!availableFeatures.contains(requiredFeature)) {
+                CLog.logAndDisplay(LogLevel.INFO, "Device doesn't have required feature "
+                        + requiredFeature + ". Tests won't run.");
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -34,13 +34,14 @@ cts_support_packages := \
     CtsAppTestStubs \
     CtsDeviceAdmin \
     CtsDeviceOpenGl \
+    CtsDeviceOwnerApp \
     CtsDeviceTaskswitchingAppA \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
+    CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
-    CtsProfileOwnerApp \
     CtsSomeAccessibilityServices \
     CtsThemeDeviceApp \
     SignatureTest \

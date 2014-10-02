@@ -1,4 +1,4 @@
-package com.android.cts.profileowner;
+package com.android.cts.managedprofile;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import static com.android.cts.profileowner.BaseProfileOwnerTest.ADMIN_RECEIVER_COMPONENT;
+import static com.android.cts.managedprofile.BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT;
 
 /**
  * Class that sets the cross-profile intent filters required to test intent filtering from

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.profileowner;
+package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -22,7 +22,7 @@ import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
 
-import com.android.cts.profileowner.BaseProfileOwnerTest.BasicAdminReceiver;
+import com.android.cts.managedprofile.BaseManagedProfileTest.BasicAdminReceiver;
 
 import org.junit.Ignore;
 
@@ -30,7 +30,7 @@ import org.junit.Ignore;
  * Test wipeData() for use in managed profile. If called from a managed profile, wipeData() should
  * remove the current managed profile. Also, no erasing of external storage should be allowed.
  */
-public class WipeDataTest extends BaseProfileOwnerTest {
+public class WipeDataTest extends BaseManagedProfileTest {
 
     private UserManager mUserManager;
 
