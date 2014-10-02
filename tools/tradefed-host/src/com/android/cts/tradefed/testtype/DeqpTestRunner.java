@@ -34,6 +34,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
     private static final String DEQP_ONDEVICE_APK = "com.drawelements.deqp.apk";
     private static final String DEQP_ONDEVICE_PKG = "com.drawelements.deqp";
+    private static final String INCOMPLETE_LOG_MESSAGE = "Crash: Incomplete test log";
 
     private final int TESTCASE_BATCH_LIMIT = 1000;
 
@@ -218,7 +219,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
         if (!mGotTestResult) {
             mListener.testFailed(mCurrentTestId,
-                    "Log doesn't contain test result");
+                    INCOMPLETE_LOG_MESSAGE);
         }
 
         if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
@@ -254,11 +255,11 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                 || code.compareTo("InternalError") == 0 || code.compareTo("Crash") == 0
                 || code.compareTo("Timeout") == 0) {
             mListener.testFailed(mCurrentTestId,
-                    code + ":" + details);
+                    code + ": " + details);
             mGotTestResult = true;
         } else {
             mListener.testFailed(mCurrentTestId,
-                    "Unknown result code: " + code + ":" + details);
+                    "Unknown result code: " + code + ": " + details);
             mGotTestResult = true;
         }
     }
@@ -492,7 +493,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                     }
                     if (!mGotTestResult) {
                         mListener.testFailed(mCurrentTestId,
-                            "Log doesn't contain test result");
+                            INCOMPLETE_LOG_MESSAGE);
                     }
 
                     mListener.testEnded(mCurrentTestId, emptyMap);
