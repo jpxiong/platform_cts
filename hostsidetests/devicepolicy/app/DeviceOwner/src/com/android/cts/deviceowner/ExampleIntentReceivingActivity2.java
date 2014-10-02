@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.profileowner;
+
+package com.android.cts.deviceowner;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-/**
- * Activity that lives in the managed profile.
- */
-public class ManagedProfileActivity extends Activity {
-    private static final String TAG = ManagedProfileActivity.class.getName();
-
-    public static final String ACTION =
-            "com.android.cts.profileowner.ACTION_TEST_MANAGED_ACTIVITY";
+public class ExampleIntentReceivingActivity2 extends Activity {
+    public static final String CONFIRM_ACTION = "com.android.cts.deviceowner.CONFIRM_2";
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "Roger that!");
+        if (getIntent().getAction().equals(PersistentIntentResolvingTest.EXAMPLE_ACTION)) {
+            sendBroadcast(new Intent(CONFIRM_ACTION));
+        }
+        finish();
     }
 }
