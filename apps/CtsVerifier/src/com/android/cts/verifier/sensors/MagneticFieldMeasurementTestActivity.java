@@ -19,11 +19,12 @@ package com.android.cts.verifier.sensors;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorCalibratedUncalibratedVerifier;
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
@@ -38,6 +39,8 @@ import android.hardware.cts.helpers.sensorverification.StandardDeviationVerifica
  * disturbances.
  */
 public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestActivity {
+    private static final float THRESHOLD_CALIBRATED_UNCALIBRATED_UT = 3f;
+
     public MagneticFieldMeasurementTestActivity() {
         super(MagneticFieldMeasurementTestActivity.class);
     }
@@ -45,50 +48,6 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
     @Override
     public void activitySetUp() {
         calibrateMagnetometer();
-    }
-
-    public String testNorm() throws Throwable {
-        appendText(R.string.snsr_mag_verify_norm);
-        return verifyNorm();
-    }
-
-    public String testStandardDeviation() throws Throwable {
-        appendText(R.string.snsr_mag_verify_std_dev);
-        return verifyStandardDeviation();
-    }
-
-    private void calibrateMagnetometer() {
-        SensorEventListener2 listener = new SensorEventListener2() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                float values[] = event.values;
-                clearText();
-                appendText(R.string.snsr_mag_calibration_description);
-                appendText(String.format("->  (%.2f, %.2f, %.2f) uT", values[0], values[1],
-                        values[2]), Color.GRAY);
-
-                // TODO: automate finding out when the magnetometer is calibrated
-                appendText(R.string.snsr_mag_calibration_complete);
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
-            @Override
-            public void onFlushCompleted(Sensor sensor) {}
-        };
-
-        TestSensorEnvironment environment = new TestSensorEnvironment(
-                getApplicationContext(),
-                Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_NORMAL);
-        TestSensorManager magnetometer = new TestSensorManager(environment);
-        try {
-            magnetometer.registerListener(new TestSensorEventListener(listener));
-            waitForUser();
-        } finally {
-            magnetometer.unregisterListener();
-        }
     }
 
     /**
@@ -111,7 +70,10 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
      * - the values representing the expectation of the test
      * - the values sampled from the sensor
      */
-    private String verifyNorm() throws Throwable {
+    @SuppressWarnings("unused")
+    public String testNorm() throws Throwable {
+        getTestLogger().logMessage(R.string.snsr_mag_verify_norm);
+
         TestSensorEnvironment environment = new TestSensorEnvironment(
                 getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
@@ -153,16 +115,93 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
      * Additionally, the device's debug output (adb logcat) dumps the set of values associated with
      * the failure to help track down the issue.
      */
-    private String verifyStandardDeviation() throws Throwable {
+    @SuppressWarnings("unused")
+    public String testStandardDeviation() throws Throwable {
+        getTestLogger().logMessage(R.string.snsr_mag_verify_std_dev);
+
         TestSensorEnvironment environment = new TestSensorEnvironment(
                 getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST);
         TestSensorOperation verifyStdDev =
                 new TestSensorOperation(environment, 100 /* event count */);
+
         verifyStdDev.addVerification(new StandardDeviationVerification(
                 new float[]{2f, 2f, 2f} /* uT */));
         verifyStdDev.execute();
         return null;
+    }
+
+    /**
+     * Verifies that the relationship between readings from calibrated and their corresponding
+     * uncalibrated sensors comply to the following equation:
+     *      calibrated = uncalibrated - bias
+     */
+    @SuppressWarnings("unused")
+    public String testCalibratedAndUncalibrated() throws Throwable {
+        getTestLogger().logMessage(R.string.snsr_mag_verify_calibrated_uncalibrated);
+
+        TestSensorEnvironment calibratedEnvironment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorEnvironment uncalibratedEnvironment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        SensorCalibratedUncalibratedVerifier verifier = new SensorCalibratedUncalibratedVerifier(
+                calibratedEnvironment,
+                uncalibratedEnvironment,
+                THRESHOLD_CALIBRATED_UNCALIBRATED_UT);
+
+        try {
+            verifier.execute();
+        } finally {
+            playSound();
+        }
+        return null;
+    }
+
+    /**
+     * A routine to help operators calibrate the magnetometer.
+     */
+    private void calibrateMagnetometer() {
+        SensorEventListener2 listener = new SensorEventListener2() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                clearText();
+
+                float values[] = event.values;
+                SensorTestLogger logger = getTestLogger();
+                logger.logInstructions(R.string.snsr_mag_calibration_description);
+                logger.logMessage(
+                        R.string.snsr_mag_measurement,
+                        values[0],
+                        values[1],
+                        values[2],
+                        SensorCtsHelper.getMagnitude(values));
+
+                // TODO: automate finding out when the magnetometer is calibrated
+                logger.logInstructions(R.string.snsr_mag_calibration_complete);
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+            @Override
+            public void onFlushCompleted(Sensor sensor) {}
+        };
+
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        TestSensorManager magnetometer = new TestSensorManager(environment);
+        try {
+            magnetometer.registerListener(new TestSensorEventListener(listener));
+            waitForUserToContinue();
+        } finally {
+            magnetometer.unregisterListener();
+        }
     }
 }

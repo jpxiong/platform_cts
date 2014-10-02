@@ -137,7 +137,6 @@ public class SensorOperationTest extends TestCase {
         } catch (AssertionError e) {
             // Expected
             System.out.println(e.getMessage());
-            // TODO: Verify that the exception rethrown was at t=5ms.
         }
 
         statsKeys = op.getStats().flatten().keySet();
@@ -178,7 +177,6 @@ public class SensorOperationTest extends TestCase {
         } catch (AssertionError e) {
             // Expected
             System.out.println(e.getMessage());
-            // TODO: Verify that the exception rethrown was at t=5ms.
         }
 
         statsKeys = op.getStats().flatten().keySet();

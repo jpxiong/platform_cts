@@ -57,8 +57,7 @@ public class SensorFeaturesDeactivator {
         mKeepScreenOnMode.requestToSetMode(mStateContainer, false);
         mLocationMode.requestToSetMode(mStateContainer, false);
 
-        // TODO: try to use adb shell dumpsys sensorservice to find out if there are clients still
-        // registered at this time
+        // TODO: find a way to find out if there are clients still registered at this time
         mStateContainer.getTestLogger()
                 .logInstructions(R.string.snsr_sensor_feature_deactivation);
         mStateContainer.waitForUserToContinue();

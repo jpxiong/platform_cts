@@ -18,9 +18,7 @@ package android.hardware.cts;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorFlushOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
@@ -267,12 +265,7 @@ public class SensorBatchingTests extends SensorTestCase {
         TestSensorOperation operation =
                 new TestSensorOperation(environment, testDurationSec, TimeUnit.SECONDS);
 
-        executeTest(
-                operation,
-                sensorType,
-                rateUs,
-                maxBatchReportLatencyUs,
-                false /* flushExpected */);
+        executeTest(environment, operation, false /* flushExpected */);
     }
 
     private void runFlushSensorTest(int sensorType, int rateUs, int maxBatchReportLatencySec)
@@ -289,19 +282,12 @@ public class SensorBatchingTests extends SensorTestCase {
         TestSensorFlushOperation operation =
                 new TestSensorFlushOperation(environment, flushDurationSec, TimeUnit.SECONDS);
 
-        executeTest(
-                operation,
-                sensorType,
-                rateUs,
-                maxBatchReportLatencyUs,
-                true /* flushExpected */);
+        executeTest(environment, operation, true /* flushExpected */);
     }
 
     private void executeTest(
+            TestSensorEnvironment environment,
             VerifiableSensorOperation operation,
-            int sensorType,
-            int rateUs,
-            int maxBatchReportLatencyUs,
             boolean flushExpected) throws Throwable {
         operation.addDefaultVerifications();
         operation.setLogEvents(true);
@@ -311,18 +297,20 @@ public class SensorBatchingTests extends SensorTestCase {
         } finally {
             SensorStats.logStats(TAG, operation.getStats());
 
-            String sensorName = SensorTestInformation.getSanitizedSensorName(sensorType);
             String sensorRate;
-            if (rateUs == SensorManager.SENSOR_DELAY_FASTEST) {
+            if (environment.getRequestedSamplingPeriodUs() == SensorManager.SENSOR_DELAY_FASTEST) {
                 sensorRate = "fastest";
             } else {
-                sensorRate = String.format("%.0fhz",
-                        SensorCtsHelper.getFrequency(rateUs, TimeUnit.MICROSECONDS));
+                sensorRate = String.format("%.0fhz", environment.getFrequencyHz());
             }
-            String batching = maxBatchReportLatencyUs > 0 ? "_batching" : "";
+            String batching = environment.getMaxReportLatencyUs() > 0 ? "_batching" : "";
             String flush = flushExpected ? "_flush" : "";
-            String fileName = String.format("sensor_batching_%s_%s%s%s.txt",
-                    sensorName, sensorRate, batching, flush);
+            String fileName = String.format(
+                    "batching_%s_%s%s%s.txt",
+                    SensorStats.getSanitizedSensorName(environment.getSensor()),
+                    sensorRate,
+                    batching,
+                    flush);
             SensorStats.logStatsToFile(fileName, operation.getStats());
         }
     }

@@ -20,7 +20,6 @@ import junit.framework.Assert;
 
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
@@ -96,9 +95,7 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
      */
     @Override
     public void execute() {
-        getStats().addValue(
-                "sensor_name",
-                SensorTestInformation.getSensorName(mEnvironment.getSensor()));
+        getStats().addValue("sensor_name", mEnvironment.getSensor().getName());
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
         listener.setLogEvents(mLogEvents);

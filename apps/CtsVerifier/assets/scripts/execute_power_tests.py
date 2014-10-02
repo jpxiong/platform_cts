@@ -369,10 +369,8 @@ class PowerTest:
                         f.write( "%.4f\n"%m)
                     self.setUsbEnabled(True, verbose = False)
                     print("Saving raw data files to device...")
-                    self.executeLocal("adb shell mkdir -p %s/ctsVerifierData/sensor_power_test_data"
-                                      % self._external_storage, False)
-                    self.executeLocal("adb push %s %s/ctsVerifierData/sensor_power_test_data/." %
-                                      (f.name, self._external_storage))
+                    self.executeLocal("adb shell mkdir -p %s" % self._external_storage, False)
+                    self.executeLocal("adb push %s %s/." % (f.name, self._external_storage))
                     self.setUsbEnabled(False, verbose = False)
             self.reportErrorIf(not measurements, "No measurements could be taken for %s" % sensor)
             avg = sum(measurements) / len(measurements)
