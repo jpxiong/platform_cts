@@ -28,6 +28,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String MANAGED_PROFILE_PKG = "com.android.cts.managedprofile";
     private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
 
+    private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
+    private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
+
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
@@ -101,6 +104,24 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, MANAGED_PROFILE_PKG + ".PrimaryUserTest"));
         // TODO: Test with startActivity
         // TODO: Test with CtsVerifier for disambiguation cases
+    }
+
+    public void testCrossProfileContent() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        try {
+            installApp(INTENT_RECEIVER_APK);
+
+            String command = "pm uninstall --user " + mUserId + " " + INTENT_RECEIVER_PKG;
+            CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+                    + getDevice().executeShellCommand(command));
+
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
+                    MANAGED_PROFILE_PKG + ".crossprofilecontent.CrossProfileContentTest", mUserId));
+        } finally {
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+        }
     }
 
     private void disableActivityForUser(String activityName, int userId)

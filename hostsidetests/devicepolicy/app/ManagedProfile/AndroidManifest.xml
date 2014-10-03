@@ -62,6 +62,20 @@
                 <action android:name="com.android.cts.managedprofile.ACTION_TEST_ALL_ACTIVITY" />
             </intent-filter>
         </activity>
+        <activity android:name=".crossprofilecontent.IntentSenderActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.android.cts.managedprofile.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
