@@ -194,6 +194,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_LMP_FEATURES = {
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG, false),
+            new Feature("android.hardware.ethernet", false),
+            new Feature("android.software.backup", false),
+            new Feature("android.software.print", false),
     };
 
     @Override
