@@ -339,8 +339,7 @@
                             <TD class="rowtitle">Host Info</TD>
                             <TD>
                                 <xsl:value-of select="TestResult/HostInfo/@name"/>
-                                (<xsl:value-of select="TestResult/HostInfo/Os/@name"/> - 
-                                  <xsl:value-of select="TestResult/HostInfo/Os/@version"/>)
+                                (<xsl:value-of select="TestResult/HostInfo/Os/@name"/> - <xsl:value-of select="TestResult/HostInfo/Os/@version"/>)
                             </TD>
                         </TR>
                         <TR>
@@ -467,7 +466,9 @@
                             <TD class="package" colspan="3">
                                 <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
                                 <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/>
-                                abi: <xsl:value-of select="@abi"/>
+                                <xsl:if test="@abi">
+                                  ABI: <xsl:value-of select="@abi"/>
+                                </xsl:if>
                                 </a>
                             </TD>
                         </TR>
@@ -512,7 +513,7 @@
                                                 <xsl:if test="@result='pass'">
                                                     <TD class="pass">
                                                         <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                            known problem
+                                                            Known problem
                                                         </div>
                                                     </TD>
                                                     <TD class="failuredetails"></TD>
@@ -585,7 +586,7 @@
         </DIV>
     </xsl:template>
 
-    <!-- Take a delimited string and insert line breaks after a some number of elements. --> 
+    <!-- Take a delimited string and insert line breaks after a some number of elements. -->
     <xsl:template name="formatDelimitedString">
         <xsl:param name="string" />
         <xsl:param name="numTokensPerRow" select="10" />
@@ -595,7 +596,7 @@
             <xsl:variable name="token" select="substring-before($string, ';')" />
             <xsl:value-of select="$token" />
             <xsl:text>&#160;</xsl:text>
-          
+
             <xsl:if test="$tokenIndex mod $numTokensPerRow = 0">
                 <br />
             </xsl:if>
