@@ -32,6 +32,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -88,8 +89,8 @@ implements OnClickListener, SurfaceHolder.Callback {
         Camera.ACTION_NEW_VIDEO
     };
 
-    private Button mPassButton;
-    private Button mFailButton;
+    private ImageButton mPassButton;
+    private ImageButton mFailButton;
     private Button mStartTestButton;
 
     private int mState = STATE_OFF;
@@ -212,8 +213,8 @@ implements OnClickListener, SurfaceHolder.Callback {
         setPassFailButtonClickListeners();
         setInfoResources(R.string.camera_intents, R.string.ci_info, -1);
 
-        mPassButton         = (Button) findViewById(R.id.pass_button);
-        mFailButton         = (Button) findViewById(R.id.fail_button);
+        mPassButton         = (ImageButton) findViewById(R.id.pass_button);
+        mFailButton         = (ImageButton) findViewById(R.id.fail_button);
         mStartTestButton  = (Button) findViewById(R.id.start_test_button);
         mStartTestButton.setOnClickListener(this);
 

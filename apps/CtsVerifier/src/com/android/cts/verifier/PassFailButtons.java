@@ -31,7 +31,7 @@ import android.os.PowerManager.WakeLock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 /**
  * {@link Activity}s to handle clicks to the pass and fail buttons of the pass fail buttons layout.
@@ -77,7 +77,7 @@ public class PassFailButtons {
          */
         void setInfoResources(int titleId, int messageId, int viewId);
 
-        Button getPassButton();
+        View getPassButton();
 
         /**
          * Returns a unique identifier for the test.  Usually, this is just the class name.
@@ -127,7 +127,7 @@ public class PassFailButtons {
         }
 
         @Override
-        public Button getPassButton() {
+        public View getPassButton() {
             return getPassButtonView(this);
         }
 
@@ -166,7 +166,7 @@ public class PassFailButtons {
         }
 
         @Override
-        public Button getPassButton() {
+        public View getPassButton() {
             return getPassButtonView(this);
         }
 
@@ -206,7 +206,7 @@ public class PassFailButtons {
         }
 
         @Override
-        public Button getPassButton() {
+        public View getPassButton() {
             return getPassButtonView(this);
         }
 
@@ -368,7 +368,7 @@ public class PassFailButtons {
         activity.finish();
     }
 
-    private static Button getPassButtonView(android.app.Activity activity) {
-        return (Button) activity.findViewById(R.id.pass_button);
+    private static ImageButton getPassButtonView(android.app.Activity activity) {
+        return (ImageButton) activity.findViewById(R.id.pass_button);
     }
 }
