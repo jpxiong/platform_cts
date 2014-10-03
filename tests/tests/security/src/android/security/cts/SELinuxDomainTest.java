@@ -128,6 +128,30 @@ public class SELinuxDomainTest extends TestCase {
         }
     }
 
+    /**
+     * Asserts that a domain, if it exists, is only running the listed executables.
+     *
+     * @param domain
+     *  The domain or SELinux context to check.
+     * @param executables
+     *  The path of the allowed executables or application package names.
+     */
+    private void assertDomainHasExecutable(String domain, String... executables)
+            throws FileNotFoundException {
+        List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
+        if (procs == null) {
+            return; // domain doesn't exist
+        }
+
+        Set<String> execList = new HashSet<String>(Arrays.asList(executables));
+
+        for (ProcessDetails p : procs) {
+            String msg = "Expected one of \"" + execList + "\" in SELinux domain \""
+                + domain + "\"" + " Found: \"" + p + "\"";
+            assertTrue(msg, execList.contains(p.procTitle));
+        }
+    }
+
     /* Init is always there */
     public void testInitDomain() throws FileNotFoundException {
         assertDomainOne("u:r:init:s0", "/init");
@@ -198,9 +222,12 @@ public class SELinuxDomainTest extends TestCase {
         assertDomainOne("u:r:system_server:s0", "system_server");
     }
 
-    /* Some OEMs do not use sdcardd so transient */
+    /*
+     * Some OEMs do not use sdcardd so transient. Other OEMs have multiple sdcards
+     * so they run the daemon multiple times.
+     */
     public void testSdcarddDomain() throws FileNotFoundException {
-        assertDomainZeroOrOne("u:r:sdcardd:s0", "/system/bin/sdcard");
+        assertDomainHasExecutable("u:r:sdcardd:s0", "/system/bin/sdcard");
     }
 
     /* Watchdogd may or may not be there */
