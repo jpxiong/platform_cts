@@ -15,9 +15,6 @@
  */
 package android.hardware.cts;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -42,25 +39,6 @@ import java.util.Random;
  */
 public class SensorIntegrationTests extends SensorTestCase {
     private static final String TAG = "SensorIntegrationTests";
-
-    /**
-     * Builder for the test suite.
-     * This is the method that will build dynamically the set of test cases to execute.
-     * Each 'base' test case is composed by three parts:
-     * - the matrix definition
-     * - the test method that will execute the test case
-     * - a static method that will combine both and add test case instances to the test suite
-     */
-    public static Test suite() {
-        TestSuite testSuite = new TestSuite();
-
-        // add test generation routines
-        addTestToSuite(testSuite, "testSensorsWithSeveralClients");
-        addTestToSuite(testSuite, "testSensorsMovingRates");
-        createStoppingTestCases(testSuite);
-
-        return testSuite;
-    }
 
     /**
      * This test focuses in the interaction of continuous and batching clients for the same Sensor
@@ -183,24 +161,41 @@ public class SensorIntegrationTests extends SensorTestCase {
      * Regress:
      * - b/10641388
      */
-    private int mSensorTypeTester;
-    private int mSensorTypeTestee;
 
-    private static void createStoppingTestCases(TestSuite testSuite) {
-        int sensorTypes[] = {
-                Sensor.TYPE_ACCELEROMETER,
-                Sensor.TYPE_GYROSCOPE,
-                Sensor.TYPE_MAGNETIC_FIELD};
+    public void testAccelerometerAccelerometerStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_ACCELEROMETER);
+    }
 
-        for(int sensorTypeTester : sensorTypes) {
-            for(int sensorTypeTestee : sensorTypes) {
-                SensorIntegrationTests test = new SensorIntegrationTests();
-                test.mSensorTypeTester = sensorTypeTester;
-                test.mSensorTypeTestee = sensorTypeTestee;
-                test.setName("testSensorStoppingInteraction");
-                testSuite.addTest(test);
-            }
-        }
+    public void testAccelerometerGyroscopeStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_GYROSCOPE);
+    }
+
+    public void testAccelerometerMagneticFieldStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD);
+    }
+
+    public void testGyroscopeAccelerometerStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_GYROSCOPE, Sensor.TYPE_ACCELEROMETER);
+    }
+
+    public void testGyroscopeGyroscopeStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_GYROSCOPE, Sensor.TYPE_GYROSCOPE);
+    }
+
+    public void testGyroscopeMagneticFieldStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD);
+    }
+
+    public void testMagneticFieldAccelerometerStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_ACCELEROMETER);
+    }
+
+    public void testMagneticFieldGyroscopeStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_GYROSCOPE);
+    }
+
+    public void testMagneticFieldMagneticFieldStopping()  throws Throwable {
+        verifySensorStoppingInteraction(Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     /**
@@ -223,12 +218,14 @@ public class SensorIntegrationTests extends SensorTestCase {
      * It is important to look at the internals of the Sensor HAL to identify how the interaction
      * of several clients can lead to the failing state.
      */
-    public void testSensorStoppingInteraction() throws Throwable {
+    public void verifySensorStoppingInteraction(
+            int sensorTypeTestee,
+            int sensorTypeTester) throws Throwable {
         Context context = getContext();
 
         TestSensorEnvironment testerEnvironment = new TestSensorEnvironment(
                 context,
-                mSensorTypeTester,
+                sensorTypeTester,
                 shouldEmulateSensorUnderLoad(),
                 SensorManager.SENSOR_DELAY_FASTEST);
         TestSensorOperation tester =
@@ -237,7 +234,7 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         TestSensorEnvironment testeeEnvironment = new TestSensorEnvironment(
                 context,
-                mSensorTypeTestee,
+                sensorTypeTestee,
                 shouldEmulateSensorUnderLoad(),
                 SensorManager.SENSOR_DELAY_FASTEST);
         VerifiableSensorOperation testee =
@@ -277,11 +274,5 @@ public class SensorIntegrationTests extends SensorTestCase {
         int reportLatency = SensorCtsHelper.getSecondsAsMicroSeconds(
                 mGenerator.nextInt(5) + 1);
         return reportLatency;
-    }
-
-    private static void addTestToSuite(TestSuite testSuite, String testName) {
-        SensorIntegrationTests test = new SensorIntegrationTests();
-        test.setName(testName);
-        testSuite.addTest(test);
     }
 }
