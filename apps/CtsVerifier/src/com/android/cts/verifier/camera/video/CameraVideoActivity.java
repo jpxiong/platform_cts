@@ -35,6 +35,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -89,8 +90,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
     private boolean isRecording = false;
     private boolean isPlayingBack = false;
     private Button captureButton;
-    private Button mPassButton;
-    private Button mFailButton;
+    private ImageButton mPassButton;
+    private ImageButton mFailButton;
 
     private TextView mStatusLabel;
 
@@ -204,8 +205,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         mPlaybackView.setOnCompletionListener(mPlaybackViewListener);
 
         captureButton = (Button) findViewById(R.id.record_button);
-        mPassButton = (Button) findViewById(R.id.pass_button);
-        mFailButton = (Button) findViewById(R.id.fail_button);
+        mPassButton = (ImageButton) findViewById(R.id.pass_button);
+        mFailButton = (ImageButton) findViewById(R.id.fail_button);
         mPassButton.setEnabled(false);
         mFailButton.setEnabled(true);
 
