@@ -41,7 +41,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -587,7 +587,7 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
     }
 
     private void setPassButtonEnabled(boolean enabled) {
-        Button pass_button = (Button) findViewById(R.id.pass_button);
+        ImageButton pass_button = (ImageButton) findViewById(R.id.pass_button);
         pass_button.setEnabled(enabled);
     }
 

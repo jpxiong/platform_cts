@@ -27,6 +27,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -55,8 +56,8 @@ implements OnClickListener, SurfaceHolder.Callback {
     private static final int NUM_ORIENTATIONS = 4;
     private static final String STAGE_INDEX_EXTRA = "stageIndex";
 
-    private Button mPassButton;
-    private Button mFailButton;
+    private ImageButton mPassButton;
+    private ImageButton mFailButton;
     private Button mTakePictureButton;
 
     private SurfaceView mCameraView;
@@ -85,8 +86,8 @@ implements OnClickListener, SurfaceHolder.Callback {
         setInfoResources(R.string.camera_orientation, R.string.co_info, -1);
         mNumCameras = Camera.getNumberOfCameras();
 
-        mPassButton         = (Button) findViewById(R.id.pass_button);
-        mFailButton         = (Button) findViewById(R.id.fail_button);
+        mPassButton         = (ImageButton) findViewById(R.id.pass_button);
+        mFailButton         = (ImageButton) findViewById(R.id.fail_button);
         mTakePictureButton  = (Button) findViewById(R.id.take_picture_button);
         mFormatView         = (ImageView) findViewById(R.id.format_view);
         mCameraView         = (SurfaceView) findViewById(R.id.camera_view);
