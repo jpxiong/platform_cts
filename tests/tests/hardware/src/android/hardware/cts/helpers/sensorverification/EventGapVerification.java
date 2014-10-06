@@ -25,6 +25,9 @@ public class EventGapVerification extends AbstractSensorVerification {
     // Number of indices to print in assert message before truncating
     private static final int TRUNCATE_MESSAGE_LENGTH = 3;
 
+    // Number of events to truncate (discard) from the initial events received
+    private static final int TRUNCATE_EVENTS_COUNT = 1;
+
     private final int mExpectedDelayUs;
 
     private final List<IndexedEventPair> mEventGaps = new LinkedList<IndexedEventPair>();
@@ -105,15 +108,16 @@ public class EventGapVerification extends AbstractSensorVerification {
      */
     @Override
     protected void addSensorEventInternal(TestSensorEvent event) {
-        if (mPreviousEvent != null) {
-            long deltaNs = event.timestamp - mPreviousEvent.timestamp;
-            long deltaUs = TimeUnit.MICROSECONDS.convert(deltaNs, TimeUnit.NANOSECONDS);
-            if (deltaUs > mExpectedDelayUs * THRESHOLD) {
-                mEventGaps.add(new IndexedEventPair(mIndex, event, mPreviousEvent));
+        if (mIndex >= TRUNCATE_EVENTS_COUNT) {
+            if (mPreviousEvent != null) {
+                long deltaNs = event.timestamp - mPreviousEvent.timestamp;
+                long deltaUs = TimeUnit.MICROSECONDS.convert(deltaNs, TimeUnit.NANOSECONDS);
+                if (deltaUs > mExpectedDelayUs * THRESHOLD) {
+                    mEventGaps.add(new IndexedEventPair(mIndex, event, mPreviousEvent));
+                }
             }
+            mPreviousEvent = event;
         }
-
-        mPreviousEvent = event;
         mIndex++;
     }
 }
