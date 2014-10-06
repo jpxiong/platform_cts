@@ -16,9 +16,13 @@
 package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.test.ActivityInstrumentationTestCase2;
+
+import static com.android.cts.managedprofile.BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT;
 
 /**
  * Test for {@link DevicePolicyManager#addCrossProfileIntentFilter} API.
@@ -27,14 +31,21 @@ import android.content.pm.PackageManager;
  * in the primary profile, one to {@code ManagedProfileActivity.ACTION} in the secondary profile,
  * and one to {@code AllUsersActivity.ACTION} in both profiles.
  */
-public class ManagedProfileTest extends BaseManagedProfileTest {
+public class ManagedProfileTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private PackageManager mPackageManager;
+    private DevicePolicyManager mDevicePolicyManager;
+
+    public ManagedProfileTest() {
+        super(TestActivity.class);
+    }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mPackageManager = getContext().getPackageManager();
+        mPackageManager = getActivity().getPackageManager();
+        mDevicePolicyManager = (DevicePolicyManager)
+                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
     @Override
@@ -55,6 +66,8 @@ public class ManagedProfileTest extends BaseManagedProfileTest {
 
         assertTrue(mPackageManager.queryIntentActivities(
                 new Intent(PrimaryUserActivity.ACTION), /* flags = */ 0).isEmpty());
+        getActivity().startActivity(ManagedProfileActivity.ACTION);
+        assertTrue(getActivity().checkActivityStarted());
     }
 
     public void testAddCrossProfileIntentFilter_primary() {
@@ -68,6 +81,8 @@ public class ManagedProfileTest extends BaseManagedProfileTest {
 
         assertEquals(1, mPackageManager.queryIntentActivities(
                 new Intent(PrimaryUserActivity.ACTION), /* flags = */ 0).size());
+        getActivity().startActivity(PrimaryUserActivity.ACTION);
+        assertTrue(getActivity().checkActivityStarted());
     }
 
     public void testAddCrossProfileIntentFilter_all() {
@@ -81,6 +96,8 @@ public class ManagedProfileTest extends BaseManagedProfileTest {
 
         assertEquals(2, mPackageManager.queryIntentActivities(
                 new Intent(AllUsersActivity.ACTION), /* flags = */ 0).size());
+        // If we used startActivity(), the user would have a disambiguation dialog presented which
+        // requires human intervention, so we won't be testing like that
     }
 
     public void testAddCrossProfileIntentFilter_managed() {
@@ -95,5 +112,7 @@ public class ManagedProfileTest extends BaseManagedProfileTest {
         // We should still be resolving in the profile
         assertEquals(1, mPackageManager.queryIntentActivities(
                 new Intent(ManagedProfileActivity.ACTION), /* flags = */ 0).size());
+        getActivity().startActivity(ManagedProfileActivity.ACTION);
+        assertTrue(getActivity().checkActivityStarted());
     }
 }

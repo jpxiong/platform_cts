@@ -31,6 +31,8 @@ public class PrimaryUserActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "Roger that!");
+        Log.i(TAG, "Primary user activity started!");
+        setResult(RESULT_OK);
+        finish();
     }
 }
