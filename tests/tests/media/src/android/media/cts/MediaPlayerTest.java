@@ -593,14 +593,16 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
         byte [] vizdata = new byte[size];
         Visualizer vis = new Visualizer(session);
-        assertTrue(vis.setCaptureSize(vizdata.length) == Visualizer.SUCCESS);
-        assertTrue(vis.setEnabled(true) == Visualizer.SUCCESS);
         AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         int oldRingerMode = am.getRingerMode();
         am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         int oldvolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         am.setStreamVolume(AudioManager.STREAM_MUSIC, 1, 0);
         try {
+            assertEquals("setCaptureSize failed",
+                    Visualizer.SUCCESS, vis.setCaptureSize(vizdata.length));
+            assertEquals("setEnabled failed", Visualizer.SUCCESS, vis.setEnabled(true));
+
             mp1.setNextMediaPlayer(mp2);
             mp1.start();
             assertTrue(mp1.isPlaying());
