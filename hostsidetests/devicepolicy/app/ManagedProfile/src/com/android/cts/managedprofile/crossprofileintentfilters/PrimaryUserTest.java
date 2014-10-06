@@ -17,9 +17,8 @@ package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.test.AndroidTestCase;
+import android.test.ActivityInstrumentationTestCase2;
 
 /**
  * Test for {@link DevicePolicyManager#addCrossProfileIntentFilter} API, for
@@ -32,28 +31,39 @@ import android.test.AndroidTestCase;
  * Note that the {code DevicePolicyManager#clearCrossProfileIntentFilters} as well as more complex
  * test scenarios can be found in {@link ManagedProfileTest}.
  */
-public class PrimaryUserTest extends AndroidTestCase {
+public class PrimaryUserTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private PackageManager mPackageManager;
+
+    public PrimaryUserTest() {
+        super(TestActivity.class);
+    }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mPackageManager = getContext().getPackageManager();
+        mPackageManager = getActivity().getPackageManager();
     }
 
     public void testAddCrossProfileIntentFilter_primary() {
         assertEquals(1, mPackageManager.queryIntentActivities(
                 new Intent(PrimaryUserActivity.ACTION), /* flags = */ 0).size());
+        getActivity().startActivity(PrimaryUserActivity.ACTION);
+        assertTrue(getActivity().checkActivityStarted());
     }
 
     public void testAddCrossProfileIntentFilter_all() {
         assertEquals(2, mPackageManager.queryIntentActivities(
                 new Intent(AllUsersActivity.ACTION), /* flags = */ 0).size());
+        
+        // If we used startActivity(), the user would have a disambiguation dialog presented which
+        // requires human intervention, so we won't be testing like that
     }
 
     public void testAddCrossProfileIntentFilter_managed() {
         assertEquals(1, mPackageManager.queryIntentActivities(
                 new Intent(ManagedProfileActivity.ACTION), /* flags = */ 0).size());
+        getActivity().startActivity(ManagedProfileActivity.ACTION);
+        assertTrue(getActivity().checkActivityStarted());
     }
 }
