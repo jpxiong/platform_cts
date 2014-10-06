@@ -1244,4 +1244,13 @@
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
     <string name="provisioning_byod_disabled">Device provisioning is not enabled.</string>
     <string name="provisioning_byod_go">Go</string>
+
+    <!-- Strings for DeviceOwnerProvisioningTest -->
+    <string name="provisioning_device_owner">Device Owner Provisioning</string>
+    <string name="device_owner_provisioning_tests">Device Owner provisioning tests</string>
+    <string name="device_owner_provisioning_tests_info">The device owner provisioning tests verify that setting up a corporate owned device can only be done on a factory reset device.</string>
+    <string name="device_owner_provisioning_category">Device Owner Provisioning</string>
+    <string name="device_owner_negative_test">Device owner negative test</string>
+    <string name="device_owner_negative_test_info">Device owner provisioning should only work on new or factory reset devices. Please click on the "Start provisioning" button and verify that you get a warning dialog telling you that the device is already set up. If that is the case, this test has passed.</string>
+    <string name="start_device_owner_provisioning_button">Start provisioning</string>
 </resources>
