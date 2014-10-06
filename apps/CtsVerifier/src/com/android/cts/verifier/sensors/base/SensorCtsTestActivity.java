@@ -94,7 +94,9 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mScreenManipulator.releaseScreenOn();
+        if (mScreenManipulator != null) {
+            mScreenManipulator.releaseScreenOn();
+        }
     }
 
     /**
