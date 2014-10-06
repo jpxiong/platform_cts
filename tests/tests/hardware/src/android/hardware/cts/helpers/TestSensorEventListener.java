@@ -169,8 +169,9 @@ public class TestSensorEventListener implements SensorEventListener2 {
             String message = SensorCtsHelper.formatAssertionMessage(
                     "WaitForEvents",
                     mEnvironment,
-                    "count:%d, available:%d",
-                    eventCount, mEventLatch.getCount());
+                    "requested:%d, received:%d",
+                    eventCount,
+                    eventCount - mEventLatch.getCount());
             Assert.assertTrue(message, mEventLatch.await(timeoutUs, TimeUnit.MICROSECONDS));
         } catch(InterruptedException e) {
             // Ignore
