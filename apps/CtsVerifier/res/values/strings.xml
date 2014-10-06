@@ -1188,4 +1188,60 @@
     <string name="snsr_rotation_vector_set_final">Place the device back to the reference position.</string>
     <string name="snsr_rotation_vector_verification">Angular deviation [%1$4.1f %2$4.1f %3$4.1f]. Current: %4$f deg. Max tolerated: %5$f.</string>
 
+    <!-- Strings for BYOD managed provisioning tests (ByodFlowTestActivity) -->
+    <string name="test_category_managed_provisioning">Managed Provisioning</string>
+    <string name="provisioning_byod_device_admin">CTS Verifier - BYOD Admin</string>
+    <string name="provisioning_byod">BYOD Managed Provisioning</string>
+    <string name="provisioning_byod_info">
+        This test exercises the BYOD managed provisioning flow.
+        Start by pressing the button on screen and follow instructions to finish the managed provisioning process.
+        If your device has not been encrypted before, it will be encrypted and rebooted.
+        After the provisioning process completes, return to this page and carry out further verifications.
+    </string>
+    <string name="provisioning_byod_start">Start BYOD provisioning flow</string>
+    <string name="provisioning_byod_instructions">
+        1. Press the button below to start the managed provisioning flow.
+        If your device has not been encrypted before, it will reboot to apply encryption.
+        After reboot follow instructions in the notification area to complete the provisioning.\n
+        2. After successful provisioning, you should be automatically redirected back to this page.
+        Please press through the following verification steps.
+        Allow a few seconds after returning from provisioning, as the profile owner test should automatically pass.
+    </string>
+    <string name="provisioning_byod_profileowner">Profile owner installed</string>
+    <string name="provisioning_byod_diskencryption">Full disk encryption enabled</string>
+    <string name="provisioning_byod_profile_visible">Work profile visible in Settings</string>
+    <string name="provisioning_byod_admin_visible">Device administrator visible in Settings</string>
+    <string name="provisioning_byod_workapps_visible">Badged work apps visible in Launcher</string>
+    <string name="provisioning_byod_profile_visible_instruction">
+        Please press the Go button to open the Settings page.
+        Navigate to Accounts and confirm that:\n
+        \n
+        - Both Personal and Work categories exist.\n
+        - \"Remove work profile\" exists under the Work category.\n
+        \n
+        Use the Back button to return to this page.
+    </string>
+    <string name="provisioning_byod_admin_visible_instruction">
+        Please press the Go button to open the Security page in Settings.
+        Navigate to Device administrators and confirm that:\n
+        \n
+        - Both Personal and Work categories exist.\n
+        - \"CTS Verifier - BYOD Admin\" exists under the Work category, and is activated.\n
+        \n
+        Use the Back button to return to this page.
+    </string>
+    <string name="provisioning_byod_workapps_visible_instruction">
+        Please press the Go button to start the launcher.
+        Go to All Apps screen and scroll through it to confirm that:\n
+        \n
+        - A new set of work apps including CTS Verifier appear in the list.\n
+        - Work badge overlay appears on work app\'s icon.\n
+        \n
+        Then navigate back to this screen using Recents button.
+    </string>
+    <string name="provisioning_byod_no_activity">Cannot communicate with activity in the work profile.</string>
+    <string name="provisioning_byod_delete_profile">Initiate deletion of work profile.</string>
+    <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
+    <string name="provisioning_byod_disabled">Device provisioning is not enabled.</string>
+    <string name="provisioning_byod_go">Go</string>
 </resources>
