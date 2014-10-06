@@ -86,13 +86,11 @@ public class TelephonyManagerTest extends AndroidTestCase {
                     }
                 };
                 mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_CELL_LOCATION);
-
+                CellLocation.requestLocationUpdate();
                 Looper.loop();
             }
         });
         t.start();
-
-        CellLocation.requestLocationUpdate();
         synchronized (mLock) {
             while (!mOnCellLocationChangedCalled) {
                 mLock.wait();
@@ -104,24 +102,21 @@ public class TelephonyManagerTest extends AndroidTestCase {
         t = new TestThread(new Runnable() {
             public void run() {
                 Looper.prepare();
-
                 // unregister the listener
                 mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_NONE);
                 mOnCellLocationChangedCalled = false;
                 // unregister again, to make sure doing so does not call the listener
                 mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_NONE);
-
+                CellLocation.requestLocationUpdate();
                 Looper.loop();
             }
         });
-        t.start();
 
-        CellLocation.requestLocationUpdate();
+        t.start();
         synchronized (mLock) {
             mLock.wait(TOLERANCE);
         }
-        //Fix me: unregister for listener is not support today. Will be added soon
-        //assertFalse(mOnCellLocationChangedCalled);
+        assertFalse(mOnCellLocationChangedCalled);
     }
 
     /**
