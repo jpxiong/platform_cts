@@ -29,6 +29,7 @@ import android.media.tv.TvView;
 import android.media.tv.TvView.TvInputCallback;
 import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.util.ArrayMap;
 import android.util.SparseIntArray;
 import android.view.InputEvent;
@@ -176,6 +177,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         super.tearDown();
     }
 
+    @UiThreadTest
     public void testConstructor() throws Exception {
         if (!Utils.hasTvInputFramework(getActivity())) {
             return;
