@@ -79,13 +79,16 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         String command = "am start-user " + userId;
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput.startsWith("Success:"));
+        assertTrue(commandOutput + " expected to start with \"Success:\"",
+                commandOutput.startsWith("Success:"));
     }
 
     protected int getMaxNumberOfUsersSupported() throws DeviceNotAvailableException {
         // TODO: move this to ITestDevice once it supports users
         String command = "pm get-max-users";
         String commandOutput = getDevice().executeShellCommand(command);
+        CLog.i("Output for command " + command + ": " + commandOutput);
+
         try {
             return Integer.parseInt(commandOutput.substring(commandOutput.lastIndexOf(" ")).trim());
         } catch (NumberFormatException e) {
@@ -97,18 +100,20 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     protected ArrayList<Integer> listUsers() throws DeviceNotAvailableException {
         String command = "pm list users";
         String commandOutput = getDevice().executeShellCommand(command);
+        CLog.i("Output for command " + command + ": " + commandOutput);
 
         // Extract the id of all existing users.
         String[] lines = commandOutput.split("\\r?\\n");
-        assertTrue(lines.length >= 1);
-        assertEquals(lines[0], "Users:");
+        assertTrue(commandOutput + " should contain at least one line", lines.length >= 1);
+        assertEquals(commandOutput, lines[0], "Users:");
 
         ArrayList<Integer> users = new ArrayList<Integer>();
         for (int i = 1; i < lines.length; i++) {
             // Individual user is printed out like this:
             // \tUserInfo{$id$:$name$:$Integer.toHexString(flags)$} [running]
             String[] tokens = lines[i].split("\\{|\\}|:");
-            assertTrue(tokens.length == 4 || tokens.length == 5);
+            assertTrue(lines[i] + " doesn't contain 4 or 5 tokens",
+                    tokens.length == 4 || tokens.length == 5);
             users.add(Integer.parseInt(tokens[1]));
         }
         return users;
@@ -200,14 +205,16 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         // TODO: Move this logic to ITestDevice.
         String command = "pm list features";
         String commandOutput = getDevice().executeShellCommand(command);
+        CLog.i("Output for command " + command + ": " + commandOutput);
 
         // Extract the id of the new user.
         HashSet<String> availableFeatures = new HashSet<String>();
         for (String feature: commandOutput.split("\\s+")) {
             // Each line in the output of the command has the format "feature:{FEATURE_VALUE}".
             String[] tokens = feature.split(":");
-            assertTrue(tokens.length > 1);
-            assertEquals("feature", tokens[0]);
+            assertTrue("\"" + feature + "\" expected to have format feature:{FEATURE_VALUE}",
+                    tokens.length > 1);
+            assertEquals(feature, "feature", tokens[0]);
             availableFeatures.add(tokens[1]);
         }
 
