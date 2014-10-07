@@ -67,6 +67,14 @@ import java.util.Map;
  *             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.accelerometer" />
  *         </pre>
  *     </li>
+ *     <li>OPTIONAL: Add a meta data attribute to indicate features such that, if any present, the
+ *         test gets excluded from being shown. If the device has any of the excluded features then
+ *         the test will not appear in the test list. Use a colon (:) to specify multiple features
+ *         to exclude for the test. Note that the colon means "or" in this case.
+ *         <pre>
+ *             <meta-data android:name="test_excluded_features" android:value="android.hardware.type.television" />
+ *         </pre>
+ *     </li>
  *
  * </ol>
  */
@@ -77,6 +85,8 @@ public class ManifestTestListAdapter extends TestListAdapter {
     private static final String TEST_PARENT_META_DATA = "test_parent";
 
     private static final String TEST_REQUIRED_FEATURES_META_DATA = "test_required_features";
+
+    private static final String TEST_EXCLUDED_FEATURES_META_DATA = "test_excluded_features";
 
     private Context mContext;
 
@@ -152,7 +162,9 @@ public class ManifestTestListAdapter extends TestListAdapter {
             String testName = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);
             String[] requiredFeatures = getRequiredFeatures(info.activityInfo.metaData);
-            TestListItem item = TestListItem.newTest(title, testName, intent, requiredFeatures);
+            String[] excludedFeatures = getExcludedFeatures(info.activityInfo.metaData);
+            TestListItem item = TestListItem.newTest(title, testName, intent,
+                                                     requiredFeatures, excludedFeatures);
 
             String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
             addTestToCategory(testsByCategory, testCategory, item);
@@ -190,6 +202,19 @@ public class ManifestTestListAdapter extends TestListAdapter {
         }
     }
 
+    static String[] getExcludedFeatures(Bundle metaData) {
+        if (metaData == null) {
+            return null;
+        } else {
+            String value = metaData.getString(TEST_EXCLUDED_FEATURES_META_DATA);
+            if (value == null) {
+                return null;
+            } else {
+                return value.split(":");
+            }
+        }
+    }
+
     static String getTitle(Context context, ActivityInfo activityInfo) {
         if (activityInfo.labelRes != 0) {
             return context.getString(activityInfo.labelRes);
@@ -216,20 +241,37 @@ public class ManifestTestListAdapter extends TestListAdapter {
         tests.add(item);
     }
 
-    List<TestListItem> filterTests(List<TestListItem> tests) {
-        List<TestListItem> filteredTests = new ArrayList<TestListItem>(tests);
-        PackageManager packageManager = mContext.getPackageManager();
-        Iterator<TestListItem> iterator = filteredTests.iterator();
-        while (iterator.hasNext()) {
-            TestListItem item = iterator.next();
-            String[] requiredFeatures = item.requiredFeatures;
-            if (requiredFeatures != null) {
-                for (int i = 0; i < requiredFeatures.length; i++) {
-                    if (!packageManager.hasSystemFeature(requiredFeatures[i])) {
-                        iterator.remove();
-                        break;
-                    }
+    private boolean hasAnyFeature(String[] features) {
+        if (features != null) {
+            PackageManager packageManager = mContext.getPackageManager();
+            for (String feature : features) {
+                if (packageManager.hasSystemFeature(feature)) {
+                    return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAllFeatures(String[] features) {
+        if (features != null) {
+            PackageManager packageManager = mContext.getPackageManager();
+            for (String feature : features) {
+                if (!packageManager.hasSystemFeature(feature)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    List<TestListItem> filterTests(List<TestListItem> tests) {
+        List<TestListItem> filteredTests = new ArrayList<TestListItem>();
+        for (TestListItem test : tests) {
+            String[] excludedFeatures = test.excludedFeatures;
+            String[] requiredFeatures = test.requiredFeatures;
+            if (!hasAnyFeature(excludedFeatures) && hasAllFeatures(requiredFeatures)) {
+                filteredTests.add(test);
             }
         }
         return filteredTests;
