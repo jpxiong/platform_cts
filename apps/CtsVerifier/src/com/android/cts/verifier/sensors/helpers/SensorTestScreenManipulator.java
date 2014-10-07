@@ -57,7 +57,7 @@ public class SensorTestScreenManipulator {
     private final DevicePolicyManager mDevicePolicyManager;
     private final ComponentName mComponentName;
     private final PowerManager.WakeLock mWakeUpScreenWakeLock;
-    private final PowerManager.WakeLock mKeepScreenWakeLock;
+    private final PowerManager.WakeLock mKeepScreenOnWakeLock;
 
     private InternalBroadcastReceiver mBroadcastReceiver;
     private boolean mTurnOffScreenOnPowerDisconnected;
@@ -74,7 +74,7 @@ public class SensorTestScreenManipulator {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         mWakeUpScreenWakeLock = powerManager.newWakeLock(levelAndFlags, "SensorTestWakeUpScreen");
         mWakeUpScreenWakeLock.setReferenceCounted(false);
-        mKeepScreenWakeLock = powerManager.newWakeLock(levelAndFlags, "SensorTestKeepScreenOn");
+        mKeepScreenOnWakeLock = powerManager.newWakeLock(levelAndFlags, "SensorTestKeepScreenOn");
         mWakeUpScreenWakeLock.setReferenceCounted(false);
     }
 
@@ -141,12 +141,12 @@ public class SensorTestScreenManipulator {
      * presses the device's power button.
      */
     public synchronized void turnScreenOn() {
-        if (mKeepScreenWakeLock.isHeld()) {
+        if (mKeepScreenOnWakeLock.isHeld()) {
             // recover from cases when we could get out of sync, this can happen because the user
             // can press the power button, and other wake-locks can prevent intents to be received
-            mKeepScreenWakeLock.release();
+            mKeepScreenOnWakeLock.release();
         }
-        mKeepScreenWakeLock.acquire();
+        mKeepScreenOnWakeLock.acquire();
     }
 
     /**
@@ -155,10 +155,10 @@ public class SensorTestScreenManipulator {
      * See {@link #turnScreenOn()} for more information.
      */
     public synchronized void releaseScreenOn() {
-        if (!mKeepScreenWakeLock.isHeld()) {
+        if (!mKeepScreenOnWakeLock.isHeld()) {
             return;
         }
-        mKeepScreenWakeLock.release();
+        mKeepScreenOnWakeLock.release();
     }
 
     /**

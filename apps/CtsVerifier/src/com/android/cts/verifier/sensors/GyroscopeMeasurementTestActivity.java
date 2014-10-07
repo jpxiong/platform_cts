@@ -22,6 +22,7 @@ import com.android.cts.verifier.sensors.renderers.GLRotationGuideRenderer;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorCalibratedUncalibratedVerifier;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensorverification.GyroscopeIntegrationVerification;
@@ -32,8 +33,10 @@ import java.util.concurrent.TimeUnit;
  * Semi-automated test that focuses on characteristics associated with Gyroscope measurements.
  */
 public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActivity {
+    private static final float THRESHOLD_CALIBRATED_UNCALIBRATED_RAD_SEC = 0.01f;
     private static final float THRESHOLD_AXIS_UNDER_ROTATION_DEG = 10.0f;
     private static final float THRESHOLD_AXIS_UNDER_NO_ROTATION_DEG = 50.0f;
+
     private static final int ROTATE_360_DEG = 360;
     private static final int ROTATION_COLLECTION_SEC = 10;
 
@@ -59,6 +62,7 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
         closeGlSurfaceView();
     }
 
+    @SuppressWarnings("unused")
     public String testDeviceStatic() throws Throwable {
         return verifyMeasurements(
                 R.string.snsr_gyro_device_static,
@@ -66,28 +70,69 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
                 0 /* expectationDeg */);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateClockwise() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, Z_AXIS, -ROTATE_360_DEG);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateCounterClockwise() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, Z_AXIS, ROTATE_360_DEG);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateRightSide() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, Y_AXIS, ROTATE_360_DEG);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateLeftSide() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, Y_AXIS, -ROTATE_360_DEG);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateTopSide() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, X_AXIS, -ROTATE_360_DEG);
     }
 
+    @SuppressWarnings("unused")
     public String testRotateBottomSide() throws Throwable {
         return verifyMeasurements(R.string.snsr_gyro_rotate_device, X_AXIS, ROTATE_360_DEG);
+    }
+
+    /**
+     * Verifies that the relationship between readings from calibrated and their corresponding
+     * uncalibrated sensors comply to the following equation:
+     *      calibrated = uncalibrated - bias
+     */
+    @SuppressWarnings("unused")
+    public String testCalibratedAndUncalibrated() throws Throwable {
+        setRendererRotation(Z_AXIS, false);
+
+        SensorTestLogger logger = getTestLogger();
+        logger.logInstructions(R.string.snsr_keep_device_rotating_clockwise);
+        waitForUserToBegin();
+        logger.logWaitForSound();
+
+        TestSensorEnvironment calibratedEnvironment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_GYROSCOPE,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        TestSensorEnvironment uncalibratedEnvironment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        SensorCalibratedUncalibratedVerifier verifier = new SensorCalibratedUncalibratedVerifier(
+                calibratedEnvironment,
+                uncalibratedEnvironment,
+                THRESHOLD_CALIBRATED_UNCALIBRATED_RAD_SEC);
+
+        try {
+            verifier.execute();
+        } finally {
+            playSound();
+        }
+        return null;
     }
 
     /**
@@ -100,8 +145,9 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
      */
     private String verifyMeasurements(int instructionsResId, int rotationAxis, int expectationDeg)
             throws Throwable {
-        SensorTestLogger logger = getTestLogger();
         setRendererRotation(rotationAxis, expectationDeg >= 0);
+
+        SensorTestLogger logger = getTestLogger();
         logger.logInstructions(instructionsResId);
         waitForUserToBegin();
         logger.logWaitForSound();

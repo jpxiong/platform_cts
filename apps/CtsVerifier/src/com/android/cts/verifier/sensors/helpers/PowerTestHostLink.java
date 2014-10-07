@@ -23,6 +23,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.util.Log;
@@ -216,7 +217,7 @@ public class PowerTestHostLink {
                 response = RESPONSE_OK;
             }
         } else if (request.startsWith(REQUEST_EXTERNAL_STORAGE)){
-            response = System.getenv("EXTERNAL_STORAGE");
+            response = SensorCtsHelper.getSensorTestDataDirectory("power/").getAbsolutePath();
             Log.d(TAG,"External storage is " + response);
         } else if (request.startsWith(REQUEST_SCREEN_OFF)) {
             try {

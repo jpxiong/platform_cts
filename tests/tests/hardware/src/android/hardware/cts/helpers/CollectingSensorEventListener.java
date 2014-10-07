@@ -18,9 +18,10 @@ package android.hardware.cts.helpers;
 
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
-import android.os.SystemClock;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,8 +29,7 @@ import java.util.concurrent.TimeUnit;
  * This should only be used for short tests.
  */
 public class CollectingSensorEventListener extends TestSensorEventListener {
-    private final ConcurrentLinkedDeque<TestSensorEvent> mSensorEventsList =
-            new ConcurrentLinkedDeque<TestSensorEvent>();
+    private final ArrayList<TestSensorEvent> mSensorEventsList = new ArrayList<TestSensorEvent>();
 
     /**
      * Constructs a {@link CollectingSensorEventListener} with an additional
@@ -52,7 +52,9 @@ public class CollectingSensorEventListener extends TestSensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         super.onSensorChanged(event);
-        mSensorEventsList.addLast(new TestSensorEvent(event, SystemClock.elapsedRealtimeNanos()));
+        synchronized (mSensorEventsList) {
+            mSensorEventsList.add(new TestSensorEvent(event));
+        }
     }
 
     /**
@@ -82,14 +84,18 @@ public class CollectingSensorEventListener extends TestSensorEventListener {
     /**
      * Get the {@link TestSensorEvent} array from the event queue.
      */
-    public TestSensorEvent[] getEvents() {
-        return mSensorEventsList.toArray(new TestSensorEvent[0]);
+    public List<TestSensorEvent> getEvents() {
+        synchronized (mSensorEventsList) {
+            return Collections.unmodifiableList(mSensorEventsList);
+        }
     }
 
     /**
      * Clear the event queue.
      */
     public void clearEvents() {
-        mSensorEventsList.clear();
+        synchronized (mSensorEventsList) {
+            mSensorEventsList.clear();
+        }
     }
 }

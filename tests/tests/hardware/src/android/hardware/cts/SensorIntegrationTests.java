@@ -18,7 +18,6 @@ package android.hardware.cts;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
@@ -29,6 +28,7 @@ import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Set of tests that verifies proper interaction of the sensors in the platform.
@@ -65,7 +65,7 @@ public class SensorIntegrationTests extends SensorTestCase {
      */
     public void testSensorsWithSeveralClients() throws Throwable {
         final int ITERATIONS = 50;
-        final int MAX_REPORTING_LATENCY_IN_SECONDS = 5;
+        final int MAX_REPORTING_LATENCY_US = (int) TimeUnit.SECONDS.toMicros(5);
         final Context context = getContext();
 
         int sensorTypes[] = {
@@ -91,7 +91,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                     sensorType,
                     shouldEmulateSensorUnderLoad(),
                     sensor.getMinDelay(),
-                    SensorCtsHelper.getSecondsAsMicroSeconds(MAX_REPORTING_LATENCY_IN_SECONDS));
+                    MAX_REPORTING_LATENCY_US);
             TestSensorOperation batchingOperation =
                     new TestSensorOperation(batchingEnvironment, 100 /* eventCount */);
             batchingOperation.addVerification(new EventOrderingVerification());
@@ -271,8 +271,7 @@ public class SensorIntegrationTests extends SensorTestCase {
     }
 
     private int generateReportLatencyInUs() {
-        int reportLatency = SensorCtsHelper.getSecondsAsMicroSeconds(
-                mGenerator.nextInt(5) + 1);
-        return reportLatency;
+        long reportLatencyUs = TimeUnit.SECONDS.toMicros(mGenerator.nextInt(5) + 1);
+        return (int) reportLatencyUs;
     }
 }

@@ -19,9 +19,7 @@ package android.hardware.cts;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 
@@ -118,12 +116,13 @@ public class SingleSensorTests extends SensorTestCase {
         for (Entry<Integer, Object[]> entry : expectedProperties.entrySet()) {
             Sensor sensor = sensorManager.getDefaultSensor(entry.getKey());
             if (sensor != null) {
-                String sensorName = SensorTestInformation.getSensorName(entry.getKey());
                 if (entry.getValue()[0] != null) {
                     int expected = (Integer) entry.getValue()[0];
                     String msg = String.format(
                             "%s: min delay %dus expected to be less than or equal to %dus",
-                            sensorName, sensor.getMinDelay(), expected);
+                            sensor.getName(),
+                            sensor.getMinDelay(),
+                            expected);
                     assertTrue(msg, sensor.getMinDelay() <= expected);
                 }
             }
@@ -550,15 +549,16 @@ public class SingleSensorTests extends SensorTestCase {
         } finally {
             SensorStats.logStats(TAG, op.getStats());
 
-            String sensorName = SensorTestInformation.getSanitizedSensorName(sensorType);
             String sensorRate;
             if (rateUs == SensorManager.SENSOR_DELAY_FASTEST) {
                 sensorRate = "fastest";
             } else {
-                sensorRate = String.format("%.0fhz",
-                        SensorCtsHelper.getFrequency(rateUs, TimeUnit.MICROSECONDS));
+                sensorRate = String.format("%.0fhz", environment.getFrequencyHz());
             }
-            String fileName = String.format("single_sensor_%s_%s.txt", sensorName, sensorRate);
+            String fileName = String.format(
+                    "single_%s_%s.txt",
+                    SensorStats.getSanitizedSensorName(environment.getSensor()),
+                    sensorRate);
             SensorStats.logStatsToFile(fileName, op.getStats());
         }
     }
