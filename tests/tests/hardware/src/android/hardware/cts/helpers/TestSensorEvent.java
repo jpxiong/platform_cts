@@ -19,6 +19,7 @@ package android.hardware.cts.helpers;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
+import android.os.SystemClock;
 
 /**
  * Class for holding information about individual {@link SensorEvent}s.
@@ -29,6 +30,16 @@ public class TestSensorEvent {
     public final long receivedTimestamp;
     public final int accuracy;
     public final float values[];
+
+    /**
+     * Constructor that sets {@link #receivedTimestamp} to
+     * {@link SystemClock#elapsedRealtimeNanos()}
+     *
+     * @param event the received sensor event
+     */
+    public TestSensorEvent(SensorEvent event) {
+        this(event, SystemClock.elapsedRealtimeNanos());
+    }
 
     /**
      * Construct a TestSensorEvent from {@link SensorEvent} data and a received timestamp.
