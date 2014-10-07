@@ -17,7 +17,7 @@
 package android.widget.cts;
 
 import android.app.Activity;
-import android.app.cts.CTSResult;
+import android.cts.util.CTSResult;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;

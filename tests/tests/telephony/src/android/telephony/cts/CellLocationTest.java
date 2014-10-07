@@ -17,6 +17,8 @@ package android.telephony.cts;
 
 
 import android.content.Context;
+import android.cts.util.ReadElf;
+import android.cts.util.TestThread;
 import android.os.Looper;
 import android.net.ConnectivityManager;
 import android.telephony.CellLocation;

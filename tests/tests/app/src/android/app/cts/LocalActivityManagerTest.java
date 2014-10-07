@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.app.LocalActivityManager;
 import android.content.Intent;
+import android.cts.util.CTSResult;
 import android.test.InstrumentationTestCase;
 import android.test.UiThreadTest;
 

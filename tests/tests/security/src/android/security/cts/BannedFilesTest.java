@@ -16,7 +16,7 @@
 
 package android.security.cts;
 
-import android.security.cts.FileUtils;
+import android.cts.util.FileUtils;
 
 import junit.framework.TestCase;
 

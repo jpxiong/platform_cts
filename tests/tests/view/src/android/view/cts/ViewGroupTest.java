@@ -19,9 +19,9 @@ package android.view.cts;
 import com.android.internal.util.XmlUtils;
 
 
-import android.app.cts.CTSResult;
 import android.content.Context;
 import android.content.Intent;
+import android.cts.util.CTSResult;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

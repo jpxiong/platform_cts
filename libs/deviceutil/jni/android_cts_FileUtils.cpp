@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,12 +40,12 @@ static jfieldID gFileStatusCtimeFieldID;
 
 /*
  * Native methods used by
- * cts/tests/src/android/os/cts/FileUtils.java
+ * cts/libs/deviceutil/src/android/cts/util/FileUtils.java
  *
- * Copied from hidden API: frameworks/base/core/jni/android_os_FileUtils.cpp
+ * Copied from hidden API: frameworks/base/core/jni/android_FileUtils.cpp
  */
 
-jboolean android_os_cts_FileUtils_getFileStatus(JNIEnv* env, jobject thiz,
+jboolean android_cts_FileUtils_getFileStatus(JNIEnv* env, jobject thiz,
         jstring path, jobject fileStatus, jboolean statLinks)
 {
     const char* pathStr = env->GetStringUTFChars(path, NULL);
@@ -77,21 +77,21 @@ jboolean android_os_cts_FileUtils_getFileStatus(JNIEnv* env, jobject thiz,
     return ret;
 }
 
-jstring android_os_cts_FileUtils_getUserName(JNIEnv* env, jobject thiz,
+jstring android_cts_FileUtils_getUserName(JNIEnv* env, jobject thiz,
         jint uid)
 {
     struct passwd *pwd = getpwuid(uid);
     return env->NewStringUTF(pwd->pw_name);
 }
 
-jstring android_os_cts_FileUtils_getGroupName(JNIEnv* env, jobject thiz,
+jstring android_cts_FileUtils_getGroupName(JNIEnv* env, jobject thiz,
         jint gid)
 {
     struct group *grp = getgrgid(gid);
     return env->NewStringUTF(grp->gr_name);
 }
 
-jint android_os_cts_FileUtils_setPermissions(JNIEnv* env, jobject clazz,
+jint android_cts_FileUtils_setPermissions(JNIEnv* env, jobject clazz,
         jstring file, jint mode)
 {
     const char *fileStr = env->GetStringUTFChars(file, NULL);
@@ -102,7 +102,7 @@ jint android_os_cts_FileUtils_setPermissions(JNIEnv* env, jobject clazz,
     if (strlen(fileStr) <= 0) {
         env->ReleaseStringUTFChars(file, fileStr);
         return ENOENT;
-    } 
+    }
 
     jint returnValue = chmod(fileStr, mode) == 0 ? 0 : errno;
     env->ReleaseStringUTFChars(file, fileStr);
@@ -110,22 +110,22 @@ jint android_os_cts_FileUtils_setPermissions(JNIEnv* env, jobject clazz,
 }
 
 static JNINativeMethod gMethods[] = {
-    {  "getFileStatus", "(Ljava/lang/String;Landroid/os/cts/FileUtils$FileStatus;Z)Z",
-            (void *) android_os_cts_FileUtils_getFileStatus  },
+    {  "getFileStatus", "(Ljava/lang/String;Landroid/cts/util/FileUtils$FileStatus;Z)Z",
+            (void *) android_cts_FileUtils_getFileStatus  },
     {  "getUserName", "(I)Ljava/lang/String;",
-            (void *) android_os_cts_FileUtils_getUserName  },
+            (void *) android_cts_FileUtils_getUserName  },
     {  "getGroupName", "(I)Ljava/lang/String;",
-            (void *) android_os_cts_FileUtils_getGroupName  },
+            (void *) android_cts_FileUtils_getGroupName  },
     {  "setPermissions", "(Ljava/lang/String;I)I",
-            (void *) android_os_cts_FileUtils_setPermissions },
+            (void *) android_cts_FileUtils_setPermissions },
 };
 
-int register_android_os_cts_FileUtils(JNIEnv* env)
+int register_android_cts_FileUtils(JNIEnv* env)
 {
-    jclass clazz = env->FindClass("android/os/cts/FileUtils");
+    jclass clazz = env->FindClass("android/cts/util/FileUtils");
     assert(clazz != null);
 
-    gFileStatusClass = env->FindClass("android/os/cts/FileUtils$FileStatus");
+    gFileStatusClass = env->FindClass("android/cts/util/FileUtils$FileStatus");
     assert(gFileStatusClass != null);
     gFileStatusDevFieldID = env->GetFieldID(gFileStatusClass, "dev", "I");
     gFileStatusInoFieldID = env->GetFieldID(gFileStatusClass, "ino", "I");
@@ -140,6 +140,6 @@ int register_android_os_cts_FileUtils(JNIEnv* env)
     gFileStatusMtimeFieldID = env->GetFieldID(gFileStatusClass, "mtime", "J");
     gFileStatusCtimeFieldID = env->GetFieldID(gFileStatusClass, "ctime", "J");
 
-    return env->RegisterNatives(clazz, gMethods, 
-            sizeof(gMethods) / sizeof(JNINativeMethod)); 
+    return env->RegisterNatives(clazz, gMethods,
+            sizeof(gMethods) / sizeof(JNINativeMethod));
 }

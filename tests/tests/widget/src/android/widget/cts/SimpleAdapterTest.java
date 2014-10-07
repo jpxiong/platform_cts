@@ -20,6 +20,7 @@ import com.android.internal.R;
 
 
 import android.content.Context;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;

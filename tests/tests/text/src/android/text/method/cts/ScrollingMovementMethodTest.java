@@ -18,6 +18,7 @@ package android.text.method.cts;
 
 import dalvik.annotation.KnownFailure;
 
+import android.cts.util.WidgetTestUtils;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.Layout;
@@ -33,7 +34,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
-import android.text.cts.WidgetTestUtils;
 
 /**
  * Test {@link ScrollingMovementMethod}. The class is an implementation of interface
