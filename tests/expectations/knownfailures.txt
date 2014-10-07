@@ -78,6 +78,19 @@
   bug: 17496766
 },
 {
+  description: "As per new CTS test case adding policy",
+  names: [
+    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_primary",
+    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_all",
+    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_managed",
+    "com.android.cts.managedprofile.ManagedProfile#testClearCrossProfileIntentFilters",
+    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_primary",
+    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_all",
+    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_managed"
+  ],
+  bug: 15900074
+},
+{
   description: "Current implementation of uninstallAllUserCaCerts does not throw expected security exception, wait for fix from framework",
   names: [
     "android.admin.cts.DevicePolicyManagerTest#testUninstallAllUserCaCerts_failIfNotProfileOwner"
