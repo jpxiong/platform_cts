@@ -142,8 +142,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
 
         // Extract the id of the new user.
         String[] tokens = commandOutput.split("\\s+");
-        assertTrue(tokens.length > 0);
-        assertEquals("Success:", tokens[0]);
+        assertTrue(commandOutput + " expected to have format \"Success: {USER_ID}\"",
+                tokens.length > 0);
+        assertEquals(commandOutput, "Success:", tokens[0]);
         return Integer.parseInt(tokens[tokens.length-1]);
     }
 
@@ -152,6 +153,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         String command = "dpm set-profile-owner '" + componentName + "' " + userId;
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput.startsWith("Success:"));
+        assertTrue(commandOutput + " expected to start with \"Success:\"",
+                commandOutput.startsWith("Success:"));
     }
 }
