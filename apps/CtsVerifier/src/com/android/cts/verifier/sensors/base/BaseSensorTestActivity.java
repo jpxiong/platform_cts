@@ -349,6 +349,9 @@ public abstract class BaseSensorTestActivity
         });
     }
 
+    /**
+     * Plays a (default) sound as a notification for the operator.
+     */
     protected void playSound() {
         MediaPlayer player = MediaPlayer.create(this, Settings.System.DEFAULT_NOTIFICATION_URI);
         if (player == null) {
@@ -366,11 +369,18 @@ public abstract class BaseSensorTestActivity
         }
     }
 
+    /**
+     * Makes the device vibrate for the given amount of time.
+     */
     protected void vibrate(int timeInMs) {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(timeInMs);
     }
 
+    /**
+     * Makes the device vibrate following the given pattern.
+     * See {@link Vibrator#vibrate(long[], int)} for more information.
+     */
     protected void vibrate(long[] pattern) {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(pattern, -1);
@@ -518,8 +528,6 @@ public abstract class BaseSensorTestActivity
             textAppender.setText(testName);
             textAppender.append();
         }
-
-        // TODO: add methods to log failures in activity setup/cleanup
 
         public void logInstructions(int instructionsResId, Object ... params) {
             TextAppender textAppender = new TextAppender(R.layout.snsr_instruction);

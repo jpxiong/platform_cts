@@ -15,6 +15,8 @@
  */
 package android.hardware.cts.helpers;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Set of static helper methods for CTS tests.
  */
-//TODO: Refactor this class and SensorTestInformation into several more well defined helper classes
+//TODO: Refactor this class into several more well defined helper classes
 public class SensorCtsHelper {
 
     private static final long NANOS_PER_MILLI = 1000000;
@@ -34,6 +36,83 @@ public class SensorCtsHelper {
      */
     private SensorCtsHelper() {}
 
+    /**
+     * Get the value of the 95th percentile using nearest rank algorithm.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
+    public static <TValue extends Comparable<? super TValue>> TValue get95PercentileValue(
+            Collection<TValue> collection) {
+        validateCollection(collection);
+
+        List<TValue> arrayCopy = new ArrayList<TValue>(collection);
+        Collections.sort(arrayCopy);
+
+        // zero-based array index
+        int arrayIndex = (int) Math.round(arrayCopy.size() * 0.95 + .5) - 1;
+
+        return arrayCopy.get(arrayIndex);
+    }
+
+    /**
+     * Calculate the mean of a collection.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
+    public static <TValue extends Number> double getMean(Collection<TValue> collection) {
+        validateCollection(collection);
+
+        double sum = 0.0;
+        for(TValue value : collection) {
+            sum += value.doubleValue();
+        }
+        return sum / collection.size();
+    }
+
+    /**
+     * Calculate the bias-corrected sample variance of a collection.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
+    public static <TValue extends Number> double getVariance(Collection<TValue> collection) {
+        validateCollection(collection);
+
+        double mean = getMean(collection);
+        ArrayList<Double> squaredDiffs = new ArrayList<Double>();
+        for(TValue value : collection) {
+            double difference = mean - value.doubleValue();
+            squaredDiffs.add(Math.pow(difference, 2));
+        }
+
+        double sum = 0.0;
+        for (Double value : squaredDiffs) {
+            sum += value;
+        }
+        return sum / (squaredDiffs.size() - 1);
+    }
+
+    /**
+     * @return The (measured) sampling rate of a collection of {@link TestSensorEvent}.
+     */
+    public static long getSamplingPeriodNs(List<TestSensorEvent> collection) {
+        int collectionSize = collection.size();
+        if (collectionSize < 2) {
+            return 0;
+        }
+        TestSensorEvent firstEvent = collection.get(0);
+        TestSensorEvent lastEvent = collection.get(collectionSize - 1);
+        return (lastEvent.timestamp - firstEvent.timestamp) / (collectionSize - 1);
+    }
+
+    /**
+     * Calculate the bias-corrected standard deviation of a collection.
+     *
+     * @throws IllegalArgumentException if the collection is null or empty
+     */
+    public static <TValue extends Number> double getStandardDeviation(
+            Collection<TValue> collection) {
+        return Math.sqrt(getVariance(collection));
+    }
 
     /**
      * Convert a period to frequency in Hz.
@@ -50,10 +129,15 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Convert number of seconds to number of microseconds.
+     * @return The magnitude (norm) represented by the given array of values.
      */
-    public static int getSecondsAsMicroSeconds(int seconds) {
-        return (int) TimeUnit.MICROSECONDS.convert(seconds, TimeUnit.SECONDS);
+    public static double getMagnitude(float[] values) {
+        float sumOfSquares = 0.0f;
+        for (float value : values) {
+            sumOfSquares += value * value;
+        }
+        double magnitude = Math.sqrt(sumOfSquares);
+        return magnitude;
     }
 
     /**
@@ -77,7 +161,7 @@ public class SensorCtsHelper {
      * @return The formatted string
      */
     public static String formatAssertionMessage(String label, TestSensorEnvironment environment) {
-        return formatAssertionMessage(label, environment, "");
+        return formatAssertionMessage(label, environment, "Failed");
     }
 
     /**
@@ -112,12 +196,42 @@ public class SensorCtsHelper {
             TestSensorEnvironment environment,
             String extras) {
         return String.format(
-                "%s | sensor=%s, rateUs=%d, maxBatchReportLatenchUs=%d | %s",
+                "%s | sensor='%s', samplingPeriodUs=%d, maxReportLatencyUs=%d | %s",
                 label,
-                SensorTestInformation.getSensorName(environment.getSensor().getType()),
+                environment.getSensor().getName(),
                 environment.getRequestedSamplingPeriodUs(),
                 environment.getMaxReportLatencyUs(),
                 extras);
+    }
+
+    /**
+     * @return A {@link File} representing a root directory to store sensor tests data.
+     */
+    public static File getSensorTestDataDirectory() throws IOException {
+        File dataDirectory = new File(System.getenv("EXTERNAL_STORAGE"), "sensorTests/");
+        return createDirectoryStructure(dataDirectory);
+    }
+
+    /**
+     * Creates the directory structure for the given sensor test data sub-directory.
+     *
+     * @param subdirectory The sub-directory's name.
+     */
+    public static File getSensorTestDataDirectory(String subdirectory) throws IOException {
+        File subdirectoryFile = new File(getSensorTestDataDirectory(), subdirectory);
+        return createDirectoryStructure(subdirectoryFile);
+    }
+
+    /**
+     * Ensures that the directory structure represented by the given {@link File} is created.
+     */
+    private static File createDirectoryStructure(File directoryStructure) throws IOException {
+        directoryStructure.mkdirs();
+        if (!directoryStructure.isDirectory()) {
+            throw new IOException("Unable to create directory structure for "
+                    + directoryStructure.getAbsolutePath());
+        }
+        return directoryStructure;
     }
 
     /**

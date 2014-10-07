@@ -541,10 +541,13 @@
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
     <string name="snsr_mag_verify_norm">Verifying the Norm...</string>
     <string name="snsr_mag_verify_std_dev">Verifying the Standard Deviation...</string>
+    <string name="snsr_mag_verify_calibrated_uncalibrated">Verifying the relationship between
+        calibrated and uncalibrated measurements...</string>
     <string name="snsr_mag_calibration_description">Please calibrate the Magnetometer by moving
         it in 8 shapes in different orientations.</string>
     <string name="snsr_mag_calibration_complete">When done, leave the device in a flat surface, far
         from all metallic objects (if the test does not pass, try re-running it outdoors).</string>
+    <string name="snsr_mag_measurement">-&gt; (%1$.2f, %2$.2f, %3$.2f) : %4$.2f uT</string>
 
     <!-- Sensor Value Accuracy -->
     <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>

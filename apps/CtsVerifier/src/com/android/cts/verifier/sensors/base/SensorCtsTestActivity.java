@@ -86,7 +86,12 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
 
     @Override
     protected void activityCleanUp() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            }
+        });
         mScreenManipulator.turnScreenOn();
         mWakeLock.release();
     }
