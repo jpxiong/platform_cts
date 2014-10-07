@@ -49,7 +49,7 @@ public class SensorStats {
     public static final String EVENT_OUT_OF_ORDER_COUNT_KEY = "event_out_of_order_count";
     public static final String EVENT_OUT_OF_ORDER_POSITIONS_KEY = "event_out_of_order_positions";
     public static final String FREQUENCY_KEY = "frequency";
-    public static final String JITTER_95_PERCENTILE_KEY = "jitter_95_percentile";
+    public static final String JITTER_95_PERCENTILE_PERCENT_KEY = "jitter_95_percentile_percent";
     public static final String MEAN_KEY = "mean";
     public static final String STANDARD_DEVIATION_KEY = "standard_deviation";
     public static final String MAGNITUDE_KEY = "magnitude";

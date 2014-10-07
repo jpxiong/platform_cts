@@ -23,13 +23,11 @@ import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link ISensorVerification} which verifies that the sensor jitter is in an acceptable range.
@@ -38,26 +36,22 @@ public class JitterVerification extends AbstractSensorVerification {
     public static final String PASSED_KEY = "jitter_passed";
 
     // sensorType: threshold (% of expected period)
-    private static final Map<Integer, Integer> DEFAULTS = new HashMap<Integer, Integer>(12);
+    private static final SparseIntArray DEFAULTS = new SparseIntArray(12);
     static {
         // Use a method so that the @deprecation warning can be set for that method only
         setDefaults();
     }
 
-    private final int mExpected;
-    private final int mThreshold;
-
-    private List<Long> mTimestamps = new LinkedList<Long>();
+    private final int mThresholdAsPercentage;
+    private final List<Long> mTimestamps = new LinkedList<Long>();
 
     /**
      * Construct a {@link JitterVerification}
      *
-     * @param expected the expected period in ns
-     * @param threshold the acceptable margin of error as a percentage
+     * @param thresholdAsPercentage the acceptable margin of error as a percentage
      */
-    public JitterVerification(int expected, int threshold) {
-        mExpected = expected;
-        mThreshold = threshold;
+    public JitterVerification(int thresholdAsPercentage) {
+        mThresholdAsPercentage = thresholdAsPercentage;
     }
 
     /**
@@ -68,40 +62,48 @@ public class JitterVerification extends AbstractSensorVerification {
      */
     public static JitterVerification getDefault(TestSensorEnvironment environment) {
         int sensorType = environment.getSensor().getType();
-        if (!DEFAULTS.containsKey(sensorType)) {
+        int threshold = DEFAULTS.get(sensorType, -1);
+        if (threshold == -1) {
             return null;
         }
-
-        int expected = (int) TimeUnit.NANOSECONDS
-                .convert(environment.getExpectedSamplingPeriodUs(), TimeUnit.MICROSECONDS);
-        return new JitterVerification(expected, DEFAULTS.get(sensorType));
+        return new JitterVerification(threshold);
     }
 
     /**
      * Verify that the 95th percentile of the jitter is in the acceptable range. Add
-     * {@value #PASSED_KEY} and {@value SensorStats#JITTER_95_PERCENTILE_KEY} keys to
+     * {@value #PASSED_KEY} and {@value SensorStats#JITTER_95_PERCENTILE_PERCENT_KEY} keys to
      * {@link SensorStats}.
      *
      * @throws AssertionError if the verification failed.
      */
     @Override
     public void verify(TestSensorEnvironment environment, SensorStats stats) {
-        if (mTimestamps.size() < 2 || environment.isSensorSamplingRateOverloaded()) {
+        int timestampsCount = mTimestamps.size();
+        if (timestampsCount < 2 || environment.isSensorSamplingRateOverloaded()) {
             // the verification is not reliable in environments under load
             stats.addValue(PASSED_KEY, true);
             return;
         }
 
         List<Double> jitters = getJitterValues();
-        double jitter95Percentile = SensorCtsHelper.get95PercentileValue(jitters);
-        boolean failed = (jitter95Percentile > mExpected * (mThreshold / 100.0));
+        double jitter95PercentileNs = SensorCtsHelper.get95PercentileValue(jitters);
+        long firstTimestamp = mTimestamps.get(0);
+        long lastTimestamp = mTimestamps.get(timestampsCount - 1);
+        long measuredPeriodNs = (lastTimestamp - firstTimestamp) / (timestampsCount - 1);
+        double jitter95PercentilePercent = (jitter95PercentileNs * 100.0) / measuredPeriodNs;
+        stats.addValue(SensorStats.JITTER_95_PERCENTILE_PERCENT_KEY, jitter95PercentilePercent);
 
-        stats.addValue(PASSED_KEY, !failed);
-        stats.addValue(SensorStats.JITTER_95_PERCENTILE_KEY, jitter95Percentile);
+        boolean success = (jitter95PercentilePercent < mThresholdAsPercentage);
+        stats.addValue(PASSED_KEY, success);
 
-        if (failed) {
-            Assert.fail(String.format("Jitter out of range: jitter at 95th percentile=%.0fns "
-                    + "(expected <%.0fns)", jitter95Percentile, mExpected * (mThreshold / 100.0)));
+        if (!success) {
+            String message = String.format(
+                    "Jitter out of range: measured period=%dns, jitter(95th percentile)=%.2f%%"
+                            + " (expected < %d%%)",
+                    measuredPeriodNs,
+                    jitter95PercentilePercent,
+                    mThresholdAsPercentage);
+            Assert.fail(message);
         }
     }
 
@@ -110,7 +112,7 @@ public class JitterVerification extends AbstractSensorVerification {
      */
     @Override
     public JitterVerification clone() {
-        return new JitterVerification(mExpected, mThreshold);
+        return new JitterVerification(mThresholdAsPercentage);
     }
 
     /**
@@ -127,7 +129,7 @@ public class JitterVerification extends AbstractSensorVerification {
     List<Double> getJitterValues() {
         List<Long> deltas = new ArrayList<Long>(mTimestamps.size() - 1);
         for (int i = 1; i < mTimestamps.size(); i++) {
-            deltas.add(mTimestamps.get(i) - mTimestamps.get(i -1));
+            deltas.add(mTimestamps.get(i) - mTimestamps.get(i - 1));
         }
         double deltaMean = SensorCtsHelper.getMean(deltas);
         List<Double> jitters = new ArrayList<Double>(deltas.size());
@@ -139,18 +141,17 @@ public class JitterVerification extends AbstractSensorVerification {
 
     @SuppressWarnings("deprecation")
     private static void setDefaults() {
-        // Sensors that we don't want to test at this time but still want to record the values.
         DEFAULTS.put(Sensor.TYPE_ACCELEROMETER, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD, Integer.MAX_VALUE);
+        DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_GYROSCOPE, Integer.MAX_VALUE);
+        DEFAULTS.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_ORIENTATION, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_PRESSURE, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_GRAVITY, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_LINEAR_ACCELERATION, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_ROTATION_VECTOR, Integer.MAX_VALUE);
-        DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_GAME_ROTATION_VECTOR, Integer.MAX_VALUE);
-        DEFAULTS.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, Integer.MAX_VALUE);
         DEFAULTS.put(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, Integer.MAX_VALUE);
     }
 }
