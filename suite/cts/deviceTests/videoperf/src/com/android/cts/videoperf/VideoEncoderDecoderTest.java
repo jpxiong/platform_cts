@@ -68,6 +68,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private int mBufferHeight;
     private int mVideoWidth;
     private int mVideoHeight;
+    private int mFrameRate;
 
     private Vector<ByteBuffer> mEncodedOutputBuffer;
     // check this many pixels per each decoded frame
@@ -155,6 +156,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     infoEnc.mSupportSemiPlanar ? CodecCapabilities.COLOR_FormatYUV420SemiPlanar :
                         CodecCapabilities.COLOR_FormatYUV420Planar);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, infoEnc.mFps);
+            mFrameRate = infoEnc.mFps;
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, KEY_I_FRAME_INTERVAL);
             double encodingTime = runEncoder(VIDEO_AVC, format, TOTAL_FRAMES);
             // re-initialize format for decoder
@@ -312,8 +314,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             }
         }
         int size = mVideoHeight * mVideoWidth * 3 /2;
+        long ptsUsec = computePresentationTime(frameCount);
 
-        codec.queueInputBuffer(index, 0 /* offset */, size, 0 /* timeUs */, flags);
+        codec.queueInputBuffer(index, 0 /* offset */, size, ptsUsec /* timeUs */, flags);
         if (VERBOSE && (frameCount == 0)) {
             printByteArray("Y ", mYBuffer.array(), 0, 20);
             printByteArray("UV ", mUVBuffer.array(), 0, 20);
@@ -601,5 +604,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         }
         builder.deleteCharAt(builder.length() - 1);
         Log.i(TAG, builder.toString());
+    }
+
+    /**
+     * Generates the presentation time for frame N, in microseconds.
+     */
+    private long computePresentationTime(int frameIndex) {
+        return 132 + frameIndex * 1000000L / mFrameRate;
     }
 }
