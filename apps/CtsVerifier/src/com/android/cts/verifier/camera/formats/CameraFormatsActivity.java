@@ -18,7 +18,6 @@ package com.android.cts.verifier.camera.formats;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -47,9 +46,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.lang.InterruptedException;
 import java.lang.Math;
-import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Comparator;
