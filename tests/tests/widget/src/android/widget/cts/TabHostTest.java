@@ -22,6 +22,7 @@ import com.android.cts.widget.R;
 import android.app.Activity;
 import android.app.ActivityGroup;
 import android.content.Intent;
+import android.cts.util.WidgetTestUtils;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.View;

@@ -1,4 +1,4 @@
-# Copyright (C) 2010 The Android Open Source Project
+# Copyright (C) 2014 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,23 +16,15 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libctsos_jni
-
-# Don't include this package in any configuration by default.
-LOCAL_MODULE_TAGS := optional
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil
 
 LOCAL_SRC_FILES := \
-		CtsOsJniOnLoad.cpp \
-		android_os_cts_CpuInstructions.cpp.arm \
-		android_os_cts_TaggedPointer.cpp \
-		android_os_cts_OSFeatures.cpp
+    $(call all-java-files-under, src)
 
-LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog libdl
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
-LOCAL_C_INCLUDES += ndk/sources/cpufeatures
-LOCAL_STATIC_LIBRARIES := cpufeatures
+LOCAL_MODULE := ctsdeviceutillegacy
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_JAVA_LIBRARY)

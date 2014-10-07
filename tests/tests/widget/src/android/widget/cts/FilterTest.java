@@ -18,6 +18,8 @@ package android.widget.cts;
 
 
 import android.cts.util.PollingCheck;
+import android.cts.util.ReadElf;
+import android.cts.util.TestThread;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Filter;

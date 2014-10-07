@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetFileDescriptor;
+import android.cts.util.FileCopyHelper;
 import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
@@ -38,7 +39,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.provider.MediaStore;
-import android.provider.cts.FileCopyHelper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 

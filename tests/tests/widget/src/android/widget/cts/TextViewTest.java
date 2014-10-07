@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
 import android.cts.util.PollingCheck;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;

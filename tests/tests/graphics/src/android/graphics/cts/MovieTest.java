@@ -24,11 +24,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.content.Context;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.test.ActivityInstrumentationTestCase2;
-
 
 public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private Movie mMovie;

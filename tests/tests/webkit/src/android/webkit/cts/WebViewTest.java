@@ -20,6 +20,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.cts.util.EvaluateJsResultPollingCheck;
+import android.cts.util.NullWebViewUtils;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;

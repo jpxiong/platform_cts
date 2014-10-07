@@ -20,6 +20,7 @@ import com.android.cts.widget.R;
 
 
 import android.content.Context;
+import android.cts.util.WidgetTestUtils;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;

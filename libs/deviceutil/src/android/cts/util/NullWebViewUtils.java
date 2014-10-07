@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.webgl.cts;
+package android.cts.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

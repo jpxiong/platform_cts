@@ -24,7 +24,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := telephony-common
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner ctsdeviceutil
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
