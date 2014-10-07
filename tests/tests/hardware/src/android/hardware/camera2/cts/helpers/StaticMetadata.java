@@ -1282,7 +1282,7 @@ public class StaticMetadata {
         if (isHardwareLevelLimitedOrBetter()) {
             float compensationStepF =
                     (float) compensationStep.getNumerator() / compensationStep.getDenominator();
-            checkTrueForKey(key, " value must be no more than 1/2", compensationStepF < 0.5f);
+            checkTrueForKey(key, " value must be no more than 1/2", compensationStepF <= 0.5f);
         }
 
         return compensationStep;
