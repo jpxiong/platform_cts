@@ -24,7 +24,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.app.UiModeManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.cts.util.PollingCheck;
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
@@ -102,6 +104,12 @@ public class AutoCompleteTextViewTest extends
         if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
             mNumeric = true;
         }
+    }
+
+    boolean isTvMode() {
+        UiModeManager uiModeManager = (UiModeManager) getActivity().getSystemService(
+                Context.UI_MODE_SERVICE);
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 
     @UiThreadTest
@@ -432,6 +440,9 @@ public class AutoCompleteTextViewTest extends
     }
 
     public void testPerformFiltering() throws Throwable {
+        if (isTvMode()) {
+            return;
+        }
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mAutoCompleteTextView.setAdapter(mAdapter);
@@ -502,6 +513,9 @@ public class AutoCompleteTextViewTest extends
     }
 
     public void testPerformCompletion() throws Throwable {
+        if (isTvMode()) {
+            return;
+        }
         final MockOnItemClickListener listener = new MockOnItemClickListener();
         assertFalse(mAutoCompleteTextView.isPerformingCompletion());
 
