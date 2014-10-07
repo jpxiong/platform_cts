@@ -1448,7 +1448,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
     public void testPlayStreamByteBuffer() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlayStreamByteBuffer";
-        final int TEST_FORMAT_ARRAY[] = {  // should hear 2 tones played 3 times
+        final int TEST_FORMAT_ARRAY[] = {  // should hear 4 tones played 3 times
                 AudioFormat.ENCODING_PCM_8BIT,
                 AudioFormat.ENCODING_PCM_16BIT,
                 AudioFormat.ENCODING_PCM_FLOAT,
@@ -1459,6 +1459,10 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         final int TEST_CONF_ARRAY[] = {
                 AudioFormat.CHANNEL_OUT_STEREO,
         };
+        final int TEST_WRITE_MODE_ARRAY[] = {
+                AudioTrack.WRITE_BLOCKING,
+                AudioTrack.WRITE_NON_BLOCKING,
+        };
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
@@ -1466,68 +1470,71 @@ public class AudioTrackTest extends CtsAndroidTestCase {
             double frequency = 800; // frequency changes for each test
             for (int TEST_SR : TEST_SR_ARRAY) {
                 for (int TEST_CONF : TEST_CONF_ARRAY) {
-                    for (int useDirect = 0; useDirect < 2; ++useDirect) {
-                        // -------- initialization --------------
-                        int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
-                                TEST_CONF, TEST_FORMAT); // in bytes
-                        int bufferSize = 12 * minBufferSize;
-                        int bufferSamples = bufferSize
-                                / AudioFormat.getBytesPerSample(TEST_FORMAT);
-                        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
-                                TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
-                        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
-                        boolean hasPlayed = false;
-                        int written = 0;
-                        ByteBuffer bb = (useDirect == 1)
-                                ? ByteBuffer.allocateDirect(bufferSize)
-                                        : ByteBuffer.allocate(bufferSize);
-                        bb.order(java.nio.ByteOrder.nativeOrder());
+                    for (int TEST_WRITE_MODE : TEST_WRITE_MODE_ARRAY) {
+                        for (int useDirect = 0; useDirect < 2; ++useDirect) {
+                            // -------- initialization --------------
+                            int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
+                                    TEST_CONF, TEST_FORMAT); // in bytes
+                            int bufferSize = 12 * minBufferSize;
+                            int bufferSamples = bufferSize
+                                    / AudioFormat.getBytesPerSample(TEST_FORMAT);
+                            AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
+                                    TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
+                            assertTrue(TEST_NAME,
+                                    track.getState() == AudioTrack.STATE_INITIALIZED);
+                            boolean hasPlayed = false;
+                            int written = 0;
+                            ByteBuffer bb = (useDirect == 1)
+                                    ? ByteBuffer.allocateDirect(bufferSize)
+                                            : ByteBuffer.allocate(bufferSize);
+                            bb.order(java.nio.ByteOrder.nativeOrder());
 
-                        // -------- test --------------
-                        switch (TEST_FORMAT) {
-                        case AudioFormat.ENCODING_PCM_8BIT: {
-                            byte data[] = createSoundDataInByteArray(
-                                    bufferSamples, TEST_SR,
-                                    frequency);
-                            bb.put(data);
-                            bb.flip();
-                            } break;
-                        case AudioFormat.ENCODING_PCM_16BIT: {
-                            short data[] = createSoundDataInShortArray(
-                                    bufferSamples, TEST_SR,
-                                    frequency);
-                            ShortBuffer sb = bb.asShortBuffer();
-                            sb.put(data);
-                            bb.limit(sb.limit() * 2);
-                            } break;
-                        case AudioFormat.ENCODING_PCM_FLOAT: {
-                            float data[] = createSoundDataInFloatArray(
-                                    bufferSamples, TEST_SR,
-                                    frequency);
-                            FloatBuffer fb = bb.asFloatBuffer();
-                            fb.put(data);
-                            bb.limit(fb.limit() * 4);
-                            } break;
-                        }
-
-                        while (written < bufferSize) {
-                            int ret = track.write(bb,
-                                    Math.min(bufferSize - written, minBufferSize),
-                                    AudioTrack.WRITE_BLOCKING);
-                            assertTrue(TEST_NAME, ret >= 0);
-                            written += ret;
-                            if (!hasPlayed) {
-                                track.play();
-                                hasPlayed = true;
+                            // -------- test --------------
+                            switch (TEST_FORMAT) {
+                                case AudioFormat.ENCODING_PCM_8BIT: {
+                                    byte data[] = createSoundDataInByteArray(
+                                            bufferSamples, TEST_SR,
+                                            frequency);
+                                    bb.put(data);
+                                    bb.flip();
+                                } break;
+                                case AudioFormat.ENCODING_PCM_16BIT: {
+                                    short data[] = createSoundDataInShortArray(
+                                            bufferSamples, TEST_SR,
+                                            frequency);
+                                    ShortBuffer sb = bb.asShortBuffer();
+                                    sb.put(data);
+                                    bb.limit(sb.limit() * 2);
+                                } break;
+                                case AudioFormat.ENCODING_PCM_FLOAT: {
+                                    float data[] = createSoundDataInFloatArray(
+                                            bufferSamples, TEST_SR,
+                                            frequency);
+                                    FloatBuffer fb = bb.asFloatBuffer();
+                                    fb.put(data);
+                                    bb.limit(fb.limit() * 4);
+                                } break;
                             }
-                        }
 
-                        Thread.sleep(WAIT_MSEC);
-                        track.stop();
-                        Thread.sleep(WAIT_MSEC);
-                        // -------- tear down --------------
-                        track.release();
-                        frequency += 200; // increment test tone frequency
+                            while (written < bufferSize) {
+                                int ret = track.write(bb,
+                                        Math.min(bufferSize - written, minBufferSize),
+                                        TEST_WRITE_MODE);
+                                assertTrue(TEST_NAME, ret >= 0);
+                                written += ret;
+                                if (!hasPlayed) {
+                                    track.play();
+                                    hasPlayed = true;
+                                }
+                            }
+
+                            Thread.sleep(WAIT_MSEC);
+                            track.stop();
+                            Thread.sleep(WAIT_MSEC);
+                            // -------- tear down --------------
+                            track.release();
+                            frequency += 200; // increment test tone frequency
+                        }
                     }
                 }
             }
