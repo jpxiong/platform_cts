@@ -26,6 +26,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.WidgetTestUtils;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;

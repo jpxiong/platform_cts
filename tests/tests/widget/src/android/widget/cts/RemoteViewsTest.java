@@ -26,6 +26,7 @@ import android.app.PendingIntent;
 import android.app.Instrumentation.ActivityMonitor;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;

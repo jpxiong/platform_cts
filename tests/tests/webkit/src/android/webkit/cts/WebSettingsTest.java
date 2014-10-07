@@ -16,6 +16,7 @@
 package android.webkit.cts;
 
 import android.content.Context;
+import android.cts.util.NullWebViewUtils;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.net.http.SslError;

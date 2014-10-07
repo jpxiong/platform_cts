@@ -17,6 +17,7 @@
 package android.widget.cts;
 
 import android.app.Activity;
+import android.cts.util.NullWebViewUtils;
 import android.os.Parcel;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.MediumTest;

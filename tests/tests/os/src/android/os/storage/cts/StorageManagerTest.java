@@ -22,7 +22,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.os.Environment;
-import android.os.cts.FileUtils;
+import android.cts.util.FileUtils;
 import android.os.storage.OnObbStateChangeListener;
 import android.os.storage.StorageManager;
 import android.test.AndroidTestCase;

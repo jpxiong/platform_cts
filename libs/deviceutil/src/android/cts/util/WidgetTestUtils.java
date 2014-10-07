@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.widget.cts;
+package android.cts.util;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

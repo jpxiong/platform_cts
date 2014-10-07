@@ -17,6 +17,7 @@
 package android.webkit.cts;
 
 import android.cts.util.EvaluateJsResultPollingCheck;
+import android.cts.util.NullWebViewUtils;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;

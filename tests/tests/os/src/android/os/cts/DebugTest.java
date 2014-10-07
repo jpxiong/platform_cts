@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.content.Context;
+import android.cts.util.TestThread;
 import android.os.Debug;
 import android.test.AndroidTestCase;
 import dalvik.system.VMDebug;

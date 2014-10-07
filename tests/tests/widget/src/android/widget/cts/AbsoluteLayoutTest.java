@@ -24,6 +24,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.cts.util.WidgetTestUtils;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
 import android.util.Xml;

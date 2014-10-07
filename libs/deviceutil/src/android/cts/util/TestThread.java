@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.os.cts;
+package android.cts.util;
 
 /**
  * Thread class for executing a Runnable containing assertions in a separate thread.

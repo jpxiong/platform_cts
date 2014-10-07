@@ -23,6 +23,7 @@ import com.android.internal.view.menu.MenuBuilder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
