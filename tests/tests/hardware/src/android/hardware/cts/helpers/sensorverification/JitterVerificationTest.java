@@ -47,7 +47,7 @@ public class JitterVerificationTest extends TestCase {
             timestamps[i] = i * 100000;
         }
         SensorStats stats = new SensorStats();
-        ISensorVerification verification = getVerification(1000, 1, timestamps);
+        ISensorVerification verification = getVerification(1, timestamps);
         verification.verify(environment, stats);
         verifyStats(stats, true, 0.0);
 
@@ -58,48 +58,48 @@ public class JitterVerificationTest extends TestCase {
             timestamp += (i % 10 == 0) ? 500000 : 1000000;
         }
         stats = new SensorStats();
-        verification = getVerification(1000, 1, timestamps);
+        verification = getVerification(1, timestamps);
         try {
             verification.verify(environment, stats);
             fail("Expected an AssertionError");
         } catch (AssertionError e) {
             // Expected;
         }
-        verifyStats(stats, false, 449494.9494);
+        verifyStats(stats, false, 47.34);
     }
 
     public void testCalculateJitter() {
         long[] timestamps = new long[]{0, 1, 2, 3, 4};
-        JitterVerification verification = getVerification(1000, 1, timestamps);
+        JitterVerification verification = getVerification(1, timestamps);
         List<Double> jitterValues = verification.getJitterValues();
         assertEquals(4, jitterValues.size());
-        assertEquals(0.0, (double) jitterValues.get(0));
-        assertEquals(0.0, (double) jitterValues.get(1));
-        assertEquals(0.0, (double) jitterValues.get(2));
-        assertEquals(0.0, (double) jitterValues.get(3));
+        assertEquals(0.0, jitterValues.get(0));
+        assertEquals(0.0, jitterValues.get(1));
+        assertEquals(0.0, jitterValues.get(2));
+        assertEquals(0.0, jitterValues.get(3));
 
         timestamps = new long[]{0, 0, 2, 4, 4};
-        verification = getVerification(1000, 1, timestamps);
+        verification = getVerification(1, timestamps);
         jitterValues = verification.getJitterValues();
         assertEquals(4, jitterValues.size());
-        assertEquals(1.0, (double) jitterValues.get(0));
-        assertEquals(1.0, (double) jitterValues.get(1));
-        assertEquals(1.0, (double) jitterValues.get(2));
-        assertEquals(1.0, (double) jitterValues.get(3));
+        assertEquals(1.0, jitterValues.get(0));
+        assertEquals(1.0, jitterValues.get(1));
+        assertEquals(1.0, jitterValues.get(2));
+        assertEquals(1.0, jitterValues.get(3));
 
         timestamps = new long[]{0, 1, 4, 9, 16};
-        verification = getVerification(1000, 1, timestamps);
+        verification = getVerification(1, timestamps);
         jitterValues = verification.getJitterValues();
         assertEquals(4, jitterValues.size());
         assertEquals(4, jitterValues.size());
-        assertEquals(3.0, (double) jitterValues.get(0));
-        assertEquals(1.0, (double) jitterValues.get(1));
-        assertEquals(1.0, (double) jitterValues.get(2));
-        assertEquals(3.0, (double) jitterValues.get(3));
+        assertEquals(3.0, jitterValues.get(0));
+        assertEquals(1.0, jitterValues.get(1));
+        assertEquals(1.0, jitterValues.get(2));
+        assertEquals(3.0, jitterValues.get(3));
     }
 
-    private JitterVerification getVerification(int expected, int threshold, long ... timestamps) {
-        JitterVerification verification = new JitterVerification(expected, threshold);
+    private JitterVerification getVerification(int threshold, long ... timestamps) {
+        JitterVerification verification = new JitterVerification(threshold);
         for (long timestamp : timestamps) {
             verification.addSensorEvent(new TestSensorEvent(null, timestamp, 0, null));
         }
@@ -108,6 +108,9 @@ public class JitterVerificationTest extends TestCase {
 
     private void verifyStats(SensorStats stats, boolean passed, double jitter95) {
         assertEquals(passed, stats.getValue(JitterVerification.PASSED_KEY));
-        assertEquals(jitter95, (Double) stats.getValue(SensorStats.JITTER_95_PERCENTILE_KEY), 0.1);
+        assertEquals(
+                jitter95,
+                (Double) stats.getValue(SensorStats.JITTER_95_PERCENTILE_PERCENT_KEY),
+                0.1);
     }
 }
