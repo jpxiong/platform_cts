@@ -86,14 +86,15 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
             return;
         }
         String testClass = DEVICE_OWNER_PKG + "." + testClassName;
-        assertTrue(runDeviceTests(DEVICE_OWNER_PKG, testClass));
+        assertTrue(testClass + " failed.", runDeviceTests(DEVICE_OWNER_PKG, testClass));
     }
 
     private void setDeviceOwner(String componentName) throws DeviceNotAvailableException {
         String command = "dpm set-device-owner '" + componentName + "'";
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput.startsWith("Success:"));
+        assertTrue(commandOutput + " expected to start with \"Success:\"",
+                commandOutput.startsWith("Success:"));
     }
 
 }
