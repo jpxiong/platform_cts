@@ -62,7 +62,7 @@ abstract class SensorSettingContainer {
         BaseSensorTestActivity.SensorTestLogger logger = stateContainer.getTestLogger();
         String settingName = getSettingName(stateContainer);
         if (getCurrentSettingMode() == modeOn) {
-            logger.logInstructions(R.string.snsr_setting_mode_set, settingName, modeOn);
+            logger.logMessage(R.string.snsr_setting_mode_set, settingName, modeOn);
             return;
         }
 

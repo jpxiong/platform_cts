@@ -20,6 +20,7 @@ import junit.framework.Assert;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
@@ -119,11 +120,7 @@ public class MagnitudeVerification extends AbstractSensorVerification {
      */
     @Override
     protected void addSensorEventInternal(TestSensorEvent event) {
-        float sumOfSquares = 0.0f;
-        for (float value : event.values) {
-            sumOfSquares += value * value;
-        }
-        mSum += (float) Math.sqrt(sumOfSquares);
+        mSum += SensorCtsHelper.getMagnitude(event.values);
         mCount++;
     }
 

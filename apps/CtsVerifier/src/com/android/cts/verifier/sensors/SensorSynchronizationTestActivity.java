@@ -14,7 +14,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.Build;
-import android.os.SystemClock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,7 +160,7 @@ public class SensorSynchronizationTestActivity
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        mSensorEvents.add(new TestSensorEvent(sensorEvent, SystemClock.elapsedRealtimeNanos()));
+        mSensorEvents.add(new TestSensorEvent(sensorEvent));
     }
 
     @Override

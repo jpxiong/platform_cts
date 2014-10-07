@@ -16,8 +16,8 @@
 
 package android.hardware.cts.helpers;
 
+import android.hardware.Sensor;
 import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -134,8 +134,10 @@ public class SensorStats {
      * Utility method to log the stats to a file. Will overwrite the file if it already exists.
      */
     public static void logStatsToFile(String fileName, SensorStats stats) throws IOException {
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(
-                new File(Environment.getExternalStorageDirectory(), fileName), false));
+        File statsDirectory = SensorCtsHelper.getSensorTestDataDirectory("stats/");
+        File logFile = new File(statsDirectory, fileName);
+        final BufferedWriter writer =
+                new BufferedWriter(new FileWriter(logFile, false /* append */));
         final Map<String, Object> flattened = stats.flatten();
         try {
             for (String key : getSortedKeys(flattened)) {
@@ -146,6 +148,20 @@ public class SensorStats {
             writer.flush();
             writer.close();
         }
+    }
+
+    /**
+     * Provides a sanitized sensor name, that can be used in file names.
+     * See {@link #logStatsToFile(String, SensorStats)}.
+     */
+    public static String getSanitizedSensorName(Sensor sensor) throws IOException {
+        String sensorType = sensor.getStringType();
+        String sanitizedSensorType = sensorType.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+        if (sanitizedSensorType.matches("_*")) {
+            throw new IOException("Unable to sanitize sensor type (" + sensorType + "). This is a"
+                    + " 'test framework' issue and the sanitation routine must be fixed.");
+        }
+        return sanitizedSensorType;
     }
 
     private static List<String> getSortedKeys(Map<String, Object> flattenedStats) {
