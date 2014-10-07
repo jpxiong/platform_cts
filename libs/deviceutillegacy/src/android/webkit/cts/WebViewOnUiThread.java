@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package android.text.cts;
+package android.webkit.cts;
 
 import android.cts.util.PollingCheck;
+import android.cts.util.TestThread;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.graphics.Rect;
@@ -251,6 +252,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public boolean canZoomOut() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.canZoomOut();
+            }
+        });
+    }
+
     public boolean zoomIn() {
         return getValue(new ValueGetter<Boolean>() {
             @Override
@@ -265,6 +275,15 @@ public class WebViewOnUiThread {
             @Override
             public Boolean capture() {
                 return mWebView.zoomOut();
+            }
+        });
+    }
+
+    public void zoomBy(final float zoomFactor) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.zoomBy(zoomFactor);
             }
         });
     }
@@ -710,6 +729,16 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.evaluateJavascript(script, result);
+            }
+        });
+    }
+
+    public void saveWebArchive(final String basename, final boolean autoname,
+                               final ValueCallback<String> callback) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.saveWebArchive(basename, autoname, callback);
             }
         });
     }

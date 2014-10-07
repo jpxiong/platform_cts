@@ -25,7 +25,7 @@ LOCAL_PROGUARD_ENABLED := disabled
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner guava
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsos_jni
+LOCAL_JNI_SHARED_LIBRARIES := libcts_jni libctsos_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
         src/android/os/cts/IParcelFileDescriptorPeer.aidl \

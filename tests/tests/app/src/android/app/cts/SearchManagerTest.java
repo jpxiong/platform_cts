@@ -17,6 +17,7 @@
 package android.app.cts;
 
 import android.content.Intent;
+import android.cts.util.CTSResult;
 
 public class SearchManagerTest extends CTSActivityTestCaseBase {
 

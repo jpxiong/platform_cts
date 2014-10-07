@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.cts.util.PollingCheck;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;

@@ -20,6 +20,7 @@ import com.android.cts.text.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.cts.util.NullWebViewUtils;
 import android.webkit.WebView;
 
 public class EmojiCtsActivity extends Activity {

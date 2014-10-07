@@ -19,6 +19,7 @@ import com.android.cts.graphics.R;
 
 
 import android.content.res.Resources;
+import android.cts.util.WidgetTestUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package android.app.cts;
+package android.cts.util;
 
 public interface CTSResult {
     public static final int RESULT_OK = 1;

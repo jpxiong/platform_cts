@@ -16,23 +16,17 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libctsos_jni
+LOCAL_MODULE := libcts_jni
 
 # Don't include this package in any configuration by default.
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := \
-		CtsOsJniOnLoad.cpp \
-		android_os_cts_CpuInstructions.cpp.arm \
-		android_os_cts_TaggedPointer.cpp \
-		android_os_cts_OSFeatures.cpp
+		CtsJniOnLoad.cpp \
+		android_cts_FileUtils.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
 LOCAL_SHARED_LIBRARIES := libnativehelper liblog libdl
-
-LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
-LOCAL_C_INCLUDES += ndk/sources/cpufeatures
-LOCAL_STATIC_LIBRARIES := cpufeatures
 
 include $(BUILD_SHARED_LIBRARY)

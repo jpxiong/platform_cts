@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import android.cts.util.NullWebViewUtils;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.webkit.WebView;

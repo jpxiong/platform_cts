@@ -16,7 +16,7 @@
 
 package android.os.cts;
 
-import android.os.cts.ReadElf;
+import android.cts.util.ReadElf;
 
 import java.io.File;
 
