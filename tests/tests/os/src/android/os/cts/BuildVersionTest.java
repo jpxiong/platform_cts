@@ -31,10 +31,8 @@ public class BuildVersionTest extends TestCase {
     private static final Set<String> EXPECTED_RELEASES =
         new HashSet<String>(Arrays.asList("4.4W.1", "4.4W", "4.4", "4.4.1", "4.4.2", "4.4.3"));
     private static final int EXPECTED_SDK = 20;
-    private static final Set<String> EXPECTED_BUILD_VARIANTS =
-            new HashSet<String>(Arrays.asList("user", "userdebug", "eng"));
-    private static final Set<String> EXPECTED_TAGS =
-            new HashSet<String>(Arrays.asList("test-keys", "dev-keys", "release-keys"));
+    private static final String EXPECTED_BUILD_VARIANT = "user";
+    private static final String EXPECTED_TAG = "release-keys";
 
     @SuppressWarnings("deprecation")
     public void testReleaseVersion() {
@@ -77,10 +75,8 @@ public class BuildVersionTest extends TestCase {
         assertTrue(fingerprintSegs[4].contains(":"));
         String[] buildNumberVariant = fingerprintSegs[4].split(":");
         String buildVariant = buildNumberVariant[1];
-        assertAnyOf("Variant", buildVariant, EXPECTED_BUILD_VARIANTS);
-
-        // Build.TAGS
-        assertAnyOf("TAGS", fingerprintSegs[5], EXPECTED_TAGS);
+        assertEquals("Variant", EXPECTED_BUILD_VARIANT, buildVariant);
+        assertEquals("Tag", EXPECTED_TAG, fingerprintSegs[5]);
     }
 
     private void assertNotEmpty(String value) {
