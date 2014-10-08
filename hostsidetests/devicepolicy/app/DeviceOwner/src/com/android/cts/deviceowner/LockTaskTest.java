@@ -30,6 +30,9 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
 
     private static final String TEST_PACKAGE = "com.google.android.example.somepackage";
 
+    private static final int ACTIVITY_RESUMED_TIMEOUT_MILLIS = 60000;  // 60 seconds
+    private static final int ACTIVITY_RUNNING_TIMEOUT_MILLIS = 20000;  // 20 seconds
+
     /**
      * The tests below need to keep detailed track of the state of the activity
      * that is started and stopped frequently.  To do this it sends a number of
@@ -139,52 +142,49 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
     // This test has the UtilityActivity trigger starting another activity (settings)
     // this should be permitted as a part of lock task (since it isn't a new task).
     // As a result onPause should be called as it goes to a new activity.
-// TODO: Reinstate once we make this test not flaky (if fails on Nexus 7 v2 most of the time,
-//       especially if testCannotStartActivityOutsideTask() is commented out.
-//    public void testStartActivityWithinTask() {
-//        mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
-//        startLockTask();
-//        waitForResume();
-//
-//        Intent launchIntent = new Intent(Settings.ACTION_SETTINGS);
-//        Intent lockTaskUtility = getLockTaskUtility();
-//        lockTaskUtility.putExtra(LockTaskUtilityActivity.START_ACTIVITY, launchIntent);
-//        mContext.startActivity(lockTaskUtility);
-//
-//        synchronized (mActivityResumedLock) {
-//            if (mIsActivityResumed) {
-//                try {
-//                    mActivityResumedLock.wait(60000);
-//                } catch (InterruptedException e) {
-//                }
-//                assertFalse(mIsActivityResumed);
-//            }
-//        }
-//        stopAndFinish(null);
-//    }
+    public void testStartActivityWithinTask() {
+        mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
+        startLockTask();
+        waitForResume();
+
+        Intent launchIntent = new Intent(Settings.ACTION_SETTINGS);
+        Intent lockTaskUtility = getLockTaskUtility();
+        lockTaskUtility.putExtra(LockTaskUtilityActivity.START_ACTIVITY, launchIntent);
+        mContext.startActivity(lockTaskUtility);
+
+        synchronized (mActivityResumedLock) {
+            if (mIsActivityResumed) {
+                try {
+                    mActivityResumedLock.wait(ACTIVITY_RESUMED_TIMEOUT_MILLIS);
+                } catch (InterruptedException e) {
+                }
+                assertFalse(mIsActivityResumed);
+            }
+        }
+        stopAndFinish(null);
+    }
 
     // This launches an activity that is not part of the current task and therefore
     // should be blocked.  This is verified by making sure that the activity does
     // not get a call to onPause.
-// TODO: Reinstate once we make this test not flaky (if fails on Nexus 7 v2 most of the time) 
-//    public void testCannotStartActivityOutsideTask() {
-//        mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
-//        startLockTask();
-//        waitForResume();
-//
-//        Intent launchIntent = new Intent(Settings.ACTION_SETTINGS);
-//        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startActivity(launchIntent);
-//
-//        synchronized (mActivityResumedLock) {
-//            try {
-//                mActivityResumedLock.wait(90000);
-//            } catch (InterruptedException e) {
-//            }
-//            assertTrue(mIsActivityResumed);
-//        }
-//        stopAndFinish(null);
-//    }
+    public void testCannotStartActivityOutsideTask() {
+        mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
+        startLockTask();
+        waitForResume();
+
+        Intent launchIntent = new Intent(Settings.ACTION_SETTINGS);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(launchIntent);
+
+        synchronized (mActivityResumedLock) {
+            try {
+                mActivityResumedLock.wait(ACTIVITY_RESUMED_TIMEOUT_MILLIS);
+            } catch (InterruptedException e) {
+            }
+            assertTrue(mIsActivityResumed);
+        }
+        stopAndFinish(null);
+    }
 
     /**
      * Call stopLockTask and finish on the LockTaskUtilityActivity.
@@ -212,7 +212,7 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
             finish();
             if (mIsActivityRunning) {
                 try {
-                    mActivityRunningLock.wait(20000);
+                    mActivityRunningLock.wait(ACTIVITY_RUNNING_TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
                 }
             }
@@ -227,7 +227,7 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
         synchronized (mActivityResumedLock) {
             if (!mIsActivityResumed) {
                 try {
-                    mActivityResumedLock.wait(20000);
+                    mActivityResumedLock.wait(ACTIVITY_RESUMED_TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
                 }
             }
@@ -272,7 +272,7 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
             mContext.startActivity(intent);
             // Give 20 secs to finish.
             try {
-                wait(20000);
+                wait(ACTIVITY_RUNNING_TIMEOUT_MILLIS);
             } catch (InterruptedException e) {
             }
             assertTrue(mIntentHandled);
