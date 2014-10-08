@@ -413,7 +413,13 @@ public class CameraTestUtils extends Assert {
 
         int offset = 0;
         data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
-        byte[] rowData = new byte[planes[0].getRowStride()];
+        int maxRowSize = planes[0].getRowStride();
+        for (int i = 0; i < planes.length; i++) {
+            if (maxRowSize < planes[i].getRowStride()) {
+                maxRowSize = planes[i].getRowStride();
+            }
+        }
+        byte[] rowData = new byte[maxRowSize];
         if(VERBOSE) Log.v(TAG, "get data from " + planes.length + " planes");
         for (int i = 0; i < planes.length; i++) {
             buffer = planes[i].getBuffer();
