@@ -320,5 +320,12 @@
     "android.hardware.cts.SensorTest#testBatchAndFlushWithHandler"
   ],
   bug: 17675466
+},
+{
+  description: "This test failed on hw decoder that doesn't output frame with the configured format.",
+  names: [
+    "android.meida.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv"
+  ],
+  bug: 17144778
 }
 ]
