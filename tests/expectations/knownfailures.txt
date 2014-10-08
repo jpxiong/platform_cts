@@ -116,7 +116,6 @@
     "com.android.cts.devicepolicy.DeviceOwnerTest#testApplicationRestrictions",
     "com.android.cts.devicepolicy.DeviceOwnerTest#testCaCertManagement",
     "com.android.cts.devicepolicy.DeviceOwnerTest#testDeviceOwnerSetup",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testKeyManagement",
     "com.android.cts.devicepolicy.DeviceOwnerTest#testPersistentIntentResolving",
     "com.android.cts.devicepolicy.DeviceOwnerTest#testScreenCaptureDisabled",
     "com.android.cts.devicepolicy.ManagedProfileTest#testManagedProfileSetup",
