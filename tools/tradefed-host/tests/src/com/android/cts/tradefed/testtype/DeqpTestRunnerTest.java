@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.build.StubCtsBuildHelper;
 import com.android.cts.tradefed.UnitTests;
 import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.IShellOutputReceiver;
@@ -29,6 +30,7 @@ import junit.framework.TestCase;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -43,6 +45,8 @@ public class DeqpTestRunnerTest extends TestCase {
     private static final String LOG_FILE_NAME = "/sdcard/TestLog.qpa";
     private static final String INSTRUMENTATION_NAME =
             "com.drawelements.deqp/com.drawelements.deqp.testercore.DeqpInstrumentation";
+    private static final String DEQP_ONDEVICE_APK = "com.drawelements.deqp.apk";
+    private static final String DEQP_ONDEVICE_PKG = "com.drawelements.deqp";
 
     /**
      * {@inheritDoc}
@@ -118,6 +122,13 @@ public class DeqpTestRunnerTest extends TestCase {
         if (majorVersion > requiredMajorVersion
                 || (majorVersion == requiredMajorVersion && minorVersion >= requiredMinorVersion)) {
 
+            EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG)))
+                    .andReturn("").once();
+            EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                    EasyMock.eq(true),
+                    EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName()))))
+                    .andReturn(null).once();
+
             EasyMock.expect(mockDevice.executeShellCommand(
                     EasyMock.eq("rm " + CASE_LIST_FILE_NAME))).andReturn("").once();
 
@@ -129,7 +140,7 @@ public class DeqpTestRunnerTest extends TestCase {
 
             String command = String.format(
                     "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
-                        + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                        + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\" "
                         + "-e deqpLogData \"%s\" %s",
                     AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                     CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -149,6 +160,9 @@ public class DeqpTestRunnerTest extends TestCase {
                     return null;
                 }
             });
+
+            EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG)))
+                    .andReturn("").once();
         }
 
         mockListener.testRunStarted(ID, 1);
@@ -167,6 +181,7 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.replay(mockListener);
 
         deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
         deqpTest.run(mockListener);
 
         EasyMock.verify(mockListener);
@@ -223,6 +238,13 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
                 .andReturn(Integer.toString(version)).atLeastOnce();
 
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true), EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName()))))
+                .andReturn(null).once();
+
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
 
@@ -234,7 +256,7 @@ public class DeqpTestRunnerTest extends TestCase {
 
         String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
-                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\" "
                     + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -263,7 +285,7 @@ public class DeqpTestRunnerTest extends TestCase {
 
         if (!pass) {
             mockListener.testFailed(testId,
-                    resultCode + ":Detail" + resultCode);
+                    resultCode + ": Detail" + resultCode);
 
             EasyMock.expectLastCall().once();
         }
@@ -274,10 +296,14 @@ public class DeqpTestRunnerTest extends TestCase {
         mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
         EasyMock.expectLastCall().once();
 
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+
         EasyMock.replay(mockDevice);
         EasyMock.replay(mockListener);
 
         deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
         deqpTest.run(mockListener);
 
         EasyMock.verify(mockListener);
@@ -287,7 +313,7 @@ public class DeqpTestRunnerTest extends TestCase {
     /**
      * Test running multiple test cases.
      */
-    public void testRun_multipleTets() throws Exception {
+    public void testRun_multipleTests() throws Exception {
         /* MultiLineReceiver expects "\r\n" line ending. */
         final String output = "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
@@ -398,6 +424,12 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
                 .andReturn(Integer.toString(version)).atLeastOnce();
 
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true), EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName()))))
+                .andReturn(null).once();
+
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
 
@@ -409,7 +441,7 @@ public class DeqpTestRunnerTest extends TestCase {
 
         String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
-                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\""
+                    + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8\" "
                     + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -446,10 +478,14 @@ public class DeqpTestRunnerTest extends TestCase {
         mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
         EasyMock.expectLastCall().once();
 
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+
         EasyMock.replay(mockDevice);
         EasyMock.replay(mockListener);
 
         deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
         deqpTest.run(mockListener);
 
         EasyMock.verify(mockListener);
