@@ -27,6 +27,7 @@ import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -166,6 +167,8 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
                 vidFD.getLength());
 
         MediaFormat mediaFmt = extractor.getTrackFormat(0);
+        mediaFmt.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                            CodecCapabilities.COLOR_FormatYUV420Flexible);
         String mime = mediaFmt.getString(MediaFormat.KEY_MIME);
         try {
             // Create decoder
@@ -191,10 +194,10 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
             throws Exception, InterruptedException {
         ByteBuffer[] decoderInputBuffers;
         ByteBuffer[] decoderOutputBuffers;
-        // Get decoder output ImageFormat, will be used to create ImageReader
-        int codecImageFormat = getImageFormatFromCodecType(mime);
-        assertEquals("Codec image format should match image reader format",
-                imageFormat, codecImageFormat);
+        if (!imageFormatSupported(decoder, imageFormat, mime)) {
+            // TODO: SKIPPING TEST
+            return;
+        }
         createImageReader(width, height, imageFormat, MAX_NUM_IMAGES, mImageListener);
 
         // Configure decoder.
@@ -293,74 +296,19 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
         }
     }
 
-    private int getImageFormatFromCodecType(String mimeType) {
-        // TODO: Need pick a codec first, then get the codec info, will revisit for future.
-        MediaCodecInfo codecInfo = getCodecInfoByType(mimeType);
-        if (VERBOSE) Log.v(TAG, "found decoder: " + codecInfo.getName());
-
-        int colorFormat = selectDecoderOutputColorFormat(codecInfo, mimeType);
-        if (VERBOSE) Log.v(TAG, "found decoder output color format: " + colorFormat);
-        switch (colorFormat) {
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-                // TODO: This is fishy, OMX YUV420P is not identical as YV12, U and V planes are
-                // swapped actually. It should give YV12 if producer is setup first, that is, after
-                // Configuring the Surface (provided by ImageReader object) into codec, but this
-                // is Chicken-egg issue, do the translation on behalf of driver here:)
-                return ImageFormat.YV12;
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-                // same as above.
-                return ImageFormat.NV21;
-            default:
-                return colorFormat;
+    private boolean imageFormatSupported(MediaCodec decoder, int imageFormat, String mime) {
+        MediaCodecInfo codecInfo = decoder.getCodecInfo();
+        if (codecInfo == null) {
+            return false;
         }
-    }
-
-    private static MediaCodecInfo getCodecInfoByType(String mimeType) {
-        int numCodecs = MediaCodecList.getCodecCount();
-        for (int i = 0; i < numCodecs; i++) {
-            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
-
-            if (codecInfo.isEncoder()) {
-                continue;
-            }
-
-            String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-                if (types[j].equalsIgnoreCase(mimeType)) {
-                    return codecInfo;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static int selectDecoderOutputColorFormat(MediaCodecInfo codecInfo, String mimeType) {
-        MediaCodecInfo.CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mimeType);
-        for (int i = 0; i < capabilities.colorFormats.length; i++) {
-            int colorFormat = capabilities.colorFormats[i];
-            if (isRecognizedFormat(colorFormat)) {
-                return colorFormat;
-            }
-        }
-        fail("couldn't find a good color format for " + codecInfo.getName() + " / " + mimeType);
-        return 0;   // not reached
-    }
-
-    // Need make this function simple, may be merge into above functions.
-    private static boolean isRecognizedFormat(int colorFormat) {
-        if (VERBOSE) Log.v(TAG, "colorformat: " + colorFormat);
-        switch (colorFormat) {
-            // these are the formats we know how to handle for this test
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-            case ImageFormat.YUV_420_888:
+        MediaCodecInfo.CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mime);
+        for (int colorFormat : capabilities.colorFormats) {
+            if (colorFormat == CodecCapabilities.COLOR_FormatYUV420Flexible
+                    && imageFormat == ImageFormat.YUV_420_888) {
                 return true;
-            default:
-                return false;
+            }
         }
+        return false;
     }
 
     private MediaCodec createDecoder(String mime, boolean useHw) throws Exception {
@@ -404,7 +352,7 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
     private static void validateYuvData(byte[] yuvData, int width, int height, int format,
             long ts, String fileName) {
 
-        assertTrue("YUV format must be one of the YUV420_888, NV21, or YV12",
+        assertTrue("YUV format must be one of the YUV_420_888, NV21, or YV12",
                 format == ImageFormat.YUV_420_888 ||
                 format == ImageFormat.NV21 ||
                 format == ImageFormat.YV12);
