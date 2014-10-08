@@ -28,9 +28,8 @@ import junit.framework.TestCase;
 public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
-    private static final Set<String> EXPECTED_RELEASES =
-        new HashSet<String>(Arrays.asList("4.4W.1", "4.4W", "4.4", "4.4.1", "4.4.2", "4.4.3"));
-    private static final int EXPECTED_SDK = 20;
+    private static final Set<String> EXPECTED_RELEASES = new HashSet<String>(Arrays.asList("5.0"));
+    private static final int EXPECTED_SDK = 21;
     private static final String EXPECTED_BUILD_VARIANT = "user";
     private static final String EXPECTED_TAG = "release-keys";
 
@@ -38,8 +37,8 @@ public class BuildVersionTest extends TestCase {
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
         assertAnyOf("BUILD.VERSION.RELEASE", Build.VERSION.RELEASE, EXPECTED_RELEASES);
-        assertEquals("" + EXPECTED_SDK, Build.VERSION.SDK);
-        assertEquals(EXPECTED_SDK, Build.VERSION.SDK_INT);
+        assertEquals("Build.VERSION.SDK", "" + EXPECTED_SDK, Build.VERSION.SDK);
+        assertEquals("Build.VERSION.SDK_INT", EXPECTED_SDK, Build.VERSION.SDK_INT);
     }
 
     public void testIncremental() {
