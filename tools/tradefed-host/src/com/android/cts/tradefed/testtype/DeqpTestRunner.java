@@ -77,6 +77,17 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     }
 
     /**
+     * Set the CTS build container.
+     * <p/>
+     * Exposed so unit tests can mock the provided build.
+     *
+     * @param buildHelper
+     */
+    public void setBuildHelper(CtsBuildHelper buildHelper) {
+        mCtsBuild = buildHelper;
+    }
+
+    /**
      * Enable or disable raw dEQP test log collection.
      */
     public void setCollectLogs(boolean logData) {
