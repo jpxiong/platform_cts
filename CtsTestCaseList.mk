@@ -24,6 +24,16 @@ cts_security_apps_list := \
     CtsSharedUidInstallDiffCert \
     CtsSimpleAppInstall \
     CtsSimpleAppInstallDiffCert \
+    CtsSplitApp \
+    CtsSplitApp_x86 \
+    CtsSplitApp_x86_64 \
+    CtsSplitApp_armeabi-v7a \
+    CtsSplitApp_armeabi \
+    CtsSplitApp_arm64-v8a \
+    CtsSplitApp_mips64 \
+    CtsSplitApp_mips \
+    CtsSplitAppDiffVersion \
+    CtsSplitAppDiffCert \
     CtsTargetInstrumentationApp \
     CtsUsePermissionDiffCert \
     CtsWriteExternalStorageApp \
