@@ -23,7 +23,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.telephony.PhoneStateListener;
@@ -288,7 +287,7 @@ public class NoLocationPermissionTest extends InstrumentationTestCase {
      * {@link LocationManager#isProviderEnabled(String)} with given
      * provider completes without an exception. (Note that under the conditions
      * of these tests, that method threw SecurityException on OS levels before
-     * {@link android.os.Build.VERSION_CODES#L}. See the method's javadoc for
+     * {@link android.os.Build.VERSION_CODES#LOLLIPOP}. See the method's javadoc for
      * details.)
      *
      * @param provider the String provider name.
