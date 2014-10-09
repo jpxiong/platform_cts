@@ -176,8 +176,15 @@ public class CtsApiCoverage {
         DexDepsXmlHandler dexDepsXmlHandler = new DexDepsXmlHandler(apiCoverage);
         xmlReader.setContentHandler(dexDepsXmlHandler);
 
-        Process process = new ProcessBuilder(dexdeps, "--format=xml", testApk.getPath()).start();
-        xmlReader.parse(new InputSource(process.getInputStream()));
+        String apkPath = testApk.getPath();
+        Process process = new ProcessBuilder(dexdeps, "--format=xml", apkPath).start();
+        try {
+            xmlReader.parse(new InputSource(process.getInputStream()));
+        } catch (SAXException e) {
+          // Catch this exception, but continue. SAXException is acceptable in cases
+          // where the apk does not contain a classes.dex and therefore parsing won't work.
+          System.err.println("warning: dexdeps failed for: " + apkPath);
+        }
     }
 
     private static void outputCoverageReport(ApiCoverage apiCoverage, List<File> testApks,
