@@ -21,8 +21,8 @@ import junit.framework.TestCase;
 public class SeccompTest extends TestCase {
 
     public void testSeccomp() {
-        if (CpuFeatures.isArm64Cpu()) {
-            return; // seccomp not supported on arm64
+        if (CpuFeatures.isArm64Cpu() || CpuFeatures.isArm64CpuIn32BitMode()) {
+            return; // seccomp not yet supported on arm64
         }
         if (OSFeatures.needsSeccompSupport()) {
             assertTrue("Please enable seccomp support "
