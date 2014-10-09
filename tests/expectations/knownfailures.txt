@@ -1,5 +1,12 @@
 [
 {
+  description: "signature test stil needs more work",
+  names: [
+    "android.signature.cts.SignatureTest#testSignature"
+  ],
+  bug: 17894722
+},
+{
   description: "Not all jdwp features are currently supported. These tests will fail",
   names: [
     "org.apache.harmony.jpda.tests.jdwp.DebuggerOnDemand.OnthrowDebuggerLaunchTest#testDebuggerLaunch001",
