@@ -19,6 +19,9 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
+# Include both the 32 and 64 bit versions
+LOCAL_MULTILIB := both
+
 LOCAL_JAVA_LIBRARIES := telephony-common
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner guava android-ex-camera2
