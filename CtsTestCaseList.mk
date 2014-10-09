@@ -133,6 +133,7 @@ cts_test_packages := \
     CtsTvTestCases \
     CtsUiAutomationTestCases \
     CtsUiRenderingTestCases \
+    CtsUsageStatsTestCases \
     CtsUtilTestCases \
     CtsViewTestCases \
     CtsWebkitTestCases \
