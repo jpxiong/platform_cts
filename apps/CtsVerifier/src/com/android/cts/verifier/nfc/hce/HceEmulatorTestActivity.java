@@ -103,7 +103,7 @@ public class HceEmulatorTestActivity extends PassFailButtons.TestListActivity {
                     OnAndOffHostEmulatorActivity.class.getName(),
                     new Intent(this, OnAndOffHostEmulatorActivity.class), null));
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 adapter.add(TestListItem.newTest(this, R.string.nfc_hce_payment_dynamic_aids_emulator,
                         DynamicAidEmulatorActivity.class.getName(),
                         new Intent(this, DynamicAidEmulatorActivity.class), null));
