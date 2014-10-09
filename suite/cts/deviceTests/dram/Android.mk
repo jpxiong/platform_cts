@@ -18,6 +18,9 @@ include $(CLEAR_VARS)
 # don't include this package in any target
 LOCAL_MODULE_TAGS := tests
 
+# Include both the 32 and 64 bit versions
+LOCAL_MULTILIB := both
+
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
 LOCAL_JNI_SHARED_LIBRARIES := libctsdram_jni
