@@ -113,7 +113,7 @@ public class WrappedGTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
         WrappedGTestResultParser resultParser = new WrappedGTestResultParser(id, listener);
         resultParser.setFakePackagePrefix(mPackageName + ".");
         try {
-            String options = mAbi == null ? "" : String.format("--abi %s ", mAbi);
+            String options = mAbi == null ? "" : String.format("--abi %s ", mAbi.getName());
             String command = String.format("am instrument -w %s%s/.%s", options, mAppNameSpace, mRunner);
             mDevice.executeShellCommand(command, resultParser, mMaxTestTimeMs, 0);
         } catch (DeviceNotAvailableException e) {
