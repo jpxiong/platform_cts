@@ -34,6 +34,7 @@ cts_security_apps_list := \
     CtsSplitApp_mips \
     CtsSplitAppDiffVersion \
     CtsSplitAppDiffCert \
+    CtsSplitAppFeature \
     CtsTargetInstrumentationApp \
     CtsUsePermissionDiffCert \
     CtsWriteExternalStorageApp \

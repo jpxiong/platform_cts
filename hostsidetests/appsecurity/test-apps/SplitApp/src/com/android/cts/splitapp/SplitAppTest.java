@@ -20,7 +20,9 @@ import static org.xmlpull.v1.XmlPullParser.END_DOCUMENT;
 import static org.xmlpull.v1.XmlPullParser.START_TAG;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -37,11 +39,17 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 
 public class SplitAppTest extends AndroidTestCase {
     private static final String TAG = "SplitAppTest";
+    private static final String PKG = "com.android.cts.splitapp";
+
+    public static boolean sFeatureTouched = false;
+    public static String sFeatureValue = null;
 
     public void testSingleBase() throws Exception {
         final Resources r = getContext().getResources();
@@ -78,7 +86,7 @@ public class SplitAppTest extends AndroidTestCase {
         // Should only have base manifest items
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setPackage("com.android.cts.splitapp");
+        intent.setPackage(PKG);
 
         List<ResolveInfo> result = pm.queryIntentActivities(intent, 0);
         assertEquals(1, result.size());
@@ -86,7 +94,7 @@ public class SplitAppTest extends AndroidTestCase {
 
         // Receiver disabled by default in base
         intent = new Intent(Intent.ACTION_DATE_CHANGED);
-        intent.setPackage("com.android.cts.splitapp");
+        intent.setPackage(PKG);
 
         result = pm.queryBroadcastReceivers(intent, 0);
         assertEquals(0, result.size());
@@ -157,7 +165,7 @@ public class SplitAppTest extends AndroidTestCase {
 
         // Receiver should be enabled now
         Intent intent = new Intent(Intent.ACTION_DATE_CHANGED);
-        intent.setPackage("com.android.cts.splitapp");
+        intent.setPackage(PKG);
 
         List<ResolveInfo> result = pm.queryBroadcastReceivers(intent, 0);
         assertEquals(1, result.size());
@@ -185,6 +193,121 @@ public class SplitAppTest extends AndroidTestCase {
 
         // Make sure we can do the maths
         assertEquals(11642, Native.add(4933, 6709));
+    }
+
+    public void testFeatureBase() throws Exception {
+        final Resources r = getContext().getResources();
+        final PackageManager pm = getContext().getPackageManager();
+
+        // Should have untouched resources from base
+        assertEquals(false, r.getBoolean(R.bool.my_receiver_enabled));
+
+        assertEquals("blue", r.getString(R.string.my_string1));
+        assertEquals("purple", r.getString(R.string.my_string2));
+
+        assertEquals(0xff00ff00, r.getColor(R.color.my_color));
+        assertEquals(123, r.getInteger(R.integer.my_integer));
+
+        assertEquals("base", getXmlTestValue(r.getXml(R.xml.my_activity_meta)));
+
+        // And that we can access resources from feature
+        // TODO: enable these once 17924027 is fixed
+//        assertEquals("red", r.getString(r.getIdentifier("feature_string", "string", PKG)));
+//        assertEquals(123, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
+
+        final Class<?> featR = Class.forName("com.android.cts.splitapp.FeatureR");
+        final int boolId = (int) featR.getDeclaredField("feature_receiver_enabled").get(null);
+        final int intId = (int) featR.getDeclaredField("feature_integer").get(null);
+        final int stringId = (int) featR.getDeclaredField("feature_string").get(null);
+        assertEquals(true, r.getBoolean(boolId));
+        assertEquals(123, r.getInteger(intId));
+        assertEquals("red", r.getString(stringId));
+
+        // Should have both base and feature assets
+        assertAssetContents(r, "file1.txt", "FILE1");
+        assertAssetContents(r, "file2.txt", "FILE2");
+        assertAssetContents(r, "dir/dirfile1.txt", "DIRFILE1");
+        assertAssetContents(r, "dir/dirfile2.txt", "DIRFILE2");
+
+        // Should have both base and feature components
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setPackage(PKG);
+        List<ResolveInfo> result = pm.queryIntentActivities(intent, 0);
+        assertEquals(2, result.size());
+        assertEquals("com.android.cts.splitapp.MyActivity", result.get(0).activityInfo.name);
+        assertEquals("com.android.cts.splitapp.FeatureActivity", result.get(1).activityInfo.name);
+
+        // Receiver only enabled in feature
+        intent = new Intent(Intent.ACTION_DATE_CHANGED);
+        intent.setPackage(PKG);
+        result = pm.queryBroadcastReceivers(intent, 0);
+        assertEquals(1, result.size());
+        assertEquals("com.android.cts.splitapp.FeatureReceiver", result.get(0).activityInfo.name);
+
+        // And we should have a service
+        intent = new Intent("com.android.cts.splitapp.service");
+        intent.setPackage(PKG);
+        result = pm.queryIntentServices(intent, 0);
+        assertEquals(1, result.size());
+        assertEquals("com.android.cts.splitapp.FeatureService", result.get(0).serviceInfo.name);
+
+        // And a provider too
+        ProviderInfo info = pm.resolveContentProvider("com.android.cts.splitapp.provider", 0);
+        assertEquals("com.android.cts.splitapp.FeatureProvider", info.name);
+
+        // And assert that we spun up the provider in this process
+        final Class<?> provider = Class.forName("com.android.cts.splitapp.FeatureProvider");
+        final Field field = provider.getDeclaredField("sCreated");
+        assertTrue("Expected provider to have been created", (boolean) field.get(null));
+        assertTrue("Expected provider to have touched us", sFeatureTouched);
+        assertEquals(r.getString(R.string.my_string1), sFeatureValue);
+
+        // Finally ensure that we can execute some code from split
+        final Class<?> logic = Class.forName("com.android.cts.splitapp.FeatureLogic");
+        final Method method = logic.getDeclaredMethod("mult", new Class[] {
+                Integer.TYPE, Integer.TYPE });
+        assertEquals(72, (int) method.invoke(null, 12, 6));
+
+        // Make sure we didn't get an extra flag from feature split
+        assertTrue("Someone parsed application flag!",
+                (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_LARGE_HEAP) == 0);
+
+        // Make sure we have permission from base APK
+        getContext().enforceCallingOrSelfPermission(android.Manifest.permission.CAMERA, null);
+
+        try {
+            // But no new permissions from the feature APK
+            getContext().enforceCallingOrSelfPermission(android.Manifest.permission.INTERNET, null);
+            fail("Whaaa, we somehow gained permission from feature?");
+        } catch (SecurityException expected) {
+        }
+    }
+
+    public void testFeatureApi() throws Exception {
+        final Resources r = getContext().getResources();
+        final PackageManager pm = getContext().getPackageManager();
+
+        // Should have untouched resources from base
+        assertEquals(false, r.getBoolean(R.bool.my_receiver_enabled));
+
+        // And that we can access resources from feature
+        // TODO: enable these once 17924027 is fixed
+//        assertEquals(321, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
+
+        final Class<?> featR = Class.forName("com.android.cts.splitapp.FeatureR");
+        final int boolId = (int) featR.getDeclaredField("feature_receiver_enabled").get(null);
+        final int intId = (int) featR.getDeclaredField("feature_integer").get(null);
+        final int stringId = (int) featR.getDeclaredField("feature_string").get(null);
+        assertEquals(false, r.getBoolean(boolId));
+        assertEquals(321, r.getInteger(intId));
+        assertEquals("red", r.getString(stringId));
+
+        // And now both receivers should be disabled
+        Intent intent = new Intent(Intent.ACTION_DATE_CHANGED);
+        intent.setPackage(PKG);
+        List<ResolveInfo> result = pm.queryBroadcastReceivers(intent, 0);
+        assertEquals(0, result.size());
     }
 
     private static void updateDpi(Resources r, int densityDpi) {
