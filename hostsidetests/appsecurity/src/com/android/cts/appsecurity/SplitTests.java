@@ -67,6 +67,9 @@ public class SplitTests extends DeviceTestCase implements IAbiReceiver, IBuildRe
     private static final String APK_DIFF_VERSION_v7 = "CtsSplitAppDiffVersion_v7.apk";
     private static final String APK_DIFF_CERT_v7 = "CtsSplitAppDiffCert_v7.apk";
 
+    private static final String APK_FEATURE = "CtsSplitAppFeature.apk";
+    private static final String APK_FEATURE_v7 = "CtsSplitAppFeature_v7.apk";
+
     private static final HashMap<String, String> ABI_TO_APK = new HashMap<>();
 
     static {
@@ -238,8 +241,14 @@ public class SplitTests extends DeviceTestCase implements IAbiReceiver, IBuildRe
         new InstallMultiple().inheritFrom(PKG).addApk(APK_DIFF_VERSION_v7).runExpectingFailure();
     }
 
-    public void testInheritNewSplit() throws Exception {
-        // TODO: flesh out this test
+    public void testFeatureBase() throws Exception {
+        new InstallMultiple().addApk(APK).addApk(APK_FEATURE).run();
+        runDeviceTests(PKG, ".SplitAppTest", "testFeatureBase");
+    }
+
+    public void testFeatureApi() throws Exception {
+        new InstallMultiple().addApk(APK).addApk(APK_FEATURE).addApk(APK_FEATURE_v7).run();
+        runDeviceTests(PKG, ".SplitAppTest", "testFeatureApi");
     }
 
     public void testInheritUpdatedBase() throws Exception {
@@ -247,10 +256,6 @@ public class SplitTests extends DeviceTestCase implements IAbiReceiver, IBuildRe
     }
 
     public void testInheritUpdatedSplit() throws Exception {
-        // TODO: flesh out this test
-    }
-
-    public void testSplitOrdering() throws Exception {
         // TODO: flesh out this test
     }
 
