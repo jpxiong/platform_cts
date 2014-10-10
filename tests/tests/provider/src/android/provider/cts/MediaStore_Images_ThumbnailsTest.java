@@ -34,6 +34,7 @@ import android.test.InstrumentationTestCase;
 
 import java.io.File;
 import java.util.ArrayList;
+import android.util.DisplayMetrics;
 
 public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
     private ArrayList<Uri> mRowsAdded;
@@ -110,7 +111,9 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
 
     public void testQueryExternalMiniThumbnails() {
         // insert the image by bitmap
-        Bitmap src = BitmapFactory.decodeResource(mContext.getResources(), R.raw.scenery);
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inTargetDensity = DisplayMetrics.DENSITY_XHIGH;
+        Bitmap src = BitmapFactory.decodeResource(mContext.getResources(), R.raw.scenery,opts);
         String stringUrl = null;
         try{
             stringUrl = Media.insertImage(mContentResolver, src, null, null);
