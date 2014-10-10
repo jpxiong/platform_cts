@@ -1494,17 +1494,19 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, mode, listener,
                     NUM_FRAMES_VERIFIED);
 
-            // Verify color correction transform and gains stay unchanged after a lock.
-            requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
-            listener = new SimpleCaptureCallback();
-            mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
-            waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            if (mode == CameraMetadata.CONTROL_AWB_MODE_AUTO) {
+                // Verify color correction transform and gains stay unchanged after a lock.
+                requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+                listener = new SimpleCaptureCallback();
+                mSession.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
-            if (mStaticInfo.areKeysAvailable(CaptureResult.CONTROL_AWB_STATE)) {
-                waitForResultValue(listener, CaptureResult.CONTROL_AWB_STATE,
-                        CaptureResult.CONTROL_AWB_STATE_LOCKED, NUM_RESULTS_WAIT_TIMEOUT);
+                if (mStaticInfo.areKeysAvailable(CaptureResult.CONTROL_AWB_STATE)) {
+                    waitForResultValue(listener, CaptureResult.CONTROL_AWB_STATE,
+                            CaptureResult.CONTROL_AWB_STATE_LOCKED, NUM_RESULTS_WAIT_TIMEOUT);
+                }
+
             }
-
             verifyAwbCaptureResultUnchanged(listener, NUM_FRAMES_VERIFIED);
         }
     }
