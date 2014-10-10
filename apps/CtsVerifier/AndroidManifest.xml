@@ -1272,6 +1272,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".managedprovisioning.CrossProfileTestActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE" />
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
+
         <receiver android:name=".managedprovisioning.DeviceAdminTestReceiver"
                 android:label="@string/provisioning_byod_device_admin"
                 android:permission="android.permission.BIND_DEVICE_ADMIN">
