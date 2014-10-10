@@ -40,24 +40,48 @@ public class IntentReceiverActivity extends Activity {
 
     private static final String ACTION_WRITE_TO_URI = "com.android.cts.action.WRITE_TO_URI";
 
+    private static final String ACTION_TAKE_PERSISTABLE_URI_PERMISSION =
+            "com.android.cts.action.TAKE_PERSISTABLE_URI_PERMISSION";
+
+    private static final String EXTRA_CAUGHT_SECURITY_EXCEPTION = "extra_caught_security_exception";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent received = getIntent();
         String action = received.getAction();
-
+        Uri uri = getIntent().getClipData().getItemAt(0).getUri();
         if (ACTION_READ_FROM_URI.equals(action)) {
             Intent result = new Intent();
-            String message = getFirstLineFromUri(getIntent().getClipData().getItemAt(0).getUri());
-            Log.i(TAG, "message received in reading test: " + message);
+            String message = null;
+            try {
+                message = getFirstLineFromUri(uri);
+            } catch (SecurityException e) {
+                Log.i(TAG, "Caught a SecurityException while trying to read " + uri, e);
+                result.putExtra(EXTRA_CAUGHT_SECURITY_EXCEPTION, true);
+            } catch (IOException e) {
+                Log.i(TAG, "Caught a IOException while trying to read " + uri, e);
+            }
+            Log.i(TAG, "Message received in reading test: " + message);
             result.putExtra("extra_response", message);
-            setResult(message != null ? Activity.RESULT_OK : Activity.RESULT_CANCELED, result);
+            setResult(Activity.RESULT_OK, result);
         } else if (ACTION_WRITE_TO_URI.equals(action)) {
             Intent result = new Intent();
             String message = received.getStringExtra("extra_message");
-            Log.i(TAG, "message received in writing test: " + message);
-            Uri uri = getIntent().getClipData().getItemAt(0).getUri();
-            boolean succeded = writeToUri(uri, message);
-            setResult(succeded ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
+            Log.i(TAG, "Message received in writing test: " + message);
+            try {
+                writeToUri(uri, message);
+            } catch (SecurityException e) {
+                Log.i(TAG, "Caught a SecurityException while trying to write to " + uri, e);
+                result.putExtra(EXTRA_CAUGHT_SECURITY_EXCEPTION, true);
+            } catch (IOException e) {
+                Log.i(TAG, "Caught a IOException while trying to write to " + uri, e);
+            }
+            setResult(Activity.RESULT_OK, result);
+        } else if (ACTION_TAKE_PERSISTABLE_URI_PERMISSION.equals(action)) {
+            Log.i(TAG, "Taking persistable uri permission to " + uri);
+            getContentResolver().takePersistableUriPermission(uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            setResult(Activity.RESULT_OK);
         }
         finish();
     }
@@ -65,28 +89,17 @@ public class IntentReceiverActivity extends Activity {
     /**
      * Returns the first line of the file associated with uri.
      */
-    private String getFirstLineFromUri(Uri uri) {
-        try {
-            InputStream is = getContentResolver().openInputStream(uri);
-            BufferedReader r = new BufferedReader(new InputStreamReader(is));
-            return r.readLine();
-        } catch (IOException e) {
-            Log.e(TAG, "could not read the uri " + uri, e);
-            return null;
-        }
+    private String getFirstLineFromUri(Uri uri) throws IOException {
+        InputStream is = getContentResolver().openInputStream(uri);
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        return r.readLine();
     }
 
-    private boolean writeToUri(Uri uri, String text) {
-        try {
-            OutputStreamWriter writer = new OutputStreamWriter(
-                    getContentResolver().openOutputStream(uri));
-            writer.write(text);
-            writer.flush();
-            writer.close();
-            return true;
-        } catch (IOException e) {
-            Log.e(TAG, "could not write to the uri " + uri, e);
-            return false;
-        }
+    private void writeToUri(Uri uri, String text) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter(
+                getContentResolver().openOutputStream(uri));
+        writer.write(text);
+        writer.flush();
+        writer.close();
     }
 }
