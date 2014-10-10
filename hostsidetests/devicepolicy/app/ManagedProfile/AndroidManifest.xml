@@ -19,6 +19,9 @@
 
     <uses-sdk android:minSdkVersion="20"/>
 
+    <permission android:name="com.android.cts.managedprofile.permission.SAMPLE"
+                android:label="Sample Permission"/>
+
     <application>
         <uses-library android:name="android.test.runner" />
         <receiver
@@ -73,6 +76,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <activity android:name=".TestActivity" />
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.android.cts.managedprofile.fileprovider"
@@ -82,7 +86,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-        <activity android:name=".TestActivity" />
+        <provider
+            android:name="com.android.cts.managedprofile.crossprofilecontent.BasicContentProvider"
+            android:authorities="com.android.cts.managedprofile.basiccontentProvider"
+            android:grantUriPermissions="true"
+            android:exported="true"
+            android:permission="com.android.cts.managedprofile.permission.SAMPLE"
+            />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
