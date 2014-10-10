@@ -19,11 +19,14 @@
 
     <uses-sdk android:minSdkVersion="19"/>
 
+    <uses-permission android:name="com.android.cts.managedprofile.permission.SAMPLE"/>
+
     <application>
         <activity android:name="com.android.cts.intent.receiver.IntentReceiverActivity">
             <intent-filter>
                 <action android:name="com.android.cts.action.READ_FROM_URI" />
                 <action android:name="com.android.cts.action.WRITE_TO_URI" />
+                <action android:name="com.android.cts.action.TAKE_PERSISTABLE_URI_PERMISSION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
