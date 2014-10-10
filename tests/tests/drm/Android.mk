@@ -16,6 +16,9 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
+# Include both the 32 and 64 bit versions of libs
+LOCAL_MULTILIB := both
+
 LOCAL_MODULE_TAGS := tests
 
 # and when built explicitly put it in the data partition
