@@ -158,6 +158,7 @@ class CtsBuilder(object):
     # CTS Stable plan
     plan = tools.TestPlan(packages)
     plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-stable')
@@ -166,6 +167,7 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.android\.cts\.browserbench')
+    plan.Include(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.Include(package+'$')
       plan.IncludeTests(package, test_list)
@@ -179,6 +181,8 @@ class CtsBuilder(object):
     plan.Exclude('.*')
     for package, test_list in small_tests.iteritems():
       plan.Include(package+'$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-small')
@@ -188,6 +192,8 @@ class CtsBuilder(object):
     plan.Exclude('.*')
     for package, test_list in medium_tests.iteritems():
       plan.Include(package+'$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-medium')
@@ -196,6 +202,8 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.hardware$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-hardware')
@@ -204,6 +212,8 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.media$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-media')
@@ -212,11 +222,24 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.mediastress$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-mediastress')
 
-    #CTS - sub plan for new test packages added for staging
+    # CTS - sub plan for new tests that is vetted for L launch
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in new_test_packages.iteritems():
+      plan.Include(package+'$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-l-tests')
+
+    # CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
     for package, test_list in small_tests.iteritems():
       plan.Exclude(package+'$')
@@ -225,6 +248,8 @@ class CtsBuilder(object):
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
     plan.Exclude(r'android\.mediastress$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
@@ -241,6 +266,7 @@ def BuildAospMediumSizeTestList():
       'android.host.security' : [],
       'android.net' : [],
       'android.os' : [],
+      'android.permission2' : [],
       'android.security' : [],
       'android.telephony' : [],
       'android.webkit' : [],
@@ -284,7 +310,6 @@ def BuildAospSmallSizeTestList():
       'android.opengl' : [],
       'android.openglperf' : [],
       'android.permission' : [],
-      'android.permission2' : [],
       'android.preference' : [],
       'android.preference2' : [],
       'android.provider' : [],
@@ -316,17 +341,10 @@ def BuildCtsFlakyTestList():
       that are known to be flaky. """
   return {
       'android.app' : [
-          'cts.ActivityManagerTest#testIsRunningInTestHarness',
-          'cts.AlertDialogTest#testAlertDialogCancelable',
-          'cts.ExpandableListActivityTest#testCallback',],
+          'cts.ActivityManagerTest#testIsRunningInTestHarness',],
       'android.dpi' : [
           'cts.DefaultManifestAttributesSdkTest#testPackageHasExpectedSdkVersion',],
       'android.hardware' : [
-          'camera2.cts.CameraDeviceTest#testCameraDeviceRepeatingRequest',
-          'camera2.cts.ImageReaderTest#testImageReaderFromCameraJpeg',
-          'cts.CameraTest#testImmediateZoom',
-          'cts.CameraTest#testPreviewCallback',
-          'cts.CameraTest#testSmoothZoom',
           'cts.CameraTest#testVideoSnapshot',
           'cts.CameraGLTest#testCameraToSurfaceTextureMetadata',
           'cts.CameraGLTest#testSetPreviewTextureBothCallbacks',
@@ -334,8 +352,6 @@ def BuildCtsFlakyTestList():
       'android.media' : [
           'cts.DecoderTest#testCodecResetsH264WithSurface',
           'cts.StreamingMediaPlayerTest#testHLS',],
-      'android.mediastress' : [
-          'cts.NativeMediaTest#test480pPlay',],
       'android.net' : [
           'cts.ConnectivityManagerTest#testStartUsingNetworkFeature_enableHipri',
           'cts.DnsTest#testDnsWorks',
@@ -344,9 +360,7 @@ def BuildCtsFlakyTestList():
           'cts.SSLCertificateSocketFactoryTest#test_createSocket_simple',
           'cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping',
           'cts.TrafficStatsTest#testTrafficStatsForLocalhost',
-          'wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',
-          'wifi.cts.ScanResultTest#testAndroidTestCaseSetupProperly',
-          'wifi.cts.ScanResultTest#testScanResultTimeStamp',],
+          'wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',],
       'android.os' : [
           'cts.BuildVersionTest#testReleaseVersion',
           'cts.BuildTest#testIsSecureUserBuild',],
@@ -359,14 +373,7 @@ def BuildCtsFlakyTestList():
           'cts.SELinuxDomainTest#testSuDomain',
           'cts.SELinuxHostTest#testAllEnforcing',],
       'android.webkit' : [
-          'cts.WebViewClientTest#testDoUpdateVisitedHistory',
-          'cts.WebViewClientTest#testLoadPage',
-          'cts.WebViewClientTest#testOnFormResubmission',
-          'cts.WebViewClientTest#testOnReceivedError',
-          'cts.WebViewClientTest#testOnReceivedHttpAuthRequest',
-          'cts.WebViewClientTest#testOnScaleChanged',
-          'cts.WebViewClientTest#testOnUnhandledKeyEvent',
-          'cts.WebViewTest#testSetInitialScale',]}
+          'cts.WebViewClientTest#testOnUnhandledKeyEvent',]}
 
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name
