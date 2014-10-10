@@ -18,6 +18,10 @@ include $(CLEAR_VARS)
 
 # don't include this package in any target
 LOCAL_MODULE_TAGS := optional
+
+# Include both the 32 and 64 bit versions of libs
+LOCAL_MULTILIB := both
+
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 

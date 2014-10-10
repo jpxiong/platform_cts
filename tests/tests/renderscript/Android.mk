@@ -22,6 +22,9 @@ LOCAL_PACKAGE_NAME := CtsRenderscriptTestCases
 # Don't include this package in any target.
 LOCAL_MODULE_TAGS := optional
 
+# Include both the 32 and 64 bit versions
+LOCAL_MULTILIB := both
+
 # When built, explicitly put it in the data partition.
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
