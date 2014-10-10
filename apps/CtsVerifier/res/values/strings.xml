@@ -1215,6 +1215,19 @@
     <string name="provisioning_byod_profile_visible">Work profile visible in Settings</string>
     <string name="provisioning_byod_admin_visible">Device administrator visible in Settings</string>
     <string name="provisioning_byod_workapps_visible">Badged work apps visible in Launcher</string>
+    <string name="provisioning_byod_cross_profile">Open app cross profiles</string>
+    <string name="provisioning_byod_cross_profile_app_personal">
+        You selected the CTS Verifier option.
+    </string>
+    <string name="provisioning_byod_cross_profile_app_work">You selected the Work option.</string>
+    <string name="provisioning_byod_cross_profile_instruction">
+        Please press the Go button to start an action.\n
+        \n
+        You should be asked to choose either \"CTS Verifier\" or \"Work\" to complete the action.
+        Pressing either should bring up a page stating your choice.\n
+        \n
+        Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
+    </string>
     <string name="provisioning_byod_profile_visible_instruction">
         Please press the Go button to open the Settings page.
         Navigate to Accounts and confirm that:\n
@@ -1247,6 +1260,8 @@
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
     <string name="provisioning_byod_disabled">Device provisioning is not enabled.</string>
     <string name="provisioning_byod_go">Go</string>
+    <string name="provisioning_button_finish">Finish</string>
+    <string name="provisioning_cross_profile_chooser">Choose an app to complete action</string>
 
     <!-- Strings for DeviceOwnerProvisioningTest -->
     <string name="provisioning_device_owner">Device Owner Provisioning</string>
