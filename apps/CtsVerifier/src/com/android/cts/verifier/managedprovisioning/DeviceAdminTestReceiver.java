@@ -26,6 +26,8 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.cts.verifier.managedprovisioning.ByodHelperActivity;
+
 /**
  * Profile owner receiver for BYOD flow test.
  * Setup cross-profile intent filter after successful provisioning.
@@ -48,6 +50,7 @@ public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
             IntentFilter filter = new IntentFilter();
             filter.addAction(ByodHelperActivity.ACTION_QUERY_PROFILE_OWNER);
             filter.addAction(ByodHelperActivity.ACTION_REMOVE_PROFILE_OWNER);
+            filter.addAction(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
             dpm.addCrossProfileIntentFilter(getWho(context), filter,
                     DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
 
