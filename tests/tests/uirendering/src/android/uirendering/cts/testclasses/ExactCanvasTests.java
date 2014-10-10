@@ -16,8 +16,6 @@
 
 package android.uirendering.cts.testclasses;
 
-import com.android.cts.uirendering.R;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -31,8 +29,7 @@ import android.uirendering.cts.bitmapverifiers.BitmapVerifier;
 import android.uirendering.cts.bitmapverifiers.RectVerifier;
 import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 import android.uirendering.cts.testinfrastructure.CanvasClient;
-import android.uirendering.cts.testinfrastructure.ViewInitializer;
-import android.view.View;
+import com.android.cts.uirendering.R;
 
 public class ExactCanvasTests extends ActivityTestBase {
     private final BitmapComparer mExactComparer = new ExactComparer();
@@ -211,15 +208,5 @@ public class ExactCanvasTests extends ActivityTestBase {
                 })
                 .addLayout(R.layout.blue_padded_square, null)
                 .runWithVerifier(verifier);
-    }
-
-    @SmallTest
-    public void testClipping() {
-        createTest().addLayout(R.layout.simple_red_layout, new ViewInitializer() {
-            @Override
-            public void intializeView(View view) {
-                view.setClipBounds(new Rect(0, 0, 50, 50));
-            }
-        }).runWithComparer(mExactComparer);
     }
 }
