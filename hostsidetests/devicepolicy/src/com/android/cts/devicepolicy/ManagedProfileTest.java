@@ -124,14 +124,53 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         }
     }
 
+    // TODO: This test is not specific to managed profiles, but applies to multi-user in general.
+    // Move it to a MultiUserTest class when there is one. Should probably move
+    // UserRestrictionActivity to a more generic apk too as it might be useful for different kinds
+    // of tests (same applies to ComponentDisablingActivity).
+    public void testNoDebuggingFeaturesRestriction() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        String restriction = "no_debugging_features";  // UserManager.DISALLOW_DEBUGGING_FEATURES
+        String command = "add-restriction";
+
+        String addRestrictionCommandOutput =
+                changeUserRestrictionForUser(restriction, command, mUserId);
+        assertTrue("Command was expected to succeed " + addRestrictionCommandOutput,
+                addRestrictionCommandOutput.contains("Status: ok"));
+
+        // This should now fail, as the shell is not available to start activities under a different
+        // user once the restriction is in place.
+        addRestrictionCommandOutput =
+                changeUserRestrictionForUser(restriction, command, mUserId);
+        assertTrue(
+                "Expected SecurityException when starting the activity "
+                        + addRestrictionCommandOutput,
+                addRestrictionCommandOutput.contains("SecurityException"));
+    }
+
     private void disableActivityForUser(String activityName, int userId)
             throws DeviceNotAvailableException {
         String command = "am start -W --user " + userId
                 + " --es extra-package " + MANAGED_PROFILE_PKG
-                + " --es extra-class-name " + MANAGED_PROFILE_PKG + "." + activityName + " "
-                + MANAGED_PROFILE_PKG + "/.ComponentDisablingActivity ";
+                + " --es extra-class-name " + MANAGED_PROFILE_PKG + "." + activityName
+                + " " + MANAGED_PROFILE_PKG + "/.ComponentDisablingActivity ";
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
                 + getDevice().executeShellCommand(command));
+    }
+
+    private String changeUserRestrictionForUser(String key, String command, int userId)
+            throws DeviceNotAvailableException {
+        String adbCommand = "am start -W --user " + userId
+                + " -c android.intent.category.DEFAULT "
+                + " --es extra-command " + command
+                + " --es extra-restriction-key " + key
+                + " " + MANAGED_PROFILE_PKG + "/.UserRestrictionActivity";
+        String commandOutput = getDevice().executeShellCommand(adbCommand);
+        CLog.logAndDisplay(LogLevel.INFO,
+                "Output for command " + adbCommand + ": " + commandOutput);
+        return commandOutput;
     }
 
     private int createManagedProfile() throws DeviceNotAvailableException {
