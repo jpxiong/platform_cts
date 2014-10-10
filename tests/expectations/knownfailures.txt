@@ -91,19 +91,6 @@
   bug: 17496766
 },
 {
-  description: "As per new CTS test case adding policy",
-  names: [
-    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_primary",
-    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_all",
-    "com.android.cts.managedprofile.PrimaryUserTest#testAddCrossProfileIntentFilter_managed",
-    "com.android.cts.managedprofile.ManagedProfile#testClearCrossProfileIntentFilters",
-    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_primary",
-    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_all",
-    "com.android.cts.managedprofile.ManagedProfile#testAddCrossProfileIntentFilter_managed"
-  ],
-  bug: 15900074
-},
-{
   description: "these tests locks the screen with an emtpy password or swipe-to-unlock, blocking subsequent test to dismiss keyguard",
   names: [
     "com.android.cts.devicepolicy.DeviceOwnerTest#testKeyManagement"
@@ -128,7 +115,8 @@
     "com.android.cts.devicepolicy.ManagedProfileTest#testManagedProfileSetup",
     "com.android.cts.devicepolicy.ManagedProfileTest#testWipeData",
     "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileIntentFilters",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileContent"
+    "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileContent",
+    "com.android.cts.devicepolicy.ManagedProfileTest#testNoDebuggingFeaturesRestriction"
   ]
 },
 {
