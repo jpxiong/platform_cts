@@ -355,7 +355,9 @@ def BuildCtsFlakyTestList():
           'cts.BannedFilesTest#testNoSuInPath',
           'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports',
           'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',
-          'cts.PackageSignatureTest#testPackageSignatures',],
+          'cts.PackageSignatureTest#testPackageSignatures',
+          'cts.SELinuxDomainTest#testSuDomain',
+          'cts.SELinuxHostTest#testAllEnforcing',],
       'android.webkit' : [
           'cts.WebViewClientTest#testDoUpdateVisitedHistory',
           'cts.WebViewClientTest#testLoadPage',
