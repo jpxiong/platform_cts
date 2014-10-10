@@ -497,6 +497,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                     openDevice(id);
 
+                    if (mStaticInfo.isHardwareLevelLegacy()) {
+                        Log.i(TAG, "Skipping test on legacy devices");
+                        continue;
+                    }
+
                     initSupportedVideoSize(id);
 
                     videoSnapshotTestByCamera(burstTest);
