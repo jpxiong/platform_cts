@@ -48,7 +48,7 @@ public class RepeatingSensorOperation extends AbstractSensorOperation {
      * in one iterations, it is thrown and all subsequent iterations will not run.
      */
     @Override
-    public void execute() {
+    public void execute() throws InterruptedException {
         for(int i = 0; i < mIterations; ++i) {
             ISensorOperation operation = mOperation.clone();
             try {

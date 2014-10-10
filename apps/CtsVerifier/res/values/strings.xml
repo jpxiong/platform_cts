@@ -469,7 +469,7 @@
     <string name="snsr_test_pass">PASS</string>
     <string name="snsr_test_skipped">SKIPPED</string>
     <string name="snsr_test_fail">FAIL</string>
-    <string name="snsr_executing_test">\nExecuting test case \'%1$s\'..\n</string>
+    <string name="snsr_execution_time">Test execution time %1$s sec</string>
 
     <!-- Strings to interact with users in Sensor Tests -->
     <string name="snsr_test_play_sound">A sound will be played once the verification is complete...</string>
@@ -479,7 +479,6 @@
     <string name="snsr_keep_device_rotating_clockwise">Once the test begins, you will have to keep rotating the device clockwise.</string>
     <string name="snsr_wait_for_user">Press \'Next\' to continue.</string>
     <string name="snsr_wait_to_begin">Press \'Next\' to begin.</string>
-    <string name="snsr_wait_to_complete">Press \'Next\' to complete.</string>
     <string name="snsr_on_complete_return">After completing the task, go back to this test.</string>
     <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
     <string name="snsr_sensor_feature_deactivation">Additionally, turn off any other features installed in the device, that register for sensors. Once you are done, you can continue the test.</string>
@@ -491,7 +490,6 @@
     <string name="snsr_setting_auto_rotate_screen_mode">Auto-rotate screen</string>
     <string name="snsr_setting_keep_screen_on">Stay awake</string>
     <string name="snsr_setting_location_mode">Location</string>
-    <string name="snsr_setting_auto_screen_off_mode">Display Sleep</string>
     <string name="snsr_pass_on_error">Pass Anyway</string>
     <string name="snsr_run_automated_tests">The screen will be turned off to execute the tests,
         when tests complete, the device will vibrate and the screen will be turned back on.</string>
@@ -526,7 +524,6 @@
         facing the ceiling. Read the instructions for each scenario, before you perform the
         test.</string>
     <string name="snsr_gyro_device_static">Leave the device static.</string>
-    <string name="snsr_gyro_rotate_clockwise">Rotate the device clockwise.</string>
     <string name="snsr_gyro_rotate_device">Once you begin the test, you will need to rotate the
         device 360deg (one time) in the direction show by the animation, then place it back on the
         flat surface.</string>
@@ -550,20 +547,15 @@
     <string name="snsr_mag_measurement">-&gt; (%1$.2f, %2$.2f, %3$.2f) : %4$.2f uT</string>
 
     <!-- Sensor Value Accuracy -->
-    <string name="snsr_val_acc_test">Sensor Value Accuracy Tests</string>
     <string name="snsr_rot_vec_test">Rotation Vector Accuracy Test</string>
-    <string name="snsr_collected_events_length">Sensor(%2$s). Collected events expected to be greater than zero. Found=%1$d.</string>
     <string name="snsr_event_length">Sensor(%3$s). Event values expected to have size=%1$d. Found=%2$d.</string>
-    <string name="snsr_event_length_positive">Sensor(%2$s). Event values expected to have size > 0. Found=%1$d</string>
     <string name="snsr_event_value">Sensor(%3$s). Event value[0] expected to be of value=%1$f. Found=%2$f.</string>
     <string name="snsr_event_time">Sensor(%5$s). Event timestamp expected to be synchronized with SystemClock.elapsedRealtimeNanos(). Event received at=%1$d. Event timestamp=%2$d. Delta=%3$d. Threshold=%4$d.</string>
-    <string name="snsr_event_time_positive">Sensor(%2$s). Event timestamp expected to positive (> 0). Found=%1$d.</string>
 
     <!-- Sensor Batching -->
     <string name="snsr_batch_test">Sensor Batching Tests</string>
     <string name="snsr_batching_walking_needed">Once the test begins, you will have to take the
         device in your hand and walk.</string>
-    <string name="snsr_batching_fifo_count">FifoReservedEventCount=%1$d. Expected to be at most FifoMaxEventCount=%2$d.</string>
 
     <!-- Sensor Synchronization -->
     <string name="snsr_synch_test">Sensor Synchronization Test</string>

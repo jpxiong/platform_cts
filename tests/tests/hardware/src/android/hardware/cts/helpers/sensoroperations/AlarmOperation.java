@@ -72,7 +72,7 @@ public class AlarmOperation extends AbstractSensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
+    public void execute() throws InterruptedException {
         // Start alarm
         IntentFilter intentFilter = new IntentFilter(ACTION);
         BroadcastReceiver receiver = new BroadcastReceiver() {

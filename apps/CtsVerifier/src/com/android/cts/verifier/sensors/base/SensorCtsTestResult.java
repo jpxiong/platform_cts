@@ -39,6 +39,8 @@ class SensorCtsTestResult extends TestResult {
     private final Context mContext;
     private final TestResult mWrappedTestResult;
 
+    private volatile boolean mInterrupted;
+
     public SensorCtsTestResult(Context context, TestResult testResult) {
         mContext = context;
         mWrappedTestResult = testResult;
@@ -96,12 +98,23 @@ class SensorCtsTestResult extends TestResult {
 
     @Override
     public void runProtected(Test test, Protectable protectable) {
-        mWrappedTestResult.runProtected(test, protectable);
+        try {
+            protectable.protect();
+        } catch (AssertionFailedError e) {
+            addFailure(test, e);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (InterruptedException e) {
+            mInterrupted = true;
+            addError(test, e);
+        } catch (Throwable e) {
+            addError(test, e);
+        }
     }
 
     @Override
     public boolean shouldStop() {
-        return mWrappedTestResult.shouldStop();
+        return mInterrupted || mWrappedTestResult.shouldStop();
     }
 
     @Override

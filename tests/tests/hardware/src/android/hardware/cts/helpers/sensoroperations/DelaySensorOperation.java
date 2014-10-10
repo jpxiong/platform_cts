@@ -50,8 +50,8 @@ public class DelaySensorOperation implements ISensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
-        sleep(mDelay, mTimeUnit);
+    public void execute() throws InterruptedException {
+        SensorCtsHelper.sleep(mDelay, mTimeUnit);
         mOperation.execute();
     }
 
@@ -69,12 +69,5 @@ public class DelaySensorOperation implements ISensorOperation {
     @Override
     public DelaySensorOperation clone() {
         return new DelaySensorOperation(mOperation.clone(), mDelay, mTimeUnit);
-    }
-
-    /**
-     * Helper method to sleep for a given number of ns. Exposed for unit testing.
-     */
-    void sleep(long delay, TimeUnit timeUnit) {
-        SensorCtsHelper.sleep(delay, timeUnit);
     }
 }

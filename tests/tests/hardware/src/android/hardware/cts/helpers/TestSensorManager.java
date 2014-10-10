@@ -120,24 +120,22 @@ public class TestSensorManager {
     /**
      * Wait for a specific number of events.
      */
-    public void waitForEvents(int eventCount) {
+    public void waitForEvents(int eventCount) throws InterruptedException {
         if (mTestSensorEventListener == null) {
             Log.w(LOG_TAG, "No listener registered, returning.");
             return;
         }
-
         mTestSensorEventListener.waitForEvents(eventCount);
     }
 
     /**
      * Wait for a specific duration.
      */
-    public void waitForEvents(long duration, TimeUnit timeUnit) {
+    public void waitForEvents(long duration, TimeUnit timeUnit) throws InterruptedException {
         if (mTestSensorEventListener == null) {
             Log.w(LOG_TAG, "No listener registered, returning.");
             return;
         }
-
         mTestSensorEventListener.waitForEvents(duration, timeUnit);
     }
 
@@ -168,7 +166,6 @@ public class TestSensorManager {
         if (mTestSensorEventListener == null) {
             return;
         }
-
         mTestSensorEventListener.waitForFlushComplete();
     }
 
@@ -185,7 +182,6 @@ public class TestSensorManager {
         if (mTestSensorEventListener == null) {
             return;
         }
-
         startFlush();
         waitForFlushCompleted();
     }
@@ -193,12 +189,12 @@ public class TestSensorManager {
     /**
      * Register a listener, wait for a specific number of events, and then unregister the listener.
      */
-    public void runSensor(TestSensorEventListener listener, int eventCount) {
+    public void runSensor(TestSensorEventListener listener, int eventCount)
+            throws InterruptedException {
         if (mTestSensorEventListener != null) {
             Log.w(LOG_TAG, "Listener already registered, returning.");
             return;
         }
-
         try {
             registerListener(listener);
             waitForEvents(eventCount);
@@ -210,12 +206,12 @@ public class TestSensorManager {
     /**
      * Register a listener, wait for a specific duration, and then unregister the listener.
      */
-    public void runSensor(TestSensorEventListener listener, long duration, TimeUnit timeUnit) {
+    public void runSensor(TestSensorEventListener listener, long duration, TimeUnit timeUnit)
+            throws InterruptedException {
         if (mTestSensorEventListener != null) {
             Log.w(LOG_TAG, "Listener already registered, returning.");
             return;
         }
-
         try {
             registerListener(listener);
             waitForEvents(duration, timeUnit);
@@ -231,7 +227,7 @@ public class TestSensorManager {
     public void runSensorAndFlush(
             TestSensorEventListener listener,
             long duration,
-            TimeUnit timeUnit) {
+            TimeUnit timeUnit) throws InterruptedException {
         if (mTestSensorEventListener != null) {
             Log.w(LOG_TAG, "Listener already registered, returning.");
             return;
