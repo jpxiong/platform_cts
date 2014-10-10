@@ -41,7 +41,7 @@
     <ListView
         android:id="@id/android:list"
         android:layout_width="match_parent"
-        android:layout_height="258dp" />
+        android:layout_height="wrap_content" />
 
     <include layout="@layout/pass_fail_buttons" />
 

@@ -73,6 +73,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mProfileVisibleTest;
     private TestItem mDeviceAdminVisibleTest;
     private TestItem mWorkAppVisibleTest;
+    private TestItem mCrossProfileIntentFiltersTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,11 +174,19 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 R.string.provisioning_byod_workapps_visible_instruction,
                 new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
 
+        Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
+        Intent chooser = Intent.createChooser(intent, getResources().getString(R.string.provisioning_cross_profile_chooser));
+        mCrossProfileIntentFiltersTest = new TestItem(this,
+                R.string.provisioning_byod_cross_profile,
+                R.string.provisioning_byod_cross_profile_instruction,
+                chooser);
+
         mTests.add(mDiskEncryptionTest);
         mTests.add(mProfileOwnerInstalled);
         mTests.add(mProfileVisibleTest);
         mTests.add(mDeviceAdminVisibleTest);
         mTests.add(mWorkAppVisibleTest);
+        mTests.add(mCrossProfileIntentFiltersTest);
     }
 
     @Override
