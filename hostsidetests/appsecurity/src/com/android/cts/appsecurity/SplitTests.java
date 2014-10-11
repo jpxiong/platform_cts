@@ -18,15 +18,9 @@ package com.android.cts.appsecurity;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.util.AbiUtils;
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
-import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.ddmlib.testrunner.TestResult;
-import com.android.ddmlib.testrunner.TestResult.TestStatus;
-import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
-import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IAbiReceiver;
@@ -37,7 +31,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tests that verify installing of various split APKs from host side.
@@ -355,43 +348,8 @@ public class SplitTests extends DeviceTestCase implements IAbiReceiver, IBuildRe
         }
     }
 
-    public void runDeviceTests(String packageName) throws DeviceNotAvailableException {
-        runDeviceTests(packageName, null, null);
-    }
-
     public void runDeviceTests(String packageName, String testClassName, String testMethodName)
             throws DeviceNotAvailableException {
-        if (testClassName != null && testClassName.startsWith(".")) {
-            testClassName = packageName + testClassName;
-        }
-
-        RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(packageName,
-                "android.support.test.runner.AndroidJUnitRunner", getDevice().getIDevice());
-        if (testClassName != null && testMethodName != null) {
-            testRunner.setMethodName(testClassName, testMethodName);
-        }
-
-        final CollectingTestListener listener = new CollectingTestListener();
-        getDevice().runInstrumentationTests(testRunner, listener);
-
-        final TestRunResult result = listener.getCurrentRunResults();
-        if (result.isRunFailure()) {
-            fail("Failed to successfully run device tests for " + result.getName() + ": "
-                    + result.getRunFailureMessage());
-        }
-
-        if (result.hasFailedTests()) {
-            // build a meaningful error message
-            StringBuilder errorBuilder = new StringBuilder("on-device tests failed:\n");
-            for (Map.Entry<TestIdentifier, TestResult> resultEntry :
-                result.getTestResults().entrySet()) {
-                if (!resultEntry.getValue().getStatus().equals(TestStatus.PASSED)) {
-                    errorBuilder.append(resultEntry.getKey().toString());
-                    errorBuilder.append(":\n");
-                    errorBuilder.append(resultEntry.getValue().getStackTrace());
-                }
-            }
-            fail(errorBuilder.toString());
-        }
+        Utils.runDeviceTests(getDevice(), packageName, testClassName, testMethodName);
     }
 }
