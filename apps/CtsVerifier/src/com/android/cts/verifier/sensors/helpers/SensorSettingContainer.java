@@ -24,12 +24,18 @@ import com.android.cts.verifier.sensors.base.ISensorTestStateContainer;
  * A helper class for {@link SensorFeaturesDeactivator}. It abstracts the responsibility of handling
  * device settings that affect sensors.
  *
- * This class is not thread safe. It is meant to be used only by {@link SensorFeaturesDeactivator}.
+ * This class is meant to be used only by {@link SensorFeaturesDeactivator}.
+ * To keep things simple, this class synchronizes access to its internal state on public methods.
+ * This approach is fine, because there is no need for concurrent access.
  */
 abstract class SensorSettingContainer {
+    private static final int DEFAULT_SETTING_VALUE = -1;
+
     private final String mAction;
     private final int mSettingNameResId;
 
+    private boolean mInitialized;
+    private boolean mSettingAvailable;
     private boolean mCapturedModeOn;
 
     public SensorSettingContainer(String action, int settingNameResId) {
@@ -37,13 +43,21 @@ abstract class SensorSettingContainer {
         mSettingNameResId = settingNameResId;
     }
 
-    public void captureInitialState() {
+    public synchronized void captureInitialState() {
+        if (mInitialized) {
+            return;
+        }
+        mSettingAvailable = getSettingMode(DEFAULT_SETTING_VALUE) != DEFAULT_SETTING_VALUE;
         mCapturedModeOn = getCurrentSettingMode();
+        mInitialized = true;
     }
 
     public synchronized void requestToSetMode(
             ISensorTestStateContainer stateContainer,
-            boolean modeOn) throws  InterruptedException {
+            boolean modeOn) throws InterruptedException {
+        if (!isSettingAvailable()) {
+            return;
+        }
         trySetMode(stateContainer, modeOn);
         if (getCurrentSettingMode() != modeOn) {
             String message = stateContainer.getString(
@@ -56,6 +70,9 @@ abstract class SensorSettingContainer {
 
     public synchronized void requestToResetMode(ISensorTestStateContainer stateContainer)
             throws InterruptedException {
+        if (!isSettingAvailable()) {
+            return;
+        }
         trySetMode(stateContainer, mCapturedModeOn);
     }
 
@@ -75,12 +92,20 @@ abstract class SensorSettingContainer {
     }
 
     private boolean getCurrentSettingMode() {
-        return getSettingMode() != 0;
+        return getSettingMode(DEFAULT_SETTING_VALUE) != 0;
     }
 
     private String getSettingName(ISensorTestStateContainer stateContainer) {
         return stateContainer.getString(mSettingNameResId);
     }
 
-    protected abstract int getSettingMode();
+    private boolean isSettingAvailable() {
+        if (!mInitialized) {
+            throw new IllegalStateException(
+                    "Object must be initialized first by invoking #captureInitialState.");
+        }
+        return mSettingAvailable;
+    }
+
+    protected abstract int getSettingMode(int defaultValue);
 }

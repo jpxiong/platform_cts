@@ -32,8 +32,6 @@ import android.provider.Settings;
  */
 public class SensorFeaturesDeactivator {
 
-    private boolean mInitialStateCaptured;
-
     private final ISensorTestStateContainer mStateContainer;
 
     private final SensorSettingContainer mAirplaneMode = new AirplaneModeSettingContainer();
@@ -64,10 +62,6 @@ public class SensorFeaturesDeactivator {
     }
 
     public synchronized void requestToRestoreFeatures() throws InterruptedException {
-        if (!isInitialStateCaptured()) {
-            return;
-        }
-
         if (Thread.currentThread().isInterrupted()) {
             // TODO: in the future, if the thread is interrupted, we might need to serialize the
             //       intermediate state we acquired so we can restore when we have a chance
@@ -82,21 +76,11 @@ public class SensorFeaturesDeactivator {
     }
 
     private void captureInitialState() {
-        if (mInitialStateCaptured) {
-            return;
-        }
-
         mAirplaneMode.captureInitialState();
         mScreenBrightnessMode.captureInitialState();
         mAutoRotateScreenMode.captureInitialState();
         mLocationMode.captureInitialState();
         mKeepScreenOnMode.captureInitialState();
-
-        mInitialStateCaptured = true;
-    }
-
-    private boolean isInitialStateCaptured() {
-        return mInitialStateCaptured;
     }
 
     private class AirplaneModeSettingContainer extends SensorSettingContainer {
@@ -105,13 +89,15 @@ public class SensorFeaturesDeactivator {
         }
 
         @Override
-        protected int getSettingMode() {
+        protected int getSettingMode(int defaultValue) {
             ContentResolver contentResolver = mStateContainer.getContentResolver();
             // Settings.System.AIRPLANE_MODE_ON is deprecated in API 17
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return Settings.System.getInt(contentResolver, Settings.System.AIRPLANE_MODE_ON, 0);
+                return Settings.System
+                        .getInt(contentResolver, Settings.System.AIRPLANE_MODE_ON, defaultValue);
             } else {
-                return Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0);
+                return Settings.Global
+                        .getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, defaultValue);
             }
         }
     }
@@ -122,11 +108,11 @@ public class SensorFeaturesDeactivator {
         }
 
         @Override
-        public int getSettingMode() {
+        public int getSettingMode(int defaultValue) {
             return Settings.System.getInt(
                     mStateContainer.getContentResolver(),
                     Settings.System.SCREEN_BRIGHTNESS_MODE,
-                    Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                    defaultValue);
         }
     }
 
@@ -137,11 +123,11 @@ public class SensorFeaturesDeactivator {
         }
 
         @Override
-        protected int getSettingMode() {
+        protected int getSettingMode(int defaultValue) {
             return Settings.System.getInt(
                     mStateContainer.getContentResolver(),
                     Settings.System.ACCELEROMETER_ROTATION,
-                    0 /* default */);
+                    defaultValue);
         }
     }
 
@@ -152,11 +138,11 @@ public class SensorFeaturesDeactivator {
         }
 
         @Override
-        protected int getSettingMode() {
+        protected int getSettingMode(int defaultValue) {
             return Settings.Global.getInt(
                     mStateContainer.getContentResolver(),
                     Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
-                    0);
+                    defaultValue);
         }
     }
 
@@ -166,11 +152,11 @@ public class SensorFeaturesDeactivator {
         }
 
         @Override
-        protected int getSettingMode() {
+        protected int getSettingMode(int defaultValue) {
             return Settings.Secure.getInt(
                     mStateContainer.getContentResolver(),
                     Settings.Secure.LOCATION_MODE,
-                    Settings.Secure.LOCATION_MODE_OFF);
+                    defaultValue);
         }
     }
 }
