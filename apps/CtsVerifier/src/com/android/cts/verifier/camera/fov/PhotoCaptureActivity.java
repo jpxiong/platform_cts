@@ -69,7 +69,7 @@ public class PhotoCaptureActivity extends Activity
     private List<SelectableResolution> mSupportedResolutions;
     private ArrayAdapter<SelectableResolution> mAdapter;
 
-    private int mCameraId;
+    private SelectableResolution mSelectedResolution;
     private Camera mCamera;
     private Size mSurfaceSize;
     private boolean mCameraInitialized = false;
@@ -165,12 +165,7 @@ public class PhotoCaptureActivity extends Activity
                     AdapterView<?> parent, View view, int position, long id) {
                 if (mSupportedResolutions != null) {
                     SelectableResolution resolution = mSupportedResolutions.get(position);
-
-                    switchToCamera(resolution.cameraId, false);
-
-                    Camera.Parameters params = mCamera.getParameters();
-                    params.setPictureSize(resolution.width, resolution.height);
-                    mCamera.setParameters(params);
+                    switchToCamera(resolution, false);
 
                     // It should be guaranteed that the FOV is correctly updated after setParameters().
                     mReportedFovPrePictureTaken = mCamera.getParameters().getHorizontalViewAngle();
@@ -376,7 +371,7 @@ public class PhotoCaptureActivity extends Activity
                     public void onCancel(DialogInterface arg0) {
                         // User cancelled preview size selection.
                         mPreviewSizes = null;
-                        switchToCamera(mCameraId, true);
+                        switchToCamera(mSelectedResolution, true);
                     }
                 }).
                 setSingleChoiceItems(choices, 0, new DialogInterface.OnClickListener() {
@@ -389,7 +384,7 @@ public class PhotoCaptureActivity extends Activity
 
                         if (mPreviewSizeCamerasToProcess.isEmpty()) {
                             // We're done, re-initialize camera.
-                            switchToCamera(mCameraId, true);
+                            switchToCamera(mSelectedResolution, true);
                         } else {
                             // Process other cameras.
                             showNextDialogToChoosePreviewSize();
@@ -415,7 +410,7 @@ public class PhotoCaptureActivity extends Activity
 
         // Either use chosen preview size for current camera or automatically
         // choose preview size based on view dimensions.
-        Size selectedPreviewSize = (mPreviewSizes != null) ? mPreviewSizes[mCameraId] :
+        Size selectedPreviewSize = (mPreviewSizes != null) ? mPreviewSizes[mSelectedResolution.cameraId] :
             getBestPreviewSize(mSurfaceSize.width, mSurfaceSize.height, params);
         if (selectedPreviewSize != null) {
             params.setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
@@ -427,19 +422,20 @@ public class PhotoCaptureActivity extends Activity
 
     private void startPreview() {
         if (mCameraInitialized && mCamera != null) {
-            setCameraDisplayOrientation(this, mCameraId, mCamera);
+            setCameraDisplayOrientation(this, mSelectedResolution.cameraId, mCamera);
             mCamera.startPreview();
             mPreviewActive = true;
         }
     }
 
-    private void switchToCamera(int cameraId, boolean initializeCamera) {
+    private void switchToCamera(SelectableResolution resolution, boolean initializeCamera) {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
         }
-        mCameraId = cameraId;
-        mCamera = Camera.open(cameraId);
+
+        mSelectedResolution = resolution;
+        mCamera = Camera.open(mSelectedResolution.cameraId);
 
         if (initializeCamera){
           initializeCamera();
@@ -472,7 +468,7 @@ public class PhotoCaptureActivity extends Activity
      * Set the common camera parameters on the given camera and returns the
      * parameter object for further modification, if needed.
      */
-    private static Camera.Parameters setCameraParams(Camera camera) {
+    private Camera.Parameters setCameraParams(Camera camera) {
         // The picture size is taken and set from the spinner selection
         // callback.
         Camera.Parameters params = camera.getParameters();
@@ -480,6 +476,7 @@ public class PhotoCaptureActivity extends Activity
         params.setJpegQuality(100);
         params.setFocusMode(getFocusMode(camera));
         params.setZoom(0);
+        params.setPictureSize(mSelectedResolution.width, mSelectedResolution.height);
         return params;
     }
 
