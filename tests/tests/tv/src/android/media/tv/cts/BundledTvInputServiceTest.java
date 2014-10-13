@@ -133,7 +133,13 @@ public class BundledTvInputServiceTest
             return;
         }
         for (final TvInputInfo info : mPassthroughInputList) {
-            mTvView.tune(info.getId(), TvContract.buildChannelUriForPassthroughInput(info.getId()));
+            runTestOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvView.tune(info.getId(),
+                            TvContract.buildChannelUriForPassthroughInput(info.getId()));
+                }
+            });
             mInstrumentation.waitForIdleSync();
             new PollingCheck(TIME_OUT) {
                 @Override
@@ -156,7 +162,13 @@ public class BundledTvInputServiceTest
         for (int i = 0; i < mPassthroughInputList.size() * STRESS_FACTOR; ++i) {
             final TvInputInfo info =
                     mPassthroughInputList.get(random.nextInt(mPassthroughInputList.size()));
-            mTvView.tune(info.getId(), TvContract.buildChannelUriForPassthroughInput(info.getId()));
+            runTestOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvView.tune(info.getId(),
+                            TvContract.buildChannelUriForPassthroughInput(info.getId()));
+                }
+            });
             mInstrumentation.waitForIdleSync();
             if (random.nextBoolean()) {
                 new PollingCheck(TIME_OUT) {
