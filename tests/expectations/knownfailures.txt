@@ -143,7 +143,7 @@
 {
   description: "This test failed on devices that use effect off loading. In addition it uses hidden apis",
   names: [
-    "android.meida.cts.AudioEffectTest#test1_1ConstructorFromUuid"
+    "android.media.cts.AudioEffectTest#test1_1ConstructorFromUuid"
   ],
   bug: 17605875
 },
@@ -319,7 +319,7 @@
 {
   description: "This test failed on hw decoder that doesn't output frame with the configured format.",
   names: [
-    "android.meida.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv"
+    "android.media.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv"
   ],
   bug: 17144778
 }
