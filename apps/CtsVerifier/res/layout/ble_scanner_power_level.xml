@@ -22,11 +22,14 @@
     <TextView android:text="@string/ble_scanner_power_level_instruction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/ble_scanner_power_level_instruction"
     />
     <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/ble_scanner_power_level_instruction"
             android:layout_centerInParent="true"
+            android:padding="10dp"
             >
         <LinearLayout android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -156,6 +159,9 @@
                     android:layout_height="wrap_content"
             />
         </LinearLayout>
+        <TextView android:id="@+id/ble_timer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
     </LinearLayout>
 
     <include android:layout_width="match_parent"
