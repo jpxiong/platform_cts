@@ -1159,7 +1159,7 @@
     <string name="pwa_info">This tests whether or displaying widets and keyfocus navigation works.\n
         You should see four buttons on the bottom of the screen.\n
         Pressing the "up" and "down" buttons should highlight different buttons.\n
-        Further, you should also be able to touch them and they should highlight as ususual.</string>
+        Further, you should also be able to touch them and they should highlight as usual.</string>
     <string name="pwa_test">Projection Widget Test</string>
     <string name="pwa_button_up">Up</string>
     <string name="pwa_button_down">Down</string>
