@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
@@ -55,7 +56,7 @@ public class PrimaryUserTest extends ActivityInstrumentationTestCase2<TestActivi
     public void testAddCrossProfileIntentFilter_all() {
         assertEquals(2, mPackageManager.queryIntentActivities(
                 new Intent(AllUsersActivity.ACTION), /* flags = */ 0).size());
-        
+
         // If we used startActivity(), the user would have a disambiguation dialog presented which
         // requires human intervention, so we won't be testing like that
     }

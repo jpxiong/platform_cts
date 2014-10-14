@@ -19,9 +19,6 @@
 
     <uses-sdk android:minSdkVersion="20"/>
 
-    <permission android:name="com.android.cts.managedprofile.permission.SAMPLE"
-                android:label="Sample Permission"/>
-
     <application>
         <uses-library android:name="android.test.runner" />
         <receiver
@@ -65,11 +62,6 @@
                 <action android:name="com.android.cts.managedprofile.ACTION_TEST_ALL_ACTIVITY" />
             </intent-filter>
         </activity>
-        <activity android:name=".crossprofilecontent.IntentSenderActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-            </intent-filter>
-        </activity>
         <activity android:name=".UserRestrictionActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -77,22 +69,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestActivity" />
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.android.cts.managedprofile.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths" />
-        </provider>
-        <provider
-            android:name="com.android.cts.managedprofile.crossprofilecontent.BasicContentProvider"
-            android:authorities="com.android.cts.managedprofile.basiccontentProvider"
-            android:grantUriPermissions="true"
-            android:exported="true"
-            android:permission="com.android.cts.managedprofile.permission.SAMPLE"
-            />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
