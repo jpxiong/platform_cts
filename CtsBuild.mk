@@ -61,3 +61,7 @@ endef
 define cts-get-executable-paths
 	$(foreach executable,$(1),$(CTS_TESTCASES_OUT)/$(executable))
 endef
+
+define cts-get-deqp-test-xmls
+	$(foreach api,$(1),$(CTS_TESTCASES_OUT)/com.drawelements.deqp.$(api).xml)
+endef
