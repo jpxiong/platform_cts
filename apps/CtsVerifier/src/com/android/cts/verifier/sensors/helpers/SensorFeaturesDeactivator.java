@@ -48,7 +48,7 @@ public class SensorFeaturesDeactivator {
         mStateContainer = stateContainer;
     }
 
-    public synchronized void requestDeactivationOfFeatures() {
+    public synchronized void requestDeactivationOfFeatures() throws InterruptedException {
         captureInitialState();
 
         mAirplaneMode.requestToSetMode(mStateContainer, true);
@@ -63,8 +63,14 @@ public class SensorFeaturesDeactivator {
         mStateContainer.waitForUserToContinue();
     }
 
-    public synchronized void requestToRestoreFeatures() {
+    public synchronized void requestToRestoreFeatures() throws InterruptedException {
         if (!isInitialStateCaptured()) {
+            return;
+        }
+
+        if (Thread.currentThread().isInterrupted()) {
+            // TODO: in the future, if the thread is interrupted, we might need to serialize the
+            //       intermediate state we acquired so we can restore when we have a chance
             return;
         }
 

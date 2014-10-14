@@ -87,7 +87,7 @@ public class RotationVectorTestActivity
         // TODO: take reference value automatically when device is 'still'
         clearText();
         appendText(R.string.snsr_rotation_vector_set_reference);
-        waitForUser();
+        waitForUserToContinue();
 
         clearText();
         for (int i = 0; i < MAX_SENSORS_AVAILABLE; ++i) {
@@ -104,7 +104,7 @@ public class RotationVectorTestActivity
         // TODO: take final value automatically when device becomes 'still' at the end
         clearText();
         appendText(R.string.snsr_rotation_vector_set_final);
-        waitForUser();
+        waitForUserToContinue();
 
         clearText();
         closeGlSurfaceView();

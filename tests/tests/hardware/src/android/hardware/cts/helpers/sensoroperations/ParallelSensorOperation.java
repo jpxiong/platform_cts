@@ -16,15 +16,21 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import android.hardware.cts.helpers.SensorStats;
-import android.util.Log;
-
 import junit.framework.Assert;
+
+import android.hardware.cts.helpers.SensorStats;
+import android.os.SystemClock;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A {@link ISensorOperation} that executes a set of children {@link ISensorOperation}s in parallel.
@@ -34,9 +40,6 @@ import java.util.concurrent.TimeUnit;
 public class ParallelSensorOperation extends AbstractSensorOperation {
     public static final String STATS_TAG = "parallel";
 
-    private static final String TAG = "ParallelSensorOperation";
-    private static final int NANOS_PER_MILLI = 1000000;
-
     private final List<ISensorOperation> mOperations = new LinkedList<ISensorOperation>();
     private final Long mTimeout;
     private final TimeUnit mTimeUnit;
@@ -44,6 +47,7 @@ public class ParallelSensorOperation extends AbstractSensorOperation {
     /**
      * Constructor for the {@link ParallelSensorOperation} without a timeout.
      */
+    // TODO: sensor tests must always provide a timeout to prevent tests from running forever
     public ParallelSensorOperation() {
         mTimeout = null;
         mTimeUnit = null;
@@ -77,57 +81,67 @@ public class ParallelSensorOperation extends AbstractSensorOperation {
      * operations, the first exception will be thrown once all operations are completed.
      */
     @Override
-    public void execute() {
-        Long timeoutTimeNs = null;
-        if (mTimeout != null && mTimeUnit != null) {
-            timeoutTimeNs = System.nanoTime() + TimeUnit.NANOSECONDS.convert(mTimeout, mTimeUnit);
-        }
+    public void execute() throws InterruptedException {
+        int operationsCount = mOperations.size();
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                operationsCount,
+                operationsCount,
+                1 /* keepAliveTime */,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
+        executor.allowCoreThreadTimeOut(true);
+        executor.prestartAllCoreThreads();
 
-        List<OperationThread> threadPool = new ArrayList<OperationThread>(mOperations.size());
+        ArrayList<Future<ISensorOperation>> futures = new ArrayList<Future<ISensorOperation>>();
         for (final ISensorOperation operation : mOperations) {
-            OperationThread thread = new OperationThread(operation);
-            thread.start();
-            threadPool.add(thread);
+            Future<ISensorOperation> future = executor.submit(new Callable<ISensorOperation>() {
+                @Override
+                public ISensorOperation call() throws Exception {
+                    operation.execute();
+                    return operation;
+                }
+            });
+            futures.add(future);
         }
 
-        List<Integer> timeoutIndices = new ArrayList<Integer>();
-        List<OperationExceptionInfo> exceptions = new ArrayList<OperationExceptionInfo>();
-        Throwable earliestException = null;
-        Long earliestExceptionTime = null;
+        Long executionTimeNs = null;
+        if (mTimeout != null) {
+            executionTimeNs = SystemClock.elapsedRealtimeNanos()
+                    + TimeUnit.NANOSECONDS.convert(mTimeout, mTimeUnit);
+        }
 
-        for (int i = 0; i < threadPool.size(); i++) {
-            OperationThread thread = threadPool.get(i);
-            join(thread, timeoutTimeNs);
-            if (thread.isAlive()) {
+        boolean hasAssertionErrors = false;
+        ArrayList<Integer> timeoutIndices = new ArrayList<Integer>();
+        ArrayList<Throwable> exceptions = new ArrayList<Throwable>();
+        for (int i = 0; i < operationsCount; ++i) {
+            Future<ISensorOperation> future = futures.get(i);
+            try {
+                ISensorOperation operation = getFutureResult(future, executionTimeNs);
+                addSensorStats(STATS_TAG, i, operation.getStats());
+            } catch (ExecutionException e) {
+                // extract the exception thrown by the worker thread
+                Throwable cause = e.getCause();
+                hasAssertionErrors |= (cause instanceof AssertionError);
+                exceptions.add(e.getCause());
+                addSensorStats(STATS_TAG, i, mOperations.get(i).getStats());
+            } catch (TimeoutException e) {
+                // we log, but we also need to interrupt the operation to terminate cleanly
                 timeoutIndices.add(i);
-                thread.interrupt();
+                future.cancel(true /* mayInterruptIfRunning */);
+            } catch (InterruptedException e) {
+                // clean-up after ourselves by interrupting all the worker threads, and propagate
+                // the interruption status, so we stop the outer loop as well
+                executor.shutdownNow();
+                throw e;
             }
-
-            Throwable exception = thread.getException();
-            Long exceptionTime = thread.getExceptionTime();
-            if (exception != null && exceptionTime != null) {
-                if (exception instanceof AssertionError) {
-                    exceptions.add(new OperationExceptionInfo(i, (AssertionError) exception));
-                }
-                if (earliestExceptionTime == null || exceptionTime < earliestExceptionTime) {
-                    earliestException = exception;
-                    earliestExceptionTime = exceptionTime;
-                }
-            }
-
-            addSensorStats(STATS_TAG, i, thread.getSensorOperation().getStats());
         }
 
-        if (earliestException == null) {
-            if (timeoutIndices.size() > 0) {
-                Assert.fail(getTimeoutMessage(timeoutIndices));
-            }
-        } else if (earliestException instanceof AssertionError) {
-            String msg = getExceptionMessage(exceptions, timeoutIndices);
-            getStats().addValue(SensorStats.ERROR, msg);
-            throw new AssertionError(msg, earliestException);
-        } else if (earliestException instanceof RuntimeException) {
-            throw (RuntimeException) earliestException;
+        String summary = getSummaryMessage(exceptions, timeoutIndices);
+        if (hasAssertionErrors) {
+            getStats().addValue(SensorStats.ERROR, summary);
+        }
+        if (!exceptions.isEmpty() || !timeoutIndices.isEmpty()) {
+            Assert.fail(summary);
         }
     }
 
@@ -144,114 +158,39 @@ public class ParallelSensorOperation extends AbstractSensorOperation {
     }
 
     /**
-     * Helper method that joins a thread at a given time in the future.
+     * Helper method that waits for a {@link Future} to complete, and returns its result.
      */
-    private void join(Thread thread, Long timeoutTimeNs) {
-        try {
-            if (timeoutTimeNs == null) {
-                thread.join();
-            } else {
-                // Cap wait time to 1ns so that join doesn't block indefinitely.
-                long waitTimeNs = Math.max(timeoutTimeNs - System.nanoTime(), 1);
-                thread.join(waitTimeNs / NANOS_PER_MILLI, (int) waitTimeNs % NANOS_PER_MILLI);
-            }
-        } catch (InterruptedException e) {
-            // Log and ignore
-            Log.w(TAG, "Thread interrupted during join, operations may timeout before expected"
-                    + " time");
+    private ISensorOperation getFutureResult(Future<ISensorOperation> future, Long timeoutNs)
+            throws ExecutionException, TimeoutException, InterruptedException {
+        if (timeoutNs == null) {
+            return future.get();
         }
+        // cap timeout to 1ns so that join doesn't block indefinitely
+        long waitTimeNs = Math.max(timeoutNs - SystemClock.elapsedRealtimeNanos(), 1);
+        return future.get(waitTimeNs, TimeUnit.NANOSECONDS);
     }
 
     /**
-     * Helper method for joining the exception messages used in assertions.
+     * Helper method for joining the exception and timeout messages used in assertions.
      */
-    private String getExceptionMessage(List<OperationExceptionInfo> exceptions,
-            List<Integer> timeoutIndices) {
+    private String getSummaryMessage(List<Throwable> exceptions, List<Integer> timeoutIndices) {
         StringBuilder sb = new StringBuilder();
-        sb.append(exceptions.get(0).toString());
-        for (int i = 1; i < exceptions.size(); i++) {
-            sb.append(", ").append(exceptions.get(i).toString());
-        }
-        if (timeoutIndices.size() > 0) {
-            sb.append(", ").append(getTimeoutMessage(timeoutIndices));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Helper method for formatting the operation timed out message used in assertions
-     */
-    private String getTimeoutMessage(List<Integer> indices) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Operation");
-        if (indices.size() != 1) {
-            sb.append("s");
-        }
-        sb.append(" ").append(indices.get(0));
-        for (int i = 1; i < indices.size(); i++) {
-            sb.append(", ").append(indices.get(i));
-        }
-        sb.append(" timed out");
-        return sb.toString();
-    }
-
-    /**
-     * Helper class for holding operation index and exception
-     */
-    private class OperationExceptionInfo {
-        private final int mIndex;
-        private final AssertionError mException;
-
-        public OperationExceptionInfo(int index, AssertionError exception) {
-            mIndex = index;
-            mException = exception;
+        for (Throwable exception : exceptions) {
+            sb.append(exception.toString()).append(", ");
         }
 
-        @Override
-        public String toString() {
-            return String.format("Operation %d failed: \"%s\"", mIndex, mException.getMessage());
-        }
-    }
-
-    /**
-     * Helper class to run the {@link ISensorOperation} in its own thread.
-     */
-    private class OperationThread extends Thread {
-        final private ISensorOperation mOperation;
-        private Throwable mException = null;
-        private Long mExceptionTime = null;
-
-        public OperationThread(ISensorOperation operation) {
-            mOperation = operation;
-        }
-
-        /**
-         * Run the thread catching {@link RuntimeException}s and {@link AssertionError}s and
-         * the time it happened.
-         */
-        @Override
-        public void run() {
-            try {
-                mOperation.execute();
-            } catch (AssertionError e) {
-                mExceptionTime = System.nanoTime();
-                mException = e;
-            } catch (RuntimeException e) {
-                mExceptionTime = System.nanoTime();
-                mException = e;
+        if (!timeoutIndices.isEmpty()) {
+            sb.append("Operation");
+            if (timeoutIndices.size() != 1) {
+                sb.append("s");
             }
+            sb.append(" [");
+            for (Integer index : timeoutIndices) {
+                sb.append(index).append(", ");
+            }
+            sb.append("] timed out");
         }
 
-        public ISensorOperation getSensorOperation() {
-            return mOperation;
-        }
-
-        public Throwable getException() {
-            return mException;
-        }
-
-        public Long getExceptionTime() {
-            return mExceptionTime;
-        }
+        return sb.toString();
     }
 }

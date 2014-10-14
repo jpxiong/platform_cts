@@ -16,9 +16,6 @@
 
 package android.hardware.cts.helpers;
 
-import android.app.Activity;
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -53,13 +50,8 @@ public class ActivityResultMultiplexedLatch {
          *
          * @return The result code of the Activity executed.
          */
-        public int await() {
-            try {
-                mEntry.latch.await();
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Error waiting for Activity result.", e);
-                return Activity.RESULT_CANCELED;
-            }
+        public int await() throws InterruptedException {
+            mEntry.latch.await();
             return mEntry.resultCode;
         }
 

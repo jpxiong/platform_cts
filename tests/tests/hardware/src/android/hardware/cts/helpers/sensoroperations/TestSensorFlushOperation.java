@@ -53,7 +53,7 @@ public class TestSensorFlushOperation extends VerifiableSensorOperation {
      * {@inheritDoc}
      */
     @Override
-    protected void doExecute(TestSensorEventListener listener) {
+    protected void doExecute(TestSensorEventListener listener) throws InterruptedException {
         mSensorManager.runSensorAndFlush(listener, mDuration, mTimeUnit);
     }
 

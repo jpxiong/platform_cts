@@ -46,7 +46,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
     }
 
     @Override
-    public void activitySetUp() {
+    public void activitySetUp() throws InterruptedException {
         calibrateMagnetometer();
     }
 
@@ -165,7 +165,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
     /**
      * A routine to help operators calibrate the magnetometer.
      */
-    private void calibrateMagnetometer() {
+    private void calibrateMagnetometer() throws InterruptedException {
         SensorEventListener2 listener = new SensorEventListener2() {
             @Override
             public void onSensorChanged(SensorEvent event) {

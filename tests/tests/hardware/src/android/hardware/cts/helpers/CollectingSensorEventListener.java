@@ -64,7 +64,7 @@ public class CollectingSensorEventListener extends TestSensorEventListener {
      * </p>
      */
     @Override
-    public void waitForEvents(int eventCount) {
+    public void waitForEvents(int eventCount) throws InterruptedException {
         clearEvents();
         super.waitForEvents(eventCount);
     }
@@ -76,7 +76,7 @@ public class CollectingSensorEventListener extends TestSensorEventListener {
      * </p>
      */
     @Override
-    public void waitForEvents(long duration, TimeUnit timeUnit) {
+    public void waitForEvents(long duration, TimeUnit timeUnit) throws InterruptedException {
         clearEvents();
         super.waitForEvents(duration, timeUnit);
     }
