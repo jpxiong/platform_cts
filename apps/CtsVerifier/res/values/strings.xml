@@ -481,7 +481,8 @@
     <string name="snsr_wait_to_begin">Press \'Next\' to begin.</string>
     <string name="snsr_on_complete_return">After completing the task, go back to this test.</string>
     <string name="snsr_movement_expected">Movement was expected during the test. Found=%1$b.</string>
-    <string name="snsr_sensor_feature_deactivation">Additionally, turn off any other features installed in the device, that register for sensors. Once you are done, you can continue the test.</string>
+    <string name="snsr_sensor_feature_deactivation">Turn off any special features installed in the
+        device that register for sensors. Once you are done, you can begin the test.</string>
     <string name="snsr_setting_mode_request">You will be redirected to set \'%1$s\' to: %2$s.</string>
     <string name="snsr_setting_mode_set">\'%1$s\' set to: %2$s.</string>
     <string name="snsr_setting_mode_not_set">\'%1$s\' not set to: %2$s.</string>
