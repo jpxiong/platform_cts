@@ -223,8 +223,10 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
 
     @Override
     public void testRunStarted(String id, int numTests) {
-        mCurrentPkgResult = mResults.getOrCreatePackage(id);
         mIsDeviceInfoRun = DeviceInfoCollector.IDS.contains(id);
+        if (!mIsDeviceInfoRun) {
+            mCurrentPkgResult = mResults.getOrCreatePackage(id);
+        }
     }
 
     /**
@@ -232,7 +234,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
      */
     @Override
     public void testStarted(TestIdentifier test) {
-        mCurrentPkgResult.insertTest(test);
+        if (!mIsDeviceInfoRun) {
+            mCurrentPkgResult.insertTest(test);
+        }
     }
 
     /**
@@ -240,7 +244,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
      */
     @Override
     public void testFailed(TestIdentifier test, String trace) {
-        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        if (!mIsDeviceInfoRun) {
+            mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        }
     }
 
     /**
@@ -249,7 +255,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
     @Override
     public void testAssumptionFailure(TestIdentifier test, String trace) {
         // TODO: do something different here?
-        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        if (!mIsDeviceInfoRun) {
+            mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        }
     }
 
     /**
@@ -265,7 +273,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
      */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        mCurrentPkgResult.reportTestEnded(test, testMetrics);
+        if (!mIsDeviceInfoRun) {
+            mCurrentPkgResult.reportTestEnded(test, testMetrics);
+        }
     }
 
     /**
