@@ -35,7 +35,7 @@ public class SensorOperationTest extends TestCase {
      * Test that the {@link FakeSensorOperation} functions correctly. Other tests in this class
      * rely on this operation.
      */
-    public void testFakeSensorOperation() {
+    public void testFakeSensorOperation() throws InterruptedException {
         final int opDurationMs = 100;
 
         ISensorOperation op = new FakeSensorOperation(opDurationMs, TimeUnit.MILLISECONDS);
@@ -60,7 +60,7 @@ public class SensorOperationTest extends TestCase {
     /**
      * Test that the {@link DelaySensorOperation} functions correctly.
      */
-    public void testDelaySensorOperation() {
+    public void testDelaySensorOperation() throws InterruptedException {
         final int opDurationMs = 500;
         final int subOpDurationMs = 100;
 
@@ -77,7 +77,7 @@ public class SensorOperationTest extends TestCase {
     /**
      * Test that the {@link ParallelSensorOperation} functions correctly.
      */
-    public void testParallelSensorOperation() {
+    public void testParallelSensorOperation() throws InterruptedException {
         final int subOpCount = 100;
         final int subOpDurationMs = 500;
 
@@ -118,7 +118,7 @@ public class SensorOperationTest extends TestCase {
      * Test that the {@link ParallelSensorOperation} functions correctly if there is a failure in
      * a child operation.
      */
-    public void testParallelSensorOperation_fail() {
+    public void testParallelSensorOperation_fail() throws InterruptedException {
         final int subOpCount = 100;
 
         ParallelSensorOperation op = new ParallelSensorOperation();
@@ -158,7 +158,7 @@ public class SensorOperationTest extends TestCase {
      * Test that the {@link ParallelSensorOperation} functions correctly if a child exceeds the
      * timeout.
      */
-    public void testParallelSensorOperation_timeout() {
+    public void testParallelSensorOperation_timeout() throws InterruptedException {
         final int subOpCount = 100;
 
         ParallelSensorOperation op = new ParallelSensorOperation(1, TimeUnit.SECONDS);
@@ -192,7 +192,7 @@ public class SensorOperationTest extends TestCase {
     /**
      * Test that the {@link RepeatingSensorOperation} functions correctly.
      */
-    public void testRepeatingSensorOperation() {
+    public void testRepeatingSensorOperation() throws InterruptedException {
         final int iterations = 10;
         final int subOpDurationMs = 100;
 
@@ -219,7 +219,7 @@ public class SensorOperationTest extends TestCase {
      * Test that the {@link RepeatingSensorOperation} functions correctly if there is a failure in
      * a child operation.
      */
-    public void testRepeatingSensorOperation_fail() {
+    public void testRepeatingSensorOperation_fail() throws InterruptedException {
         final int iterations = 100;
         final int failCount = 75;
 
@@ -277,7 +277,7 @@ public class SensorOperationTest extends TestCase {
     /**
      * Test that the {@link SequentialSensorOperation} functions correctly.
      */
-    public void testSequentialSensorOperation() {
+    public void testSequentialSensorOperation() throws InterruptedException {
         final int subOpCount = 10;
         final int subOpDurationMs = 100;
 
@@ -308,7 +308,7 @@ public class SensorOperationTest extends TestCase {
      * Test that the {@link SequentialSensorOperation} functions correctly if there is a failure in
      * a child operation.
      */
-    public void testSequentialSensorOperation_fail() {
+    public void testSequentialSensorOperation_fail() throws InterruptedException {
         final int subOpCount = 100;
         final int failCount = 75;
 

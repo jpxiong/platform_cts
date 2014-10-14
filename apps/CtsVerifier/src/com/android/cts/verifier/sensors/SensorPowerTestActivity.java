@@ -34,11 +34,10 @@ public class SensorPowerTestActivity
         super(SensorPowerTestActivity.class);
     }
 
-
     @Override
-    public void waitForUserAcknowledgement(final String message) {
+    public void waitForUserAcknowledgement(final String message) throws InterruptedException {
         appendText(message);
-        waitForUser();
+        waitForUserToContinue();
     }
 
     @Override
@@ -63,7 +62,7 @@ public class SensorPowerTestActivity
     }
 
     @Override
-    protected void activitySetUp() {
+    protected void activitySetUp() throws InterruptedException {
         mScreenManipulator = new SensorTestScreenManipulator(getApplicationContext());
         mScreenManipulator.initialize(this);
     }

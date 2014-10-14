@@ -43,7 +43,7 @@ abstract class SensorSettingContainer {
 
     public synchronized void requestToSetMode(
             ISensorTestStateContainer stateContainer,
-            boolean modeOn) {
+            boolean modeOn) throws  InterruptedException {
         trySetMode(stateContainer, modeOn);
         if (getCurrentSettingMode() != modeOn) {
             String message = stateContainer.getString(
@@ -54,11 +54,13 @@ abstract class SensorSettingContainer {
         }
     }
 
-    public synchronized void requestToResetMode(ISensorTestStateContainer stateContainer) {
+    public synchronized void requestToResetMode(ISensorTestStateContainer stateContainer)
+            throws InterruptedException {
         trySetMode(stateContainer, mCapturedModeOn);
     }
 
-    private void trySetMode(ISensorTestStateContainer stateContainer, boolean modeOn) {
+    private void trySetMode(ISensorTestStateContainer stateContainer, boolean modeOn)
+            throws InterruptedException {
         BaseSensorTestActivity.SensorTestLogger logger = stateContainer.getTestLogger();
         String settingName = getSettingName(stateContainer);
         if (getCurrentSettingMode() == modeOn) {
