@@ -19,6 +19,7 @@ package com.android.cts.verifier.bluetooth;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
+import java.lang.Math;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,10 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
     private Map<Integer, Integer> mCount;
     private int[] mPowerLevel;
 
+    private TextView mTimerText;
+    private CountDownTimer mTimer;
+    private static final long REFRESH_MAC_TIME = 930000; // 15.5 min
+
     private static final int[] POWER_DBM = {-21, -15, -7, 1, 9};
 
     @Override
@@ -54,9 +60,25 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
         setInfoResources(R.string.ble_power_level_name,
                          R.string.ble_power_level_info, -1);
 
-        mCount = new HashMap<Integer, Integer>();
+        mTimerText = (TextView)findViewById(R.id.ble_timer);
+        mTimer = new CountDownTimer(REFRESH_MAC_TIME, 1000) {
+            @Override
+            public void onTick(long millis) {
+                int min = (int)millis / 60000;
+                int sec = ((int)millis / 1000) % 60;
+                mTimerText.setText(min + ":" + sec);
+            }
+
+            @Override
+            public void onFinish() {
+                mTimerText.setTextColor(getResources().getColor(R.color.red));
+                mTimerText.setText("Time is up!");
+            }
+        };
+
         mRssiText = new HashMap<Integer, TextView>();
         mCountText = new HashMap<Integer, TextView>();
+        mCount = null;
         mMacText = new HashMap<Integer, TextView>();
         mSetPowerText = new HashMap<Integer, TextView>();
         mPowerLevel = new int[]{AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW,
@@ -64,9 +86,6 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
             AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM,
             AdvertiseSettings.ADVERTISE_TX_POWER_HIGH};
 
-        for (int i : mPowerLevel) {
-            mCount.put(i, 0);
-        }
         mMacText.put(AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW,
             (TextView)findViewById(R.id.ble_ultra_low_mac));
         mMacText.put(AdvertiseSettings.ADVERTISE_TX_POWER_LOW,
@@ -114,6 +133,7 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BleScannerService.BLE_POWER_LEVEL);
+        filter.addAction(BleScannerService.BLE_PRIVACY_NEW_MAC_RECEIVE);
         registerReceiver(onBroadcast, filter);
     }
 
@@ -135,26 +155,43 @@ public class BleScannerPowerLevelActivity extends PassFailButtons.Activity {
             switch (intent.getAction()) {
                 case BleScannerService.BLE_POWER_LEVEL:
                     int powerLevelBit = intent.getIntExtra(
-                        BleScannerService.EXTRA_POWER_LEVEL_BIT, -1);
+                            BleScannerService.EXTRA_POWER_LEVEL_BIT, -1);
                     int powerLevel = intent.getIntExtra(BleScannerService.EXTRA_POWER_LEVEL, -2);
                     if (powerLevelBit < 0 || powerLevelBit > 3) {
-                      Toast.makeText(context, "Invalid power level", Toast.LENGTH_SHORT).show();
-                      break;
+                        Toast.makeText(context, "Invalid power level", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+
+                    if (mCount == null) {
+                        mCount = new HashMap<Integer, Integer>();
+                        for (int i : mPowerLevel) {
+                            mCount.put(i, 0);
+                        }
+                        mTimer.start();
                     }
                     Integer t = mCount.get(powerLevelBit) + 1;
                     mCount.put(powerLevelBit, t);
                     mCountText.get(powerLevelBit).setText(t.toString());
+
                     mMacText.get(powerLevelBit)
                         .setText(intent.getStringExtra(BleScannerService.EXTRA_MAC_ADDRESS));
                     mRssiText.get(powerLevelBit)
                         .setText(intent.getStringExtra(BleScannerService.EXTRA_RSSI));
-                    if (POWER_DBM[powerLevelBit] == powerLevel) {
+                    if (Math.abs(POWER_DBM[powerLevelBit] - powerLevel) < 2) {
                         mSetPowerText.get(powerLevelBit).setText("Valid power level");
                     } else {
                         mSetPowerText.get(powerLevelBit)
                             .setText("Unknown BLe advertise tx power: " + powerLevel);
                     }
                     break;
+                case BleScannerService.BLE_PRIVACY_NEW_MAC_RECEIVE:
+                     Toast.makeText(context, "New MAC address detected", Toast.LENGTH_SHORT)
+                            .show();
+                     mTimerText.setTextColor(getResources().getColor(R.color.green));
+                     mTimerText.append("   Get new MAC address.");
+                     mTimer.cancel();
+                     getPassButton().setEnabled(true);
+                     break;
             }
         }
     };
