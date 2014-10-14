@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Set of static helper methods for CTS tests.
  */
-//TODO: Refactor this class into several more well defined helper classes
+//TODO: Refactor this class into several more well defined helper classes, look at StatisticsUtils
 public class SensorCtsHelper {
 
     private static final long NANOS_PER_MILLI = 1000000;
@@ -143,13 +143,9 @@ public class SensorCtsHelper {
     /**
      * Helper method to sleep for a given duration.
      */
-    public static void sleep(long duration, TimeUnit timeUnit) {
+    public static void sleep(long duration, TimeUnit timeUnit) throws InterruptedException {
         long durationNs = TimeUnit.NANOSECONDS.convert(duration, timeUnit);
-        try {
-            Thread.sleep(durationNs / NANOS_PER_MILLI, (int) (durationNs % NANOS_PER_MILLI));
-        } catch (InterruptedException e) {
-            // Ignore
-        }
+        Thread.sleep(durationNs / NANOS_PER_MILLI, (int) (durationNs % NANOS_PER_MILLI));
     }
 
     /**

@@ -59,6 +59,8 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
     /**
      * Test cases.
      */
+
+    @SuppressWarnings("unused")
     public String testTrigger() throws Throwable {
         return runTest(
                 R.string.snsr_significant_motion_test_trigger,
@@ -67,6 +69,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                 false /* vibrate */);
     }
 
+    @SuppressWarnings("unused")
     public String testNotTriggerAfterCancel() throws Throwable {
         return runTest(
                 R.string.snsr_significant_motion_test_cancel,
@@ -78,6 +81,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
     /**
      * Verifies that Significant Motion is not trigger by the vibrator motion.
      */
+    @SuppressWarnings("unused")
     public String testVibratorDoesNotTrigger() throws Throwable {
      return runTest(
              R.string.snsr_significant_motion_test_vibration,
@@ -90,6 +94,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
      * Verifies that the natural motion of keeping the device in hand does not change the location.
      * It ensures that Significant Motion will not trigger in that scenario.
      */
+    @SuppressWarnings("unused")
     public String testInHandDoesNotTrigger() throws Throwable {
         return runTest(
                 R.string.snsr_significant_motion_test_in_hand,
@@ -98,6 +103,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                 false /* vibrate */);
     }
 
+    @SuppressWarnings("unused")
     public String testSittingDoesNotTrigger() throws Throwable {
         return runTest(
                 R.string.snsr_significant_motion_test_sitting,
@@ -106,6 +112,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
                 false /* vibrate */);
     }
 
+    @SuppressWarnings("unused")
     public String testTriggerDeactivation() throws Throwable {
         SensorTestLogger logger = getTestLogger();
         logger.logInstructions(R.string.snsr_significant_motion_test_deactivation);
@@ -167,6 +174,7 @@ public class SignificantMotionTestActivity extends SensorCtsVerifierTestActivity
             }
         } finally {
             mSensorManager.cancelTriggerSensor(verifier, mSensorSignificantMotion);
+            playSound();
         }
         return result;
     }

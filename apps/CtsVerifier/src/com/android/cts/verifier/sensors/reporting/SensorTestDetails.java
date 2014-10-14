@@ -22,6 +22,7 @@ import com.android.cts.verifier.R;
 import org.junit.runner.Result;
 
 import android.content.Context;
+import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 
 /**
  * A class that holds the result of a Sensor test execution.
@@ -34,7 +35,12 @@ public class SensorTestDetails {
     public enum ResultCode {
         SKIPPED,
         PASS,
-        FAIL
+        FAIL,
+        INTERRUPTED
+    }
+
+    public SensorTestDetails(String name, ResultCode resultCode) {
+        this(name, resultCode, null /* summary */);
     }
 
     public SensorTestDetails(String name, ResultCode resultCode, String summary) {
@@ -67,6 +73,21 @@ public class SensorTestDetails {
                 result.getRunCount() - result.getFailureCount() - result.getIgnoreCount(),
                 result.getIgnoreCount(),
                 result.getFailureCount());
+    }
+
+    public SensorTestDetails(String name, String tag, Throwable cause) {
+        ResultCode resultCode = ResultCode.FAIL;
+        if (cause instanceof InterruptedException) {
+            resultCode = ResultCode.INTERRUPTED;
+            // the interrupted status must be restored, so other routines can consume it
+            Thread.currentThread().interrupt();
+        } else if (cause instanceof SensorTestStateNotSupportedException) {
+            resultCode = ResultCode.SKIPPED;
+        }
+
+        mName = name;
+        mResultCode = resultCode;
+        mSummary = String.format("[%s] %s", tag, cause.getMessage());
     }
 
     public String getName() {

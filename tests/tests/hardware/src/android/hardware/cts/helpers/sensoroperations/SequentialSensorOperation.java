@@ -48,7 +48,7 @@ public class SequentialSensorOperation extends AbstractSensorOperation {
      * in one operation, it is thrown and all subsequent operations will not run.
      */
     @Override
-    public void execute() {
+    public void execute() throws InterruptedException {
         for (int i = 0; i < mOperations.size(); i++) {
             ISensorOperation operation = mOperations.get(i);
             try {
