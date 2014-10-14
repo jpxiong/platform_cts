@@ -76,7 +76,7 @@ public class TestSensorOperation extends VerifiableSensorOperation {
      * {@inheritDoc}
      */
     @Override
-    protected void doExecute(TestSensorEventListener listener) {
+    protected void doExecute(TestSensorEventListener listener) throws InterruptedException {
         if (mEventCount != null) {
             mSensorManager.runSensor(listener, mEventCount);
         } else {

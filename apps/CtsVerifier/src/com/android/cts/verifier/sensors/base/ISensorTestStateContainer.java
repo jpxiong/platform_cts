@@ -33,7 +33,7 @@ public interface ISensorTestStateContainer {
     /**
      * Waits for the operator to acknowledge to continue execution.
      */
-    void waitForUserToContinue();
+    void waitForUserToContinue() throws InterruptedException;
 
     /**
      * @param resId The resource Id to extract.
@@ -55,7 +55,7 @@ public interface ISensorTestStateContainer {
      * @param action The action to start the Activity.
      * @return The Activity's result code.
      */
-    int executeActivity(String action);
+    int executeActivity(String action) throws InterruptedException;
 
     /**
      * Starts an Activity and blocks until it completes, then it returns its result back to the
@@ -64,7 +64,7 @@ public interface ISensorTestStateContainer {
      * @param intent The intent to start the Activity.
      * @return The Activity's result code.
      */
-    int executeActivity(Intent intent);
+    int executeActivity(Intent intent) throws InterruptedException;
 
     /**
      * @return The {@link ContentResolver} associated with the test.

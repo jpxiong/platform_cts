@@ -38,8 +38,12 @@ public interface ISensorOperation {
     /**
      * Executes the sensor operation.  This may throw {@link RuntimeException}s such as
      * {@link AssertionError}s.
+     *
+     * NOTE: the operation is expected to handle interruption by:
+     * - cleaning up on {@link InterruptedException}
+     * - propagating the exception down the stack
      */
-    public void execute();
+    public void execute() throws InterruptedException;
 
     /**
      * Get the stats for the operation.

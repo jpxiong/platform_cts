@@ -51,7 +51,7 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
     }
 
     @Override
-    protected void activitySetUp() {
+    protected void activitySetUp() throws InterruptedException {
         getTestLogger().logInstructions(R.string.snsr_gyro_device_placement);
         waitForUserToContinue();
         initializeGlSurfaceView(mRenderer);
