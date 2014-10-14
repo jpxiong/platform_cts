@@ -173,6 +173,21 @@ public class CtsXmlResultReporterTest extends TestCase {
         assertTrue(output.contains(failureTag));
     }
 
+    public void testDeviceSetup() {
+        Map<String, String> emptyMap = Collections.emptyMap();
+        final TestIdentifier testId = new TestIdentifier("android.tests.devicesetup", "TestDeviceSetup");
+        mResultReporter.invocationStarted(mMockBuild);
+        mResultReporter.testRunStarted(AbiUtils.createId(UnitTests.ABI.getName(), testId.getClassName()), 1);
+        mResultReporter.testStarted(testId);
+        mResultReporter.testEnded(testId, emptyMap);
+        mResultReporter.testRunEnded(3, emptyMap);
+        mResultReporter.invocationEnded(1);
+        String output = getOutput();
+        // TODO: consider doing xml based compare
+        final String deviceSetupTag = "appPackageName=\"android.tests.devicesetup\"";
+        assertFalse(output, output.contains(deviceSetupTag));
+    }
+
     /**
      * Gets the output produced, stripping it of extraneous whitespace characters.
      */
