@@ -51,7 +51,8 @@ public class SensorCalibratedUncalibratedVerifier {
      */
     public void execute() throws Throwable {
         CollectingSensorEventListener calibratedTestListener = new CollectingSensorEventListener();
-        CollectingSensorEventListener uncalibratedTestListener = new CollectingSensorEventListener();
+        CollectingSensorEventListener uncalibratedTestListener =
+                new CollectingSensorEventListener();
         mCalibratedSensorManager.registerListener(calibratedTestListener);
         mUncalibratedSensorManager.registerListener(uncalibratedTestListener);
 

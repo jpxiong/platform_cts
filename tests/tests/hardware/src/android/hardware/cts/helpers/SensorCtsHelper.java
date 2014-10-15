@@ -192,7 +192,7 @@ public class SensorCtsHelper {
             TestSensorEnvironment environment,
             String extras) {
         return String.format(
-                "%s | sensor='%s', samplingPeriodUs=%d, maxReportLatencyUs=%d | %s",
+                "%s | sensor='%s', samplingPeriod=%dus, maxReportLatency=%dus | %s",
                 label,
                 environment.getSensor().getName(),
                 environment.getRequestedSamplingPeriodUs(),

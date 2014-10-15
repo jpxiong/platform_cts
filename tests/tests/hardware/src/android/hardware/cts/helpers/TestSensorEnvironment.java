@@ -28,6 +28,13 @@ import java.util.concurrent.TimeUnit;
  * The environment is self contained and carries its state around all the sensor test framework.
  */
 public class TestSensorEnvironment {
+
+    /**
+     * It represents the fraction of the expected sampling frequency, at which the sensor can
+     * actually produce events.
+     */
+    private static final float MAXIMUM_EXPECTED_SAMPLING_FREQUENCY_MULTIPLIER = 0.9f;
+
     private final Context mContext;
     private final Sensor mSensor;
     private final boolean mSensorMightHaveMoreListeners;
@@ -40,7 +47,10 @@ public class TestSensorEnvironment {
      * @param context The context for the test
      * @param sensorType The type of the sensor under test
      * @param samplingPeriodUs The requested collection period for the sensor under test
+     *
+     * @deprecated Use variants with {@link Sensor} objects.
      */
+    @Deprecated
     public TestSensorEnvironment(Context context, int sensorType, int samplingPeriodUs) {
         this(context, sensorType, false /* sensorMightHaveMoreListeners */, samplingPeriodUs);
     }
@@ -52,7 +62,10 @@ public class TestSensorEnvironment {
      * @param sensorType The type of the sensor under test
      * @param samplingPeriodUs The requested collection period for the sensor under test
      * @param maxReportLatencyUs The requested collection report latency for the sensor under test
+     *
+     * @deprecated Use variants with {@link Sensor} objects.
      */
+    @Deprecated
     public TestSensorEnvironment(
             Context context,
             int sensorType,
@@ -72,7 +85,10 @@ public class TestSensorEnvironment {
      * @param sensorType The type of the sensor under test
      * @param sensorMightHaveMoreListeners Whether the sensor under test is acting under load
      * @param samplingPeriodUs The requested collection period for the sensor under test
+     *
+     * @deprecated Use variants with {@link Sensor} objects.
      */
+    @Deprecated
     public TestSensorEnvironment(
             Context context,
             int sensorType,
@@ -93,7 +109,10 @@ public class TestSensorEnvironment {
      * @param sensorMightHaveMoreListeners Whether the sensor under test is acting under load
      * @param samplingPeriodUs The requested collection period for the sensor under test
      * @param maxReportLatencyUs The requested collection report latency for the sensor under test
+     *
+     * @deprecated Use variants with {@link Sensor} objects.
      */
+    @Deprecated
     public TestSensorEnvironment(
             Context context,
             int sensorType,
@@ -103,6 +122,26 @@ public class TestSensorEnvironment {
         this(context,
                 getSensor(context, sensorType),
                 sensorMightHaveMoreListeners,
+                samplingPeriodUs,
+                maxReportLatencyUs);
+    }
+
+    /**
+     * Constructs an environment for sensor testing.
+     *
+     * @param context The context for the test
+     * @param sensor The sensor under test
+     * @param samplingPeriodUs The requested collection period for the sensor under test
+     * @param maxReportLatencyUs The requested collection report latency for the sensor under test
+     */
+    public TestSensorEnvironment(
+            Context context,
+            Sensor sensor,
+            int samplingPeriodUs,
+            int maxReportLatencyUs) {
+        this(context,
+                sensor,
+                false /* sensorMightHaveMoreListeners */,
                 samplingPeriodUs,
                 maxReportLatencyUs);
     }
@@ -171,7 +210,8 @@ public class TestSensorEnvironment {
      * data at different sampling rates (the rates are unknown); false otherwise.
      */
     public boolean isSensorSamplingRateOverloaded() {
-        return mSensorMightHaveMoreListeners && mSamplingPeriodUs != SensorManager.SENSOR_DELAY_FASTEST;
+        return mSensorMightHaveMoreListeners
+                && mSamplingPeriodUs != SensorManager.SENSOR_DELAY_FASTEST;
     }
 
     /**
@@ -194,6 +234,15 @@ public class TestSensorEnvironment {
         }
 
         return Math.max(expectedSamplingPeriodUs, mSensor.getMinDelay());
+    }
+
+    /**
+     * @return The actual sampling period at which a sensor can sample data. This value is a
+     *         fraction of {@link #getExpectedSamplingPeriodUs()}.
+     */
+    public int getMaximumExpectedSamplingPeriodUs() {
+        int expectedSamplingPeriodUs = getExpectedSamplingPeriodUs();
+        return (int) (expectedSamplingPeriodUs / MAXIMUM_EXPECTED_SAMPLING_FREQUENCY_MULTIPLIER);
     }
 
     /**
