@@ -199,6 +199,10 @@ cts_device_executables := \
 cts_target_junit_tests := \
     CtsJdwp
 
+cts_deqp_test_apis := \
+    gles3 \
+    gles31
+
 # All the files that will end up under the repository/testcases
 # directory of the final CTS distribution.
 CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
@@ -216,8 +220,7 @@ CTS_TEST_XMLS := $(call cts-get-test-xmls,$(cts_host_libraries)) \
     $(call cts-get-test-xmls,$(cts_native_exes)) \
     $(call cts-get-test-xmls,$(cts_target_junit_tests)) \
     $(call cts-get-test-xmls,$(cts_ui_tests)) \
-    external/deqp/android/cts/com.drawelements.deqp.gles3.xml \
-    external/deqp/android/cts/com.drawelements.deqp.gles31.xml
+    $(call cts-get-deqp-test-xmls,$(cts_deqp_test_apis))
 
 # The following files will be placed in the tools directory of the CTS distribution
 CTS_TOOLS_LIST :=
