@@ -19,8 +19,6 @@ package com.android.cts.verifier.sensors.base;
 
 import com.android.cts.verifier.sensors.reporting.SensorTestDetails;
 
-import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -47,29 +45,16 @@ public abstract class SensorCtsVerifierTestActivity extends BaseSensorTestActivi
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected SensorCtsVerifierTestActivity(
-            Class<? extends SensorCtsVerifierTestActivity> testClass,
-            int layoutId) {
-        super(testClass, layoutId);
-    }
-
-    /**
      * Executes Semi-automated Sensor tests.
      * Execution is driven by this class, and allows discovery of tests using reflection.
      */
     @Override
-    protected SensorTestDetails executeTests() {
+    protected SensorTestDetails executeTests() throws InterruptedException {
         // TODO: use reporting to log individual test results
-        StringBuilder overallTestResults = new StringBuilder();
         for (Method testMethod : findTestMethods()) {
             SensorTestDetails testDetails = executeTest(testMethod);
             getTestLogger().logTestDetails(testDetails);
-            overallTestResults.append(testDetails.toString());
-            overallTestResults.append("\n");
         }
-
         return new SensorTestDetails(
                 getApplicationContext(),
                 getTestClassName(),
@@ -91,34 +76,40 @@ public abstract class SensorCtsVerifierTestActivity extends BaseSensorTestActivi
         return testMethods;
     }
 
-    private SensorTestDetails executeTest(Method testMethod) {
+    private SensorTestDetails executeTest(Method testMethod) throws InterruptedException {
         String testMethodName = testMethod.getName();
         String testName = String.format("%s#%s", getTestClassName(), testMethodName);
-        String testSummary;
-        SensorTestDetails.ResultCode testResultCode;
 
+        SensorTestDetails testDetails;
         try {
-            getTestLogger().logTestStart(testMethod.getName());
-            testSummary = (String) testMethod.invoke(this);
-            testResultCode = SensorTestDetails.ResultCode.PASS;
-            ++mTestPassedCounter;
+            getTestLogger().logTestStart(testMethodName);
+            String testSummary = (String) testMethod.invoke(this);
+            testDetails =
+                    new SensorTestDetails(testName, SensorTestDetails.ResultCode.PASS, testSummary);
         } catch (InvocationTargetException e) {
             // get the inner exception, because we use reflection APIs to execute the test
-            Throwable cause = e.getCause();
-            testSummary = cause.getMessage();
-            if (cause instanceof SensorTestStateNotSupportedException) {
-                testResultCode = SensorTestDetails.ResultCode.SKIPPED;
-                ++mTestSkippedCounter;
-            } else {
-                testResultCode = SensorTestDetails.ResultCode.FAIL;
-                ++mTestFailedCounter;
-            }
+            testDetails = new SensorTestDetails(testName, "TestExecution", e.getCause());
         } catch (Throwable e) {
-            testSummary = e.getMessage();
-            testResultCode = SensorTestDetails.ResultCode.FAIL;
-            ++mTestFailedCounter;
+            testDetails = new SensorTestDetails(testName, "TestInfrastructure", e);
         }
 
-        return new SensorTestDetails(testName, testResultCode, testSummary);
+        SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+        switch(resultCode) {
+            case PASS:
+                ++mTestPassedCounter;
+                break;
+            case SKIPPED:
+                ++mTestSkippedCounter;
+                break;
+            case INTERRUPTED:
+                throw new InterruptedException();
+            case FAIL:
+                ++mTestFailedCounter;
+                break;
+            default:
+                throw new IllegalStateException("Unknown ResultCode: " + resultCode);
+        }
+
+        return testDetails;
     }
 }

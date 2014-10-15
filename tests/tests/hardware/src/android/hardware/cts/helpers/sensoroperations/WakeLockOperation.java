@@ -59,7 +59,7 @@ public class WakeLockOperation extends AbstractSensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
+    public void execute() throws InterruptedException {
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         WakeLock wakeLock = pm.newWakeLock(mWakelockFlags, TAG);
 

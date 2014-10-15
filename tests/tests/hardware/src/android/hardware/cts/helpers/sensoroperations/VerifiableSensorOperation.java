@@ -94,7 +94,7 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
      * Collect the specified number of events from the sensor and run all enabled verifications.
      */
     @Override
-    public void execute() {
+    public void execute() throws InterruptedException {
         getStats().addValue("sensor_name", mEnvironment.getSensor().getName());
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
@@ -131,7 +131,7 @@ public abstract class VerifiableSensorOperation extends AbstractSensorOperation 
     /**
      * Execute operations in a {@link TestSensorManager}.
      */
-    protected abstract void doExecute(TestSensorEventListener listener);
+    protected abstract void doExecute(TestSensorEventListener listener) throws InterruptedException;
 
     /**
      * Clone the subclass operation.

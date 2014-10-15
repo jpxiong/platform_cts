@@ -33,7 +33,6 @@ import android.hardware.cts.helpers.TestSensorEvent;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,8 +85,7 @@ public class StepCounterTestActivity
                     "Sensors Step Counter/Detector are not supported.");
         }
 
-        ScrollView scrollView = (ScrollView) findViewById(R.id.log_scroll_view);
-        scrollView.setOnTouchListener(new View.OnTouchListener() {
+        setLogScrollViewListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // during movement of the device, the ScrollView will detect user taps as attempts
@@ -95,12 +93,25 @@ public class StepCounterTestActivity
                 // to overcome the fact that a ScrollView cannot be disabled from scrolling, we
                 // listen for ACTION_UP events instead of click events in the child layout
                 long elapsedTime = SystemClock.elapsedRealtimeNanos();
-                if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getAction() != MotionEvent.ACTION_UP) {
+                    return false;
+                }
+
+                try {
                     logUserReportedStep(elapsedTime);
+                } catch (InterruptedException e) {
+                    // we cannot propagate the exception in the main thread, so we just catch and
+                    // restore the status, we don't need to log as we are terminating anyways
+                    Thread.currentThread().interrupt();
                 }
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void activityCleanUp() {
+        setLogScrollViewListener(null /* listener */);
     }
 
     public String testWalking() throws Throwable {
@@ -323,11 +334,10 @@ public class StepCounterTestActivity
         // TODO: with delayed assertions check events of other types are tracked
     }
 
-    private void logUserReportedStep(long timestamp) {
+    private void logUserReportedStep(long timestamp) throws InterruptedException {
         if (!mCheckForMotion) {
             return;
         }
-
         playSound();
         mTimestampsUserReported.add(timestamp);
         getTestLogger().logMessage(R.string.snsr_step_reported, timestamp);
