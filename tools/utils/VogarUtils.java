@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import com.android.cts.util.AbiUtils;
+
 import vogar.Expectation;
 import vogar.ExpectationStore;
 import vogar.ModeId;
@@ -38,12 +40,26 @@ public class VogarUtils {
         return false;
     }
 
+    /**
+     * @return true iff the class/name is found in the vogar known failure list and it is not
+     * a known failure that is a result of an unsupported abi.
+     */
     public static boolean isVogarKnownFailure(ExpectationStore expectationStore,
             final String testClassName,
             final String testMethodName) {
-        String fullTestName = String.format("%s#%s", testClassName, testMethodName);
-        return expectationStore != null
-                && expectationStore.get(fullTestName) != Expectation.SUCCESS;
+        if (expectationStore == null) {
+            return false;
+        }
+        String fullTestName = buildFullTestName(testClassName, testMethodName);
+        Expectation expectation = expectationStore.get(fullTestName);
+        if (expectation == Expectation.SUCCESS) {
+            return false;
+        }
+
+        String description = expectation.getDescription();
+        boolean foundAbi = AbiUtils.parseAbiList(description).size() > 0;
+
+        return expectation != Expectation.SUCCESS && !foundAbi;
     }
 
     public static ExpectationStore provideExpectationStore(String dir) throws IOException {
@@ -66,5 +82,50 @@ public class VogarUtils {
             expectSet.addAll(Arrays.asList(files));
         }
         return expectSet;
+    }
+
+    /** @return the test name in the form of com.android.myclass.TestClass#testMyMethod */
+    public static String buildFullTestName(String testClass, String testMethodName) {
+        return String.format("%s#%s", testClass, testMethodName);
+    }
+
+    /**
+     * This method looks in the description field of the Vogar entry for the ABI_LIST_MARKER
+     * and returns the list of abis found there.
+     *
+     * @return The Set of supported abis parsed from the {@code expectation}'s description.
+     */
+    public static Set<String> extractSupportedAbis(String architecture, Expectation expectation) {
+        Set<String> supportedAbiSet = AbiUtils.getAbisForArch(architecture);
+        if (expectation == null || expectation.getDescription().isEmpty()) {
+            // Include all abis since there was no limitation found in the description
+            return supportedAbiSet;
+        }
+
+        // Remove any abis that are not supported for the test.
+        supportedAbiSet.removeAll(AbiUtils.parseAbiList(expectation.getDescription()));
+
+        return supportedAbiSet;
+    }
+
+    /**
+     * Determine the correct set of ABIs for the given className/testName.
+     *
+     * @return the set of ABIs that can be expected to pass for the given combination of
+     * {@code architecture}, {@code className} and {@code testName}.
+     */
+    public static Set<String> extractSupportedAbis(String architecture,
+                                                   ExpectationStore[] expectationStores,
+                                                   String className,
+                                                   String testName) {
+
+        String fullTestName = VogarUtils.buildFullTestName(className, testName);
+        Set<String> supportedAbiSet = AbiUtils.getAbisForArch(architecture);
+        for (ExpectationStore expectationStore : expectationStores) {
+            Expectation expectation = expectationStore.get(fullTestName);
+            supportedAbiSet.retainAll(extractSupportedAbis(architecture, expectation));
+        }
+
+        return supportedAbiSet;
     }
 }

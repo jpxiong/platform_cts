@@ -1,4 +1,5 @@
-# Copyright (C) 2008 The Android Open Source Project
+#
+# Copyright (C) 2014 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,20 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-LOCAL_PATH := $(call my-dir)
+include $(call all-subdir-makefiles)
 
-# descGen java library
-# ============================================================
+# ======================================================
+# Build a static host library for the AbiUtils
+LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+LOCAL_SRC_FILES := src/com/android/cts/util/AbiUtils.java
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE := descGen
-
-LOCAL_SRC_FILES := CollectAllTests.java DescriptionGenerator.java VogarUtils.java
-
-LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
-
-LOCAL_JAVA_LIBRARIES := junit
-LOCAL_STATIC_JAVA_LIBRARIES := ctsabiutilslib vogarexpectlib
-
+LOCAL_MODULE := ctsabiutilslib
 include $(BUILD_HOST_JAVA_LIBRARY)

@@ -163,4 +163,22 @@ public class AbiUtils {
     public static String getBitness(String name) {
         return ABIS_32BIT.contains(name) ? "32" : "64";
     }
+
+    /**
+     * @param abilistString A comma separated string containing abis.
+     * @return A List of Strings containing valid ABIs.
+     */
+    public static Set<String> parseAbiList(String unsupportedAbiDescription) {
+        Set<String> abiSet = new HashSet<>();
+        String[] descSegments = unsupportedAbiDescription.split(":");
+        if (descSegments.length == 2) {
+            for (String abi : descSegments[1].split(",")) {
+                String trimmedAbi = abi.trim();
+                if (isAbiSupportedByCts(trimmedAbi)) {
+                    abiSet.add(trimmedAbi);
+                }
+            }
+        }
+        return abiSet;
+    }
 }
