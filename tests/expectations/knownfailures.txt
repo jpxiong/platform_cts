@@ -1,5 +1,13 @@
 [
 {
+  description: "tests a fragile by nature as they rely on hardcoded behavior",
+  names: [
+    "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverText",
+    "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverTextExtend"
+  ],
+  bug: 17595050
+},
+{
   description: "signature test stil needs more work",
   names: [
     "android.signature.cts.SignatureTest#testSignature"
@@ -37,6 +45,26 @@
   bug: 16720689
 },
 {
+  description: "test can only run properly on a user build device when the bug is resolved",
+  names: [
+    "android.appwidget.cts.AppWidgetTest#testAppWidgetProviderCallbacks",
+    "android.appwidget.cts.AppWidgetTest#testBindAppWidget",
+    "android.appwidget.cts.AppWidgetTest#testCollectionWidgets",
+    "android.appwidget.cts.AppWidgetTest#testDeleteHost",
+    "android.appwidget.cts.AppWidgetTest#testDeleteHosts",
+    "android.appwidget.cts.AppWidgetTest#testGetAppWidgetIds",
+    "android.appwidget.cts.AppWidgetTest#testGetAppWidgetInfo",
+    "android.appwidget.cts.AppWidgetTest#testGetAppWidgetOptions",
+    "android.appwidget.cts.AppWidgetTest#testPartiallyUpdateAppWidgetViaWidgetId",
+    "android.appwidget.cts.AppWidgetTest#testPartiallyUpdateAppWidgetViaWidgetIds",
+    "android.appwidget.cts.AppWidgetTest#testTwoAppWidgetProviderCallbacks",
+    "android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaComponentName",
+    "android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaWidgetId",
+    "android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaWidgetIds"
+  ],
+  bug: 17993121
+},
+{
   description: "A few WebGL tests are known to fail in WebView",
   names: [
     "android.webgl.cts.WebGLTest#test_conformance_extensions_oes_texture_float_with_video_html",
@@ -72,6 +100,13 @@
     "android.hardware.camera2.cts.AllocationTest#testParamSensitivity"
   ],
   bug: 17530117
+},
+{
+  description: "this test removes the stay-awake option, causing the screen to turn off during the execution of subsequent tests",
+  names: [
+    "android.admin.cts.DevicePolicyManagerTest#testMaximumTimeToLock"
+  ],
+  bug: 18002490
 },
 {
   description: "these tests locks the screen with an emtpy password or swipe-to-unlock, blocking subsequent test to dismiss keyguard",
