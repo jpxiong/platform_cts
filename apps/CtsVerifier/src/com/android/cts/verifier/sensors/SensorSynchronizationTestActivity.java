@@ -7,7 +7,6 @@ import junit.framework.Assert;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -137,9 +136,9 @@ public class SensorSynchronizationTestActivity
     public String testCrossSensorSynchronization() throws Throwable {
         appendText("This test provides a rough indication of cross-sensor timestamp synchronization.");
         appendText("Hold device still in hand and click 'Next'");
-        waitForUser();
+        waitForUserToBegin();
         clearText();
-        appendText("Quickly twist device upside-down and back", Color.GREEN);
+        appendText("Quickly twist device upside-down and back");
 
         startDataCollection();
         Thread.sleep(DATA_COLLECTION_TIME_IN_MS);

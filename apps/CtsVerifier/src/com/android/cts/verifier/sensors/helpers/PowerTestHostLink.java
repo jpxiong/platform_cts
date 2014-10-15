@@ -53,7 +53,7 @@ public class PowerTestHostLink {
     public interface HostToDeviceInterface {
         void logTestResult(SensorTestDetails testDetails);
         void raiseError(String testName, String message) throws Exception;
-        void waitForUserAcknowledgement(String message);
+        void waitForUserAcknowledgement(String message) throws InterruptedException;
         void logText(String text);
         void turnScreenOff();
     }

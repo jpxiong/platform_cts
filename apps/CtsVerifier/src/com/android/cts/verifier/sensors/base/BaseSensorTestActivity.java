@@ -28,13 +28,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.cts.helpers.ActivityResultMultiplexedLatch;
-import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.media.MediaPlayer;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,8 +43,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.security.InvalidParameterException;
-import java.util.concurrent.Semaphore;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A base Activity that is used to build different methods to execute tests inside CtsVerifier.
@@ -76,10 +80,11 @@ public abstract class BaseSensorTestActivity
     private final int mLayoutId;
     private final SensorFeaturesDeactivator mSensorFeaturesDeactivator;
 
-    private final Semaphore mSemaphore = new Semaphore(0);
+    private final ExecutorService mExecutorService = Executors.newSingleThreadExecutor();
     private final SensorTestLogger mTestLogger = new SensorTestLogger();
     private final ActivityResultMultiplexedLatch mActivityResultMultiplexedLatch =
             new ActivityResultMultiplexedLatch();
+    private final ArrayList<CountDownLatch> mWaitForUserLatches = new ArrayList<CountDownLatch>();
 
     private ScrollView mLogScrollView;
     private LinearLayout mLogLayout;
@@ -128,7 +133,13 @@ public abstract class BaseSensorTestActivity
         mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
 
         updateNextButton(false /*enabled*/);
-        new Thread(this).start();
+        mExecutorService.execute(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mExecutorService.shutdownNow();
     }
 
     @Override
@@ -149,7 +160,12 @@ public abstract class BaseSensorTestActivity
 
     @Override
     public void onClick(View target) {
-        mSemaphore.release();
+        synchronized (mWaitForUserLatches) {
+            for (CountDownLatch latch : mWaitForUserLatches) {
+                latch.countDown();
+            }
+            mWaitForUserLatches.clear();
+        }
     }
 
     @Override
@@ -167,40 +183,36 @@ public abstract class BaseSensorTestActivity
      */
     @Override
     public void run() {
+        long startTimeNs = SystemClock.elapsedRealtimeNanos();
         String testName = getTestClassName();
 
-        // guarantee the proper clean up of tests based on the operations that successfully ran
-        SensorTestDetails testDetails = deactivateSensorFeatures();
-        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.PASS) {
-            // sensor features
-            testDetails = executeActivitySetUp();
-            if (testDetails.getResultCode() == SensorTestDetails.ResultCode.PASS) {
-                // activity set up
-                // TODO: implement execution filters:
-                //      - execute all tests and report results officially
-                //      - execute single test or failed tests only
-                testDetails = executeTests();
-                try {
-                    activityCleanUp();
-                } catch (Throwable e) {
-                    testDetails = new SensorTestDetails(
-                            testName,
-                            SensorTestDetails.ResultCode.FAIL,
-                            "[ActivityCleanUp] " + e.getMessage());
-                }
-                // end activity set up
-            }
-            try {
-                mSensorFeaturesDeactivator.requestToRestoreFeatures();
-            } catch (Throwable e) {
-                testDetails = new SensorTestDetails(
-                        testName,
-                        SensorTestDetails.ResultCode.FAIL,
-                        "[RestoreSensorFeatures] " + e.getMessage());
-            }
-            // end sensor features
+        SensorTestDetails testDetails;
+        try {
+            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
+            testDetails = new SensorTestDetails(testName, SensorTestDetails.ResultCode.PASS);
+        } catch (Throwable e) {
+            testDetails = new SensorTestDetails(testName, "DeactivateSensorFeatures", e);
         }
+
+        SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+        if (resultCode == SensorTestDetails.ResultCode.SKIPPED) {
+            // this is an invalid state at this point of the test setup
+            throw new IllegalStateException("Deactivation of features cannot skip the test.");
+        }
+        if (resultCode == SensorTestDetails.ResultCode.PASS) {
+            testDetails = executeActivityTests(testName);
+        }
+
+        // we consider all remaining states at this point, because we could have been half way
+        // deactivating features
+        try {
+            mSensorFeaturesDeactivator.requestToRestoreFeatures();
+        } catch (Throwable e) {
+            testDetails = new SensorTestDetails(testName, "RestoreSensorFeatures", e);
+        }
+
         mTestLogger.logTestDetails(testDetails);
+        mTestLogger.logExecutionTime(startTimeNs);
 
         // because we cannot enforce test failures in several devices, set the test UI so the
         // operator can report the result of the test
@@ -210,6 +222,9 @@ public abstract class BaseSensorTestActivity
     /**
      * A general set up routine. It executes only once before the first test case.
      *
+     * NOTE: implementers must be aware of the interrupted status of the worker thread, and let
+     * {@link InterruptedException} propagate.
+     *
      * @throws Throwable An exception that denotes the failure of set up. No tests will be executed.
      */
     protected void activitySetUp() throws Throwable {}
@@ -218,6 +233,11 @@ public abstract class BaseSensorTestActivity
      * A general clean up routine. It executes upon successful execution of {@link #activitySetUp()}
      * and after all the test cases.
      *
+     * NOTE: implementers must be aware of the interrupted status of the worker thread, and handle
+     * it in two cases:
+     * - let {@link InterruptedException} propagate
+     * - if it is invoked with the interrupted status, prevent from showing any UI
+
      * @throws Throwable An exception that will be logged and ignored, for ease of implementation
      *                   by subclasses.
      */
@@ -229,16 +249,11 @@ public abstract class BaseSensorTestActivity
      *
      * @return A {@link SensorTestDetails} object containing information about the executed tests.
      */
-    protected abstract SensorTestDetails executeTests();
+    protected abstract SensorTestDetails executeTests() throws InterruptedException;
 
     @Override
     public SensorTestLogger getTestLogger() {
         return mTestLogger;
-    }
-
-    @Deprecated
-    protected void appendText(String text, int textColor) {
-        appendText(text);
     }
 
     @Deprecated
@@ -268,21 +283,22 @@ public abstract class BaseSensorTestActivity
      *
      * @param waitMessageResId The action requested to the operator.
      */
-    protected void waitForUser(int waitMessageResId) {
+    protected void waitForUser(int waitMessageResId) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        synchronized (mWaitForUserLatches) {
+            mWaitForUserLatches.add(latch);
+        }
+
         mTestLogger.logInstructions(waitMessageResId);
         updateNextButton(true);
-        try {
-            mSemaphore.acquire();
-        } catch (InterruptedException e)  {
-            Log.e(LOG_TAG, "Error on waitForUser", e);
-        }
+        latch.await();
         updateNextButton(false);
     }
 
     /**
      * Waits for the operator to acknowledge to begin execution.
      */
-    protected void waitForUserToBegin() {
+    protected void waitForUserToBegin() throws InterruptedException {
         waitForUser(R.string.snsr_wait_to_begin);
     }
 
@@ -290,20 +306,15 @@ public abstract class BaseSensorTestActivity
      * {@inheritDoc}
      */
     @Override
-    public void waitForUserToContinue() {
+    public void waitForUserToContinue() throws InterruptedException {
         waitForUser(R.string.snsr_wait_for_user);
-    }
-
-    @Deprecated
-    protected void waitForUser() {
-        waitForUserToContinue();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int executeActivity(String action) {
+    public int executeActivity(String action) throws InterruptedException {
         return executeActivity(new Intent(action));
     }
 
@@ -311,7 +322,7 @@ public abstract class BaseSensorTestActivity
      * {@inheritDoc}
      */
     @Override
-    public int executeActivity(Intent intent) {
+    public int executeActivity(Intent intent) throws InterruptedException {
         ActivityResultMultiplexedLatch.Latch latch = mActivityResultMultiplexedLatch.bindThread();
         startActivityForResult(intent, latch.getRequestCode());
         return latch.await();
@@ -352,18 +363,15 @@ public abstract class BaseSensorTestActivity
     /**
      * Plays a (default) sound as a notification for the operator.
      */
-    protected void playSound() {
+    protected void playSound() throws InterruptedException {
         MediaPlayer player = MediaPlayer.create(this, Settings.System.DEFAULT_NOTIFICATION_URI);
         if (player == null) {
             Log.e(LOG_TAG, "MediaPlayer unavailable.");
             return;
         }
-
         player.start();
         try {
             Thread.sleep(500);
-        } catch(InterruptedException e) {
-            Log.d(LOG_TAG, "Error on playSound", e);
         } finally {
             player.stop();
         }
@@ -411,10 +419,16 @@ public abstract class BaseSensorTestActivity
         return mTestClass.getName();
     }
 
+    protected void setLogScrollViewListener(View.OnTouchListener listener) {
+        mLogScrollView.setOnTouchListener(listener);
+    }
+
     private void setTestResult(SensorTestDetails testDetails) {
+        // the name here, must be the Activity's name because it is what CtsVerifier expects
+        String name = super.getClass().getName();
         String summary = mTestLogger.getOverallSummary();
-        String name = testDetails.getName();
-        switch(testDetails.getResultCode()) {
+        SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+        switch(resultCode) {
             case SKIPPED:
                 TestResult.setPassedResult(this, name, summary);
                 break;
@@ -424,48 +438,50 @@ public abstract class BaseSensorTestActivity
             case FAIL:
                 TestResult.setFailedResult(this, name, summary);
                 break;
+            case INTERRUPTED:
+                // do not set a result, just return so the test can complete
+                break;
+            default:
+                throw new IllegalStateException("Unknown ResultCode: " + resultCode);
         }
     }
 
-    private SensorTestDetails deactivateSensorFeatures() {
-        String testName = getTestClassName();
-        try {
-            mSensorFeaturesDeactivator.requestDeactivationOfFeatures();
-        } catch (Throwable e) {
-            return new SensorTestDetails(
-                    testName,
-                    SensorTestDetails.ResultCode.FAIL,
-                    "[DeactivateSensorFeatures] " + e.getMessage());
-        }
-        return new SensorTestDetails(
-                testName,
-                SensorTestDetails.ResultCode.PASS,
-                null /* summary */);
-    }
-
-    private SensorTestDetails executeActivitySetUp() {
-        String testName = getTestClassName();
+    private SensorTestDetails executeActivityTests(String testName) {
+        SensorTestDetails testDetails;
         try {
             activitySetUp();
-        } catch (SensorTestStateNotSupportedException e) {
-            return new SensorTestDetails(
-                    testName,
-                    SensorTestDetails.ResultCode.SKIPPED,
-                    e.getMessage());
+            testDetails = new SensorTestDetails(testName, SensorTestDetails.ResultCode.PASS);
         } catch (Throwable e) {
-            return new SensorTestDetails(
-                    testName,
-                    SensorTestDetails.ResultCode.FAIL,
-                    "[ActivitySetUp] " + e.getMessage());
+            testDetails = new SensorTestDetails(testName, "ActivitySetUp", e);
         }
-        return new SensorTestDetails(
-                testName,
-                SensorTestDetails.ResultCode.PASS,
-                null /* summary */);
+
+        SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+        if (resultCode == SensorTestDetails.ResultCode.PASS) {
+            // TODO: implement execution filters:
+            //      - execute all tests and report results officially
+            //      - execute single test or failed tests only
+            try {
+                testDetails = executeTests();
+            } catch (Throwable e) {
+                // we catch and continue because we have to guarantee a proper clean-up sequence
+                testDetails = new SensorTestDetails(testName, "TestExecution", e);
+            }
+        }
+
+        // clean-up executes for all states, even on SKIPPED and INTERRUPTED there might be some
+        // intermediate state that needs to be taken care of
+        try {
+            activityCleanUp();
+        } catch (Throwable e) {
+            testDetails = new SensorTestDetails(testName, "ActivityCleanUp", e);
+        }
+
+        return testDetails;
     }
 
     private void promptUserToSetResult(SensorTestDetails testDetails) {
-        if (testDetails.getResultCode() == SensorTestDetails.ResultCode.FAIL) {
+        SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+        if (resultCode == SensorTestDetails.ResultCode.FAIL) {
             mTestLogger.logInstructions(R.string.snsr_test_complete_with_errors);
             enableTestResultButton(
                     mPassButton,
@@ -475,7 +491,7 @@ public abstract class BaseSensorTestActivity
                     mFailButton,
                     R.string.fail_button_text,
                     testDetails.cloneAndChangeResultCode(SensorTestDetails.ResultCode.FAIL));
-        } else {
+        } else if (resultCode != SensorTestDetails.ResultCode.INTERRUPTED) {
             mTestLogger.logInstructions(R.string.snsr_test_complete);
             enableTestResultButton(
                     mPassButton,
@@ -548,7 +564,8 @@ public abstract class BaseSensorTestActivity
         public void logTestDetails(SensorTestDetails testDetails) {
             String name = testDetails.getName();
             String summary = testDetails.getSummary();
-            switch (testDetails.getResultCode()) {
+            SensorTestDetails.ResultCode resultCode = testDetails.getResultCode();
+            switch (resultCode) {
                 case SKIPPED:
                     logTestSkip(name, summary);
                     break;
@@ -558,9 +575,11 @@ public abstract class BaseSensorTestActivity
                 case FAIL:
                     logTestFail(name, summary);
                     break;
+                case INTERRUPTED:
+                    // do nothing, the test was interrupted so do we
+                    break;
                 default:
-                    throw new InvalidParameterException(
-                            "Invalid SensorTestDetails.ResultCode: " + testDetails.getResultCode());
+                    throw new IllegalStateException("Unknown ResultCode: " + resultCode);
             }
         }
 
@@ -587,6 +606,17 @@ public abstract class BaseSensorTestActivity
 
         String getOverallSummary() {
             return mOverallSummaryBuilder.toString();
+        }
+
+        void logExecutionTime(long startTimeNs) {
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            }
+            long executionTimeNs = SystemClock.elapsedRealtimeNanos() - startTimeNs;
+            long executionTimeSec = TimeUnit.NANOSECONDS.toSeconds(executionTimeNs);
+            // TODO: find a way to format times with nanosecond accuracy and longer than 24hrs
+            String formattedElapsedTime = DateUtils.formatElapsedTime(executionTimeSec);
+            logMessage(R.string.snsr_execution_time, formattedElapsedTime);
         }
 
         private void logTestEnd(int textViewResId, String testSummary) {

@@ -19,15 +19,12 @@ package com.android.cts.verifier.sensors;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorFlushOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
-import android.os.Bundle;
-import android.os.PowerManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -51,27 +48,9 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
     // such events to generate
     private static final int REPORT_LATENCY_25_SEC = 25;
 
-    private PowerManager.WakeLock mWakeLock;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void activitySetUp() throws InterruptedException {
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "BatchingTests");
-        mWakeLock.acquire();
-    }
-
-    @Override
-    protected void activityCleanUp() throws InterruptedException {
-        mWakeLock.release();
-    }
-
     // TODO: refactor to discover all available sensors of each type and dynamically generate test
     // cases for all of them
+    @SuppressWarnings("unused")
     public String testStepCounter_batching() throws Throwable {
         return runBatchTest(
                 Sensor.TYPE_STEP_COUNTER,
@@ -79,6 +58,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_batching_walking_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testStepCounter_flush() throws Throwable {
         return runFlushTest(
                 Sensor.TYPE_STEP_COUNTER,
@@ -86,6 +66,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_batching_walking_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testStepDetector_batching() throws Throwable {
         return  runBatchTest(
                 Sensor.TYPE_STEP_DETECTOR,
@@ -93,6 +74,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_batching_walking_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testStepDetector_flush() throws Throwable {
         return  runFlushTest(
                 Sensor.TYPE_STEP_DETECTOR,
@@ -100,6 +82,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_batching_walking_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testProximity_batching() throws Throwable {
         return runBatchTest(
                 Sensor.TYPE_PROXIMITY,
@@ -107,6 +90,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_interaction_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testProximity_flush() throws Throwable {
         return runFlushTest(
                 Sensor.TYPE_PROXIMITY,
@@ -114,6 +98,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_interaction_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testLight_batching() throws Throwable {
         return runBatchTest(
                 Sensor.TYPE_LIGHT,
@@ -121,6 +106,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
                 R.string.snsr_interaction_needed);
     }
 
+    @SuppressWarnings("unused")
     public String testLight_flush() throws Throwable {
         return runFlushTest(
                 Sensor.TYPE_LIGHT,
@@ -164,7 +150,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
         return executeTest(operation);
     }
 
-    private String executeTest(VerifiableSensorOperation operation) {
+    private String executeTest(VerifiableSensorOperation operation) throws InterruptedException {
         operation.addDefaultVerifications();
         operation.setLogEvents(true);
         operation.execute();

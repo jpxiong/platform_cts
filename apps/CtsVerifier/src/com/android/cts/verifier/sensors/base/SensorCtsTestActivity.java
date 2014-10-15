@@ -37,7 +37,6 @@ import org.junit.runner.notification.RunListener;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.hardware.cts.SensorTestCase;
 import android.os.PowerManager;
@@ -67,11 +66,11 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
     }
 
     @Override
-    protected void activitySetUp() {
-        mScreenManipulator = new SensorTestScreenManipulator(getApplicationContext());
-        mScreenManipulator.initialize(this);
+    protected void activitySetUp() throws InterruptedException {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock =  powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SensorCtsTests");
+        mScreenManipulator = new SensorTestScreenManipulator(getApplicationContext());
+        mScreenManipulator.initialize(this);
 
         SensorTestLogger logger = getTestLogger();
         logger.logInstructions(R.string.snsr_no_interaction);
@@ -93,7 +92,9 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
             }
         });
         mScreenManipulator.turnScreenOn();
-        mWakeLock.release();
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
     }
 
     @Override
@@ -101,6 +102,7 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
         super.onDestroy();
         if (mScreenManipulator != null) {
             mScreenManipulator.releaseScreenOn();
+            mScreenManipulator.close();
         }
     }
 
@@ -154,7 +156,7 @@ public abstract class SensorCtsTestActivity extends BaseSensorTestActivity {
             return new JUnit38ClassRunner(sensorTestSuite);
         }
 
-        private boolean hasSuiteMethod(Class testClass) {
+        private boolean hasSuiteMethod(Class<?> testClass) {
             try {
                 testClass.getMethod("suite");
                 return true;

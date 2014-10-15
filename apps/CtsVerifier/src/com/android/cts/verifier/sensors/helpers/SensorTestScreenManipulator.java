@@ -85,7 +85,8 @@ public class SensorTestScreenManipulator {
      * NOTE: Initialization will bring up an Activity to let the user activate the Device Admin,
      * this method will block until the user completes the operation.
      */
-    public synchronized void initialize(ISensorTestStateContainer stateContainer) {
+    public synchronized void initialize(ISensorTestStateContainer stateContainer)
+            throws InterruptedException {
         if (!isDeviceAdminInitialized()) {
             Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
             intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName);
