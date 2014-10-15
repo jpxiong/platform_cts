@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.cts.managedprofile.crossprofilecontent;
+package com.android.cts.intent.sender;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -69,4 +69,3 @@ public class BasicContentProvider extends ContentProvider {
                 new File("/dev/null"), ParcelFileDescriptor.MODE_READ_ONLY);
     }
 }
-
