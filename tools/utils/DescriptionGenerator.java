@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,6 +39,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import vogar.ExpectationStore;
+import vogar.Expectation;
 
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
@@ -82,11 +84,13 @@ public class DescriptionGenerator extends Doclet {
     static final String ATTRIBUTE_VALUE_FRAMEWORK = "Android 1.0";
 
     static final String ATTRIBUTE_NAME = "name";
+    static final String ATTRIBUTE_ABIS = "abis";
     static final String ATTRIBUTE_HOST_CONTROLLER = "HostController";
 
     static final String XML_OUTPUT_PATH = "./description.xml";
 
     static final String OUTPUT_PATH_OPTION = "-o";
+    static final String ARCHITECTURE_OPTION = "-a";
 
     /**
      * Start to parse the classes passed in by javadoc, and generate
@@ -103,11 +107,20 @@ public class DescriptionGenerator extends Doclet {
         }
 
         String outputPath = XML_OUTPUT_PATH;
+        String architecture = null;
         String[][] options = root.options();
         for (String[] option : options) {
-            if (option.length == 2 && option[0].equals(OUTPUT_PATH_OPTION)) {
-                outputPath = option[1];
+            if (option.length == 2) {
+                if (option[0].equals(OUTPUT_PATH_OPTION)) {
+                    outputPath = option[1];
+                } else if (option[0].equals(ARCHITECTURE_OPTION)) {
+                    architecture = option[1];
+                }
             }
+        }
+        if (architecture == null || architecture.equals("")) {
+            Log.e("Missing architecture!", null);
+            return false;
         }
 
         XMLGenerator xmlGenerator = null;
@@ -128,7 +141,7 @@ public class DescriptionGenerator extends Doclet {
 
         for (ClassDoc clazz : classes) {
             if ((!clazz.isAbstract()) && (isValidJUnitTestCase(clazz))) {
-                xmlGenerator.addTestClass(new TestClass(clazz, ctsExpectationStore));
+                xmlGenerator.addTestClass(new TestClass(clazz, ctsExpectationStore, architecture));
             }
         }
 
@@ -420,6 +433,8 @@ public class DescriptionGenerator extends Doclet {
                     Node caseNode = elem.appendChild(mDoc.createElement(TAG_TEST));
 
                     setAttribute(caseNode, ATTRIBUTE_NAME, caze.mName);
+                    String abis = caze.mAbis.toString();
+                    setAttribute(caseNode, ATTRIBUTE_ABIS, abis.substring(1, abis.length() - 1));
                     if ((caze.mController != null) && (caze.mController.length() != 0)) {
                         setAttribute(caseNode, ATTRIBUTE_HOST_CONTROLLER, caze.mController);
                     }
@@ -509,9 +524,9 @@ public class DescriptionGenerator extends Doclet {
          *
          * @param clazz The specified ClassDoc.
          */
-        TestClass(ClassDoc clazz, ExpectationStore expectationStore) {
+        TestClass(ClassDoc clazz, ExpectationStore expectationStore, String architecture) {
             mName = clazz.toString();
-            mCases = getTestMethods(expectationStore, clazz);
+            mCases = getTestMethods(expectationStore, architecture, clazz);
         }
 
         /**
@@ -520,7 +535,8 @@ public class DescriptionGenerator extends Doclet {
          * @param clazz The specified ClassDoc.
          * @return A collection of TestMethod.
          */
-        Collection<TestMethod> getTestMethods(ExpectationStore expectationStore, ClassDoc clazz) {
+        Collection<TestMethod> getTestMethods(ExpectationStore expectationStore,
+                String architecture, ClassDoc clazz) {
             Collection<MethodDoc> methods = getAllMethods(clazz);
 
             ArrayList<TestMethod> cases = new ArrayList<TestMethod>();
@@ -553,8 +569,13 @@ public class DescriptionGenerator extends Doclet {
                 }
 
                 if (name.startsWith("test")) {
-                    cases.add(new TestMethod(name, method.commentText(), controller, knownFailure,
-                            isBroken, isSuppressed));
+                    Expectation expectation = expectationStore.get(
+                            VogarUtils.buildFullTestName(clazz.toString(), name));
+                    Set<String> supportedAbis =
+                            VogarUtils.extractSupportedAbis(architecture, expectation);
+                    cases.add(new TestMethod(
+                            name, method.commentText(), controller, supportedAbis,
+                                    knownFailure, isBroken, isSuppressed));
                 }
             }
 
@@ -610,6 +631,7 @@ public class DescriptionGenerator extends Doclet {
         String mName;
         String mDescription;
         String mController;
+        Set<String> mAbis;
         String mKnownFailure;
         boolean mIsBroken;
         boolean mIsSuppressed;
@@ -621,11 +643,12 @@ public class DescriptionGenerator extends Doclet {
          * @param description The description of the test case.
          * @param knownFailure The reason of known failure.
          */
-        TestMethod(String name, String description, String controller, String knownFailure,
-                boolean isBroken, boolean isSuppressed) {
+        TestMethod(String name, String description, String controller, Set<String> abis,
+                String knownFailure, boolean isBroken, boolean isSuppressed) {
             mName = name;
             mDescription = description;
             mController = controller;
+            mAbis = abis;
             mKnownFailure = knownFailure;
             mIsBroken = isBroken;
             mIsSuppressed = isSuppressed;
