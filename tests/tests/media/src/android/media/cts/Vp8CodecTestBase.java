@@ -335,11 +335,11 @@ public class Vp8CodecTestBase extends AndroidTestCase {
     }
 
     /**
-     * Converts (interleaves) YUV420 planar to NV12 (if hw) or NV21 (if sw).
+     * Converts (interleaves) YUV420 planar to NV12.
      * Assumes packed, macroblock-aligned frame with no cropping
-     * (visible/coded row length == stride).  Swap U/V if |sw|.
+     * (visible/coded row length == stride).
      */
-    private static byte[] YUV420ToNV(int width, int height, byte[] yuv, boolean sw) {
+    private static byte[] YUV420ToNV(int width, int height, byte[] yuv) {
         byte[] nv = new byte[yuv.length];
         // Y plane we just copy.
         System.arraycopy(yuv, 0, nv, 0, width * height);
@@ -348,17 +348,9 @@ public class Vp8CodecTestBase extends AndroidTestCase {
         int u_offset = width * height;
         int v_offset = u_offset + u_offset / 4;
         int nv_offset = width * height;
-        if (sw) {
-            for (int i = 0; i < width * height / 4; i++) {
-                nv[nv_offset++] = yuv[v_offset++];
-                nv[nv_offset++] = yuv[u_offset++];
-            }
-        }
-        else {
-            for (int i = 0; i < width * height / 4; i++) {
-                nv[nv_offset++] = yuv[u_offset++];
-                nv[nv_offset++] = yuv[v_offset++];
-            }
+        for (int i = 0; i < width * height / 4; i++) {
+            nv[nv_offset++] = yuv[u_offset++];
+            nv[nv_offset++] = yuv[v_offset++];
         }
         return nv;
     }
@@ -788,7 +780,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
             // Convert YUV420 to NV12 if necessary
             if (mProperties.colorFormat != CodecCapabilities.COLOR_FormatYUV420Planar) {
                 return YUV420ToNV(mStreamParams.frameWidth, mStreamParams.frameHeight,
-                        mSrcFrame, mProperties.isGoogleSwCodec());
+                        mSrcFrame);
             } else {
                 return mSrcFrame;
             }
@@ -1390,7 +1382,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     // Convert YUV420 to NV12 if necessary
                     if (properties.colorFormat != CodecCapabilities.COLOR_FormatYUV420Planar) {
                         srcFrame = YUV420ToNV(streamParams.frameWidth, streamParams.frameHeight,
-                                srcFrame, properties.isGoogleSwCodec());
+                                srcFrame);
                     }
                 }
 
@@ -1652,8 +1644,7 @@ public class Vp8CodecTestBase extends AndroidTestCase {
                     // Convert YUV420 to NV12 if necessary
                     if (codecProperties[i].colorFormat !=
                             CodecCapabilities.COLOR_FormatYUV420Planar) {
-                        srcFrame[i] = YUV420ToNV(params.frameWidth, params.frameHeight, srcFrame[i],
-                                codecProperties[i].isGoogleSwCodec());
+                        srcFrame[i] = YUV420ToNV(params.frameWidth, params.frameHeight, srcFrame[i]);
                     }
                 }
 
