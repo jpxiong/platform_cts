@@ -502,4 +502,25 @@ public class TvContractTest extends AndroidTestCase {
         verifyDeleteWithSelection(TvContract.Programs.CONTENT_URI,
                 TvContract.Programs._ID + ">0");
     }
+
+    public void testDefaultValues() throws Exception {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
+        ContentValues values = new ContentValues();
+        values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
+        Uri channelUri = mContentResolver.insert(mChannelsUri, values);
+        assertNotNull(channelUri);
+        long channelId = ContentUris.parseId(channelUri);
+        try (Cursor cursor = mContentResolver.query(
+                channelUri, CHANNELS_PROJECTION, null, null, null)) {
+            cursor.moveToNext();
+            assertEquals(TvContract.Channels.TYPE_OTHER,
+                    cursor.getString(cursor.getColumnIndex(TvContract.Channels.COLUMN_TYPE)));
+            assertEquals(TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO,
+                    cursor.getString(cursor.getColumnIndex(
+                            TvContract.Channels.COLUMN_SERVICE_TYPE)));
+        }
+        values.clear();
+    }
 }
