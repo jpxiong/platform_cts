@@ -69,6 +69,7 @@ cts_support_packages := \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
     CtsIntentReceiverApp \
+    CtsIntentSenderApp \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \

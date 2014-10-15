@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.managedprofile.crossprofilecontent;
 
-import static com.android.cts.managedprofile.BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT;
+package com.android.cts.intent.sender;
 
-import android.app.admin.DevicePolicyManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
-import android.test.ActivityInstrumentationTestCase2;
+import android.test.InstrumentationTestCase;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 
-public class CrossProfileContentTest extends
-        ActivityInstrumentationTestCase2<IntentSenderActivity> {
+public class IntentSenderTest extends InstrumentationTestCase {
 
     private static final String MESSAGE = "Sample Message";
 
@@ -49,35 +45,20 @@ public class CrossProfileContentTest extends
 
     private static final String TAG = "CrossProfileContentTest";
 
-    private static final String BASIC_CONTENT_PROVIDER_AUTHORITY =
-            "com.android.cts.managedprofile.basiccontentProvider";
-
-
-    private DevicePolicyManager mDpm;
-
     private Context mContext;
-
-    public CrossProfileContentTest() {
-        super(IntentSenderActivity.class);
-    }
+    private IntentSenderActivity mActivity;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getTargetContext();
-        mDpm = (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_READ_FROM_URI);
-        intentFilter.addAction(ACTION_WRITE_TO_URI);
-        intentFilter.addAction(ACTION_TAKE_PERSISTABLE_URI_PERMISSION);
-        mDpm.addCrossProfileIntentFilter(ADMIN_RECEIVER_COMPONENT, intentFilter,
-                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+        mActivity = launchActivity(mContext.getPackageName(), IntentSenderActivity.class, null);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        mDpm.clearCrossProfileIntentFilters(ADMIN_RECEIVER_COMPONENT);
+    public void tearDown() throws Exception {
         super.tearDown();
+        mActivity.finish();
     }
 
     /**
@@ -85,14 +66,15 @@ public class CrossProfileContentTest extends
      * This intent will have, in the ClipData, a uri whose associated file stores a message.
      * The receiver will read the message from the uri, and put it inside the result intent.
      */
-    public void testReceiverCanRead() {
+    public void testReceiverCanRead() throws Exception {
         Uri uri = getUriWithTextInFile("reading_test", MESSAGE);
         assertTrue(uri != null);
         Intent intent = new Intent(ACTION_READ_FROM_URI);
         intent.setClipData(ClipData.newRawUri("", uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        Intent result = getActivity().getResultForIntent(intent);
-        assertTrue(result != null);
+
+        final Intent result = mActivity.getResult(intent);
+        assertNotNull(result);
         assertEquals(MESSAGE, result.getStringExtra("extra_response"));
     }
 
@@ -102,7 +84,7 @@ public class CrossProfileContentTest extends
      * The receiver will read the message from the extra, and write it to the uri in
      * the ClipData.
      */
-    public void testReceiverCanWrite() {
+    public void testReceiverCanWrite() throws Exception {
         // It's the receiver of the intent that should write to the uri, not us. So, for now, we
         // write an empty string.
         Uri uri = getUriWithTextInFile("writing_test", "");
@@ -112,19 +94,21 @@ public class CrossProfileContentTest extends
         intent.putExtra("extra_message", MESSAGE);
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        getActivity().getResultForIntent(intent);
+
+        mActivity.getResult(intent);
         assertEquals(MESSAGE, getFirstLineFromUri(uri));
     }
 
-    public void testPersistablePermission() {
+    public void testPersistablePermission() throws Exception {
         Uri uri = getUriWithTextInFile("persistable_test", MESSAGE);
         grantPersistableReadPermission(uri);
 
         // Now checking if the receiver can read this uri, without re-granting the read permission.
         Intent intent = new Intent(ACTION_READ_FROM_URI);
         intent.setClipData(ClipData.newRawUri("", uri));
-        Intent result = getActivity().getResultForIntent(intent);
-        assertTrue(result != null);
+
+        final Intent result = mActivity.getResult(intent);
+        assertNotNull(result);
         assertEquals(MESSAGE, result.getStringExtra("extra_response"));
     }
 
@@ -138,7 +122,7 @@ public class CrossProfileContentTest extends
      * uriNotGranted), to enforce that even if an app has permission to one uri of a
      * ContentProvider, it still cannot access a uri it does not have access to.
      */
-    public void testAppPermissionsDontWorkAcrossProfiles() {
+    public void testAppPermissionsDontWorkAcrossProfiles() throws Exception {
         // The FileProvider does not allow to use app permissions. So we need to use another
         // ContentProvider.
         Uri uriGranted = getBasicContentProviderUri("uri_granted");
@@ -152,19 +136,41 @@ public class CrossProfileContentTest extends
         Intent notGrant = new Intent(ACTION_READ_FROM_URI);
         notGrant.setClipData(ClipData.newRawUri("", uriNotGranted));
 
-        Intent result = getActivity().getResultForIntent(notGrant);
-        assertTrue(result != null);
+        final Intent result = mActivity.getResult(notGrant);
+        assertNotNull(result);
         // The receiver did not have permission to read the uri. So it should have caught a security
         // exception.
         assertTrue(result.getBooleanExtra("extra_caught_security_exception", false));
     }
 
-    private void grantPersistableReadPermission(Uri uri) {
+    /**
+     * Ensure that sender is only able to send data that it has access to.
+     */
+    public void testSecurity() throws Exception {
+        // Pick a URI that neither of us have access to; it doens't matter if
+        // its missing, since we expect a SE before a FNFE.
+        final Uri uri = Uri.parse("content://media/external/images/media/10240");
+        final Intent intent = new Intent(ACTION_READ_FROM_URI);
+        intent.setClipData(ClipData.newRawUri("", uri));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        // We're expecting to run into a security exception
+        final Intent result = mActivity.getResult(intent);
+        if (result == null) {
+            // This is fine; probably of a SecurityException when off in the
+            // system somewhere.
+        } else {
+            // But if we somehow came through, make sure they threw.
+            assertTrue(result.getBooleanExtra("extra_caught_security_exception", false));
+        }
+    }
+
+    private void grantPersistableReadPermission(Uri uri) throws Exception {
         Intent grantPersistable = new Intent(ACTION_TAKE_PERSISTABLE_URI_PERMISSION);
         grantPersistable.setClipData(ClipData.newRawUri("", uri));
         grantPersistable.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        getActivity().getResultForIntent(grantPersistable);
+        mActivity.getResult(grantPersistable);
     }
 
     private Uri getBasicContentProviderUri(String path) {
@@ -172,7 +178,7 @@ public class CrossProfileContentTest extends
         // granting these uris to other apps, or these apps from trying to access these uris.
         return new Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority(BASIC_CONTENT_PROVIDER_AUTHORITY)
+                .authority("com.android.cts.intent.sender.provider")
                 .path(path)
                 .build();
     }
@@ -191,7 +197,7 @@ public class CrossProfileContentTest extends
             Log.e(TAG, "Could not create file " + filename + " with text " + text);
             return null;
         }
-        return FileProvider.getUriForFile(mContext, "com.android.cts.managedprofile.fileprovider",
+        return FileProvider.getUriForFile(mContext, "com.android.cts.intent.sender.fileprovider",
                 file);
     }
 

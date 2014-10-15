@@ -22,11 +22,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-
 
 /**
  * Class to receive intents sent across profile boundaries, and read/write to content uri specified
