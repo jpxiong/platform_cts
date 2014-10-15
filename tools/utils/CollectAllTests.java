@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.cts.util.AbiUtils;
 
 import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
@@ -20,6 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import vogar.Expectation;
 import vogar.ExpectationStore;
 
 import java.io.BufferedReader;
@@ -61,9 +63,9 @@ public class CollectAllTests extends DescriptionGenerator {
     private static final String TEST_TYPE = "LOCAL_TEST_TYPE :";
 
     public static void main(String[] args) {
-        if (args.length < 4 || args.length > 6) {
+        if (args.length < 5 || args.length > 7) {
             System.err.println("usage: CollectAllTests <output-file> <manifest-file> <jar-file> "
-                               + "<java-package> [expectation-dir [makefile-file]]");
+                               + "<java-package> <architecture> [expectation-dir [makefile-file]]");
             if (args.length != 0) {
                 System.err.println("received:");
                 for (String arg : args) {
@@ -86,8 +88,14 @@ public class CollectAllTests extends DescriptionGenerator {
                 return;
             }
         }
-        String libcoreExpectationDir = (args.length > 4) ? args[4] : null;
-        String androidMakeFile = (args.length > 5) ? args[5] : null;
+        String architecture = args[4];
+        if (architecture == null || architecture.equals("")) {
+            System.err.println("Invalid architecture");
+            System.exit(1);
+            return;
+        }
+        String libcoreExpectationDir = (args.length > 5) ? args[5] : null;
+        String androidMakeFile = (args.length > 6) ? args[6] : null;
 
         final TestType testType = TestType.getTestType(androidMakeFile);
 
@@ -207,7 +215,7 @@ public class CollectAllTests extends DescriptionGenerator {
 
                 try {
                     klass.getConstructor(new Class<?>[] { String.class } );
-                    addToTests(expectations, testCases, klass);
+                    addToTests(expectations, architecture, testCases, klass);
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
@@ -218,7 +226,7 @@ public class CollectAllTests extends DescriptionGenerator {
 
                 try {
                     klass.getConstructor(new Class<?>[0]);
-                    addToTests(expectations, testCases, klass);
+                    addToTests(expectations, architecture, testCases, klass);
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
@@ -356,6 +364,7 @@ public class CollectAllTests extends DescriptionGenerator {
     }
 
     private static void addToTests(ExpectationStore[] expectations,
+                                   String architecture,
                                    Map<String,TestClass> testCases,
                                    Class<?> testClass) {
         Set<String> testNames = new HashSet<String>();
@@ -386,11 +395,12 @@ public class CollectAllTests extends DescriptionGenerator {
             }
 
             testNames.add(testName);
-            addToTests(expectations, testCases, testClass, testName);
+            addToTests(expectations, architecture, testCases, testClass, testName);
         }
     }
 
     private static void addToTests(ExpectationStore[] expectations,
+                                   String architecture,
                                    Map<String,TestClass> testCases,
                                    Class<?> test,
                                    String testName) {
@@ -412,6 +422,10 @@ public class CollectAllTests extends DescriptionGenerator {
             return;
         }
 
+        Set<String> supportedAbis = VogarUtils.extractSupportedAbis(architecture,
+                                                                    expectations,
+                                                                    testClassName,
+                                                                    testName);
         TestClass testClass;
         if (testCases.containsKey(testClassName)) {
             testClass = testCases.get(testClassName);
@@ -420,7 +434,8 @@ public class CollectAllTests extends DescriptionGenerator {
             testCases.put(testClassName, testClass);
         }
 
-        testClass.mCases.add(new TestMethod(testName, "", "", knownFailure, false, false));
+        testClass.mCases.add(new TestMethod(testName, "", "", supportedAbis,
+              knownFailure, false, false));
     }
 
     private static boolean isJunit3Test(Class<?> klass) {
