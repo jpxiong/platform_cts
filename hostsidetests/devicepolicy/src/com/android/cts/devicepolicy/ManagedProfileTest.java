@@ -28,6 +28,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String MANAGED_PROFILE_PKG = "com.android.cts.managedprofile";
     private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
 
+    private static final String INTENT_SENDER_PKG = "com.android.cts.intent.sender";
+    private static final String INTENT_SENDER_APK = "CtsIntentSenderApp.apk";
+
     private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
     private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
 
@@ -110,16 +113,30 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
+
         try {
-            installApp(INTENT_RECEIVER_APK);
+            getDevice().uninstallPackage(INTENT_SENDER_PKG);
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+            installAppAsUser(INTENT_SENDER_APK, 0);
+            installAppAsUser(INTENT_RECEIVER_APK, mUserId);
 
-            String command = "pm uninstall --user " + mUserId + " " + INTENT_RECEIVER_PKG;
-            CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
-                    + getDevice().executeShellCommand(command));
+            // Test from parent to managed
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                    "addManagedCanAccessParentFilters", mUserId));
+            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".IntentSenderTest", 0));
 
-            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-                    MANAGED_PROFILE_PKG + ".crossprofilecontent.CrossProfileContentTest", mUserId));
+            getDevice().uninstallPackage(INTENT_SENDER_PKG);
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+            installAppAsUser(INTENT_SENDER_APK, mUserId);
+            installAppAsUser(INTENT_RECEIVER_APK, 0);
+
+            // Test from managed to parent
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                    "addParentCanAccessManagedFilters", mUserId));
+            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".IntentSenderTest", mUserId));
+
         } finally {
+            getDevice().uninstallPackage(INTENT_SENDER_PKG);
             getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
         }
     }

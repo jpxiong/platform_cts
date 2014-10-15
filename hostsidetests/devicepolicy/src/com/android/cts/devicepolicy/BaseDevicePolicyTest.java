@@ -17,6 +17,7 @@
 package com.android.cts.devicepolicy;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
@@ -26,11 +27,13 @@ import com.android.ddmlib.testrunner.TestResult.TestStatus;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,6 +75,21 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         String installResult = getDevice().installPackage(mCtsBuild.getTestApp(fileName), true);
         assertNull(String.format("Failed to install %s, Reason: %s", fileName, installResult),
                 installResult);
+    }
+
+    protected void installAppAsUser(String appFileName, int userId) throws FileNotFoundException,
+            DeviceNotAvailableException {
+        final ITestDevice device = getDevice();
+
+        final File apk = mCtsBuild.getTestApp(appFileName);
+        final String remotePath = "/data/local/tmp/" + apk.getName();
+        if (!device.pushFile(apk, remotePath)) {
+            throw new IllegalStateException("Failed to push " + apk);
+        }
+
+        final String result = device.executeShellCommand(
+                "pm install --user " + userId + " " + remotePath);
+        assertTrue(result, result.contains("\nSuccess"));
     }
 
     /** Initializes the user with the given id. This is required so that apps can run on it. */
@@ -135,7 +153,17 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     protected boolean runDeviceTestsAsUser(
             String pkgName, @Nullable String testClassName, int userId)
             throws DeviceNotAvailableException {
-        return runDeviceTests(pkgName, testClassName, null /*testMethodName*/, userId);
+        return runDeviceTestsAsUser(pkgName, testClassName, null, userId);
+    }
+
+    /** Returns true if the specified tests passed. Tests are run as given user. */
+    protected boolean runDeviceTestsAsUser(
+            String pkgName, @Nullable String testClassName, String testMethodName, int userId)
+            throws DeviceNotAvailableException {
+        if (testClassName.startsWith(".")) {
+            testClassName = pkgName + testClassName;
+        }
+        return runDeviceTests(pkgName, testClassName, testMethodName, userId);
     }
 
     private boolean runDeviceTests(String pkgName, @Nullable String testClassName,
