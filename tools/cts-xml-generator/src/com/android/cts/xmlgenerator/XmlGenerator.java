@@ -205,7 +205,8 @@ class XmlGenerator {
             String className = nameCollector.toString();
             nameCollector.append('#').append(test.getName());
             writer.append("<Test name=\"").append(test.getName()).append("\"");
-            String abis = getSupportedAbis(mUnsupportedAbis, mArchitecture, className).toString();
+            String abis = getSupportedAbis(mUnsupportedAbis, mArchitecture,
+                    className, nameCollector.toString()).toString();
             writer.append(" abis=\"" + abis.substring(1, abis.length() - 1) + "\"");
             if (isKnownFailure(mKnownFailures, nameCollector.toString())) {
                 writer.append(" expectation=\"failure\"");
@@ -232,23 +233,36 @@ class XmlGenerator {
 
     // Returns the list of ABIs supported by this TestCase on this architecture.
     public static Set<String> getSupportedAbis(ExpectationStore expectationStore,
-            String architecture, String className) {
+            String architecture, String className, String testName) {
         Set<String> supportedAbis = AbiUtils.getAbisForArch(architecture);
-        Expectation e = (expectationStore == null) ? null : expectationStore.get(className);
-        if (e != null && !e.getDescription().isEmpty()) {
-            // Description should be written in the form "blah blah: abi1, abi2..."
-            String description = e.getDescription().split(":")[1];
-            String[] unsupportedAbis = description.split(",");
-            for (String a : unsupportedAbis) {
-                String abi = a.trim();
-                if (!AbiUtils.isAbiSupportedByCts(abi)) {
-                    throw new RuntimeException(
-                            String.format("Unrecognised ABI %s in %s", abi, e.getDescription()));
-                }
-                supportedAbis.remove(abi);
-            }
+        if (expectationStore == null) {
+            return supportedAbis;
         }
+
+        removeUnsupportedAbis(expectationStore.get(className), supportedAbis);
+        removeUnsupportedAbis(expectationStore.get(testName), supportedAbis);
         return supportedAbis;
+    }
+
+    public static void removeUnsupportedAbis(Expectation expectation, Set<String> supportedAbis) {
+        if (expectation == null) {
+            return;
+        }
+
+        String description = expectation.getDescription();
+        if (description.isEmpty()) {
+            return;
+        }
+
+        String[] unsupportedAbis = description.split(":")[1].split(",");
+        for (String a : unsupportedAbis) {
+            String abi = a.trim();
+            if (!AbiUtils.isAbiSupportedByCts(abi)) {
+                throw new RuntimeException(
+                        String.format("Unrecognised ABI %s in %s", abi, description));
+            }
+            supportedAbis.remove(abi);
+        }
     }
 
 }

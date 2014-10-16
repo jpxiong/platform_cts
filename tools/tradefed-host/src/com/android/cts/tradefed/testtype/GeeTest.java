@@ -49,9 +49,9 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
     private CtsBuildHelper mCtsBuild;
     private ITestDevice mDevice;
     private IAbi mAbi;
+    private String mExeName;
 
     private final String mPackageName;
-    private final String mExeName;
 
     public GeeTest(String packageName, String exeName) {
         mPackageName = packageName;
@@ -63,6 +63,7 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
      */
     public void setAbi(IAbi abi) {
         mAbi = abi;
+        mExeName += mAbi.getBitness();
     }
 
     @Override

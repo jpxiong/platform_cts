@@ -47,7 +47,7 @@ define cts-get-ui-lib-paths
 endef
 
 define cts-get-native-paths
-	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe))/$(exe))
+	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe),,,$(3))/$(exe)$(2))
 endef
 
 define cts-get-package-paths
