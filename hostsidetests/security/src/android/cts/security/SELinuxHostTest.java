@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.security.cts;
+package android.cts.security;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
