@@ -34,12 +34,6 @@ LOCAL_PACKAGE_NAME := CtsSecurityTestCases
 
 LOCAL_SDK_VERSION := current
 
-intermediates.COMMON := $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME),,COMMON)
-
-sepolicy_asset_dir := $(intermediates.COMMON)/assets
-
-LOCAL_ASSET_DIR := $(sepolicy_asset_dir)
-
 include $(BUILD_CTS_PACKAGE)
 
 selinux_policy.xml := $(sepolicy_asset_dir)/selinux_policy.xml
