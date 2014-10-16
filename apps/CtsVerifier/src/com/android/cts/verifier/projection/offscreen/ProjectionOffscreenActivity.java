@@ -26,6 +26,9 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -68,7 +71,7 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
     protected TestStatus mTestStatus = TestStatus.RUNNING;
 
     private final Runnable sendKeyEventRunnable = new Runnable() {
-            @Override
+        @Override
         public void run() {
             try {
                 mService.onKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
@@ -79,15 +82,28 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
         }
     };
 
+    private final Runnable playNotificationRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        }
+    };
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-            new Handler(Looper.getMainLooper()).postDelayed(
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(
                     sendKeyEventRunnable, DELAYED_RUNNABLE_TIME);
             mStatusView.setText("Running test...");
             mTimeScreenTurnedOff = SystemClock.uptimeMillis();
+            // Notify user its safe to turn screen back on after 5s + fudge factor
+            handler.postDelayed(playNotificationRunnable, TIME_SCREEN_OFF + 500);
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             if (SystemClock.uptimeMillis() - mTimeScreenTurnedOff < TIME_SCREEN_OFF) {
                 mStatusView.setText("ERROR: Turned on screen too early");
@@ -121,8 +137,9 @@ public class ProjectionOffscreenActivity extends PassFailButtons.Activity
                     filter.addAction(Intent.ACTION_SCREEN_ON);
 
                     registerReceiver(mReceiver, filter);
-                    mStatusView.setText(
-                            "Please turn off your screen and turn it back on after 5 seconds");
+                    mStatusView.setText("Please turn off your screen and turn it back on after " +
+                            "5 seconds. A sound will be played when it is safe to turn the " +
+                            "screen back on");
                 }
 
             });
