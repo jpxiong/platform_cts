@@ -17,6 +17,7 @@
 package com.android.cts.browser;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.cts.util.WatchDog;
 import android.net.Uri;
 import android.provider.Browser;
@@ -70,10 +71,12 @@ public class BrowserBenchTest extends CtsAndroidTestCase {
     private volatile int mRunIndex;
     /** stores results for each runs. last entry will be the final score. */
     private LinkedHashMap<String, double[]> mResultsMap;
+    private PackageManager mPackageManager;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mPackageManager = getInstrumentation().getContext().getPackageManager();
         mWebServer = new CtsTestServer(getContext()) {
             @Override
             protected HttpResponse onPost(HttpRequest request) throws Exception {
@@ -124,6 +127,10 @@ public class BrowserBenchTest extends CtsAndroidTestCase {
 
     @TimeoutReq(minutes = 60)
     public void testOctane() throws InterruptedException {
+        if (!isBrowserSupported()) {
+            Log.i(TAG, "Skipping test for device with no supported browser");
+            return;
+        }
         String url = mWebServer.getAssetUrl(OCTANE_START_FILE) + "?auto=1";
         final int kRepeat = 5;
         doTest(url, ResultType.LOWER_BETTER, ResultUnit.MS,
@@ -166,5 +173,14 @@ public class BrowserBenchTest extends CtsAndroidTestCase {
             }
             numberToProcess++;
         }
+    }
+
+    /**
+     * @return true iff this device is has a working browser.
+     */
+    private boolean isBrowserSupported() {
+        return !(mPackageManager.hasSystemFeature("android.hardware.type.television")
+                 || mPackageManager.hasSystemFeature("android.software.leanback")
+                 || mPackageManager.hasSystemFeature("android.hardware.type.watch"));
     }
 }
