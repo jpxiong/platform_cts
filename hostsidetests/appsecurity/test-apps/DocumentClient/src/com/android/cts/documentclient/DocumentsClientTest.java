@@ -54,6 +54,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         mDevice = UiDevice.getInstance(getInstrumentation());
         mActivity = launchActivity(getInstrumentation().getTargetContext().getPackageName(),
                 MyActivity.class, null);
+        mDevice.waitForIdle();
     }
 
     @Override
@@ -78,6 +79,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         mActivity.startActivityForResult(intent, 42);
 
         // Ensure that we see both of our roots
+        mDevice.waitForIdle();
         assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).exists());
         assertTrue("CtsCreate root", new UiObject(new UiSelector().text("CtsCreate")).exists());
         assertFalse("CtsGetContent", new UiObject(new UiSelector().text("CtsGetContent")).exists());
@@ -85,8 +87,6 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         // Pick a specific file from our test provider
         mDevice.waitForIdle();
         new UiObject(new UiSelector().text("CtsLocal")).click();
-
-        // make sure drawer is expanded?
 
         mDevice.waitForIdle();
         new UiObject(new UiSelector().text("FILE1")).click();
@@ -148,6 +148,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         mDevice.waitForIdle();
         new UiObject(new UiSelector().text("FILE1")).click();
 
+        mDevice.waitForIdle();
         new UiObject(new UiSelector().resourceId("com.android.documentsui:id/container_save")
                 .childSelector(new UiSelector().resourceId("android:id/button1"))).click();
 
@@ -237,16 +238,15 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         intent.setType("*/*");
         mActivity.startActivityForResult(intent, 42);
 
-        mDevice.waitForIdle();
-
         // Look around, we should be able to see both DocumentsProviders and
         // other GET_CONTENT sources.
+        mDevice.waitForIdle();
         assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).exists());
         assertTrue("CtsCreate root", new UiObject(new UiSelector().text("CtsCreate")).exists());
         assertTrue("CtsGetContent", new UiObject(new UiSelector().text("CtsGetContent")).exists());
 
-        new UiObject(new UiSelector().text("CtsGetContent")).click();
         mDevice.waitForIdle();
+        new UiObject(new UiSelector().text("CtsGetContent")).click();
 
         final Result result = mActivity.getResult();
         assertEquals("ReSuLt", result.data.getAction());
