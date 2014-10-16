@@ -9,6 +9,9 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_MODULE := $(test_executable)
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA)/nativetest
+LOCAL_MULTILIB := both
+LOCAL_MODULE_STEM_32 := $(LOCAL_MODULE)32
+LOCAL_MODULE_STEM_64 := $(LOCAL_MODULE)64
 
 LOCAL_SHARED_LIBRARIES += \
     libdl \
@@ -33,6 +36,10 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := $(list_executable)
+LOCAL_MULTILIB := both
+# Use the 32 bit list executable since it will include some 32 bit only tests.
+LOCAL_MODULE_STEM_32 := $(LOCAL_MODULE)
+LOCAL_MODULE_STEM_64 := $(LOCAL_MODULE)64
 
 # A main without the extra output from the gtest main.
 LOCAL_SRC_FILES := \
