@@ -25,6 +25,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Debug;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -580,7 +581,8 @@ public class PopupWindowTest extends
         assertEquals(50, mPopupWindow.getHeight());
 
         mPopupWindow.getContentView().getLocationOnScreen(viewXY);
-        // the position should be changed
+
+        // The popup should appear below and to right with an offset.
         assertEquals(anchorXY[0] + 20 + viewInWindowOff[0], viewXY[0]);
         assertEquals(anchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
 
@@ -597,14 +599,15 @@ public class PopupWindowTest extends
         assertEquals(50, mPopupWindow.getHeight());
 
         mPopupWindow.getContentView().getLocationOnScreen(viewXY);
-        // the position should be changed
+
+        // The popup should appear below and to right with an offset.
         assertEquals(anchorXY[0] + 10 + viewInWindowOff[0], viewXY[0]);
         assertEquals(anchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
 
-        final View anthoterView = mActivity.findViewById(R.id.anchor_middle_right);
+        final View anotherView = mActivity.findViewById(R.id.anchor_middle_left);
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
-                mPopupWindow.update(anthoterView, 0, 0, 60, 60);
+                mPopupWindow.update(anotherView, 0, 0, 60, 60);
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -614,11 +617,12 @@ public class PopupWindowTest extends
         assertEquals(60, mPopupWindow.getHeight());
 
         int[] newXY = new int[2];
-        anthoterView.getLocationOnScreen(newXY);
+        anotherView.getLocationOnScreen(newXY);
         mPopupWindow.getContentView().getLocationOnScreen(viewXY);
-        // the position should be changed
+
+        // The popup should appear below and to the right.
         assertEquals(newXY[0] + viewInWindowOff[0], viewXY[0]);
-        assertEquals(newXY[1] + anthoterView.getHeight() + viewInWindowOff[1], viewXY[1]);
+        assertEquals(newXY[1] + anotherView.getHeight() + viewInWindowOff[1], viewXY[1]);
 
         dismissPopup();
     }
@@ -815,8 +819,7 @@ public class PopupWindowTest extends
     }
 
     private View createPopupContent() {
-        TextView popupView = new TextView(mActivity);
-        popupView.setText("Popup");
+        View popupView = new View(mActivity);
         popupView.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
         popupView.setBackgroundColor(Color.WHITE);
 
