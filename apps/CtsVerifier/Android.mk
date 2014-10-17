@@ -23,7 +23,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-Iaidl-files-under, src)
 
-LOCAL_STATIC_JAVA_LIBRARIES := cts-sensors-tests ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := cts-sensors-tests ctstestrunner android-ex-camera2
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
@@ -77,12 +77,15 @@ cts : $(verifier-zip)
 ifeq ($(HOST_OS),linux)
 $(verifier-zip) : $(HOST_OUT)/bin/cts-usb-accessory
 endif
+$(verifier-zip) : $(HOST_OUT)/CameraITS
+
 $(verifier-zip) : $(call intermediates-dir-for,APPS,CtsVerifier)/package.apk | $(ACP)
 		$(hide) mkdir -p $(verifier-dir)
 		$(hide) $(ACP) -fp $< $(verifier-dir)/CtsVerifier.apk
 ifeq ($(HOST_OS),linux)
 		$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts-usb-accessory $(verifier-dir)/cts-usb-accessory
 endif
+		$(hide) $(ACP) -fpr $(HOST_OUT)/CameraITS $(verifier-dir)
 		$(hide) cd $(cts-dir) && zip -rq $(verifier-dir-name) $(verifier-dir-name)
 
 ifneq ($(filter cts, $(MAKECMDGOALS)),)
