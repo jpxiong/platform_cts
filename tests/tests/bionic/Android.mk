@@ -22,8 +22,6 @@ LOCAL_STATIC_LIBRARIES += \
     libgtest_libc++ \
     libgtest_main_libc++ \
 
-LOCAL_CXX_STL := libc++
-
 LOCAL_CTS_TEST_PACKAGE := android.bionic
 include $(BUILD_CTS_EXECUTABLE)
 
