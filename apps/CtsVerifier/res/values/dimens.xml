@@ -36,4 +36,6 @@
     <dimen name="snsr_view_padding_left">8dp</dimen>
     <dimen name="snsr_view_padding_right">8dp</dimen>
 
+    <dimen name="js_padding">10dp</dimen>
+
 </resources>
