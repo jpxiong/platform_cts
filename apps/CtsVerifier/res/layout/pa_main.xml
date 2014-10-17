@@ -17,11 +17,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <include
+        android:id="@+id/pass_fail_buttons"
+        android:layout_gravity="top"
+        layout="@layout/pass_fail_buttons" />
+
     <TextureView
         android:id="@+id/texture_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-     <include layout="@layout/pass_fail_buttons" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/pass_fail_buttons" />
 
 </RelativeLayout>
