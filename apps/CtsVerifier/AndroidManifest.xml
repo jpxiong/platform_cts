@@ -48,6 +48,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -1271,6 +1272,33 @@
                 <action android:name="android.app.action.PROFILE_PROVISIONING_COMPLETE"/>
             </intent-filter>
         </receiver>
+
+        <activity android:name=".jobscheduler.IdleConstraintTestActivity" android:label="@string/js_idle_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+        </activity>
+
+        <activity android:name=".jobscheduler.ChargingConstraintTestActivity" android:label="@string/js_charging_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+        </activity>
+
+        <activity android:name=".jobscheduler.ConnectivityConstraintTestActivity" android:label="@string/js_connectivity_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+        </activity>
+
+        <service android:name=".jobscheduler.MockJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
     </application>
 

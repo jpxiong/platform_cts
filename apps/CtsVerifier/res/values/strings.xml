@@ -35,6 +35,7 @@
     <string name="test_category_streaming">Streaming</string>
     <string name="test_category_features">Features</string>
     <string name="test_category_deskclock">Clock</string>
+    <string name="test_category_jobscheduler">Job Scheduler</string>
     <string name="test_category_other">Other</string>
     <string name="clear">Clear</string>
     <string name="test_results_cleared">Test results cleared.</string>
@@ -1264,4 +1265,28 @@
     <string name="device_owner_negative_test">Device owner negative test</string>
     <string name="device_owner_negative_test_info">Device owner provisioning should only work on new or factory reset devices. Please click on the "Start provisioning" button and verify that you get a warning dialog telling you that the device is already set up. If that is the case, this test has passed.</string>
     <string name="start_device_owner_provisioning_button">Start provisioning</string>
+
+    <!-- Strings for JobScheduler Tests -->
+    <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
+
+    <string name="js_idle_test">Idle Mode Constraints</string>
+    <string name="js_start_test_text">Start test</string>
+    <string name="js_idle_instructions">Verify the behaviour of the JobScheduler API for when the device is in idle mode. Simply follow the on-screen instructions.</string>
+    <string name="js_idle_description_1">Turn the screen off and then back on in order to begin.</string>
+    <string name="js_idle_item_idle_off">Idle job does not execute when device is not idle.</string>
+    <string name="js_idle_item_idle_on">Idle job does execute when device is forced into idle.</string>
+
+    <string name="js_charging_test">Charging Constraints</string>
+    <string name="js_charging_instructions">Verify the behaviour of the JobScheduler API for when the device is on power and unplugged from power. Simply follow the on-screen instructions.</string>
+    <string name="js_charging_description_1">Unplug the phone in order to begin.</string>
+    <string name="js_charging_off_test">Device not charging will not execute a job with a charging constraint.</string>
+    <string name="js_charging_on_test">Device when charging will execute a job with a charging constraint.</string>
+    <string name="js_charging_description_2">After the above test has passed, plug the device back in to continue. If the above failed, you can simply fail this test.</string>
+
+    <string name="js_connectivity_test">Connectivity Constraints</string>
+    <string name="js_connectivity_instructions">Verify the behaviour of the JobScheduler API for when the device has no access to data connectivity. Simply follow the on-screen instructions.</string>
+    <string name="js_connectivity_description_1">Disable WiFi and Cellular data to begin.</string>
+    <string name="js_unmetered_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
+    <string name="js_any_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
+    <string name="js_no_connectivity_test">Device with no connectivity will still execute a job with no connectivity constraints.</string>
 </resources>
