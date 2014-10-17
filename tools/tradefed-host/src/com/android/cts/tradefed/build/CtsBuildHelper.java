@@ -33,7 +33,7 @@ public class CtsBuildHelper {
     private final String mSuiteName = "CTS";
     /** The root location of the extracted CTS package */
     private final File mRootDir;
-    /** the {@link CTS_DIR_NAME} directory */
+    /** the {@link #CTS_DIR_NAME} directory */
     private final File mCtsDir;
 
     /**
