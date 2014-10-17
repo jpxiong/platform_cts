@@ -122,6 +122,7 @@ cts_test_packages := \
     CtsGraphicsTestCases \
     CtsGraphics2TestCases \
     CtsHardwareTestCases \
+    CtsJobSchedulerDeviceTestCases \
     CtsJniTestCases \
     CtsKeystoreTestCases \
     CtsLocationTestCases \
