@@ -762,15 +762,26 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      */
     private void installPrerequisiteApks(Collection<String> prerequisiteApks)
             throws DeviceNotAvailableException {
+        Log.logAndDisplay(LogLevel.INFO, LOG_TAG, "Installing prerequisites");
+        Set<String> supportedAbiSet = getAbis();
         for (String apkName : prerequisiteApks) {
             try {
                 File apkFile = mCtsBuild.getTestApp(apkName);
-                String errorCode = null;
-                String abi = AbiFormatter.getDefaultAbi(getDevice(), mForceAbi);
-                String[] options = {AbiUtils.createAbiFlag(abi)};
-                errorCode = getDevice().installPackage(apkFile, true, options);
-                if (errorCode != null) {
-                    CLog.e("Failed to install %s. Reason: %s", apkName, errorCode);
+                // As a workaround for multi arch support, try to install the APK
+                // for all device supported ABIs. This will generate warning messages
+                // until the above FIXME is resolved.
+                int installFailCount = 0;
+                for (String abi : supportedAbiSet) {
+                    String[] options = {AbiUtils.createAbiFlag(abi)};
+                    String errorCode = getDevice().installPackage(apkFile, true, options);
+                    if (errorCode != null) {
+                        installFailCount++;
+                        CLog.w("Failed to install %s. Reason: %s", apkName, errorCode);
+                    }
+
+                }
+                if (installFailCount >= supportedAbiSet.size()) {
+                    CLog.e("Failed to install %s. See warning messages.", apkName);
                 }
             } catch (FileNotFoundException e) {
                 CLog.e("Could not find test apk %s", apkName);
