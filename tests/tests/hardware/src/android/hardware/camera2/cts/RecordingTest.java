@@ -548,6 +548,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      */
     private void videoSnapshotTestByCamera(boolean burstTest)
             throws Exception {
+        final int NUM_SINGLE_SHOT_TEST = 5;
+        final int FRAMEDROP_TOLERANCE = 8;
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
@@ -603,70 +605,89 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         + videoSz.toString() + ".mp4";
             }
 
-            prepareRecordingWithProfile(profile);
+            int numTestIterations = burstTest ? 1 : NUM_SINGLE_SHOT_TEST;
+            int totalDroppedFrames = 0;
 
-            // prepare video snapshot
-            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
-            SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
-            CaptureRequest.Builder videoSnapshotRequestBuilder =
-                    mCamera.createCaptureRequest((mStaticInfo.isHardwareLevelLegacy()) ?
-                            CameraDevice.TEMPLATE_RECORD : CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
+            for (int numTested = 0; numTested < numTestIterations; numTested++) {
+                prepareRecordingWithProfile(profile);
 
-            // prepare preview surface by using video size.
-            updatePreviewSurfaceWithVideoSize(videoSz);
+                // prepare video snapshot
+                SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+                SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+                CaptureRequest.Builder videoSnapshotRequestBuilder =
+                        mCamera.createCaptureRequest((mStaticInfo.isHardwareLevelLegacy()) ?
+                                CameraDevice.TEMPLATE_RECORD :
+                                CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
 
-            prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
+                // prepare preview surface by using video size.
+                updatePreviewSurfaceWithVideoSize(videoSz);
 
-            // Start recording
-            startRecording(/* useMediaRecorder */true, resultListener);
-            long startTime = SystemClock.elapsedRealtime();
+                prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
+                CaptureRequest request = videoSnapshotRequestBuilder.build();
 
-            // Record certain duration.
-            SystemClock.sleep(RECORDING_DURATION_MS / 2);
+                // Start recording
+                startRecording(/* useMediaRecorder */true, resultListener);
+                long startTime = SystemClock.elapsedRealtime();
 
-            // take a video snapshot
-            CaptureRequest request = videoSnapshotRequestBuilder.build();
-            if (burstTest) {
-                List<CaptureRequest> requests =
-                        new ArrayList<CaptureRequest>(BURST_VIDEO_SNAPSHOT_NUM);
-                for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
-                    requests.add(request);
+                // Record certain duration.
+                SystemClock.sleep(RECORDING_DURATION_MS / 2);
+
+                // take video snapshot
+                if (burstTest) {
+                    List<CaptureRequest> requests =
+                            new ArrayList<CaptureRequest>(BURST_VIDEO_SNAPSHOT_NUM);
+                    for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
+                        requests.add(request);
+                    }
+                    mSession.captureBurst(requests, resultListener, mHandler);
+                } else {
+                    mSession.capture(request, resultListener, mHandler);
                 }
-                mSession.captureBurst(requests, resultListener, mHandler);
-            } else {
-                mSession.capture(request, resultListener, mHandler);
-            }
 
-            // make sure recording is still going after video snapshot
-            SystemClock.sleep(RECORDING_DURATION_MS / 2);
+                // make sure recording is still going after video snapshot
+                SystemClock.sleep(RECORDING_DURATION_MS / 2);
 
-            // Stop recording and preview
-            stopRecording(/* useMediaRecorder */true);
-            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
+                // Stop recording and preview
+                stopRecording(/* useMediaRecorder */true);
+                int duration = (int) (SystemClock.elapsedRealtime() - startTime);
 
-            // Validation recorded video
-            validateRecording(videoSz, duration);
+                // Validation recorded video
+                validateRecording(videoSz, duration);
 
-            if (burstTest) {
-                for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
+                if (burstTest) {
+                    for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
+                        Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                        validateVideoSnapshotCapture(image, videoSnapshotSz);
+                        image.close();
+                    }
+                } else {
+                    // validate video snapshot image
                     Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                     validateVideoSnapshotCapture(image, videoSnapshotSz);
+
+                    // validate if there is framedrop around video snapshot
+                    totalDroppedFrames +=  validateFrameDropAroundVideoSnapshot(
+                            resultListener, image.getTimestamp());
+
+                    //TODO: validate jittering. Should move to PTS
+                    //validateJittering(resultListener);
+
                     image.close();
                 }
-            } else {
-                // validate video snapshot image
-                Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-                validateVideoSnapshotCapture(image, videoSnapshotSz);
-
-                // validate if there is framedrop around video snapshot
-                validateFrameDropAroundVideoSnapshot(resultListener, image.getTimestamp());
-
-                //TODO: validate jittering. Should move to PTS
-                //validateJittering(resultListener);
-
-                image.close();
             }
 
+            if (!burstTest) {
+                Log.w(TAG, String.format("Camera %d Video size %s: Number of dropped frames " +
+                        "detected in %d trials is %d frames.", cameraId, videoSz.toString(),
+                        numTestIterations, totalDroppedFrames));
+                mCollector.expectLessOrEqual(
+                        String.format(
+                                "Camera %d Video size %s: Number of dropped frames %d must not"
+                                + " be larger than %d",
+                                cameraId, videoSz.toString(), totalDroppedFrames,
+                                FRAMEDROP_TOLERANCE),
+                        FRAMEDROP_TOLERANCE, totalDroppedFrames);
+            }
             closeImageReader();
         }
     }
@@ -867,8 +888,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     /**
      * Validate if video snapshot causes frame drop.
      * Here frame drop is defined as frame duration >= 2 * expected frame duration.
+     * Return the estimated number of frames dropped during video snapshot
      */
-    private void validateFrameDropAroundVideoSnapshot(
+    private int validateFrameDropAroundVideoSnapshot(
             SimpleCaptureCallback resultListener, long imageTimeStamp) {
         int expectedDurationMs = 1000 / mVideoFrameRate;
         CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
@@ -883,6 +905,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
                 long nextTS = getValueNotNull(nextResult, CaptureResult.SENSOR_TIMESTAMP);
                 int durationMs = (int) (currentTS - prevTS) / 1000000;
+                int totalFramesDropped = 0;
 
                 // Snapshots in legacy mode pause the preview briefly.  Skip the duration
                 // requirements for legacy mode unless this is fixed.
@@ -925,8 +948,18 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                                 durationMs, expectedDurationMs
                         ));
                     }
+
+                    int totalDurationMs = (int) (nextTS - prevTS) / 1000000;
+                    // Rounding and minus 2 for the expected 2 frames interval
+                    totalFramesDropped =
+                            (totalDurationMs + expectedDurationMs / 2) /expectedDurationMs - 2;
+                    if (totalFramesDropped < 0) {
+                        Log.w(TAG, "totalFrameDropped is " + totalFramesDropped +
+                                ". Video frame rate might be too fast.");
+                    }
+                    totalFramesDropped = Math.max(0, totalFramesDropped);
                 }
-                return;
+                return totalFramesDropped;
             }
             prevTS = currentTS;
         }
