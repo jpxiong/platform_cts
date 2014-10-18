@@ -28,6 +28,7 @@ import android.net.wifi.WifiConfiguration.Status;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.TxPacketCountListener;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -36,6 +37,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WifiManagerTest extends AndroidTestCase {
@@ -46,7 +48,7 @@ public class WifiManagerTest extends AndroidTestCase {
     private WifiManager mWifiManager;
     private WifiLock mWifiLock;
     private static MySync mMySync;
-    private List<ScanResult> mScanResult = null;
+    private List<ScanResult> mScanResults = null;
     private NetworkInfo mNetworkInfo;
 
     // Please refer to WifiManager
@@ -66,6 +68,10 @@ public class WifiManagerTest extends AndroidTestCase {
     private static final int TIMEOUT_MSEC = 6000;
     private static final int WAIT_MSEC = 60;
     private static final int DURATION = 10000;
+    private static final int WIFI_SCAN_TEST_INTERVAL_MILLIS = 60 * 1000;
+    private static final int WIFI_SCAN_TEST_CACHE_DELAY_MILLIS = 3 * 60 * 1000;
+    private static final int WIFI_SCAN_TEST_ITERATIONS = 5;
+
     private IntentFilter mIntentFilter;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -74,9 +80,9 @@ public class WifiManagerTest extends AndroidTestCase {
             if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                 synchronized (mMySync) {
                     if (mWifiManager.getScanResults() != null) {
-                        mScanResult = mWifiManager.getScanResults();
+                        mScanResults = mWifiManager.getScanResults();
                         mMySync.expectedState = STATE_SCAN_RESULTS_AVAILABLE;
-                        mScanResult = mWifiManager.getScanResults();
+                        mScanResults = mWifiManager.getScanResults();
                         mMySync.notifyAll();
                     }
                 }
@@ -258,6 +264,46 @@ public class WifiManagerTest extends AndroidTestCase {
         mWifiManager.getConnectionInfo();
         setWifiEnabled(false);
         assertFalse(mWifiManager.isWifiEnabled());
+    }
+
+    /**
+     * Test WiFi scan timestamp - fails when WiFi scan timestamps are inconsistent with
+     * {@link SystemClock#elapsedRealtime()} on device.<p>
+     * To run this test in cts-tradefed:
+     * run cts --class android.net.wifi.cts.WifiManagerTest --method testWifiScanTimestamp
+     */
+    public void testWifiScanTimestamp() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            Log.d(TAG, "Skipping test as WiFi is not supported");
+            return;
+        }
+        if (!mWifiManager.isWifiEnabled()) {
+            setWifiEnabled(true);
+        }
+        // Scan multiple times to make sure scan timestamps increase with device timestamp.
+        for (int i = 0; i < WIFI_SCAN_TEST_ITERATIONS; ++i) {
+            startScan();
+            // Make sure at least one AP is found.
+            assertFalse("empty scan results!", mScanResults.isEmpty());
+            long nowMillis = SystemClock.elapsedRealtime();
+            // Keep track of how many APs are fresh in one scan.
+            int numFreshAps = 0;
+            for (ScanResult result : mScanResults) {
+                long scanTimeMillis = TimeUnit.MICROSECONDS.toMillis(result.timestamp);
+                if (Math.abs(nowMillis - scanTimeMillis)  < WIFI_SCAN_TEST_CACHE_DELAY_MILLIS) {
+                    numFreshAps++;
+                }
+            }
+            // At least half of the APs in the scan should be fresh.
+            int numTotalAps = mScanResults.size();
+            String msg = "Stale AP count: " + (numTotalAps - numFreshAps) + ", fresh AP count: "
+                    + numFreshAps;
+            assertTrue(msg, numFreshAps * 2 >= mScanResults.size());
+            if (i < WIFI_SCAN_TEST_ITERATIONS - 1) {
+                // Wait before running next iteration.
+                Thread.sleep(WIFI_SCAN_TEST_INTERVAL_MILLIS);
+            }
+        }
     }
 
     /**
