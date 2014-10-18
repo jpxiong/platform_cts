@@ -18,6 +18,7 @@ package android.media.cts;
 
 import com.android.cts.media.R;
 
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.audiofx.AcousticEchoCanceler;
@@ -47,6 +48,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 1.1: test NS creation and release
     public void test1_1NsCreateAndRelease() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         AudioRecord ar = getAudioRecord();
         assertNotNull("could not create AudioRecord", ar);
 
@@ -67,6 +72,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 1.2: test setEnabled() and getEnabled()
     public void test1_2NsSetEnabledGetEnabled() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         if (!NoiseSuppressor.isAvailable()) {
             return;
         }
@@ -100,6 +109,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 2.1: test AEC creation and release
     public void test2_1AecCreateAndRelease() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         AudioRecord ar = getAudioRecord();
         assertNotNull("could not create AudioRecord", ar);
 
@@ -120,6 +133,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 2.2: test AEC setEnabled() and getEnabled()
     public void test2_2AecSetEnabledGetEnabled() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         if (!AcousticEchoCanceler.isAvailable()) {
             return;
         }
@@ -153,6 +170,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 3.1: test AGC creation and release
     public void test3_1AgcCreateAndRelease() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         AudioRecord ar = getAudioRecord();
         assertNotNull("could not create AudioRecord", ar);
 
@@ -173,6 +194,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
 
     //Test case 3.2: test AGC setEnabled() and getEnabled()
     public void test3_2AgcSetEnabledGetEnabled() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
+
         if (!AutomaticGainControl.isAvailable()) {
             return;
         }
@@ -199,6 +224,10 @@ public class AudioPreProcessingTest extends AndroidTestCase {
     //-----------------------------------------------------------------
     // private methods
     //----------------------------------
+    private boolean hasMicrophone() {
+        return getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
+    }
 
     private AudioRecord getAudioRecord() {
         AudioRecord ar = null;
