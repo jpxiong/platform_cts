@@ -337,39 +337,50 @@ public class SELinuxDomainTest extends TestCase {
                     continue;
                 }
 
-                // Get the context via attr/current
-                String context = new Scanner(new File(f, "attr/current")).next();
-                context = context.trim();
-
-                // Get the vSize, item #23 from the stat file
-                String x = new Scanner(new File(f, "stat")).nextLine();
-                long vSize = getVsizeFromStat(x);
-
-                StringBuilder sb = new StringBuilder();
-                Scanner tmp = new Scanner(new File(f, "cmdline"));
-
-                // Java's scanner tends to return oddly when handling
-                // long binary blobs. Probably some caching optimization.
-                while (tmp.hasNext()) {
-                    sb.append(tmp.next().replace('\0', ' '));
+                try {
+                    ProcessDetails p = getProcessDetails(pid, f);
+                    ArrayList<ProcessDetails> l = map.get(p.label);
+                    if (l == null) {
+                        l = new ArrayList<ProcessDetails>();
+                        map.put(p.label, l);
+                    }
+                    l.add(p);
+                } catch (FileNotFoundException e) {
+                    // sometimes processes go away while the test is running.
+                    // Don't freak out if this happens
                 }
-
-                // At this point we build up a valid proctitle, then split
-                // on whitespace to get the left portion. Which is either
-                // package name or process executable path. This avoids
-                // the comm 16 char width limitation and is limited to PAGE_SIZE
-                String cmdline = sb.toString().trim();
-                cmdline = cmdline.split("\\s+")[0];
-
-                ProcessDetails p = new ProcessDetails(cmdline, context, vSize, pid);
-                ArrayList<ProcessDetails> l = map.get(context);
-                if (l == null) {
-                    l = new ArrayList<ProcessDetails>();
-                    map.put(context, l);
-                }
-                l.add(p);
             }
             return map;
         }
+
+        private static ProcessDetails getProcessDetails(int pid, File f) throws FileNotFoundException {
+            // Get the context via attr/current
+            String context = new Scanner(new File(f, "attr/current")).next();
+            context = context.trim();
+
+            // Get the vSize, item #23 from the stat file
+            String x = new Scanner(new File(f, "stat")).nextLine();
+            long vSize = getVsizeFromStat(x);
+
+            StringBuilder sb = new StringBuilder();
+            Scanner tmp = new Scanner(new File(f, "cmdline"));
+
+            // Java's scanner tends to return oddly when handling
+            // long binary blobs. Probably some caching optimization.
+            while (tmp.hasNext()) {
+                sb.append(tmp.next().replace('\0', ' '));
+            }
+            tmp.close();
+
+            // At this point we build up a valid proctitle, then split
+            // on whitespace to get the left portion. Which is either
+            // package name or process executable path. This avoids
+            // the comm 16 char width limitation and is limited to PAGE_SIZE
+            String cmdline = sb.toString().trim();
+            cmdline = cmdline.split("\\s+")[0];
+
+            return new ProcessDetails(cmdline, context, vSize, pid);
+        }
+
     }
 }
