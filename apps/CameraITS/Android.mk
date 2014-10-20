@@ -15,14 +15,15 @@
 
 its-dir-name := CameraITS
 its-dir := $(HOST_OUT)/$(its-dir-name)
+its-build-stamp := $(its-dir)/build_stamp
 
-camera-its: $(its-dir)
+camera-its: $(its-build-stamp)
 
 .PHONY: camera-its
 
-$(its-dir):
+$(its-build-stamp): $(ACP)
 	echo $(its_dir)
 	mkdir -p $(its-dir)
 	$(ACP) -rfp cts/apps/$(its-dir-name)/* $(its-dir)
 	rm $(its-dir)/Android.mk
-
+	touch $@
