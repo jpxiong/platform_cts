@@ -53,6 +53,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         Virtualizer eq = null;
         try {
             eq = new Virtualizer(0, 0);
@@ -80,6 +84,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 1.0: test strength
     public void test1_0Strength() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         getVirtualizer(0);
         try {
             if (mVirtualizer.getStrengthSupported()) {
@@ -108,6 +116,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 1.1: test properties
     public void test1_1Properties() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         getVirtualizer(0);
         try {
             Virtualizer.Settings settings = mVirtualizer.getProperties();
@@ -141,6 +153,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 1.2: test setStrength() throws exception after release
     public void test1_2SetStrengthAfterRelease() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         getVirtualizer(0);
         mVirtualizer.release();
         try {
@@ -158,6 +174,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         getVirtualizer(0);
         try {
             mVirtualizer.setEnabled(true);
@@ -173,6 +193,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         getVirtualizer(0);
         mVirtualizer.release();
         try {
@@ -190,6 +214,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -212,6 +240,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -236,6 +268,10 @@ public class VirtualizerTest extends AndroidTestCase {
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
+        if (!isVirtualizerAvailable()) {
+            return;
+        }
+
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -262,6 +298,10 @@ public class VirtualizerTest extends AndroidTestCase {
     //-----------------------------------------------------------------
     // private methods
     //----------------------------------
+
+    private boolean isVirtualizerAvailable() {
+        return AudioEffect.isEffectTypeAvailable(AudioEffect.EFFECT_TYPE_VIRTUALIZER);
+    }
 
     private void getVirtualizer(int session) {
          if (mVirtualizer == null || session != mSession) {
