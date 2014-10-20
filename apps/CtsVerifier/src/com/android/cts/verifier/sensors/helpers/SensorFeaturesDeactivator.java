@@ -23,6 +23,8 @@ import android.content.ContentResolver;
 import android.os.Build;
 import android.provider.Settings;
 
+import java.lang.reflect.Field;
+
 /**
  * A helper class that provides a mechanism to:
  * - prompt users to activate/deactivate features that are known to register for sensor data.
@@ -37,6 +39,7 @@ public class SensorFeaturesDeactivator {
     private final SensorSettingContainer mAirplaneMode = new AirplaneModeSettingContainer();
     private final SensorSettingContainer mScreenBrightnessMode =
             new ScreenBrightnessModeSettingContainer();
+    private final SensorSettingContainer mAmbientDisplayMode = new AmbientDisplaySettingContainer();
     private final SensorSettingContainer mAutoRotateScreenMode =
             new AutoRotateScreenModeSettingContainer();
     private final SensorSettingContainer mKeepScreenOnMode = new KeepScreenOnModeSettingContainer();
@@ -51,6 +54,7 @@ public class SensorFeaturesDeactivator {
 
         mAirplaneMode.requestToSetMode(mStateContainer, true);
         mScreenBrightnessMode.requestToSetMode(mStateContainer, false);
+        mAmbientDisplayMode.requestToSetMode(mStateContainer, false);
         mAutoRotateScreenMode.requestToSetMode(mStateContainer, false);
         mKeepScreenOnMode.requestToSetMode(mStateContainer, false);
         mLocationMode.requestToSetMode(mStateContainer, false);
@@ -70,6 +74,7 @@ public class SensorFeaturesDeactivator {
 
         mAirplaneMode.requestToResetMode(mStateContainer);
         mScreenBrightnessMode.requestToResetMode(mStateContainer);
+        mAmbientDisplayMode.requestToResetMode(mStateContainer);
         mAutoRotateScreenMode.requestToResetMode(mStateContainer);
         mKeepScreenOnMode.requestToResetMode(mStateContainer);
         mLocationMode.requestToResetMode(mStateContainer);
@@ -78,6 +83,7 @@ public class SensorFeaturesDeactivator {
     private void captureInitialState() {
         mAirplaneMode.captureInitialState();
         mScreenBrightnessMode.captureInitialState();
+        mAmbientDisplayMode.captureInitialState();
         mAutoRotateScreenMode.captureInitialState();
         mLocationMode.captureInitialState();
         mKeepScreenOnMode.captureInitialState();
@@ -112,6 +118,37 @@ public class SensorFeaturesDeactivator {
             return Settings.System.getInt(
                     mStateContainer.getContentResolver(),
                     Settings.System.SCREEN_BRIGHTNESS_MODE,
+                    defaultValue);
+        }
+    }
+
+    private class AmbientDisplaySettingContainer extends SensorSettingContainer {
+        public AmbientDisplaySettingContainer() {
+            super(Settings.ACTION_DISPLAY_SETTINGS, R.string.snsr_setting_ambient_display);
+        }
+
+        @Override
+        protected int getSettingMode(int defaultValue) {
+            // TODO: replace the use of reflection with Settings.Secure.DOZE_ENABLED when the
+            //       static field is not hidden anymore
+            Class<?> secureSettingsClass = Settings.Secure.class;
+            Field dozeEnabledField;
+            try {
+                dozeEnabledField = secureSettingsClass.getField("DOZE_ENABLED");
+            } catch (NoSuchFieldException e) {
+                return defaultValue;
+            }
+
+            String settingName;
+            try {
+                settingName = (String) dozeEnabledField.get(null /* obj */);
+            } catch (IllegalAccessException e) {
+                return defaultValue;
+            }
+
+            return Settings.Secure.getInt(
+                    mStateContainer.getContentResolver(),
+                    settingName,
                     defaultValue);
         }
     }

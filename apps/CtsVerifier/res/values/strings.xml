@@ -492,6 +492,7 @@
     <string name="snsr_setting_auto_rotate_screen_mode">Auto-rotate screen</string>
     <string name="snsr_setting_keep_screen_on">Stay awake</string>
     <string name="snsr_setting_location_mode">Location</string>
+    <string name="snsr_setting_ambient_display">Ambient Display</string>
     <string name="snsr_pass_on_error">Pass Anyway</string>
     <string name="snsr_run_automated_tests">The screen will be turned off to execute the tests,
         when tests complete, the device will vibrate and the screen will be turned back on.</string>
