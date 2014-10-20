@@ -17,7 +17,7 @@
 package android.hardware.cts.helpers.sensoroperations;
 
 import android.content.Context;
-import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -40,6 +40,7 @@ public class WakeLockOperation extends SensorOperation {
      * @param wakeLockFlags the flags used when acquiring the wake-lock
      */
     public WakeLockOperation(SensorOperation operation, Context context, int wakeLockFlags) {
+        super(operation.getStats());
         mOperation = operation;
         mContext = context;
         mWakeLockFlags = wakeLockFlags;
@@ -59,13 +60,12 @@ public class WakeLockOperation extends SensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         WakeLock wakeLock = pm.newWakeLock(mWakeLockFlags, TAG);
-
         wakeLock.acquire();
         try {
-            mOperation.execute();
+            mOperation.execute(asTestNode(parent));
         } finally {
             wakeLock.release();
         }
@@ -75,15 +75,7 @@ public class WakeLockOperation extends SensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public SensorStats getStats() {
-        return mOperation.getStats();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SensorOperation clone() {
-        return new WakeLockOperation(mOperation, mContext, mWakeLockFlags);
+        return new WakeLockOperation(mOperation.clone(), mContext, mWakeLockFlags);
     }
 }

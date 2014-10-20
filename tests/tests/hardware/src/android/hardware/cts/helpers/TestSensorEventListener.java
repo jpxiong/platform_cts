@@ -25,7 +25,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -40,6 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestSensorEventListener implements SensorEventListener2 {
     public static final String LOG_TAG = "TestSensorEventListener";
+
     private static final long EVENT_TIMEOUT_US = TimeUnit.SECONDS.toMicros(5);
     private static final long FLUSH_TIMEOUT_US = TimeUnit.SECONDS.toMicros(10);
 
@@ -84,7 +90,6 @@ public class TestSensorEventListener implements SensorEventListener2 {
         synchronized (mCollectedEvents) {
             mCollectedEvents.add(new TestSensorEvent(event, timestampNs));
         }
-
         synchronized (mEventLatches) {
             for (CountDownLatch latch : mEventLatches) {
                 latch.countDown();
@@ -135,6 +140,40 @@ public class TestSensorEventListener implements SensorEventListener2 {
     public void clearEvents() {
         synchronized (mCollectedEvents) {
             mCollectedEvents.clear();
+        }
+    }
+
+
+    /**
+     * Utility method to log the collected events to a file.
+     * It will overwrite the file if it already exists, the file is created in a relative directory
+     * named 'events' under the sensor test directory (part of external storage).
+     */
+    public void logCollectedEventsToFile(String fileName) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Sensor='").append(mEnvironment.getSensor()).append("', ");
+        builder.append("SamplingRateOverloaded=")
+                .append(mEnvironment.isSensorSamplingRateOverloaded()).append(", ");
+        builder.append("RequestedSamplingPeriod=")
+                .append(mEnvironment.getRequestedSamplingPeriodUs()).append("us, ");
+        builder.append("MaxReportLatency=")
+                .append(mEnvironment.getMaxReportLatencyUs()).append("us");
+
+        synchronized (mCollectedEvents) {
+            for (TestSensorEvent event : mCollectedEvents) {
+                builder.append("\n");
+                builder.append("Timestamp=").append(event.timestamp).append("ns, ");
+                builder.append("ReceivedTimestamp=").append(event.receivedTimestamp).append("ns, ");
+                builder.append("Accuracy=").append(event.accuracy).append(", ");
+                builder.append("Values=").append(Arrays.toString(event.values));
+            }
+        }
+
+        File eventsDirectory = SensorCtsHelper.getSensorTestDataDirectory("events/");
+        File logFile = new File(eventsDirectory, fileName);
+        FileWriter fileWriter = new FileWriter(logFile, false /* append */);
+        try (BufferedWriter writer = new BufferedWriter(fileWriter)) {
+            writer.write(builder.toString());
         }
     }
 

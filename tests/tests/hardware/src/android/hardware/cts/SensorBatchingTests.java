@@ -288,10 +288,9 @@ public class SensorBatchingTests extends SensorTestCase {
             TestSensorOperation operation,
             boolean flushExpected) throws Throwable {
         operation.addDefaultVerifications();
-        operation.setLogEvents(true);
 
         try {
-            operation.execute();
+            operation.execute(getCurrentTestNode());
         } finally {
             SensorStats stats = operation.getStats();
             stats.log(TAG);

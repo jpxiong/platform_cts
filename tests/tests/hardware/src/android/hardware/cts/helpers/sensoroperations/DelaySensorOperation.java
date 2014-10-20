@@ -17,7 +17,7 @@
 package android.hardware.cts.helpers.sensoroperations;
 
 import android.hardware.cts.helpers.SensorCtsHelper;
-import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -38,9 +38,7 @@ public class DelaySensorOperation extends SensorOperation {
      * @param timeUnit the unit of the delay
      */
     public DelaySensorOperation(SensorOperation operation, long delay, TimeUnit timeUnit) {
-        if (operation == null || timeUnit == null) {
-            throw new IllegalArgumentException("Arguments cannot be null");
-        }
+        super(operation.getStats());
         mOperation = operation;
         mDelay = delay;
         mTimeUnit = timeUnit;
@@ -50,17 +48,9 @@ public class DelaySensorOperation extends SensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
         SensorCtsHelper.sleep(mDelay, mTimeUnit);
-        mOperation.execute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SensorStats getStats() {
-        return mOperation.getStats();
+        mOperation.execute(asTestNode(parent));
     }
 
     /**
