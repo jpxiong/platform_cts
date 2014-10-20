@@ -35,7 +35,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.compute_target_exposure(props):
+        if (not its.caps.compute_target_exposure(props) or
+            not its.caps.freeform_crop(props)):
             print "Test skipped"
             return
 
@@ -46,7 +47,7 @@ def main():
         print "Active sensor region (%d,%d %dx%d)" % (ax, ay, aw, ah)
 
         # Uses a 2x digital zoom.
-        assert(props['android.scaler.availableMaxDigitalZoom'] >= 2)
+        assert(its.objects.get_max_digital_zoom(props) >= 2)
 
         # Capture a full frame.
         req = its.objects.manual_capture_request(s,e)
