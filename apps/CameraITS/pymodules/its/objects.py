@@ -159,6 +159,25 @@ def get_fastest_manual_capture_settings(props):
     req = manual_capture_request(s,e)
     return req, out_spec
 
+def get_max_digital_zoom(props):
+    """Returns the maximum amount of zooming possible by the camera device.
+
+    Args:
+        props: the object returned from its.device.get_camera_properties().
+
+    Return:
+        A float indicating the maximum amount of zooming possible by the
+        camera device.
+    """
+
+    maxz = 1.0
+
+    if props.has_key("android.scaler.availableMaxDigitalZoom"):
+        maxz = props["android.scaler.availableMaxDigitalZoom"]
+
+    return maxz
+
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """

@@ -20,12 +20,32 @@ import its.target
 import numpy
 import os.path
 
+
+def check_crop_region(expected, reported, active, err_threshold):
+    """Check if the reported region is within the tolerance.
+
+    Args:
+        expected: expected crop region
+        reported: reported crop region
+        active: active resolution
+        err_threshold: error threshold for the active resolution
+    """
+
+    ex = (active["right"] - active["left"]) * err_threshold
+    ey = (active["bottom"] - active["top"]) * err_threshold
+
+    assert ((abs(expected["left"] - reported["left"]) <= ex) and
+            (abs(expected["right"] - reported["right"]) <= ex) and
+            (abs(expected["top"] - reported["top"]) <= ey) and
+            (abs(expected["bottom"] - reported["bottom"]) <= ey))
+
 def main():
     """Test that raw streams are not croppable.
     """
     NAME = os.path.basename(__file__).split(".")[0]
 
     DIFF_THRESH = 0.05
+    CROP_REGION_ERROR_THRESHOLD = 0.01
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
@@ -39,6 +59,13 @@ def main():
         aw, ah = a["right"] - a["left"], a["bottom"] - a["top"]
         print "Active sensor region: (%d,%d %dx%d)" % (ax, ay, aw, ah)
 
+        full_region = {
+            "left": 0,
+            "top": 0,
+            "right": aw,
+            "bottom": ah
+        }
+
         # Capture without a crop region.
         # Use a manual request with a linear tonemap so that the YUV and RAW
         # should look the same (once converted by the its.image module).
@@ -46,31 +73,42 @@ def main():
         req = its.objects.manual_capture_request(s,e, True)
         cap1_raw, cap1_yuv = cam.do_capture(req, cam.CAP_RAW_YUV)
 
-        # Capture with a center crop region.
+        # Calculate a center crop region.
+        zoom = min(3.0, its.objects.get_max_digital_zoom(props))
+        assert(zoom >= 1)
+        cropw = aw / zoom
+        croph = ah / zoom
+
         req["android.scaler.cropRegion"] = {
-                "top": ay + ah/3,
-                "left": ax + aw/3,
-                "right": ax + 2*aw/3,
-                "bottom": ay + 2*ah/3}
+            "left": aw / 2 - cropw / 2,
+            "top": ah / 2 - croph / 2,
+            "right": aw / 2 + cropw / 2,
+            "bottom": ah / 2 + croph / 2
+        }
+
+        # when both YUV and RAW are requested, the crop region that's
+        # applied to YUV should be reported.
+        crop_region = req["android.scaler.cropRegion"]
+        if crop_region == full_region:
+            crop_region_err_thresh = 0.0
+        else:
+            crop_region_err_thresh = CROP_REGION_ERROR_THRESHOLD
+
         cap2_raw, cap2_yuv = cam.do_capture(req, cam.CAP_RAW_YUV)
 
-        reported_crops = []
         imgs = {}
-        for s,cap in [("yuv_full",cap1_yuv), ("raw_full",cap1_raw),
-                ("yuv_crop",cap2_yuv), ("raw_crop",cap2_raw)]:
+        for s, cap, cr, err_delta in [("yuv_full", cap1_yuv, full_region, 0),
+                      ("raw_full", cap1_raw, full_region, 0),
+                      ("yuv_crop", cap2_yuv, crop_region, crop_region_err_thresh),
+                      ("raw_crop", cap2_raw, crop_region, crop_region_err_thresh)]:
             img = its.image.convert_capture_to_rgb_image(cap, props=props)
             its.image.write_image(img, "%s_%s.jpg" % (NAME, s))
             r = cap["metadata"]["android.scaler.cropRegion"]
-            x, y = a["left"], a["top"]
-            w, h = a["right"] - a["left"], a["bottom"] - a["top"]
-            reported_crops.append((x,y,w,h))
+            x, y = r["left"], r["top"]
+            w, h = r["right"] - r["left"], r["bottom"] - r["top"]
             imgs[s] = img
-            print "Crop on %s: (%d,%d %dx%d)" % (s, x,y,w,h)
-
-        # The metadata should report uncropped for all shots (since there is
-        # at least 1 uncropped stream in each case).
-        for (x,y,w,h) in reported_crops:
-            assert((ax,ay,aw,ah) == (x,y,w,h))
+            print "Crop on %s: (%d,%d %dx%d)" % (s, x, y, w, h)
+            check_crop_region(cr, r, a, err_delta)
 
         # Also check the image content; 3 of the 4 shots should match.
         # Note that all the shots are RGB below; the variable names correspond
