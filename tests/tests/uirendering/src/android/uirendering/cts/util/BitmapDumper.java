@@ -84,9 +84,10 @@ public final class BitmapDumper {
         int[] visualizerArray = differenceVisualizer.getDifferences(idealArray, testedArray);
         visualizerBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         visualizerBitmap.setPixels(visualizerArray, 0, width, 0, 0, width, height);
+        Bitmap croppedBitmap = Bitmap.createBitmap(testedBitmap, 0, 0, width, height);
 
         saveFile(className, testName, IDEAL_RENDERING_FILE_NAME, idealBitmap);
-        saveFile(className, testName, TESTED_RENDERING_FILE_NAME, testedBitmap);
+        saveFile(className, testName, TESTED_RENDERING_FILE_NAME, croppedBitmap);
         saveFile(className, testName, VISUALIZER_RENDERING_FILE_NAME, visualizerBitmap);
     }
 

@@ -357,5 +357,12 @@
     "android.media.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv"
   ],
   bug: 17144778
+},
+{
+  description: "Roboto font tests are not yet known good on all devices",
+  names: [
+    "android.uirendering.cts.testclasses.FontRenderingTests"
+  ],
+  bug: 17109280
 }
 ]

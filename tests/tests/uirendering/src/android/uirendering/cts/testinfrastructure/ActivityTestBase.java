@@ -185,7 +185,8 @@ public abstract class ActivityTestBase extends
                 TEST_WIDTH, TEST_HEIGHT);
         boolean success = bitmapVerifier.verify(mSoftwareArray, 0, TEST_WIDTH, TEST_WIDTH, TEST_HEIGHT);
         if (!success) {
-            BitmapDumper.dumpBitmap(bitmap, getName(), this.getClass().getSimpleName());
+            Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, 0, 0, TEST_WIDTH, TEST_HEIGHT);
+            BitmapDumper.dumpBitmap(croppedBitmap, getName(), this.getClass().getSimpleName());
             BitmapDumper.dumpBitmap(bitmapVerifier.getDifferenceBitmap(), getName() + "_verifier",
                     this.getClass().getSimpleName());
         }
