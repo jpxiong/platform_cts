@@ -32,10 +32,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if (not its.caps.manual_sensor(props) or
-            not its.caps.manual_post_proc(props)):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props) and
+            its.caps.manual_post_proc(props))
 
         # Converge 3A and get the estimates.
         sens, exp, gains, xform, focus = cam.do_3a(get_results=True)

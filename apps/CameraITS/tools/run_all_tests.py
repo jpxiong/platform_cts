@@ -27,6 +27,8 @@ def main():
     Script should be run from the top-level CameraITS directory.
     """
 
+    SKIP_RET_CODE = 101
+
     # Not yet mandated tests
     NOT_YET_MANDATED = {
         "scene0":[
@@ -70,7 +72,9 @@ def main():
 
     # Run each test, capturing stdout and stderr.
     numpass = 0
+    numskip = 0
     numnotmandatedfail = 0
+    numfail = 0
     for (scene,testname,testpath) in tests:
         cmd = ['python', os.path.join(os.getcwd(),testpath)] + sys.argv[1:]
         outdir = os.path.join(topdir,scene)
@@ -80,22 +84,37 @@ def main():
         with open(outpath,"w") as fout, open(errpath,"w") as ferr:
             retcode = subprocess.call(cmd,stderr=ferr,stdout=fout,cwd=outdir)
         t1 = time.time()
-        retstr = "PASS "
-        if retcode != 0:
-            retstr = "FAIL*" if testname in NOT_YET_MANDATED[scene] else "FAIL "
 
-        if retstr == "FAIL*":
+        if retcode == 0:
+            retstr = "PASS "
+            numpass += 1
+        elif retcode == SKIP_RET_CODE:
+            retstr = "SKIP "
+            numskip += 1
+        elif retcode != 0 and testname in NOT_YET_MANDATED[scene]:
+            retstr = "FAIL*"
             numnotmandatedfail += 1
+        else:
+            retstr = "FAIL "
+            numfail += 1
 
         print "%s %s/%s [%.1fs]" % (retstr, scene, testname, t1-t0)
-        if retcode == 0 or testname in NOT_YET_MANDATED[scene]:
-            numpass += 1
 
-    print "\n%d / %d tests passed (%.1f%%)" % (
-            numpass, len(tests), 100.0*float(numpass)/len(tests))
+    if numskip > 0:
+        skipstr = ", %d test%s skipped" % (numskip, "s" if numskip > 1 else "")
+    else:
+        skipstr = ""
+
+    print "\n%d / %d tests passed (%.1f%%)%s" % (
+            numpass + numnotmandatedfail, len(tests) - numskip,
+            100.0 * float(numpass + numnotmandatedfail) / (len(tests) - numskip)
+                if len(tests) != numskip else 100.0,
+            skipstr)
+
     if numnotmandatedfail > 0:
         print "(*) tests are not yet mandated"
-    its.device.ItsSession.report_result(camera_id, numpass == len(tests))
+
+    its.device.ItsSession.report_result(camera_id, numfail == 0)
 
 if __name__ == '__main__':
     main()

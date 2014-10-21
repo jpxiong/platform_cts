@@ -39,9 +39,7 @@ def main():
 
         # Capture at the smallest resolution.
         props = cam.get_camera_properties()
-        if not its.caps.manual_sensor(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props))
 
         _, fmt = its.objects.get_fastest_manual_capture_settings(props)
         w,h = fmt["width"], fmt["height"]

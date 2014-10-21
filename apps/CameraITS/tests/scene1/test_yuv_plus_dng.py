@@ -25,10 +25,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if (not its.caps.raw(props) or
-            not its.caps.read_3a(props)):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.raw(props) and
+            its.caps.read_3a(props))
 
         cam.do_3a()
 
