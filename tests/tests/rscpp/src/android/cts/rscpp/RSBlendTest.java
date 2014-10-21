@@ -36,7 +36,6 @@ public class RSBlendTest extends RSCppTest {
         for (int iter = 0; iter < 15; iter++) {
             int[] baseAlloc = new int[X * Y * 4];
             RSUtils.genRandom(0x789321, 255, 1, -128, baseAlloc);
-            RenderScript mRS = RenderScript.create(getContext());
             byte[] byteAlloc = new byte[X * Y * 4];
             for (int i = 0; i < X * Y * 4; i++) {
                 byteAlloc[i] = (byte)baseAlloc[i];
@@ -110,12 +109,11 @@ public class RSBlendTest extends RSCppTest {
             }
 
             blendTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, byteAlloc2, iter);
-            rsOutput.copyTo(byteAlloc);
-            for (int i = 0; i < X * Y * 4; i++) {
-                assertTrue(byteAlloc[i] == byteAlloc2[i]);
-            }
 
-            mRS.destroy();
+            Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+            rsCppOutput.copyFromUnchecked(byteAlloc2);
+            mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+            checkForErrors();
         }
 
     }
