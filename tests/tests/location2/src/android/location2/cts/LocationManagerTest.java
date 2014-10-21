@@ -227,15 +227,18 @@ public class LocationManagerTest extends InstrumentationTestCase {
     @UiThreadTest
     public void testGpsStatusListener() {
         try {
-            mManager.addGpsStatusListener(new MockGpsStatusListener());
-            fail("Should have failed to add a gps status listener");
+            // .addGpsStatusListener returns true if the listener added successfully
+            if (mManager.addGpsStatusListener(new MockGpsStatusListener())) {
+                fail("Should have failed to add a gps status listener");
+            }
         } catch (SecurityException e) {
             // expected
         }
 
         try {
-            mManager.addGpsStatusListener(null);
-            fail("Should have failed to add a gps status listener");
+            if (mManager.addGpsStatusListener(null)) {
+                fail("Should have failed to add null as a gps status listener");
+            }
         } catch (SecurityException e) {
             // expected
         }
