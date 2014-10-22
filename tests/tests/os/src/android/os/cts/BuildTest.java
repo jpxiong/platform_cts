@@ -18,8 +18,13 @@ package android.os.cts;
 
 
 import android.os.Build;
+import android.os.SystemProperties;
+
+import dalvik.system.VMRuntime;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -27,59 +32,76 @@ import junit.framework.TestCase;
 
 public class BuildTest extends TestCase {
 
-    private static final String RO_PRODUCT_CPU_ABI = "ro.product.cpu.abi";
-
-    private static final String RO_PRODUCT_CPU_ABI2 = "ro.product.cpu.abi2";
+    private static final String RO_PRODUCT_CPU_ABILIST = "ro.product.cpu.abilist";
+    private static final String RO_PRODUCT_CPU_ABILIST32 = "ro.product.cpu.abilist32";
+    private static final String RO_PRODUCT_CPU_ABILIST64 = "ro.product.cpu.abilist64";
 
     /** Tests that check the values of {@link Build#CPU_ABI} and {@link Build#CPU_ABI2}. */
-    public void testCpuAbi() throws IOException {
-        if (CpuFeatures.isArmCpu()) {
-            assertArmCpuAbiConstants();
+    public void testCpuAbi() throws Exception {
+        testCpuAbiCommon();
+        if (VMRuntime.getRuntime().is64Bit()) {
+            testCpuAbi64();
+        } else {
+            testCpuAbi32();
         }
     }
 
-    private void assertArmCpuAbiConstants() throws IOException {
-        if (CpuFeatures.isArm7Compatible()) {
-            String cpuAbi = getProperty(RO_PRODUCT_CPU_ABI);
-            String cpuAbi2 = getProperty(RO_PRODUCT_CPU_ABI2);
-            //if CPU_ABI is armv7, CPU_ABI2 is either of {armeabi, NULL}
-            if (cpuAbi.equals(CpuFeatures.ARMEABI_V7)) {
-                String message = "CPU is ARM v7 compatible, so "
-                    + RO_PRODUCT_CPU_ABI  + " must be set to " + CpuFeatures.ARMEABI_V7 + " and "
-                    + RO_PRODUCT_CPU_ABI2 + " must be set to " + CpuFeatures.ARMEABI + " or NULL";
-                assertEquals(message, CpuFeatures.ARMEABI_V7, Build.CPU_ABI);
-                if (cpuAbi2.equals(CpuFeatures.ARMEABI)){
-                    assertEquals(message, cpuAbi2, Build.CPU_ABI2);
-                } else {
-                    assertNoPropertySet(message, RO_PRODUCT_CPU_ABI2);
-                    assertEquals(message, Build.UNKNOWN, Build.CPU_ABI2);
-                }
-            }
-            //if CPU_ABI is x86, then CPU_ABI2 is either of {armeabi, armv7, NULL}
-            else if (cpuAbi.equals(CpuFeatures.X86ABI)) {
-                String message = "CPU is x86 but ARM v7 compatible, so "
-                    + RO_PRODUCT_CPU_ABI  + " must be set to " + CpuFeatures.X86ABI + " and "
-                    + RO_PRODUCT_CPU_ABI2 + " must be set to " + CpuFeatures.ARMEABI + " or "
-                    + CpuFeatures.ARMEABI_V7 + " or NULL";
-                assertEquals(message, CpuFeatures.X86ABI, Build.CPU_ABI);
-                if (cpuAbi2.equals(CpuFeatures.ARMEABI_V7) || cpuAbi2.equals(CpuFeatures.ARMEABI))
-                    assertEquals(message, cpuAbi2, Build.CPU_ABI2);
-                else {
-                    assertNoPropertySet(message, RO_PRODUCT_CPU_ABI2);
-                    assertEquals(message, Build.UNKNOWN, Build.CPU_ABI2);
-                }
-            }
+    private void testCpuAbiCommon() throws Exception {
+        // The build property must match Build.SUPPORTED_ABIS exactly.
+        final String[] abiListProperty = getStringList(RO_PRODUCT_CPU_ABILIST);
+        assertEquals(Arrays.toString(abiListProperty), Arrays.toString(Build.SUPPORTED_ABIS));
+
+        List<String> abiList = Arrays.asList(abiListProperty);
+
+        // Every device must support at least one 32 bit ABI.
+        assertTrue(Build.SUPPORTED_32_BIT_ABIS.length > 0);
+
+        // Every supported 32 bit ABI must be present in Build.SUPPORTED_ABIS.
+        for (String abi : Build.SUPPORTED_32_BIT_ABIS) {
+            assertTrue(abiList.contains(abi));
+            assertFalse(VMRuntime.is64BitAbi(abi));
         }
-        else {
-            String message = "CPU is not ARM v7 compatible. "
-                    + RO_PRODUCT_CPU_ABI  + " must be set to " + CpuFeatures.ARMEABI + " and "
-                    + RO_PRODUCT_CPU_ABI2 + " must not be set.";
-            assertProperty(message, RO_PRODUCT_CPU_ABI, CpuFeatures.ARMEABI);
-            assertNoPropertySet(message, RO_PRODUCT_CPU_ABI2);
-            assertEquals(message, CpuFeatures.ARMEABI, Build.CPU_ABI);
-            assertEquals(message, Build.UNKNOWN, Build.CPU_ABI2);
+
+        // Every supported 64 bit ABI must be present in Build.SUPPORTED_ABIS.
+        for (String abi : Build.SUPPORTED_64_BIT_ABIS) {
+            assertTrue(abiList.contains(abi));
+            assertTrue(VMRuntime.is64BitAbi(abi));
+        }
+
+        // Build.CPU_ABI and Build.CPU_ABI2 must be present in Build.SUPPORTED_ABIS.
+        assertTrue(abiList.contains(Build.CPU_ABI));
+        if (!Build.CPU_ABI2.isEmpty()) {
+            assertTrue(abiList.contains(Build.CPU_ABI2));
         }
     }
+
+    private void testCpuAbi32() throws Exception {
+        List<String> abi32 = Arrays.asList(Build.SUPPORTED_32_BIT_ABIS);
+        assertTrue(abi32.contains(Build.CPU_ABI));
+
+        if (!Build.CPU_ABI2.isEmpty()) {
+            assertTrue(abi32.contains(Build.CPU_ABI2));
+        }
+    }
+
+    private void testCpuAbi64() {
+        List<String> abi64 = Arrays.asList(Build.SUPPORTED_64_BIT_ABIS);
+        assertTrue(abi64.contains(Build.CPU_ABI));
+
+        if (!Build.CPU_ABI2.isEmpty()) {
+            assertTrue(abi64.contains(Build.CPU_ABI2));
+        }
+    }
+
+    private String[] getStringList(String property) throws IOException {
+        String value = getProperty(property);
+        if (value.isEmpty()) {
+            return new String[0];
+        } else {
+            return value.split(",");
+        }
+    }
+
     /**
      * @param property name passed to getprop
      */
