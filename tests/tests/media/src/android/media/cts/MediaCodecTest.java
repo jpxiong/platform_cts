@@ -402,8 +402,7 @@ public class MediaCodecTest extends AndroidTestCase {
             inputSurface.makeCurrent();
             encoder.start();
 
-            int totalBuffers = encoder.getInputBuffers().length +
-                    encoder.getOutputBuffers().length;
+            int totalBuffers = encoder.getOutputBuffers().length;
             if (VERBOSE) Log.d(TAG, "Total buffers: " + totalBuffers);
 
             // Submit several frames quickly, without draining the encoder output, to try to
