@@ -89,7 +89,7 @@ public class TestPackageRepo implements ITestPackageRepo {
                     if (def.getTests().size() > 0) {
                         mTestMap.get(abi).put(name, def);
                     } else {
-                        Log.i(LOG_TAG, String.format("No tests in %s for %s, skipping",
+                        Log.d(LOG_TAG, String.format("No tests in %s for %s, skipping",
                                 name, abi));
                     }
                 }
