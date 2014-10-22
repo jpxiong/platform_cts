@@ -33,7 +33,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.full(props))
+        its.caps.skip_unless(its.caps.full(props) and
+                             its.caps.per_frame_control(props))
 
         _,fmt = its.objects.get_fastest_manual_capture_settings(props)
         e, s = its.target.get_target_exposure_combos(cam)["midExposureTime"]

@@ -32,7 +32,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.manual_sensor(props))
+        its.caps.skip_unless(its.caps.manual_sensor(props) and
+                             its.caps.per_frame_control(props))
 
         expt_range = props['android.sensor.info.exposureTimeRange']
         sens_range = props['android.sensor.info.sensitivityRange']
