@@ -445,6 +445,8 @@ public class JDiffClassDescription {
             checkFieldsCompliance();
             checkConstructorCompliance();
             checkMethodCompliance();
+        } else {
+            mClassFieldMap = null;
         }
     }
 
@@ -714,15 +716,10 @@ public class JDiffClassDescription {
             try {
                 Field f = findMatchingField(field);
                 if (f == null) {
-                    StringBuilder builder = new StringBuilder();
-                    Field[] fields = mClass.getDeclaredFields();
-                    for (Field fi : fields) {
-                        builder.append("\tfield: ").append(fi.getName()).append("\n");
-                    }
                     mResultObserver.notifyFailure(FailureType.MISSING_FIELD,
                             field.toReadableString(mAbsoluteClassName),
                             "No field with correct signature found:" +
-                            field.toSignatureString() + ". Found: " + builder.toString());
+                            field.toSignatureString());
                 } else if (f.getModifiers() != field.mModifier) {
                     mResultObserver.notifyFailure(FailureType.MISMATCH_FIELD,
                             field.toReadableString(mAbsoluteClassName),
