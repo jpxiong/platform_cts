@@ -26,8 +26,10 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,6 +55,8 @@ public class JDiffClassDescription {
 
     @SuppressWarnings("unchecked")
     private Class<?> mClass;
+    // A map of field name to field of the fields contained in {@code mClass}
+    private Map<String, Field> mClassFieldMap;
 
     private String mPackageName;
     private String mShortClassName;
@@ -437,6 +441,7 @@ public class JDiffClassDescription {
     public void checkSignatureCompliance() {
         checkClassCompliance();
         if (mClass != null) {
+            mClassFieldMap = buildFieldMap(mClass);
             checkFieldsCompliance();
             checkConstructorCompliance();
             checkMethodCompliance();
@@ -709,10 +714,15 @@ public class JDiffClassDescription {
             try {
                 Field f = findMatchingField(field);
                 if (f == null) {
+                    StringBuilder builder = new StringBuilder();
+                    Field[] fields = mClass.getDeclaredFields();
+                    for (Field fi : fields) {
+                        builder.append("\tfield: ").append(fi.getName()).append("\n");
+                    }
                     mResultObserver.notifyFailure(FailureType.MISSING_FIELD,
                             field.toReadableString(mAbsoluteClassName),
                             "No field with correct signature found:" +
-                            field.toSignatureString());
+                            field.toSignatureString() + ". Found: " + builder.toString());
                 } else if (f.getModifiers() != field.mModifier) {
                     mResultObserver.notifyFailure(FailureType.MISMATCH_FIELD,
                             field.toReadableString(mAbsoluteClassName),
@@ -751,14 +761,8 @@ public class JDiffClassDescription {
      * @param field the field description to find
      * @return the reflected field, or null if not found.
      */
-    private Field findMatchingField(JDiffField field){
-        Field[] fields = mClass.getDeclaredFields();
-        for (Field f : fields) {
-            if (f.getName().equals(field.mName)) {
-                return f;
-            }
-        }
-        return null;
+    private Field findMatchingField(JDiffField field) {
+        return mClassFieldMap.get(field.mName);
     }
 
     /**
@@ -1189,6 +1193,31 @@ public class JDiffClassDescription {
         // <? extends java.lang.Object and <?> are the same, so
         // canonicalize them to one form.
         return paramType.replace("<? extends java.lang.Object>", "<?>");
+    }
+
+    /**
+     * Scan a class (an its entire inheritance chain) for fields.
+     *
+     * @return a {@link Map} of fieldName to {@link Field}
+     */
+    private static Map<String, Field> buildFieldMap(Class testClass) {
+        Map<String, Field> fieldMap = new HashMap<String, Field>();
+        // Scan the superclass
+        if (testClass.getSuperclass() != null) {
+            fieldMap.putAll(buildFieldMap(testClass.getSuperclass()));
+        }
+
+        // Scan the interfaces
+        for (Class interfaceClass : testClass.getInterfaces()) {
+            fieldMap.putAll(buildFieldMap(interfaceClass));
+        }
+
+        // Check the fields in the test class
+        for (Field field : testClass.getDeclaredFields()) {
+            fieldMap.put(field.getName(), field);
+        }
+
+        return fieldMap;
     }
 
     private static void loge(String message, Exception exception) {
