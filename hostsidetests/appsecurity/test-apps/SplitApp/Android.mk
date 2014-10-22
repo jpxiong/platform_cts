@@ -30,7 +30,7 @@ LOCAL_PACKAGE_SPLITS := mdpi-v4 hdpi-v4 xhdpi-v4 xxhdpi-v4 v7 fr de
 LOCAL_ASSET_DIR := $(LOCAL_PATH)/assets
 
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey1
-LOCAL_AAPT_FLAGS := --version-code 100 --version-name OneHundred --replace-version -c mdpi
+LOCAL_AAPT_FLAGS := --version-code 100 --version-name OneHundred --replace-version -c mdpi -c hdpi -c xhdpi -c xxhdpi
 
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_DEX_PREOPT := false
@@ -53,7 +53,7 @@ LOCAL_PACKAGE_NAME := CtsSplitAppDiffVersion
 LOCAL_PACKAGE_SPLITS := v7
 
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey1
-LOCAL_AAPT_FLAGS := --version-code 101 --version-name OneHundredOne --replace-version -c mdpi
+LOCAL_AAPT_FLAGS := --version-code 101 --version-name OneHundredOne --replace-version -c mdpi -c hdpi -c xhdpi -c xxhdpi
 
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_DEX_PREOPT := false
@@ -76,7 +76,7 @@ LOCAL_PACKAGE_NAME := CtsSplitAppDiffCert
 LOCAL_PACKAGE_SPLITS := v7
 
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey2
-LOCAL_AAPT_FLAGS := --version-code 100 --version-name OneHundred --replace-version -c mdpi
+LOCAL_AAPT_FLAGS := --version-code 100 --version-name OneHundred --replace-version -c mdpi -c hdpi -c xhdpi -c xxhdpi
 
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_DEX_PREOPT := false
