@@ -69,8 +69,6 @@ public class SignatureTest extends AndroidTestCase {
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_RETURN = "return";
 
-    private static ArrayList<String> mDebugArray = new ArrayList<String>();
-
     private HashSet<String> mKeyTagSet;
     private TestResultObserver mResultObserver;
 
@@ -85,6 +83,8 @@ public class SignatureTest extends AndroidTestCase {
             mErrorString.append(type.toString().toLowerCase());
             mErrorString.append(":\t");
             mErrorString.append(name);
+            mErrorString.append("\tError: ");
+            mErrorString.append(errorMessage);
         }
     }
 
@@ -109,7 +109,7 @@ public class SignatureTest extends AndroidTestCase {
         logd(String.format("Class: %s", rClass.toString()));
         Field[] fs = rClass.getFields();
         for (Field f : fs) {
-            logd(String.format("Field: %s", fs.toString()));
+            logd(String.format("Field: %s", f.toString()));
             try {
                 start(r.getXml(f.getInt(rClass)));
             } catch (Exception e) {
@@ -142,11 +142,12 @@ public class SignatureTest extends AndroidTestCase {
      * Signature test entry point.
      */
     private void start(XmlPullParser parser) throws XmlPullParserException, IOException {
-        logd(String.format("Parser: %s", parser.getName()));
-        logd(String.format("Parser: %s", parser.getNamespace()));
-        logd(String.format("Parser: %s", parser.getLineNumber()));
-        logd(String.format("Parser: %s", parser.getColumnNumber()));
-        logd(String.format("Parser: %s", parser.getPositionDescription()));
+        logd(String.format("Name: %s", parser.getName()));
+        logd(String.format("Text: %s", parser.getText()));
+        logd(String.format("Namespace: %s", parser.getNamespace()));
+        logd(String.format("Line Number: %s", parser.getLineNumber()));
+        logd(String.format("Column Number: %s", parser.getColumnNumber()));
+        logd(String.format("Position Description: %s", parser.getPositionDescription()));
         JDiffClassDescription currentClass = null;
         String currentPackage = "";
         JDiffMethod currentMethod = null;
@@ -204,7 +205,16 @@ public class SignatureTest extends AndroidTestCase {
                 currentClass.addField(field);
             } else {
                 throw new RuntimeException(
-                        "unknow tag exception:" + tagname);
+                        "unknown tag exception:" + tagname);
+            }
+            if (currentPackage != null) {
+                logd(String.format("currentPackage: %s", currentPackage));
+            }
+            if (currentClass != null) {
+                logd(String.format("currentClass: %s", currentClass.toSignatureString()));
+            }
+            if (currentMethod != null) {
+                logd(String.format("currentMethod: %s", currentMethod.toSignatureString()));
             }
         }
     }
