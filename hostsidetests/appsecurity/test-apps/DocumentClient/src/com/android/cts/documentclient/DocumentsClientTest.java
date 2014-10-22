@@ -30,6 +30,7 @@ import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiSelector;
 import android.test.InstrumentationTestCase;
 import android.test.MoreAsserts;
+import android.text.format.DateUtils;
 
 import com.android.cts.documentclient.MyActivity.Result;
 
@@ -46,6 +47,8 @@ import java.io.OutputStream;
 public class DocumentsClientTest extends InstrumentationTestCase {
     private UiDevice mDevice;
     private MyActivity mActivity;
+
+    private static final long TIMEOUT = 10 * DateUtils.SECOND_IN_MILLIS;
 
     @Override
     public void setUp() throws Exception {
@@ -80,7 +83,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
 
         // Ensure that we see both of our roots
         mDevice.waitForIdle();
-        assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).exists());
+        assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).waitForExists(TIMEOUT));
         assertTrue("CtsCreate root", new UiObject(new UiSelector().text("CtsCreate")).exists());
         assertFalse("CtsGetContent", new UiObject(new UiSelector().text("CtsGetContent")).exists());
 
@@ -241,7 +244,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         // Look around, we should be able to see both DocumentsProviders and
         // other GET_CONTENT sources.
         mDevice.waitForIdle();
-        assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).exists());
+        assertTrue("CtsLocal root", new UiObject(new UiSelector().text("CtsLocal")).waitForExists(TIMEOUT));
         assertTrue("CtsCreate root", new UiObject(new UiSelector().text("CtsCreate")).exists());
         assertTrue("CtsGetContent", new UiObject(new UiSelector().text("CtsGetContent")).exists());
 
