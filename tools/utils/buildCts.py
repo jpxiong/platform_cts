@@ -286,7 +286,6 @@ def BuildAospMediumSizeTestList():
       'android.permission2' : [],
       'android.security' : [],
       'android.telephony' : [],
-      'android.view' : [],
       'android.webkit' : [],
       'android.widget' : [],
       'com.android.cts.browserbench' : []}
@@ -343,6 +342,7 @@ def BuildAospSmallSizeTestList():
       'android.theme' : [],
       'android.usb' : [],
       'android.util' : [],
+      'android.view' : [],
       'com.android.cts.dram' : [],
       'com.android.cts.filesystemperf' : [],
       'com.android.cts.jank' : [],
