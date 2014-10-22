@@ -33,7 +33,6 @@ import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.LogFileSaver;
 import com.android.tradefed.result.TestSummary;
-import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.StreamUtil;
 
@@ -226,6 +225,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
         mIsDeviceInfoRun = DeviceInfoCollector.IDS.contains(id);
         if (!mIsDeviceInfoRun) {
             mCurrentPkgResult = mResults.getOrCreatePackage(id);
+            mCurrentPkgResult.setDeviceSerial(mDeviceSerial);
         }
     }
 
