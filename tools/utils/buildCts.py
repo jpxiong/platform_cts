@@ -212,6 +212,7 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.media$')
+    plan.Include(r'android\.view$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
@@ -247,6 +248,7 @@ class CtsBuilder(object):
       plan.Exclude(package+'$')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
+    plan.Exclude(r'android\.view$')
     plan.Exclude(r'android\.mediastress$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
@@ -325,7 +327,6 @@ def BuildAospSmallSizeTestList():
       'android.theme' : [],
       'android.usb' : [],
       'android.util' : [],
-      'android.view' : [],
       'com.android.cts.dram' : [],
       'com.android.cts.filesystemperf' : [],
       'com.android.cts.jank' : [],
