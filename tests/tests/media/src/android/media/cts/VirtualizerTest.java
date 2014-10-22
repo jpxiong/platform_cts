@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class VirtualizerTest extends AndroidTestCase {
+public class VirtualizerTest extends PostProcTestBase {
 
     private String TAG = "VirtualizerTest";
     private final static short TEST_STRENGTH = 500;
@@ -34,13 +34,6 @@ public class VirtualizerTest extends AndroidTestCase {
 
     private Virtualizer mVirtualizer = null;
     private Virtualizer mVirtualizer2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
@@ -60,7 +53,6 @@ public class VirtualizerTest extends AndroidTestCase {
         Virtualizer eq = null;
         try {
             eq = new Virtualizer(0, 0);
-            assertNotNull(" could not create Virtualizer", eq);
             try {
                 assertTrue(" invalid effect ID", (eq.getId() != 0));
             } catch (IllegalStateException e) {
@@ -298,10 +290,6 @@ public class VirtualizerTest extends AndroidTestCase {
     //-----------------------------------------------------------------
     // private methods
     //----------------------------------
-
-    private boolean isVirtualizerAvailable() {
-        return AudioEffect.isEffectTypeAvailable(AudioEffect.EFFECT_TYPE_VIRTUALIZER);
-    }
 
     private void getVirtualizer(int session) {
          if (mVirtualizer == null || session != mSession) {
