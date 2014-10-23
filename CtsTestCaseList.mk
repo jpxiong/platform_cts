@@ -107,7 +107,6 @@ cts_test_packages := \
     CtsAdminTestCases \
     CtsAnimationTestCases \
     CtsAppTestCases \
-    CtsAppWidgetTestCases \
     CtsBluetoothTestCases \
     CtsCalendarcommon2TestCases \
     CtsContentTestCases \
