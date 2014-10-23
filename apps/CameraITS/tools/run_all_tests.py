@@ -64,6 +64,12 @@ def main():
         os.mkdir(os.path.join(topdir, d))
     print "Saving output files to:", topdir, "\n"
 
+    # determine camera id
+    camera_id = 0
+    for s in sys.argv[1:]:
+        if s[:7] == "camera=" and len(s) > 7:
+            camera_id = s[7:]
+
     # Run each test, capturing stdout and stderr.
     numpass = 0
     numnotmandatedfail = 0
@@ -91,7 +97,7 @@ def main():
             numpass, len(tests), 100.0*float(numpass)/len(tests))
     if numnotmandatedfail > 0:
         print "(*) tests are not yet mandated"
-    its.device.ItsSession.report_result(numpass == len(tests))
+    its.device.ItsSession.report_result(camera_id, numpass == len(tests))
 
 if __name__ == '__main__':
     main()
