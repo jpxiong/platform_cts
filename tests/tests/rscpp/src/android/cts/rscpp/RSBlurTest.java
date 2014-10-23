@@ -35,7 +35,6 @@ public class RSBlurTest extends RSCppTest {
     public void testRSBlurOneChannel() {
         int[] baseAlloc = new int[X * Y];
         RSUtils.genRandom(0x1DEFF, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y];
         for (int i = 0; i < X * Y; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -54,19 +53,17 @@ public class RSBlurTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y];
         blurTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, true);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
-
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
     }
 
 
     public void testRSBlurFourChannels() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0xFAFADE10, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -85,12 +82,11 @@ public class RSBlurTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         blurTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, false);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
-
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
     }
 
 
