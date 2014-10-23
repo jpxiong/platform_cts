@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class VisualizerTest extends AndroidTestCase {
+public class VisualizerTest extends PostProcTestBase {
 
     private String TAG = "VisualizerTest";
     private final static int MIN_CAPTURE_RATE_MAX = 10000; // 10Hz
@@ -33,10 +33,6 @@ public class VisualizerTest extends AndroidTestCase {
     private final static int MAX_LOOPER_WAIT_COUNT = 10;
 
     private Visualizer mVisualizer = null;
-    private int mSession = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private byte[] mWaveform = null;
     private byte[] mFft = null;
     private boolean mCaptureWaveform = false;
@@ -53,10 +49,12 @@ public class VisualizerTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         Visualizer visualizer = null;
-         try {
+        try {
             visualizer = new Visualizer(0);
-            assertNotNull("could not create Visualizer", visualizer);
         } catch (IllegalArgumentException e) {
             fail("Visualizer not found");
         } catch (UnsupportedOperationException e) {
@@ -75,6 +73,9 @@ public class VisualizerTest extends AndroidTestCase {
 
     //Test case 1.0: capture rates
     public void test1_0CaptureRates() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getVisualizer(0);
         try {
             int captureRate = mVisualizer.getMaxCaptureRate();
@@ -94,6 +95,9 @@ public class VisualizerTest extends AndroidTestCase {
 
     //Test case 1.1: test capture size
     public void test1_1CaptureSize() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getVisualizer(0);
         try {
             int[] range = mVisualizer.getCaptureSizeRange();
@@ -124,6 +128,9 @@ public class VisualizerTest extends AndroidTestCase {
 
     //Test case 2.0: test cature in polling mode
     public void test2_0PollingCapture() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             getVisualizer(0);
             mVisualizer.setEnabled(true);
@@ -151,6 +158,9 @@ public class VisualizerTest extends AndroidTestCase {
 
     //Test case 2.1: test capture with listener
     public void test2_1ListenerCapture() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             getVisualizer(0);
             synchronized(mLock) {

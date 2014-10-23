@@ -35,10 +35,10 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import java.util.UUID;
 
-public class AudioEffectTest extends AndroidTestCase {
+public class AudioEffectTest extends PostProcTestBase {
 
     private String TAG = "AudioEffectTest";
-    private final static int MIN_NUMBER_EFFECTS = 5;
+    private final static int MIN_NUMBER_EFFECTS = 1;
     // allow +/- 5% tolerance between set and get delays
     private final static float DELAY_TOLERANCE = 1.05f;
     // allow +/- 5% tolerance between set and get ratios
@@ -50,16 +50,8 @@ public class AudioEffectTest extends AndroidTestCase {
 
     private AudioEffect mEffect = null;
     private AudioEffect mEffect2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
     private MediaPlayer mMediaPlayer = null;
     private int mError = 0;
-
-    private final Object mLock = new Object();
 
     private ListenerThread mEffectListenerLooper = null;
 
@@ -71,9 +63,11 @@ public class AudioEffectTest extends AndroidTestCase {
     // 0 - static methods
     //----------------------------------
 
-    //Test case 0.0: test queryEffects() and platfrom at least provides Equalizer, Bass Boost,
-    // Virtualizer, Environmental reverb and Preset reverb effects
+    //Test case 0.0: test queryEffects() and platfrom at least provides an Equalizer
     public void test0_0QueryEffects() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
 
         AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
 
@@ -81,29 +75,14 @@ public class AudioEffectTest extends AndroidTestCase {
                 (desc.length >= MIN_NUMBER_EFFECTS));
 
         boolean hasEQ = false;
-        boolean hasBassBoost = false;
-        boolean hasVirtualizer = false;
-        boolean hasEnvReverb = false;
-        boolean hasPresetReverb = false;
 
         for (int i = 0; i < desc.length; i++) {
             if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_EQUALIZER)) {
                 hasEQ = true;
-            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_BASS_BOOST)) {
-                hasBassBoost = true;
-            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_VIRTUALIZER)) {
-                hasVirtualizer = true;
-            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_ENV_REVERB)) {
-                hasEnvReverb = true;
-            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_PRESET_REVERB)) {
-                hasPresetReverb = true;
+                break;
             }
         }
         assertTrue("test0_0QueryEffects: equalizer not found", hasEQ);
-        assertTrue("test0_0QueryEffects: bass boost not found", hasBassBoost);
-        assertTrue("test0_0QueryEffects: virtualizer not found", hasVirtualizer);
-        assertTrue("test0_0QueryEffects: environmental reverb not found", hasEnvReverb);
-        assertTrue("test0_0QueryEffects: preset reverb not found", hasPresetReverb);
     }
 
     //-----------------------------------------------------------------
@@ -129,45 +108,10 @@ public class AudioEffectTest extends AndroidTestCase {
         return ar;
     }
 
-    //Test case 1.0: test constructor from effect type and get effect ID
-    public void test1_0ConstructorFromType() throws Exception {
-        AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
-        assertTrue("no effects found", (desc.length != 0));
-        for (int i = 0; i < desc.length; i++) {
-            if (!desc[i].type.equals(AudioEffect.EFFECT_TYPE_NULL)) {
-                try {
-                    int sessionId;
-                    AudioRecord ar = null;
-                    if (AudioEffect.EFFECT_PRE_PROCESSING.equals(desc[i].connectMode)) {
-                        ar = getAudioRecord();
-                        sessionId = ar.getAudioSessionId();
-                    } else {
-                        sessionId = 0;
-                    }
-                    AudioEffect effect = new AudioEffect(desc[i].type,
-                            AudioEffect.EFFECT_TYPE_NULL,
-                            0,
-                            sessionId);
+//    // Test case 1.0: test constructor from effect type and get effect ID
+//    public void test1_0ConstructorFromType() ...
+//    Note: This test was removed because it used hidden api's.
 
-                    assertNotNull("could not create AudioEffect", effect);
-                    try {
-                        assertTrue("invalid effect ID", (effect.getId() != 0));
-                    } catch (IllegalStateException e) {
-                        fail("AudioEffect not initialized");
-                    } finally {
-                        effect.release();
-                        if (ar != null) {
-                            ar.release();
-                        }
-                    }
-                } catch (IllegalArgumentException e) {
-                    fail("Effect not found: "+desc[i].name);
-                } catch (UnsupportedOperationException e) {
-                    fail("Effect library not loaded");
-                }
-            }
-        }
-    }
 
 //    //Test case 1.1: test constructor from effect uuid
 //    public void test1_1ConstructorFromUuid() ...
@@ -175,28 +119,15 @@ public class AudioEffectTest extends AndroidTestCase {
 //     1. will fail in devices that offload effects
 //     2. it used hidden api's.
 
-    //Test case 1.2: test constructor failure from unknown type
-    public void test1_2ConstructorUnknownType() throws Exception {
-
-        try {
-            AudioEffect effect = new AudioEffect(UUID.randomUUID(),
-                    AudioEffect.EFFECT_TYPE_NULL,
-                    0,
-                    0);
-            fail("could create random AudioEffect");
-            if (effect != null) {
-                effect.release();
-            }
-        } catch (IllegalArgumentException e) {
-
-        } catch (UnsupportedOperationException e) {
-            fail("Effect library not loaded");
-        }
-    }
+//    //Test case 1.2: test constructor failure from unknown type
+//    public void test1_2ConstructorUnknownType() ...
+//    Note: This test was removed because it used hidden api's.
 
     //Test case 1.3: test getEnabled() failure when called on released effect
     public void test1_3GetEnabledAfterRelease() throws Exception {
-
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_EQUALIZER,
                     AudioEffect.EFFECT_TYPE_NULL,
@@ -219,6 +150,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 1.4: test contructor on mediaPlayer audio session
     public void test1_4InsertOnMediaPlayer() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         MediaPlayer mp = new MediaPlayer();
         assertNotNull("could not create mediaplayer", mp);
         AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.testmp3);
@@ -238,6 +172,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 1.5: test auxiliary effect attachement on MediaPlayer
     public void test1_5AuxiliaryOnMediaPlayer() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createMediaPlayerLooper();
@@ -270,6 +207,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 1.6: test auxiliary effect attachement failure before setDatasource
     public void test1_6AuxiliaryOnMediaPlayerFailure() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createMediaPlayerLooper();
@@ -301,6 +241,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 1.7: test auxiliary effect attachement on AudioTrack
     public void test1_7AuxiliaryOnAudioTrack() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         AudioTrack track = null;
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
@@ -342,7 +285,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
-
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_EQUALIZER,
                     AudioEffect.EFFECT_TYPE_NULL,
@@ -370,7 +315,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
-
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_EQUALIZER,
                     AudioEffect.EFFECT_TYPE_NULL,
@@ -397,6 +344,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.0: test setParameter(byte[], byte[]) / getParameter(byte[], byte[])
     public void test3_0SetParameterByteArrayByteArray() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
             byte[] param = mEffect.intToByteArray(PresetReverb.PARAM_PRESET);
@@ -428,6 +378,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.1: test setParameter(int, int) / getParameter(int, int[])
     public void test3_1SetParameterIntInt() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
             int param = EnvironmentalReverb.PARAM_DECAY_TIME;
@@ -459,6 +412,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.2: test setParameter(int, short) / getParameter(int, short[])
     public void test3_2SetParameterIntShort() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
             int param = PresetReverb.PARAM_PRESET;
@@ -488,6 +444,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.3: test setParameter(int, byte[]) / getParameter(int, byte[])
     public void test3_3SetParameterIntByteArray() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
             int param = EnvironmentalReverb.PARAM_DECAY_TIME;
@@ -521,6 +480,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.4: test setParameter(int[], int[]) / getParameter(int[], int[])
     public void test3_4SetParameterIntArrayIntArray() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
             int[] param = new int[1];
@@ -555,6 +517,9 @@ public class AudioEffectTest extends AndroidTestCase {
     //Test case 3.5: test setParameter(int[], short[]) / getParameter(int[], short[])
 
     public void test3_5SetParameterIntArrayShortArray() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
             int[] param = new int[1];
@@ -586,6 +551,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.6: test setParameter(int[], byte[]) / getParameter(int[], byte[])
     public void test3_6SetParameterIntArrayByteArray() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
             int[] param = new int[1];
@@ -620,6 +588,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.7: test setParameter() throws exception after release()
     public void test3_7SetParameterAfterRelease() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         AudioEffect effect = null;
         try {
             effect = new AudioEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB,
@@ -645,6 +616,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 3.8: test getParameter() throws exception after release()
     public void test3_8GetParameterAfterRelease() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         AudioEffect effect = null;
         try {
             effect = new AudioEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB,
@@ -675,6 +649,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 4.0: test control passed to higher priority client
     public void test4_0setEnabledLowerPriority() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         AudioEffect effect1 = null;
         AudioEffect effect2 = null;
         try {
@@ -712,6 +689,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 4.1: test control passed to higher priority client
     public void test4_1setParameterLowerPriority() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         AudioEffect effect1 = null;
         AudioEffect effect2 = null;
         try {
@@ -761,7 +741,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 4.2: test control status listener
     public void test4_2ControlStatusListener() throws Exception {
-
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -784,7 +766,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 4.3: test enable status listener
     public void test4_3EnableStatusListener() throws Exception {
-
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -811,6 +795,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 4.4: test parameter changed listener
     public void test4_4ParameterChangedListener() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -844,6 +831,9 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 5.0: test command method
     public void test5_0Command() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
             byte[] cmd = new byte[0];

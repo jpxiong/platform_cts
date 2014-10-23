@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class EqualizerTest extends AndroidTestCase {
+public class EqualizerTest extends PostProcTestBase {
 
     private String TAG = "EqualizerTest";
     private final static int MIN_NUMBER_OF_BANDS = 4;
@@ -37,13 +37,6 @@ public class EqualizerTest extends AndroidTestCase {
 
     private Equalizer mEqualizer = null;
     private Equalizer mEqualizer2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
@@ -56,10 +49,12 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         Equalizer eq = null;
         try {
             eq = new Equalizer(0, 0);
-            assertNotNull("could not create Equalizer", eq);
             try {
                 assertTrue("invalid effect ID", (eq.getId() != 0));
             } catch (IllegalStateException e) {
@@ -83,6 +78,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 1.0: test setBandLevel() and getBandLevel()
     public void test1_0BandLevel() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         try {
             short numBands = mEqualizer.getNumberOfBands();
@@ -112,6 +110,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 1.1: test band frequency
     public void test1_1BandFrequency() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         try {
             short band = mEqualizer.getBand(TEST_FREQUENCY_MILLIHERTZ);
@@ -137,6 +138,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 1.2: test presets
     public void test1_2Presets() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         try {
             short numPresets = mEqualizer.getNumberOfPresets();
@@ -162,6 +166,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 1.3: test properties
     public void test1_3Properties() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         try {
             Equalizer.Settings settings = mEqualizer.getProperties();
@@ -193,7 +200,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 1.4: test setBandLevel() throws exception after release
     public void test1_4SetBandLevelAfterRelease() throws Exception {
-
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         mEqualizer.release();
         try {
@@ -211,6 +220,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         try {
             mEqualizer.setEnabled(true);
@@ -227,7 +239,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
-
+        if (!hasAudioOutput()) {
+            return;
+        }
         getEqualizer(0);
         mEqualizer.release();
         try {
@@ -245,6 +259,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -267,6 +284,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -291,6 +311,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -460,5 +483,4 @@ public class EqualizerTest extends AndroidTestCase {
             mEqualizer2 = null;
         }
     }
-
 }
