@@ -17,7 +17,6 @@
 package android.hardware.cts.helpers;
 
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,21 +29,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class CollectingSensorEventListener extends TestSensorEventListener {
     private final ArrayList<TestSensorEvent> mSensorEventsList = new ArrayList<TestSensorEvent>();
-
-    /**
-     * Constructs a {@link CollectingSensorEventListener} with an additional
-     * {@link SensorEventListener2}.
-     */
-    public CollectingSensorEventListener(SensorEventListener2 listener) {
-        super(listener);
-    }
-
-    /**
-     * Constructs a {@link CollectingSensorEventListener}.
-     */
-    public CollectingSensorEventListener() {
-        this(null);
-    }
 
     /**
      * {@inheritDoc}

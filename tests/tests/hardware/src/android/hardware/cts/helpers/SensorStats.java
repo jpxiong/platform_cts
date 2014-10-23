@@ -40,14 +40,15 @@ import java.util.Set;
 public class SensorStats {
     public static final String DELIMITER = "__";
 
-    public static final String FIRST_TIMESTAMP_KEY = "first_timestamp";
-    public static final String LAST_TIMESTAMP_KEY = "last_timestamp";
     public static final String ERROR = "error";
-    public static final String EVENT_COUNT_KEY = "event_count";
     public static final String EVENT_GAP_COUNT_KEY = "event_gap_count";
     public static final String EVENT_GAP_POSITIONS_KEY = "event_gap_positions";
     public static final String EVENT_OUT_OF_ORDER_COUNT_KEY = "event_out_of_order_count";
     public static final String EVENT_OUT_OF_ORDER_POSITIONS_KEY = "event_out_of_order_positions";
+    public static final String EVENT_TIME_SYNCHRONIZATION_COUNT_KEY =
+            "event_time_synchronization_count";
+    public static final String EVENT_TIME_SYNCHRONIZATION_POSITIONS_KEY =
+            "event_time_synchronization_positions";
     public static final String FREQUENCY_KEY = "frequency";
     public static final String JITTER_95_PERCENTILE_PERCENT_KEY = "jitter_95_percentile_percent";
     public static final String MEAN_KEY = "mean";
