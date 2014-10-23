@@ -157,6 +157,22 @@ public class AbiUtils {
     }
 
     /**
+     * @return the test name portion of the test id.
+     *         e.g. armeabi-v7a android.mytest = android.mytest
+     */
+    public static String parseTestName(String id) {
+        return parseId(id)[1];
+    }
+
+    /**
+     * @return the abi portion of the test id.
+     *         e.g. armeabi-v7a android.mytest = armeabi-v7a
+     */
+    public static String parseAbi(String id) {
+        return parseId(id)[0];
+    }
+
+    /**
      * @param name The name of the ABI.
      * @return The bitness of the ABI with the given name
      */
