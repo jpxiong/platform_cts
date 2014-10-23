@@ -77,11 +77,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     private static final String TAG = "EncodeVirtualDisplayWithCompositionTest";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private static final String MIME_TYPE = "video/avc";
 
-    private static final long DEFAULT_WAIT_TIMEOUT_MS = 5000;
-    private static final long DEFAULT_WAIT_TIMEOUT_US = 5000000;
+    private static final long DEFAULT_WAIT_TIMEOUT_MS = 3000;
+    private static final long DEFAULT_WAIT_TIMEOUT_US = 3000000;
 
     private static final int COLOR_RED =  makeColor(100, 0, 0);
     private static final int COLOR_BLUE =  makeColor(0, 100, 0);
@@ -222,7 +222,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             }
         });
         renderingThread.start();
-        renderingThread.join(22000);
+        renderingThread.join(60000);
         assertTrue(!renderingThread.isAlive());
         if (mTestException != null) {
             throw mTestException;
@@ -559,7 +559,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                 while (!mStopEncoding) {
                     int index = mEncoder.dequeueOutputBuffer(info, TIMEOUT_USEC_NORMAL);
                     if (DBG) {
-                        Log.i(TAG, "dequeOutputBuffer returned " + index);
+                        Log.i(TAG, "encoder dequeOutputBuffer returned " + index);
                     }
                     if (index >= 0) {
                         if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
