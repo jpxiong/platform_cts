@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class BassBoostTest extends AndroidTestCase {
+public class BassBoostTest extends PostProcTestBase {
 
     private String TAG = "BassBoostTest";
     private final static short TEST_STRENGTH = 500;
@@ -34,13 +34,6 @@ public class BassBoostTest extends AndroidTestCase {
 
     private BassBoost mBassBoost = null;
     private BassBoost mBassBoost2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
@@ -53,10 +46,12 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         BassBoost eq = null;
         try {
             eq = new BassBoost(0, 0);
-            assertNotNull("could not create BassBoost", eq);
             try {
                 assertTrue("invalid effect ID", (eq.getId() != 0));
             } catch (IllegalStateException e) {
@@ -81,6 +76,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 1.0: test strength
     public void test1_0Strength() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         getBassBoost(0);
         try {
             if (mBassBoost.getStrengthSupported()) {
@@ -110,6 +108,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 1.1: test properties
     public void test1_1Properties() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         getBassBoost(0);
         try {
             BassBoost.Settings settings = mBassBoost.getProperties();
@@ -144,6 +145,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 1.2: test setStrength() throws exception after release
     public void test1_2SetStrengthAfterRelease() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         getBassBoost(0);
         mBassBoost.release();
         try {
@@ -162,6 +166,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         getBassBoost(0);
         try {
             mBassBoost.setEnabled(true);
@@ -178,6 +185,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         getBassBoost(0);
         mBassBoost.release();
         try {
@@ -196,6 +206,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -218,6 +231,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -242,6 +258,9 @@ public class BassBoostTest extends AndroidTestCase {
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
+        if (!isBassBoostAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -413,5 +432,4 @@ public class BassBoostTest extends AndroidTestCase {
             mBassBoost2 = null;
         }
     }
-
 }
