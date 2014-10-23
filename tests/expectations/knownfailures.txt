@@ -361,5 +361,14 @@
     "android.uirendering.cts.testclasses.FontRenderingTests"
   ],
   bug: 17109280
+},
+{
+  description: "android.keystore tests will replace these tests",
+  names: [
+    "com.android.org.conscrypt.MacTest#test_getInstance_OpenSSL_ENGINE",
+    "com.android.org.conscrypt.NativeCryptoTest#test_ENGINE_by_id_TestEngine",
+    "com.android.org.conscrypt.SignatureTest#test_getInstance_OpenSSL_ENGINE"
+  ],
+  bug: 18030049
 }
 ]
