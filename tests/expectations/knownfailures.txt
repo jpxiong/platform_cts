@@ -86,12 +86,16 @@
   description: "permissions for the API previously used in the test has changed, making it impossible to pass",
   names: [
     "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingFast",
-    "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingSlow",
-    "android.openglperf.cts.GlVboPerfTest#testVboVsNonVboPerfGeometry0",
-    "android.openglperf.cts.GlVboPerfTest#testVboVsNonVboPerfGeometry1",
-    "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers"
+    "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingSlow"
   ],
   bug: 17394321
+},
+{
+  description: "unexpected failures",
+  names: [
+    "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers"
+  ],
+  bug: 18091590
 },
 {
   description: "these tests require a good test scene, so they fail if run in random conditions",
