@@ -21,9 +21,12 @@ import junit.framework.Assert;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,13 +39,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestSensorEventListener implements SensorEventListener2 {
     public static final String LOG_TAG = "TestSensorEventListener";
-    private static final long EVENT_TIMEOUT_US = TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS);
-    private static final long FLUSH_TIMEOUT_US = TimeUnit.MICROSECONDS.convert(5, TimeUnit.SECONDS);
+    private static final long EVENT_TIMEOUT_US = TimeUnit.SECONDS.toMicros(5);
+    private static final long FLUSH_TIMEOUT_US = TimeUnit.SECONDS.toMicros(10);
+
+    private final ArrayList<CountDownLatch> mEventLatches = new ArrayList<CountDownLatch>();
+    private final ArrayList<CountDownLatch> mFlushLatches = new ArrayList<CountDownLatch>();
 
     private final SensorEventListener2 mListener;
+    private final Handler mHandler;
 
-    private volatile CountDownLatch mEventLatch;
-    private volatile CountDownLatch mFlushLatch = new CountDownLatch(1);
+    private volatile boolean mEventsReceivedInHandler = true;
     private volatile TestSensorEnvironment mEnvironment;
     private volatile boolean mLogEvents;
 
@@ -50,13 +56,28 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * Construct a {@link TestSensorEventListener}.
      */
     public TestSensorEventListener() {
-        this(null);
+        this(null /* listener */, null /* handler */);
+    }
+
+    /**
+     * Construct a {@link TestSensorEventListener} with a {@link Handler}.
+     */
+    public TestSensorEventListener(Handler handler) {
+        this(null /* listener */, handler);
     }
 
     /**
      * Construct a {@link TestSensorEventListener} that wraps a {@link SensorEventListener2}.
      */
     public TestSensorEventListener(SensorEventListener2 listener) {
+        this(listener, null /* handler */);
+    }
+
+    /**
+     * Construct a {@link TestSensorEventListener} that wraps a {@link SensorEventListener2}, and it
+     * has a {@link Handler}.
+     */
+    public TestSensorEventListener(SensorEventListener2 listener, Handler handler) {
         if (listener != null) {
             mListener = listener;
         } else {
@@ -67,6 +88,14 @@ public class TestSensorEventListener implements SensorEventListener2 {
                 public void onAccuracyChanged(Sensor sensor, int i) {}
             };
         }
+        mHandler = handler;
+    }
+
+    /**
+     * @return The handler (if any) associated with the instance.
+     */
+    public Handler getHandler() {
+        return mHandler;
     }
 
     /**
@@ -88,6 +117,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
+        checkHandler();
         mListener.onSensorChanged(event);
         if (mLogEvents) {
             Log.v(LOG_TAG, String.format(
@@ -98,9 +128,10 @@ public class TestSensorEventListener implements SensorEventListener2 {
                     Arrays.toString(event.values)));
         }
 
-        CountDownLatch eventLatch = mEventLatch;
-        if(eventLatch != null) {
-            eventLatch.countDown();
+        synchronized (mEventLatches) {
+            for (CountDownLatch latch : mEventLatches) {
+                latch.countDown();
+            }
         }
     }
 
@@ -109,6 +140,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        checkHandler();
         mListener.onAccuracyChanged(sensor, accuracy);
     }
 
@@ -117,12 +149,14 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onFlushCompleted(Sensor sensor) {
-        CountDownLatch latch = mFlushLatch;
-        mFlushLatch = new CountDownLatch(1);
-        if(latch != null) {
-            latch.countDown();
-        }
+        checkHandler();
         mListener.onFlushCompleted(sensor);
+
+        synchronized (mFlushLatches) {
+            for (CountDownLatch latch : mFlushLatches) {
+                latch.countDown();
+            }
+        }
     }
 
     /**
@@ -131,13 +165,23 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForFlushComplete() throws InterruptedException {
-        CountDownLatch latch = mFlushLatch;
-        if(latch == null) {
-            return;
+        CountDownLatch latch = new CountDownLatch(1);
+        synchronized (mFlushLatches) {
+            mFlushLatches.add(latch);
         }
-        Assert.assertTrue(
-                SensorCtsHelper.formatAssertionMessage("WaitForFlush", mEnvironment),
-                latch.await(FLUSH_TIMEOUT_US, TimeUnit.MICROSECONDS));
+
+        try {
+            String message = SensorCtsHelper.formatAssertionMessage(
+                    "WaitForFlush",
+                    mEnvironment,
+                    "timeout=%dus",
+                    FLUSH_TIMEOUT_US);
+            Assert.assertTrue(message, latch.await(FLUSH_TIMEOUT_US, TimeUnit.MICROSECONDS));
+        } finally {
+            synchronized (mFlushLatches) {
+                mFlushLatches.remove(latch);
+            }
+        }
     }
 
     /**
@@ -146,22 +190,34 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForEvents(int eventCount) throws InterruptedException {
-        mEventLatch = new CountDownLatch(eventCount);
+        CountDownLatch eventLatch = new CountDownLatch(eventCount);
+        synchronized (mEventLatches) {
+            mEventLatches.add(eventLatch);
+        }
         try {
-            int rateUs = mEnvironment.getExpectedSamplingPeriodUs();
-            // Timeout is 2 * event count * expected period + batch timeout + default wait
-            long timeoutUs = (2 * eventCount * rateUs)
+            long samplingPeriodUs = mEnvironment.getMaximumExpectedSamplingPeriodUs();
+            // timeout is 2 * event count * expected period + batch timeout + default wait
+            // we multiply by two as not to raise an error in this function even if the events are
+            // streaming at a lower rate than expected, as long as it's not streaming twice as slow
+            // as expected
+            long timeoutUs = (2 * eventCount * samplingPeriodUs)
                     + mEnvironment.getMaxReportLatencyUs()
                     + EVENT_TIMEOUT_US;
-            String message = SensorCtsHelper.formatAssertionMessage(
-                    "WaitForEvents",
-                    mEnvironment,
-                    "requested:%d, received:%d",
-                    eventCount,
-                    eventCount - mEventLatch.getCount());
-            Assert.assertTrue(message, mEventLatch.await(timeoutUs, TimeUnit.MICROSECONDS));
+            boolean success = eventLatch.await(timeoutUs, TimeUnit.MICROSECONDS);
+            if (!success) {
+                String message = SensorCtsHelper.formatAssertionMessage(
+                        "WaitForEvents",
+                        mEnvironment,
+                        "requested=%d, received=%d, timeout=%dus",
+                        eventCount,
+                        eventCount - eventLatch.getCount(),
+                        timeoutUs);
+                Assert.fail(message);
+            }
         } finally {
-            mEventLatch = null;
+            synchronized (mEventLatches) {
+                mEventLatches.remove(eventLatch);
+            }
         }
     }
 
@@ -170,5 +226,23 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     public void waitForEvents(long duration, TimeUnit timeUnit) throws InterruptedException {
         SensorCtsHelper.sleep(duration, timeUnit);
+    }
+
+    /**
+     * Asserts that sensor events arrived in the proper thread if a {@link Handler} was associated
+     * with the current instance.
+     *
+     * If no events were received this assertion will be evaluated to {@code true}.
+     */
+    public void assertEventsReceivedInHandler() {
+        Assert.assertTrue(
+                "Events did not arrive in the Looper associated with the given Handler.",
+                mEventsReceivedInHandler);
+    }
+
+    private void checkHandler() {
+        if (mHandler != null) {
+            mEventsReceivedInHandler &= (mHandler.getLooper() == Looper.myLooper());
+        }
     }
 }

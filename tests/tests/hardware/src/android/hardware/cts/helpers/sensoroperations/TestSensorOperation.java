@@ -16,9 +16,27 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import junit.framework.Assert;
+
+import android.hardware.cts.helpers.SensorCtsHelper;
+import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEventListener;
+import android.hardware.cts.helpers.TestSensorManager;
+import android.hardware.cts.helpers.ValidatingSensorEventListener;
+import android.hardware.cts.helpers.sensorverification.EventGapVerification;
+import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
+import android.hardware.cts.helpers.sensorverification.EventTimestampSynchronizationVerification;
+import android.hardware.cts.helpers.sensorverification.FrequencyVerification;
+import android.hardware.cts.helpers.sensorverification.ISensorVerification;
+import android.hardware.cts.helpers.sensorverification.JitterVerification;
+import android.hardware.cts.helpers.sensorverification.MagnitudeVerification;
+import android.hardware.cts.helpers.sensorverification.MeanVerification;
+import android.hardware.cts.helpers.sensorverification.StandardDeviationVerification;
+import android.os.Handler;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,70 +47,204 @@ import java.util.concurrent.TimeUnit;
  * events and then run all the tests.
  * </p>
  */
-public class TestSensorOperation extends VerifiableSensorOperation {
-    private final Integer mEventCount;
-    private final Long mDuration;
-    private final TimeUnit mTimeUnit;
+public class TestSensorOperation extends AbstractSensorOperation {
+    private final Collection<ISensorVerification> mVerifications =
+            new HashSet<ISensorVerification>();
+
+    private final TestSensorManager mSensorManager;
+    private final TestSensorEnvironment mEnvironment;
+    private final Executor mExecutor;
+    private final Handler mHandler;
+
+    private boolean mLogEvents;
 
     /**
-     * Create a {@link TestSensorOperation}.
-     *
-     * @param environment the test environment
-     * @param eventCount the number of events to gather
+     * An interface that defines an abstraction for operations to be performed by the
+     * {@link TestSensorOperation}.
      */
-    public TestSensorOperation(TestSensorEnvironment environment, int eventCount) {
-        this(environment, eventCount, null /* duration */, null /* timeUnit */);
+    public interface Executor {
+        void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
+                throws InterruptedException;
     }
 
     /**
      * Create a {@link TestSensorOperation}.
-     *
-     * @param environment the test environment
-     * @param duration the duration to gather events for
-     * @param timeUnit the time unit of the duration
+     */
+    public TestSensorOperation(TestSensorEnvironment environment, Executor executor) {
+        this(environment, executor, null /* handler */);
+    }
+
+    /**
+     * Create a {@link TestSensorOperation}.
      */
     public TestSensorOperation(
             TestSensorEnvironment environment,
-            long duration,
-            TimeUnit timeUnit) {
-        this(environment, null /* eventCount */, duration, timeUnit);
+            Executor executor,
+            Handler handler) {
+        mEnvironment = environment;
+        mExecutor = executor;
+        mHandler = handler;
+        mSensorManager = new TestSensorManager(mEnvironment);
     }
 
     /**
-     * Private helper constructor.
+     * Set whether to log events.
      */
-    private TestSensorOperation(
+    public void setLogEvents(boolean logEvents) {
+        mLogEvents = logEvents;
+    }
+
+    /**
+     * Set all of the default test expectations.
+     */
+    public void addDefaultVerifications() {
+        addVerification(EventGapVerification.getDefault(mEnvironment));
+        addVerification(EventOrderingVerification.getDefault(mEnvironment));
+        addVerification(FrequencyVerification.getDefault(mEnvironment));
+        addVerification(JitterVerification.getDefault(mEnvironment));
+        addVerification(MagnitudeVerification.getDefault(mEnvironment));
+        addVerification(MeanVerification.getDefault(mEnvironment));
+        addVerification(StandardDeviationVerification.getDefault(mEnvironment));
+        addVerification(EventTimestampSynchronizationVerification.getDefault(mEnvironment));
+    }
+
+    public void addVerification(ISensorVerification verification) {
+        if (verification != null) {
+            mVerifications.add(verification);
+        }
+    }
+
+    /**
+     * Collect the specified number of events from the sensor and run all enabled verifications.
+     */
+    @Override
+    public void execute() throws InterruptedException {
+        getStats().addValue("sensor_name", mEnvironment.getSensor().getName());
+
+        ValidatingSensorEventListener listener =
+                new ValidatingSensorEventListener(mVerifications, mHandler);
+        listener.setLogEvents(mLogEvents);
+
+        mExecutor.execute(mSensorManager, listener);
+
+        boolean failed = false;
+        StringBuilder sb = new StringBuilder();
+        for (ISensorVerification verification : mVerifications) {
+            failed |= evaluateResults(verification, sb);
+        }
+
+        if (failed) {
+            String msg = SensorCtsHelper
+                    .formatAssertionMessage("VerifySensorOperation", mEnvironment, sb.toString());
+            getStats().addValue(SensorStats.ERROR, msg);
+            Assert.fail(msg);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TestSensorOperation clone() {
+        TestSensorOperation operation = new TestSensorOperation(mEnvironment, mExecutor);
+        for (ISensorVerification verification : mVerifications) {
+            operation.addVerification(verification.clone());
+        }
+        return operation;
+    }
+
+    /**
+     * Evaluate the results of a test, aggregate the stats, and build the error message.
+     */
+    private boolean evaluateResults(ISensorVerification verification, StringBuilder sb) {
+        try {
+            verification.verify(mEnvironment, getStats());
+        } catch (AssertionError e) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(e.getMessage());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Creates an operation that will wait for a given amount of events to arrive.
+     *
+     * @param environment The test environment.
+     * @param eventCount The number of events to wait for.
+     */
+    public static TestSensorOperation createOperation(
             TestSensorEnvironment environment,
-            Integer eventCount,
-            Long duration,
-            TimeUnit timeUnit) {
-        super(environment);
-        mEventCount = eventCount;
-        mDuration = duration;
-        mTimeUnit = timeUnit;
+            final int eventCount) {
+        Executor executor = new Executor() {
+            @Override
+            public void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
+                    throws InterruptedException {
+                try {
+                    sensorManager.registerListener(listener);
+                    listener.waitForEvents(eventCount);
+                } finally {
+                    sensorManager.unregisterListener();
+                }
+            }
+        };
+        return new TestSensorOperation(environment, executor);
     }
 
     /**
-     * {@inheritDoc}
+     * Creates an operation that will wait for a given amount of time to collect events.
+     *
+     * @param environment The test environment.
+     * @param duration The duration to wait for events.
+     * @param timeUnit The time unit for {@code duration}.
      */
-    @Override
-    protected void doExecute(TestSensorEventListener listener) throws InterruptedException {
-        if (mEventCount != null) {
-            mSensorManager.runSensor(listener, mEventCount);
-        } else {
-            mSensorManager.runSensor(listener, mDuration, mTimeUnit);
-        }
+    public static TestSensorOperation createOperation(
+            TestSensorEnvironment environment,
+            final long duration,
+            final TimeUnit timeUnit) {
+        Executor executor = new Executor() {
+            @Override
+            public void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
+                    throws InterruptedException {
+                try {
+                    sensorManager.registerListener(listener);
+                    listener.waitForEvents(duration, timeUnit);
+                } finally {
+                    sensorManager.unregisterListener();
+                }
+            }
+        };
+        return new TestSensorOperation(environment, executor);
     }
 
     /**
-     * {@inheritDoc}
+     * Creates an operation that will wait for a given amount of time before calling
+     * {@link TestSensorManager#requestFlush()}.
+     *
+     * @param environment The test environment.
+     * @param duration The duration to wait before calling {@link TestSensorManager#requestFlush()}.
+     * @param timeUnit The time unit for {@code duration}.
      */
-    @Override
-    protected VerifiableSensorOperation doClone() {
-        if (mEventCount != null) {
-            return new TestSensorOperation(mEnvironment, mEventCount);
-        } else {
-            return new TestSensorOperation(mEnvironment, mDuration, mTimeUnit);
-        }
+    public static TestSensorOperation createFlushOperation(
+            TestSensorEnvironment environment,
+            final long duration,
+            final TimeUnit timeUnit) {
+        Executor executor = new Executor() {
+            @Override
+            public void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
+                    throws InterruptedException {
+                try {
+                    sensorManager.registerListener(listener);
+                    SensorCtsHelper.sleep(duration, timeUnit);
+                    sensorManager.requestFlush();
+                    listener.waitForFlushComplete();
+                } finally {
+                    sensorManager.unregisterListener();
+                }
+            }
+        };
+        return new TestSensorOperation(environment, executor);
     }
 }

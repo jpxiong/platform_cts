@@ -24,7 +24,6 @@ import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
-import android.hardware.cts.helpers.sensoroperations.VerifiableSensorOperation;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 
 import java.util.Random;
@@ -81,7 +80,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                     shouldEmulateSensorUnderLoad(),
                     SensorManager.SENSOR_DELAY_FASTEST);
             TestSensorOperation continuousOperation =
-                    new TestSensorOperation(environment, 100 /* eventCount */);
+                    TestSensorOperation.createOperation(environment, 100 /* eventCount */);
             continuousOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(continuousOperation, ITERATIONS));
 
@@ -93,7 +92,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                     sensor.getMinDelay(),
                     MAX_REPORTING_LATENCY_US);
             TestSensorOperation batchingOperation =
-                    new TestSensorOperation(batchingEnvironment, 100 /* eventCount */);
+                    TestSensorOperation.createOperation(batchingEnvironment, 100 /* eventCount */);
             batchingOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
@@ -145,7 +144,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                             generateSamplingRateInUs(sensorType),
                             generateReportLatencyInUs());
                     TestSensorOperation sensorOperation =
-                            new TestSensorOperation(environment, 100 /* eventCount */);
+                            TestSensorOperation.createOperation(environment, 100 /* eventCount */);
                     sensorOperation.addVerification(new EventOrderingVerification());
                     sequentialOperation.add(sensorOperation);
                 }
@@ -229,7 +228,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                 shouldEmulateSensorUnderLoad(),
                 SensorManager.SENSOR_DELAY_FASTEST);
         TestSensorOperation tester =
-                new TestSensorOperation(testerEnvironment, 100 /* event count */);
+                TestSensorOperation.createOperation(testerEnvironment, 100 /* event count */);
         tester.addVerification(new EventOrderingVerification());
 
         TestSensorEnvironment testeeEnvironment = new TestSensorEnvironment(
@@ -237,8 +236,8 @@ public class SensorIntegrationTests extends SensorTestCase {
                 sensorTypeTestee,
                 shouldEmulateSensorUnderLoad(),
                 SensorManager.SENSOR_DELAY_FASTEST);
-        VerifiableSensorOperation testee =
-                new TestSensorOperation(testeeEnvironment, 100 /* event count */);
+        TestSensorOperation testee =
+                TestSensorOperation.createOperation(testeeEnvironment, 100 /* event count */);
         testee.addVerification(new EventOrderingVerification());
 
         ParallelSensorOperation operation = new ParallelSensorOperation();

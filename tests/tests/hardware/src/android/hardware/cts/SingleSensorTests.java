@@ -541,7 +541,8 @@ public class SingleSensorTests extends SensorTestCase {
                 sensorType,
                 shouldEmulateSensorUnderLoad(),
                 rateUs);
-        TestSensorOperation op = new TestSensorOperation(environment, 5, TimeUnit.SECONDS);
+        TestSensorOperation op =
+                TestSensorOperation.createOperation(environment, 5, TimeUnit.SECONDS);
         op.addDefaultVerifications();
         op.setLogEvents(true);
         try {
