@@ -229,17 +229,6 @@ class CtsBuilder(object):
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-mediastress')
 
-    # CTS - sub plan for new tests that is vetted for L launch
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    for package, test_list in new_test_packages.iteritems():
-      plan.Include(package+'$')
-    plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
-    for package, test_list in flaky_tests.iteritems():
-      plan.ExcludeTests(package, test_list)
-    self.__WritePlan(plan, 'CTS-l-tests')
-
     # CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
     for package, test_list in small_tests.iteritems():
