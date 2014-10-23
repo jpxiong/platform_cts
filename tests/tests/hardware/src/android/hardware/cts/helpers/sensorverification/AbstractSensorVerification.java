@@ -18,6 +18,8 @@ package android.hardware.cts.helpers.sensorverification;
 
 import android.hardware.cts.helpers.TestSensorEvent;
 
+import java.util.List;
+
 /**
  * Abstract class that deals with the synchronization of the sensor verifications.
  */
@@ -52,18 +54,38 @@ public abstract class AbstractSensorVerification implements ISensorVerification 
      */
     protected abstract void addSensorEventInternal(TestSensorEvent event);
 
+    protected <TEvent extends IndexedEvent> int[] getIndexArray(List<TEvent> indexedEvents) {
+        int eventsCount = indexedEvents.size();
+        int[] indices = new int[eventsCount];
+        for (int i = 0; i < eventsCount; i++) {
+            indices[i] = indexedEvents.get(i).index;
+        }
+        return indices;
+    }
+
+    /**
+     * Helper class to store the index and current event.
+     * Events are added to the verification in the order they are generated, the index represents
+     * the position of the given event, in the list of added events.
+     */
+    protected class IndexedEvent {
+        public final int index;
+        public final TestSensorEvent event;
+
+        public IndexedEvent(int index, TestSensorEvent event) {
+            this.index = index;
+            this.event = event;
+        }
+    }
+
     /**
      * Helper class to store the index, previous event, and current event.
      */
-    protected class IndexedEventPair {
-        public final int index;
-        public final TestSensorEvent event;
+    protected class IndexedEventPair extends IndexedEvent {
         public final TestSensorEvent previousEvent;
 
-        public IndexedEventPair(int index, TestSensorEvent event,
-                TestSensorEvent previousEvent) {
-            this.index = index;
-            this.event = event;
+        public IndexedEventPair(int index, TestSensorEvent event, TestSensorEvent previousEvent) {
+            super(index, event);
             this.previousEvent = previousEvent;
         }
     }

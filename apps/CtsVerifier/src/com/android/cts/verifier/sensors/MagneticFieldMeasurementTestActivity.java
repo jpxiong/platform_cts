@@ -79,7 +79,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST);
         TestSensorOperation verifyNorm =
-                new TestSensorOperation(environment, 100 /* event count */);
+                TestSensorOperation.createOperation(environment, 100 /* event count */);
 
         float expectedMagneticFieldEarth =
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
@@ -124,7 +124,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST);
         TestSensorOperation verifyStdDev =
-                new TestSensorOperation(environment, 100 /* event count */);
+                TestSensorOperation.createOperation(environment, 100 /* event count */);
 
         verifyStdDev.addVerification(new StandardDeviationVerification(
                 new float[]{2f, 2f, 2f} /* uT */));
