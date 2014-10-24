@@ -25,7 +25,8 @@ LOCAL_SRC_FILES := \
 		CtsOsJniOnLoad.cpp \
 		android_os_cts_CpuInstructions.cpp.arm \
 		android_os_cts_TaggedPointer.cpp \
-		android_os_cts_OSFeatures.cpp
+		android_os_cts_OSFeatures.cpp \
+		android_os_cts_NoExecutePermissionTest.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
