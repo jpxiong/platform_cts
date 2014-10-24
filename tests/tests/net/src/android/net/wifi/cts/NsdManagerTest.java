@@ -356,7 +356,7 @@ public class NsdManagerTest extends AndroidTestCase {
         assertTrue(lastEvent.mInfo.getPort() == localPort);
         assertTrue(eventCacheSize() == 1);
 
-        assertTrue(checkForAdditionalEvents());
+        checkForAdditionalEvents();
         clearEventCache();
 
         // Unregister the service
