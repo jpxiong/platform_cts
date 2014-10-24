@@ -213,8 +213,9 @@ public class WifiManagerTest extends AndroidTestCase {
     private void assertDisableOthers(WifiConfiguration wifiConfiguration, boolean disableOthers) {
         for (WifiConfiguration w : mWifiManager.getConfiguredNetworks()) {
             if ((!w.SSID.equals(wifiConfiguration.SSID)) && w.status != Status.CURRENT) {
-                if (disableOthers)
+                if (disableOthers) {
                     assertEquals(Status.DISABLED, w.status);
+                }
             }
         }
     }
@@ -321,6 +322,7 @@ public class WifiManagerTest extends AndroidTestCase {
             // skip the test if WiFi is not supported
             return;
         }
+
         // store the list of enabled networks, so they can be re-enabled after test completes
         Set<String> enabledSsids = getEnabledNetworks(mWifiManager.getConfiguredNetworks());
         try {
@@ -353,11 +355,6 @@ public class WifiManagerTest extends AndroidTestCase {
             wifiConfiguration = mWifiManager.getConfiguredNetworks().get(pos);
             assertDisableOthers(wifiConfiguration, disableOthers);
             assertEquals(Status.ENABLED, wifiConfiguration.status);
-            disableOthers = true;
-
-            assertTrue(mWifiManager.enableNetwork(netId, disableOthers));
-            wifiConfiguration = mWifiManager.getConfiguredNetworks().get(pos);
-            assertDisableOthers(wifiConfiguration, disableOthers);
 
             assertTrue(mWifiManager.disableNetwork(netId));
             wifiConfiguration = mWifiManager.getConfiguredNetworks().get(pos);
