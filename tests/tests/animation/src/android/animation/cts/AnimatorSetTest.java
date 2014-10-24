@@ -223,8 +223,6 @@ public class AnimatorSetTest extends
         assertTrue(clone2.getListeners().contains(listener2));
 
         assertTrue(set2.getListeners().contains(setListener));
-        assertEquals(set1.getChangingConfigurations(), set2.getChangingConfigurations());
-
 
         for (Animator.AnimatorListener listener : set1.getListeners()) {
             assertTrue(set2.getListeners().contains(listener));
