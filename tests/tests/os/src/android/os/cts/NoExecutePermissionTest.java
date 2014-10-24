@@ -28,45 +28,26 @@ import junit.framework.TestCase;
  */
 public class NoExecutePermissionTest extends TestCase {
 
-    public void testNoExecutePermission() throws FileNotFoundException {
+    static {
+        System.loadLibrary("ctsos_jni");
+    }
+
+    public void testNoExecuteStack() {
         if (!cpuHasNxSupport()) {
             return;
         }
+        assertFalse(isStackExecutable());
+    }
 
-        String heapPermissions = null;
-        String stackPermissions = null;
-
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File("/proc/self/maps"));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
-                String[] fields = line.split("\\s+");
-
-                // Sample line:
-                // 0001d000-00024000 rw-p 00000000 00:00 0          [heap]
-                if (fields != null && fields.length >= 1) {
-                    String permissions = fields[1];
-                    if (fields.length >= 6) {
-                        String tag = fields[5];
-                        if ("[heap]".equals(tag)) {
-                            heapPermissions = permissions;
-                        } else if ("[stack]".equals(tag)) {
-                            stackPermissions = permissions;
-                        }
-                    }
-                }
-            }
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
+    public void testNoExecuteHeap() {
+        if (!cpuHasNxSupport()) {
+            return;
         }
+        assertFalse(isHeapExecutable());
+    }
 
-        if (heapPermissions != null) {
-            assertEquals("NX (No Execute) not enabled for heap", "rw-p", heapPermissions);
-        }
-        assertEquals("NX (No Execute) not enabled for stack", "rw-p", stackPermissions);
+    public void testExecuteCode() {
+        assertTrue(isMyCodeExecutable());
     }
 
     private static boolean cpuHasNxSupport() {
@@ -84,4 +65,8 @@ public class NoExecutePermissionTest extends TestCase {
         // have NX support.
         return true;
     }
+
+    private static native boolean isStackExecutable();
+    private static native boolean isHeapExecutable();
+    private static native boolean isMyCodeExecutable();
 }
