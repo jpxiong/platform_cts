@@ -171,7 +171,7 @@ public class PhotoCaptureActivity extends Activity
                     mReportedFovPrePictureTaken = mCamera.getParameters().getHorizontalViewAngle();
 
                     mResolutionSpinnerIndex = position;
-                    initializeCamera();
+                    startPreview();
                 }
             }
 
@@ -395,6 +395,10 @@ public class PhotoCaptureActivity extends Activity
     }
 
     private void initializeCamera() {
+        initializeCamera(true);
+    }
+
+    private void initializeCamera(boolean startPreviewAfterInit) {
         if (mCamera == null || mSurfaceHolder.getSurface() == null) {
             return;
         }
@@ -417,7 +421,10 @@ public class PhotoCaptureActivity extends Activity
             mCamera.setParameters(params);
             mCameraInitialized = true;
         }
-        startPreview();
+
+        if (startPreviewAfterInit) {
+          startPreview();
+        }
     }
 
     private void startPreview() {
@@ -428,7 +435,7 @@ public class PhotoCaptureActivity extends Activity
         }
     }
 
-    private void switchToCamera(SelectableResolution resolution, boolean initializeCamera) {
+    private void switchToCamera(SelectableResolution resolution, boolean startPreview) {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
@@ -437,9 +444,7 @@ public class PhotoCaptureActivity extends Activity
         mSelectedResolution = resolution;
         mCamera = Camera.open(mSelectedResolution.cameraId);
 
-        if (initializeCamera){
-          initializeCamera();
-        }
+        initializeCamera(startPreview);
     }
 
     /**
