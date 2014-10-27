@@ -26,7 +26,7 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.raw(props) and
-            its.caps.read_3a(props))
+                             its.caps.read_3a(props))
 
         cam.do_3a()
 
