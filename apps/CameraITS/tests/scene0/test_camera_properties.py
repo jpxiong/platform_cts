@@ -26,10 +26,10 @@ def main():
 
         pprint.pprint(props)
 
-        # Test that a handful of required keys are present.
-        if its.caps.manual_sensor(props):
-            assert(props.has_key('android.sensor.info.sensitivityRange'))
+        its.caps.skip_unless(its.caps.manual_sensor(props))
 
+        # Test that a handful of required keys are present.
+        assert(props.has_key('android.sensor.info.sensitivityRange'))
         assert(props.has_key('android.sensor.orientation'))
         assert(props.has_key('android.scaler.streamConfigurationMap'))
         assert(props.has_key('android.lens.facing'))

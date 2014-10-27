@@ -37,11 +37,9 @@ def main():
     with its.device.ItsSession() as cam:
 
         props = cam.get_camera_properties()
-        if not its.caps.raw16(props) or \
-           not its.caps.manual_sensor(props) or \
-           not its.caps.read_3a(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.raw16(props) and
+           its.caps.manual_sensor(props) and
+           its.caps.read_3a(props))
 
         # Expose for the scene with min sensitivity
         sens_min, sens_max = props['android.sensor.info.sensitivityRange']
