@@ -37,13 +37,8 @@ def main():
         "scene1":[
             "test_ae_precapture_trigger",
             "test_black_white",
-            "test_burst_sameness_manual",
             "test_crop_region_raw",
-            "test_crop_regions",
-            "test_exposure",
             "test_locked_burst",
-            "test_param_exposure_time",
-            "test_param_flash_mode",
             "test_yuv_plus_jpeg"
         ]
     }
