@@ -91,6 +91,7 @@ public class RSCppTest extends AndroidTestCase {
         mRS = RenderScript.create(mCtx);
         mRS.setMessageHandler(mRsMessage);
         mVerify = new ScriptC_verify(mRS);
+        mVerify.set_gAllowedIntError(3);
     }
 
     @Override
