@@ -78,7 +78,6 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
     private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
     private static final int SLOWMO_SLOW_FACTOR = 4;
-    private static final int MAX_NUM_FRAME_DROP_ALLOWED = 4;
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
     private MediaRecorder mMediaRecorder;
@@ -910,15 +909,6 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Snapshots in legacy mode pause the preview briefly.  Skip the duration
                 // requirements for legacy mode unless this is fixed.
                 if (!mStaticInfo.isHardwareLevelLegacy()) {
-                    mCollector.expectTrue(
-                            String.format(
-                                    "Video %dx%d Frame drop detected before video snapshot: " +
-                                            "duration %dms (expected %dms)",
-                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
-                                    durationMs, expectedDurationMs
-                            ),
-                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_ALLOWED)
-                    );
                     // Log a warning is there is any frame drop detected.
                     if (durationMs >= expectedDurationMs * 2) {
                         Log.w(TAG, String.format(
@@ -930,15 +920,6 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     }
 
                     durationMs = (int) (nextTS - currentTS) / 1000000;
-                    mCollector.expectTrue(
-                            String.format(
-                                    "Video %dx%d Frame drop detected after video snapshot: " +
-                                            "duration %dms (expected %dms)",
-                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
-                                    durationMs, expectedDurationMs
-                            ),
-                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_ALLOWED)
-                    );
                     // Log a warning is there is any frame drop detected.
                     if (durationMs >= expectedDurationMs * 2) {
                         Log.w(TAG, String.format(
