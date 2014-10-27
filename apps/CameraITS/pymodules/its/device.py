@@ -30,7 +30,7 @@ class ItsSession(object):
 
     The script importing this module (on the host machine) prepares JSON
     objects encoding CaptureRequests, specifying sets of parameters to use
-    when capturing an image using the Camera2 APIs. This class encapsualtes
+    when capturing an image using the Camera2 APIs. This class encapsulates
     sending the requests to the device, monitoring the device's progress, and
     copying the resultant captures back to the host machine when done. TCP
     forwarded over adb is the transport mechanism used.
@@ -411,7 +411,7 @@ class ItsSession(object):
             CAP_RAW_YUV_JPEG
             CAP_DNG_YUV_JPEG
 
-        If multiple formats are specified, then this function returns multuple
+        If multiple formats are specified, then this function returns multiple
         capture objects, one for each requested format. If multiple formats and
         multiple captures (i.e. a burst) are specified, then this function
         returns multiple lists of capture objects. In both cases, the order of
@@ -437,7 +437,7 @@ class ItsSession(object):
             * width: the width of the captured image.
             * height: the height of the captured image.
             * format: image the format, in ["yuv","jpeg","raw","raw10","dng"].
-            * metadata: the capture result object (Python dictionaty).
+            * metadata: the capture result object (Python dictionary).
         """
         cmd = {}
         cmd["cmdName"] = "doCapture"
@@ -470,7 +470,7 @@ class ItsSession(object):
 
         # Wait for ncap*nsurf images and ncap metadata responses.
         # Assume that captures come out in the same order as requested in
-        # the burst, however indifidual images of different formats ca come
+        # the burst, however individual images of different formats can come
         # out in any order for that capture.
         nbufs = 0
         bufs = {"yuv":[], "raw":[], "raw10":[], "dng":[], "jpeg":[]}
