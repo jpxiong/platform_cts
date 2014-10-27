@@ -49,6 +49,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (mHasFeature) {
             mUserId = createManagedProfile();
             installApp(MANAGED_PROFILE_APK);
+            installApp(INTENT_RECEIVER_APK);
+            installApp(INTENT_SENDER_APK);
             setProfileOwner(MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId);
             startUser(mUserId);
         }
@@ -59,8 +61,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (mHasFeature) {
             removeUser(mUserId);
             getDevice().uninstallPackage(MANAGED_PROFILE_PKG);
+            getDevice().uninstallPackage(INTENT_SENDER_PKG);
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
         }
-
         super.tearDown();
     }
 
@@ -114,30 +117,58 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             return;
         }
 
-        try {
-            getDevice().uninstallPackage(INTENT_SENDER_PKG);
-            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
-            installAppAsUser(INTENT_SENDER_APK, 0);
-            installAppAsUser(INTENT_RECEIVER_APK, mUserId);
+        // Test from parent to managed
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "removeAllFilters", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "addManagedCanAccessParentFilters", mUserId));
+        assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".ContentTest", 0));
 
-            // Test from parent to managed
-            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                    "addManagedCanAccessParentFilters", mUserId));
-            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".IntentSenderTest", 0));
+        // Test from managed to parent
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "removeAllFilters", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "addParentCanAccessManagedFilters", mUserId));
+        assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".ContentTest", mUserId));
 
-            getDevice().uninstallPackage(INTENT_SENDER_PKG);
-            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
-            installAppAsUser(INTENT_SENDER_APK, mUserId);
-            installAppAsUser(INTENT_RECEIVER_APK, 0);
+    }
 
-            // Test from managed to parent
-            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                    "addParentCanAccessManagedFilters", mUserId));
-            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".IntentSenderTest", mUserId));
+    public void testCrossProfileCopyPaste() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
 
-        } finally {
-            getDevice().uninstallPackage(INTENT_SENDER_PKG);
-            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "allowCrossProfileCopyPaste", mUserId));
+        // Test that managed can see what is copied in the parent.
+        testCrossProfileCopyPasteInternal(mUserId, true);
+        // Test that the parent can see what is copied in managed.
+        testCrossProfileCopyPasteInternal(0, true);
+
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "disallowCrossProfileCopyPaste", mUserId));
+        // Test that managed can still see what is copied in the parent.
+        testCrossProfileCopyPasteInternal(mUserId, true);
+        // Test that the parent cannot see what is copied in managed.
+        testCrossProfileCopyPasteInternal(0, false);
+    }
+
+    private void testCrossProfileCopyPasteInternal(int userId, boolean shouldSucceed)
+            throws DeviceNotAvailableException {
+        final String direction = (userId == 0) ? "addManagedCanAccessParentFilters"
+                : "addParentCanAccessManagedFilters";
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "removeAllFilters", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                direction, mUserId));
+        if (shouldSucceed) {
+            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".CopyPasteTest",
+                    "testCanReadAcrossProfiles", userId));
+            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".CopyPasteTest",
+                    "testIsNotified", userId));
+        } else {
+            assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".CopyPasteTest",
+                    "testCannotReadAcrossProfiles", userId));
         }
     }
 

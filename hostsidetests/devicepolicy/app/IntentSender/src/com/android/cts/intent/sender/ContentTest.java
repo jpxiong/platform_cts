@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class IntentSenderTest extends InstrumentationTestCase {
+public class ContentTest extends InstrumentationTestCase {
 
     private static final String MESSAGE = "Sample Message";
 
@@ -57,8 +57,8 @@ public class IntentSenderTest extends InstrumentationTestCase {
 
     @Override
     public void tearDown() throws Exception {
-        super.tearDown();
         mActivity.finish();
+        super.tearDown();
     }
 
     /**
@@ -73,7 +73,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         intent.setClipData(ClipData.newRawUri("", uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        final Intent result = mActivity.getResult(intent);
+        final Intent result = mActivity.getCrossProfileResult(intent);
         assertNotNull(result);
         assertEquals(MESSAGE, result.getStringExtra("extra_response"));
     }
@@ -95,7 +95,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        mActivity.getResult(intent);
+        mActivity.getCrossProfileResult(intent);
         assertEquals(MESSAGE, getFirstLineFromUri(uri));
     }
 
@@ -107,7 +107,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         Intent intent = new Intent(ACTION_READ_FROM_URI);
         intent.setClipData(ClipData.newRawUri("", uri));
 
-        final Intent result = mActivity.getResult(intent);
+        final Intent result = mActivity.getCrossProfileResult(intent);
         assertNotNull(result);
         assertEquals(MESSAGE, result.getStringExtra("extra_response"));
     }
@@ -136,7 +136,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         Intent notGrant = new Intent(ACTION_READ_FROM_URI);
         notGrant.setClipData(ClipData.newRawUri("", uriNotGranted));
 
-        final Intent result = mActivity.getResult(notGrant);
+        final Intent result = mActivity.getCrossProfileResult(notGrant);
         assertNotNull(result);
         // The receiver did not have permission to read the uri. So it should have caught a security
         // exception.
@@ -155,7 +155,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         // We're expecting to run into a security exception
-        final Intent result = mActivity.getResult(intent);
+        final Intent result = mActivity.getCrossProfileResult(intent);
         if (result == null) {
             // This is fine; probably of a SecurityException when off in the
             // system somewhere.
@@ -170,7 +170,7 @@ public class IntentSenderTest extends InstrumentationTestCase {
         grantPersistable.setClipData(ClipData.newRawUri("", uri));
         grantPersistable.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        mActivity.getResult(grantPersistable);
+        mActivity.getCrossProfileResult(grantPersistable);
     }
 
     private Uri getBasicContentProviderUri(String path) {
