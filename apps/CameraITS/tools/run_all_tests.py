@@ -109,7 +109,7 @@ def main():
     if numnotmandatedfail > 0:
         print "(*) tests are not yet mandated"
 
-    its.device.ItsSession.report_result(camera_id, numfail == 0)
+    its.device.report_result(camera_id, numfail == 0)
 
 if __name__ == '__main__':
     main()
