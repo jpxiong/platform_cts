@@ -34,7 +34,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.compute_target_exposure(props))
+        its.caps.skip_unless(its.caps.compute_target_exposure(props) and
+                             its.caps.per_frame_control(props))
 
         e,s = its.target.get_target_exposure_combos(cam)["midExposureTime"]
         for i,e_mult in enumerate([0.8, 0.9, 1.0, 1.1, 1.2]):

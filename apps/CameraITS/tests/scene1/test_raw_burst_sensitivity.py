@@ -38,8 +38,9 @@ def main():
 
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.raw16(props) and
-           its.caps.manual_sensor(props) and
-           its.caps.read_3a(props))
+                             its.caps.manual_sensor(props) and
+                             its.caps.read_3a(props) and
+                             its.caps.per_frame_control(props))
 
         # Expose for the scene with min sensitivity
         sens_min, sens_max = props['android.sensor.info.sensitivityRange']
