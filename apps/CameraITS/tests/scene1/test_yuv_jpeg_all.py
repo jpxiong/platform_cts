@@ -29,7 +29,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.compute_target_exposure(props))
+        its.caps.skip_unless(its.caps.compute_target_exposure(props) and
+                             its.caps.per_frame_control(props))
 
         # Use a manual request with a linear tonemap so that the YUV and JPEG
         # should look the same (once converted by the its.image module).
