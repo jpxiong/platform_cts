@@ -33,10 +33,8 @@ def main():
     with its.device.ItsSession() as cam:
 
         props = cam.get_camera_properties()
-        if (not its.caps.compute_target_exposure(props) or
-            not its.caps.raw16(props)):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.compute_target_exposure(props) and
+            its.caps.raw16(props))
 
         successes = []
         failures = []

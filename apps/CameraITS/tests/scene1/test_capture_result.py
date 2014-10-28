@@ -34,10 +34,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if (not its.caps.manual_sensor(props) or
-            not its.caps.manual_post_proc(props)):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props) and
+            its.caps.manual_post_proc(props))
 
         manual_tonemap = [0,0, 1,1] # Linear
         manual_transform = its.objects.int_to_rational([1,2,3, 4,5,6, 7,8,9])

@@ -25,9 +25,7 @@ def main():
         props = cam.get_camera_properties()
 
         # Only run test if the appropriate caps are claimed.
-        if not its.caps.sensor_fusion(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.sensor_fusion(props))
 
         # Get the timestamp of a captured image.
         req, fmt = its.objects.get_fastest_manual_capture_settings(props)
