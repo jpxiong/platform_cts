@@ -1260,17 +1260,24 @@ public class ConfigTest extends AndroidTestCase {
 
         // Check that the list of locales doesn't contain any of the
         // "tl" variants. They should've been converted to "fil"
-        // locales. We can't check for "fil" locales because OEMs sadly
-        // still ship devices without all the localizations (http://b/18158040).
+        // locales.
         AssetManager am = config.getResources().getAssets();
         String[] locales = am.getLocales();
-        final List<String> tlLocales = new ArrayList<String>();
+        final List<String> tlLocales = new ArrayList<String>(4);
+        final List<String> filLocales = new ArrayList<String>(4);
         for (String locale : locales) {
             if (locale.startsWith("tl-") || locale.equals("tl")) {
                 tlLocales.add(locale);
             }
+
+            if (locale.startsWith("fil-") || locale.equals("fil")) {
+                filLocales.add(locale);
+            }
         }
 
         assertEquals(0, tlLocales.size());
+        assertEquals(2, filLocales.size());
+        assertTrue(filLocales.contains("fil"));
+        assertTrue(filLocales.contains("fil-PH"));
     }
 }
