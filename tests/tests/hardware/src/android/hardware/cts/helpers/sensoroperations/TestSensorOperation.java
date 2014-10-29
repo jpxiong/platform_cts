@@ -35,21 +35,19 @@ import android.hardware.cts.helpers.sensorverification.MeanVerification;
 import android.hardware.cts.helpers.sensorverification.StandardDeviationVerification;
 import android.os.Handler;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@link ISensorOperation} used to verify that sensor events and sensor values are correct.
+ * A {@link SensorOperation} used to verify that sensor events and sensor values are correct.
  * <p>
  * Provides methods to set test expectations as well as providing a set of default expectations
  * depending on sensor type.  When {{@link #execute()} is called, the sensor will collect the
  * events and then run all the tests.
  * </p>
  */
-public class TestSensorOperation extends AbstractSensorOperation {
-    private final Collection<ISensorVerification> mVerifications =
-            new HashSet<ISensorVerification>();
+public class TestSensorOperation extends SensorOperation {
+    private final HashSet<ISensorVerification> mVerifications = new HashSet<>();
 
     private final TestSensorManager mSensorManager;
     private final TestSensorEnvironment mEnvironment;

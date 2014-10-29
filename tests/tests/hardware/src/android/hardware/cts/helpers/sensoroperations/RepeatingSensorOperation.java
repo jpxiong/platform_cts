@@ -19,22 +19,22 @@ package android.hardware.cts.helpers.sensoroperations;
 import android.hardware.cts.helpers.SensorStats;
 
 /**
- * A {@link ISensorOperation} that executes a single {@link ISensorOperation} a given number of
- * times. This class can be combined to compose complex {@link ISensorOperation}s.
+ * A {@link SensorOperation} that executes a single {@link SensorOperation} a given number of
+ * times. This class can be combined to compose complex {@link SensorOperation}s.
  */
-public class RepeatingSensorOperation extends AbstractSensorOperation {
+public class RepeatingSensorOperation extends SensorOperation {
     public static final String STATS_TAG = "repeating";
 
-    private final ISensorOperation mOperation;
+    private final SensorOperation mOperation;
     private final int mIterations;
 
     /**
      * Constructor for {@link RepeatingSensorOperation}.
      *
-     * @param operation the {@link ISensorOperation} to run.
+     * @param operation the {@link SensorOperation} to run.
      * @param iterations the number of iterations to run the operation for.
      */
-    public RepeatingSensorOperation(ISensorOperation operation, int iterations) {
+    public RepeatingSensorOperation(SensorOperation operation, int iterations) {
         if (operation == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
@@ -44,13 +44,13 @@ public class RepeatingSensorOperation extends AbstractSensorOperation {
     }
 
     /**
-     * Executes the {@link ISensorOperation}s the given number of times. If an exception occurs
-     * in one iterations, it is thrown and all subsequent iterations will not run.
+     * Executes the {@link SensorOperation}s the given number of times. If an exception occurs in
+     * one iterations, it is thrown and all subsequent iterations will not run.
      */
     @Override
     public void execute() throws InterruptedException {
         for(int i = 0; i < mIterations; ++i) {
-            ISensorOperation operation = mOperation.clone();
+            SensorOperation operation = mOperation.clone();
             try {
                 operation.execute();
             } catch (AssertionError e) {

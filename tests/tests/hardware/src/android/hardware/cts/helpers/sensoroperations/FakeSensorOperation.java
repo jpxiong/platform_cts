@@ -16,17 +16,17 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import android.hardware.cts.helpers.SensorStats;
-
 import junit.framework.Assert;
+
+import android.hardware.cts.helpers.SensorStats;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * A fake {@ISensorOperation} that will run for a specified time and then pass or fail. Useful when
- * debugging the framework.
+ * A fake {@link SensorOperation} that will run for a specified time and then pass or fail. Useful
+ * when debugging the framework.
  */
-public class FakeSensorOperation extends AbstractSensorOperation {
+public class FakeSensorOperation extends SensorOperation {
     private static final int NANOS_PER_MILLI = 1000000;
 
     private final boolean mFail;

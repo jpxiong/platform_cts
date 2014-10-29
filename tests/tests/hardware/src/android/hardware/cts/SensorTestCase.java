@@ -26,7 +26,7 @@ import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.hardware.cts.helpers.TestSensorEnvironment;
-import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
+import android.hardware.cts.helpers.sensoroperations.SensorOperation;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -41,7 +41,7 @@ public abstract class SensorTestCase extends AndroidTestCase {
      * By default tests need to run in a {@link TestSensorEnvironment} that assumes each sensor is
      * running with a load of several listeners, requesting data at different rates.
      *
-     * In a better world the component acting as builder of {@link ISensorOperation} would compute
+     * In a better world the component acting as builder of {@link SensorOperation} would compute
      * this value based on the tests composed.
      *
      * Ideally, each {@link Sensor} object would expose this information to clients.
