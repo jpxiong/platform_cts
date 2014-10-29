@@ -83,6 +83,7 @@ public class BleAdvertiserHardwareScanFilterActivity extends PassFailButtons.Act
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter();
+        filter.addAction(BleAdvertiserService.BLE_ADV_NOT_SUPPORT);
         filter.addAction(BleAdvertiserService.BLE_START_SCANNABLE);
         filter.addAction(BleAdvertiserService.BLE_START_UNSCANNABLE);
         filter.addAction(BleAdvertiserService.BLE_STOP_SCANNABLE);
@@ -104,6 +105,10 @@ public class BleAdvertiserHardwareScanFilterActivity extends PassFailButtons.Act
 
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void pass() {
+        this.setTestResultAndFinish(true);
     }
 
     private void stopAdvertising() {
@@ -129,6 +134,9 @@ public class BleAdvertiserHardwareScanFilterActivity extends PassFailButtons.Act
                 case BleAdvertiserService.BLE_STOP_SCANNABLE:
                 case BleAdvertiserService.BLE_STOP_UNSCANNABLE:
                     showMessage("Stop advertising");
+                    break;
+                case BleAdvertiserService.BLE_ADV_NOT_SUPPORT:
+                    pass();
                     break;
             }
         }
