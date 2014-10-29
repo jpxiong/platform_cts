@@ -36,6 +36,7 @@
     <string name="test_category_features">Features</string>
     <string name="test_category_deskclock">Clock</string>
     <string name="test_category_jobscheduler">Job Scheduler</string>
+    <string name="test_category_tv">TV</string>
     <string name="test_category_other">Other</string>
     <string name="clear">Clear</string>
     <string name="test_results_cleared">Test results cleared.</string>
@@ -1400,6 +1401,30 @@
     <string name="js_unmetered_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
     <string name="js_any_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
     <string name="js_no_connectivity_test">Device with no connectivity will still execute a job with no connectivity constraints.</string>
+
+    <!-- String for TV app Tests -->
+    <string name="tv">TV App Behavior Verifier</string>
+    <string name="tv_info">
+    This test verifies that the default TV app is invoked via intents and issues appropriate
+    calls to framework APIs, so that TV input apps work properly with the default TV app.
+    </string>
+
+    <string name="tv_input_discover_test">TV app input discoverability test</string>
+    <string name="tv_input_discover_test_go_to_setup">
+    Press the \"Launch TV app\" button, and set up the newly installed TV input: \"CTS Verifier\".
+    </string>
+    <string name="tv_input_discover_test_verify_setup">
+    Setup activity must have been started.
+    </string>
+    <string name="tv_input_discover_test_tune_to_channel">
+    Press the \"Launch TV app\" button, and tune to the channel named \"Dummy\" from
+    \"CTS Verifier\" input. If necessary, configure the channel to be visible.
+    </string>
+    <string name="tv_input_discover_test_verify_tune">
+    Tune command must be called.
+    </string>
+
+    <string name="tv_launch_tv_app">Launch TV app</string>
 
     <!-- A list of fully-qualified test classes that should not be run. -->
     <string-array name="disabled_tests" />
