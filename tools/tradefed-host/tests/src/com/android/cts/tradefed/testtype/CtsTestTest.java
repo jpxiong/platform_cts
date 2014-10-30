@@ -47,11 +47,16 @@ public class CtsTestTest extends TestCase {
     private static final String PLAN_NAME = "CTS";
     private static final String PACKAGE_NAME = "test-name";
     private static final String ID = AbiUtils.createId(UnitTests.ABI.getName(), PACKAGE_NAME);
+    private static final TestIdentifier TEST_IDENTIFIER =
+            new TestIdentifier("CLASS_NAME", "TEST_NAME");
     private static final List<String> NAMES = new ArrayList<>();
     private static final List<String> IDS = new ArrayList<>();
+    private static final List<TestIdentifier> TEST_IDENTIFIER_LIST = new ArrayList<>();
+
     static {
         NAMES.add(PACKAGE_NAME);
         IDS.add(ID);
+        TEST_IDENTIFIER_LIST.add(TEST_IDENTIFIER);
     }
 
     /** the test fixture under test, with all external dependencies mocked out */
@@ -110,8 +115,8 @@ public class CtsTestTest extends TestCase {
         // turn off device collection for simplicity
         mCtsTest.setSkipDeviceInfo(true);
         // only run tests on one ABI
-        EasyMock.expect(mMockDevice.getProperty("ro.product.cpu.abilist")).andReturn(
-                UnitTests.ABI.getName()).anyTimes();
+        EasyMock.expect(mMockDevice.getProperty("ro.product.cpu.abilist"))
+                .andReturn(UnitTests.ABI.getName()).anyTimes();
     }
 
     /**
@@ -214,7 +219,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_excludedPackage() throws DeviceNotAvailableException, ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
         mMockPlan.parse((InputStream) EasyMock.anyObject());
-        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
+        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
 
         mCtsTest.addExcludedPackageName(PACKAGE_NAME);
 
@@ -229,7 +234,7 @@ public class CtsTestTest extends TestCase {
      */
     public void testRun_continueSession() throws DeviceNotAvailableException {
         mCtsTest.setContinueSessionId(1);
-        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
+        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
         TestFilter filter = new TestFilter();
         EasyMock.expect(mMockPlan.getTestFilter(ID)).andReturn(filter);
 
@@ -248,7 +253,7 @@ public class CtsTestTest extends TestCase {
     private void setParsePlanExceptations() throws ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
         mMockPlan.parse((InputStream) EasyMock.anyObject());
-        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
+        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
         TestFilter filter = new TestFilter();
         EasyMock.expect(mMockPlan.getTestFilter(ID)).andReturn(filter);
         mMockPackageDef.setTestFilter(filter);
@@ -263,7 +268,7 @@ public class CtsTestTest extends TestCase {
         EasyMock.expect(mMockRepo.getTestPackages(PACKAGE_NAME)).andReturn(mMockPackageDefs).anyTimes();
         EasyMock.expect(mMockRepo.getTestPackage(ID)).andReturn(mMockPackageDef).anyTimes();
         EasyMock.expect(mMockPackageDef.createTest((File) EasyMock.anyObject())).andReturn(mMockTest);
-        EasyMock.expect(mMockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
+        EasyMock.expect(mMockPackageDef.getTests()).andReturn(TEST_IDENTIFIER_LIST);
         EasyMock.expect(mMockPackageDef.getName()).andReturn(PACKAGE_NAME).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getAbi()).andReturn(UnitTests.ABI).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getId()).andReturn(ID).atLeastOnce();
