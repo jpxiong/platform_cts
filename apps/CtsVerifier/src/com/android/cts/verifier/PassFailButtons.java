@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 /**
  * {@link Activity}s to handle clicks to the pass and fail buttons of the pass fail buttons layout.
@@ -242,8 +243,25 @@ public class PassFailButtons {
             }
         };
 
-        activity.findViewById(R.id.pass_button).setOnClickListener(clickListener);
-        activity.findViewById(R.id.fail_button).setOnClickListener(clickListener);
+        View passButton = activity.findViewById(R.id.pass_button);
+        passButton.setOnClickListener(clickListener);
+        passButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast.makeText(activity, R.string.pass_button_text, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        View failButton = activity.findViewById(R.id.fail_button);
+        failButton.setOnClickListener(clickListener);
+        failButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast.makeText(activity, R.string.fail_button_text, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     private static void setInfo(final android.app.Activity activity, final int titleId,
@@ -255,6 +273,13 @@ public class PassFailButtons {
             @Override
             public void onClick(View view) {
                 showInfoDialog(activity, titleId, messageId, viewId);
+            }
+        });
+        infoButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast.makeText(activity, R.string.info_button_text, Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
 
