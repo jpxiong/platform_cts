@@ -464,8 +464,13 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             throw new IllegalArgumentException("missing device");
         }
 
+        Set<String> abiSet = getAbis();
+        if (abiSet == null || abiSet.isEmpty()) {
+            throw new IllegalArgumentException("could not get device's ABIs");
+        }
+
         checkFields();
-        setupTestPackageList();
+        setupTestPackageList(abiSet);
         if (mBugreport) {
             listener = new FailedTestBugreportGenerator(listener, getDevice());
         }
@@ -489,12 +494,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         // collect and install the prerequisiteApks first, to save time when multiple test
         // packages are using the same prerequisite apk
-        Collection<String> prerequisiteApks = getPrerequisiteApks(mTestPackageList);
+        Map<String, Set<String>> prerequisiteApks = getPrerequisiteApks(mTestPackageList, abiSet);
         Collection<String> uninstallPackages = getPrerequisitePackageNames(mTestPackageList);
 
         try {
-            installPrerequisiteApks(prerequisiteApks);
-
             // always collect the device info, even for resumed runs, since test will likely be
             // running on a different device
             collectDeviceInfo(getDevice(), mCtsBuild, listener);
@@ -505,9 +508,18 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG,
                 String.format("Start test run of %,d packages, containing %,d tests",
                     remainingPackageCount, totalTestCount));
+            IAbi currentAbi = null;
 
             for (int i = mLastTestPackageIndex; i < mTestPackageList.size(); i++) {
                 TestPackage testPackage = mTestPackageList.get(i);
+
+                if (currentAbi == null ||
+                    !currentAbi.getName().equals(testPackage.getAbi().getName())) {
+                    currentAbi = testPackage.getAbi();
+                    installPrerequisiteApks(
+                        prerequisiteApks.get(currentAbi.getName()), currentAbi);
+                }
+
                 if (testPackage.getKnownTests().size() == 0) {
                     // Skip empty packages. For example, those created by derived plans.
                     continue;
@@ -671,14 +683,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /**
      * Set {@code mTestPackageList} to the list of test packages to run filtered by ABI.
      */
-    private void setupTestPackageList() throws DeviceNotAvailableException {
+    private void setupTestPackageList(Set<String> abis) throws DeviceNotAvailableException {
         if (!mTestPackageList.isEmpty()) {
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, "Resume tests using existing package list");
             return;
-        }
-        Set<String> abis = getAbis();
-        if (abis == null || abis.isEmpty()) {
-            throw new IllegalArgumentException("could not get device's ABIs");
         }
         Log.logAndDisplay(LogLevel.INFO, LOG_TAG, "ABIs: " + abis);
 
@@ -842,18 +850,32 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
-     * Return the list of unique prerequisite apks to install
+     * Return the list (by abi) of unique prerequisite apks to install
      * @param testPackages
      */
-    private Collection<String> getPrerequisiteApks(List<TestPackage> testPackages) {
-        Set<String> apkNames = new HashSet<String>();
+    private Map<String, Set<String>> getPrerequisiteApks(
+            List<TestPackage> testPackages, Set<String> abiSet) {
+        Map<String, Set<String>> abiToApkMap = new HashMap<>();
         for (TestPackage testPkg : testPackages) {
-            String apkName = testPkg.mPackageDef.getTargetApkName();
-            if (apkName != null) {
-                apkNames.add(apkName);
+            if (testPkg.getKnownTests().size() == 0) {
+                // No tests, no point in installing pre-reqs
+                continue;
             }
+            String apkName = testPkg.mPackageDef.getTargetApkName();
+            if (apkName == null) {
+                continue;
+            }
+            String abiName = testPkg.getAbi().getName();
+            if (!abiSet.contains(abiName)) {
+                continue;
+            }
+
+            if (!abiToApkMap.containsKey(abiName)) {
+                abiToApkMap.put(abiName, new HashSet<String>());
+            }
+            abiToApkMap.get(abiName).add(apkName);
         }
-        return apkNames;
+        return abiToApkMap;
     }
 
     /**
@@ -865,28 +887,19 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @param prerequisiteApks
      * @throws DeviceNotAvailableException
      */
-    private void installPrerequisiteApks(Collection<String> prerequisiteApks)
+    private void installPrerequisiteApks(Collection<String> prerequisiteApks, IAbi abi)
             throws DeviceNotAvailableException {
+        if (prerequisiteApks == null) {
+            return;
+        }
         Log.logAndDisplay(LogLevel.INFO, LOG_TAG, "Installing prerequisites");
-        Set<String> supportedAbiSet = getAbis();
         for (String apkName : prerequisiteApks) {
             try {
                 File apkFile = mCtsBuild.getTestApp(apkName);
-                // As a workaround for multi arch support, try to install the APK
-                // for all device supported ABIs. This will generate warning messages
-                // until the above FIXME is resolved.
-                int installFailCount = 0;
-                for (String abi : supportedAbiSet) {
-                    String[] options = {AbiUtils.createAbiFlag(abi)};
-                    String errorCode = getDevice().installPackage(apkFile, true, options);
-                    if (errorCode != null) {
-                        installFailCount++;
-                        CLog.w("Failed to install %s. Reason: %s", apkName, errorCode);
-                    }
-
-                }
-                if (installFailCount >= supportedAbiSet.size()) {
-                    CLog.e("Failed to install %s. See warning messages.", apkName);
+                String[] options = {AbiUtils.createAbiFlag(abi.getName())};
+                String errorCode = getDevice().installPackage(apkFile, true, options);
+                if (errorCode != null) {
+                    CLog.e("Failed to install %s. Reason: %s", apkName, errorCode);
                 }
             } catch (FileNotFoundException e) {
                 CLog.e("Could not find test apk %s", apkName);
