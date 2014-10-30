@@ -28,6 +28,7 @@ LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt
 LOCAL_CTS_TEST_PACKAGE := android.host.security
 
 LOCAL_JAVA_RESOURCE_FILES := $(HOST_OUT_EXECUTABLES)/sepolicy-analyze
+LOCAL_JAVA_RESOURCE_FILES += $(call intermediates-dir-for,ETC,general_sepolicy.conf)/general_sepolicy.conf
 
 include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 
