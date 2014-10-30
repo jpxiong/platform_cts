@@ -477,4 +477,9 @@ class TestPackageDef implements ITestPackageDef {
         }
         return buf.toString();
     }
+
+    @Override
+    public int compareTo(ITestPackageDef testPackageDef) {
+        return getId().compareTo(testPackageDef.getId());
+    }
 }

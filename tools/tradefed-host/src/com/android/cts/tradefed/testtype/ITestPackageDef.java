@@ -28,7 +28,7 @@ import java.util.Collection;
  * <p/>
  * Knows how to translate this info into a runnable {@link IRemoteTest}.
  */
-public interface ITestPackageDef {
+public interface ITestPackageDef extends Comparable<ITestPackageDef> {
 
     /**
      * Get the id of the test package.
