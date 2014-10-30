@@ -1,5 +1,12 @@
 [
 {
+  description: "the UsageStats is not yet stable enough",
+  names: [
+    "android.app.usage.cts.UsageStatsTest"
+  ],
+  bug: 17536113
+},
+{
   description: "the ConnectivityConstraintTest are not yet stable",
   names: [
     "android.jobscheduler.cts.ConnectivityConstraintTest"
