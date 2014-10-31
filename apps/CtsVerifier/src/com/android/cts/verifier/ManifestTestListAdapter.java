@@ -22,12 +22,14 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +90,8 @@ public class ManifestTestListAdapter extends TestListAdapter {
 
     private static final String TEST_EXCLUDED_FEATURES_META_DATA = "test_excluded_features";
 
+    private final HashSet<String> mDisabledTests;
+
     private Context mContext;
 
     private String mTestParent;
@@ -96,6 +100,12 @@ public class ManifestTestListAdapter extends TestListAdapter {
         super(context);
         mContext = context;
         mTestParent = testParent;
+
+        String[] disabledTestArray = context.getResources().getStringArray(R.array.disabled_tests);
+        mDisabledTests = new HashSet<>(disabledTestArray.length);
+        for (int i = 0; i < disabledTestArray.length; i++) {
+            mDisabledTests.add(disabledTestArray[i]);
+        }
     }
 
     @Override
@@ -158,6 +168,10 @@ public class ManifestTestListAdapter extends TestListAdapter {
         int size = list.size();
         for (int i = 0; i < size; i++) {
             ResolveInfo info = list.get(i);
+            if (info.activityInfo == null || mDisabledTests.contains(info.activityInfo.name)) {
+                Log.w("CtsVerifier", "ignoring disabled test: " + info.activityInfo.name);
+                continue;
+            }
             String title = getTitle(mContext, info.activityInfo);
             String testName = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);

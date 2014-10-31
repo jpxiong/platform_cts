@@ -1314,4 +1314,8 @@
     <string name="js_unmetered_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
     <string name="js_any_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
     <string name="js_no_connectivity_test">Device with no connectivity will still execute a job with no connectivity constraints.</string>
+
+    <!-- A list of fully-qualified test classes that should not be run. -->
+    <string-array name="disabled_tests" />
+
 </resources>
