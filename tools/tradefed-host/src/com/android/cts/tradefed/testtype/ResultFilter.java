@@ -135,4 +135,9 @@ class ResultFilter extends ResultForwarder {
         }
         super.testRunEnded(0, new HashMap<String, String>());
     }
+
+    /** @return the number of known tests */
+    public int getKnownTestCount() {
+        return mKnownTests.size();
+    }
 }
