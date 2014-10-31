@@ -372,6 +372,7 @@ def BuildCtsVettedNewPackagesList():
       'android.uiautomation' : [],
       'android.uirendering' : [],
       'android.webgl' : [],
+      'com.drawelements.deqp.gles3' : [],
       'com.drawelements.deqp.gles31' : []}
 
 def BuildCtsFlakyTestList():
