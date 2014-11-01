@@ -57,7 +57,7 @@ public class StaticMetadata {
     private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST = 100000L; // 100us
     private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST = 100000000; // 100ms
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST = 100;
-    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
+    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 800;
     private static final int STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST = 4;
     private static final int TONEMAP_MAX_CURVE_POINTS_AT_LEAST = 64;
     private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN = -2;
