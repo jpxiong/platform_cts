@@ -100,6 +100,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_device_admin" />
+            <meta-data android:name="test_required_features"
+                    android:value="android.software.device_admin" />
         </activity>
 
         <!-- A generic activity for intent based tests -->
@@ -114,7 +116,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_device_admin" />
             <meta-data android:name="test_excluded_features"
-                       android:value="android.hardware.type.television:android.software.leanback" />
+                       android:value="android.hardware.type.television:android.software.leanback:android.hardware.type.watch" />
         </activity>
 
         <receiver android:name=".admin.TestDeviceAdminReceiver"
@@ -131,6 +133,8 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
+            <meta-data android:name="test_required_features"
+                    android:value="android.software.backup" />
         </activity>
 
         <activity android:name=".bluetooth.BluetoothTestActivity"
@@ -430,7 +434,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_security" />
             <meta-data android:name="test_excluded_features"
-                       android:value="android.hardware.type.television:android.software.leanback" />
+                       android:value="android.hardware.type.television:android.software.leanback:android.hardware.type.watch" />
         </activity>
 
         <activity android:name=".streamquality.StreamingVideoActivity"
@@ -441,6 +445,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_streaming" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 
         <activity android:name=".streamquality.PlayVideoActivity"
@@ -871,7 +877,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
             <meta-data android:name="test_excluded_features"
-                       android:value="android.hardware.type.television:android.software.leanback" />
+                       android:value="android.hardware.type.television:android.software.leanback:android.hardware.type.watch" />
         </activity>
         <activity android:name=".location.LocationModeBatterySavingTestActivity"
                 android:label="@string/location_mode_battery_saving_test">
@@ -880,6 +886,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
         <activity android:name=".location.LocationModeDeviceOnlyTestActivity"
                 android:label="@string/location_mode_device_only_test">
@@ -1002,6 +1010,8 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_hardware" />
             <meta-data android:name="test_required_features" android:value="android.hardware.usb.accessory" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 <!-- Turned off Sensor Power Test in initial L release
         <activity android:name=".sensors.SensorPowerTestActivity"
@@ -1062,6 +1072,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
         <activity android:name=".security.CANotifyOnBootActivity"
                 android:label="@string/caboot_test">
@@ -1070,6 +1082,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 
         <activity android:name=".p2p.GoNegRequesterTestListActivity"
@@ -1133,6 +1147,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
+            <meta-data android:name="test_required_features"
+                    android:value="android.software.app_widgets" />
         </activity>
 
         <activity android:name=".deskclock.DeskClockTestsActivity"
@@ -1229,6 +1245,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_projection" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 
         <activity android:name=".projection.touch.ProjectionTouchActivity"
