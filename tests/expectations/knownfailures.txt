@@ -1,5 +1,12 @@
 [
 {
+  description: "the ConnectivityConstraintTest are not yet stable",
+  names: [
+    "android.jobscheduler.cts.ConnectivityConstraintTest"
+  ],
+  bug: 18117279
+},
+{
   description: "tests a fragile by nature as they rely on hardcoded behavior",
   names: [
     "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverText",
