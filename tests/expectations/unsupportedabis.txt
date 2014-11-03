@@ -9,11 +9,7 @@
     "android.renderscriptlegacy.cts.LeakTest",
     "android.renderscriptlegacy.cts.RSBase",
     "android.renderscriptlegacy.cts.RSBaseCompute",
-    "android.renderscriptlegacy.cts.VersionTest",
-    "android.sample.cts.SampleDeviceResultTest",
-    "android.sample.cts.SampleDeviceTest",
-    "android.sample.cts.SampleHostResultTest",
-    "android.sample.cts.SampleHostTest"
+    "android.renderscriptlegacy.cts.VersionTest"
   ]
 }
 ]
