@@ -63,6 +63,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
@@ -199,6 +200,7 @@ public class CameraTestUtils extends Assert {
     public static class SimpleCaptureCallback extends CameraCaptureSession.CaptureCallback {
         private final LinkedBlockingQueue<CaptureResult> mQueue =
                 new LinkedBlockingQueue<CaptureResult>();
+        private AtomicLong mNumFramesArrived = new AtomicLong(0);
 
         @Override
         public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request,
@@ -210,6 +212,7 @@ public class CameraTestUtils extends Assert {
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request,
                 TotalCaptureResult result) {
             try {
+                mNumFramesArrived.incrementAndGet();
                 mQueue.put(result);
             } catch (InterruptedException e) {
                 throw new UnsupportedOperationException(
@@ -225,6 +228,10 @@ public class CameraTestUtils extends Assert {
         @Override
         public void onCaptureSequenceCompleted(CameraCaptureSession session, int sequenceId,
                 long frameNumber) {
+        }
+
+        public long getTotalNumFrames() {
+            return mNumFramesArrived.get();
         }
 
         public CaptureResult getCaptureResult(long timeout) {
