@@ -16,12 +16,15 @@
 package com.android.cts.tradefed.result;
 
 import com.android.ddmlib.Log;
+import com.android.cts.tradefed.result.TestLog.TestLogType;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data structure that represents a "Test" result XML element.
@@ -58,6 +61,12 @@ class Test extends AbstractXmlPullParser {
     private String mDetails;
 
     /**
+     * Log info for this test like a logcat dump or bugreport.
+     * Use *Locked methods instead of mutating this directly.
+     */
+    private List<TestLog> mTestLogs;
+
+    /**
      * Create an empty {@link Test}
      */
     public Test() {
@@ -73,6 +82,13 @@ class Test extends AbstractXmlPullParser {
         mResult = CtsTestStatus.NOT_EXECUTED;
         mStartTime = TimeUtil.getTimestamp();
         updateEndTime();
+    }
+
+    /**
+     * Add a test log to this Test.
+     */
+    public void addTestLog(TestLog testLog) {
+        addTestLogLocked(testLog);
     }
 
     /**
@@ -156,6 +172,8 @@ class Test extends AbstractXmlPullParser {
         serializer.attribute(CtsXmlResultReporter.ns, RESULT_ATTR, mResult.getValue());
         serializer.attribute(CtsXmlResultReporter.ns, STARTTIME_ATTR, mStartTime);
         serializer.attribute(CtsXmlResultReporter.ns, ENDTIME_ATTR, mEndTime);
+
+        serializeTestLogsLocked(serializer);
 
         if (mMessage != null) {
             serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
@@ -328,10 +346,38 @@ class Test extends AbstractXmlPullParser {
                 mMessage = getAttribute(parser, MESSAGE_ATTR);
             } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(STACK_TAG)) {
                 mStackTrace = parser.nextText();
+            } else if (eventType == XmlPullParser.START_TAG && TestLog.isTag(parser.getName())) {
+                parseTestLog(parser);
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
             }
             eventType = parser.next();
+        }
+    }
+
+    /** Parse a TestLog entry from the parser positioned at a TestLog tag. */
+    private void parseTestLog(XmlPullParser parser) throws XmlPullParserException{
+        TestLog log = TestLog.fromXml(parser);
+        if (log == null) {
+            throw new XmlPullParserException("invalid XML: bad test log tag");
+        }
+        addTestLog(log);
+    }
+
+    /** Add a TestLog to the test in a thread safe manner. */
+    private synchronized void addTestLogLocked(TestLog testLog) {
+        if (mTestLogs == null) {
+            mTestLogs = new ArrayList<>(TestLogType.values().length);
+        }
+        mTestLogs.add(testLog);
+    }
+
+    /** Serialize the TestLogs of this test in a thread safe manner. */
+    private synchronized void serializeTestLogsLocked(KXmlSerializer serializer) throws IOException {
+        if (mTestLogs != null) {
+            for (TestLog log : mTestLogs) {
+                log.serialize(serializer);
+            }
         }
     }
 }
