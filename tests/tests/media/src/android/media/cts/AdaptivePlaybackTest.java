@@ -50,7 +50,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> H264(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/avc",
+                MediaFormat.MIMETYPE_VIDEO_AVC,
                 "OMX.google.h264.decoder",
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
                 R.raw.video_1280x720_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz);
@@ -59,7 +59,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> HEVC(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/hevc",
+                MediaFormat.MIMETYPE_VIDEO_HEVC,
                 "OMX.google.hevc.decoder",
                 R.raw.video_640x360_mp4_hevc_450kbps_30fps_aac_stereo_128kbps_48000hz,
                 R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz);
@@ -68,7 +68,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> H263(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/3gpp",
+                MediaFormat.MIMETYPE_VIDEO_H263,
                 "OMX.google.h263.decoder",
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
                 R.raw.video_352x288_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz);
@@ -77,7 +77,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> Mpeg4(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/mp4v-es",
+                MediaFormat.MIMETYPE_VIDEO_MPEG4,
                 "OMX.google.mpeg4.decoder",
 
                 R.raw.video_1280x720_mp4_mpeg4_1000kbps_25fps_aac_stereo_128kbps_44100hz,
@@ -87,7 +87,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> VP8(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/x-vnd.on2.vp8",
+                MediaFormat.MIMETYPE_VIDEO_VP8,
                 "OMX.google.vp8.decoder",
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
                 R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
@@ -96,7 +96,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     public Iterable<Codec> VP9(CodecFactory factory) {
         return factory.createCodecList(
                 mContext,
-                "video/x-vnd.on2.vp9",
+                MediaFormat.MIMETYPE_VIDEO_VP9,
                 "OMX.google.vp9.decoder",
                 R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
                 R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
@@ -1288,9 +1288,8 @@ class CodecFamily extends CodecList {
             }
 
             /* enumerate codecs */
-            int codecCount = MediaCodecList.getCodecCount();
-            for (int codecIx = 0; codecIx < codecCount; codecIx++) {
-                MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(codecIx);
+            MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+            for (MediaCodecInfo codecInfo : mcl.getCodecInfos()) {
                 if (codecInfo.isEncoder()) {
                     continue;
                 }

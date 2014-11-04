@@ -18,6 +18,7 @@ package com.android.cts.videoperf;
 
 import android.graphics.Point;
 import android.media.MediaCodec;
+import android.media.MediaCodecList;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.Stat;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.lang.System;
 import java.util.Random;
@@ -49,7 +51,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     // is not very high.
     private static final long VIDEO_CODEC_WAIT_TIME_US = 5000;
     private static final boolean VERBOSE = false;
-    private static final String VIDEO_AVC = "video/avc";
+    private static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC;
     private static final int TOTAL_FRAMES = 300;
     private static final int NUMBER_OF_REPEAT = 10;
     // i frame interval for encoder
@@ -130,12 +132,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @param numberRepeat how many times to repeat the encoding / decoding process
      */
     private void doTest(String mimeType, int w, int h, int numberRepeat) throws Exception {
-        CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(mimeType, w, h, true);
+        CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(mimeType, w, h, true /* encoder */);
         if (infoEnc == null) {
-            Log.i(TAG, "Codec " + mimeType + "with " + w + "," + h + " not supported");
+            Log.i(TAG, "Encoder " + mimeType + " with " + w + "," + h + " not supported");
             return;
         }
-        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false);
+        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false /* encoder */);
         assertNotNull(infoDec);
         mVideoWidth = w;
         mVideoHeight = h;
@@ -207,8 +209,11 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @return time taken in ms to encode the frames. This does not include initialization time.
      */
     private double runEncoder(String mimeType, MediaFormat format, int totalFrames) {
-        MediaCodec codec = MediaCodec.createEncoderByType(mimeType);
+        MediaCodec codec = null;
         try {
+            MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+            String encoderName = mcl.findEncoderForFormat(format);
+            codec = MediaCodec.createByCodecName(encoderName);
             codec.configure(
                     format,
                     null /* surface */,
@@ -216,7 +221,11 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     MediaCodec.CONFIGURE_FLAG_ENCODE);
         } catch (IllegalStateException e) {
             Log.e(TAG, "codec '" + mimeType + "' failed configuration.");
+            codec.release();
             assertTrue("codec '" + mimeType + "' failed configuration.", false);
+        } catch (IOException | NullPointerException e) {
+            Log.i(TAG, "could not find codec for " + format);
+            return Double.NaN;
         }
         codec.start();
         ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
@@ -347,7 +356,15 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @return returns length-2 array with 0: time for decoding, 1 : rms error of pixels
      */
     private double[] runDecoder(String mimeType, MediaFormat format) {
-        MediaCodec codec = MediaCodec.createDecoderByType(mimeType);
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        String decoderName = mcl.findDecoderForFormat(format);
+        MediaCodec codec = null;
+        try {
+            codec = MediaCodec.createByCodecName(decoderName);
+        } catch (IOException | NullPointerException e) {
+            Log.i(TAG, "could not find codec for " + format);
+            return null;
+        }
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
         codec.start();
         ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
