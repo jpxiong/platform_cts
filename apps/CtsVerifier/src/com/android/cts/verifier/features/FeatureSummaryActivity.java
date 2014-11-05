@@ -169,6 +169,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     };
 
     public static final Feature[] ALL_JELLY_BEAN_FEATURES = {
+            // Required features in prior releases that became optional
+            new Feature(PackageManager.FEATURE_FAKETOUCH, false),
+
+            //new feature in JB
             new Feature(PackageManager.FEATURE_TELEVISION, false),
     };
 
@@ -190,13 +194,32 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_KITKAT_WATCH_FEATURES = {
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE, false),
+            new Feature(PackageManager.FEATURE_BACKUP, false),
+            new Feature(PackageManager.FEATURE_PRINTING, false),
+            new Feature(PackageManager.FEATURE_WATCH, false),
+            new Feature(PackageManager.FEATURE_WEBVIEW, false),
+            new Feature(PackageManager.FEATURE_CAMERA_EXTERNAL, false),
     };
 
-    public static final Feature[] ALL_LMP_FEATURES = {
+    public static final Feature[] ALL_LOLLIPOP_FEATURES = {
+            // New features in L
+            new Feature(PackageManager.FEATURE_AUDIO_OUTPUT, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_MANUAL_POST_PROCESSING, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_MANUAL_SENSOR, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_RAW, false),
+            new Feature(PackageManager.FEATURE_CAMERA_LEVEL_FULL, false),
+            new Feature(PackageManager.FEATURE_CONNECTION_SERVICE, false),
+            new Feature(PackageManager.FEATURE_GAMEPAD, false),
+            new Feature(PackageManager.FEATURE_LEANBACK, false),
+            new Feature(PackageManager.FEATURE_LIVE_TV, false),
+            new Feature(PackageManager.FEATURE_MANAGED_USERS, false),
+            new Feature(PackageManager.FEATURE_OPENGLES_EXTENSION_PACK, false),
+            new Feature(PackageManager.FEATURE_SECURELY_REMOVES_USERS, false),
+            new Feature(PackageManager.FEATURE_SENSOR_AMBIENT_TEMPERATURE, false),
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG, false),
+            new Feature(PackageManager.FEATURE_SENSOR_RELATIVE_HUMIDITY, false),
+            new Feature(PackageManager.FEATURE_VERIFIED_BOOT, false),
             new Feature("android.hardware.ethernet", false),
-            new Feature("android.software.backup", false),
-            new Feature("android.software.print", false),
     };
 
     @Override
@@ -230,7 +253,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
         if (apiVersion >= Build.VERSION_CODES.LOLLIPOP) {
-            Collections.addAll(features, ALL_LMP_FEATURES);
+            Collections.addAll(features, ALL_LOLLIPOP_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.KITKAT_WATCH) {
             Collections.addAll(features, ALL_KITKAT_WATCH_FEATURES);
