@@ -63,19 +63,15 @@ public class BleClientConnectActivity extends PassFailButtons.Activity {
                 }
             }
         });
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
         IntentFilter filter = new IntentFilter();
         filter.addAction(BleClientService.BLE_BLUETOOTH_CONNECTED);
         registerReceiver(onBroadcast, filter);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    protected void onDestroy(){
+        super.onDestroy();
         unregisterReceiver(onBroadcast);
     }
 
