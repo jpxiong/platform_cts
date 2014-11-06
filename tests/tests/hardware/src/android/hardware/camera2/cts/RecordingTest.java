@@ -287,8 +287,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     updatePreviewSurfaceWithVideoSize(size);
 
                     // Start recording
+                    SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
                     startSlowMotionRecording(/*useMediaRecorder*/true, videoFramerate, captureRate,
-                            fpsRange);
+                            fpsRange, resultListener);
                     long startTime = SystemClock.elapsedRealtime();
 
                     // Record certain duration.
@@ -296,10 +297,12 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                     // Stop recording and preview
                     stopRecording(/*useMediaRecorder*/true);
-                    int duration = (int) (SystemClock.elapsedRealtime() - startTime);
+                    // Convert number of frames camera produced into the duration in unit of ms.
+                    int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                                    videoFramerate);
 
                     // Validation.
-                    validateRecording(size, duration * SLOWMO_SLOW_FACTOR);
+                    validateRecording(size, durationMs);
 
                 }
 
@@ -329,7 +332,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     }
 
     private void startSlowMotionRecording(boolean useMediaRecorder, int videoFrameRate,
-            int captureRate, Range<Integer> fpsRange) throws Exception {
+            int captureRate, Range<Integer> fpsRange,
+            CameraCaptureSession.CaptureCallback listener) throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(2);
         assertTrue("Both preview and recording surfaces should be valid",
                 mPreviewSurface.isValid() && mRecordingSurface.isValid());
@@ -370,7 +374,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < slowMotionFactor - 1; i++) {
             slowMoRequests.add(recordingOnlyBuilder.build()); // Recording only.
         }
-        mSession.setRepeatingBurst(slowMoRequests, null, null);
+        mSession.setRepeatingBurst(slowMoRequests, listener, mHandler);
 
         if (useMediaRecorder) {
             mMediaRecorder.start();
@@ -415,18 +419,25 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             updatePreviewSurfaceWithVideoSize(videoSz);
 
             // Start recording
-            startRecording(/* useMediaRecorder */true);
-            long startTime = SystemClock.elapsedRealtime();
+            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+            startRecording(/* useMediaRecorder */true, resultListener);
 
             // Record certain duration.
             SystemClock.sleep(RECORDING_DURATION_MS);
 
             // Stop recording and preview
             stopRecording(/* useMediaRecorder */true);
-            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
+            // Convert number of frames camera produced into the duration in unit of ms.
+            int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                            profile.videoFrameRate);
+
+            if (VERBOSE) {
+                Log.v(TAG, "video frame rate: " + profile.videoFrameRate +
+                                ", num of frames produced: " + resultListener.getTotalNumFrames());
+            }
 
             // Validation.
-            validateRecording(videoSz, duration);
+            validateRecording(videoSz, durationMs);
         }
     }
 
@@ -458,18 +469,20 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             updatePreviewSurfaceWithVideoSize(sz);
 
             // Start recording
-            startRecording(/* useMediaRecorder */true);
-            long startTime = SystemClock.elapsedRealtime();
+            SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+            startRecording(/* useMediaRecorder */true, resultListener);
 
             // Record certain duration.
             SystemClock.sleep(RECORDING_DURATION_MS);
 
             // Stop recording and preview
             stopRecording(/* useMediaRecorder */true);
-            int duration = (int) (SystemClock.elapsedRealtime() - startTime);
+            // Convert number of frames camera produced into the duration in unit of ms.
+            int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                            VIDEO_FRAME_RATE);
 
             // Validation.
-            validateRecording(sz, duration);
+            validateRecording(sz, durationMs);
         }
     }
 
@@ -861,7 +874,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             // TODO: Don't skip this for video snapshot
             if (!mStaticInfo.isHardwareLevelLegacy()) {
                 assertTrue(String.format(
-                        "Video duration doesn't match: recorded %dms, expected %dms", duration,
+                        "Camera %s: Video duration doesn't match: recorded %dms, expected %dms",
+                        mCamera.getId(), duration,
                         durationMs), Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
             }
         } finally {
