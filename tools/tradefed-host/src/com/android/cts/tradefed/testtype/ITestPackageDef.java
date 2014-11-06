@@ -37,12 +37,6 @@ public interface ITestPackageDef extends Comparable<ITestPackageDef> {
     public String getId();
 
     /**
-     * Get the appPackageName of the test package.
-     * @return the {@link String} appPackageName
-     */
-    public String getAppPackageName();
-
-    /**
      * Creates a runnable {@link IRemoteTest} from info stored in this definition.
      *
      * @param testCaseDir {@link File} representing directory of test case data
@@ -50,22 +44,6 @@ public interface ITestPackageDef extends Comparable<ITestPackageDef> {
      *         <code>null</code> if test could not be created
      */
     public IRemoteTest createTest(File testCaseDir);
-
-    /**
-     * Determine if given test is defined in this package.
-     *
-     * @param testDef the {@link TestIdentifier}
-     * @return <code>true</code> if test is defined
-     */
-    public boolean isKnownTest(TestIdentifier testDef);
-
-    /**
-     * Determine if given test class is defined in this package.
-     *
-     * @param testClassName the fully qualified test class name
-     * @return <code>true</code> if test class is defined
-     */
-    public boolean isKnownTestClass(String testClassName);
 
     /**
      * Get the collection of tests in this test package.
