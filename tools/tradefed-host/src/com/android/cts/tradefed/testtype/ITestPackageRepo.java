@@ -19,7 +19,7 @@ package com.android.cts.tradefed.testtype;
 import com.android.cts.util.AbiUtils;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Interface for accessing tests from the CTS repository.
@@ -36,12 +36,19 @@ public interface ITestPackageRepo {
     public ITestPackageDef getTestPackage(String id);
 
     /**
-     * Get a {@link Set} of {@link TestPackageDef} given a name
-     *
-     * @param name the string package name
-     * @return a {@link Set} of {@link TestPackageDef}
+     * @return a sorted {@link List} of all package ids found in repo.
      */
-    public Set<ITestPackageDef> getTestPackages(String name);
+    public List<String> getPackageIds();
+
+    /**
+     * @return a sorted {@link List} of test package names
+     */
+    public List<String> getPackageNames();
+
+    /**
+     * @return A {@link Map} of test package name to a {@link List} of {@link ITestPackageDef}s.
+     */
+    public Map<String, List<ITestPackageDef>> getTestPackageDefsByName();
 
     /**
      * Attempt to find the package ids for a given test class name
@@ -50,15 +57,4 @@ public interface ITestPackageRepo {
      * @return a {@link List} of package ids.
      */
     public List<String> findPackageIdsForTest(String testClassName);
-
-    /**
-     * @return a sorted {@link List} of all package ids found in repo.
-     */
-    public List<String> getPackageIds();
-
-    /**
-     * @return a sorted {@link List} of all package names found in repo.
-     */
-    public List<String> getPackageNames();
-
 }
