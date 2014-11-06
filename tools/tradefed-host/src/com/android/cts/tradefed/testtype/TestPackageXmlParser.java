@@ -40,18 +40,14 @@ public class TestPackageXmlParser extends AbstractXmlParser {
 
     private static final String LOG_TAG = "TestPackageXmlParser";
 
-    private final Set<String> mAbis;
     private final boolean mIncludeKnownFailures;
 
     private Map<String, TestPackageDef> mPackageDefs = new HashMap<String, TestPackageDef>();
 
     /**
-     * @param abis Holds the ABIs which the test must be run against. This must be a subset of the
-     * ABIs supported by the device under test.
      * @param includeKnownFailures Whether to run tests which are known to fail.
      */
-    public TestPackageXmlParser(Set<String> abis, boolean includeKnownFailures) {
-        mAbis = abis;
+    public TestPackageXmlParser(boolean includeKnownFailures) {
         mIncludeKnownFailures = includeKnownFailures;
     }
 
@@ -88,7 +84,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String runTimeArgs = attributes.getValue("runtimeArgs");
                 final String testType = getTestType(attributes);
 
-                for (String abiName : mAbis) {
+                for (String abiName : AbiUtils.getAbisSupportedByCts()) {
                     Abi abi = new Abi(abiName, AbiUtils.getBitness(abiName));
                     TestPackageDef packageDef = new TestPackageDef();
                     packageDef.setAppPackageName(appPackageName);
@@ -154,13 +150,11 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                         Set<String> abis = new HashSet<String>();
                         if (abiList == null) {
                             // If no specification, add all supported abis
-                            abis.addAll(mAbis);
+                            abis.addAll(AbiUtils.getAbisSupportedByCts());
                         } else {
-                            for (String abi : abiList.split(", ")) {
-                                if (mAbis.contains(abi)) {
-                                    // Else only add the abi which are supported
-                                    abis.add(abi);
-                                }
+                            for (String abi : abiList.split(",")) {
+                                // Else only add the abi which are supported
+                                abis.add(abi.trim());
                             }
                         }
                         for (String abi : abis) {
@@ -206,9 +200,9 @@ public class TestPackageXmlParser extends AbstractXmlParser {
     }
 
     /**
-     * @returns the set of {@link TestPackageDef} containing data parsed from xml
+     * @return the set of {@link TestPackageDef} containing data parsed from xml
      */
     public Set<TestPackageDef> getTestPackageDefs() {
-        return new HashSet<TestPackageDef>(mPackageDefs.values());
+        return new HashSet<>(mPackageDefs.values());
     }
 }
