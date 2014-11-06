@@ -23,12 +23,7 @@
 #    as needed by CTS.
 #
 
-ifneq ($(filter $(LOCAL_CXX_STL),libc++ libc++_static),)
 LOCAL_CXX_STL := libc++
-else
-LOCAL_CXX_STL := stlport
-endif
-
 include $(BUILD_EXECUTABLE)
 
 cts_executable_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml

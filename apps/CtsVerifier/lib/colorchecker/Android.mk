@@ -19,6 +19,7 @@ LOCAL_PATH := $(call my-dir)
 # Build image analysis library
 
 include $(CLEAR_VARS)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libcolorchecker
@@ -34,7 +35,7 @@ LOCAL_SRC_FILES += testingimage.cpp \
                    whitebalancetest.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker
-LOCAL_CXX_STL := stlport
+LOCAL_CXX_STL := libc++
 LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libutils \

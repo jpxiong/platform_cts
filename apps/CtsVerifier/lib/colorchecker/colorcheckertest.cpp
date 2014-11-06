@@ -549,10 +549,10 @@ bool ColorCheckerTest::verifyPointPair(Vec2f pointUpperLeft,
         (pointBottomRight.x() >= mImage->getHeight()) ||
         (pointBottomRight.y() < 0) ||
         (pointBottomRight.y() >= mImage->getWidth()) ||
-        (abs(pointUpperLeft.x() - pointBottomRight.x()) <= 5) ||
-        (abs(pointUpperLeft.y() - pointBottomRight.y()) <= 5) ||
-        (abs(pointUpperLeft.x() - pointBottomRight.x()) >= 30) ||
-        (abs(pointUpperLeft.y() - pointBottomRight.y()) >= 30)) {
+        (std::abs(pointUpperLeft.x() - pointBottomRight.x()) <= 5) ||
+        (std::abs(pointUpperLeft.y() - pointBottomRight.y()) <= 5) ||
+        (std::abs(pointUpperLeft.x() - pointBottomRight.x()) >= 30) ||
+        (std::abs(pointUpperLeft.y() - pointBottomRight.y()) >= 30)) {
 
         // If any of the quadrilateral corners are out of the image or if
         // the distance between them are too large or too big, the quadrilateral
