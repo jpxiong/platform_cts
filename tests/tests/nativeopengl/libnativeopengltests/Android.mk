@@ -16,10 +16,11 @@
 # This is the shared library included by the JNI test app.
 #
 
-LOCAL_PATH:= $(call my-dir)/../standalone/jni/
+LOCAL_PATH := $(call my-dir)/../standalone/jni/
+REAL_LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+LOCAL_ADDITIONAL_DEPENDENCIES := $(REAL_LOCAL_PATH)/Android.mk
 
 LOCAL_MODULE := libnativeopengltests
 
@@ -36,12 +37,12 @@ LOCAL_SRC_FILES := \
         tests/EGLCleanup_test.cpp \
         tests/EGLCreateContext_test.cpp
 
-LOCAL_CXX_STL := stlport
+LOCAL_CXX_STL := libc++
 LOCAL_SHARED_LIBRARIES := libEGL \
                           libGLESv2 \
                           libandroid \
                           liblog \
 
-LOCAL_STATIC_LIBRARIES := libgtest
+LOCAL_STATIC_LIBRARIES := libgtest_libc++
 
 include $(BUILD_SHARED_LIBRARY)

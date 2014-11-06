@@ -18,6 +18,7 @@ ifeq ($(HOST_OS),linux)
 
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
@@ -26,9 +27,10 @@ LOCAL_SRC_FILES += ../jni/graphics/Matrix.cpp
 
 #$(info $(LOCAL_SRC_FILES))
 LOCAL_C_INCLUDES += external/gtest/include $(LOCAL_PATH)/../jni/graphics/
-LOCAL_STATIC_LIBRARIES := libutils libcutils libgtest_host libgtest_main_host liblog
-LOCAL_LDFLAGS:= -g -lrt -ldl -lstdc++ -lm -fno-exceptions -lpthread
+LOCAL_STATIC_LIBRARIES := libgtest_libc++_host libgtest_main_libc++_host liblog
+LOCAL_LDFLAGS:= -g -lpthread
 LOCAL_MODULE:= cts_device_opengl_test
+LOCAL_CXX_STL := libc++
 include $(BUILD_HOST_EXECUTABLE)
 
 endif # linux
