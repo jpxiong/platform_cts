@@ -219,7 +219,12 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG, false),
             new Feature(PackageManager.FEATURE_SENSOR_RELATIVE_HUMIDITY, false),
             new Feature(PackageManager.FEATURE_VERIFIED_BOOT, false),
+
+            // New hidden features in L
             new Feature("android.hardware.ethernet", false),
+            new Feature("android.hardware.hdmi.cec", false),
+            new Feature("android.software.leanback_only", false),
+            new Feature("android.software.voice_recognizers", false),
     };
 
     @Override
