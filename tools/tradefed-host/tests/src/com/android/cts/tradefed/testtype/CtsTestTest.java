@@ -35,8 +35,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -81,7 +83,7 @@ public class CtsTestTest extends TestCase {
         mMockDevice = EasyMock.createMock(ITestDevice.class);
         mMockListener = EasyMock.createNiceMock(ITestInvocationListener.class);
         mStubBuildHelper = new StubCtsBuildHelper();
-        mMockPackageDefs = new HashSet<ITestPackageDef>();
+        mMockPackageDefs = new HashSet<>();
         mMockPackageDef = EasyMock.createMock(ITestPackageDef.class);
         mMockPackageDefs.add(mMockPackageDef);
         EasyMock.expect(mMockPackageDef.getTargetApkName()).andStubReturn(null);
@@ -124,7 +126,7 @@ public class CtsTestTest extends TestCase {
      */
     @SuppressWarnings("unchecked")
     public void testRun_plan() throws DeviceNotAvailableException, ParseException {
-        setParsePlanExceptations();
+        setParsePlanExpectations();
 
         setCreateAndRunTestExpectations();
 
@@ -139,6 +141,12 @@ public class CtsTestTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testRun_package() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
+        Map<String, List<ITestPackageDef>> nameMap = new HashMap<>();
+        List<ITestPackageDef> testPackageDefList = new ArrayList<>();
+        testPackageDefList.add(mMockPackageDef);
+        nameMap.put(PACKAGE_NAME, testPackageDefList);
+
+        EasyMock.expect(mMockRepo.getTestPackageDefsByName()).andReturn(nameMap);
 
         setCreateAndRunTestExpectations();
 
@@ -153,7 +161,12 @@ public class CtsTestTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testRun_resume() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
+        Map<String, List<ITestPackageDef>> nameMap = new HashMap<>();
+        List<ITestPackageDef> testPackageDefList = new ArrayList<>();
+        testPackageDefList.add(mMockPackageDef);
+        nameMap.put(PACKAGE_NAME, testPackageDefList);
 
+        EasyMock.expect(mMockRepo.getTestPackageDefsByName()).andReturn(nameMap);
         setCreateAndRunTestExpectations();
         // abort the first run
         EasyMock.expectLastCall().andThrow(new DeviceNotAvailableException());
@@ -219,7 +232,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_excludedPackage() throws DeviceNotAvailableException, ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
         mMockPlan.parse((InputStream) EasyMock.anyObject());
-        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
+        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
 
         mCtsTest.addExcludedPackageName(PACKAGE_NAME);
 
@@ -234,7 +247,7 @@ public class CtsTestTest extends TestCase {
      */
     public void testRun_continueSession() throws DeviceNotAvailableException {
         mCtsTest.setContinueSessionId(1);
-        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
+        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
         TestFilter filter = new TestFilter();
         EasyMock.expect(mMockPlan.getTestFilter(ID)).andReturn(filter);
 
@@ -250,10 +263,10 @@ public class CtsTestTest extends TestCase {
     /**
      * Set EasyMock expectations for parsing {@link #PLAN_NAME}
      */
-    private void setParsePlanExceptations() throws ParseException {
+    private void setParsePlanExpectations() throws ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
         mMockPlan.parse((InputStream) EasyMock.anyObject());
-        EasyMock.expect(mMockPlan.getTestNames()).andReturn(NAMES);
+        EasyMock.expect(mMockPlan.getTestIds()).andReturn(IDS);
         TestFilter filter = new TestFilter();
         EasyMock.expect(mMockPlan.getTestFilter(ID)).andReturn(filter);
         mMockPackageDef.setTestFilter(filter);
@@ -265,10 +278,9 @@ public class CtsTestTest extends TestCase {
     private void setCreateAndRunTestExpectations() throws DeviceNotAvailableException {
         EasyMock.expect(mMockRepo.getPackageNames()).andReturn(NAMES).anyTimes();
         EasyMock.expect(mMockRepo.getPackageIds()).andReturn(IDS).anyTimes();
-        EasyMock.expect(mMockRepo.getTestPackages(PACKAGE_NAME)).andReturn(mMockPackageDefs).anyTimes();
         EasyMock.expect(mMockRepo.getTestPackage(ID)).andReturn(mMockPackageDef).anyTimes();
         EasyMock.expect(mMockPackageDef.createTest((File) EasyMock.anyObject())).andReturn(mMockTest);
-        EasyMock.expect(mMockPackageDef.getTests()).andReturn(TEST_IDENTIFIER_LIST);
+        EasyMock.expect(mMockPackageDef.getTests()).andReturn(TEST_IDENTIFIER_LIST).times(2);
         EasyMock.expect(mMockPackageDef.getName()).andReturn(PACKAGE_NAME).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getAbi()).andReturn(UnitTests.ABI).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getId()).andReturn(ID).atLeastOnce();

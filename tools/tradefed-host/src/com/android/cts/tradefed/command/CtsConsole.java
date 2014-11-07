@@ -80,7 +80,7 @@ public class CtsConsole extends Console {
             public void run() {
                 CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
-                    listPackages(ctsBuild, AbiUtils.getAbisSupportedByCts());
+                    listPackages(ctsBuild);
                 }
             }
         }, LIST_PATTERN, "packages");
@@ -193,8 +193,8 @@ public class CtsConsole extends Console {
         }
     }
 
-    private void listPackages(CtsBuildHelper ctsBuild, Set<String> abis) {
-        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir(), abis, false);
+    private void listPackages(CtsBuildHelper ctsBuild) {
+        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir(), false);
         for (String packageName : testCaseRepo.getPackageNames()) {
             printLine(packageName);
         }
