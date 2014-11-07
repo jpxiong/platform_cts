@@ -19,6 +19,7 @@ package android.media.cts;
 import com.android.cts.media.R;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
@@ -285,6 +286,11 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
     }
 
     private void ex(Iterable<Codec> codecList, Test[] testList) {
+        if (codecList == null) {
+            Log.i(TAG, "CodecList was empty. Skipping test.");
+            return;
+        }
+
         TestList tests = new TestList();
         for (Codec c : codecList) {
             for (Test test : testList) {
@@ -1342,8 +1348,21 @@ class CodecFamilyExcept extends CodecList {
 }
 
 class CodecFactory {
+    protected boolean hasCodec(String codecName) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (codecName.equals(info.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public CodecList createCodecList(
             Context context, String mime, String googleCodecName, int ...resources) {
+        if (!hasCodec(googleCodecName)) {
+            return null;
+        }
         return new CodecFamily(context, mime, googleCodecName, resources);
     }
 }
@@ -1351,6 +1370,9 @@ class CodecFactory {
 class SWCodecFactory extends CodecFactory {
     public CodecList createCodecList(
             Context context, String mime, String googleCodecName, int ...resources) {
+        if (!hasCodec(googleCodecName)) {
+            return null;
+        }
         return new CodecByName(context, mime, googleCodecName, resources);
     }
 }
@@ -1358,6 +1380,9 @@ class SWCodecFactory extends CodecFactory {
 class HWCodecFactory extends CodecFactory {
     public CodecList createCodecList(
             Context context, String mime, String googleCodecName, int ...resources) {
+        if (!hasCodec(googleCodecName)) {
+            return null;
+        }
         return new CodecFamilyExcept(context, mime, googleCodecName, resources);
     }
 }
