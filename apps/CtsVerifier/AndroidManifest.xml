@@ -157,6 +157,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/bt_control" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+            <meta-data android:name="test_excluded_features" android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".bluetooth.SecureServerActivity"
