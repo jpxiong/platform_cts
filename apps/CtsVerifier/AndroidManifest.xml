@@ -801,8 +801,14 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
-            <meta-data android:name="test_required_features"
-                       android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.stepcounter" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.stepdetector" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.proximity" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.light" />
         </activity>
 
         <!-- TODO: enable when a more reliable way to identify time synchronization is available -->
@@ -826,6 +832,14 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.compass" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.gyroscope" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.barometer" />
         </activity>
 
         <activity android:name=".sensors.SensorBatchingTestsActivity"
@@ -836,8 +850,14 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
-            <meta-data android:name="test_excluded_features"
-                       android:value="android.hardware.type.television:android.software.leanback" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.compass" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.gyroscope" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.barometer" />
         </activity>
 
         <activity android:name=".sensors.SensorIntegrationTestsActivity"
@@ -848,6 +868,12 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.compass" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.gyroscope" />
         </activity>
 
         <activity android:name=".sensors.SensorTestActivity"
@@ -858,6 +884,18 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST"/>
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.accelerometer" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.stepcounter" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.stepdetector" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.heartrate" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.compass" />
+            <meta-data android:name="test_applicable_features"
+                       android:value="android.hardware.sensor.ambient_temperature" />
         </activity>
 
         <!-- End sensor tests definitions -->
@@ -1188,8 +1226,8 @@
             <meta-data
                 android:name="test_category"
                 android:value="@string/test_category_sensors" />
-            <meta-data android:name="test_excluded_features"
-                       android:value="android.hardware.type.television:android.software.leanback" />
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.sensor.accelerometer" />
         </activity>
 
         <receiver android:name=".widget.WidgetCtsProvider">
