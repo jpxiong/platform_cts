@@ -479,6 +479,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
 
     @UiThreadTest
     public void testPostUrlWithNonNetworkUrl() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         final String nonNetworkUrl = "file:///android_asset/" + TestHtmlConstants.HELLO_WORLD_URL;
 
         mOnUiThread.postUrlAndWaitForCompletion(nonNetworkUrl, new byte[1]);
@@ -489,6 +492,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
 
     @UiThreadTest
     public void testPostUrlWithNetworkUrl() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         startWebServer(false);
         final String networkUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         final String postDataString = "username=my_username&password=my_password";
@@ -570,6 +576,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
     }
 
     public void testCanInjectHeaders() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
         final String X_FOO = "X-foo";
         final String X_FOO_VALUE = "test";
 
@@ -904,6 +914,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
     }
 
     public void testAddJavascriptInterfaceExceptions() throws Exception {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
         WebSettings settings = mOnUiThread.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
