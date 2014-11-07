@@ -907,6 +907,10 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
         <activity android:name=".location.LocationModeHighAccuracyTestActivity"
                 android:label="@string/location_mode_high_accuracy_test">
@@ -917,6 +921,10 @@
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
             <meta-data android:name="test_required_features"
                     android:value="android.hardware.location.network:android.hardware.location.gps" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
         <activity android:name=".location.LocationModeBatterySavingTestActivity"
                 android:label="@string/location_mode_battery_saving_test">
@@ -926,6 +934,10 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
             <meta-data android:name="test_required_features" android:value="android.hardware.location.network" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
         <activity android:name=".location.LocationModeDeviceOnlyTestActivity"
                 android:label="@string/location_mode_device_only_test">
@@ -935,6 +947,10 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_location" />
             <meta-data android:name="test_required_features" android:value="android.hardware.location.gps" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".camera.formats.CameraFormatsActivity"
@@ -1111,6 +1127,10 @@
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
             <meta-data android:name="test_excluded_features"
                     android:value="android.hardware.type.watch" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
         <activity android:name=".security.CANotifyOnBootActivity"
                 android:label="@string/caboot_test">
@@ -1121,6 +1141,10 @@
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
             <meta-data android:name="test_excluded_features"
                     android:value="android.hardware.type.watch" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".p2p.GoNegRequesterTestListActivity"
@@ -1195,6 +1219,10 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_deskclock" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
 <!-- TODO: enable when not requiring to tap the screen and timeouts are tuned -->
@@ -1371,6 +1399,10 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".jobscheduler.ChargingConstraintTestActivity" android:label="@string/js_charging_test">
@@ -1379,6 +1411,10 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".jobscheduler.ConnectivityConstraintTestActivity" android:label="@string/js_connectivity_test">
@@ -1387,6 +1423,10 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_jobscheduler" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.software.leanback" />
         </activity>
 
         <service android:name=".jobscheduler.MockJobService"
