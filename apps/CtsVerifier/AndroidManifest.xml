@@ -1178,14 +1178,15 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name=".sample.SampleTestActivity"
+        <!-- remove comment from the next activity to see the sample test surfacing in the app -->
+        <!-- activity android:name=".sample.SampleTestActivity"
                   android:label="@string/sample_framework_test">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
-        </activity>
+        </activity -->
 
         <activity android:name=".widget.WidgetTestActivity"
                 android:label="@string/widget_framework_test">
