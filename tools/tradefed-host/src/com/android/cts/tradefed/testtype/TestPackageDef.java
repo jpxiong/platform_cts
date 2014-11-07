@@ -112,20 +112,12 @@ class TestPackageDef implements ITestPackageDef {
         mAppPackageName = appPackageName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAppPackageName() {
+    String getAppPackageName() {
         return mAppPackageName;
     }
 
     void setRunTimeArgs(String runTimeArgs) {
         mRunTimeArgs = runTimeArgs;
-    }
-
-    String getRunTimeArgs() {
-        return mRunTimeArgs;
     }
 
     void setAppNameSpace(String appNameSpace) {
@@ -374,19 +366,7 @@ class TestPackageDef implements ITestPackageDef {
         return mTestFilter.filter(mTests);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isKnownTest(TestIdentifier testDef) {
-        return mTests.contains(testDef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isKnownTestClass(String className) {
+    boolean isKnownTestClass(String className) {
         return mTestClasses.contains(className);
     }
 
@@ -471,7 +451,7 @@ class TestPackageDef implements ITestPackageDef {
      * @return The hex encoded string.
      */
     private String toHexString(byte[] arr) {
-        StringBuffer buf = new StringBuffer(arr.length * 2);
+        StringBuilder buf = new StringBuilder(arr.length * 2);
         for (byte b : arr) {
             buf.append(String.format("%02x", b & 0xFF));
         }
