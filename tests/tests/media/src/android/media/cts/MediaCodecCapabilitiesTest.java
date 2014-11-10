@@ -15,6 +15,7 @@
  */
 package android.media.cts;
 
+import android.content.pm.PackageManager;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
@@ -36,10 +37,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     private static final int PLAY_TIME_MS = 30000;
 
     public void testAvcBaseline1() throws Exception {
-        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline)) {
-          return;
-        }
-        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
+        if (hasCodec(AVC_MIME) && !supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel1)) {
             throw new RuntimeException("AVCLevel1 support is required by CDD");
         }
@@ -125,7 +123,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testHevcMain1() throws Exception {
-        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+        if (hasCodec(HEVC_MIME) && !supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
                 CodecProfileLevel.HEVCMainTierLevel1)) {
             throw new RuntimeException("HECLevel1 support is required by CDD");
         }
@@ -238,4 +236,15 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         return false;
     }
 
+    private static boolean hasCodec(String mimeType) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
