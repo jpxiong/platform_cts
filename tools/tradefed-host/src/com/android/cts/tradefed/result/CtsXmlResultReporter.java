@@ -27,10 +27,13 @@ import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
+import com.android.tradefed.result.ILogSaver;
+import com.android.tradefed.result.ILogSaverListener;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.ITestSummaryListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
+import com.android.tradefed.result.LogFile;
 import com.android.tradefed.result.LogFileSaver;
 import com.android.tradefed.result.TestSummary;
 import com.android.tradefed.util.FileUtil;
@@ -54,7 +57,9 @@ import java.util.Map;
  * <p/>
  * Outputs xml in format governed by the cts_result.xsd
  */
-public class CtsXmlResultReporter implements ITestInvocationListener, ITestSummaryListener {
+public class CtsXmlResultReporter
+        implements ITestInvocationListener, ITestSummaryListener, ILogSaverListener {
+
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
@@ -89,11 +94,15 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
     @Option(name = "result-server", description = "Server to publish test results.")
     private String mResultServer;
 
+    @Option(name = "include-test-log-tags", description = "Include test log tags in XML report.")
+    private boolean mIncludeTestLogTags = false;
+
     protected IBuildInfo mBuildInfo;
     private String mStartTime;
     private String mDeviceSerial;
     private TestResults mResults = new TestResults();
     private TestPackageResult mCurrentPkgResult = null;
+    private Test mCurrentTest = null;
     private boolean mIsDeviceInfoRun = false;
     private ResultReporter mReporter;
     private File mLogDir;
@@ -102,6 +111,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
+    }
+
+    /** Set whether to include TestLog tags in the XML reports. */
+    public void setIncludeTestLogTags(boolean include) {
+        mIncludeTestLogTags = include;
     }
 
     /**
@@ -211,6 +225,20 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testLogSaved(String dataName, LogDataType dataType, InputStreamSource dataStream,
+            LogFile logFile) {
+        if (mIncludeTestLogTags && mCurrentTest != null) {
+            TestLog log = TestLog.fromDataName(dataName, logFile.getUrl());
+            if (log != null) {
+                mCurrentTest.addTestLog(log);
+            }
+        }
+    }
+
+    /**
      * Return the {@link LogFileSaver} to use.
      * <p/>
      * Exposed for unit testing.
@@ -219,6 +247,10 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
         return new LogFileSaver(mLogDir);
     }
 
+    @Override
+    public void setLogSaver(ILogSaver logSaver) {
+      // Don't need to keep a reference to logSaver, because we don't save extra logs in this class.
+    }
 
     @Override
     public void testRunStarted(String id, int numTests) {
@@ -235,7 +267,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener, ITestSumma
     @Override
     public void testStarted(TestIdentifier test) {
         if (!mIsDeviceInfoRun) {
-            mCurrentPkgResult.insertTest(test);
+            mCurrentTest = mCurrentPkgResult.insertTest(test);
         }
     }
 
