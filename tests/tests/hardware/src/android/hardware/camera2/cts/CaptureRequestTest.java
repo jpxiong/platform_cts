@@ -326,7 +326,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_ON);
 
                 // LEGACY won't support AE mode OFF
-                if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                boolean aeOffModeSupported = false;
+                for (int aeMode : mStaticInfo.getAeAvailableModesChecked()) {
+                    if (aeMode == CaptureRequest.CONTROL_AE_MODE_OFF) {
+                        aeOffModeSupported = true;
+                    }
+                }
+                if (aeOffModeSupported) {
                     flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_OFF);
                 }
 
