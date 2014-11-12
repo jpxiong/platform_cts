@@ -45,22 +45,25 @@ public class BleClientConnectActivity extends PassFailButtons.Activity {
                          R.string.ble_client_send_connect_info, -1);
         getPassButton().setEnabled(false);
 
-        mEditText = (EditText) findViewById(R.id.ble_address);
-
-        ((Button) findViewById(R.id.ble_connect)).setOnClickListener(new OnClickListener() {
+        ((Button) findViewById(R.id.ble_scan_start)).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address = mEditText.getText().toString();
-                if (!BluetoothAdapter.checkBluetoothAddress(address)) {
-                    showMessage("Invalid bluetooth address.");
-                } else {
-                    Intent intent = new Intent(BleClientConnectActivity.this,
-                                               BleClientService.class);
-                    intent.putExtra(BleClientService.EXTRA_COMMAND,
-                                    BleClientService.COMMAND_CONNECT);
-                    intent.putExtra(BluetoothDevice.EXTRA_DEVICE, address);
-                    startService(intent);
-                }
+                Intent intent = new Intent(BleClientConnectActivity.this,
+                        BleClientService.class);
+                intent.putExtra(BleClientService.EXTRA_COMMAND,
+                        BleClientService.COMMAND_SCAN_START);
+                startService(intent);
+            }
+        });
+
+        ((Button) findViewById(R.id.ble_scan_stop)).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BleClientConnectActivity.this,
+                        BleClientService.class);
+                intent.putExtra(BleClientService.EXTRA_COMMAND,
+                        BleClientService.COMMAND_SCAN_STOP);
+                startService(intent);
             }
         });
 
