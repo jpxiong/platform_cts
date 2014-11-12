@@ -24,6 +24,7 @@ import android.graphics.ImageFormat;
 import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -76,6 +77,42 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
         bis.close();
         masterFd.close();
+    }
+
+    private boolean hasCodecForMimeType(String mimeType) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasH264() {
+        return hasCodecForMimeType("video/avc");
+    }
+
+    private boolean hasHEVC() {
+        return hasCodecForMimeType("video/hevc");
+    }
+
+    private boolean hasH263() {
+        return hasCodecForMimeType("video/3gpp");
+    }
+
+    private boolean hasMpeg4() {
+        return hasCodecForMimeType("video/mp4v-es");
+    }
+
+    private boolean hasVP8() {
+        return hasCodecForMimeType("video/x-vnd.on2.vp8");
+    }
+
+    private boolean hasVP9() {
+        return hasCodecForMimeType("video/x-vnd.on2.vp9");
     }
 
     // TODO: add similar tests for other audio and video formats
@@ -175,6 +212,10 @@ public class DecoderTest extends MediaPlayerTestBase {
         MediaFormat format = ex.getTrackFormat(0);
         String mime = format.getString(MediaFormat.KEY_MIME);
         assertTrue("not a video track. Wrong test file?", mime.startsWith("video/"));
+        if (!hasCodecForMimeType(mime)) {
+            Log.i(TAG, "Could not find a codec for mimeType: " + mime);
+            return;
+        }
         MediaCodec dec = MediaCodec.createDecoderByType(mime);
         Surface s = getActivity().getSurfaceHolder().getSurface();
         dec.configure(format, s, null, 0);
@@ -840,6 +881,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicH264() throws Exception {
+        if (!hasH264()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
@@ -853,6 +897,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicHEVC() throws Exception {
+        if (!hasHEVC()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
@@ -866,6 +913,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicH263() throws Exception {
+        if (!hasH263()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
@@ -879,6 +929,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicMpeg4() throws Exception {
+        if (!hasMpeg4()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
@@ -892,6 +945,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicVP8() throws Exception {
+        if (!hasVP8()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
@@ -905,6 +961,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicVP9() throws Exception {
+        if (!hasVP9()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
@@ -918,6 +977,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSH263() throws Exception {
+        if (!hasH263()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
@@ -926,6 +988,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSH264() throws Exception {
+        if (!hasH264()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
@@ -934,6 +999,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSHEVC() throws Exception {
+        if (!hasHEVC()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
@@ -942,6 +1010,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSMpeg4() throws Exception {
+        if (!hasMpeg4()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
@@ -950,6 +1021,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSVP8() throws Exception {
+        if (!hasVP8()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
@@ -958,6 +1032,9 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSVP9() throws Exception {
+        if (!hasVP9()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
@@ -966,66 +1043,102 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsH264WithoutSurface() throws Exception {
+        if (!hasH264()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, null);
     }
 
     public void testCodecResetsH264WithSurface() throws Exception {
+        if (!hasH264()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, s);
     }
 
     public void testCodecResetsHEVCWithoutSurface() throws Exception {
+        if (!hasHEVC()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz, null);
     }
 
     public void testCodecResetsHEVCWithSurface() throws Exception {
+        if (!hasHEVC()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz, s);
     }
 
     public void testCodecResetsH263WithoutSurface() throws Exception {
+        if (!hasH263()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, null);
     }
 
     public void testCodecResetsH263WithSurface() throws Exception {
+        if (!hasH263()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, s);
     }
 
     public void testCodecResetsMpeg4WithoutSurface() throws Exception {
+        if (!hasMpeg4()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, null);
     }
 
     public void testCodecResetsMpeg4WithSurface() throws Exception {
+        if (!hasMpeg4()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, s);
     }
 
     public void testCodecResetsVP8WithoutSurface() throws Exception {
+        if (!hasVP8()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
     }
 
     public void testCodecResetsVP8WithSurface() throws Exception {
+        if (!hasVP8()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
     }
 
     public void testCodecResetsVP9WithoutSurface() throws Exception {
+        if (!hasVP9()) {
+            return;
+        }
         testCodecResets(
                 R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
     }
 
     public void testCodecResetsVP9WithSurface() throws Exception {
+        if (!hasVP9()) {
+            return;
+        }
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecResets(
                 R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
