@@ -27,6 +27,7 @@
         <EditText android:id="@+id/write_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@string/ble_test_text"
                 android:hint="@string/ble_write_hint"
                 android:padding="5dip"
                 />
