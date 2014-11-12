@@ -305,11 +305,8 @@ public class ManifestTestListAdapter extends TestListAdapter {
     List<TestListItem> filterTests(List<TestListItem> tests) {
         List<TestListItem> filteredTests = new ArrayList<TestListItem>();
         for (TestListItem test : tests) {
-            String[] excludedFeatures = test.excludedFeatures;
-            String[] requiredFeatures = test.requiredFeatures;
-            String[] applicableFeatures = test.applicableFeatures;
-            if (!hasAnyFeature(excludedFeatures) && hasAllFeatures(requiredFeatures)) {
-                if (hasAnyFeature(applicableFeatures) || hasAllFeatures(applicableFeatures)) {
+            if (!hasAnyFeature(test.excludedFeatures) && hasAllFeatures(test.requiredFeatures)) {
+                if (test.applicableFeatures == null || hasAnyFeature(test.applicableFeatures)) {
                     filteredTests.add(test);
                 }
             }
