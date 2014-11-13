@@ -286,7 +286,7 @@ public class VisualizerTest extends PostProcTestBase {
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sine1khzm40db);
             final int EXPECTED_PEAK_MB = -4015;
             final int EXPECTED_RMS_MB =  -4300;
-            final int MAX_MEASUREMENT_ERROR_MB = 1500;
+            final int MAX_MEASUREMENT_ERROR_MB = 2000;
             assertNotNull("null MediaPlayer", mp);
 
             AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -308,6 +308,9 @@ public class VisualizerTest extends PostProcTestBase {
                     Visualizer.SUCCESS, status);
             MeasurementPeakRms measurement = new MeasurementPeakRms();
             status = mVisualizer.getMeasurementPeakRms(measurement);
+            mp.stop();
+            mp.release();
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
             assertEquals("getMeasurementPeakRms() reports failure",
                     Visualizer.SUCCESS, status);
             Log.i("VisTest", "peak="+measurement.mPeak+"  rms="+measurement.mRms);
@@ -315,9 +318,54 @@ public class VisualizerTest extends PostProcTestBase {
             int deltaRms =  Math.abs(measurement.mRms - EXPECTED_RMS_MB);
             assertTrue("peak deviation in mB=" + deltaPeak, deltaPeak < MAX_MEASUREMENT_ERROR_MB);
             assertTrue("RMS deviation in mB=" + deltaRms, deltaRms < MAX_MEASUREMENT_ERROR_MB);
+
+        } catch (IllegalStateException e) {
+            fail("method called in wrong state");
+        } catch (InterruptedException e) {
+            fail("sleep() interrupted");
+        } finally {
+            releaseVisualizer();
+        }
+    }
+
+    //Test case 4.2: test measurement of peak / RMS in Long MP3
+    public void test4_2MeasurePeakRmsLongMP3() throws Exception {
+        try {
+            // this test will play a 1kHz sine wave with peaks at -40dB
+            MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sine1khzs40dblong);
+            final int EXPECTED_PEAK_MB = -4015;
+            final int EXPECTED_RMS_MB =  -4300;
+            final int MAX_MEASUREMENT_ERROR_MB = 2000;
+            assertNotNull("null MediaPlayer", mp);
+
+            AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+            assertNotNull("null AudioManager", am);
+            int originalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,
+                    am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+            getVisualizer(mp.getAudioSessionId());
+            mp.start();
+
+            mVisualizer.setEnabled(true);
+            assertTrue("visualizer not enabled", mVisualizer.getEnabled());
+            Thread.sleep(100);
+            int status = mVisualizer.setMeasurementMode(Visualizer.MEASUREMENT_MODE_PEAK_RMS);
+            // make sure we're playing long enough so the measurement is valid
+            Thread.sleep(500);
+            assertEquals("setMeasurementMode() for PEAK_RMS doesn't report success",
+                    Visualizer.SUCCESS, status);
+            MeasurementPeakRms measurement = new MeasurementPeakRms();
+            status = mVisualizer.getMeasurementPeakRms(measurement);
             mp.stop();
             mp.release();
             am.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
+            assertEquals("getMeasurementPeakRms() reports failure",
+                    Visualizer.SUCCESS, status);
+            Log.i("VisTest", "peak="+measurement.mPeak+"  rms="+measurement.mRms);
+            int deltaPeak = Math.abs(measurement.mPeak - EXPECTED_PEAK_MB);
+            int deltaRms =  Math.abs(measurement.mRms - EXPECTED_RMS_MB);
+            assertTrue("peak deviation in mB=" + deltaPeak, deltaPeak < MAX_MEASUREMENT_ERROR_MB);
+            assertTrue("RMS deviation in mB=" + deltaRms, deltaRms < MAX_MEASUREMENT_ERROR_MB);
 
         } catch (IllegalStateException e) {
             fail("method called in wrong state");
