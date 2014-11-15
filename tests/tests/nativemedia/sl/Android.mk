@@ -30,7 +30,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_STATIC_LIBRARIES := \
     libOpenSLESUT \
-    libgtest_libc++
+    libgtest
 
 LOCAL_CTS_TEST_PACKAGE := android.nativemedia.sl
 include $(BUILD_CTS_EXECUTABLE)
