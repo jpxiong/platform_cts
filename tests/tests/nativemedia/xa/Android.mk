@@ -29,7 +29,7 @@ LOCAL_SHARED_LIBRARIES := \
   libOpenMAXAL \
 
 LOCAL_STATIC_LIBRARIES := \
-  libgtest_libc++ \
+  libgtest \
 
 LOCAL_CTS_TEST_PACKAGE := android.nativemedia.xa
 include $(BUILD_CTS_EXECUTABLE)

@@ -22,8 +22,8 @@ LOCAL_WHOLE_STATIC_LIBRARIES += \
 LOCAL_STATIC_LIBRARIES += \
     libtinyxml2 \
     liblog \
-    libgtest_libc++ \
-    libgtest_main_libc++ \
+    libgtest \
+    libgtest_main \
 
 LOCAL_CTS_TEST_PACKAGE := android.bionic
 include $(BUILD_CTS_EXECUTABLE)
