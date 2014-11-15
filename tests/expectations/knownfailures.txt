@@ -349,10 +349,7 @@
     "android.hardware.cts.SingleSensorTests#testLinearAcceleration_10hz",
     "android.hardware.cts.SingleSensorTests#testLinearAcceleration_5hz",
     "android.hardware.cts.SingleSensorTests#testLinearAcceleration_1hz",
-    "android.hardware.cts.SensorTest#testValuesForAllSensors",
-    "android.hardware.cts.SensorTest#testSensorTimeStamps",
-    "android.hardware.cts.SensorTest#testBatchAndFlush",
-    "android.hardware.cts.SensorTest#testBatchAndFlushWithHandler"
+    "android.hardware.cts.SensorTest#testSensorTimeStamps"
   ],
   bug: 17675466
 },
