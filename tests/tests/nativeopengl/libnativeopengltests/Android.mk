@@ -43,6 +43,6 @@ LOCAL_SHARED_LIBRARIES := libEGL \
                           libandroid \
                           liblog \
 
-LOCAL_STATIC_LIBRARIES := libgtest_libc++
+LOCAL_STATIC_LIBRARIES := libgtest
 
 include $(BUILD_SHARED_LIBRARY)
