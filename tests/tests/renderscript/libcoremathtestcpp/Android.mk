@@ -30,5 +30,4 @@ LOCAL_C_INCLUDES += frameworks/rs
 
 LOCAL_SHARED_LIBRARIES := libdl liblog libRScpp
 LOCAL_STATIC_LIBRARIES := libcutils
-LOCAL_CXX_STL := stlport
 include $(BUILD_SHARED_LIBRARY)
