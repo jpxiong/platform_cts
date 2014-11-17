@@ -195,10 +195,14 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
         testDecoder(R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
         testDecoder(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_mono_24kbps_11025hz);
         testDecoder(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz);
-
     }
 
     private void testDecoder(int res) throws Exception {
+        if (!supportsPlayback(res)) {
+            Log.i(TAG, "SKIPPING testDecoder() resid=" + res + " Unsupported decorder.");
+            return;
+        }
+
         AssetFileDescriptor fd = mResources.openRawResourceFd(res);
 
         int[] jdata = getDecodedData(
@@ -382,6 +386,11 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
     }
 
     private void testVideoPlayback(int res) throws Exception {
+        if (!supportsPlayback(res)) {
+            Log.i(TAG, "SKIPPING testVideoPlayback() resid=" + res + " Unsupported decorder.");
+            return;
+        }
+
         AssetFileDescriptor fd = mResources.openRawResourceFd(res);
 
         boolean ret = testPlaybackNative(mActivity.getSurfaceHolder().getSurface(),
