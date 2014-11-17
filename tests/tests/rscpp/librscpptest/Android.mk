@@ -30,7 +30,15 @@ LOCAL_C_INCLUDES += frameworks/rs
 
 LOCAL_SHARED_LIBRARIES := libdl liblog
 LOCAL_STATIC_LIBRARIES := libRScpp_static libcutils
-LOCAL_CXX_STL := stlport_static
+
+ifeq ($(my_32_64_bit_suffix),32)
+    LOCAL_SDK_VERSION := 8
+else
+    LOCAL_SDK_VERSION := 21
+endif
+
+LOCAL_NDK_STL_VARIANT := stlport_static
+
 include $(BUILD_SHARED_LIBRARY)
 
 
