@@ -67,7 +67,10 @@
         \n\nFollow the instructions below to check that the data backup and restore works:
         \n\n1. Make sure backup and automatic restore are enabled in settings. Depending on the
         backup transport supported by the device you may need to do additional steps. For instance
-        you may need to set a Google account as the backup account for the device.
+        you may need to set a Google account as the backup account for the device. If you cannot
+        find the corresponding setting options on your device, run \"adb shell bmgr enable true\"
+        to enable the backup manager. You can check its status by executing \"adb shell bmgr
+        enabled\".
         \n\n2. Run the backup manager: adb shell bmgr run
         \n\n3. Uninstall the program: adb uninstall com.android.cts.verifier
         \n\n4. Reinstall the CTS Verifier and verify that the values are still the same.
