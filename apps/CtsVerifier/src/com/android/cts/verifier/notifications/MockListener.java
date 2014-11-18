@@ -82,6 +82,7 @@ public class MockListener extends NotificationListenerService {
         Log.d(TAG, "created");
 
         mTestPackages.add("com.android.cts.verifier");
+        mTestPackages.add("com.android.cts.robot");
 
         mPosted = new ArrayList<String>();
         mRemoved = new ArrayList<String>();
