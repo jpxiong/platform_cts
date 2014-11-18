@@ -16,8 +16,15 @@
 package android.media.cts;
 
 import android.content.Context;
+
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -143,6 +150,10 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     }
 
     protected void loadResource(int resid) throws Exception {
+        if (!supportsPlayback(resid)) {
+            throw new UnsupportedCodecException();
+        }
+
         AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
         try {
             mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
@@ -197,6 +208,12 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     }
 
     protected void playVideoTest(int resid, int width, int height) throws Exception {
+        if (!supportsPlayback(resid)) {
+            LOG.info("SKIPPING playVideoTest() for resid=" + resid 
+                    + " Could not find a codec for playback.");
+            return;
+        }
+
         loadResource(resid);
         playLoadedVideo(width, height, 0);
     }
@@ -278,4 +295,69 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     }
 
     private static class PrepareFailedException extends Exception {}
+    public static class UnsupportedCodecException extends Exception {}
+
+    public boolean supportsPlayback(int resid) throws IOException {
+        // First determine if the device supports playback of the requested resource.
+        AssetFileDescriptor fd = mResources.openRawResourceFd(resid);
+        MediaExtractor ex = new MediaExtractor();
+        ex.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+        MediaFormat format = ex.getTrackFormat(0);
+        String mimeType = format.getString(MediaFormat.KEY_MIME);
+        return hasCodecForMimeType(mimeType, false);
+    }
+
+    public boolean supportsPlayback(String path) throws IOException {
+        MediaExtractor ex = new MediaExtractor();
+        ex.setDataSource(path);
+        MediaFormat format = ex.getTrackFormat(0);
+        String mimeType = format.getString(MediaFormat.KEY_MIME);
+        return hasCodecForMimeType(mimeType, false);
+    }
+
+    public static boolean hasCodecForMimeType(String mimeType, boolean encoder) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (encoder != info.isEncoder()) {
+                continue;
+            }
+
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    LOG.info("Found codec for mimeType=" + mimeType + " codec=" + info.getName());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasH264(boolean encoder) {
+        return hasCodecForMimeType("video/avc", encoder);
+    }
+
+    public static boolean hasHEVC(boolean encoder) {
+        return hasCodecForMimeType("video/hevc", encoder);
+    }
+
+    public static boolean hasH263(boolean encoder) {
+        return hasCodecForMimeType("video/3gpp", encoder);
+    }
+
+    public static boolean hasMpeg4(boolean encoder) {
+        return hasCodecForMimeType("video/mp4v-es", encoder);
+    }
+
+    public static boolean hasVP8(boolean encoder) {
+        return hasCodecForMimeType("video/x-vnd.on2.vp8", encoder);
+    }
+
+    public static boolean hasVP9(boolean encoder) {
+        return hasCodecForMimeType("video/x-vnd.on2.vp9", encoder);
+    }
+
+    public boolean hasAudioOutput() {
+        return getInstrumentation().getTargetContext().getPackageManager()
+            .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
+    }
 }
