@@ -263,11 +263,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 Log.i(TAG, "Testing Still preview capture combination for Camera " + id);
                 openDevice(id);
 
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test for legacy devices");
-                    continue;
-                }
-
                 previewStillCombinationTestByCamera();
             } finally {
                 closeDevice();
@@ -307,11 +302,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing AE regions for Camera " + id);
                 openDevice(id);
-
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
 
                 boolean aeRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
                 if (!aeRegionsSupported) {
@@ -362,11 +352,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing AF regions for Camera " + id);
                 openDevice(id);
-
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
 
                 boolean afRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
                 if (!afRegionsSupported) {
