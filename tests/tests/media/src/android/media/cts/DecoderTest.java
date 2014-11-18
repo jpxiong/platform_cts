@@ -79,42 +79,6 @@ public class DecoderTest extends MediaPlayerTestBase {
         masterFd.close();
     }
 
-    private boolean hasCodecForMimeType(String mimeType) {
-        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
-        for (MediaCodecInfo info : list.getCodecInfos()) {
-            for (String type : info.getSupportedTypes()) {
-                if (type.equalsIgnoreCase(mimeType)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean hasH264() {
-        return hasCodecForMimeType("video/avc");
-    }
-
-    private boolean hasHEVC() {
-        return hasCodecForMimeType("video/hevc");
-    }
-
-    private boolean hasH263() {
-        return hasCodecForMimeType("video/3gpp");
-    }
-
-    private boolean hasMpeg4() {
-        return hasCodecForMimeType("video/mp4v-es");
-    }
-
-    private boolean hasVP8() {
-        return hasCodecForMimeType("video/x-vnd.on2.vp8");
-    }
-
-    private boolean hasVP9() {
-        return hasCodecForMimeType("video/x-vnd.on2.vp9");
-    }
-
     // TODO: add similar tests for other audio and video formats
     public void testBug11696552() throws Exception {
         MediaCodec mMediaCodec = MediaCodec.createDecoderByType("audio/mp4a-latm");
@@ -212,8 +176,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         MediaFormat format = ex.getTrackFormat(0);
         String mime = format.getString(MediaFormat.KEY_MIME);
         assertTrue("not a video track. Wrong test file?", mime.startsWith("video/"));
-        if (!hasCodecForMimeType(mime)) {
-            Log.i(TAG, "Could not find a codec for mimeType: " + mime);
+        if (!hasCodecForMimeType(mime, false)) {
+            Log.i(TAG, "SKIPPING testBFrames(): Could not find a codec for mimeType: " + mime);
             return;
         }
         MediaCodec dec = MediaCodec.createDecoderByType(mime);
@@ -881,7 +845,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicH264() throws Exception {
-        if (!hasH264()) {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicH264(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -897,7 +862,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicHEVC() throws Exception {
-        if (!hasHEVC()) {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicHEVC(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -913,7 +879,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicH263() throws Exception {
-        if (!hasH263()) {
+        if (!hasH263(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicH263(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -929,7 +896,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicMpeg4() throws Exception {
-        if (!hasMpeg4()) {
+        if (!hasMpeg4(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicMpeg4(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -945,7 +913,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicVP8() throws Exception {
-        if (!hasVP8()) {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicVP8(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -961,7 +930,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecBasicVP9() throws Exception {
-        if (!hasVP9()) {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testCodecBasicVP9(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -977,7 +947,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSH263() throws Exception {
-        if (!hasH263()) {
+        if (!hasH263(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSH263(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -988,7 +959,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSH264() throws Exception {
-        if (!hasH264()) {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSH264(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -999,7 +971,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSHEVC() throws Exception {
-        if (!hasHEVC()) {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSHEVC(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1010,7 +983,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSMpeg4() throws Exception {
-        if (!hasMpeg4()) {
+        if (!hasMpeg4(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSMpeg4(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1021,7 +995,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSVP8() throws Exception {
-        if (!hasVP8()) {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSVP8(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1032,7 +1007,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecEarlyEOSVP9() throws Exception {
-        if (!hasVP9()) {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testCodecEarlyEOSVP9(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1043,7 +1019,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsH264WithoutSurface() throws Exception {
-        if (!hasH264()) {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsH264WithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1051,7 +1028,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsH264WithSurface() throws Exception {
-        if (!hasH264()) {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsH264WithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1060,7 +1038,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsHEVCWithoutSurface() throws Exception {
-        if (!hasHEVC()) {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsHEVCWithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1068,7 +1047,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsHEVCWithSurface() throws Exception {
-        if (!hasHEVC()) {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsHEVCWithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1077,7 +1057,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsH263WithoutSurface() throws Exception {
-        if (!hasH263()) {
+        if (!hasH263(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsH263WithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1085,7 +1066,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsH263WithSurface() throws Exception {
-        if (!hasH263()) {
+        if (!hasH263(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsH263WithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1094,7 +1076,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsMpeg4WithoutSurface() throws Exception {
-        if (!hasMpeg4()) {
+        if (!hasMpeg4(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsMpeg4WithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1102,7 +1085,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsMpeg4WithSurface() throws Exception {
-        if (!hasMpeg4()) {
+        if (!hasMpeg4(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsMpeg4WithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1111,7 +1095,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsVP8WithoutSurface() throws Exception {
-        if (!hasVP8()) {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsVP8WithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1119,7 +1104,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsVP8WithSurface() throws Exception {
-        if (!hasVP8()) {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsVP8WithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1128,7 +1114,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsVP9WithoutSurface() throws Exception {
-        if (!hasVP9()) {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsVP9WithoutSurface(): No codec found.");
             return;
         }
         testCodecResets(
@@ -1136,7 +1123,8 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testCodecResetsVP9WithSurface() throws Exception {
-        if (!hasVP9()) {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testCodecResetsVP9WithSurface(): No codec found.");
             return;
         }
         Surface s = getActivity().getSurfaceHolder().getSurface();
@@ -1245,6 +1233,13 @@ public class DecoderTest extends MediaPlayerTestBase {
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
         extractor.selectTrack(0); // consider variable looping on track
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mimeType = format.getString(MediaFormat.KEY_MIME);
+        if (!hasCodecForMimeType(mimeType, false)) {
+            Log.i(TAG, "SKIPPING testEOSBehavior() for resid=" + movie + " No codec found for "
+                    + "mimeType = " + mimeType);
+            return;
+        }
         List<Long> outputChecksums = new ArrayList<Long>();
         List<Long> outputTimestamps = new ArrayList<Long>();
         Arrays.sort(stopAtSample);

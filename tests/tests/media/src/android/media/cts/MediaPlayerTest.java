@@ -21,6 +21,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
@@ -304,6 +309,11 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testPlayAudioTwice() throws Exception {
+        if (!hasAudioOutput()) {
+            Log.i(LOG_TAG, "SKIPPING testPlayAudioTwice(). No audio output.");
+            return;
+        }
+
         final int resid = R.raw.camera_click;
 
         MediaPlayer mp = MediaPlayer.create(mContext, resid);
@@ -550,6 +560,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     private void testGapless(int resid1, int resid2) throws Exception {
+        if (!hasAudioOutput()) {
+            Log.i(LOG_TAG, "SKIPPING testPlayAudioTwice(). No audio output.");
+            return;
+        }
 
         MediaPlayer mp1 = new MediaPlayer();
         mp1.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -660,7 +674,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
         });
 
-        loadResource(R.raw.testvideo);
+        try {
+            loadResource(R.raw.testvideo);
+        } catch (UnsupportedCodecException e) {
+            Log.i(LOG_TAG, "SKIPPING testVideoSurfaceResetting(). Could not find codec.");
+            return;
+        }
         playLoadedVideo(352, 288, -1);
 
         Thread.sleep(SLEEP_TIME);
@@ -1011,7 +1030,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testDeselectTrack() throws Throwable {
-        loadResource(R.raw.testvideo_with_2_subtitles);
+        try {
+            loadResource(R.raw.testvideo_with_2_subtitles);
+        } catch (UnsupportedCodecException e) {
+            Log.i(LOG_TAG, "SKIPPING testDeselectTrack(). Could not find codec.");
+            return;
+        }
         runTestOnUiThread(new Runnable() {
             public void run() {
                 try {
@@ -1082,7 +1106,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testChangeSubtitleTrack() throws Throwable {
-        loadResource(R.raw.testvideo_with_2_subtitles);
+        try {
+            loadResource(R.raw.testvideo_with_2_subtitles);
+        } catch (UnsupportedCodecException e) {
+            Log.i(LOG_TAG, "SKIPPING testChangeSubtitleTrack(). Could not find codec.");
+            return;
+        }
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -1170,7 +1199,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testGetTrackInfo() throws Throwable {
-        loadResource(R.raw.testvideo_with_2_subtitles);
+        try {
+            loadResource(R.raw.testvideo_with_2_subtitles);
+        } catch (UnsupportedCodecException e) {
+            Log.i(LOG_TAG, "SKIPPING testGetTrackInfo(). Could not find codec.");
+            return;
+        }
         runTestOnUiThread(new Runnable() {
             public void run() {
                 try {
@@ -1245,7 +1279,13 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
-        loadResource(R.raw.testvideo);
+        try {
+            loadResource(R.raw.testvideo);
+        } catch (UnsupportedCodecException e) {
+            Log.i(LOG_TAG, "SKIPPING testCallback(). Could not find codec.");
+            return;
+        }
+
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
 
@@ -1317,6 +1357,11 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
     public void testRecordAndPlay() throws Exception {
         if (!hasMicrophone()) {
+            Log.i(LOG_TAG, "SKIPPING testRecordAndPlay(). No microphone.");
+            return;
+        }
+        if (!hasH263(false)) {
+            Log.i(LOG_TAG, "SKIPPING testRecordAndPlay(). Cound not find codec.");
             return;
         }
         File outputFile = new File(Environment.getExternalStorageDirectory(),
