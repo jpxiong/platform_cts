@@ -52,6 +52,9 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
     private static final float MIN_FPS_FOR_FULL_DEVICE = 20.0f;
     private String mCameraId;
 
+    // Last defined capability enum, for iterating over all of them
+    private static final int LAST_CAPABILITY_ENUM = REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE;
+
     /**
      * Test the available capability for different hardware support level devices.
      */
@@ -65,11 +68,13 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
 
             if (mStaticInfo.isHardwareLevelFull()) {
                 // Capability advertisement must be right.
-                mCollector.expectTrue("Full device must contains MANUAL_SENSOR capability",
+                mCollector.expectTrue("Full device must contain MANUAL_SENSOR capability",
                         availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR));
-                mCollector.expectTrue("Full device must contains MANUAL_POST_PROCESSING capability",
+                mCollector.expectTrue("Full device must contain MANUAL_POST_PROCESSING capability",
                         availableCaps.contains(
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING));
+                mCollector.expectTrue("Full device must contain BURST_CAPTURE capability",
+                        availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE));
 
                 // Max resolution fps must be >= 20.
                 mCollector.expectTrue("Full device must support at least 20fps for max resolution",
@@ -78,6 +83,12 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 // Need support per frame control
                 mCollector.expectTrue("Full device must support per frame control",
                         mStaticInfo.isPerFrameControlSupported());
+            }
+
+            if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                mCollector.expectTrue("MANUAL_SENSOR capability always requires " +
+                        "READ_SENSOR_SETTINGS capability as well",
+                        availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS));
             }
 
             // TODO: test all the keys mandatory for all capability devices.
@@ -121,7 +132,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
             List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
 
             for (Integer capability = REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE;
-                    capability <= REQUEST_AVAILABLE_CAPABILITIES_RAW; capability++) {
+                    capability <= LAST_CAPABILITY_ENUM; capability++) {
                 boolean isCapabilityAvailable = availableCaps.contains(capability);
                 validateCapability(capability, isCapabilityAvailable);
             }
@@ -227,6 +238,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
 
     private void validateCapability(Integer capability, boolean isCapabilityAvailable) {
         List<CaptureRequest.Key<?>> requestKeys = new ArrayList<>();
+        Set<CaptureResult.Key<?>> resultKeys = new HashSet<>();
         /* For available capabilities, only check request keys in this test
            Characteristics keys are tested in ExtendedCameraCharacteristicsTest
            Result keys are tested in CaptureResultTest */
@@ -298,6 +310,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.SENSOR_SENSITIVITY);
                 if (mStaticInfo.hasFocuser()) {
                     requestKeys.add(CaptureRequest.LENS_APERTURE);
+                    requestKeys.add(CaptureRequest.LENS_FOCUS_DISTANCE);
                     requestKeys.add(CaptureRequest.LENS_FILTER_DENSITY);
                     requestKeys.add(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE);
                 }
@@ -307,15 +320,37 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 // RAW_CAPABILITY needs to check for not just capture request keys
                 validateRawCapability(isCapabilityAvailable);
                 return;
+            case REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE:
+                // Tested in ExtendedCameraCharacteristicsTest
+                return;
+            case REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS:
+                capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS";
+                resultKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
+                resultKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
+                resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
+                if (mStaticInfo.hasFocuser()) {
+                    resultKeys.add(CaptureResult.LENS_APERTURE);
+                    resultKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
+                    resultKeys.add(CaptureResult.LENS_FILTER_DENSITY);
+                }
+                break;
             default:
                 capabilityName = "Unknown";
-                Assert.fail(String.format("Unknown capability: %d", capability));
+                assertTrue(String.format("Unknown capability set: %d", capability),
+                           !isCapabilityAvailable);
+                return;
         }
 
-        boolean matchExpectation =
-                validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+        boolean matchExpectation = true;
+        if (!requestKeys.isEmpty()) {
+            matchExpectation &= validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+        }
+        if(!resultKeys.isEmpty()) {
+            matchExpectation &= validateResultKeysPresence(capabilityName, resultKeys, isCapabilityAvailable);
+        }
+
         // In case of isCapabilityAvailable == true, error has been filed in
-        // validateRequestKeysPresence
+        // validateRequest/ResultKeysPresence
         if (!matchExpectation && !isCapabilityAvailable) {
             mCollector.addMessage(String.format(
                     "Camera %s doesn't list capability %s but contain all required keys",

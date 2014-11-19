@@ -28,6 +28,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.util.Rational;
+import android.util.Range;
 import android.util.Size;
 
 import java.util.ArrayList;
@@ -267,7 +268,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
         int counter = 0;
         for (CameraCharacteristics c : mCharacteristics) {
             int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-            assertNotNull("android.request.availableCapabilities must never be null");
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    actualCapabilities);
             if (!arrayContains(actualCapabilities,
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
                 Log.i(TAG, "RAW capability is not supported in camera " + counter++ +
@@ -339,6 +341,100 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     }
 
     /**
+     * Test values for static metadata used by the BURST capability.
+     */
+    public void testStaticBurstCharacteristics() {
+        int counter = 0;
+        for (CameraCharacteristics c : mCharacteristics) {
+            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    actualCapabilities);
+
+            // Check if the burst capability is defined
+            boolean haveBurstCapability = arrayContains(actualCapabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE);
+
+            StreamConfigurationMap config =
+                    c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            assertNotNull(String.format("No stream configuration map found for: ID %s",
+                    mIds[counter]), config);
+
+            // Ensure that max YUV size matches max JPEG size
+            Size maxYuvSize = CameraTestUtils.getMaxSize(
+                    config.getOutputSizes(ImageFormat.YUV_420_888));
+            Size maxJpegSize = CameraTestUtils.getMaxSize(config.getOutputSizes(ImageFormat.JPEG));
+
+            boolean haveMaxYuv = maxYuvSize != null ?
+                (maxJpegSize.getWidth() <= maxYuvSize.getWidth() &&
+                        maxJpegSize.getHeight() <= maxYuvSize.getHeight()) : false;
+
+            // Ensure that YUV output is fast enough - needs to be at least 20 fps
+
+            long maxYuvRate =
+                config.getOutputMinFrameDuration(ImageFormat.YUV_420_888, maxYuvSize);
+            final long MIN_DURATION_BOUND_NS = 50000000; // 50 ms, 20 fps
+
+            boolean haveMaxYuvRate = maxYuvRate <= MIN_DURATION_BOUND_NS;
+
+            // Ensure that there's an FPS range that's fast enough to capture at above
+            // minFrameDuration, for full-auto bursts
+            Range[] fpsRanges = c.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            float minYuvFps = 1.f / maxYuvRate;
+
+            boolean haveFastAeTargetFps = false;
+            for (Range<Integer> r : fpsRanges) {
+                if (r.getLower() >= minYuvFps) {
+                    haveFastAeTargetFps = true;
+                    break;
+                }
+            }
+
+            // Ensure that maximum sync latency is small enough for fast setting changes, even if
+            // it's not quite per-frame
+
+            Integer maxSyncLatencyValue = c.get(CameraCharacteristics.SYNC_MAX_LATENCY);
+            assertNotNull(String.format("No sync latency declared for ID %s", mIds[counter]),
+                    maxSyncLatencyValue);
+
+            int maxSyncLatency = maxSyncLatencyValue;
+            final long MAX_LATENCY_BOUND = 4;
+            boolean haveFastSyncLatency =
+                (maxSyncLatency <= MAX_LATENCY_BOUND) && (maxSyncLatency >= 0);
+
+            if (haveBurstCapability) {
+                assertTrue(
+                        String.format("BURST-capable camera device %s does not have maximum YUV " +
+                                "size that is at least max JPEG size",
+                                mIds[counter]),
+                        haveMaxYuv);
+                assertTrue(
+                        String.format("BURST-capable camera device %s YUV frame rate is too slow" +
+                                "(%d ns min frame duration reported, less than %d ns expected)",
+                                mIds[counter], maxYuvRate, MIN_DURATION_BOUND_NS),
+                        haveMaxYuvRate);
+                assertTrue(
+                        String.format("BURST-capable camera device %s does not list an AE target " +
+                                " FPS range with min FPS >= %f, for full-AUTO bursts",
+                                mIds[counter], minYuvFps),
+                        haveFastAeTargetFps);
+                assertTrue(
+                        String.format("BURST-capable camera device %s YUV sync latency is too long" +
+                                "(%d frames reported, [0, %d] frames expected)",
+                                mIds[counter], maxSyncLatency, MAX_LATENCY_BOUND),
+                        haveFastSyncLatency);
+            } else {
+                assertTrue(
+                        String.format("Camera device %s has all the requirements for BURST" +
+                                " capability but does not report it!", mIds[counter]),
+                        !(haveMaxYuv && haveMaxYuvRate &&
+                                haveFastAeTargetFps && haveFastSyncLatency));
+            }
+
+            counter++;
+        }
+    }
+
+    /**
      * Check key is present in characteristics if the hardware level is at least {@code hwLevel};
      * check that the key is present if the actual capabilities are one of {@code capabilities}.
      *
@@ -351,7 +447,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
         assertNotNull("android.info.supportedHardwareLevel must never be null", actualHwLevel);
 
         int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-        assertNotNull("android.request.availableCapabilities must never be null");
+        assertNotNull("android.request.availableCapabilities must never be null",
+                actualCapabilities);
 
         List<Key<?>> allKeys = c.getKeys();
 

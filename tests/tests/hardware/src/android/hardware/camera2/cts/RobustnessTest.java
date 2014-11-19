@@ -128,10 +128,13 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             {YUV , PREVIEW,  YUV,  PREVIEW,  JPEG, MAXIMUM }  // Two-input in-app processing with still capture.
         };
 
-        final int[][] FULL_COMBINATIONS = {
+        final int[][] BURST_COMBINATIONS = {
             {PRIV, PREVIEW,  PRIV, MAXIMUM }, // Maximum-resolution GPU processing with preview.
             {PRIV, PREVIEW,  YUV,  MAXIMUM }, // Maximum-resolution in-app processing with preview.
             {YUV,  PREVIEW,  YUV,  MAXIMUM }, // Maximum-resolution two-input in-app processsing.
+        };
+
+        final int[][] FULL_COMBINATIONS = {
             {PRIV, PREVIEW,  PRIV, PREVIEW,  JPEG, MAXIMUM }, //Video recording with maximum-size video snapshot.
             {YUV,  VGA,      PRIV, PREVIEW,  YUV,  MAXIMUM }, // Standard video recording plus maximum-resolution in-app processing.
             {YUV,  VGA,      YUV,  PREVIEW,  YUV,  MAXIMUM } // Preview plus two-input maximum-resolution in-app processing.
@@ -149,7 +152,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         };
 
         final int[][][] TABLES =
-                { LEGACY_COMBINATIONS, LIMITED_COMBINATIONS, FULL_COMBINATIONS, RAW_COMBINATIONS };
+            { LEGACY_COMBINATIONS, LIMITED_COMBINATIONS, BURST_COMBINATIONS, FULL_COMBINATIONS, RAW_COMBINATIONS };
 
         // Sanity check the tables
         int tableIdx = 0;
@@ -203,7 +206,14 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     testOutputCombination(id, config, maxSizes);
                 }
 
-                // Check for FULL and RAW and run those if appropriate
+                // Check for BURST_CAPTURE, FULL and RAW and run those if appropriate
+
+                if (staticInfo.isCapabilitySupported(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)) {
+                    for (int[] config : BURST_COMBINATIONS) {
+                        testOutputCombination(id, config, maxSizes);
+                    }
+                }
 
                 if (staticInfo.isHardwareLevelFull()) {
                     for (int[] config : FULL_COMBINATIONS) {
