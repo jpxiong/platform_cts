@@ -106,13 +106,6 @@
   bug: 17530117
 },
 {
-  description: "this test removes the stay-awake option, causing the screen to turn off during the execution of subsequent tests",
-  names: [
-    "android.admin.cts.DevicePolicyManagerTest#testMaximumTimeToLock"
-  ],
-  bug: 18002490
-},
-{
   description: "these tests locks the screen with an emtpy password or swipe-to-unlock, blocking subsequent test to dismiss keyguard",
   names: [
     "android.admin.cts.DevicePolicyManagerTest#testPasswordQuality_something",
