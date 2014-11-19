@@ -185,11 +185,6 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
             final StaticMetadata staticInfo = new StaticMetadata(cc);
 
-            if (staticInfo.isHardwareLevelLegacy()) {
-                Log.i(TAG, "Skipping test on legacy devices");
-                continue;
-            }
-
             openDevice(id);
 
             // Always run legacy-level tests
