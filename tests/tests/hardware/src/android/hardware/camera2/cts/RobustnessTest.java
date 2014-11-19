@@ -363,16 +363,6 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         }
     }
 
-    private final class ImageCloser implements ImageReader.OnImageAvailableListener {
-        @Override
-        public void onImageAvailable(ImageReader reader) {
-            Image image = reader.acquireLatestImage();
-            if (image != null) {
-                image.close();
-            }
-        }
-    }
-
     private void testOutputCombination(String cameraId, int[] config, MaxOutputSizes maxSizes)
             throws Exception {
 
@@ -382,7 +372,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         final int TIMEOUT_FOR_RESULT_MS = 1000;
         final int MIN_RESULT_COUNT = 3;
 
-        ImageCloser imageCloser = new ImageCloser();
+        ImageDropperListener imageDropperListener = new ImageDropperListener();
         // Set up outputs
         List<Object> outputTargets = new ArrayList<>();
         List<Surface> outputSurfaces = new ArrayList<>();
@@ -408,7 +398,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     Size targetSize = maxSizes.maxJpegSizes[sizeLimit];
                     ImageReader target = ImageReader.newInstance(
                         targetSize.getWidth(), targetSize.getHeight(), JPEG, MIN_RESULT_COUNT);
-                    target.setOnImageAvailableListener(imageCloser, mHandler);
+                    target.setOnImageAvailableListener(imageDropperListener, mHandler);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
                     jpegTargets.add(target);
@@ -418,7 +408,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     Size targetSize = maxSizes.maxYuvSizes[sizeLimit];
                     ImageReader target = ImageReader.newInstance(
                         targetSize.getWidth(), targetSize.getHeight(), YUV, MIN_RESULT_COUNT);
-                    target.setOnImageAvailableListener(imageCloser, mHandler);
+                    target.setOnImageAvailableListener(imageDropperListener, mHandler);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
                     yuvTargets.add(target);
@@ -428,7 +418,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                     Size targetSize = maxSizes.maxRawSize;
                     ImageReader target = ImageReader.newInstance(
                         targetSize.getWidth(), targetSize.getHeight(), RAW, MIN_RESULT_COUNT);
-                    target.setOnImageAvailableListener(imageCloser, mHandler);
+                    target.setOnImageAvailableListener(imageDropperListener, mHandler);
                     outputTargets.add(target);
                     outputSurfaces.add(target.getSurface());
                     rawTargets.add(target);
