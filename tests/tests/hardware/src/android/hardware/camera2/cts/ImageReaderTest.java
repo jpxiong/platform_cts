@@ -88,10 +88,6 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "Testing jpeg capture for Camera " + id);
                 openDevice(id);
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
                 bufferFormatTestByCamera(ImageFormat.JPEG, /*repeating*/false);
             } finally {
                 closeDevice(id);
@@ -117,10 +113,6 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "Testing repeating jpeg capture for Camera " + id);
                 openDevice(id);
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
                 bufferFormatTestByCamera(ImageFormat.JPEG, /*repeating*/true);
             } finally {
                 closeDevice(id);
@@ -156,10 +148,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "YUV and JPEG testing for camera " + id);
                 openDevice(id);
-                if (mStaticInfo.isHardwareLevelLegacy()) {
-                    Log.i(TAG, "Skipping test on legacy devices");
-                    continue;
-                }
+
                 bufferFormatWithYuvTestByCamera(ImageFormat.JPEG);
             } finally {
                 closeDevice(id);
