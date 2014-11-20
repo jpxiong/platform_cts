@@ -16,16 +16,21 @@
 
 package com.android.cts.verifier.tv;
 
-import com.android.cts.verifier.R;
-
+import android.content.Intent;
+import android.media.tv.TvContract;
 import android.view.View;
 
+import com.android.cts.verifier.R;
+
 /**
- * Tests for verifying TV app behavior.
+ * Tests for verifying TV app behavior for third-party TV input apps.
  */
 public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
         implements View.OnClickListener {
     private static final String TAG = "TvInputDiscoveryTestActivity";
+
+    private static final Intent TV_APP_INTENT = new Intent(Intent.ACTION_VIEW,
+            TvContract.buildChannelUri(0));
 
     private static final long TIMEOUT_MS = 5l * 60l * 1000l;  // 5 mins.
 
@@ -108,5 +113,11 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
             postTarget.removeCallbacks(failCallback);
             getPassButton().setEnabled(true);
         }
+    }
+
+    @Override
+    protected void setInfoResources() {
+        setInfoResources(R.string.tv_input_discover_test,
+                R.string.tv_input_discover_test_info, -1);
     }
 }

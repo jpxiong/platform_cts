@@ -30,7 +30,7 @@ import android.view.View;
 public class MockTvInputSetupActivity extends Activity {
     private static final String TAG = "MockTvInputSetupActivity";
 
-    private static final String CHANNEL_NUMBER = "999-999";
+    private static final String CHANNEL_NUMBER = "999-0";
     private static final String CHANNEL_NAME = "Dummy";
 
     private static Object sLock = new Object();

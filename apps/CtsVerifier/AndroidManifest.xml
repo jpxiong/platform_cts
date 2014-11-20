@@ -1377,7 +1377,19 @@
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
         </activity>
 
-        <activity android:name=".tv.TvInputDiscoveryTestActivity" android:label="@string/tv">
+        <activity android:name=".tv.TvInputDiscoveryTestActivity"
+                android:label="@string/tv_input_discover_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_tv" />
+            <meta-data android:name="test_required_features"
+                    android:value="android.software.live_tv" />
+        </activity>
+
+        <activity android:name=".tv.ParentalControlTestActivity"
+                android:label="@string/tv_parental_control_test">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -1407,6 +1419,14 @@
             <meta-data android:name="android.media.tv.input"
                 android:resource="@xml/mock_tv_input_service" />
         </service>
+
+        <receiver android:name=".tv.TvInputReceiver">
+            <intent-filter>
+                <action android:name="android.media.tv.action.QUERY_CONTENT_RATING_SYSTEMS" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.metadata.CONTENT_RATING_SYSTEMS"
+                android:resource="@xml/mock_content_rating_systems" />
+        </receiver>
 
     </application>
 

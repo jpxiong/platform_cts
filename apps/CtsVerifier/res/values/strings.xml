@@ -1402,22 +1402,23 @@
     <string name="js_any_connectivity_test">Device with no connectivity will not execute a job with an unmetered connectivity constraint.</string>
     <string name="js_no_connectivity_test">Device with no connectivity will still execute a job with no connectivity constraints.</string>
 
-    <!-- String for TV app Tests -->
-    <string name="tv">TV App Behavior Verifier</string>
-    <string name="tv_info">
-    This test verifies that the default TV app is invoked via intents and issues appropriate
-    calls to framework APIs, so that TV input apps work properly with the default TV app.
-    </string>
+    <!-- String for Live Channels app Tests -->
 
-    <string name="tv_input_discover_test">TV app input discoverability test</string>
+    <string name="tv_input_discover_test">3rd-party TV input app discoverability test</string>
+    <string name="tv_input_discover_test_info">
+    This test verifies that the pre-loaded Live Channels app is invoked via intents and issues
+    appropriate calls to framework APIs, so that TV input apps work properly with the pre-loaded
+    Live Channels app.
+    </string>
     <string name="tv_input_discover_test_go_to_setup">
-    Press the \"Launch TV app\" button, and set up the newly installed TV input: \"CTS Verifier\".
+    Press the \"Launch Live Channels\" button, and set up the newly installed TV input:
+    \"CTS Verifier\".
     </string>
     <string name="tv_input_discover_test_verify_setup">
     Setup activity must have been started.
     </string>
     <string name="tv_input_discover_test_tune_to_channel">
-    Press the \"Launch TV app\" button, and tune to the channel named \"Dummy\" from
+    Press the \"Launch Live Channels\" button, and tune to the channel named \"Dummy\" from
     \"CTS Verifier\" input. If necessary, configure the channel to be visible.
     </string>
     <string name="tv_input_discover_test_verify_tune">
@@ -1428,8 +1429,38 @@
     when you tune to the \"Dummy\" channel.
     </string>
 
-    <string name="tv_launch_tv_app">Launch TV app</string>
+    <string name="tv_parental_control_test">Live Channels app parental control test</string>
+    <string name="tv_parental_control_test_info">
+    This test verifies that the default Live Channels app invokes proper parental control APIs in
+    the framework.
+    </string>
+    <string name="tv_parental_control_test_turn_on_parental_control">
+    Press the \"Launch Live Channels\" button, and turn on the parental control. If it\'s on
+    already, turn it off and on again.
+    </string>
+    <string name="tv_parental_control_test_verify_receive_broadcast1">
+    TV input service must have received ACTION_PARENTAL_CONTROLS_ENABLED_CHANGED broadcast.
+    </string>
+    <string name="tv_parental_control_test_block_tv_ma">
+    Press the \"Launch Live Channels\" button, and block \"Fake\" rating for \"CtsVerifier\" rating
+    system in the parental control settings. You may have to enable the rating system if it is
+    disabled by default. If it\'s already blocked, unblock, save, and then block again.
+    </string>
+    <string name="tv_parental_control_test_verify_receive_broadcast2">
+    TV input service must have received ACTION_BLOCKED_RATINGS_CHANGED broadcast.
+    </string>
+    <string name="tv_parental_control_test_block_unblock">
+    Press the \"Launch Live Channels\" button; verify that the channel is blocked visually.
+    Try unblock the screen by entering PIN; verify that it\'s unblocked visually.
+    </string>
+
+    <string name="tv_launch_tv_app">Launch Live Channels</string>
+    <string name="tv_channel_not_found">
+    CtsVerifier channel is not set up. Please set up before proceeding.
+    </string>
+
     <string name="overlay_view_text">Overlay View Dummy Text</string>
+    <string name="fake_rating">Fake</string>
 
     <!-- A list of fully-qualified test classes that should not be run. -->
     <string-array name="disabled_tests" />
