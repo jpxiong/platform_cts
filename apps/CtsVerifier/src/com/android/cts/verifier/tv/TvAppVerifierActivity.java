@@ -30,13 +30,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Tests for verifying TV app behavior.
+ * Base class for TV app tests.
  */
 public abstract class TvAppVerifierActivity extends PassFailButtons.Activity {
     private static final String TAG = "TvAppVerifierActivity";
-
-    protected static final Intent TV_APP_INTENT = new Intent(Intent.ACTION_VIEW,
-            TvContract.buildChannelUri(0));
 
     private static final long TIMEOUT_MS = 5l * 60l * 1000l;  // 5 mins.
 
@@ -59,7 +56,7 @@ public abstract class TvAppVerifierActivity extends PassFailButtons.Activity {
         createTestItems();
         setContentView(view);
         setPassFailButtonClickListeners();
-        setInfoResources(R.string.tv, R.string.tv_info, -1);
+        setInfoResources();
 
         getPassButton().setEnabled(false);
     }
@@ -80,6 +77,8 @@ public abstract class TvAppVerifierActivity extends PassFailButtons.Activity {
     }
 
     protected abstract void createTestItems();
+
+    protected abstract void setInfoResources();
 
     /**
      * Call this to create a test step where the user must perform some action.
