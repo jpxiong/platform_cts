@@ -112,6 +112,7 @@ public class ItsService extends Service implements SensorEventListener {
     public static final String TRIGGER_AE_KEY = "ae";
     public static final String TRIGGER_AF_KEY = "af";
     public static final String VIB_PATTERN_KEY = "pattern";
+    public static final String EVCOMP_KEY = "evComp";
 
     private CameraManager mCameraManager = null;
     private HandlerThread mCameraThread = null;
@@ -802,6 +803,12 @@ public class ItsService extends Service implements SensorEventListener {
             mNeedsLockedAE = params.optBoolean(LOCK_AE_KEY, false);
             mNeedsLockedAWB = params.optBoolean(LOCK_AWB_KEY, false);
 
+            // An EV compensation can be specified as part of AE convergence.
+            int evComp = params.optInt(EVCOMP_KEY, 0);
+            if (evComp != 0) {
+                Logt.i(TAG, String.format("Running 3A with AE exposure compensation value: %d", evComp));
+            }
+
             // By default, AE and AF both get triggered, but the user can optionally override this.
             // Also, AF won't get triggered if the lens is fixed-focus.
             boolean doAE = true;
@@ -845,7 +852,11 @@ public class ItsService extends Service implements SensorEventListener {
                 // at a time, to simplify the logic here.
                 if (!mInterlock3A.block(TIMEOUT_3A * 1000) ||
                         System.currentTimeMillis() - tstart > TIMEOUT_3A * 1000) {
-                    throw new ItsException("3A failed to converge (timeout)");
+                    throw new ItsException(
+                            "3A failed to converge after " + TIMEOUT_3A + " seconds.\n" +
+                            "AE converge state: " + mConvergedAE + ", \n" +
+                            "AF convergence state: " + mConvergedAF + ", \n" +
+                            "AWB convergence state: " + mConvergedAWB + ".");
                 }
                 mInterlock3A.close();
 
@@ -875,6 +886,10 @@ public class ItsService extends Service implements SensorEventListener {
                             CaptureRequest.CONTROL_AWB_MODE_AUTO);
                     req.set(CaptureRequest.CONTROL_AWB_LOCK, false);
                     req.set(CaptureRequest.CONTROL_AWB_REGIONS, regionAWB);
+
+                    if (evComp != 0) {
+                        req.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, evComp);
+                    }
 
                     if (mConvergedAE && mNeedsLockedAE) {
                         req.set(CaptureRequest.CONTROL_AE_LOCK, true);
