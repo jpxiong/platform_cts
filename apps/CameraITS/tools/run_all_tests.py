@@ -38,6 +38,8 @@ def main():
             "test_ae_precapture_trigger",
             "test_black_white",
             "test_crop_region_raw",
+            "test_ev_compensation_advanced",
+            "test_ev_compensation_basic",
             "test_locked_burst",
             "test_yuv_plus_jpeg"
         ]
