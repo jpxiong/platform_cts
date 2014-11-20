@@ -291,9 +291,8 @@ public class SimRestrictedApisTest extends AndroidTestCase {
      * Tests that the test apk doesn't have carrier previliges.
      */
     public void testHasCarrierPrivileges() {
-        int previlegeStatus = TelephonyManager.getDefault().hasCarrierPrivileges();
-        if (previlegeStatus == TelephonyManager.CARRIER_PRIVILEGE_STATUS_HAS_ACCESS) {
-            fail("Unexpected carrier previlege status: " + previlegeStatus);
+        if (TelephonyManager.getDefault().hasCarrierPrivileges()) {
+            fail("App unexpectedly has carrier privileges");
         }
     }
 
