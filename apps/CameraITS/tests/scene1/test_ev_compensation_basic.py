@@ -26,46 +26,35 @@ def main():
     """
     NAME = os.path.basename(__file__).split(".")[0]
 
-    MAX_LUMA_DELTA_THRESH = 0.01
-    AVG_LUMA_DELTA_THRESH = 0.001
-
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        cam.do_3a()
-
-        # Capture auto shots, but with a linear tonemap.
-        req = its.objects.auto_capture_request()
-        req["android.tonemap.mode"] = 0
-        req["android.tonemap.curveRed"] = (0.0, 0.0, 1.0, 1.0)
-        req["android.tonemap.curveGreen"] = (0.0, 0.0, 1.0, 1.0)
-        req["android.tonemap.curveBlue"] = (0.0, 0.0, 1.0, 1.0)
 
         evs = range(-4,5)
         lumas = []
         for ev in evs:
+            # Re-converge 3A, and lock AE once converged. skip AF trigger as
+            # dark/bright scene could make AF convergence fail and this test
+            # doesn't care the image sharpness.
+            cam.do_3a(ev_comp=ev, lock_ae=True, do_af=False)
+
+            # Capture a single shot with the same EV comp and locked AE.
+            req = its.objects.auto_capture_request()
             req['android.control.aeExposureCompensation'] = ev
+            req["android.control.aeLock"] = True
             cap = cam.do_capture(req)
             y = its.image.convert_capture_to_planes(cap)[0]
             tile = its.image.get_image_patch(y, 0.45,0.45,0.1,0.1)
             lumas.append(its.image.compute_image_means(tile)[0])
 
-        ev_step_size_in_stops = its.objects.rational_to_float(
-                props['android.control.aeCompensationStep'])
-        luma_increase_per_step = pow(2, ev_step_size_in_stops)
-        expected_lumas = [lumas[0] * pow(luma_increase_per_step, i) \
-                for i in range(len(evs))]
-
         pylab.plot(evs, lumas, 'r')
-        pylab.plot(evs, expected_lumas, 'b')
         matplotlib.pyplot.savefig("%s_plot_means.png" % (NAME))
 
-        luma_diffs = [expected_lumas[i] - lumas[i] for i in range(len(evs))]
-        max_diff = max(luma_diffs)
-        avg_diff = sum(luma_diffs) / len(luma_diffs)
-        print "Max delta between modeled and measured lumas:", max_diff
-        print "Avg delta between modeled and measured lumas:", avg_diff
-        assert(max_diff < MAX_LUMA_DELTA_THRESH)
-        assert(avg_diff < AVG_LUMA_DELTA_THRESH)
+        luma_diffs = numpy.diff(lumas)
+        min_luma_diffs = min(luma_diffs)
+        print "Min of the luma value difference between adjacent ev comp: ", \
+                min_luma_diffs
+        # All luma brightness should be increasing with increasing ev comp.
+        assert(min_luma_diffs > 0)
 
 if __name__ == '__main__':
     main()
