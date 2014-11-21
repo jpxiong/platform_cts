@@ -574,7 +574,10 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
         debug_fname_prefix: If not None, the (string) name of a file prefix to
             use to save a number of debug images for visualizing the output of
             this function; can be used to see if the patches are being found
-            successfully.
+            successfully. If this argument is provided, then some of the sanity
+            check assertions will be disabled to allow the function to provide
+            useful debugging information, meaning that garbage data may be
+            returned.
 
     Returns:
         6x4 list of lists of integer (x,y) coords of the center of each patch,
