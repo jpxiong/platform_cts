@@ -92,7 +92,10 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
         doPlayStreams(6, 0.00002f);
     }
 
-   private void doPlayStreams(int seed, float probability) throws Throwable {
+    private void doPlayStreams(int seed, float probability) throws Throwable {
+        if (!hasH264(false)) {
+            return;
+        }
         Random random = new Random(seed);
         createHttpServer(seed, probability);
         for (int i = 0; i < 10; i++) {
