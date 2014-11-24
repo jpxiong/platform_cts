@@ -172,6 +172,7 @@ cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
     CtsDevicePolicyManagerTestCases \
+    CtsDumpsysHostTestCases \
     CtsHostJank \
     CtsHostUi \
     CtsMonkeyTestCases \
