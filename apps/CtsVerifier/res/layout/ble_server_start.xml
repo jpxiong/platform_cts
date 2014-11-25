@@ -19,7 +19,7 @@
         android:orientation="vertical"
         android:padding="10dip"
         >
-    <include android:id="@+id/pass_fail_buttons" 
+    <include android:id="@+id/pass_fail_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
