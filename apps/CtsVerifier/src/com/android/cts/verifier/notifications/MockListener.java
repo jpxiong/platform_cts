@@ -227,7 +227,6 @@ public class MockListener extends NotificationListenerService {
         Log.d(TAG, "removed: " + sbn.getTag());
         mRemoved.add(sbn.getTag());
         mNotifications.remove(sbn.getKey());
-        mNotificationKeys.remove(sbn.getTag());
         onNotificationRankingUpdate(rankingMap);
     }
 
