@@ -381,4 +381,19 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         return packageManager.hasSystemFeature("android.hardware.type.television") ||
                 packageManager.hasSystemFeature("android.software.leanback");
     }
+
+    private static boolean isFormatSupported(
+            String mimeType, int w, int h, int frameRate, boolean isEncoder) {
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaFormat format = MediaFormat.createVideoFormat(mimeType, w, h);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
+        String codec = isEncoder
+                ? mcl.findEncoderForFormat(format)
+                : mcl.findDecoderForFormat(format);
+        return (codec != null);
+    }
+
+    public static boolean isDecodeFormatSupported(String mimeType, int w, int h, int frameRate) {
+        return isFormatSupported(mimeType, w, h, frameRate, false /* isEncoder */);
+    }
 }
