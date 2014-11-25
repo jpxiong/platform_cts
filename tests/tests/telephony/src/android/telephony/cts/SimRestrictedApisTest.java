@@ -52,51 +52,6 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     }
 
     /**
-     * Tests the SmsManager.updateMmsDownloadStatus() API. This makes a call to
-     * updateMmsDownloadStatus() API and expects a SecurityException since the test apk is not
-     * signed by a certificate on the SIM.
-     */
-    public void testUpdateMmsDownloadStatus() {
-        try {
-            if (isSimCardPresent()) {
-                SmsManager.getDefault().updateMmsDownloadStatus(null, 0, 0, null);
-                fail("Expected SecurityException. App doesn't have carrier privileges.");
-            }
-        } catch (SecurityException expected) {
-        }
-    }
-
-    /**
-     * Tests the SmsManager.updateMmsSendStatus() API. This makes a call to updateMmsSendStatus()
-     * API and expects a SecurityException since the test apk is not signed by a certificate on the
-     * SIM.
-     */
-    public void testUpdateMmsSendStatus() {
-        try {
-            if (isSimCardPresent()) {
-                SmsManager.getDefault().updateMmsSendStatus(null, 0, TEST_PDU, 0, null);
-                fail("Expected SecurityException. App doesn't have carrier privileges.");
-            }
-        } catch (SecurityException expected) {
-        }
-    }
-
-    /**
-     * Tests the SmsManager.updateSmsSendStatus() API. This makes a call to updateSmsSendStatus()
-     * API and expects a SecurityException since the test apk is not signed by a certificate on the
-     * SIM.
-     */
-    public void testUpdateSmsSendStatus() {
-        try {
-            if (isSimCardPresent()) {
-                SmsManager.getDefault().updateSmsSendStatus(0, false);
-                fail("Expected SecurityException. App doesn't have carrier privileges.");
-            }
-        } catch (SecurityException expected) {
-        }
-    }
-
-    /**
      * Tests the TelephonyManager.setLine1NumberForDisplay() API. This makes a call to
      * setLine1NumberForDisplay() API and expects a SecurityException since the test apk is not
      * signed by a certificate on the SIM.
