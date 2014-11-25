@@ -20,6 +20,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 
 import android.os.Build;
@@ -32,8 +33,8 @@ import android.util.Log;
 public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
 
     private static final String TAG = "MediaCodecCapabilitiesTest";
-    private static final String AVC_MIME = "video/avc";
-    private static final String HEVC_MIME = "video/hevc";
+    private static final String AVC_MIME  = MediaFormat.MIMETYPE_VIDEO_AVC;
+    private static final String HEVC_MIME = MediaFormat.MIMETYPE_VIDEO_HEVC;
     private static final int PLAY_TIME_MS = 30000;
 
     // Android device implementations with H.264 encoders, MUST support Baseline Profile Level 3.

@@ -83,14 +83,15 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     // TODO: add similar tests for other audio and video formats
     public void testBug11696552() throws Exception {
-        MediaCodec mMediaCodec = MediaCodec.createDecoderByType("audio/mp4a-latm");
-        MediaFormat mFormat = MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 2);
+        MediaCodec mMediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
+        MediaFormat mFormat = MediaFormat.createAudioFormat(
+                MediaFormat.MIMETYPE_AUDIO_AAC, 48000 /* frequency */, 2 /* channels */);
         mFormat.setByteBuffer("csd-0", ByteBuffer.wrap( new byte [] {0x13, 0x10} ));
         mFormat.setInteger(MediaFormat.KEY_IS_ADTS, 1);
         mMediaCodec.configure(mFormat, null, null, 0);
         mMediaCodec.start();
         int index = mMediaCodec.dequeueInputBuffer(250000);
-        mMediaCodec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM );
+        mMediaCodec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         mMediaCodec.dequeueOutputBuffer(info, 250000);
     }
