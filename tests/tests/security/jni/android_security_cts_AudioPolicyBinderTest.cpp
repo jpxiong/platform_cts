@@ -97,11 +97,13 @@ jboolean android_security_cts_AudioPolicy_test_startOutput(JNIEnv* env __unused,
         return false;
     }
 
-    status_t status = aps->startOutput(output, (audio_stream_type_t)(AUDIO_STREAM_MIN -1), session);
+    status_t status = aps->startOutput(output, (audio_stream_type_t)(AUDIO_STREAM_MIN -1),
+                                       (audio_session_t)session);
     if (status == NO_ERROR) {
         return false;
     }
-    status = aps->startOutput(output, (audio_stream_type_t)AUDIO_STREAM_CNT, session);
+    status = aps->startOutput(output, (audio_stream_type_t)AUDIO_STREAM_CNT,
+                              (audio_session_t)session);
     if (status == NO_ERROR) {
         return false;
     }
@@ -123,11 +125,13 @@ jboolean android_security_cts_AudioPolicy_test_stopOutput(JNIEnv* env __unused,
         return false;
     }
 
-    status_t status = aps->stopOutput(output, (audio_stream_type_t)(AUDIO_STREAM_MIN -1), session);
+    status_t status = aps->stopOutput(output, (audio_stream_type_t)(AUDIO_STREAM_MIN -1),
+                                      (audio_session_t)session);
     if (status == NO_ERROR) {
         return false;
     }
-    status = aps->stopOutput(output, (audio_stream_type_t)AUDIO_STREAM_CNT, session);
+    status = aps->stopOutput(output, (audio_stream_type_t)AUDIO_STREAM_CNT,
+                             (audio_session_t)session);
     if (status == NO_ERROR) {
         return false;
     }
