@@ -257,21 +257,21 @@ public class MediaCodecListTest extends AndroidTestCase {
         }
 
         int profile = CodecProfileLevel.H263ProfileBaseline;
-        assertTrue(checkProfileSupported("video/3gpp", false, profile));
-        assertTrue(checkProfileSupported("video/3gpp", true, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_H263, false, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_H263, true, profile));
     }
 
     // AVC baseline profile must be supported
     public void testIsAVCBaselineProfileSupported() {
         int profile = CodecProfileLevel.AVCProfileBaseline;
-        assertTrue(checkProfileSupported("video/avc", false, profile));
-        assertTrue(checkProfileSupported("video/avc", true, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_AVC, false, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_AVC, true, profile));
     }
 
     // HEVC main profile must be supported
     public void testIsHEVCMainProfileSupported() {
         int profile = CodecProfileLevel.HEVCProfileMain;
-        assertTrue(checkProfileSupported("video/hevc", false, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, false, profile));
     }
 
     // MPEG4 simple profile must be supported
@@ -282,10 +282,10 @@ public class MediaCodecListTest extends AndroidTestCase {
         }
 
         int profile = CodecProfileLevel.MPEG4ProfileSimple;
-        assertTrue(checkProfileSupported("video/mp4v-es", false, profile));
+        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_MPEG4, false, profile));
 
         // FIXME: no support for M4v simple profile video encoder
-        // assertTrue(checkProfileSupported("video/mp4v-es", true, profile));
+        // assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_MPEG4, true, profile));
     }
 
     /*
@@ -375,29 +375,29 @@ public class MediaCodecListTest extends AndroidTestCase {
         List<CodecType> list = new ArrayList<CodecType>(16);
 
         // Mandatory audio codecs
-        list.add(new CodecType("audio/amr-wb", false));         // amrwb decoder
-        list.add(new CodecType("audio/amr-wb", true));          // amrwb encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false));   // amrwb decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true));    // amrwb encoder
 
         // flac decoder is not omx-based yet
-        // list.add(new CodecType("audio/flac", false));        // flac decoder
-        list.add(new CodecType("audio/flac", true));            // flac encoder
-        list.add(new CodecType("audio/mpeg", false));           // mp3 decoder
-        list.add(new CodecType("audio/mp4a-latm", false));      // aac decoder
-        list.add(new CodecType("audio/mp4a-latm", true));       // aac encoder
-        list.add(new CodecType("audio/vorbis", false));         // vorbis decoder
-        list.add(new CodecType("audio/3gpp", false));           // amrnb decoder
-        list.add(new CodecType("audio/3gpp", true));            // amrnb encoder
+        // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, false));  // flac decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, true));      // flac encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_MPEG, false));     // mp3 decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, false));      // aac decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, true));       // aac encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_VORBIS, false));   // vorbis decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false));   // amrnb decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true));    // amrnb encoder
 
         // Mandatory video codecs
-        list.add(new CodecType("video/avc", false));            // avc decoder
-        list.add(new CodecType("video/avc", true));             // avc encoder
-        list.add(new CodecType("video/hevc", false));           // hevc decoder
-        list.add(new CodecType("video/3gpp", false));           // h263 decoder
-        list.add(new CodecType("video/3gpp", true));            // h263 encoder
-        list.add(new CodecType("video/mp4v-es", false));        // m4v decoder
-        list.add(new CodecType("video/x-vnd.on2.vp8", false));  // vp8 decoder
-        list.add(new CodecType("video/x-vnd.on2.vp8", true));   // vp8 encoder
-        list.add(new CodecType("video/x-vnd.on2.vp9", false));  // vp9 decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, false));    // avc decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, true));     // avc encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_HEVC, false));   // hevc decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, false));   // h263 decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, true));    // h263 encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_MPEG4, false));  // m4v decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, false));    // vp8 decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, true));     // vp8 encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP9, false));    // vp9 decoder
 
         return list;
     }
