@@ -100,6 +100,7 @@ cts_test_packages := \
     CtsDeviceBrowserBench \
     CtsDeviceVideoPerf \
     CtsDeviceOpenGl \
+    CtsDeviceTvProviderPerf \
     CtsAccelerationTestCases \
     CtsAccountManagerTestCases \
     CtsAccessibilityServiceTestCases \
