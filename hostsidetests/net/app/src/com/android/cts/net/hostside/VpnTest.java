@@ -16,6 +16,8 @@
 
 package com.android.cts.net.hostside;
 
+import static android.system.OsConstants.*;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -25,34 +27,58 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.VpnService;
-import android.os.ParcelFileDescriptor;
-import android.os.SystemClock;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiScrollable;
 import android.support.test.uiautomator.UiSelector;
-import android.test.MoreAsserts;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.StructPollfd;
 import android.test.InstrumentationTestCase;
+import android.test.MoreAsserts;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.Closeable;
+import java.io.FileDescriptor;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Inet6Address;
-import java.util.concurrent.atomic.AtomicReference;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Random;
 
 /**
- * Tests for {@link DocumentsProvider} and interaction with platform intents
- * like {@link Intent#ACTION_OPEN_DOCUMENT}.
+ * Tests for the VpnService API.
+ *
+ * These tests establish a VPN via the VpnService API, and have the service reflect the packets back
+ * to the device without causing any network traffic. This allows testing the local VPN data path
+ * without a network connection or a VPN server.
+ *
+ * Note: in Lollipop, VPN functionality relies on kernel support for UID-based routing. If these
+ * tests fail, it may be due to the lack of kernel support. The necessary patches can be
+ * cherry-picked from the Android common kernel trees:
+ *
+ * android-3.10:
+ *   https://android-review.googlesource.com/#/c/99220/
+ *   https://android-review.googlesource.com/#/c/100545/
+ *
+ * android-3.4:
+ *   https://android-review.googlesource.com/#/c/99225/
+ *   https://android-review.googlesource.com/#/c/100557/
+ *
  */
 public class VpnTest extends InstrumentationTestCase {
 
     public static String TAG = "VpnTest";
     public static int TIMEOUT_MS = 3 * 1000;
+    public static int SOCKET_TIMEOUT_MS = 100;
 
     private UiDevice mDevice;
     private MyActivity mActivity;
@@ -201,8 +227,156 @@ public class VpnTest extends InstrumentationTestCase {
         mActivity.startService(intent);
     }
 
-    private static void checkUdpEcho(
-            String to, String expectedFrom, boolean expectReply) throws IOException {
+    private static void closeQuietly(Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    private static void checkPing(String to) throws IOException, ErrnoException {
+        InetAddress address = InetAddress.getByName(to);
+        FileDescriptor s;
+        final int LENGTH = 64;
+        byte[] packet = new byte[LENGTH];
+        byte[] header;
+
+        // Construct a ping packet.
+        Random random = new Random();
+        random.nextBytes(packet);
+        if (address instanceof Inet6Address) {
+            s = Os.socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
+            header = new byte[] { (byte) 0x80, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+        } else {
+            // Note that this doesn't actually work due to http://b/18558481 .
+            s = Os.socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+            header = new byte[] { (byte) 0x08, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+        }
+        System.arraycopy(header, 0, packet, 0, header.length);
+
+        // Send the packet.
+        int port = random.nextInt(65534) + 1;
+        Os.connect(s, address, port);
+        Os.write(s, packet, 0, packet.length);
+
+        // Expect a reply.
+        StructPollfd pollfd = new StructPollfd();
+        pollfd.events = (short) POLLIN;  // "error: possible loss of precision"
+        pollfd.fd = s;
+        int ret = Os.poll(new StructPollfd[] { pollfd }, SOCKET_TIMEOUT_MS);
+        assertEquals("Expected reply after sending ping", 1, ret);
+
+        byte[] reply = new byte[LENGTH];
+        int read = Os.read(s, reply, 0, LENGTH);
+        assertEquals(LENGTH, read);
+
+        // Find out what the kernel set the ICMP ID to.
+        InetSocketAddress local = (InetSocketAddress) Os.getsockname(s);
+        port = local.getPort();
+        packet[4] = (byte) ((port >> 8) & 0xff);
+        packet[5] = (byte) (port & 0xff);
+
+        // Check the contents.
+        if (packet[0] == (byte) 0x80) {
+            packet[0] = (byte) 0x81;
+        } else {
+            packet[0] = 0;
+        }
+        // Zero out the checksum in the reply so it matches the uninitialized checksum in packet.
+        reply[2] = reply[3] = 0;
+        MoreAsserts.assertEquals(packet, reply);
+    }
+
+    // Writes data to out and checks that it appears identically on in.
+    private static void writeAndCheckData(
+            OutputStream out, InputStream in, byte[] data) throws IOException {
+        out.write(data, 0, data.length);
+        out.flush();
+
+        byte[] read = new byte[data.length];
+        int bytesRead = 0, totalRead = 0;
+        do {
+            bytesRead = in.read(read, totalRead, read.length - totalRead);
+            totalRead += bytesRead;
+        } while (bytesRead >= 0 && totalRead < data.length);
+        assertEquals(totalRead, data.length);
+        MoreAsserts.assertEquals(data, read);
+    }
+
+    private static void checkTcpReflection(String to, String expectedFrom) throws IOException {
+        // Exercise TCP over the VPN by "connecting to ourselves". We open a server socket and a
+        // client socket, and connect the client socket to a remote host, with the port of the
+        // server socket. The PacketReflector reflects the packets, changing the source addresses
+        // but not the ports, so our client socket is connected to our server socket, though both
+        // sockets think their peers are on the "remote" IP address.
+
+        // Open a listening socket.
+        ServerSocket listen = new ServerSocket(0, 10, InetAddress.getByName("::"));
+
+        // Connect the client socket to it.
+        InetAddress toAddr = InetAddress.getByName(to);
+        Socket client = new Socket();
+        try {
+            client.connect(new InetSocketAddress(toAddr, listen.getLocalPort()), SOCKET_TIMEOUT_MS);
+            if (expectedFrom == null) {
+                closeQuietly(listen);
+                closeQuietly(client);
+                fail("Expected connection to fail, but it succeeded.");
+            }
+        } catch (IOException e) {
+            if (expectedFrom != null) {
+                closeQuietly(listen);
+                fail("Expected connection to succeed, but it failed.");
+            } else {
+                // We expected the connection to fail, and it did, so there's nothing more to test.
+                return;
+            }
+        }
+
+        // The connection succeeded, and we expected it to succeed. Send some data; if things are
+        // working, the data will be sent to the VPN, reflected by the PacketReflector, and arrive
+        // at our server socket. For good measure, send some data in the other direction.
+        Socket server = null;
+        try {
+            // Accept the connection on the server side.
+            listen.setSoTimeout(SOCKET_TIMEOUT_MS);
+            server = listen.accept();
+
+            // Check that the source and peer addresses are as expected.
+            assertEquals(expectedFrom, client.getLocalAddress().getHostAddress());
+            assertEquals(expectedFrom, server.getLocalAddress().getHostAddress());
+            assertEquals(
+                    new InetSocketAddress(toAddr, client.getLocalPort()),
+                    server.getRemoteSocketAddress());
+            assertEquals(
+                    new InetSocketAddress(toAddr, server.getLocalPort()),
+                    client.getRemoteSocketAddress());
+
+            // Now write some data.
+            final int LENGTH = 32768;
+            byte[] data = new byte[LENGTH];
+            new Random().nextBytes(data);
+
+            // Make sure our writes don't block or time out, because we're single-threaded and can't
+            // read and write at the same time.
+            server.setReceiveBufferSize(LENGTH * 2);
+            client.setSendBufferSize(LENGTH * 2);
+            client.setSoTimeout(SOCKET_TIMEOUT_MS);
+            server.setSoTimeout(SOCKET_TIMEOUT_MS);
+
+            // Send some data from client to server, then from server to client.
+            writeAndCheckData(client.getOutputStream(), server.getInputStream(), data);
+            writeAndCheckData(server.getOutputStream(), client.getInputStream(), data);
+        } finally {
+            closeQuietly(listen);
+            closeQuietly(client);
+            closeQuietly(server);
+        }
+    }
+
+    private static void checkUdpEcho(String to, String expectedFrom) throws IOException {
         DatagramSocket s;
         InetAddress address = InetAddress.getByName(to);
         if (address instanceof Inet6Address) {  // http://b/18094870
@@ -210,10 +384,12 @@ public class VpnTest extends InstrumentationTestCase {
         } else {
             s = new DatagramSocket();
         }
-        s.setSoTimeout(100);  // ms.
+        s.setSoTimeout(SOCKET_TIMEOUT_MS);
 
-        String msg = "Hello, world!";
-        DatagramPacket p = new DatagramPacket(msg.getBytes(), msg.length());
+        Random random = new Random();
+        byte[] data = new byte[random.nextInt(1650)];
+        random.nextBytes(data);
+        DatagramPacket p = new DatagramPacket(data, data.length);
         s.connect(address, 7);
 
         if (expectedFrom != null) {
@@ -222,10 +398,10 @@ public class VpnTest extends InstrumentationTestCase {
         }
 
         try {
-            if (expectReply) {
+            if (expectedFrom != null) {
                 s.send(p);
                 s.receive(p);
-                MoreAsserts.assertEquals(msg.getBytes(), p.getData());
+                MoreAsserts.assertEquals(data, p.getData());
             } else {
                 try {
                     s.send(p);
@@ -238,12 +414,19 @@ public class VpnTest extends InstrumentationTestCase {
         }
     }
 
-    private static void expectUdpEcho(String to, String expectedFrom) throws IOException {
-        checkUdpEcho(to, expectedFrom, true);
+    private void checkTrafficOnVpn() throws IOException, ErrnoException {
+        checkUdpEcho("192.0.2.251", "192.0.2.2");
+        checkUdpEcho("2001:db8:dead:beef::f00", "2001:db8:1:2::ffe");
+        checkPing("2001:db8:dead:beef::f00");
+        checkTcpReflection("192.0.2.252", "192.0.2.2");
+        checkTcpReflection("2001:db8:dead:beef::f00", "2001:db8:1:2::ffe");
     }
 
-    private static void expectNoUdpEcho(String to) throws IOException {
-        checkUdpEcho(to, null, false);
+    private void checkNoTrafficOnVpn() throws IOException, ErrnoException {
+        checkUdpEcho("192.0.2.251", null);
+        checkUdpEcho("2001:db8:dead:beef::f00", null);
+        checkTcpReflection("192.0.2.252", null);
+        checkTcpReflection("2001:db8:dead:beef::f00", null);
     }
 
     public void testDefault() throws Exception {
@@ -253,8 +436,7 @@ public class VpnTest extends InstrumentationTestCase {
                  new String[] {"192.0.2.0/24", "2001:db8::/32"},
                  "", "");
 
-        expectUdpEcho("192.0.2.251", "192.0.2.2");
-        expectUdpEcho("2001:db8:dead:beef::f00", "2001:db8:1:2::ffe");
+        checkTrafficOnVpn();
     }
 
     public void testAppAllowed() throws Exception {
@@ -264,8 +446,7 @@ public class VpnTest extends InstrumentationTestCase {
                  new String[] {"0.0.0.0/0", "::/0"},
                  mPackageName, "");
 
-        expectUdpEcho("192.0.2.251", "192.0.2.2");
-        expectUdpEcho("2001:db8:dead:beef::f00", "2001:db8:1:2::ffe");
+        checkTrafficOnVpn();
     }
 
     public void testAppDisallowed() throws Exception {
@@ -275,7 +456,6 @@ public class VpnTest extends InstrumentationTestCase {
                  new String[] {"192.0.2.0/24", "2001:db8::/32"},
                  "", mPackageName);
 
-        expectNoUdpEcho("192.0.2.251");
-        expectNoUdpEcho("2001:db8:dead:beef::f00");
+        checkNoTrafficOnVpn();
     }
 }
