@@ -160,6 +160,7 @@ public class CtsTestRunListener extends InstrumentationRunListener {
             mHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
             mSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 
+            mProperties.setProperty("user.home", "");
             mProperties.setProperty("java.io.tmpdir", System.getProperty("java.io.tmpdir"));
             // The CDD mandates that devices that support WiFi are the only ones that will have 
             // multicast.
