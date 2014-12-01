@@ -21,15 +21,37 @@ import com.android.cts.widget.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.PopupWindow;
+import android.view.View;
+import android.view.View.OnApplyWindowInsetsListener;
+import android.view.Window;
+import android.view.WindowInsets;
 
 /**
  * Stub activity for testing {@link PopupWindow}
  */
 public class MockPopupWindowCtsActivity extends Activity {
+    private boolean isFirstRun = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popupwindow);
+        Window window = getWindow();
+        final View decor = window.getDecorView();
+        decor.setOnApplyWindowInsetsListener(new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                if (isFirstRun) {
+                    if (insets.isRound()) {
+                        decor.setPadding(decor.getPaddingLeft(), decor.getPaddingTop(),
+                                decor.getPaddingRight(),
+                                decor.getPaddingBottom() + insets.getSystemWindowInsetBottom());
+                    }
+                    isFirstRun = false;
+                    setContentView(R.layout.popupwindow);
+                }
+                return insets.consumeSystemWindowInsets();
+            }
+        });
     }
 }
 
