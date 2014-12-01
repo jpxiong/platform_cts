@@ -18,6 +18,9 @@ package android.media.cts;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
@@ -306,17 +309,23 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testRecordingAudioInRawFormats() throws Exception {
-        testRecordAudioInRawFormat(
-                MediaRecorder.OutputFormat.AMR_NB,
-                MediaRecorder.AudioEncoder.AMR_NB);
+        if (hasAmrnb()) {
+            testRecordAudioInRawFormat(
+                    MediaRecorder.OutputFormat.AMR_NB,
+                    MediaRecorder.AudioEncoder.AMR_NB);
+        }
 
-        testRecordAudioInRawFormat(
-                MediaRecorder.OutputFormat.AMR_WB,
-                MediaRecorder.AudioEncoder.AMR_WB);
+        if (hasAmrwb()) {
+            testRecordAudioInRawFormat(
+                    MediaRecorder.OutputFormat.AMR_WB,
+                    MediaRecorder.AudioEncoder.AMR_WB);
+        }
 
-        testRecordAudioInRawFormat(
-                MediaRecorder.OutputFormat.AAC_ADTS,
-                MediaRecorder.AudioEncoder.AAC);
+        if (hasAcc()) {
+            testRecordAudioInRawFormat(
+                    MediaRecorder.OutputFormat.AAC_ADTS,
+                    MediaRecorder.AudioEncoder.AAC);
+        }
     }
 
     private void testRecordAudioInRawFormat(
@@ -348,6 +357,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
+        if (!hasAmrnb()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         assertEquals(0, mMediaRecorder.getMaxAmplitude());
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -363,6 +375,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
+        if (!hasAmrnb()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setMaxDuration(MAX_DURATION_MSEC);
@@ -375,6 +390,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     public void testSetMaxDuration() throws Exception {
         if (!hasMicrophone()) {
+            return;
+        }
+        if (!hasAmrnb()) {
             return;
         }
         testSetMaxDuration(RECORD_TIME_LONG_MS, RECORDED_DUR_TOLERANCE_MS);
@@ -451,6 +469,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
+        if (!hasAmrnb()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -482,5 +503,33 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private boolean hasMicrophone() {
         return mActivity.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_MICROPHONE);
+    }
+
+    private static boolean hasCodecForMimeType(String mimeType, boolean encoder) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (encoder != info.isEncoder()) {
+                continue;
+            }
+
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasAmrnb() {
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false);
+    }
+
+    private static boolean hasAmrwb() {
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false);
+    }
+
+    private static boolean hasAcc() {
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AAC, false);
     }
 }
