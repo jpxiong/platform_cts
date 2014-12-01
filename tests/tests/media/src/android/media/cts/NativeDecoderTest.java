@@ -406,6 +406,10 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
     }
 
     private void testMuxer(int res, boolean webm) throws Exception {
+        if (!supportsPlayback(res)) {
+            Log.i(TAG, "SKIPPING testMuxer() resid=" + res + " Unsupported decorder.");
+            return;
+        }
         AssetFileDescriptor infd = mResources.openRawResourceFd(res);
 
         File base = mContext.getExternalFilesDir(null);
