@@ -1423,8 +1423,13 @@
     <string name="tv_input_discover_test_verify_tune">
     Tune command must be called.
     </string>
+    <string name="tv_input_discover_test_verify_overlay_view">
+    Overlay view must be shown. Verify that there is a text view displaying \"Overlay View Dummy Text\"
+    when you tune to the \"Dummy\" channel.
+    </string>
 
     <string name="tv_launch_tv_app">Launch TV app</string>
+    <string name="overlay_view_text">Overlay View Dummy Text</string>
 
     <!-- A list of fully-qualified test classes that should not be run. -->
     <string-array name="disabled_tests" />
