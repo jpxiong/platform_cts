@@ -37,6 +37,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -211,9 +212,8 @@ public class SplitAppTest extends AndroidTestCase {
         assertEquals("base", getXmlTestValue(r.getXml(R.xml.my_activity_meta)));
 
         // And that we can access resources from feature
-        // TODO: enable these once 17924027 is fixed
-//        assertEquals("red", r.getString(r.getIdentifier("feature_string", "string", PKG)));
-//        assertEquals(123, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
+        assertEquals("red", r.getString(r.getIdentifier("feature_string", "string", PKG)));
+        assertEquals(123, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
 
         final Class<?> featR = Class.forName("com.android.cts.splitapp.FeatureR");
         final int boolId = (int) featR.getDeclaredField("feature_receiver_enabled").get(null);
@@ -292,8 +292,7 @@ public class SplitAppTest extends AndroidTestCase {
         assertEquals(false, r.getBoolean(R.bool.my_receiver_enabled));
 
         // And that we can access resources from feature
-        // TODO: enable these once 17924027 is fixed
-//        assertEquals(321, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
+        assertEquals(321, r.getInteger(r.getIdentifier("feature_integer", "integer", PKG)));
 
         final Class<?> featR = Class.forName("com.android.cts.splitapp.FeatureR");
         final int boolId = (int) featR.getDeclaredField("feature_receiver_enabled").get(null);
@@ -308,6 +307,16 @@ public class SplitAppTest extends AndroidTestCase {
         intent.setPackage(PKG);
         List<ResolveInfo> result = pm.queryBroadcastReceivers(intent, 0);
         assertEquals(0, result.size());
+    }
+
+    public void testCodeCacheWrite() throws Exception {
+        assertTrue(new File(getContext().getFilesDir(), "normal.raw").createNewFile());
+        assertTrue(new File(getContext().getCodeCacheDir(), "cache.raw").createNewFile());
+    }
+
+    public void testCodeCacheRead() throws Exception {
+        assertTrue(new File(getContext().getFilesDir(), "normal.raw").exists());
+        assertFalse(new File(getContext().getCodeCacheDir(), "cache.raw").exists());
     }
 
     private static void updateDpi(Resources r, int densityDpi) {
