@@ -33,6 +33,7 @@ import android.os.ConditionVariable;
 import android.util.Log;
 import android.view.Surface;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,9 +134,29 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         }
     }
 
-    public void testInvalidAccessTest() {
-        // TODO: test invalid access case, see if we can receive expected
-        // exceptions
+    /**
+     * Test invalid access of image byte buffers: when an image is closed, further access
+     * of the image byte buffers will get an IllegalStateException. The basic assumption of
+     * this test is that the ImageReader always gives direct byte buffer, which is always true
+     * for camera case. For if the produced image byte buffer is not direct byte buffer, there
+     * is no guarantee to get an ISE for this invalid access case.
+     */
+    public void testInvalidAccessTest() throws Exception {
+        // Test byte buffer access after an image is released, it should throw ISE.
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing invalid image access for Camera " + id);
+                openDevice(id);
+                bufferAccessAfterRelease();
+                fail("ImageReader should throw IllegalStateException when accessing a byte buffer"
+                        + " after the image is closed");
+            } catch (IllegalStateException e) {
+                // Expected.
+            } finally {
+                closeDevice(id);
+            }
+        }
+
     }
 
     /**
@@ -256,6 +277,36 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 closeImageReader(yuvReader);
                 yuvReader = null;
             }
+        }
+    }
+
+    /**
+     * Test buffer access after release, YUV420_888 single capture is tested. This method
+     * should throw ISE.
+     */
+    private void bufferAccessAfterRelease() throws Exception {
+        final int FORMAT = ImageFormat.YUV_420_888;
+        Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(FORMAT,
+                StaticMetadata.StreamDirection.Output);
+
+        try {
+            // Create ImageReader.
+            mListener = new SimpleImageListener();
+            createDefaultImageReader(availableSizes[0], FORMAT, MAX_NUM_IMAGES, mListener);
+
+            // Start capture.
+            CaptureRequest request = prepareCaptureRequest();
+            SimpleCaptureCallback listener = new SimpleCaptureCallback();
+            startCapture(request, /* repeating */false, listener, mHandler);
+
+            mListener.waitForAnyImageAvailable(CAPTURE_WAIT_TIMEOUT_MS);
+            Image img = mReader.acquireNextImage();
+            ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+            img.close();
+
+            byte data = buffer.get(); // An ISE should be thrown here.
+        } finally {
+            closeDefaultImageReader();
         }
     }
 
