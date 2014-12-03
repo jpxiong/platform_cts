@@ -68,6 +68,7 @@ cts_support_packages := \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
+    CtsHostsideNetworkTestsApp \
     CtsIntentReceiverApp \
     CtsIntentSenderApp \
     CtsManagedProfileApp \
@@ -175,6 +176,7 @@ cts_host_libraries := \
     CtsDevicePolicyManagerTestCases \
     CtsDumpsysHostTestCases \
     CtsHostJank \
+    CtsHostsideNetworkTests \
     CtsHostUi \
     CtsMonkeyTestCases \
     CtsThemeHostTestCases \
