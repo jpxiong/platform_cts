@@ -436,17 +436,23 @@ public class StaticMetadata {
         int[] modes = getValueFromKeyNonNull(key);
 
         boolean foundAuto = false;
+        boolean found50Hz = false;
+        boolean found60Hz = false;
         for (int mode : modes) {
             checkTrueForKey(key, "mode value " + mode + " is out if range",
                     mode >= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF ||
                     mode <= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO);
             if (mode == CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO) {
                 foundAuto = true;
-                return modes;
+            } else if (mode == CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_50HZ) {
+                found50Hz = true;
+            } else if (mode == CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_60HZ) {
+                found60Hz = true;
             }
         }
-        // Must contain AUTO mode.
-        checkTrueForKey(key, "AUTO mode is missing", foundAuto);
+        // Must contain AUTO mode or one of 50/60Hz mode.
+        checkTrueForKey(key, "Either AUTO mode or both 50HZ/60HZ mode should present",
+                foundAuto || (found50Hz && found60Hz));
 
         return modes;
     }
