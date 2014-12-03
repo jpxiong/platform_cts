@@ -115,6 +115,25 @@ public class KernelSettingsTest extends TestCase {
 
     private static native boolean supportsXattr();
 
+    /**
+     * ICMP redirects should be disabled.
+     */
+    public void testNoIcmpRedirects() throws IOException {
+        try {
+            assertEquals("ICMP redirects are enabled for IPv4.",
+                    "0", getFile("/proc/sys/net/ipv4/conf/all/accept_redirects"));
+        } catch (FileNotFoundException e) {
+            // Odd. The file doesn't exist... Assume we're ok.
+        }
+
+        try {
+            assertEquals("ICMP redirects are enabled for IPv6.",
+                    "0", getFile("/proc/sys/net/ipv6/conf/all/accept_redirects"));
+        } catch (FileNotFoundException e) {
+            // Odd. The file doesn't exist... Assume we're ok.
+        }
+    }
+
     private String getFile(String filename) throws IOException {
         BufferedReader in = null;
         try {
