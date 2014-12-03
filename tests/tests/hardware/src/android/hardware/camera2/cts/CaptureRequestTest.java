@@ -2098,15 +2098,18 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
             resultListener = new SimpleCaptureCallback();
             startPreview(requestBuilder, previewSz, resultListener);
-            long[] frameDurationRange =
-                    new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+
+            long[] frameDurationRange = new long[]{
+                    (long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
             for (int j = 0; j < numFramesVerified; j++) {
                 CaptureResult result =
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
                 validatePipelineDepth(result);
                 long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
                 mCollector.expectInRange(
-                        "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
+                        "Frame duration must be in the range of " +
+                                Arrays.toString(frameDurationRange),
                         frameDuration,
                         (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
                         (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
