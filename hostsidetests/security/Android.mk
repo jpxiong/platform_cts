@@ -25,7 +25,7 @@ LOCAL_MODULE := CtsSecurityHostTestCases
 
 LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed ddmlib-prebuilt tradefed-prebuilt
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt
 
 LOCAL_CTS_TEST_PACKAGE := android.host.security
 

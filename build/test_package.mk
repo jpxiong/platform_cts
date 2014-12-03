@@ -37,7 +37,7 @@ $(cts_package_apk): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/pac
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	$(hide) $(ACP) -fp $(call intermediates-dir-for,APPS,$(PRIVATE_PACKAGE))/package.apk $@
 
-$(cts_library_xml): PRIVATE_SRC_DIRS := $(cts_src_dirs)
+$(cts_package_xml): PRIVATE_SRC_DIRS := $(cts_src_dirs)
 $(cts_package_xml): PRIVATE_INSTRUMENTATION := $(LOCAL_INSTRUMENTATION_FOR)
 $(cts_package_xml): PRIVATE_PACKAGE := $(LOCAL_PACKAGE_NAME)
 ifneq ($(filter cts/suite/cts/%, $(LOCAL_PATH)),)
