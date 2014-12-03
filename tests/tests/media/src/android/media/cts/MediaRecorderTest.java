@@ -522,14 +522,14 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     private static boolean hasAmrnb() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false);
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true);
     }
 
     private static boolean hasAmrwb() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false);
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true);
     }
 
     private static boolean hasAcc() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AAC, false);
+        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AAC, true);
     }
 }
