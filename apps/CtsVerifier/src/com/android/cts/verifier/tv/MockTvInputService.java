@@ -16,18 +16,23 @@
 
 package com.android.cts.verifier.tv;
 
+import com.android.cts.verifier.R;
+
 import android.content.Context;
 import android.media.tv.TvInputService;
 import android.net.Uri;
 import android.util.Pair;
 import android.view.Surface;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 public class MockTvInputService extends TvInputService {
     private static final String TAG = "MockTvInputService";
 
     private static Object sLock = new Object();
     private static Pair<View, Runnable> sTuneCallback = null;
+    private static Pair<View, Runnable> sOverlayViewCallback = null;
 
     static void expectTune(View postTarget, Runnable successCallback) {
         synchronized (sLock) {
@@ -35,18 +40,52 @@ public class MockTvInputService extends TvInputService {
         }
     }
 
+    static void expectOverlayView(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sOverlayViewCallback = Pair.create(postTarget, successCallback);
+        }
+    }
+
     @Override
     public Session onCreateSession(String inputId) {
-        return new MockSessionImpl(this);
+        Session session = new MockSessionImpl(this);
+        session.setOverlayViewEnabled(true);
+        return session;
     }
 
     private static class MockSessionImpl extends Session {
+        private Context mContext;
+
         private MockSessionImpl(Context context) {
             super(context);
+            mContext = context;
         }
 
         @Override
         public void onRelease() {
+        }
+
+        @Override
+        public View onCreateOverlayView() {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                    LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.tv_overlay, null);
+            TextView textView = (TextView) view.findViewById(R.id.overlay_view_text);
+            textView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                        int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    Pair<View, Runnable> overlayViewCallback = null;
+                    synchronized (sLock) {
+                        overlayViewCallback = sOverlayViewCallback;
+                        sOverlayViewCallback = null;
+                    }
+                    if (overlayViewCallback != null) {
+                        overlayViewCallback.first.post(overlayViewCallback.second);
+                    }
+                }
+            });
+            return view;
         }
 
         @Override
@@ -68,6 +107,8 @@ public class MockTvInputService extends TvInputService {
             if (tuneCallback != null) {
                 tuneCallback.first.post(tuneCallback.second);
             }
+            notifyVideoAvailable();
+            notifyContentAllowed();
             return true;
         }
 

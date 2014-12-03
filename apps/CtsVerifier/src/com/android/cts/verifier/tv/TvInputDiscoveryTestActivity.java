@@ -33,6 +33,9 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
     private View mVerifySetupItem;
     private View mTuneToChannelItem;
     private View mVerifyTuneItem;
+    private View mVerifyOverlayViewItem;
+    private boolean mTuneVerified;
+    private boolean mOverlayViewVerified;
 
     @Override
     public void onClick(View v) {
@@ -66,10 +69,21 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
             MockTvInputService.expectTune(postTarget, new Runnable() {
                 @Override
                 public void run() {
-                    postTarget.removeCallbacks(failCallback);
                     setPassState(mTuneToChannelItem, true);
                     setPassState(mVerifyTuneItem, true);
-                    getPassButton().setEnabled(true);
+
+                    mTuneVerified = true;
+                    updatePassState(postTarget, failCallback);
+                }
+            });
+            MockTvInputService.expectOverlayView(postTarget, new Runnable() {
+                @Override
+                public void run() {
+                    postTarget.removeCallbacks(failCallback);
+                    setPassState(mVerifyOverlayViewItem, true);
+
+                    mOverlayViewVerified = true;
+                    updatePassState(postTarget, failCallback);
                 }
             });
         }
@@ -85,5 +99,14 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
         mTuneToChannelItem = createUserItem(R.string.tv_input_discover_test_tune_to_channel,
                 R.string.tv_launch_tv_app, this);
         mVerifyTuneItem = createAutoItem(R.string.tv_input_discover_test_verify_tune);
+        mVerifyOverlayViewItem = createAutoItem(
+                R.string.tv_input_discover_test_verify_overlay_view);
+    }
+
+    private void updatePassState(View postTarget, Runnable failCallback) {
+        if (mTuneVerified && mOverlayViewVerified) {
+            postTarget.removeCallbacks(failCallback);
+            getPassButton().setEnabled(true);
+        }
     }
 }
