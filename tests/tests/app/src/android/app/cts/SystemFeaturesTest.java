@@ -141,8 +141,6 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         boolean manualSensor = false;
         boolean manualPostProcessing = false;
         boolean raw = false;
-        boolean readSensorSettings = false;
-        boolean burstCapture = false;
         CameraCharacteristics[] cameraChars = new CameraCharacteristics[cameraIds.length];
         for (String cameraId : cameraIds) {
             CameraCharacteristics chars = mCameraManager.getCameraCharacteristics(cameraId);
@@ -162,14 +160,8 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                     case CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW:
                         raw = true;
                         break;
-                    case CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS:
-                        readSensorSettings = true;
-                        break;
-                    case CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE:
-                        burstCapture = true;
-                        break;
                     default:
-                        // Capabilities that don't have a matching system feature
+                        // Capabilities don't have a matching system feature
                         break;
                 }
             }
@@ -179,8 +171,6 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         assertFeature(manualPostProcessing,
                 PackageManager.FEATURE_CAMERA_CAPABILITY_MANUAL_POST_PROCESSING);
         assertFeature(raw, PackageManager.FEATURE_CAMERA_CAPABILITY_RAW);
-        assertFeature(readSensorSettings, PackageManager.FEATURE_CAMERA_CAPABILITY_READ_SENSOR_SETTINGS);
-        assertFeature(burstCapture, PackageManager.FEATURE_CAMERA_CAPABILITY_BURST_CAPTURE);
     }
 
     private void checkFrontCamera() {
