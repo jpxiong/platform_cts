@@ -19,11 +19,11 @@ package util.build;
 import com.android.dx.command.dexer.Main;
 import java.io.IOException;
 
-public class DexBuildStep extends BuildStep {
+public class DxBuildStep extends BuildStep {
 
     private final boolean deleteInputFileAfterBuild;
 
-    DexBuildStep(BuildFile inputFile, BuildFile outputFile,
+    DxBuildStep(BuildFile inputFile, BuildFile outputFile,
             boolean deleteInputFileAfterBuild) {
         super(inputFile, outputFile);
         this.deleteInputFileAfterBuild = deleteInputFileAfterBuild;
@@ -71,7 +71,7 @@ public class DexBuildStep extends BuildStep {
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj)) {
-            DexBuildStep other = (DexBuildStep) obj;
+            DxBuildStep other = (DxBuildStep) obj;
 
             return inputFile.equals(other.inputFile)
                     && outputFile.equals(other.outputFile);
