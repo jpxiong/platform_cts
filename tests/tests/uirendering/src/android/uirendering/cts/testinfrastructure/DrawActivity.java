@@ -51,7 +51,7 @@ public class DrawActivity extends Activity {
     public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
             @Nullable ViewInitializer viewInitializer, boolean useHardware) {
         ((RenderSpecHandler) mHandler).setViewInitializer(viewInitializer);
-        int arg2 = (useHardware ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE);
+        int arg2 = (useHardware ? View.LAYER_TYPE_NONE : View.LAYER_TYPE_SOFTWARE);
         if (canvasClient != null) {
             mHandler.obtainMessage(RenderSpecHandler.CANVAS_MSG, 0, arg2, canvasClient).sendToTarget();
         } else if (webViewUrl != null) {
