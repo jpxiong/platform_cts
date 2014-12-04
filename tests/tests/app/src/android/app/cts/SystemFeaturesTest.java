@@ -292,14 +292,57 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 Sensor.TYPE_STEP_COUNTER);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_STEP_DETECTOR,
                 Sensor.TYPE_STEP_DETECTOR);
-        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE,
-                Sensor.TYPE_HEART_RATE);
-        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
-                Sensor.TYPE_HEART_RATE);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_AMBIENT_TEMPERATURE,
                 Sensor.TYPE_AMBIENT_TEMPERATURE);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_RELATIVE_HUMIDITY,
                 Sensor.TYPE_RELATIVE_HUMIDITY);
+
+
+        /*
+         * We have three cases to test for :
+         * Case 1:  Device does not have an HRM
+         * FEATURE_SENSOR_HEART_RATE               false
+         * FEATURE_SENSOR_HEART_RATE_ECG           false
+         * assertFeatureForSensor(TYPE_HEART_RATE) false
+         *
+         * Case 2:  Device has a PPG HRM
+         * FEATURE_SENSOR_HEART_RATE               true
+         * FEATURE_SENSOR_HEART_RATE_ECG           false
+         * assertFeatureForSensor(TYPE_HEART_RATE) true
+         *
+         * Case 3:  Device has an ECG HRM
+         * FEATURE_SENSOR_HEART_RATE               false
+         * FEATURE_SENSOR_HEART_RATE_ECG           true
+         * assertFeatureForSensor(TYPE_HEART_RATE) true
+         */
+
+        if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG)) {
+                /* Case 3 for FEATURE_SENSOR_HEART_RATE_ECG true case */
+                assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
+                        Sensor.TYPE_HEART_RATE);
+
+                /* Remove HEART_RATE from featuresLeft, no way to test that one */
+                assertTrue("Features left " + featuresLeft + " to check did not include "
+                        + PackageManager.FEATURE_SENSOR_HEART_RATE,
+                        featuresLeft.remove(PackageManager.FEATURE_SENSOR_HEART_RATE));
+        } else if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
+                /* Case 1 & 2 for FEATURE_SENSOR_HEART_RATE_ECG false case */
+                assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
+                        Sensor.TYPE_HEART_RATE);
+
+                /* Case 1 & 3 for FEATURE_SENSOR_HEART_RATE false case */
+                assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE,
+                        Sensor.TYPE_HEART_RATE);
+        } else {
+                /* Case 2 for FEATURE_SENSOR_HEART_RATE true case */
+                assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_HEART_RATE,
+                        Sensor.TYPE_HEART_RATE);
+
+                /* Remove HEART_RATE_ECG from featuresLeft, no way to test that one */
+                assertTrue("Features left " + featuresLeft + " to check did not include "
+                        + PackageManager.FEATURE_SENSOR_HEART_RATE_ECG,
+                        featuresLeft.remove(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG));
+        }
 
         assertTrue("Assertions need to be added to this test for " + featuresLeft,
                 featuresLeft.isEmpty());
