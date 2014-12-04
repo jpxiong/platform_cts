@@ -209,7 +209,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
     protected void playVideoTest(int resid, int width, int height) throws Exception {
         if (!supportsPlayback(resid)) {
-            LOG.info("SKIPPING playVideoTest() for resid=" + resid 
+            LOG.info("SKIPPING playVideoTest() for resid=" + resid
                     + " Could not find a codec for playback.");
             return;
         }
@@ -332,6 +332,21 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         return false;
     }
 
+    public static MediaCodecInfo getMediaCodecInfo(String mimeType, boolean isEncoder) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (isEncoder != info.isEncoder()) {
+                continue;
+            }
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    return info;
+                }
+            }
+        }
+        return null;
+    }
+
     public static boolean hasH264(boolean encoder) {
         return hasCodecForMimeType("video/avc", encoder);
     }
@@ -359,5 +374,26 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     public boolean hasAudioOutput() {
         return getInstrumentation().getTargetContext().getPackageManager()
             .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
+    }
+
+    public boolean isTv() {
+        PackageManager packageManager = getInstrumentation().getTargetContext().getPackageManager();
+        return packageManager.hasSystemFeature("android.hardware.type.television") ||
+                packageManager.hasSystemFeature("android.software.leanback");
+    }
+
+    private static boolean isFormatSupported(
+            String mimeType, int w, int h, int frameRate, boolean isEncoder) {
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaFormat format = MediaFormat.createVideoFormat(mimeType, w, h);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
+        String codec = isEncoder
+                ? mcl.findEncoderForFormat(format)
+                : mcl.findDecoderForFormat(format);
+        return (codec != null);
+    }
+
+    public static boolean isDecodeFormatSupported(String mimeType, int w, int h, int frameRate) {
+        return isFormatSupported(mimeType, w, h, frameRate, false /* isEncoder */);
     }
 }

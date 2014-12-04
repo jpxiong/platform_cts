@@ -20,6 +20,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 
 import android.os.Build;
@@ -32,14 +33,94 @@ import android.util.Log;
 public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
 
     private static final String TAG = "MediaCodecCapabilitiesTest";
-    private static final String AVC_MIME = "video/avc";
-    private static final String HEVC_MIME = "video/hevc";
+    private static final String AVC_MIME  = MediaFormat.MIMETYPE_VIDEO_AVC;
+    private static final String HEVC_MIME = MediaFormat.MIMETYPE_VIDEO_HEVC;
     private static final int PLAY_TIME_MS = 30000;
+
+    // Android device implementations with H.264 encoders, MUST support Baseline Profile Level 3.
+    // SHOULD support Main Profile/ Level 4, if supported the device must also support Main
+    // Profile/Level 4 decoding.
+    public void testH264EncoderProfileAndLevel() throws Exception {
+        if (!hasH264(true /* isEncoder */)) {
+            Log.d(TAG, "SKIPPING testH264EncoderProfileAndLevel: No codec found.");
+            return;
+        }
+        boolean testLevel = true;
+        if (!supports(AVC_MIME, true /* isEncoder */, CodecProfileLevel.AVCProfileBaseline,
+                CodecProfileLevel.AVCLevel3, testLevel)) {
+            fail("H.264 Baseline Profile Level 3 support is required by CDD");
+        }
+
+        if (supports(AVC_MIME, true /* isEncoder */, CodecProfileLevel.AVCProfileMain,
+                    CodecProfileLevel.AVCLevel4, testLevel)) {
+            if (!supports(AVC_MIME, false, CodecProfileLevel.AVCProfileMain,
+                    CodecProfileLevel.AVCLevel4, testLevel)) {
+                fail("If H.264 Main Profile Level 4 encoding is supported, " +
+                        "the device must also support is the same profile and level for decoding.");
+            }
+        }
+    }
+
+    // Android device implementations with H.264 decoders, MUST support Baseline Profile Level 3.
+    // Android Television Devices MUST support High Profile Level 4.2.
+    public void testH264DecoderProfileAndLevel() throws Exception {
+        if (!hasH264(false /* isEncoder */)) {
+            Log.d(TAG, "SKIPPING testH264DecoderProfileAndLevel: No codec found.");
+            return;
+        }
+        if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
+                CodecProfileLevel.AVCLevel3)) {
+            fail("H.264 Baseline Profile Level 3 support is required by CDD");
+        }
+        if (isTv()) {
+            if (!supports(AVC_MIME, CodecProfileLevel.AVCProfileHigh,
+                    CodecProfileLevel.AVCLevel42)) {
+                fail("H.264 High Profile Level 4.2 support is required by CDD for " +
+                        "television devices");
+            }
+      }
+    }
+
+    // Android device implementations, when supporting H.265 codec MUST support the Main Profile
+    // Level 3 Main tier.
+    // Android Television Devices MUST support the Main Profile Level 4.1 Main tier.
+    // When the UHD video decoding profile is supported, it MUST support Main10 Level 5 Main
+    // Tier profile.
+    public void testH265DecoderProfileAndLevel() throws Exception {
+        MediaCodecInfo info = getMediaCodecInfo(HEVC_MIME, false /* isEncoder */);
+        if (info == null) {
+            Log.d(TAG, "SKIPPING testH265DecoderProfileAndLevel: No codec found.");
+            return;
+        }
+
+        if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                CodecProfileLevel.HEVCMainTierLevel3)) {
+            fail("H.265 Main Profile Level 3 Main tier support is required by CDD");
+        }
+        if (isTv()) {
+            if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
+                    CodecProfileLevel.HEVCMainTierLevel41)) {
+                fail("H.265 Main Profile Level 4.1 Main tier support is required by CDD for " +
+                        "television devices");
+            }
+        }
+
+        MediaCodecInfo.CodecCapabilities cCaps = info.getCapabilitiesForType(HEVC_MIME);
+        MediaCodecInfo.VideoCapabilities vCaps = cCaps.getVideoCapabilities();
+        if (vCaps.areSizeAndRateSupported(3840, 2160, 30)) {
+            if (!supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain10,
+                    CodecProfileLevel.HEVCMainTierLevel5)) {
+                fail("H.265 Main10 Level 5 Main Tier support is required by CDD when " +
+                        "the UHD video decoding profile is supported");
+            }
+        }
+    }
+
 
     public void testAvcBaseline1() throws Exception {
         if (hasCodec(AVC_MIME) && !supports(AVC_MIME, CodecProfileLevel.AVCProfileBaseline,
                 CodecProfileLevel.AVCLevel1)) {
-            throw new RuntimeException("AVCLevel1 support is required by CDD");
+            fail("AVCLevel1 support is required by CDD");
         }
         // We don't have a test stream, but at least we're testing
         // that supports() returns true for something.
@@ -125,7 +206,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     public void testHevcMain1() throws Exception {
         if (hasCodec(HEVC_MIME) && !supports(HEVC_MIME, CodecProfileLevel.HEVCProfileMain,
                 CodecProfileLevel.HEVCMainTierLevel1)) {
-            throw new RuntimeException("HECLevel1 support is required by CDD");
+            fail("HECLevel1 support is required by CDD");
         }
         // We don't have a test stream, but at least we're testing
         // that supports() returns true for something.
@@ -195,18 +276,19 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     private boolean supports(String mimeType, int profile) {
-        return supports(mimeType, profile, 0, false);
+        return supports(mimeType, false /* isEncoder */, profile, 0, false);
     }
 
     private boolean supports(String mimeType, int profile, int level) {
-        return supports(mimeType, profile, level, true);
+        return supports(mimeType, false /* isEncoder */, profile, level, true);
     }
 
-    private boolean supports(String mimeType, int profile, int level, boolean testLevel) {
+    private boolean supports(String mimeType, boolean isEncoder,
+            int profile, int level, boolean testLevel) {
         int numCodecs = MediaCodecList.getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
             MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
-            if (codecInfo.isEncoder()) {
+            if (isEncoder != codecInfo.isEncoder()) {
                 continue;
             }
 

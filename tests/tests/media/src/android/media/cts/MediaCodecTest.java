@@ -50,14 +50,15 @@ public class MediaCodecTest extends AndroidTestCase {
     private static final boolean VERBOSE = false;           // lots of logging
 
     // parameters for the video encoder
-    private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
+                                                            // H.264 Advanced Video Coding
+    private static final String MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC;
     private static final int BIT_RATE = 2000000;            // 2Mbps
     private static final int FRAME_RATE = 15;               // 15fps
     private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
     // parameters for the audio encoder
-    private static final String MIME_TYPE_AUDIO = "audio/mp4a-latm";
+    private static final String MIME_TYPE_AUDIO = MediaFormat.MIMETYPE_AUDIO_AAC;
     private static final int AUDIO_SAMPLE_RATE = 44100;
     private static final int AUDIO_AAC_PROFILE = 2; /* OMX_AUDIO_AACObjectLC */
     private static final int AUDIO_CHANNEL_COUNT = 2; // mono
@@ -79,7 +80,7 @@ public class MediaCodecTest extends AndroidTestCase {
      * methods when called in incorrect operational states.
      */
     public void testException() throws Exception {
-        String mimeType = "audio/amr-wb";
+        String mimeType = MediaFormat.MIMETYPE_AUDIO_AMR_WB;
         if (!supportsCodec(mimeType, false)) {
             Log.i(TAG, "No decoder found for mimeType= " + mimeType);
             return;

@@ -18,6 +18,8 @@ package android.media.cts;
 
 import com.android.cts.media.R;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.ImageFormat;
@@ -81,14 +83,15 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     // TODO: add similar tests for other audio and video formats
     public void testBug11696552() throws Exception {
-        MediaCodec mMediaCodec = MediaCodec.createDecoderByType("audio/mp4a-latm");
-        MediaFormat mFormat = MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 2);
+        MediaCodec mMediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
+        MediaFormat mFormat = MediaFormat.createAudioFormat(
+                MediaFormat.MIMETYPE_AUDIO_AAC, 48000 /* frequency */, 2 /* channels */);
         mFormat.setByteBuffer("csd-0", ByteBuffer.wrap( new byte [] {0x13, 0x10} ));
         mFormat.setInteger(MediaFormat.KEY_IS_ADTS, 1);
         mMediaCodec.configure(mFormat, null, null, 0);
         mMediaCodec.start();
         int index = mMediaCodec.dequeueInputBuffer(250000);
-        mMediaCodec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM );
+        mMediaCodec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         mMediaCodec.dequeueOutputBuffer(info, 250000);
     }
@@ -844,21 +847,23 @@ public class DecoderTest extends MediaPlayerTestBase {
         return numsamples;
     }
 
+    private void testDecode(int testVideo, int frameNum) throws Exception {
+        // Decode to Surface.
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(testVideo, RESET_MODE_NONE, -1 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", frameNum, frames1);
+
+        // Decode to buffer.
+        int frames2 = countFrames(testVideo, RESET_MODE_NONE, -1 /* eosframe */, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
     public void testCodecBasicH264() throws Exception {
         if (!hasH264(false)) {
             Log.i(TAG, "SKIPPING testCodecBasicH264(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 240, frames1);
-
-        int frames2 = countFrames(
-                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+        testDecode(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 240);
     }
 
     public void testCodecBasicHEVC() throws Exception {
@@ -866,16 +871,7 @@ public class DecoderTest extends MediaPlayerTestBase {
             Log.i(TAG, "SKIPPING testCodecBasicHEVC(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 300, frames1);
-
-        int frames2 = countFrames(
-                R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+        testDecode(R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz, 300);
     }
 
     public void testCodecBasicH263() throws Exception {
@@ -883,16 +879,7 @@ public class DecoderTest extends MediaPlayerTestBase {
             Log.i(TAG, "SKIPPING testCodecBasicH263(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 122, frames1);
-
-        int frames2 = countFrames(
-                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+        testDecode(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 122);
     }
 
     public void testCodecBasicMpeg4() throws Exception {
@@ -900,16 +887,7 @@ public class DecoderTest extends MediaPlayerTestBase {
             Log.i(TAG, "SKIPPING testCodecBasicMpeg4(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 249, frames1);
-
-        int frames2 = countFrames(
-                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+        testDecode(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 249);
     }
 
     public void testCodecBasicVP8() throws Exception {
@@ -917,16 +895,7 @@ public class DecoderTest extends MediaPlayerTestBase {
             Log.i(TAG, "SKIPPING testCodecBasicVP8(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 240, frames1);
-
-        int frames2 = countFrames(
-                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+        testDecode(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 240);
     }
 
     public void testCodecBasicVP9() throws Exception {
@@ -934,16 +903,256 @@ public class DecoderTest extends MediaPlayerTestBase {
             Log.i(TAG, "SKIPPING testCodecBasicVP9(): No codec found.");
             return;
         }
-        Surface s = getActivity().getSurfaceHolder().getSurface();
-        int frames1 = countFrames(
-                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, s);
-        assertEquals("wrong number of frames decoded", 240, frames1);
+        testDecode(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 240);
+    }
 
-        int frames2 = countFrames(
-                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                RESET_MODE_NONE, -1 /* eosframe */, null);
-        assertEquals("different number of frames when using Surface", frames1, frames2);
+    public void testH264Decode320x240() throws Exception {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testH264Decode320x240(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_320x240_mp4_h264_800kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testH264Decode720x480() throws Exception {
+        if (!hasH264(false)) {
+            Log.i(TAG, "SKIPPING testH264Decode720x480(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_720x480_mp4_h264_2048kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testH264Decode30fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testH264Decode30fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 30)) {
+            Log.i(TAG, "SKIPPING testH264Decode30fps1280x720(): Unsupported profile.");
+            return;
+        }
+
+        testDecode(R.raw.video_1280x720_mp4_h264_8192kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testH264Decode60fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 60)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testH264Decode60fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 60)) {
+            Log.i(TAG, "SKIPPING testH264Decode60fps1280x720(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1280x720_mp4_h264_8192kbps_60fps_aac_stereo_128kbps_44100hz, 596);
+    }
+
+    public void testH264Decode30fps1920x1080Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testH264Decode30fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 30)) {
+            Log.i(TAG, "SKIPPING testH264Decode30fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1920x1080_mp4_h264_20480kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testH264Decode60fps1920x1080Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 60)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testH264Decode60fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 60)) {
+            Log.i(TAG, "SKIPPING testH264Decode60fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1920x1080_mp4_h264_20480kbps_60fps_aac_stereo_128kbps_44100hz, 596);
+    }
+
+    public void testVP8Decode320x240() throws Exception {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testVP8Decode320x240(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_320x240_webm_vp8_800kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP8Decode640x360() throws Exception {
+        if (!hasVP8(false)) {
+            Log.i(TAG, "SKIPPING testVP8Decode640x360(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_640x360_webm_vp8_2048kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP8Decode30fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1280, 720, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testVP8Decode30fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1280, 720, 30)) {
+            Log.i(TAG, "SKIPPING testVP8Decode30fps1280x720(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1280x720_webm_vp8_8192kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP8Decode60fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1280, 720, 60)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testVP8Decode60fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1280, 720, 60)) {
+            Log.i(TAG, "SKIPPING testVP8Decode60fps1280x720(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1280x720_webm_vp8_8192kbps_60fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP8Decode30fps1920x1080Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1920, 1080, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testVP8Decode30fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1920, 1080, 30)) {
+            Log.i(TAG, "SKIPPING testVP8Decode30fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1920x1080_webm_vp8_20480kbps_30fps_vorbis_stereo_128kbps_44100hz,
+                249);
+    }
+
+    public void testVP8Decode60fps1920x1080Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1920, 1080, 60)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testVP8Decode60fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP8, 1920, 1080, 60)) {
+            Log.i(TAG, "SKIPPING testVP8Decode60fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1920x1080_webm_vp8_20480kbps_60fps_vorbis_stereo_128kbps_44100hz,
+                249);
+    }
+
+    public void testVP9Decode320x240() throws Exception {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testVP9Decode320x240(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_320x240_webm_vp9_600kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP9Decode640x360() throws Exception {
+        if (!hasVP9(false)) {
+            Log.i(TAG, "SKIPPING testVP9Decode640x360(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_640x360_webm_vp9_1638kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP9Decode30fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP9, 1280, 720, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testVP9Decode30fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP9, 1280, 720, 30)) {
+            Log.i(TAG, "SKIPPING testVP8Decode30fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1280x720_webm_vp9_4096kbps_30fps_vorbis_stereo_128kbps_44100hz, 249);
+    }
+
+    public void testVP9Decode30fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP9, 1920, 1080, 30)) {
+            Log.d(TAG, "SKIPPING testVP9Decode30fps1920x1080(): Unsupported optional profile.");
+            return;
+        }
+
+        testDecode(R.raw.video_1920x1080_webm_vp9_10240kbps_30fps_vorbis_stereo_128kbps_44100hz,
+                249);
+    }
+
+    public void testVP9Decode30fps3840x2160() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_VP9, 3840, 2160, 30)) {
+            Log.d(TAG, "SKIPPING testVP9Decode30fps3840x2160(): Unsupported optional profile.");
+            return;
+        }
+
+        testDecode(R.raw.video_3840x2160_webm_vp9_20480kbps_30fps_vorbis_stereo_128kbps_44100hz,
+                249);
+    }
+
+    public void testHEVCDecode352x288() throws Exception {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testHEVCDecode352x288(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_352x288_mp4_hevc_600kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testHEVCDecode720x480() throws Exception {
+        if (!hasHEVC(false)) {
+            Log.i(TAG, "SKIPPING testHEVCDecode720x480(): No codec found.");
+            return;
+        }
+        testDecode(R.raw.video_720x480_mp4_hevc_1638kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testHEVCDecode30fps1280x720Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, 1280, 720, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testHEVCDecode30fps1280x720() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, 1280, 720, 30)) {
+            Log.i(TAG, "SKIPPING testHEVCDecode30fps1280x720(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1280x720_mp4_hevc_4096kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testHEVCDecode30fps1920x1080Tv() throws Exception {
+        if (isTv() && !isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, 1920, 1080, 30)) {
+            fail("Profile is required for TV device.");
+        }
+    }
+
+    public void testHEVCDecode30fps1920x1080() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, 1920, 1080, 30)) {
+            Log.i(TAG, "SKIPPING testHEVCDecode30fps1920x1080(): Unsupported profile.");
+            return;
+        }
+        testDecode(R.raw.video_1920x1080_mp4_hevc_10240kbps_30fps_aac_stereo_128kbps_44100hz, 299);
+    }
+
+    public void testHEVCDecode30fps2840x2160() throws Exception {
+        if (!isDecodeFormatSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, 2840, 2160, 30)) {
+            Log.i(TAG, "SKIPPING testHEVCDecode30fps2840x2160(): Unsupported optional profile.");
+            return;
+        }
+        testDecode(R.raw.video_2840x2160_mp4_hevc_20480kbps_30fps_aac_stereo_128kbps_44100hz, 299);
     }
 
     public void testCodecEarlyEOSH263() throws Exception {
