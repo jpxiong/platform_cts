@@ -30,7 +30,9 @@ import android.graphics.Rect;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
+import android.media.tv.TvTrackInfo;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Surface;
@@ -40,26 +42,57 @@ import android.widget.TextView;
 
 import com.android.cts.verifier.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MockTvInputService extends TvInputService {
     private static final String TAG = "MockTvInputService";
+
+    private static final String BROADCAST_ACTION = "action";
+    private static final String SELECT_TRACK_TYPE = "type";
+    private static final String SELECT_TRACK_ID = "id";
+    private static final String CAPTION_ENABLED = "enabled";
 
     private static Object sLock = new Object();
     private static Callback sTuneCallback = null;
     private static Callback sOverlayViewCallback = null;
     private static Callback sBroadcastCallback = null;
-    private static String sExpectedBroadcastAction = null;
     private static Callback sUnblockContentCallback = null;
+    private static Callback sSelectTrackCallback = null;
+    private static Callback sSetCaptionEnabledCallback = null;
     private static TvContentRating sRating = null;
+
+    static final TvTrackInfo sEngAudioTrack =
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio_eng")
+            .setAudioChannelCount(2)
+            .setAudioSampleRate(48000)
+            .setLanguage("eng")
+            .build();
+    static final TvTrackInfo sSpaAudioTrack =
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio_spa")
+            .setAudioChannelCount(2)
+            .setAudioSampleRate(48000)
+            .setLanguage("spa")
+            .build();
+    static final TvTrackInfo sEngSubtitleTrack =
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle_eng")
+            .setLanguage("eng")
+            .build();
+    static final TvTrackInfo sSpaSubtitleTrack =
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle_spa")
+            .setLanguage("spa")
+            .build();
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             synchronized (sLock) {
                 if (sBroadcastCallback != null) {
-                    if (intent.getAction().equals(sExpectedBroadcastAction)) {
+                    String expectedAction =
+                            sBroadcastCallback.getBundle().getString(BROADCAST_ACTION);
+                    if (intent.getAction().equals(expectedAction)) {
                         sBroadcastCallback.post();
                         sBroadcastCallback = null;
-                        sExpectedBroadcastAction = null;
                     }
                 }
             }
@@ -75,7 +108,7 @@ public class MockTvInputService extends TvInputService {
     static void expectBroadcast(View postTarget, String action, Runnable successCallback) {
         synchronized (sLock) {
             sBroadcastCallback = new Callback(postTarget, successCallback);
-            sExpectedBroadcastAction = action;
+            sBroadcastCallback.getBundle().putString(BROADCAST_ACTION, action);
         }
     }
 
@@ -94,6 +127,22 @@ public class MockTvInputService extends TvInputService {
     static void expectOverlayView(View postTarget, Runnable successCallback) {
         synchronized (sLock) {
             sOverlayViewCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectSelectTrack(int type, String id, View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sSelectTrackCallback = new Callback(postTarget, successCallback);
+            sSelectTrackCallback.getBundle().putInt(SELECT_TRACK_TYPE, type);
+            sSelectTrackCallback.getBundle().putString(SELECT_TRACK_ID, id);
+        }
+    }
+
+    static void expectSetCaptionEnabled(boolean enabled, View postTarget,
+            Runnable successCallback) {
+        synchronized (sLock) {
+            sSetCaptionEnabledCallback = new Callback(postTarget, successCallback);
+            sSetCaptionEnabledCallback.getBundle().putBoolean(CAPTION_ENABLED, enabled);
         }
     }
 
@@ -122,10 +171,15 @@ public class MockTvInputService extends TvInputService {
     private static class MockSessionImpl extends Session {
         private final Context mContext;
         private Surface mSurface = null;
+        private List<TvTrackInfo> mTracks = new ArrayList<>();
 
         private MockSessionImpl(Context context) {
             super(context);
             mContext = context;
+            mTracks.add(sEngAudioTrack);
+            mTracks.add(sSpaAudioTrack);
+            mTracks.add(sEngSubtitleTrack);
+            mTracks.add(sSpaSubtitleTrack);
         }
 
         @Override
@@ -203,16 +257,39 @@ public class MockTvInputService extends TvInputService {
                 }
             }
             notifyVideoAvailable();
+            notifyTracksChanged(mTracks);
+            notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, sEngAudioTrack.getId());
+            notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, null);
             return true;
         }
 
         @Override
         public boolean onSelectTrack(int type, String trackId) {
+            synchronized (sLock) {
+                if (sSelectTrackCallback != null) {
+                    Bundle bundle = sSelectTrackCallback.getBundle();
+                    if (bundle.getInt(SELECT_TRACK_TYPE) == type
+                            && bundle.getString(SELECT_TRACK_ID).equals(trackId)) {
+                        sSelectTrackCallback.post();
+                        sSelectTrackCallback = null;
+                    }
+                }
+            }
+            notifyTrackSelected(type, trackId);
             return true;
         }
 
         @Override
         public void onSetCaptionEnabled(boolean enabled) {
+            synchronized (sLock) {
+                if (sSetCaptionEnabledCallback != null) {
+                    Bundle bundle = sSetCaptionEnabledCallback.getBundle();
+                    if (bundle.getBoolean(CAPTION_ENABLED) == enabled) {
+                        sSetCaptionEnabledCallback.post();
+                        sSetCaptionEnabledCallback = null;
+                    }
+                }
+            }
         }
 
         @Override
@@ -230,6 +307,7 @@ public class MockTvInputService extends TvInputService {
     private static class Callback {
         private final View mPostTarget;
         private final Runnable mAction;
+        private final Bundle mBundle = new Bundle();
 
         Callback(View postTarget, Runnable action) {
             mPostTarget = postTarget;
@@ -238,6 +316,10 @@ public class MockTvInputService extends TvInputService {
 
         public void post() {
             mPostTarget.post(mAction);
+        }
+
+        public Bundle getBundle() {
+            return mBundle;
         }
     }
 }
