@@ -22,9 +22,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.webkit.WebView;
+
+
+import com.android.cts.uirendering.R;
 
 /**
  * A generic activity that uses a view specified by the user.
@@ -40,12 +45,6 @@ public class DrawActivity extends Activity {
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         mHandler = new RenderSpecHandler();
-    }
-
-    @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        mView = parent;
-        return super.onCreateView(parent, name, context, attrs);
     }
 
     public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
@@ -85,6 +84,10 @@ public class DrawActivity extends Activity {
             switch (message.what) {
                 case LAYOUT_MSG: {
                     setContentView(message.arg1);
+                    mView = findViewById(R.id.test_root);
+                    if (mView == null) {
+                        throw new IllegalStateException("test_root failed to inflate");
+                    }
                 } break;
 
                 case CANVAS_MSG: {

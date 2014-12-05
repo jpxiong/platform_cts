@@ -38,30 +38,33 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
 
 
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
-        boolean res = true;
+        int failCount = 0;
         int[] differenceMap = new int[bitmap.length];
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
                 int expectedColor = getExpectedColor(x, y);
                 if (!verifyPixel(bitmap[index], expectedColor)) {
-                    Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor)
-                            + " received : " + Integer.toHexString(bitmap[index])
-                            + " at position (" + x + "," + y + ")");
-                    res = false;
+                    if (failCount < 50) {
+                        Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor)
+                                + " received : " + Integer.toHexString(bitmap[index])
+                                + " at position (" + x + "," + y + ")");
+                    }
+                    failCount++;
                     differenceMap[index] = FAIL_COLOR;
                 } else {
                     differenceMap[index] = PASS_COLOR;
                 }
             }
         }
-        if (!res) {
+        boolean success = failCount == 0;
+        if (!success) {
             mDifferenceBitmap = Bitmap.createBitmap(ActivityTestBase.TEST_WIDTH,
                     ActivityTestBase.TEST_HEIGHT, Bitmap.Config.ARGB_8888);
             mDifferenceBitmap.setPixels(differenceMap, offset, stride, 0, 0,
                     ActivityTestBase.TEST_WIDTH, ActivityTestBase.TEST_HEIGHT);
         }
-        return res;
+        return success;
     }
 
     protected boolean verifyPixel(int color, int expectedColor) {
