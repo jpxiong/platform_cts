@@ -22,6 +22,13 @@
   bug: 17595050
 },
 {
+  description: "AudioPolicyBinder tests are not yet robust enough",
+  names: [
+    "android.security.cts.AudioPolicyBinderTest"
+  ],
+  bug: 18461670
+},
+{
   description: "Not all jdwp features are currently supported. These tests will fail",
   names: [
     "org.apache.harmony.jpda.tests.jdwp.DebuggerOnDemand.OnthrowDebuggerLaunchTest#testDebuggerLaunch001",
