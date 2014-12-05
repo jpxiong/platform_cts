@@ -16,6 +16,7 @@
 
 package com.android.cts.videoperf;
 
+import android.cts.util.MediaUtils;
 import android.graphics.Point;
 import android.media.MediaCodec;
 import android.media.MediaCodecList;
@@ -157,10 +158,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     infoEnc.mSupportSemiPlanar ? CodecCapabilities.COLOR_FormatYUV420SemiPlanar :
                         CodecCapabilities.COLOR_FormatYUV420Planar);
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, infoEnc.mFps);
             mFrameRate = infoEnc.mFps;
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, KEY_I_FRAME_INTERVAL);
-            double encodingTime = runEncoder(VIDEO_AVC, format, TOTAL_FRAMES);
+            double encodingTime = runEncoder(VIDEO_AVC, format, TOTAL_FRAMES, mFrameRate);
             // re-initialize format for decoder
             format = new MediaFormat();
             format.setString(MediaFormat.KEY_MIME, mimeType);
@@ -208,11 +208,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @param totalFrames total number of frames to encode
      * @return time taken in ms to encode the frames. This does not include initialization time.
      */
-    private double runEncoder(String mimeType, MediaFormat format, int totalFrames) {
+    private double runEncoder(String mimeType, MediaFormat format, int totalFrames, int frameRate) {
         MediaCodec codec = null;
         try {
             MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-            String encoderName = mcl.findEncoderForFormat(format);
+            String encoderName = MediaUtils.findEncoderForFormat(format, frameRate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
             codec = MediaCodec.createByCodecName(encoderName);
             codec.configure(
                     format,
