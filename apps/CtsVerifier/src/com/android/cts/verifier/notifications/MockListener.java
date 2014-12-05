@@ -31,7 +31,9 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MockListener extends NotificationListenerService {
     static final String TAG = "MockListener";
@@ -67,8 +69,10 @@ public class MockListener extends NotificationListenerService {
 
     private ArrayList<String> mPosted = new ArrayList<String>();
     private ArrayMap<String, JSONObject> mNotifications = new ArrayMap<>();
+    private ArrayMap<String, String> mNotificationKeys = new ArrayMap<>();
     private ArrayList<String> mRemoved = new ArrayList<String>();
     private ArrayList<String> mOrder = new ArrayList<>();
+    private Set<String> mTestPackages = new HashSet<>();
     private BroadcastReceiver mReceiver;
     private int mDND = -1;
 
@@ -76,6 +80,9 @@ public class MockListener extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "created");
+
+        mTestPackages.add("com.android.cts.verifier");
+        mTestPackages.add("com.android.cts.robot");
 
         mPosted = new ArrayList<String>();
         mRemoved = new ArrayList<String>();
@@ -123,10 +130,13 @@ public class MockListener extends NotificationListenerService {
                     setResultCode(Activity.RESULT_OK);
                 } else if (SERVICE_CLEAR_ONE.equals(action)) {
                     Log.d(TAG, "SERVICE_CLEAR_ONE");
-                    MockListener.this.cancelNotification(
-                            context.getApplicationInfo().packageName,
-                            intent.getStringExtra(EXTRA_TAG),
-                            intent.getIntExtra(EXTRA_CODE, 0));
+                    String tag = intent.getStringExtra(EXTRA_TAG);
+                    String key = mNotificationKeys.get(tag);
+                    if (key != null) {
+                        MockListener.this.cancelNotification(key);
+                    } else {
+                        Log.w(TAG, "Notification does not exist: " + tag);
+                    }
                 } else if (SERVICE_CLEAR_ALL.equals(action)) {
                     Log.d(TAG, "SERVICE_CLEAR_ALL");
                     MockListener.this.cancelAllNotifications();
@@ -205,6 +215,7 @@ public class MockListener extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
+        if (!mTestPackages.contains(sbn.getPackageName())) { return; }
         Log.d(TAG, "posted: " + sbn.getTag());
         mPosted.add(sbn.getTag());
         JSONObject notification = new JSONObject();
@@ -216,6 +227,7 @@ public class MockListener extends NotificationListenerService {
             notification.put(JSON_ICON, sbn.getNotification().icon);
             notification.put(JSON_FLAGS, sbn.getNotification().flags);
             mNotifications.put(sbn.getKey(), notification);
+            mNotificationKeys.put(sbn.getTag(), sbn.getKey());
         } catch (JSONException e) {
             Log.e(TAG, "failed to pack up notification payload", e);
         }
@@ -227,6 +239,7 @@ public class MockListener extends NotificationListenerService {
         Log.d(TAG, "removed: " + sbn.getTag());
         mRemoved.add(sbn.getTag());
         mNotifications.remove(sbn.getKey());
+        mNotificationKeys.remove(sbn.getTag());
         onNotificationRankingUpdate(rankingMap);
     }
 
