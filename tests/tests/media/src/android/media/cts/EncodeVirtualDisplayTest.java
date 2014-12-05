@@ -22,6 +22,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.content.Context;
+import android.cts.util.MediaUtils;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -165,12 +166,10 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
      * Returns true if the encoder level, specified in the ENCODER_PARAM_TABLE, can be supported.
      */
     private static boolean verifySupportForEncoderLevel(int i) {
-        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
         MediaFormat format = MediaFormat.createVideoFormat(
                 MIME_TYPE, ENCODER_PARAM_TABLE[i][0], ENCODER_PARAM_TABLE[i][1]);
         format.setInteger(MediaFormat.KEY_BIT_RATE, ENCODER_PARAM_TABLE[i][2]);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, ENCODER_PARAM_TABLE[i][3]);
-        return mcl.findEncoderForFormat(format) != null;
+        return MediaUtils.findEncoderForFormat(format, ENCODER_PARAM_TABLE[i][3]) != null;
     }
 
     /**
@@ -211,11 +210,10 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
             encoderFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, sBitRate);
-            encoderFormat.setInteger(MediaFormat.KEY_FRAME_RATE, sFrameRate);
             encoderFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
 
-            MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-            String codec = mcl.findEncoderForFormat(encoderFormat);
+            String codec = MediaUtils.findEncoderForFormat(encoderFormat, sFrameRate);
+            encoderFormat.setInteger(MediaFormat.KEY_FRAME_RATE, sFrameRate);
             if (codec == null) {
                 // Don't run the test if the codec isn't present.
                 Log.i(TAG, "SKIPPING test: no support for " + encoderFormat);
