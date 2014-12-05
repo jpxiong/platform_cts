@@ -37,12 +37,14 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.Range;
 import android.util.Size;
+import android.view.Surface;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +59,96 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
     private final boolean DEBUG = false;
 
+    class VideoStorage {
+        private LinkedList<Pair<ByteBuffer, BufferInfo>> mStream;
+        private MediaFormat mFormat;
+
+        public VideoStorage() {
+            mStream = new LinkedList<Pair<ByteBuffer, BufferInfo>>();
+        }
+
+        public void setFormat(MediaFormat format) {
+            mFormat = format;
+        }
+
+        public void addBuffer(ByteBuffer buffer, BufferInfo info) {
+            ByteBuffer savedBuffer = ByteBuffer.allocate(info.size);
+            savedBuffer.put(buffer);
+            BufferInfo savedInfo = new BufferInfo();
+            savedInfo.set(0, savedBuffer.position(), info.presentationTimeUs, info.flags);
+            mStream.addLast(Pair.create(savedBuffer, savedInfo));
+        }
+
+        private void play(MediaCodec decoder, Surface surface) {
+            decoder.reset();
+            final Object condition = new Object();
+            final Iterator<Pair<ByteBuffer, BufferInfo>> it = mStream.iterator();
+            decoder.setCallback(new MediaCodec.Callback() {
+                public void onOutputBufferAvailable(MediaCodec codec, int ix, BufferInfo info) {
+                    codec.releaseOutputBuffer(ix, info.size > 0);
+                    if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        synchronized (condition) {
+                            condition.notifyAll();
+                        }
+                    }
+                }
+                public void onInputBufferAvailable(MediaCodec codec, int ix) {
+                    if (it.hasNext()) {
+                        Pair<ByteBuffer, BufferInfo> el = it.next();
+                        el.first.clear();
+                        codec.getInputBuffer(ix).put(el.first);
+                        BufferInfo info = el.second;
+                        codec.queueInputBuffer(
+                                ix, 0, info.size, info.presentationTimeUs, info.flags);
+                    }
+                }
+                public void onError(MediaCodec codec, MediaCodec.CodecException e) {
+                    Log.i(TAG, "got codec exception", e);
+                    fail("received codec error during decode" + e);
+                }
+                public void onOutputFormatChanged(MediaCodec codec, MediaFormat format) {
+                    Log.i(TAG, "got output format " + format);
+                }
+            });
+            decoder.configure(mFormat, surface, null /* crypto */, 0 /* flags */);
+            decoder.start();
+            synchronized (condition) {
+                try {
+                    condition.wait();
+                } catch (InterruptedException e) {
+                    fail("playback interrupted");
+                }
+            }
+            decoder.stop();
+        }
+
+        public void playAll(Surface surface) {
+            if (mFormat == null) {
+                Log.i(TAG, "no stream to play");
+                return;
+            }
+            String mime = mFormat.getString(MediaFormat.KEY_MIME);
+            MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+            for (MediaCodecInfo info : mcl.getCodecInfos()) {
+                if (info.isEncoder()) {
+                    continue;
+                }
+                MediaCodec codec = null;
+                try {
+                    CodecCapabilities caps = info.getCapabilitiesForType(mime);
+                    if (!caps.isFormatSupported(mFormat)) {
+                        continue;
+                    }
+                    codec = MediaCodec.createByCodecName(info.getName());
+                } catch (IllegalArgumentException | IOException e) {
+                    continue;
+                }
+                play(codec, surface);
+                codec.release();
+            }
+        }
+    }
+
     abstract class VideoProcessorBase extends MediaCodec.Callback {
         private static final String TAG = "VideoProcessorBase";
 
@@ -70,6 +162,8 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
         protected MediaFormat mDecFormat;
         protected MediaCodec mDecoder, mEncoder;
+
+        private VideoStorage mEncodedStream;
 
         protected void open(String path) throws IOException {
             mExtractor = new MediaExtractor();
@@ -89,6 +183,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     break;
                 }
             }
+            mEncodedStream = new VideoStorage();
             assertTrue("file " + path + " has no video", mTrackIndex >= 0);
         }
 
@@ -107,7 +202,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             mDecoder.setCallback(this);
             mEncoder.setCallback(this);
 
-            MediaCodecInfo.VideoCapabilities encCaps =
+            VideoCapabilities encCaps =
                 mEncoder.getCodecInfo().getCapabilitiesForType(outMime).getVideoCapabilities();
             if (!encCaps.isSizeSupported(width, height)) {
                 Log.i(TAG, videoEncName + " does not support size: " + width + "x" + height);
@@ -189,6 +284,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             if (DEBUG) Log.v(TAG, "encoder received output #" + ix
                      + " (sz=" + info.size + ", f=" + info.flags
                      + ", ts=" + info.presentationTimeUs + ")");
+            mEncodedStream.addBuffer(mEncoder.getOutputBuffer(ix), info);
             if (!mCompleted) {
                 mEncoder.releaseOutputBuffer(ix, false);
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -199,6 +295,14 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     }
                 }
             }
+        }
+
+        protected void saveEncoderFormat(MediaFormat format) {
+            mEncodedStream.setFormat(format);
+        }
+
+        public void playBack(Surface surface) {
+            mEncodedStream.playAll(surface);
         }
 
         public abstract boolean processLoop(
@@ -379,6 +483,9 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
         @Override
         public void onOutputFormatChanged(MediaCodec mediaCodec, MediaFormat mediaFormat) {
             Log.i(TAG, mediaCodec.getName() + " got new output format " + mediaFormat);
+            if (mediaCodec == mEncoder) {
+                saveEncoderFormat(mediaFormat);
+            }
         }
 
         // next methods are synchronized on mCondition
@@ -595,6 +702,9 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
         @Override
         public void onOutputFormatChanged(MediaCodec mediaCodec, MediaFormat mediaFormat) {
             Log.i(TAG, mediaCodec.getName() + " got new output format " + mediaFormat);
+            if (mediaCodec == mEncoder) {
+                saveEncoderFormat(mediaFormat);
+            }
         }
     }
 
@@ -777,10 +887,13 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                 flexYUV ? new VideoProcessor() : new SurfaceVideoProcessor();
 
             // We are using a resource URL as an example
-            return processor.processLoop(
+            boolean success = processor.processLoop(
                     SOURCE_URL, mMime, mName, width, height, optional);
+            if (success) {
+                processor.playBack(getActivity().getSurfaceHolder().getSurface());
+            }
+            return success;
         }
-
     }
 
     private Encoder[] googH265()  { return goog(MediaFormat.MIMETYPE_VIDEO_HEVC); }
