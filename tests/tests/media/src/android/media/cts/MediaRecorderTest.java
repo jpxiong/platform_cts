@@ -17,9 +17,8 @@ package android.media.cts;
 
 
 import android.content.pm.PackageManager;
+import android.cts.util.MediaUtils;
 import android.hardware.Camera;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
@@ -309,36 +308,40 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testRecordingAudioInRawFormats() throws Exception {
-        if (hasAmrnb()) {
-            testRecordAudioInRawFormat(
+        int testsRun = 0;
+        if (hasAmrNb()) {
+            testsRun += testRecordAudioInRawFormat(
                     MediaRecorder.OutputFormat.AMR_NB,
                     MediaRecorder.AudioEncoder.AMR_NB);
         }
 
-        if (hasAmrwb()) {
-            testRecordAudioInRawFormat(
+        if (hasAmrWb()) {
+            testsRun += testRecordAudioInRawFormat(
                     MediaRecorder.OutputFormat.AMR_WB,
                     MediaRecorder.AudioEncoder.AMR_WB);
         }
 
-        if (hasAcc()) {
-            testRecordAudioInRawFormat(
+        if (hasAac()) {
+            testsRun += testRecordAudioInRawFormat(
                     MediaRecorder.OutputFormat.AAC_ADTS,
                     MediaRecorder.AudioEncoder.AAC);
         }
+        if (testsRun == 0) {
+            MediaUtils.skipTest("no audio codecs or microphone");
+        }
     }
 
-    private void testRecordAudioInRawFormat(
+    private int testRecordAudioInRawFormat(
             int fileFormat, int codec) throws Exception {
-
         if (!hasMicrophone()) {
-            return;
+            return 0; // skip
         }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(fileFormat);
         mMediaRecorder.setOutputFile(OUTPUT_PATH);
         mMediaRecorder.setAudioEncoder(codec);
         recordMedia(MAX_FILE_SIZE, mOutFile);
+        return 1;
     }
 
     public void testGetAudioSourceMax() throws Exception {
@@ -354,10 +357,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testRecorderAudio() throws Exception {
-        if (!hasMicrophone()) {
-            return;
-        }
-        if (!hasAmrnb()) {
+        if (!hasMicrophone() || !hasAmrNb()) {
+            MediaUtils.skipTest("no audio codecs or microphone");
             return;
         }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -372,10 +373,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testOnInfoListener() throws Exception {
-        if (!hasMicrophone()) {
-            return;
-        }
-        if (!hasAmrnb()) {
+        if (!hasMicrophone() || !hasAmrNb()) {
+            MediaUtils.skipTest("no audio codecs or microphone");
             return;
         }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -389,10 +388,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testSetMaxDuration() throws Exception {
-        if (!hasMicrophone()) {
-            return;
-        }
-        if (!hasAmrnb()) {
+        if (!hasMicrophone() || !hasAmrNb()) {
+            MediaUtils.skipTest("no audio codecs or microphone");
             return;
         }
         testSetMaxDuration(RECORD_TIME_LONG_MS, RECORDED_DUR_TOLERANCE_MS);
@@ -430,14 +427,15 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testSetMaxFileSize() throws Exception {
-        if (!hasMicrophone() || !hasCamera()) {
-            return;
-        }
         testSetMaxFileSize(512 * 1024, 50 * 1024);
     }
 
     private void testSetMaxFileSize(
             long fileSize, long tolerance) throws Exception {
+        if (!hasMicrophone() || !hasCamera() || !hasAmrNb() || !hasH264()) {
+            MediaUtils.skipTest("no microphone, camera, or codecs");
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -466,10 +464,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testOnErrorListener() throws Exception {
-        if (!hasMicrophone()) {
-            return;
-        }
-        if (!hasAmrnb()) {
+        if (!hasMicrophone() || !hasAmrNb()) {
+            MediaUtils.skipTest("no audio codecs or microphone");
             return;
         }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -505,31 +501,19 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
                 PackageManager.FEATURE_MICROPHONE);
     }
 
-    private static boolean hasCodecForMimeType(String mimeType, boolean encoder) {
-        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-        for (MediaCodecInfo info : list.getCodecInfos()) {
-            if (encoder != info.isEncoder()) {
-                continue;
-            }
-
-            for (String type : info.getSupportedTypes()) {
-                if (type.equalsIgnoreCase(mimeType)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private static boolean hasAmrNb() {
+        return MediaUtils.hasEncoder(MediaFormat.MIMETYPE_AUDIO_AMR_NB);
     }
 
-    private static boolean hasAmrnb() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true);
+    private static boolean hasAmrWb() {
+        return MediaUtils.hasEncoder(MediaFormat.MIMETYPE_AUDIO_AMR_WB);
     }
 
-    private static boolean hasAmrwb() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true);
+    private static boolean hasAac() {
+        return MediaUtils.hasEncoder(MediaFormat.MIMETYPE_AUDIO_AAC);
     }
 
-    private static boolean hasAcc() {
-        return hasCodecForMimeType(MediaFormat.MIMETYPE_AUDIO_AAC, true);
+    private static boolean hasH264() {
+        return MediaUtils.hasEncoder(MediaFormat.MIMETYPE_VIDEO_AVC);
     }
 }

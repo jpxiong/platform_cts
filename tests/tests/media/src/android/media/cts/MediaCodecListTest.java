@@ -249,6 +249,25 @@ public class MediaCodecListTest extends AndroidTestCase {
                 pm.hasSystemFeature(pm.FEATURE_CAMERA);
     }
 
+    private boolean hasMicrophone() {
+        PackageManager pm = getContext().getPackageManager();
+        return pm.hasSystemFeature(pm.FEATURE_MICROPHONE);
+    }
+
+    private boolean isWatch() {
+        PackageManager pm = getContext().getPackageManager();
+        return pm.hasSystemFeature(pm.FEATURE_WATCH);
+    }
+
+    private boolean isHandheld() {
+        // handheld nature is not exposed to package manager, for now
+        // we check for touchscreen and NOT watch and NOT tv
+        PackageManager pm = getContext().getPackageManager();
+        return pm.hasSystemFeature(pm.FEATURE_TOUCHSCREEN)
+                && !pm.hasSystemFeature(pm.FEATURE_WATCH)
+                && !pm.hasSystemFeature(pm.FEATURE_TELEVISION);
+    }
+
     // H263 baseline profile must be supported
     public void testIsH263BaselineProfileSupported() {
         if (!hasCamera()) {
@@ -375,29 +394,40 @@ public class MediaCodecListTest extends AndroidTestCase {
         List<CodecType> list = new ArrayList<CodecType>(16);
 
         // Mandatory audio codecs
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false));   // amrwb decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true));    // amrwb encoder
 
         // flac decoder is not omx-based yet
         // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, false));  // flac decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, true));      // flac encoder
         list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_MPEG, false));     // mp3 decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, false));      // aac decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, true));       // aac encoder
         list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_VORBIS, false));   // vorbis decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false));   // amrnb decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true));    // amrnb encoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, false));      // aac decoder
+        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_RAW, false));      // raw/pcm decoder
+        if (hasMicrophone() && !isWatch()) {
+            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, true));       // aac encoder
+            // flac encoder is not required
+            // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, true));   // flac encoder
+        }
+        if (isHandheld()) {
+            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false));   // amrnb decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true));    // amrnb encoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false));   // amrwb decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true));    // amrwb encoder
+        }
 
         // Mandatory video codecs
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, false));    // avc decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, true));     // avc encoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_HEVC, false));   // hevc decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, false));   // h263 decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, true));    // h263 encoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_MPEG4, false));  // m4v decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, false));    // vp8 decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, true));     // vp8 encoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP9, false));    // vp9 decoder
+
+        if (!isWatch()) {
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, false));    // avc decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, true));     // avc encoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, false));    // vp8 decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, true));     // vp8 encoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP9, false));    // vp9 decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_HEVC, false));   // hevc decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_MPEG4, false));  // m4v decoder
+            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, false));   // h263 decoder
+            if (hasCamera()) {
+                list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, true));    // h263 encoder
+            }
+        }
 
         return list;
     }
