@@ -14,6 +14,7 @@
        limitations under the License.
   -->
 <View xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="100px"
-        android:layout_height="100px"
-        android:background="@drawable/blue_padded_square"/>
+    android:id="@+id/test_root"
+    android:layout_width="100px"
+    android:layout_height="100px"
+    android:background="@drawable/blue_padded_square"/>
