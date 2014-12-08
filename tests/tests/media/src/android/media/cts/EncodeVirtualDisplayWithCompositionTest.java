@@ -22,6 +22,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.cts.util.MediaUtils;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -1327,12 +1328,11 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             new Size(352, 576)
         };
 
-        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
         for (Size sz : standardSizes) {
             MediaFormat format = MediaFormat.createVideoFormat(
                 MIME_TYPE, sz.getWidth(), sz.getHeight());
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, 15); // require at least 15fps
-            if (mcl.findEncoderForFormat(format) != null) {
+            // require at least 15fps
+            if (MediaUtils.findEncoderForFormat(format, 15) != null) {
                 return sz;
             }
         }
