@@ -130,6 +130,7 @@ public class PingTest extends AndroidTestCase {
 
         // Check the response is an echo reply.
         byte[] response = new byte[bytesRead];
+        responseBuffer.flip();
         responseBuffer.get(response, 0, bytesRead);
         assertEquals((byte) 0x81, response[0]);
 
