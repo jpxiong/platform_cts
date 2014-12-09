@@ -62,7 +62,7 @@ public class ViewClippingTests extends ActivityTestBase {
     };
 
     // TODO: attempt to reduce
-    static final int TOLERANCE = 10;
+    static final int TOLERANCE = 16;
     static BitmapVerifier makeClipVerifier(Rect blueBoundsRect) {
         return new RectVerifier(Color.WHITE, Color.BLUE, blueBoundsRect, TOLERANCE);
     }
