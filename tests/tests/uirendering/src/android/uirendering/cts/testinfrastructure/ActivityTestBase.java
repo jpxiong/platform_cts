@@ -115,6 +115,13 @@ public abstract class ActivityTestBase extends
         getActivity().runOnUiThread(finishRunnable);
     }
 
+    static int[] getBitmapPixels(Bitmap bitmap) {
+        int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
+        bitmap.getPixels(pixels, 0, bitmap.getWidth(),
+                0, 0, bitmap.getWidth(), bitmap.getHeight());
+        return pixels;
+    }
+
     public Bitmap takeScreenshot() {
         getInstrumentation().waitForIdleSync();
         Bitmap bitmap1 = getInstrumentation().getUiAutomation().takeScreenshot();
@@ -124,7 +131,7 @@ public abstract class ActivityTestBase extends
             bitmap2 = bitmap1;
             bitmap1 = getInstrumentation().getUiAutomation().takeScreenshot();
             count++;
-        } while (count < MAX_SCREEN_SHOTS && !Arrays.equals(bitmap2.mBuffer, bitmap1.mBuffer));
+        } while (count < MAX_SCREEN_SHOTS && !Arrays.equals(getBitmapPixels(bitmap2), getBitmapPixels(bitmap1)));
         return bitmap1;
     }
 
