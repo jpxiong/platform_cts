@@ -17,17 +17,13 @@ package android.uirendering.cts.testinfrastructure;
 
 import android.annotation.Nullable;
 import android.app.Activity;
-import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.webkit.WebView;
-
 
 import com.android.cts.uirendering.R;
 
@@ -41,10 +37,17 @@ public class DrawActivity extends Activity {
 
     private Handler mHandler;
     private View mView;
+    private boolean mOnWatch;
 
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         mHandler = new RenderSpecHandler();
+        int uiMode = getResources().getConfiguration().uiMode;
+        mOnWatch = (uiMode & Configuration.UI_MODE_TYPE_WATCH) == Configuration.UI_MODE_TYPE_WATCH;
+    }
+
+    public boolean getOnWatch() {
+        return mOnWatch;
     }
 
     public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
