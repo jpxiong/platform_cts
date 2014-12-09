@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class ActivityTestBase extends
         ActivityInstrumentationTestCase2<DrawActivity> {
-    public static final String TAG_NAME = "ActivityTestBase";
+    public static final String TAG = "ActivityTestBase";
     public static final boolean DEBUG = false;
     public static final boolean USE_RS = false;
     public static final int TEST_WIDTH = 180;
@@ -97,7 +97,7 @@ public abstract class ActivityTestBase extends
 
             for (TestCase testCase : testCases) {
                 if (!testCase.wasTestRan) {
-                    Log.w(TAG_NAME, getName() + " not all of the tests were ran");
+                    Log.w(TAG, getName() + " not all of the tests ran");
                     break;
                 }
             }
@@ -213,6 +213,11 @@ public abstract class ActivityTestBase extends
          * every test case is tested against it.
          */
         public void runWithComparer(BitmapComparer bitmapComparer) {
+            if (getActivity().getOnWatch()) {
+                Log.d(TAG, getName() + "skipped");
+                return;
+            }
+
             if (mTestCases.size() == 0) {
                 throw new IllegalStateException("Need at least one test to run");
             }
@@ -231,6 +236,11 @@ public abstract class ActivityTestBase extends
          * the verifier given.
          */
         public void runWithVerifier(BitmapVerifier bitmapVerifier) {
+            if (getActivity().getOnWatch()) {
+                Log.d(TAG, getName() + "skipped");
+                return;
+            }
+
             if (mTestCases.size() == 0) {
                 throw new IllegalStateException("Need at least one test to run");
             }
