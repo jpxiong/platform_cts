@@ -1120,6 +1120,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 
         <activity android:name=".notifications.PackagePriorityVerifierActivity"
@@ -1129,6 +1131,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.watch" />
         </activity>
 
         <service android:name=".notifications.MockListener"
