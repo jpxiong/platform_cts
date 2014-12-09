@@ -69,9 +69,9 @@ public class LoudnessEnhancerTest extends PostProcTestBase {
         getLoudnessEnhancer(0);
         try {
             mLE.setTargetGain(0);
-            assertEquals("target gain differs from value set", 0, mLE.getTargetGain());
+            assertEquals("target gain differs from value set", 0.0f, mLE.getTargetGain());
             mLE.setTargetGain(800);
-            assertEquals("target gain differs from value set", 800, mLE.getTargetGain());
+            assertEquals("target gain differs from value set", 800.0f, mLE.getTargetGain());
         } catch (IllegalArgumentException e) {
             fail("target gain illegal argument");
         } catch (UnsupportedOperationException e) {
