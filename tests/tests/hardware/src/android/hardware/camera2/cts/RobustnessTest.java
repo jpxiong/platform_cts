@@ -28,7 +28,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.media.CamcorderProfile;
@@ -42,6 +41,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -50,11 +50,14 @@ import static org.mockito.Mockito.*;
 public class RobustnessTest extends Camera2AndroidTestCase {
     private static final String TAG = "RobustnessTest";
 
-    private static final int FAILED_CONFIGURE_TIMEOUT = 5000; //ms
+    private static final int CONFIGURE_TIMEOUT = 5000; //ms
+    private static final int CAPTURE_TIMEOUT = 1000; //ms
 
     /**
-     * Test that a {@link CameraCaptureSession} configured with a {@link Surface} with invalid
-     * dimensions fails gracefully.
+     * Test that a {@link CameraCaptureSession} can be configured with a {@link Surface} containing
+     * a dimension other than one of the supported output dimensions.  The buffers produced into
+     * this surface are expected have the dimensions of the closest possible buffer size in the
+     * available stream configurations for a surface with this format.
      */
     public void testBadSurfaceDimensions() throws Exception {
         for (String id : mCameraIds) {
@@ -62,9 +65,21 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
 
-                // Setup Surface with unconfigured dimensions.
-                SurfaceTexture surfaceTexture = new SurfaceTexture(0);
-                Surface surface = new Surface(surfaceTexture);
+                // Find some size not supported by the camera
+                Size weirdSize = new Size(643, 577);
+                int count = 0;
+                while(mOrderedPreviewSizes.contains(weirdSize)) {
+                    // Really, they can't all be supported...
+                    weirdSize = new Size(weirdSize.getWidth() + 1, weirdSize.getHeight() + 1);
+                    count++;
+                    assertTrue("Too many exotic YUV_420_888 resolutions supported.", count < 100);
+                }
+
+                // Setup imageReader with invalid dimension
+                ImageReader imageReader = ImageReader.newInstance(weirdSize.getWidth(),
+                        weirdSize.getHeight(), ImageFormat.YUV_420_888, 3);
+
+                Surface surface = imageReader.getSurface();
                 List<Surface> surfaces = new ArrayList<>();
                 surfaces.add(surface);
 
@@ -78,13 +93,34 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 // Check that correct session callback is hit.
                 CameraCaptureSession.StateCallback sessionListener =
                         mock(CameraCaptureSession.StateCallback.class);
-                mCamera.createCaptureSession(surfaces, sessionListener, mHandler);
-                verify(sessionListener, timeout(FAILED_CONFIGURE_TIMEOUT).atLeastOnce()).
-                        onConfigureFailed(any(CameraCaptureSession.class));
-                verify(sessionListener, never()).onConfigured(any(CameraCaptureSession.class));
+                CameraCaptureSession session = CameraTestUtils.configureCameraSession(mCamera,
+                        surfaces, sessionListener, mHandler);
+
+                verify(sessionListener, timeout(CONFIGURE_TIMEOUT).atLeastOnce()).
+                        onConfigured(any(CameraCaptureSession.class));
+                verify(sessionListener, timeout(CONFIGURE_TIMEOUT).atLeastOnce()).
+                        onReady(any(CameraCaptureSession.class));
+                verify(sessionListener, never()).onConfigureFailed(any(CameraCaptureSession.class));
                 verify(sessionListener, never()).onActive(any(CameraCaptureSession.class));
-                verify(sessionListener, never()).onReady(any(CameraCaptureSession.class));
                 verify(sessionListener, never()).onClosed(any(CameraCaptureSession.class));
+
+                CameraCaptureSession.CaptureCallback captureListener =
+                        mock(CameraCaptureSession.CaptureCallback.class);
+                session.capture(request.build(), captureListener, mHandler);
+
+                verify(captureListener, timeout(CAPTURE_TIMEOUT).atLeastOnce()).
+                        onCaptureCompleted(any(CameraCaptureSession.class),
+                                any(CaptureRequest.class), any(TotalCaptureResult.class));
+                verify(captureListener, never()).onCaptureFailed(any(CameraCaptureSession.class),
+                        any(CaptureRequest.class), any(CaptureFailure.class));
+
+                Image image = imageReader.acquireLatestImage();
+                int imageWidth = image.getWidth();
+                int imageHeight = image.getHeight();
+                Size actualSize = new Size(imageWidth, imageHeight);
+
+                assertTrue("Camera does not contain outputted image resolution " + actualSize,
+                        mOrderedPreviewSizes.contains(actualSize));
             } finally {
                 closeDevice(id);
             }
