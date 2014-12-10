@@ -513,6 +513,11 @@ public class CameraManagerTest extends AndroidTestCase {
         mCameraManager.registerAvailabilityCallback(ac, mHandler);
         String[] cameras = mCameraManager.getCameraIdList();
 
+        if (cameras.length == 0) {
+            Log.i(TAG, "No cameras present, skipping test");
+            return;
+        }
+
         // Verify we received available for all cameras' initial state in a reasonable amount of time
         HashSet<String> expectedAvailableCameras = new HashSet<String>(Arrays.asList(cameras));
         while (expectedAvailableCameras.size() > 0) {
