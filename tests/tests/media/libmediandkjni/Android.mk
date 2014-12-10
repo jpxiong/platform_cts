@@ -24,7 +24,9 @@ LOCAL_SRC_FILES := \
 	native-media-jni.cpp \
 	codec-utils-jni.cpp
 
-LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
+LOCAL_C_INCLUDES := \
+	$(JNI_H_INCLUDE) \
+	system/core/include
 
 LOCAL_C_INCLUDES += $(call include-path-for, mediandk)
 

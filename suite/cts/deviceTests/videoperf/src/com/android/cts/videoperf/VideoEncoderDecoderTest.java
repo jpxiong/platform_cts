@@ -16,7 +16,12 @@
 
 package com.android.cts.videoperf;
 
+import android.graphics.ImageFormat;
 import android.graphics.Point;
+import android.media.cts.CodecImage;
+import android.media.cts.CodecUtils;
+import android.media.Image;
+import android.media.Image.Plane;
 import android.media.MediaCodec;
 import android.media.MediaCodecList;
 import android.media.MediaCodecInfo.CodecCapabilities;
@@ -60,12 +65,10 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private static final int Y_CLAMP_MIN = 16;
     private static final int Y_CLAMP_MAX = 235;
     private static final int YUV_PLANE_ADDITIONAL_LENGTH = 200;
-    private ByteBuffer mYBuffer;
-    private ByteBuffer mUVBuffer;
-    // if input raw data is semi-planar
-    private boolean mSrcSemiPlanar;
-    // if output raw data is semi-planar
-    private boolean mDstSemiPlanar;
+    private ByteBuffer mYBuffer, mYDirectBuffer;
+    private ByteBuffer mUVBuffer, mUVDirectBuffer;
+    private int mSrcColorFormat;
+    private int mDstColorFormat;
     private int mBufferWidth;
     private int mBufferHeight;
     private int mVideoWidth;
@@ -95,6 +98,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         mEncodedOutputBuffer = null;
         mYBuffer = null;
         mUVBuffer = null;
+        mYDirectBuffer = null;
+        mUVDirectBuffer = null;
         mRandom = null;
         super.tearDown();
     }
@@ -124,6 +129,33 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         doTest(VIDEO_AVC, 1920, 1072, NUMBER_OF_REPEAT);
     }
 
+    private boolean isSrcSemiPlanar() {
+        return mSrcColorFormat == CodecCapabilities.COLOR_FormatYUV420SemiPlanar;
+    }
+
+    private boolean isSrcFlexYUV() {
+        return mSrcColorFormat == CodecCapabilities.COLOR_FormatYUV420Flexible;
+    }
+
+    private boolean isDstSemiPlanar() {
+        return mDstColorFormat == CodecCapabilities.COLOR_FormatYUV420SemiPlanar;
+    }
+
+    private boolean isDstFlexYUV() {
+        return mDstColorFormat == CodecCapabilities.COLOR_FormatYUV420Flexible;
+    }
+
+    private static int getColorFormat(CodecInfo info) {
+        if (info.mSupportSemiPlanar) {
+            return CodecCapabilities.COLOR_FormatYUV420SemiPlanar;
+        } else if (info.mSupportPlanar) {
+            return CodecCapabilities.COLOR_FormatYUV420Planar;
+        } else {
+            // FlexYUV must be supported
+            return CodecCapabilities.COLOR_FormatYUV420Flexible;
+        }
+    }
+
     /**
      * Run encoding / decoding test for given mimeType of codec
      * @param mimeType like video/avc
@@ -141,8 +173,14 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         assertNotNull(infoDec);
         mVideoWidth = w;
         mVideoHeight = h;
-        initYUVPlane(w + YUV_PLANE_ADDITIONAL_LENGTH, h + YUV_PLANE_ADDITIONAL_LENGTH,
-                infoEnc.mSupportSemiPlanar, infoDec.mSupportSemiPlanar);
+
+        mSrcColorFormat = getColorFormat(infoEnc);
+        mDstColorFormat = getColorFormat(infoDec);
+        Log.i(TAG, "Testing video resolution " + w + "x" + h +
+                   ": enc format " + mSrcColorFormat +
+                   ", dec format " + mDstColorFormat);
+
+        initYUVPlane(w + YUV_PLANE_ADDITIONAL_LENGTH, h + YUV_PLANE_ADDITIONAL_LENGTH);
         double[] encoderFpsResults = new double[numberRepeat];
         double[] decoderFpsResults = new double[numberRepeat];
         double[] totalFpsResults = new double[numberRepeat];
@@ -154,9 +192,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             format.setInteger(MediaFormat.KEY_BIT_RATE, infoEnc.mBitRate);
             format.setInteger(MediaFormat.KEY_WIDTH, w);
             format.setInteger(MediaFormat.KEY_HEIGHT, h);
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                    infoEnc.mSupportSemiPlanar ? CodecCapabilities.COLOR_FormatYUV420SemiPlanar :
-                        CodecCapabilities.COLOR_FormatYUV420Planar);
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mSrcColorFormat);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, infoEnc.mFps);
             mFrameRate = infoEnc.mFps;
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, KEY_I_FRAME_INTERVAL);
@@ -166,9 +202,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             format.setString(MediaFormat.KEY_MIME, mimeType);
             format.setInteger(MediaFormat.KEY_WIDTH, w);
             format.setInteger(MediaFormat.KEY_HEIGHT, h);
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                    infoDec.mSupportSemiPlanar ? CodecCapabilities.COLOR_FormatYUV420SemiPlanar :
-                        CodecCapabilities.COLOR_FormatYUV420Planar);
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mDstColorFormat);
             double[] decoderResult = runDecoder(VIDEO_AVC, format);
             if (decoderResult == null) {
                 success = false;
@@ -228,7 +262,6 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             return Double.NaN;
         }
         codec.start();
-        ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
         ByteBuffer[] codecOutputBuffers = codec.getOutputBuffers();
 
         int numBytesSubmitted = 0;
@@ -241,10 +274,24 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             if (inFramesCount < totalFrames) {
                 index = codec.dequeueInputBuffer(VIDEO_CODEC_WAIT_TIME_US /* timeoutUs */);
                 if (index != MediaCodec.INFO_TRY_AGAIN_LATER) {
-                    int size = queueInputBufferEncoder(
-                            codec, codecInputBuffers, index, inFramesCount,
-                            (inFramesCount == (totalFrames - 1)) ?
-                                    MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                    int size;
+                    // when encoder only supports flexYUV, use Image only; otherwise,
+                    // use ByteBuffer & Image each on half of the frames to test both
+                    if (isSrcFlexYUV() || inFramesCount % 2 == 0) {
+                        Image image = codec.getInputImage(index);
+                        // image should always be available
+                        assertTrue(image != null);
+                        size = queueInputImageEncoder(
+                                codec, image, index, inFramesCount,
+                                (inFramesCount == (totalFrames - 1)) ?
+                                        MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                    } else {
+                        ByteBuffer buffer = codec.getInputBuffer(index);
+                        size = queueInputBufferEncoder(
+                                codec, buffer, index, inFramesCount,
+                                (inFramesCount == (totalFrames - 1)) ?
+                                        MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                    }
                     inFramesCount++;
                     numBytesSubmitted += size;
                     if (VERBOSE) {
@@ -290,8 +337,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @return size of enqueued data.
      */
     private int queueInputBufferEncoder(
-            MediaCodec codec, ByteBuffer[] inputBuffers, int index, int frameCount, int flags) {
-        ByteBuffer buffer = inputBuffers[index];
+            MediaCodec codec, ByteBuffer buffer, int index, int frameCount, int flags) {
         buffer.clear();
 
         Point origin = getOrigin(frameCount);
@@ -302,7 +348,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             buffer.put(yBuffer, srcOffsetY, mVideoWidth);
             srcOffsetY += mBufferWidth;
         }
-        if (mSrcSemiPlanar) {
+        if (isSrcSemiPlanar()) {
             int srcOffsetU = origin.y / 2 * mBufferWidth + origin.x / 2 * 2;
             final byte[] uvBuffer = mUVBuffer.array();
             for (int i = 0; i < mVideoHeight / 2; i++) {
@@ -313,16 +359,161 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             int srcOffsetU = origin.y / 2 * mBufferWidth / 2 + origin.x / 2;
             int srcOffsetV = srcOffsetU + mBufferWidth / 2 * mBufferHeight / 2;
             final byte[] uvBuffer = mUVBuffer.array();
-            for (int i = 0; i < mVideoHeight /2; i++) { //U only
+            for (int i = 0; i < mVideoHeight / 2; i++) { //U only
                 buffer.put(uvBuffer, srcOffsetU, mVideoWidth / 2);
                 srcOffsetU += mBufferWidth / 2;
             }
-            for (int i = 0; i < mVideoHeight /2; i++) { //V only
+            for (int i = 0; i < mVideoHeight / 2; i++) { //V only
                 buffer.put(uvBuffer, srcOffsetV, mVideoWidth / 2);
                 srcOffsetV += mBufferWidth / 2;
             }
         }
-        int size = mVideoHeight * mVideoWidth * 3 /2;
+        int size = mVideoHeight * mVideoWidth * 3 / 2;
+        long ptsUsec = computePresentationTime(frameCount);
+
+        codec.queueInputBuffer(index, 0 /* offset */, size, ptsUsec /* timeUs */, flags);
+        if (VERBOSE && (frameCount == 0)) {
+            printByteArray("Y ", mYBuffer.array(), 0, 20);
+            printByteArray("UV ", mUVBuffer.array(), 0, 20);
+            printByteArray("UV ", mUVBuffer.array(), mBufferWidth * 60, 20);
+        }
+        return size;
+    }
+
+    class YUVImage extends CodecImage {
+        private final int mImageWidth;
+        private final int mImageHeight;
+        private final Plane[] mPlanes;
+
+        YUVImage(
+                Point origin,
+                int imageWidth, int imageHeight,
+                int arrayWidth, int arrayHeight,
+                boolean semiPlanar,
+                ByteBuffer bufferY, ByteBuffer bufferUV) {
+            mImageWidth = imageWidth;
+            mImageHeight = imageHeight;
+            ByteBuffer dupY = bufferY.duplicate();
+            ByteBuffer dupUV = bufferUV.duplicate();
+            mPlanes = new Plane[3];
+
+            int srcOffsetY = origin.x + origin.y * arrayWidth;
+
+            mPlanes[0] = new YUVPlane(
+                        mImageWidth, mImageHeight, arrayWidth, 1,
+                        dupY, srcOffsetY);
+
+            if (semiPlanar) {
+                int srcOffsetUV = origin.y / 2 * arrayWidth + origin.x / 2 * 2;
+
+                mPlanes[1] = new YUVPlane(
+                        mImageWidth / 2, mImageHeight / 2, arrayWidth, 2,
+                        dupUV, srcOffsetUV);
+                mPlanes[2] = new YUVPlane(
+                        mImageWidth / 2, mImageHeight / 2, arrayWidth, 2,
+                        dupUV, srcOffsetUV + 1);
+            } else {
+                int srcOffsetU = origin.y / 2 * arrayWidth / 2 + origin.x / 2;
+                int srcOffsetV = srcOffsetU + arrayWidth / 2 * arrayHeight / 2;
+
+                mPlanes[1] = new YUVPlane(
+                        mImageWidth / 2, mImageHeight / 2, arrayWidth / 2, 1,
+                        dupUV, srcOffsetU);
+                mPlanes[2] = new YUVPlane(
+                        mImageWidth / 2, mImageHeight / 2, arrayWidth / 2, 1,
+                        dupUV, srcOffsetV);
+            }
+        }
+
+        @Override
+        public int getFormat() {
+            return ImageFormat.YUV_420_888;
+        }
+
+        @Override
+        public int getWidth() {
+            return mImageWidth;
+        }
+
+        @Override
+        public int getHeight() {
+            return mImageHeight;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return 0;
+        }
+
+        @Override
+        public Plane[] getPlanes() {
+            return mPlanes;
+        }
+
+        @Override
+        public void close() {
+            mPlanes[0] = null;
+            mPlanes[1] = null;
+            mPlanes[2] = null;
+        }
+
+        class YUVPlane extends CodecImage.Plane {
+            private final int mRowStride;
+            private final int mPixelStride;
+            private final ByteBuffer mByteBuffer;
+
+            YUVPlane(int w, int h, int rowStride, int pixelStride,
+                    ByteBuffer buffer, int offset) {
+                mRowStride = rowStride;
+                mPixelStride = pixelStride;
+
+                // only safe to access length bytes starting from buffer[offset]
+                int length = (h - 1) * rowStride + (w - 1) * pixelStride + 1;
+
+                buffer.position(offset);
+                mByteBuffer = buffer.slice();
+                mByteBuffer.limit(length);
+            }
+
+            @Override
+            public int getRowStride() {
+                return mRowStride;
+            }
+
+            @Override
+            public int getPixelStride() {
+                return mPixelStride;
+            }
+
+            @Override
+            public ByteBuffer getBuffer() {
+                return mByteBuffer;
+            }
+        }
+    }
+
+    /**
+     * Fills input image for encoder from YUV buffers.
+     * @return size of enqueued data.
+     */
+    private int queueInputImageEncoder(
+            MediaCodec codec, Image image, int index, int frameCount, int flags) {
+        assertTrue(image.getFormat() == ImageFormat.YUV_420_888);
+
+
+        Point origin = getOrigin(frameCount);
+
+        // Y color first
+        CodecImage srcImage = new YUVImage(
+                origin,
+                mVideoWidth, mVideoHeight,
+                mBufferWidth, mBufferHeight,
+                isSrcSemiPlanar(),
+                mYDirectBuffer, mUVDirectBuffer);
+
+        CodecUtils.copyFlexYUVImage(image, srcImage);
+
+        int size = mVideoHeight * mVideoWidth * 3 / 2;
         long ptsUsec = computePresentationTime(frameCount);
 
         codec.queueInputBuffer(index, 0 /* offset */, size, ptsUsec /* timeUs */, flags);
@@ -368,7 +559,6 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
         codec.start();
         ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
-        ByteBuffer[] codecOutputBuffers = codec.getOutputBuffers();
 
         double totalErrorSquared = 0;
 
@@ -407,22 +597,49 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
                 // only do YUV compare on EOS frame if the buffer size is none-zero
                 if (info.size > 0) {
-                    ByteBuffer buf = codecOutputBuffers[outputBufIndex];
-                    if (VERBOSE && (outFrameCount == 0)) {
-                        printByteBuffer("Y ", buf, 0, 20);
-                        printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
-                        printByteBuffer("UV ", buf,
-                                mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
-                    }
                     Point origin = getOrigin(outFrameCount);
-                    for (int i = 0; i < PIXEL_CHECK_PER_FRAME; i++) {
+                    int i;
+
+                    // if decoder supports planar or semiplanar, check output with
+                    // ByteBuffer & Image each on half of the points
+                    int pixelCheckPerFrame = PIXEL_CHECK_PER_FRAME;
+                    if (!isDstFlexYUV()) {
+                        pixelCheckPerFrame /= 2;
+                        ByteBuffer buf = codec.getOutputBuffer(outputBufIndex);
+                        if (VERBOSE && (outFrameCount == 0)) {
+                            printByteBuffer("Y ", buf, 0, 20);
+                            printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
+                            printByteBuffer("UV ", buf,
+                                    mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
+                        }
+                        for (i = 0; i < pixelCheckPerFrame; i++) {
+                            int w = mRandom.nextInt(mVideoWidth);
+                            int h = mRandom.nextInt(mVideoHeight);
+                            getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
+                            getPixelValuesFromOutputBuffer(buf, w, h, decoded);
+                            if (VERBOSE) {
+                                Log.i(TAG, outFrameCount + "-" + i + "- th round: ByteBuffer:"
+                                        + " expected "
+                                        + expected.mY + "," + expected.mU + "," + expected.mV
+                                        + " decoded "
+                                        + decoded.mY + "," + decoded.mU + "," + decoded.mV);
+                            }
+                            totalErrorSquared += expected.calcErrorSquared(decoded);
+                        }
+                    }
+
+                    Image image = codec.getOutputImage(outputBufIndex);
+                    assertTrue(image != null);
+                    for (i = 0; i < pixelCheckPerFrame; i++) {
                         int w = mRandom.nextInt(mVideoWidth);
                         int h = mRandom.nextInt(mVideoHeight);
                         getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
-                        getPixelValuesFromOutputBuffer(buf, w, h, decoded);
+                        getPixelValuesFromImage(image, w, h, decoded);
                         if (VERBOSE) {
-                            Log.i(TAG, outFrameCount + "-" + i + "- th round expcted " + expected.mY
-                                    + "," + expected.mU + "," + expected.mV + "  decoded "
+                            Log.i(TAG, outFrameCount + "-" + i + "- th round: FlexYUV:"
+                                    + " expcted "
+                                    + expected.mY + "," + expected.mU + "," + expected.mV
+                                    + " decoded "
                                     + decoded.mY + "," + decoded.mU + "," + decoded.mV);
                         }
                         totalErrorSquared += expected.calcErrorSquared(decoded);
@@ -434,23 +651,17 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     Log.d(TAG, "saw output EOS.");
                     sawOutputEOS = true;
                 }
-            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                codecOutputBuffers = codec.getOutputBuffers();
-                Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
                 Log.d(TAG, "output format has changed to " + oformat);
                 int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
-                if (colorFormat == CodecCapabilities.COLOR_FormatYUV420SemiPlanar ) {
-                    mDstSemiPlanar = true;
-                } else if (colorFormat == CodecCapabilities.COLOR_FormatYUV420Planar ) {
-                    mDstSemiPlanar = false;
+                if (colorFormat == CodecCapabilities.COLOR_FormatYUV420SemiPlanar
+                        || colorFormat == CodecCapabilities.COLOR_FormatYUV420Planar) {
+                    mDstColorFormat = colorFormat;
                 } else {
+                    mDstColorFormat = CodecCapabilities.COLOR_FormatYUV420Flexible;
                     Log.w(TAG, "output format changed to unsupported one " +
-                            Integer.toHexString(colorFormat));
-                    // give up and return as nothing can be done
-                    codec.release();
-                    return null;
+                            Integer.toHexString(colorFormat) + ", using FlexYUV");
                 }
             }
         }
@@ -491,12 +702,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * @param semiPlanarEnc
      * @param semiPlanarDec
      */
-    private void initYUVPlane(int w, int h, boolean semiPlanarEnc, boolean semiPlanarDec) {
+    private void initYUVPlane(int w, int h) {
         int bufferSizeY = w * h;
         mYBuffer = ByteBuffer.allocate(bufferSizeY);
         mUVBuffer = ByteBuffer.allocate(bufferSizeY / 2);
-        mSrcSemiPlanar = semiPlanarEnc;
-        mDstSemiPlanar = semiPlanarDec;
+        mYDirectBuffer = ByteBuffer.allocateDirect(bufferSizeY);
+        mUVDirectBuffer = ByteBuffer.allocateDirect(bufferSizeY / 2);
         mBufferWidth = w;
         mBufferHeight = h;
         final byte[] yArray = mYBuffer.array();
@@ -506,7 +717,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 yArray[i * w + j]  = clampY((i + j) & 0xff);
             }
         }
-        if (semiPlanarEnc) {
+        if (isSrcSemiPlanar()) {
             for (int i = 0; i < h/2; i++) {
                 for (int j = 0; j < w/2; j++) {
                     uvArray[i * w + 2 * j]  = (byte) (i & 0xff);
@@ -522,6 +733,10 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 }
             }
         }
+        mYDirectBuffer.put(yArray);
+        mUVDirectBuffer.put(uvArray);
+        mYDirectBuffer.rewind();
+        mUVDirectBuffer.rewind();
     }
 
     /**
@@ -556,7 +771,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private void getPixelValuesFromYUVBuffers(int originX, int originY, int x, int y,
             YUVValue result) {
         result.mY = mYBuffer.get((originY + y) * mBufferWidth + (originX + x));
-        if (mSrcSemiPlanar) {
+        if (isSrcSemiPlanar()) {
             int index = (originY + y) / 2 * mBufferWidth + (originX + x) / 2 * 2;
             //Log.d(TAG, "YUV " + originX + "," + originY + "," + x + "," + y + "," + index);
             result.mU = mUVBuffer.get(index);
@@ -577,7 +792,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      */
     private void getPixelValuesFromOutputBuffer(ByteBuffer buffer, int x, int y, YUVValue result) {
         result.mY = buffer.get(y * mVideoWidth + x);
-        if (mDstSemiPlanar) {
+        if (isDstSemiPlanar()) {
             int index = mVideoWidth * mVideoHeight + y / 2 * mVideoWidth + x / 2 * 2;
             //Log.d(TAG, "Decoded " + x + "," + y + "," + index);
             result.mU = buffer.get(index);
@@ -588,6 +803,22 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             result.mU = buffer.get(index);
             result.mV = buffer.get(index + vOffset);
         }
+    }
+
+    private void getPixelValuesFromImage(Image image, int x, int y, YUVValue result) {
+        assertTrue(image.getFormat() == ImageFormat.YUV_420_888);
+
+        Plane[] planes = image.getPlanes();
+        assertTrue(planes.length == 3);
+
+        result.mY = getPixelFromPlane(planes[0], x, y);
+        result.mU = getPixelFromPlane(planes[1], x / 2, y / 2);
+        result.mV = getPixelFromPlane(planes[2], x / 2, y / 2);
+    }
+
+    private byte getPixelFromPlane(Plane plane, int x, int y) {
+        ByteBuffer buf = plane.getBuffer();
+        return buf.get(y * plane.getRowStride() + x * plane.getPixelStride());
     }
 
     /**
