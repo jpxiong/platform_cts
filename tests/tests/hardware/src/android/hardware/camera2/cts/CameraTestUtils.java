@@ -18,6 +18,7 @@ package android.hardware.camera2.cts;
 
 import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.PointF;
@@ -489,6 +490,23 @@ public class CameraTestUtils extends Assert {
                 break;
             default:
                 fail("Unsupported Image Format: " + format);
+        }
+    }
+
+    public static void dumpFile(String fileName, Bitmap data) {
+        FileOutputStream outStream;
+        try {
+            Log.v(TAG, "output will be saved as " + fileName);
+            outStream = new FileOutputStream(fileName);
+        } catch (IOException ioe) {
+            throw new RuntimeException("Unable to create debug output file " + fileName, ioe);
+        }
+
+        try {
+            data.compress(Bitmap.CompressFormat.JPEG, /*quality*/90, outStream);
+            outStream.close();
+        } catch (IOException ioe) {
+            throw new RuntimeException("failed writing data to file " + fileName, ioe);
         }
     }
 
