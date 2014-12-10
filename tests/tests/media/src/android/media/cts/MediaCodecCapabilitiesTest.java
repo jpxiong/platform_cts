@@ -22,7 +22,9 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import static android.media.MediaCodecInfo.CodecProfileLevel.*;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_AVC;
+import static android.media.MediaFormat.MIMETYPE_VIDEO_H263;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_HEVC;
+import static android.media.MediaFormat.MIMETYPE_VIDEO_MPEG4;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
@@ -74,6 +76,39 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                     "H.264 must support High Profile Level 4.2 on TV",
                     checkDecoder(MIMETYPE_VIDEO_AVC, AVCProfileHigh, AVCLevel42));
         }
+    }
+
+    // Android device implementations with H.263 encoders, MUST support Level 45.
+    public void testH263EncoderProfileAndLevel() throws Exception {
+        if (!MediaUtils.checkEncoder(MIMETYPE_VIDEO_H263)) {
+            return; // skip
+        }
+
+        assertTrue(
+                "H.263 must support Level 45",
+                hasEncoder(MIMETYPE_VIDEO_H263, MPEG4ProfileSimple, H263Level45));
+    }
+
+    // Android device implementations with H.263 decoders, MUST support Level 30.
+    public void testH263DecoderProfileAndLevel() throws Exception {
+        if (!MediaUtils.checkDecoder(MIMETYPE_VIDEO_H263)) {
+            return; // skip
+        }
+
+        assertTrue(
+                "H.263 must support Level 30",
+                hasDecoder(MIMETYPE_VIDEO_H263, MPEG4ProfileSimple, H263Level30));
+    }
+
+    // Android device implementations with MPEG-4 decoders, MUST support Simple Profile Level 3.
+    public void testMpeg4DecoderProfileAndLevel() throws Exception {
+        if (!MediaUtils.checkDecoder(MIMETYPE_VIDEO_MPEG4)) {
+            return; // skip
+        }
+
+        assertTrue(
+                "MPEG-4 must support Simple Profile Level 3",
+                hasDecoder(MIMETYPE_VIDEO_MPEG4, MPEG4ProfileSimple, MPEG4Level3));
     }
 
     // Android device implementations, when supporting H.265 codec MUST support the Main Profile
@@ -277,7 +312,18 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             try {
                 CodecCapabilities caps = info.getCapabilitiesForType(mime);
                 for (CodecProfileLevel pl : caps.profileLevels) {
-                    if (pl.profile == profile && pl.level >= level) {
+                    if (pl.profile != profile) {
+                        continue;
+                    }
+
+                    // H.263 levels are not completely ordered:
+                    // Level45 support only implies Level10 support
+                    if (mime.equalsIgnoreCase(MIMETYPE_VIDEO_H263)) {
+                        if (pl.level != level && pl.level == H263Level45 && level > H263Level10) {
+                            continue;
+                        }
+                    }
+                    if (pl.level >= level) {
                         return true;
                     }
                 }
