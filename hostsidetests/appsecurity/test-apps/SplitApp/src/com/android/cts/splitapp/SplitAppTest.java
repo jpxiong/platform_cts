@@ -21,6 +21,7 @@ import static org.xmlpull.v1.XmlPullParser.START_TAG;
 
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
@@ -30,6 +31,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -317,6 +319,30 @@ public class SplitAppTest extends AndroidTestCase {
     public void testCodeCacheRead() throws Exception {
         assertTrue(new File(getContext().getFilesDir(), "normal.raw").exists());
         assertFalse(new File(getContext().getCodeCacheDir(), "cache.raw").exists());
+    }
+
+    public void testRevision0_0() throws Exception {
+        final PackageInfo info = getContext().getPackageManager()
+                .getPackageInfo(getContext().getPackageName(), 0);
+        assertEquals(0, info.baseRevisionCode);
+        assertEquals(1, info.splitRevisionCodes.length);
+        assertEquals(0, info.splitRevisionCodes[0]);
+    }
+
+    public void testRevision12_0() throws Exception {
+        final PackageInfo info = getContext().getPackageManager()
+                .getPackageInfo(getContext().getPackageName(), 0);
+        assertEquals(12, info.baseRevisionCode);
+        assertEquals(1, info.splitRevisionCodes.length);
+        assertEquals(0, info.splitRevisionCodes[0]);
+    }
+
+    public void testRevision0_12() throws Exception {
+        final PackageInfo info = getContext().getPackageManager()
+                .getPackageInfo(getContext().getPackageName(), 0);
+        assertEquals(0, info.baseRevisionCode);
+        assertEquals(1, info.splitRevisionCodes.length);
+        assertEquals(12, info.splitRevisionCodes[0]);
     }
 
     private static void updateDpi(Resources r, int densityDpi) {
