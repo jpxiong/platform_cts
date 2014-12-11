@@ -82,6 +82,25 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         return new UiObject(rootsList.childSelector(new UiSelector().text(label)));
     }
 
+    private UiObject findDocument(String label) throws UiObjectNotFoundException {
+        final UiSelector docList = new UiSelector().resourceId(
+                "com.android.documentsui:id/container_directory").childSelector(
+                new UiSelector().resourceId("com.android.documentsui:id/list"));
+
+        // Wait for the first list item to appear
+        assertTrue("First list item",
+                new UiObject(docList.childSelector(new UiSelector())).waitForExists(TIMEOUT));
+
+        // Now scroll around to find our item
+        new UiScrollable(docList).scrollIntoView(new UiSelector().text(label));
+        return new UiObject(docList.childSelector(new UiSelector().text(label)));
+    }
+
+    private UiObject findSaveButton() throws UiObjectNotFoundException {
+        return new UiObject(new UiSelector().resourceId("com.android.documentsui:id/container_save")
+                .childSelector(new UiSelector().resourceId("android:id/button1")));
+    }
+
     public void testOpenSimple() throws Exception {
         if (!supportedHardware()) return;
 
@@ -108,7 +127,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         findRoot("CtsLocal").click();
 
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().text("FILE1")).click();
+        findDocument("FILE1").click();
 
         final Result result = mActivity.getResult();
         final Uri uri = result.data.getData();
@@ -137,8 +156,7 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         findRoot("CtsCreate").click();
 
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().resourceId("com.android.documentsui:id/container_save")
-                .childSelector(new UiSelector().resourceId("android:id/button1"))).click();
+        findSaveButton().click();
 
         final Result result = mActivity.getResult();
         final Uri uri = result.data.getData();
@@ -164,13 +182,12 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         // Pick file2, which should be selected since MIME matches, then try
         // picking a non-matching MIME, which should leave file2 selected.
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().text("FILE2")).click();
+        findDocument("FILE2").click();
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().text("FILE1")).click();
+        findDocument("FILE1").click();
 
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().resourceId("com.android.documentsui:id/container_save")
-                .childSelector(new UiSelector().resourceId("android:id/button1"))).click();
+        findSaveButton().click();
 
         final Result result = mActivity.getResult();
         final Uri uri = result.data.getData();
@@ -188,10 +205,9 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         findRoot("CtsCreate").click();
 
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().text("DIR2")).click();
+        findDocument("DIR2").click();
         mDevice.waitForIdle();
-        new UiObject(new UiSelector().resourceId("com.android.documentsui:id/container_save")
-                .childSelector(new UiSelector().resourceId("android:id/button1"))).click();
+        findSaveButton().click();
 
         final Result result = mActivity.getResult();
         final Uri uri = result.data.getData();
