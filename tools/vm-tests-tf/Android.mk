@@ -93,10 +93,10 @@ ifeq ($(strip $(LOCAL_USE_JACK)),true)
     vmteststf_dep_jars += $(cts-tf-dalvik-lib.jack)
 endif
 
-$(intermediates)/junit.jack:$(LOCAL_PATH)/lib/junit.jar | $(JILL_JAR)
+$(intermediates)/junit.jack:$(LOCAL_PATH)/lib/junit.jar | $(JILL_JAR) $(JACK_JAR)
 	$(transform-jar-to-jack)
 
-$(intermediates)/tradefed-prebuilt.jack:$(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar | $(JILL_JAR)
+$(intermediates)/tradefed-prebuilt.jack:$(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar | $(JILL_JAR) $(JACK_JAR)
 	$(transform-jar-to-jack)
 
 $(vmteststf_jar): PRIVATE_SRC_FOLDER := $(LOCAL_PATH)/src
