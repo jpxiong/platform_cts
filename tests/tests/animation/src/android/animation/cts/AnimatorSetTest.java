@@ -174,8 +174,8 @@ public class AnimatorSetTest extends
 
     }
 
-    public void testClone() {
-        AnimatorSet set1 = new AnimatorSet();
+    public void testClone() throws Throwable {
+        final AnimatorSet set1 = new AnimatorSet();
         final AnimatorListenerAdapter setListener = new AnimatorListenerAdapter() {};
         set1.addListener(setListener);
         ObjectAnimator animator1 = new ObjectAnimator();
@@ -198,7 +198,12 @@ public class AnimatorSetTest extends
 
         AnimateObject target = new AnimateObject();
         set1.setTarget(target);
-        set1.start();
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                set1.start();
+            }
+        });
         assertTrue(set1.isStarted());
 
         animator1.getListeners();
