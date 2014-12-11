@@ -90,7 +90,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 MediaFormat.MIMETYPE_VIDEO_VP8,
                 "OMX.google.vp8.decoder",
                 R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_48000hz,
-                R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_48000hz);
+                R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
     }
 
     public Iterable<Codec> VP9(CodecFactory factory) {
