@@ -32,7 +32,6 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.hardware.camera2.utils.ArrayUtils;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.ConditionVariable;
@@ -212,7 +211,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 int[] supportedFormats = config.getOutputFormats();
                 List<Integer> supportedYUVFormats = new ArrayList<>();
                 for (int format : YUVFormats) {
-                    if (ArrayUtils.contains(supportedFormats, format)) {
+                    if (CameraTestUtils.contains(supportedFormats, format)) {
                         supportedYUVFormats.add(format);
                     }
                 }
@@ -344,9 +343,10 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                                             Bitmap.Config.ARGB_8888);
                                     dumpFile(fullSizeYuvFileName, fullYUVBmap);
                                 }
-                                fail("YUV and JPEG image at capture size " + captureSz +
-                                        " for the same frame are not similar, center patches " +
-                                        "have difference metric of " + difference);
+                                fail("Camera " + mCamera.getId() + ": YUV and JPEG image at " +
+                                        "capture size " + captureSz + " for the same frame are " +
+                                        "not similar, center patches have difference metric of " +
+                                        difference);
                             }
 
                             // Stop capture, delete the streams.
