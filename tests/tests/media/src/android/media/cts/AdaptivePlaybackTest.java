@@ -1348,7 +1348,7 @@ class CodecFamilyExcept extends CodecList {
 
 class CodecFactory {
     protected boolean hasCodec(String codecName) {
-        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
         for (MediaCodecInfo info : list.getCodecInfos()) {
             if (codecName.equals(info.getName())) {
                 return true;
