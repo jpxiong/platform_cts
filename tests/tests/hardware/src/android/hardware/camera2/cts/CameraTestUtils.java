@@ -700,6 +700,21 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
+     * Returns true if the given {@code array} contains the given element.
+     *
+     * @param array {@code array} to check for {@code elem}
+     * @param elem {@code elem} to test for
+     * @return {@code true} if the given element is contained
+     */
+    public static boolean contains(int[] array, int elem) {
+        if (array == null) return false;
+        for (int i = 0; i < array.length; i++) {
+            if (elem == array[i]) return true;
+        }
+        return false;
+    }
+
+    /**
      * Get object array from byte array.
      *
      * @param array Input byte array to be converted
