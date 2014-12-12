@@ -1150,6 +1150,8 @@
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
             <meta-data android:name="test_required_features"
                     android:value="android.software.app_widgets" />
+            <meta-data android:name="test_excluded_features"
+                       android:value="android.software.leanback" />
         </activity>
 
         <activity android:name=".deskclock.DeskClockTestsActivity"
