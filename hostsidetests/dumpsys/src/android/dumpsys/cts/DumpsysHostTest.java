@@ -523,7 +523,7 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkProcess(String[] parts) {
-        assertEquals(9, parts.length);
+        assertTrue(parts.length >= 9);
         assertNotNull(parts[4]); // process
         assertInteger(parts[5]); // userMillis
         assertInteger(parts[6]); // systemMillis
@@ -658,7 +658,7 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkMisc(String[] parts) {
-        assertEquals(20, parts.length);
+        assertTrue(parts.length >= 20);
         assertInteger(parts[4]);      // screenOnTime
         assertInteger(parts[5]);      // phoneOnTime
         assertInteger(parts[6]);      // wifiOnTime
