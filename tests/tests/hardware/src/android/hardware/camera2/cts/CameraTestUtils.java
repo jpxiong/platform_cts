@@ -812,6 +812,7 @@ public class CameraTestUtils extends Assert {
                 validateJpegData(data, width, height, filePath);
                 break;
             case ImageFormat.YUV_420_888:
+            case ImageFormat.YV12:
                 validateYuvData(data, width, height, format, image.getTimestamp(), filePath);
                 break;
             case ImageFormat.RAW_SENSOR:
