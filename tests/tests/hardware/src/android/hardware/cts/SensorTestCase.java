@@ -35,7 +35,7 @@ import android.util.Log;
  */
 public abstract class SensorTestCase extends AndroidTestCase {
     // TODO: consolidate all log tags
-    protected final String LOG_TAG = "TestRunner";
+    protected static final String LOG_TAG = "TestRunner";
 
     /**
      * By default tests need to run in a {@link TestSensorEnvironment} that assumes each sensor is
@@ -51,9 +51,9 @@ public abstract class SensorTestCase extends AndroidTestCase {
     protected SensorTestCase() {}
 
     @Override
-    public void runTest() throws Throwable {
+    public void runBare() throws Throwable {
         try {
-            super.runTest();
+            super.runBare();
         } catch (SensorTestStateNotSupportedException e) {
             // the sensor state is not supported in the device, log a warning and skip the test
             Log.w(LOG_TAG, e.getMessage());
