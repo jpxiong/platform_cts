@@ -19,12 +19,12 @@ package android.hardware.cts.helpers;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
+import android.hardware.cts.helpers.sensoroperations.SensorOperation;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * A class that encapsulates base environment information for the {@link ISensorOperation}.
+ * A class that encapsulates base environment information for the {@link SensorOperation}.
  * The environment is self contained and carries its state around all the sensor test framework.
  */
 public class TestSensorEnvironment {

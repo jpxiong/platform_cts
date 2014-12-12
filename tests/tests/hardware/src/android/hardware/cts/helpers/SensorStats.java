@@ -17,7 +17,7 @@
 package android.hardware.cts.helpers;
 
 import android.hardware.Sensor;
-import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
+import android.hardware.cts.helpers.sensoroperations.SensorOperation;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Class used to store stats related to {@link ISensorOperation}s.  Sensor stats may be linked
+ * Class used to store stats related to {@link SensorOperation}s. Sensor stats may be linked
  * together so that they form a tree.
  */
 public class SensorStats {
@@ -55,8 +55,8 @@ public class SensorStats {
     public static final String STANDARD_DEVIATION_KEY = "standard_deviation";
     public static final String MAGNITUDE_KEY = "magnitude";
 
-    private final Map<String, Object> mValues = new HashMap<String, Object>();
-    private final Map<String, SensorStats> mSensorStats = new HashMap<String, SensorStats>();
+    private final Map<String, Object> mValues = new HashMap<>();
+    private final Map<String, SensorStats> mSensorStats = new HashMap<>();
 
     /**
      * Add a value.
@@ -73,7 +73,7 @@ public class SensorStats {
 
     /**
      * Add a nested {@link SensorStats}. This is useful for keeping track of stats in a
-     * {@link ISensorOperation} tree.
+     * {@link SensorOperation} tree.
      *
      * @param key the key
      * @param stats the sub {@link SensorStats} object.
@@ -104,13 +104,13 @@ public class SensorStats {
     /**
      * Flattens the map and all sub {@link SensorStats} objects. Keys will be flattened using
      * {@value #DELIMITER}. For example, if a sub {@link SensorStats} is added with key
-     * {@code "key1"} containing the key value pair {@code ("key2", "value")}, the flattened map
-     * will contain the entry {@code ("key1__key2", "value")}.
+     * {@code "key1"} containing the key value pair {@code \("key2", "value"\)}, the flattened map
+     * will contain the entry {@code \("key1__key2", "value"\)}.
      *
      * @return a {@link Map} containing all stats from the value and sub {@link SensorStats}.
      */
     public synchronized Map<String, Object> flatten() {
-        final Map<String, Object> flattenedMap = new HashMap<String, Object>(mValues);
+        final Map<String, Object> flattenedMap = new HashMap<>(mValues);
         for (Entry<String, SensorStats> statsEntry : mSensorStats.entrySet()) {
             for (Entry<String, Object> valueEntry : statsEntry.getValue().flatten().entrySet()) {
                 String key = statsEntry.getKey() + DELIMITER + valueEntry.getKey();
@@ -166,7 +166,7 @@ public class SensorStats {
     }
 
     private static List<String> getSortedKeys(Map<String, Object> flattenedStats) {
-        List<String> keys = new ArrayList<String>(flattenedStats.keySet());
+        List<String> keys = new ArrayList<>(flattenedStats.keySet());
         Collections.sort(keys);
         return keys;
     }
