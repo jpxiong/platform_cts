@@ -222,6 +222,10 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 Log.v(TAG, "Testing all YUV image resolutions for camera " + id);
                 openDevice(id);
 
+                // Skip warmup on FULL mode devices.
+                int warmupCaptureNumber = (mStaticInfo.isHardwareLevelLegacy()) ?
+                        MAX_NUM_IMAGES - 1 : 0;
+
                 // NV21 isn't supported by ImageReader.
                 final int[] YUVFormats = new int[] {ImageFormat.YUV_420_888, ImageFormat.YV12};
 
@@ -270,15 +274,37 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                                     ImageFormat.JPEG, MAX_NUM_IMAGES, jpegListener);
                             Surface jpegSurface = jpegReader.getSurface();
 
-                            // Capture images.
+                            // Setup session
                             List<Surface> outputSurfaces = new ArrayList<Surface>();
                             outputSurfaces.add(yuvSurface);
                             outputSurfaces.add(jpegSurface);
-                            CaptureRequest.Builder request =
-                                    prepareCaptureRequestForSurfaces(outputSurfaces);
+                            createSession(outputSurfaces);
+
+                            // Warm up camera preview (mainly to give legacy devices time to do 3A).
+                            CaptureRequest.Builder warmupRequest =
+                                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                            warmupRequest.addTarget(yuvSurface);
+                            assertNotNull("Fail to get CaptureRequest.Builder", warmupRequest);
                             SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
 
-                            startCapture(request.build(), /*repeating*/false, resultListener,
+                            for (int i = 0; i < warmupCaptureNumber; i++) {
+                                startCapture(warmupRequest.build(), /*repeating*/false,
+                                        resultListener, mHandler);
+                            }
+                            for (int i = 0; i < warmupCaptureNumber; i++) {
+                                resultListener.getCaptureResult(CAPTURE_WAIT_TIMEOUT_MS);
+                                Image image = yuvListener.getImage(CAPTURE_WAIT_TIMEOUT_MS);
+                                image.close();
+                            }
+
+                            // Capture image.
+                            CaptureRequest.Builder mainRequest =
+                                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                            for (Surface s : outputSurfaces) {
+                                mainRequest.addTarget(s);
+                            }
+
+                            startCapture(mainRequest.build(), /*repeating*/false, resultListener,
                                     mHandler);
 
                             // Verify capture result and images
@@ -437,8 +463,11 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         assertTrue("Invalid argument to convertPixelYuvToRgba",
                 w > 0 && h > 0 && wOffset >= 0 && hOffset >= 0);
         assertNotNull(yuvImage);
-        assertTrue("YUV image must have format YUV_420_888",
-                yuvImage.getFormat() == ImageFormat.YUV_420_888);
+
+        int imageFormat = yuvImage.getFormat();
+        assertTrue("YUV image must have YUV-type format",
+                imageFormat == ImageFormat.YUV_420_888 || imageFormat == ImageFormat.YV12 ||
+                        imageFormat == ImageFormat.NV21);
 
         int height = yuvImage.getHeight();
         int width = yuvImage.getWidth();
