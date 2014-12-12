@@ -368,7 +368,7 @@ public class MediaCodecListTest extends AndroidTestCase {
         // Mandatory audio encoders (for non-watch devices with camera)
 
         if (hasMicrophone() && !isWatch()) {
-            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, true, 16000));
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, true, 8000));
             list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, true, 48000));
             // flac encoder is not required
             // list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_FLAC, true));  // encoder
