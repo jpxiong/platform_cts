@@ -131,7 +131,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                     hasDecoder(MIMETYPE_VIDEO_HEVC, HEVCProfileMain, HEVCMainTierLevel41));
         }
 
-        if (MediaUtils.canDecodeVideo(MIMETYPE_VIDEO_HEVC, 3840, 2160, 30)) {
+        if (isTv() && MediaUtils.canDecodeVideo(MIMETYPE_VIDEO_HEVC, 3840, 2160, 30)) {
             assertTrue(
                     "H.265 must support Main10 Profile Main Tier Level 5 if UHD is supported",
                     hasDecoder(MIMETYPE_VIDEO_HEVC, HEVCProfileMain10, HEVCMainTierLevel5));
