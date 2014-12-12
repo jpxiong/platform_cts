@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Tests for the primitive {@link ISensorOperation}s including {@link DelaySensorOperation},
+ * Tests for the primitive {@link SensorOperation}s including {@link DelaySensorOperation},
  * {@link ParallelSensorOperation}, {@link RepeatingSensorOperation} and
  * {@link SequentialSensorOperation}.
  */
@@ -38,7 +38,7 @@ public class SensorOperationTest extends TestCase {
     public void testFakeSensorOperation() throws InterruptedException {
         final int opDurationMs = 100;
 
-        ISensorOperation op = new FakeSensorOperation(opDurationMs, TimeUnit.MILLISECONDS);
+        SensorOperation op = new FakeSensorOperation(opDurationMs, TimeUnit.MILLISECONDS);
 
         assertFalse(op.getStats().flatten().containsKey("executed"));
         long start = System.currentTimeMillis();
@@ -65,12 +65,12 @@ public class SensorOperationTest extends TestCase {
         final int subOpDurationMs = 100;
 
         FakeSensorOperation subOp = new FakeSensorOperation(subOpDurationMs, TimeUnit.MILLISECONDS);
-        ISensorOperation op = new DelaySensorOperation(subOp, opDurationMs, TimeUnit.MILLISECONDS);
+        SensorOperation op = new DelaySensorOperation(subOp, opDurationMs, TimeUnit.MILLISECONDS);
 
         long startMs = System.currentTimeMillis();
         op.execute();
-        long dirationMs = System.currentTimeMillis() - startMs;
-        long durationDeltaMs = Math.abs(opDurationMs + subOpDurationMs - dirationMs);
+        long durationMs = System.currentTimeMillis() - startMs;
+        long durationDeltaMs = Math.abs(opDurationMs + subOpDurationMs - durationMs);
         assertTrue(durationDeltaMs < TEST_DURATION_THRESHOLD_MS);
     }
 
@@ -83,7 +83,7 @@ public class SensorOperationTest extends TestCase {
 
         ParallelSensorOperation op = new ParallelSensorOperation();
         for (int i = 0; i < subOpCount; i++) {
-            ISensorOperation subOp = new FakeSensorOperation(subOpDurationMs,
+            SensorOperation subOp = new FakeSensorOperation(subOpDurationMs,
                     TimeUnit.MILLISECONDS);
             op.add(subOp);
         }
@@ -124,7 +124,7 @@ public class SensorOperationTest extends TestCase {
         ParallelSensorOperation op = new ParallelSensorOperation();
         for (int i = 0; i < subOpCount; i++) {
             // Trigger failures in the 5th, 55th operations at t=5ms, t=55ms
-            ISensorOperation subOp = new FakeSensorOperation(i % 50 == 5, i, TimeUnit.MILLISECONDS);
+            SensorOperation subOp = new FakeSensorOperation(i % 50 == 5, i, TimeUnit.MILLISECONDS);
             op.add(subOp);
         }
 
@@ -164,7 +164,7 @@ public class SensorOperationTest extends TestCase {
         ParallelSensorOperation op = new ParallelSensorOperation(1, TimeUnit.SECONDS);
         for (int i = 0; i < subOpCount; i++) {
             // Trigger timeouts in the 5th, 55th operations (5 seconds vs 1 seconds)
-            ISensorOperation subOp = new FakeSensorOperation(i % 50 == 5 ? 5 : 0, TimeUnit.SECONDS);
+            SensorOperation subOp = new FakeSensorOperation(i % 50 == 5 ? 5 : 0, TimeUnit.SECONDS);
             op.add(subOp);
         }
 
@@ -196,8 +196,8 @@ public class SensorOperationTest extends TestCase {
         final int iterations = 10;
         final int subOpDurationMs = 100;
 
-        ISensorOperation subOp = new FakeSensorOperation(subOpDurationMs, TimeUnit.MILLISECONDS);
-        ISensorOperation op = new RepeatingSensorOperation(subOp, iterations);
+        SensorOperation subOp = new FakeSensorOperation(subOpDurationMs, TimeUnit.MILLISECONDS);
+        SensorOperation op = new RepeatingSensorOperation(subOp, iterations);
 
         Set<String> statsKeys = op.getStats().flatten().keySet();
         assertEquals(0, statsKeys.size());
@@ -223,7 +223,7 @@ public class SensorOperationTest extends TestCase {
         final int iterations = 100;
         final int failCount = 75;
 
-        ISensorOperation subOp = new FakeSensorOperation(0, TimeUnit.MILLISECONDS) {
+        SensorOperation subOp = new FakeSensorOperation(0, TimeUnit.MILLISECONDS) {
             private int mExecutedCount = 0;
             private SensorStats mFakeStats = new SensorStats();
 
@@ -249,7 +249,7 @@ public class SensorOperationTest extends TestCase {
                 return mFakeStats;
             }
         };
-        ISensorOperation op = new RepeatingSensorOperation(subOp, iterations);
+        SensorOperation op = new RepeatingSensorOperation(subOp, iterations);
 
         Set<String> statsKeys = op.getStats().flatten().keySet();
         assertEquals(0, statsKeys.size());
@@ -283,7 +283,7 @@ public class SensorOperationTest extends TestCase {
 
         SequentialSensorOperation op = new SequentialSensorOperation();
         for (int i = 0; i < subOpCount; i++) {
-            ISensorOperation subOp = new FakeSensorOperation(subOpDurationMs,
+            SensorOperation subOp = new FakeSensorOperation(subOpDurationMs,
                     TimeUnit.MILLISECONDS);
             op.add(subOp);
         }
@@ -315,7 +315,7 @@ public class SensorOperationTest extends TestCase {
         SequentialSensorOperation op = new SequentialSensorOperation();
         for (int i = 0; i < subOpCount; i++) {
             // Trigger a failure in the 75th operation only
-            ISensorOperation subOp = new FakeSensorOperation(i + 1 == failCount, 0,
+            SensorOperation subOp = new FakeSensorOperation(i + 1 == failCount, 0,
                     TimeUnit.MILLISECONDS);
             op.add(subOp);
         }
