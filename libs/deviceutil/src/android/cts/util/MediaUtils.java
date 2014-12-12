@@ -18,8 +18,6 @@ package android.cts.util;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodecInfo;
-import android.media.MediaCodecInfo.CodecCapabilities;
-import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -321,44 +319,11 @@ public class MediaUtils {
 
     public static boolean canDecodeVideo(String mime, int width, int height, float rate) {
         MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
-
-        // WORKAROUND for MediaCodecList.findDecoderForFormat() that does not
-        // work if frame rate is specified.
-        return findCodecForFormat(format, (double)rate, false /* encoder */) != null;
+        format.setFloat(MediaFormat.KEY_FRAME_RATE, rate);
+        return canDecode(format);
     }
 
     public static boolean checkDecoderForFormat(MediaFormat format) {
         return check(canDecode(format), "no decoder for " + format);
     }
-
-    // WORKAROUND for MediaCodecList.findEncoderForFormat() that does not
-    // work if frame rate is specified.
-    public static String findEncoderForFormat(MediaFormat format, double rate) {
-        return findCodecForFormat(format, rate, true /* encoder */);
-    }
-
-    private static String findCodecForFormat(MediaFormat format, double rate, boolean encoder) {
-        String mime = format.getString(MediaFormat.KEY_MIME);
-        for (MediaCodecInfo info : sMCL.getCodecInfos()) {
-            if (info.isEncoder() != encoder) {
-                continue;
-            }
-            CodecCapabilities codecCaps = null;
-            try {
-                codecCaps = info.getCapabilitiesForType(mime);
-            } catch (IllegalArgumentException | NullPointerException e) {
-                continue;
-            }
-            if (codecCaps != null && codecCaps.isFormatSupported(format)) {
-                int width = format.getInteger(MediaFormat.KEY_WIDTH);
-                int height = format.getInteger(MediaFormat.KEY_HEIGHT);
-                VideoCapabilities caps = codecCaps.getVideoCapabilities();
-                if (caps != null && caps.areSizeAndRateSupported(width, height, rate)) {
-                    return info.getName();
-                }
-            }
-        }
-        return null;
-    }
-
 }
