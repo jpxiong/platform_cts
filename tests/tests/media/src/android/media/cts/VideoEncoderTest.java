@@ -164,6 +164,8 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
         protected MediaCodec mDecoder, mEncoder;
 
         private VideoStorage mEncodedStream;
+        protected int mFrameRate = 0;
+        protected int mBitRate = 0;
 
         protected void open(String path) throws IOException {
             mExtractor = new MediaExtractor();
@@ -214,14 +216,24 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             {
                 int maxWidth = encCaps.getSupportedWidths().getUpper();
                 int maxHeight = encCaps.getSupportedHeightsFor(maxWidth).getUpper();
-                int maxRate =
-                    encCaps.getSupportedFrameRatesFor(maxWidth, maxHeight).getUpper().intValue();
-                outFmt.setInteger(MediaFormat.KEY_FRAME_RATE, Math.min(30, maxRate));
-                int bitRate = encCaps.getBitrateRange().clamp(
+                int frameRate = mFrameRate;
+                if (frameRate <= 0) {
+                    int maxRate =
+                        encCaps.getSupportedFrameRatesFor(maxWidth, maxHeight)
+                        .getUpper().intValue();
+                    frameRate = Math.min(30, maxRate);
+                }
+                outFmt.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
+
+                int bitRate = mBitRate;
+                if (bitRate <= 0) {
+                    bitRate = encCaps.getBitrateRange().clamp(
                         (int)(encCaps.getBitrateRange().getUpper() /
                                 Math.sqrt(maxWidth * maxHeight / width / height)));
-                Log.d(TAG, "max rate = " + maxRate + ", bit rate = " + bitRate);
+                }
                 outFmt.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+
+                Log.d(TAG, "frame rate = " + frameRate + ", bit rate = " + bitRate);
             }
             outFmt.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
             outFmt.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
@@ -303,6 +315,11 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
         public void playBack(Surface surface) {
             mEncodedStream.playAll(surface);
+        }
+
+        public void setFrameAndBitRates(int frameRate, int bitRate) {
+            mFrameRate = frameRate;
+            mBitRate = bitRate;
         }
 
         public abstract boolean processLoop(
@@ -879,12 +896,29 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             return test(width, height, true /* optional */, flexYUV);
         }
 
+        public boolean testDetailed(
+                int width, int height, int frameRate, int bitRate, boolean flexYUV) {
+            return test(width, height, frameRate, bitRate, true /* optional */, flexYUV);
+        }
+
+        public boolean testSupport(int width, int height, int frameRate, int bitRate) {
+            return mCaps.areSizeAndRateSupported(width, height, frameRate) &&
+                    mCaps.getBitrateRange().contains(bitRate);
+        }
+
         private boolean test(int width, int height, boolean optional, boolean flexYUV) {
+            return test(width, height, 0 /* frameRate */, 0 /* bitRate */, optional, flexYUV);
+        }
+
+        private boolean test(int width, int height, int frameRate, int bitRate,
+                boolean optional, boolean flexYUV) {
             Log.i(TAG, "testing " + mMime + " on " + mName + " for " + width + "x" + height
                     + (flexYUV ? " flexYUV" : " surface"));
 
             VideoProcessorBase processor =
                 flexYUV ? new VideoProcessor() : new SurfaceVideoProcessor();
+
+            processor.setFrameAndBitRates(frameRate, bitRate);
 
             // We are using a resource URL as an example
             boolean success = processor.processLoop(
@@ -916,6 +950,21 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
     private Encoder[] other(String mime) {
         return encoders(mime, false /* goog */);
+    }
+
+    private Encoder[] combineArray(Encoder[] a, Encoder[] b) {
+        Encoder[] all = new Encoder[a.length + b.length];
+        System.arraycopy(a, 0, all, 0, a.length);
+        System.arraycopy(b, 0, all, a.length, b.length);
+        return all;
+    }
+
+    private Encoder[] h264()  {
+        return combineArray(googH264(), otherH264());
+    }
+
+    private Encoder[] vp8()  {
+        return combineArray(googVP8(), otherVP8());
     }
 
     private Encoder[] encoders(String mime, boolean goog) {
@@ -1277,6 +1326,89 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
     public void testOtherVP9Flex1080p()   { specific(otherVP9(),   1920, 1080, true /* flex */); }
     public void testOtherVP9Surf1080p()   { specific(otherVP9(),   1920, 1080, false /* flex */); }
 
+    // Tests encoder profiles required by CDD.
+    // H264
+    public void testH264LowQualitySDSupport()   {
+        support(h264(), 320, 240, 20, 384 * 1000);
+    }
+
+    public void testH264HighQualitySDSupport()   {
+        support(h264(), 720, 480, 30, 2 * 1000000);
+    }
+
+    public void testH264FlexQVGA20fps384kbps()   {
+        detailed(h264(), 320, 240, 20, 384 * 1000, true /* flex */);
+    }
+
+    public void testH264SurfQVGA20fps384kbps()   {
+        detailed(h264(), 320, 240, 20, 384 * 1000, false /* flex */);
+    }
+
+    public void testH264Flex480p30fps2Mbps()   {
+        detailed(h264(), 720, 480, 30, 2 * 1000000, true /* flex */);
+    }
+
+    public void testH264Surf480p30fps2Mbps()   {
+        detailed(h264(), 720, 480, 30, 2 * 1000000, false /* flex */);
+    }
+
+    public void testH264Flex720p30fps4Mbps()   {
+        detailed(h264(), 1280, 720, 30, 4 * 1000000, true /* flex */);
+    }
+
+    public void testH264Surf720p30fps4Mbps()   {
+        detailed(h264(), 1280, 720, 30, 4 * 1000000, false /* flex */);
+    }
+
+    public void testH264Flex1080p30fps10Mbps()   {
+        detailed(h264(), 1920, 1080, 30, 10 * 1000000, true /* flex */);
+    }
+
+    public void testH264Surf1080p30fps10Mbps()   {
+        detailed(h264(), 1920, 1080, 30, 10 * 1000000, false /* flex */);
+    }
+
+    // VP8
+    public void testVP8LowQualitySDSupport()   {
+        support(vp8(), 320, 180, 30, 800 * 1000);
+    }
+
+    public void testVP8HighQualitySDSupport()   {
+        support(vp8(), 640, 360, 30, 2 * 1000000);
+    }
+
+    public void testVP8Flex180p30fps800kbps()   {
+        detailed(vp8(), 320, 180, 30, 800 * 1000, true /* flex */);
+    }
+
+    public void testVP8Surf180p30fps800kbps()   {
+        detailed(vp8(), 320, 180, 30, 800 * 1000, false /* flex */);
+    }
+
+    public void testVP8Flex360p30fps2Mbps()   {
+        detailed(vp8(), 640, 360, 30, 2 * 1000000, true /* flex */);
+    }
+
+    public void testVP8Surf360p30fps2Mbps()   {
+        detailed(vp8(), 640, 360, 30, 2 * 1000000, false /* flex */);
+    }
+
+    public void testVP8Flex720p30fps4Mbps()   {
+        detailed(vp8(), 1280, 720, 30, 4 * 1000000, true /* flex */);
+    }
+
+    public void testVP8Surf720p30fps4Mbps()   {
+        detailed(vp8(), 1280, 720, 30, 4 * 1000000, false /* flex */);
+    }
+
+    public void testVP8Flex1080p30fps10Mbps()   {
+        detailed(vp8(), 1920, 1080, 30, 10 * 1000000, true /* flex */);
+    }
+
+    public void testVP8Surf1080p30fps10Mbps()   {
+        detailed(vp8(), 1920, 1080, 30, 10 * 1000000, false /* flex */);
+    }
+
     private void minmin(Encoder[] encoders, boolean flexYUV) {
         extreme(encoders, 0 /* x */, 0 /* y */, flexYUV, false /* near */);
     }
@@ -1355,6 +1487,45 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
         }
         if (skipped) {
             MediaUtils.skipTest("duplicate or unsupported resolution");
+        }
+    }
+
+    /* test size, frame rate and bit rate */
+    private void detailed(
+            Encoder[] encoders, int width, int height, int frameRate, int bitRate,
+            boolean flexYUV) {
+        if (encoders.length == 0) {
+            MediaUtils.skipTest("no such encoder present");
+            return;
+        }
+        boolean skipped = true;
+        for (Encoder encoder : encoders) {
+            if (encoder.testSupport(width, height, frameRate, bitRate)) {
+                skipped = false;
+                encoder.testDetailed(width, height, frameRate, bitRate, flexYUV);
+            }
+        }
+        if (skipped) {
+            MediaUtils.skipTest("unsupported resolution and rate");
+        }
+    }
+
+    /* test size and rate are supported */
+    private void support(Encoder[] encoders, int width, int height, int frameRate, int bitRate) {
+        boolean supported = false;
+        if (encoders.length == 0) {
+            MediaUtils.skipTest("no such encoder present");
+            return;
+        }
+        for (Encoder encoder : encoders) {
+            if (encoder.testSupport(width, height, frameRate, bitRate)) {
+                supported = true;
+                break;
+            }
+        }
+        if (!supported) {
+            fail("unsupported format " + width + "x" + height + " " +
+                    frameRate + "fps " + bitRate + "bps");
         }
     }
 }
