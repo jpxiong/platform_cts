@@ -24,7 +24,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 # Include both the 32 and 64 bit versions
 LOCAL_MULTILIB := both
 
-LOCAL_JAVA_LIBRARIES := voip-common conscrypt
+LOCAL_JAVA_LIBRARIES := voip-common conscrypt org.apache.http.legacy
 
 LOCAL_JNI_SHARED_LIBRARIES := libcts_jni libnativedns_jni
 

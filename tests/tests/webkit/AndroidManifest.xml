@@ -28,6 +28,7 @@
                   android:exported="true"
                   android:authorities="android.webkit.cts.MockContentProvider" />
         <uses-library android:name="android.test.runner" />
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
         <activity android:name="android.webkit.cts.CookieSyncManagerCtsActivity"
             android:label="CookieSyncManagerCtsActivity"
