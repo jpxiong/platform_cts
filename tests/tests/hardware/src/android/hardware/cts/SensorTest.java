@@ -327,7 +327,7 @@ public class SensorTest extends SensorTestCase {
         HandlerThread handlerThread = new HandlerThread("sensorThread");
         handlerThread.start();
         Handler handler = new Handler(handlerThread.getLooper());
-        TestSensorEventListener listener = new TestSensorEventListener(handler);
+        TestSensorEventListener listener = new TestSensorEventListener(environment, handler);
 
         sensorManager.registerListener(listener);
         listener.waitForEvents(1);

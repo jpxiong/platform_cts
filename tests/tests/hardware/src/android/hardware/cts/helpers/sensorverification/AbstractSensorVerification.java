@@ -18,6 +18,7 @@ package android.hardware.cts.helpers.sensorverification;
 
 import android.hardware.cts.helpers.TestSensorEvent;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,18 +30,10 @@ public abstract class AbstractSensorVerification implements ISensorVerification 
      * {@inheritDoc}
      */
     @Override
-    public synchronized void addSensorEvents(TestSensorEvent ... events) {
+    public synchronized void addSensorEvents(Collection<TestSensorEvent> events) {
         for (TestSensorEvent event : events) {
             addSensorEventInternal(event);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized void addSensorEvent(TestSensorEvent event) {
-        addSensorEventInternal(event);
     }
 
     /**

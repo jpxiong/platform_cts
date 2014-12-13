@@ -21,9 +21,9 @@ import junit.framework.Assert;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
+import android.hardware.cts.helpers.TestSensorEvent;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
-import android.hardware.cts.helpers.ValidatingSensorEventListener;
 import android.hardware.cts.helpers.sensorverification.EventGapVerification;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 import android.hardware.cts.helpers.sensorverification.EventTimestampSynchronizationVerification;
@@ -36,6 +36,7 @@ import android.hardware.cts.helpers.sensorverification.StandardDeviationVerifica
 import android.os.Handler;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -118,17 +119,15 @@ public class TestSensorOperation extends SensorOperation {
     @Override
     public void execute() throws InterruptedException {
         getStats().addValue("sensor_name", mEnvironment.getSensor().getName());
-
-        ValidatingSensorEventListener listener =
-                new ValidatingSensorEventListener(mVerifications, mHandler);
-        listener.setLogEvents(mLogEvents);
+        TestSensorEventListener listener = new TestSensorEventListener(mEnvironment, mHandler);
 
         mExecutor.execute(mSensorManager, listener);
 
         boolean failed = false;
         StringBuilder sb = new StringBuilder();
+        List<TestSensorEvent> collectedEvents = listener.getCollectedEvents();
         for (ISensorVerification verification : mVerifications) {
-            failed |= evaluateResults(verification, sb);
+            failed |= evaluateResults(collectedEvents, verification, sb);
         }
 
         if (failed) {
@@ -154,8 +153,14 @@ public class TestSensorOperation extends SensorOperation {
     /**
      * Evaluate the results of a test, aggregate the stats, and build the error message.
      */
-    private boolean evaluateResults(ISensorVerification verification, StringBuilder sb) {
+    private boolean evaluateResults(
+            List<TestSensorEvent> events,
+            ISensorVerification verification,
+            StringBuilder sb) {
         try {
+            // this is an intermediate state in refactoring, at some point verifications might
+            // become stateless
+            verification.addSensorEvents(events);
             verification.verify(mEnvironment, getStats());
         } catch (AssertionError e) {
             if (sb.length() > 0) {

@@ -24,12 +24,13 @@ import android.hardware.SensorEventListener2;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A {@link SensorEventListener2} which performs operations such as waiting for a specific number of
@@ -42,74 +43,35 @@ public class TestSensorEventListener implements SensorEventListener2 {
     private static final long EVENT_TIMEOUT_US = TimeUnit.SECONDS.toMicros(5);
     private static final long FLUSH_TIMEOUT_US = TimeUnit.SECONDS.toMicros(10);
 
-    private final ArrayList<CountDownLatch> mEventLatches = new ArrayList<CountDownLatch>();
-    private final ArrayList<CountDownLatch> mFlushLatches = new ArrayList<CountDownLatch>();
+    private final List<TestSensorEvent> mCollectedEvents = new ArrayList<>();
+    private final List<CountDownLatch> mEventLatches = new ArrayList<>();
+    private final List<CountDownLatch> mFlushLatches = new ArrayList<>();
+    private final AtomicInteger mEventsReceivedOutsideHandler = new AtomicInteger();
 
-    private final SensorEventListener2 mListener;
     private final Handler mHandler;
+    private final TestSensorEnvironment mEnvironment;
 
-    private volatile boolean mEventsReceivedInHandler = true;
-    private volatile TestSensorEnvironment mEnvironment;
-    private volatile boolean mLogEvents;
+    /**
+     * @deprecated Use {@link TestSensorEventListener(TestSensorEnvironment)}.
+     */
+    @Deprecated
+    public TestSensorEventListener() {
+        this(null /* environment */);
+    }
 
     /**
      * Construct a {@link TestSensorEventListener}.
      */
-    public TestSensorEventListener() {
-        this(null /* listener */, null /* handler */);
+    public TestSensorEventListener(TestSensorEnvironment environment) {
+        this(environment, null /* handler */);
     }
 
     /**
-     * Construct a {@link TestSensorEventListener} with a {@link Handler}.
+     * Construct a {@link TestSensorEventListener}.
      */
-    public TestSensorEventListener(Handler handler) {
-        this(null /* listener */, handler);
-    }
-
-    /**
-     * Construct a {@link TestSensorEventListener} that wraps a {@link SensorEventListener2}.
-     */
-    public TestSensorEventListener(SensorEventListener2 listener) {
-        this(listener, null /* handler */);
-    }
-
-    /**
-     * Construct a {@link TestSensorEventListener} that wraps a {@link SensorEventListener2}, and it
-     * has a {@link Handler}.
-     */
-    public TestSensorEventListener(SensorEventListener2 listener, Handler handler) {
-        if (listener != null) {
-            mListener = listener;
-        } else {
-            // use a Null Object to simplify handling the listener
-            mListener = new SensorEventListener2() {
-                public void onFlushCompleted(Sensor sensor) {}
-                public void onSensorChanged(SensorEvent sensorEvent) {}
-                public void onAccuracyChanged(Sensor sensor, int i) {}
-            };
-        }
-        mHandler = handler;
-    }
-
-    /**
-     * @return The handler (if any) associated with the instance.
-     */
-    public Handler getHandler() {
-        return mHandler;
-    }
-
-    /**
-     * Set the sensor, rate, and batch report latency used for the assertions.
-     */
-    public void setEnvironment(TestSensorEnvironment environment) {
+    public TestSensorEventListener(TestSensorEnvironment environment, Handler handler) {
         mEnvironment = environment;
-    }
-
-    /**
-     * Set whether or not to log events
-     */
-    public void setLogEvents(boolean log) {
-        mLogEvents = log;
+        mHandler = handler;
     }
 
     /**
@@ -117,15 +79,10 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
+        long timestampNs = SystemClock.elapsedRealtimeNanos();
         checkHandler();
-        mListener.onSensorChanged(event);
-        if (mLogEvents) {
-            Log.v(LOG_TAG, String.format(
-                    "Sensor %d: sensor_timestamp=%dns, received_timestamp=%dns, values=%s",
-                    mEnvironment.getSensor().getType(),
-                    event.timestamp,
-                    SystemClock.elapsedRealtimeNanos(),
-                    Arrays.toString(event.values)));
+        synchronized (mCollectedEvents) {
+            mCollectedEvents.add(new TestSensorEvent(event, timestampNs));
         }
 
         synchronized (mEventLatches) {
@@ -141,7 +98,6 @@ public class TestSensorEventListener implements SensorEventListener2 {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         checkHandler();
-        mListener.onAccuracyChanged(sensor, accuracy);
     }
 
     /**
@@ -150,12 +106,35 @@ public class TestSensorEventListener implements SensorEventListener2 {
     @Override
     public void onFlushCompleted(Sensor sensor) {
         checkHandler();
-        mListener.onFlushCompleted(sensor);
-
         synchronized (mFlushLatches) {
             for (CountDownLatch latch : mFlushLatches) {
                 latch.countDown();
             }
+        }
+    }
+
+    /**
+     * @return The handler (if any) associated with the instance.
+     */
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+    /**
+     * @return A list of {@link TestSensorEvent}s collected by the listener.
+     */
+    public List<TestSensorEvent> getCollectedEvents() {
+        synchronized (mCollectedEvents){
+            return Collections.unmodifiableList(mCollectedEvents);
+        }
+    }
+
+    /**
+     * Clears the internal list of collected {@link TestSensorEvent}s.
+     */
+    public void clearEvents() {
+        synchronized (mCollectedEvents) {
+            mCollectedEvents.clear();
         }
     }
 
@@ -165,6 +144,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForFlushComplete() throws InterruptedException {
+        clearEvents();
         CountDownLatch latch = new CountDownLatch(1);
         synchronized (mFlushLatches) {
             mFlushLatches.add(latch);
@@ -190,10 +170,12 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
     public void waitForEvents(int eventCount) throws InterruptedException {
+        clearEvents();
         CountDownLatch eventLatch = new CountDownLatch(eventCount);
         synchronized (mEventLatches) {
             mEventLatches.add(eventLatch);
         }
+
         try {
             long samplingPeriodUs = mEnvironment.getMaximumExpectedSamplingPeriodUs();
             // timeout is 2 * event count * expected period + batch timeout + default wait
@@ -235,14 +217,20 @@ public class TestSensorEventListener implements SensorEventListener2 {
      * If no events were received this assertion will be evaluated to {@code true}.
      */
     public void assertEventsReceivedInHandler() {
-        Assert.assertTrue(
-                "Events did not arrive in the Looper associated with the given Handler.",
-                mEventsReceivedInHandler);
+        int eventsOutsideHandler = mEventsReceivedOutsideHandler.get();
+        String message = String.format(
+                "Events arrived outside the associated Looper. Expected=0, Found=%d",
+                eventsOutsideHandler);
+        Assert.assertEquals(message, 0 /* expected */, eventsOutsideHandler);
     }
 
+    /**
+     * Keeps track of the number of events that arrived in a different {@link Looper} than the one
+     * associated with the {@link TestSensorEventListener}.
+     */
     private void checkHandler() {
-        if (mHandler != null) {
-            mEventsReceivedInHandler &= (mHandler.getLooper() == Looper.myLooper());
+        if (mHandler != null && mHandler.getLooper() != Looper.myLooper()) {
+            mEventsReceivedOutsideHandler.incrementAndGet();
         }
     }
 }

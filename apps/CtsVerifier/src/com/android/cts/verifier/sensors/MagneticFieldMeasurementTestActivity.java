@@ -21,7 +21,6 @@ import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCalibratedUncalibratedVerifier;
 import android.hardware.cts.helpers.SensorCtsHelper;
@@ -166,7 +165,11 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
      * A routine to help operators calibrate the magnetometer.
      */
     private void calibrateMagnetometer() throws InterruptedException {
-        SensorEventListener2 listener = new SensorEventListener2() {
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        TestSensorEventListener listener = new TestSensorEventListener(environment) {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 clearText();
@@ -184,21 +187,11 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
                 // TODO: automate finding out when the magnetometer is calibrated
                 logger.logInstructions(R.string.snsr_mag_calibration_complete);
             }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
-            @Override
-            public void onFlushCompleted(Sensor sensor) {}
         };
 
-        TestSensorEnvironment environment = new TestSensorEnvironment(
-                getApplicationContext(),
-                Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_NORMAL);
         TestSensorManager magnetometer = new TestSensorManager(environment);
         try {
-            magnetometer.registerListener(new TestSensorEventListener(listener));
+            magnetometer.registerListener(listener);
             waitForUserToContinue();
         } finally {
             magnetometer.unregisterListener();
