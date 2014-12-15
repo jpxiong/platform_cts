@@ -27,43 +27,78 @@ import android.os.SystemClock;
 import android.test.AndroidTestCase;
 
 public class AlarmManagerTest extends AndroidTestCase {
-    private AlarmManager mAlarmManager;
+    public static final String MOCKACTION = "android.app.AlarmManagerTest.TEST_ALARMRECEIVER";
+    public static final String MOCKACTION2 = "android.app.AlarmManagerTest.TEST_ALARMRECEIVER2";
+
+    private AlarmManager mAm;
     private Intent mIntent;
     private PendingIntent mSender;
-    private Intent mServiceIntent;
+    private Intent mIntent2;
+    private PendingIntent mSender2;
 
     /*
      *  The default snooze delay: 5 seconds
      */
-    private final long SNOOZE_DELAY = 5 * 1000L;
+    private static final long SNOOZE_DELAY = 5 * 1000L;
     private long mWakeupTime;
     private MockAlarmReceiver mMockAlarmReceiver;
+    private MockAlarmReceiver mMockAlarmReceiver2;
 
-    private final int TIME_DELTA = 1000;
-    private final int TIME_DELAY = 5000;
+    private static final int TIME_DELTA = 1000;
+    private static final int TIME_DELAY = 10000;
 
-    class Sync {
-        public boolean mIsConnected;
-        public boolean mIsDisConnected;
-    }
+    // Receiver registration/unregistration between tests races with the system process, so
+    // we add a little buffer time here to allow the system to process before we proceed.
+    // This value is in milliseconds.
+    private static final long REGISTER_PAUSE = 250;
+
+    // Constants used for validating exact vs inexact alarm batching immunity.  We run a few
+    // trials of an exact alarm that is placed within an inexact alarm's window of opportunity,
+    // and mandate that the average observed delivery skew between the two be statistically
+    // significant -- i.e. that the two alarms are not being coalesced.
+    private static final long TEST_WINDOW_LENGTH = 5 * 1000L;
+    private static final long TEST_EXACT_OFFSET = TEST_WINDOW_LENGTH * 9 / 10;
+    private static final long TEST_ALARM_FUTURITY = 6 * 1000L;
+    private static final long NUM_TRIALS = 4;
+
+    // Delta between the center of the window and the exact alarm's trigger time.  We expect
+    // that on average the delta between the exact and windowed alarm will average at least
+    // this much; we conservatively check for it to average at least half this.
+    private static final long AVERAGE_WINDOWED_TO_EXACT_SKEW =
+            TEST_EXACT_OFFSET - (TEST_WINDOW_LENGTH / 2);
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        mIntent = new Intent(MockAlarmReceiver.MOCKACTION);
+
+        mAm = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+        mIntent = new Intent(MOCKACTION)
+                .addFlags(Intent.FLAG_RECEIVER_FOREGROUND | Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         mSender = PendingIntent.getBroadcast(mContext, 0, mIntent, 0);
-        mMockAlarmReceiver = new MockAlarmReceiver();
-        IntentFilter filter = new IntentFilter(MockAlarmReceiver.MOCKACTION);
+        mMockAlarmReceiver = new MockAlarmReceiver(mIntent.getAction());
+
+        mIntent2 = new Intent(MOCKACTION2)
+                .addFlags(Intent.FLAG_RECEIVER_FOREGROUND | Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+        mSender2 = PendingIntent.getBroadcast(mContext, 0, mIntent2, 0);
+        mMockAlarmReceiver2 = new MockAlarmReceiver(mIntent2.getAction());
+
+        IntentFilter filter = new IntentFilter(mIntent.getAction());
         mContext.registerReceiver(mMockAlarmReceiver, filter);
+
+        IntentFilter filter2 = new IntentFilter(mIntent2.getAction());
+        mContext.registerReceiver(mMockAlarmReceiver2, filter2);
+
+        Thread.sleep(REGISTER_PAUSE);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (mServiceIntent != null) {
-            mContext.stopService(mServiceIntent);
-        }
+        mContext.unregisterReceiver(mMockAlarmReceiver);
+        mContext.unregisterReceiver(mMockAlarmReceiver2);
+
+        Thread.sleep(REGISTER_PAUSE);
     }
 
     public void testSetTypes() throws Exception {
@@ -73,7 +108,7 @@ public class AlarmManagerTest extends AndroidTestCase {
         // test parameter type is RTC_WAKEUP
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, mWakeupTime, mSender);
+        mAm.setExact(AlarmManager.RTC_WAKEUP, mWakeupTime, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -85,7 +120,7 @@ public class AlarmManagerTest extends AndroidTestCase {
         // test parameter type is RTC
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAlarmManager.set(AlarmManager.RTC, mWakeupTime, mSender);
+        mAm.setExact(AlarmManager.RTC, mWakeupTime, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -97,7 +132,7 @@ public class AlarmManagerTest extends AndroidTestCase {
         // test parameter type is ELAPSED_REALTIME
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = SystemClock.elapsedRealtime() + SNOOZE_DELAY;
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME, mWakeupTime, mSender);
+        mAm.setExact(AlarmManager.ELAPSED_REALTIME, mWakeupTime, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -109,7 +144,7 @@ public class AlarmManagerTest extends AndroidTestCase {
         // test parameter type is ELAPSED_REALTIME_WAKEUP
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = SystemClock.elapsedRealtime() + SNOOZE_DELAY;
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mWakeupTime, mSender);
+        mAm.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, mWakeupTime, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -125,19 +160,61 @@ public class AlarmManagerTest extends AndroidTestCase {
         // that would instead cause such alarms to never be triggered.
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = -1000;
-        mAlarmManager.set(AlarmManager.RTC, mWakeupTime, mSender);
+        mAm.set(AlarmManager.RTC, mWakeupTime, mSender);
         new PollingCheck(TIME_DELAY) {
             @Override
             protected boolean check() {
                 return mMockAlarmReceiver.alarmed;
             }
         }.run();
+    }
+
+    public void testExactAlarmBatching() throws Exception {
+        long deltaSum = 0;
+        for (int i = 0; i < NUM_TRIALS; i++) {
+            final long now = System.currentTimeMillis();
+            final long windowStart = now + TEST_ALARM_FUTURITY;
+            final long exactStart = windowStart + TEST_EXACT_OFFSET;
+
+            mMockAlarmReceiver.setAlarmedFalse();
+            mMockAlarmReceiver2.setAlarmedFalse();
+            mAm.setWindow(AlarmManager.RTC_WAKEUP, windowStart, TEST_WINDOW_LENGTH, mSender);
+            mAm.setExact(AlarmManager.RTC_WAKEUP, exactStart, mSender2);
+
+            // Wait until a half-second beyond its target window, just to provide a
+            // little safety slop.
+            new PollingCheck(TEST_WINDOW_LENGTH + (windowStart - now) + 500) {
+                @Override
+                protected boolean check() {
+                    return mMockAlarmReceiver.alarmed;
+                }
+            }.run();
+
+            // Now wait until 1 sec beyond the expected exact alarm fire time, or for at
+            // least one second if we're already past the nominal exact alarm fire time
+            long timeToExact = Math.max(exactStart - System.currentTimeMillis() + 1000, 1000);
+            new PollingCheck(timeToExact) {
+                @Override
+                protected boolean check() {
+                    return mMockAlarmReceiver2.alarmed;
+                }
+            }.run();
+
+            final long delta = Math.abs(mMockAlarmReceiver2.rtcTime - mMockAlarmReceiver.rtcTime);
+            deltaSum += delta;
+        }
+
+        // Success when we observe that the exact and windowed alarm are not being often
+        // delivered close together -- that is, when we can be confident that they are not
+        // being coalesced.
+        assertTrue("Exact alarms appear to be coalescing with inexact alarms",
+                deltaSum > NUM_TRIALS * AVERAGE_WINDOWED_TO_EXACT_SKEW / 2);
     }
 
     public void testSetRepeating() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, TIME_DELAY / 2, mSender);
+        mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, TIME_DELAY / 2, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -151,13 +228,13 @@ public class AlarmManagerTest extends AndroidTestCase {
                 return mMockAlarmReceiver.alarmed;
             }
         }.run();
-        mAlarmManager.cancel(mSender);
+        mAm.cancel(mSender);
     }
 
     public void testCancel() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, 1000, mSender);
+        mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, 1000, mSender);
         new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
             @Override
             protected boolean check() {
@@ -171,7 +248,7 @@ public class AlarmManagerTest extends AndroidTestCase {
                 return mMockAlarmReceiver.alarmed;
             }
         }.run();
-        mAlarmManager.cancel(mSender);
+        mAm.cancel(mSender);
         Thread.sleep(TIME_DELAY);
         mMockAlarmReceiver.setAlarmedFalse();
         Thread.sleep(TIME_DELAY * 5);
@@ -179,8 +256,7 @@ public class AlarmManagerTest extends AndroidTestCase {
     }
 
     public void testSetInexactRepeating() throws Exception {
-
-        mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+        mAm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 AlarmManager.INTERVAL_FIFTEEN_MINUTES, mSender);
         SystemClock.setCurrentTimeMillis(System.currentTimeMillis()
                 + AlarmManager.INTERVAL_FIFTEEN_MINUTES);
