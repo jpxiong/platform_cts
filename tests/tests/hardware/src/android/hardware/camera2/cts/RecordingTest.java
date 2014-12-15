@@ -30,8 +30,8 @@ import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaCodecList;
+import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -66,15 +66,15 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int VIDEO_FRAME_RATE = 30;
     private final String VIDEO_FILE_PATH = Environment.getExternalStorageDirectory().getPath();
     private static final int[] mCamcorderProfileList = {
+            CamcorderProfile.QUALITY_HIGH,
             CamcorderProfile.QUALITY_2160P,
             CamcorderProfile.QUALITY_1080P,
-            CamcorderProfile.QUALITY_480P,
             CamcorderProfile.QUALITY_720P,
+            CamcorderProfile.QUALITY_480P,
             CamcorderProfile.QUALITY_CIF,
-            CamcorderProfile.QUALITY_LOW,
-            CamcorderProfile.QUALITY_HIGH,
             CamcorderProfile.QUALITY_QCIF,
             CamcorderProfile.QUALITY_QVGA,
+            CamcorderProfile.QUALITY_LOW,
     };
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
     private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
@@ -119,7 +119,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                 initSupportedVideoSize(mCameraIds[i]);
 
-                basicRecordingTestByCamera();
+                basicRecordingTestByCamera(mCamcorderProfileList);
             } finally {
                 closeDevice();
                 releaseRecorder();
@@ -219,6 +219,53 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
     public void testSlowMotionRecording() throws Exception {
         slowMotionRecording();
+    }
+
+    /**
+     * <p>
+     * Test recording framerate accuracy when switching from low FPS to high FPS.
+     * </p>
+     * <p>
+     * This test first record a video with profile of lowest framerate then record a video with
+     * profile of highest framerate. Make sure that the video framerate are still accurate.
+     * </p>
+     */
+    public void testRecordingFramerateLowToHigh() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                Log.i(TAG, "Testing basic recording for camera " + mCameraIds[i]);
+                // Re-use the MediaRecorder object for the same camera device.
+                mMediaRecorder = new MediaRecorder();
+                openDevice(mCameraIds[i]);
+
+                initSupportedVideoSize(mCameraIds[i]);
+
+                int minFpsProfileId = -1, minFps = 1000;
+                int maxFpsProfileId = -1, maxFps = 0;
+                int cameraId = Integer.valueOf(mCamera.getId());
+
+                for (int profileId : mCamcorderProfileList) {
+                    if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
+                        continue;
+                    }
+                    CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
+                    if (profile.videoFrameRate < minFps) {
+                        minFpsProfileId = profileId;
+                        minFps = profile.videoFrameRate;
+                    }
+                    if (profile.videoFrameRate > maxFps) {
+                        maxFpsProfileId = profileId;
+                        maxFps = profile.videoFrameRate;
+                    }
+                }
+
+                int camcorderProfileList[] = new int[] {minFpsProfileId, maxFpsProfileId};
+                basicRecordingTestByCamera(camcorderProfileList);
+            } finally {
+                closeDevice();
+                releaseRecorder();
+            }
+        }
     }
 
     /**
@@ -389,8 +436,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * Test camera recording by using each available CamcorderProfile for a
      * given camera. preview size is set to the video size.
      */
-    private void basicRecordingTestByCamera() throws Exception {
-        for (int profileId : mCamcorderProfileList) {
+    private void basicRecordingTestByCamera(int[] camcorderProfileList) throws Exception {
+        for (int profileId : camcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
                     allowedUnsupported(cameraId, profileId)) {
@@ -658,10 +705,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                 // Stop recording and preview
                 stopRecording(/* useMediaRecorder */true);
-                int duration = (int) (SystemClock.elapsedRealtime() - startTime);
+                int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                        profile.videoFrameRate);
 
                 // Validation recorded video
-                validateRecording(videoSz, duration);
+                validateRecording(videoSz, durationMs);
 
                 if (burstTest) {
                     for (int i = 0; i < BURST_VIDEO_SNAPSHOT_NUM; i++) {
@@ -854,14 +902,28 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         File outFile = new File(mOutMediaFileName);
         assertTrue("No video is recorded", outFile.exists());
 
-        MediaPlayer mediaPlayer = new MediaPlayer();
+        MediaExtractor extractor = new MediaExtractor();
         try {
-            mediaPlayer.setDataSource(mOutMediaFileName);
-            mediaPlayer.prepare();
-            Size videoSz = new Size(mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight());
+            extractor.setDataSource(mOutMediaFileName);
+            long durationUs = 0;
+            int width = -1, height = -1;
+            int numTracks = extractor.getTrackCount();
+            final String VIDEO_MIME_TYPE = "video";
+            for (int i = 0; i < numTracks; i++) {
+                MediaFormat format = extractor.getTrackFormat(i);
+                String mime = format.getString(MediaFormat.KEY_MIME);
+                if (mime.contains(VIDEO_MIME_TYPE)) {
+                    Log.i(TAG, "video format is: " + format.toString());
+                    durationUs = format.getLong(MediaFormat.KEY_DURATION);
+                    width = format.getInteger(MediaFormat.KEY_WIDTH);
+                    height = format.getInteger(MediaFormat.KEY_HEIGHT);
+                    break;
+                }
+            }
+            Size videoSz = new Size(width, height);
             assertTrue("Video size doesn't match, expected " + sz.toString() +
                     " got " + videoSz.toString(), videoSz.equals(sz));
-            int duration = mediaPlayer.getDuration();
+            int duration = (int) (durationUs / 1000);
             if (VERBOSE) {
                 Log.v(TAG, String.format("Video duration: recorded %dms, expected %dms",
                                          duration, durationMs));
@@ -870,12 +932,12 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             // TODO: Don't skip this for video snapshot
             if (!mStaticInfo.isHardwareLevelLegacy()) {
                 assertTrue(String.format(
-                        "Camera %s: Video duration doesn't match: recorded %dms, expected %dms",
-                        mCamera.getId(), duration,
-                        durationMs), Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
+                        "Camera %s: Video duration doesn't match: recorded %dms, expected %dms.",
+                        mCamera.getId(), duration, durationMs),
+                        Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
             }
         } finally {
-            mediaPlayer.release();
+            extractor.release();
             if (!DEBUG_DUMP) {
                 outFile.delete();
             }
