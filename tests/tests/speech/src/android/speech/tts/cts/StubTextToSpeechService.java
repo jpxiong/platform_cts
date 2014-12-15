@@ -20,12 +20,17 @@ import android.speech.tts.SynthesisCallback;
 import android.speech.tts.SynthesisRequest;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeechService;
+import android.util.Log;
 
 /**
  * Stub implementation of {@link TextToSpeechService}. Used for testing the
  * TTS engine API.
  */
 public class StubTextToSpeechService extends TextToSpeechService {
+    private static final String LOG_TAG = "StubTextToSpeechService";
+
+    // Object that onSynthesizeText will #wait on, if set to non-null
+    public static volatile Object sSynthesizeTextWait;
 
     @Override
     protected String[] onGetLanguage() {
@@ -51,6 +56,18 @@ public class StubTextToSpeechService extends TextToSpeechService {
         if (callback.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1) != TextToSpeech.SUCCESS) {
             return;
         }
+
+        final Object synthesizeTextWait = sSynthesizeTextWait;
+        if (synthesizeTextWait != null) {
+            synchronized (synthesizeTextWait) {
+                try {
+                  synthesizeTextWait.wait(10000);  // 10s timeout
+                } catch (InterruptedException e) {
+                    Log.e(LOG_TAG, "onSynthesizeText wait interrupted", e);
+                }
+            }
+        }
+
         byte[] data = { 0x01, 0x2 };
         if (callback.audioAvailable(data, 0, data.length) != TextToSpeech.SUCCESS) {
             return;
