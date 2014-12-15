@@ -74,15 +74,13 @@ public class TestSensorManager {
         }
 
         mTestSensorEventListener = listener;
-        mTestSensorEventListener.setEnvironment(mEnvironment);
-
         String message = SensorCtsHelper.formatAssertionMessage("registerListener", mEnvironment);
         boolean result = mSensorManager.registerListener(
                 mTestSensorEventListener,
                 mEnvironment.getSensor(),
                 mEnvironment.getRequestedSamplingPeriodUs(),
                 mEnvironment.getMaxReportLatencyUs(),
-                listener.getHandler());
+                mTestSensorEventListener.getHandler());
         Assert.assertTrue(message, result);
     }
 
