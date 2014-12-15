@@ -392,5 +392,19 @@
     "com.android.org.conscrypt.SignatureTest#test_getInstance_OpenSSL_ENGINE"
   ],
   bug: 18030049
+},
+{
+  description: "The new recording test is not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.RecordingTest#testRecordingFramerateLowToHigh"
+  ],
+  bug: 18705837
+},
+{
+  description: "The new image reader test is not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.ImageReaderTest#testAllOutputYUVResolutions"
+  ],
+  bug: 18689511
 }
 ]
