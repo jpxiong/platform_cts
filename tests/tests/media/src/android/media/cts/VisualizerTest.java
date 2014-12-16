@@ -302,10 +302,19 @@ public class VisualizerTest extends PostProcTestBase {
             assertTrue("visualizer not enabled", mVisualizer.getEnabled());
             Thread.sleep(100);
             int status = mVisualizer.setMeasurementMode(Visualizer.MEASUREMENT_MODE_PEAK_RMS);
-            // make sure we're playing long enough so the measurement is valid
-            Thread.sleep(500);
             assertEquals("setMeasurementMode() for PEAK_RMS doesn't report success",
                     Visualizer.SUCCESS, status);
+            // make sure we're playing long enough so the measurement is valid
+            int currentPosition = mp.getCurrentPosition();
+            final int maxTry = 100;
+            int tryCount = 0;
+            while (currentPosition < 400 && tryCount < maxTry) {
+                Thread.sleep(50);
+                currentPosition = mp.getCurrentPosition();
+                tryCount++;
+            }
+            assertTrue("MediaPlayer not ready", tryCount < maxTry);
+
             MeasurementPeakRms measurement = new MeasurementPeakRms();
             status = mVisualizer.getMeasurementPeakRms(measurement);
             mp.stop();
@@ -350,10 +359,19 @@ public class VisualizerTest extends PostProcTestBase {
             assertTrue("visualizer not enabled", mVisualizer.getEnabled());
             Thread.sleep(100);
             int status = mVisualizer.setMeasurementMode(Visualizer.MEASUREMENT_MODE_PEAK_RMS);
-            // make sure we're playing long enough so the measurement is valid
-            Thread.sleep(500);
             assertEquals("setMeasurementMode() for PEAK_RMS doesn't report success",
                     Visualizer.SUCCESS, status);
+            // make sure we're playing long enough so the measurement is valid
+            int currentPosition = mp.getCurrentPosition();
+            final int maxTry = 100;
+            int tryCount = 0;
+            while (currentPosition < 400 && tryCount < maxTry) {
+                Thread.sleep(50);
+                currentPosition = mp.getCurrentPosition();
+                tryCount++;
+            }
+            assertTrue("MediaPlayer not ready", tryCount < maxTry);
+
             MeasurementPeakRms measurement = new MeasurementPeakRms();
             status = mVisualizer.getMeasurementPeakRms(measurement);
             mp.stop();
