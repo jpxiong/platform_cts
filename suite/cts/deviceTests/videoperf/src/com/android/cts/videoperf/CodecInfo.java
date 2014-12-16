@@ -66,7 +66,12 @@ public class CodecInfo {
                 break;
             }
         }
-        VideoCapabilities vidCap = cap.getVideoCapabilities();
+
+        if (cap.colorFormats.length == 0) {
+            Log.w(TAG, "no supported color format");
+            return null;
+        }
+
         CodecInfo info = new CodecInfo();
         for (int color : cap.colorFormats) {
             if (color == CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
@@ -77,12 +82,8 @@ public class CodecInfo {
             }
         }
         printIntArray("supported colors", cap.colorFormats);
-        //  either YUV420 planar or semiplanar should be supported
-        if (!info.mSupportPlanar && !info.mSupportSemiPlanar) {
-            Log.i(TAG, "no supported color format");
-            return null;
-        }
 
+        VideoCapabilities vidCap = cap.getVideoCapabilities();
         if (mimeType.equals(VIDEO_AVC)) {
             info.mFps = vidCap.getSupportedFrameRatesFor(w, h).getUpper().intValue();
             info.mBitRate = vidCap.getBitrateRange().getUpper();
