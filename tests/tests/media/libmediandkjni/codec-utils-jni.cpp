@@ -16,8 +16,10 @@
 
 /* Original code copied from NDK Native-media sample code */
 
-#undef NDEBUG
 //#define LOG_NDEBUG 0
+#define TAG "CodecUtilsJNI"
+#include <log/log.h>
+
 #include <stdint.h>
 #include <sys/types.h>
 #include <jni.h>
@@ -26,20 +28,6 @@
 #include <JNIHelp.h>
 
 typedef ssize_t offs_t;
-
-// for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
-#include <android/log.h>
-#define TAG "CodecUtilsJNI"
-#define __ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#if LOG_NDEBUG
-#define ALOGV(...) do { if (0) { __ALOGV(__VA_ARGS__); } } while (0)
-#else
-#define ALOGV(...) __ALOGV(__VA_ARGS__)
-#endif
-#define ALOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
-#define ALOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
-#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
 struct NativeImage {
     struct crop {
@@ -132,13 +120,13 @@ void initializeGlobalFields(JNIEnv *env) {
     }
 
     {   // Image
-        jclass imageClazz = env->FindClass("android/media/Image");
+        jclass imageClazz = env->FindClass("android/media/cts/CodecImage");
         gFields.methodWidth  = env->GetMethodID(imageClazz, "getWidth", "()I");
         gFields.methodHeight = env->GetMethodID(imageClazz, "getHeight", "()I");
         gFields.methodFormat = env->GetMethodID(imageClazz, "getFormat", "()I");
         gFields.methodTimestamp = env->GetMethodID(imageClazz, "getTimestamp", "()J");
         gFields.methodPlanes = env->GetMethodID(
-                imageClazz, "getPlanes", "()[Landroid/media/Image$Plane;");
+                imageClazz, "getPlanes", "()[Landroid/media/cts/CodecImage$Plane;");
         gFields.methodCrop   = env->GetMethodID(
                 imageClazz, "getCropRect", "()Landroid/graphics/Rect;");
         env->DeleteLocalRef(imageClazz);
@@ -146,7 +134,7 @@ void initializeGlobalFields(JNIEnv *env) {
     }
 
     {   // Image.Plane
-        jclass planeClazz = env->FindClass("android/media/Image$Plane");
+        jclass planeClazz = env->FindClass("android/media/cts/CodecImage$Plane");
         gFields.methodBuffer = env->GetMethodID(planeClazz, "getBuffer", "()Ljava/nio/ByteBuffer;");
         gFields.methodPixelStride = env->GetMethodID(planeClazz, "getPixelStride", "()I");
         gFields.methodRowStride = env->GetMethodID(planeClazz, "getRowStride", "()I");
