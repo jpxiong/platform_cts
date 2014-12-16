@@ -129,12 +129,14 @@ public class TextToSpeechTest extends AndroidTestCase {
         getTts().stop();
         final int iterations = 20;
         for (int i = 0; i < iterations; i++) {
-            int result = getTts().speak(SAMPLE_TEXT, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID + Integer.toString(i));
+            int result = getTts().speak(SAMPLE_TEXT, TextToSpeech.QUEUE_ADD, null,
+                    UTTERANCE_ID + Integer.toString(i));
             assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
         }
         getTts().stop();
         for (int i = 0; i < iterations; i++) {
-            assertTrue("speak() stop callback timeout", mTts.waitForStop(UTTERANCE_ID + Integer.toString(i)));
+            assertTrue("speak() stop callback timeout", mTts.waitForStop(
+                    UTTERANCE_ID + Integer.toString(i)));
         }
     }
 
