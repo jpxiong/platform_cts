@@ -229,7 +229,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                 if (bitRate <= 0) {
                     bitRate = encCaps.getBitrateRange().clamp(
                         (int)(encCaps.getBitrateRange().getUpper() /
-                                Math.sqrt(maxWidth * maxHeight / width / height)));
+                                Math.sqrt((double)maxWidth * maxHeight / width / height)));
                 }
                 outFmt.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
 

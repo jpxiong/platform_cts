@@ -17,21 +17,28 @@ package android.media.cts;
 
 import android.content.pm.PackageManager;
 import android.cts.util.MediaUtils;
+import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
+import android.media.MediaCodecInfo.VideoCapabilities;
 import static android.media.MediaCodecInfo.CodecProfileLevel.*;
+import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_AVC;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_H263;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_HEVC;
 import static android.media.MediaFormat.MIMETYPE_VIDEO_MPEG4;
-import android.media.MediaCodecList;
-import android.media.MediaFormat;
+import static android.media.MediaFormat.MIMETYPE_VIDEO_VP8;
+import static android.media.MediaFormat.MIMETYPE_VIDEO_VP9;
 import android.media.MediaPlayer;
-
 import android.os.Build;
-
 import android.util.Log;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Arrays;
 
 /**
  * Basic sanity test of data returned by MediaCodeCapabilities.
@@ -40,6 +47,16 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
 
     private static final String TAG = "MediaCodecCapabilitiesTest";
     private static final int PLAY_TIME_MS = 30000;
+    private static final int TIMEOUT_US = 1000000;  // 1 sec
+
+    private final MediaCodecList mRegularCodecs =
+            new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+    private final MediaCodecList mAllCodecs =
+            new MediaCodecList(MediaCodecList.ALL_CODECS);
+    private final MediaCodecInfo[] mRegularInfos =
+            mRegularCodecs.getCodecInfos();
+    private final MediaCodecInfo[] mAllInfos =
+            mAllCodecs.getCodecInfos();
 
     // Android device implementations with H.264 encoders, MUST support Baseline Profile Level 3.
     // SHOULD support Main Profile/ Level 4, if supported the device must also support Main
@@ -331,5 +348,176 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             }
         }
         return false;
+    }
+
+    private boolean isVideoMime(String mime) {
+        return mime.toLowerCase().startsWith("video/");
+    }
+
+    private Set<String> requiredAdaptiveFormats() {
+        Set<String> adaptiveFormats = new HashSet<String>();
+        adaptiveFormats.add(MediaFormat.MIMETYPE_VIDEO_AVC);
+        adaptiveFormats.add(MediaFormat.MIMETYPE_VIDEO_HEVC);
+        adaptiveFormats.add(MediaFormat.MIMETYPE_VIDEO_VP8);
+        adaptiveFormats.add(MediaFormat.MIMETYPE_VIDEO_VP9);
+        return adaptiveFormats;
+    }
+
+    public void testHaveAdaptiveVideoDecoderForAllSupportedFormats() {
+        Set<String> supportedFormats = new HashSet<String>();
+        boolean skipped = true;
+
+        // gather all supported video formats
+        for (MediaCodecInfo info : mAllInfos) {
+            if (info.isEncoder()) {
+                continue;
+            }
+            for (String mime : info.getSupportedTypes()) {
+                if (isVideoMime(mime)) {
+                    supportedFormats.add(mime);
+                }
+            }
+        }
+
+        // limit to CDD-required formats for now
+        supportedFormats.retainAll(requiredAdaptiveFormats());
+
+        // check if there is an adaptive decoder for each
+        for (String mime : supportedFormats) {
+            skipped = false;
+            // implicit assumption that QVGA video is always valid.
+            MediaFormat format = MediaFormat.createVideoFormat(mime, 176, 144);
+            format.setFeatureEnabled(CodecCapabilities.FEATURE_AdaptivePlayback, true);
+            String codec = mAllCodecs.findDecoderForFormat(format);
+            assertTrue(
+                    "could not find adaptive decoder for " + mime, codec != null);
+        }
+        if (skipped) {
+            MediaUtils.skipTest("no video decoders that are required to be adaptive found");
+        }
+    }
+
+    public void testAllVideoDecodersAreAdaptive() {
+        Set<String> adaptiveFormats = requiredAdaptiveFormats();
+        boolean skipped = true;
+        for (MediaCodecInfo info : mAllInfos) {
+            if (info.isEncoder()) {
+                continue;
+            }
+            for (String mime : info.getSupportedTypes()) {
+                if (!isVideoMime(mime)
+                        // limit to CDD-required formats for now
+                        || !adaptiveFormats.contains(mime)) {
+                    continue;
+                }
+                skipped = false;
+                CodecCapabilities caps = info.getCapabilitiesForType(mime);
+                assertTrue(
+                    info.getName() + " is not adaptive for " + mime,
+                    caps.isFeatureSupported(CodecCapabilities.FEATURE_AdaptivePlayback));
+            }
+        }
+        if (skipped) {
+            MediaUtils.skipTest("no video decoders that are required to be adaptive found");
+        }
+    }
+
+    private MediaFormat createReasonableVideoFormat(
+            CodecCapabilities caps, String mime, boolean encoder, int width, int height) {
+        VideoCapabilities vidCaps = caps.getVideoCapabilities();
+        MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
+        if (encoder) {
+            // bitrate
+            int maxWidth = vidCaps.getSupportedWidths().getUpper();
+            int maxHeight = vidCaps.getSupportedHeightsFor(width).getUpper();
+            int maxRate = vidCaps.getSupportedFrameRatesFor(width, height).getUpper().intValue();
+            int bitrate = vidCaps.getBitrateRange().clamp(
+                    (int)(vidCaps.getBitrateRange().getUpper()
+                            / Math.sqrt((double)maxWidth * maxHeight / width / height)));
+            Log.i(TAG, "reasonable bitrate for " + width + "x" + height + "@" + maxRate
+                    + " " + mime + " = " + bitrate);
+            format.setInteger(format.KEY_BIT_RATE, bitrate);
+            format.setInteger(format.KEY_FRAME_RATE, maxRate);
+        }
+        return format;
+    }
+
+    public void testSecureCodecsAdvertiseSecurePlayback() throws IOException {
+        boolean skipped = true;
+        for (MediaCodecInfo info : mAllInfos) {
+            boolean isEncoder = info.isEncoder();
+            if (isEncoder || !info.getName().endsWith(".secure")) {
+                continue;
+            }
+            for (String mime : info.getSupportedTypes()) {
+                if (!isVideoMime(mime)) {
+                    continue;
+                }
+                skipped = false;
+                CodecCapabilities caps = info.getCapabilitiesForType(mime);
+                assertTrue(
+                        info.getName() + " does not advertise secure playback",
+                        caps.isFeatureSupported(CodecCapabilities.FEATURE_SecurePlayback));
+            }
+        }
+        if (skipped) {
+            MediaUtils.skipTest("no video decoders found ending in .secure");
+        }
+    }
+
+    public void testAllNonTunneledVideoCodecsSupportFlexibleYUV() throws IOException {
+        boolean skipped = true;
+        for (MediaCodecInfo info : mAllInfos) {
+            boolean isEncoder = info.isEncoder();
+            for (String mime: info.getSupportedTypes()) {
+                if (!isVideoMime(mime)) {
+                    continue;
+                }
+                CodecCapabilities caps = info.getCapabilitiesForType(mime);
+                if (caps.isFeatureRequired(CodecCapabilities.FEATURE_TunneledPlayback)
+                        || caps.isFeatureRequired(CodecCapabilities.FEATURE_SecurePlayback)) {
+                    continue;
+                }
+                skipped = false;
+                assertTrue(
+                    info.getName() + " does not advertise COLOR_FormatYUV420Flexible",
+                    Arrays.asList(caps.colorFormats).contains(
+                            caps.COLOR_FormatYUV420Flexible));
+
+                MediaCodec codec = null;
+                MediaFormat format = null;
+                try {
+                    codec = MediaCodec.createByCodecName(info.getName());
+                    // implicit assumption that QVGA video is always valid.
+                    format = createReasonableVideoFormat(caps, mime, isEncoder, 176, 144);
+                    format.setInteger(
+                            MediaFormat.KEY_COLOR_FORMAT,
+                            caps.COLOR_FormatYUV420Flexible);
+
+                    codec.configure(format, null /* surface */, null /* crypto */,
+                            isEncoder ? codec.CONFIGURE_FLAG_ENCODE : 0);
+                    MediaFormat configuredFormat =
+                            isEncoder ? codec.getInputFormat() : codec.getOutputFormat();
+                    Log.d(TAG, "color format is " + configuredFormat.getInteger(
+                            MediaFormat.KEY_COLOR_FORMAT));
+                    if (isEncoder) {
+                        codec.start();
+                        int ix = codec.dequeueInputBuffer(TIMEOUT_US);
+                        assertNotNull(
+                                info.getName() + " encoder has non-flexYUV input buffer #" + ix,
+                                codec.getInputImage(ix));
+                    } else {
+                        // TODO: test these on various decoders (need test streams)
+                    }
+                } finally {
+                    if (codec != null) {
+                        codec.release();
+                    }
+                }
+            }
+        }
+        if (skipped) {
+            MediaUtils.skipTest("no non-tunneled/non-secure video decoders found");
+        }
     }
 }
