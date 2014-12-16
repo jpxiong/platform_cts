@@ -61,7 +61,7 @@ public class StubTextToSpeechService extends TextToSpeechService {
         if (synthesizeTextWait != null) {
             synchronized (synthesizeTextWait) {
                 try {
-                  synthesizeTextWait.wait(10000);  // 10s timeout
+                    synthesizeTextWait.wait(10000);  // 10s timeout
                 } catch (InterruptedException e) {
                     Log.e(LOG_TAG, "onSynthesizeText wait interrupted", e);
                 }

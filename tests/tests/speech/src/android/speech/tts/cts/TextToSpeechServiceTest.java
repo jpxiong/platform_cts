@@ -82,7 +82,8 @@ public class TextToSpeechServiceTest extends AndroidTestCase {
         getTts().stop();
         final int iterations = 20;
         for (int i = 0; i < iterations; i++) {
-            int result = getTts().speak(UTTERANCE, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID + Integer.toString(i));
+            int result = getTts().speak(UTTERANCE, TextToSpeech.QUEUE_ADD, null,
+                    UTTERANCE_ID + Integer.toString(i));
             assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
         }
         getTts().stop();
@@ -93,7 +94,8 @@ public class TextToSpeechServiceTest extends AndroidTestCase {
         }
 
         for (int i = 0; i < iterations; i++) {
-            assertTrue("speak() stop callback timeout", mTts.waitForStop(UTTERANCE_ID + Integer.toString(i)));
+            assertTrue("speak() stop callback timeout", mTts.waitForStop(
+                    UTTERANCE_ID + Integer.toString(i)));
         }
     }
 
