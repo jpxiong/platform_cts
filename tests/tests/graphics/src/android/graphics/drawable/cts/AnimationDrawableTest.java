@@ -76,7 +76,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         // Check the values set in the constructor
         assertNotNull(mAnimationDrawable.getConstantState());
         assertFalse(mAnimationDrawable.isRunning());
-        assertTrue(mAnimationDrawable.isOneShot());
+        assertFalse(mAnimationDrawable.isOneShot());
     }
 
     public void testSetVisible() throws Throwable {
@@ -292,26 +292,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertEquals(2, dr.getNumberOfFrames());
         assertEquals(2000, dr.getDuration(0));
         assertEquals(1000, dr.getDuration(1));
-        assertSame(dr.getFrame(0), dr.getCurrent());
-    }
-
-    public void testInflateMissingAttributes() throws XmlPullParserException, IOException {
-        XmlResourceParser parser = getResourceParser(R.xml.anim_list_missing_list_attrs);
-        AnimationDrawable dr = new AnimationDrawable();
-        dr.inflate(mResources, parser, Xml.asAttributeSet(parser));
-        // use default visibility
-        assertTrue(dr.isVisible());
-        // default value of android:oneShot is false
-        assertFalse(dr.isOneShot());
-        // default value of android:variablePadding is false
-        // TODO: its not clear what the value of constant padding should be when variablePadding
-        // is false
-        //assertNotNull(drawableContainerState.getConstantPadding());
-        // add a new frame from xml
-        assertEquals(3, dr.getNumberOfFrames());
-        assertEquals(2000, dr.getDuration(0));
-        assertEquals(1000, dr.getDuration(1));
-        assertEquals(2000, dr.getDuration(2));
         assertSame(dr.getFrame(0), dr.getCurrent());
     }
 
