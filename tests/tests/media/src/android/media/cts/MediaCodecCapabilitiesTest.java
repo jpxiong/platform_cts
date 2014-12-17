@@ -48,6 +48,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     private static final String TAG = "MediaCodecCapabilitiesTest";
     private static final int PLAY_TIME_MS = 30000;
     private static final int TIMEOUT_US = 1000000;  // 1 sec
+    private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
 
     private final MediaCodecList mRegularCodecs =
             new MediaCodecList(MediaCodecList.REGULAR_CODECS);
@@ -438,6 +439,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                     + " " + mime + " = " + bitrate);
             format.setInteger(format.KEY_BIT_RATE, bitrate);
             format.setInteger(format.KEY_FRAME_RATE, maxRate);
+            format.setInteger(format.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
         }
         return format;
     }
@@ -479,10 +481,16 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                     continue;
                 }
                 skipped = false;
+                boolean found = false;
+                for (int c : caps.colorFormats) {
+                    if (c == caps.COLOR_FormatYUV420Flexible) {
+                        found = true;
+                        break;
+                    }
+                }
                 assertTrue(
                     info.getName() + " does not advertise COLOR_FormatYUV420Flexible",
-                    Arrays.asList(caps.colorFormats).contains(
-                            caps.COLOR_FormatYUV420Flexible));
+                    found);
 
                 MediaCodec codec = null;
                 MediaFormat format = null;
