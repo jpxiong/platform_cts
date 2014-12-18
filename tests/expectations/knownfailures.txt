@@ -94,6 +94,13 @@
   bug: 17748398
 },
 {
+  description: "WebGL test uniformMatrixBadArgs is too strict. Disabled until it's fixed upstream.",
+  names: [
+    "android.webgl.cts.WebGLTest#test_conformance_more_functions_uniformMatrixBadArgs_html"
+  ],
+  bug: 18638404
+},
+{
   description: "permissions for the API previously used in the test has changed, making it impossible to pass",
   names: [
     "android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingFast",
