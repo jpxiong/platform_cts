@@ -35,38 +35,38 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inX;
         public Target.Floaty out;
     }
 
     private void checkExp2FloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x80096e5b0f2662el, false);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x58195894b8b72a12l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testExp2FloatFloat(in, out);
-            verifyResultsExp2FloatFloat(in, out, false);
+            script.forEach_testExp2FloatFloat(inX, out);
+            verifyResultsExp2FloatFloat(inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2FloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testExp2FloatFloat(in, out);
-            verifyResultsExp2FloatFloat(in, out, true);
+            scriptRelaxed.forEach_testExp2FloatFloat(inX, out);
+            verifyResultsExp2FloatFloat(inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2FloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsExp2FloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsExp2FloatFloat(Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 1];
+        inX.copyTo(arrayInX);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inX = arrayInX[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp2(args, target);
@@ -77,9 +77,9 @@ public class TestExp2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xcc4102f6b7fc7d5al, false);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4eeb7f70e7690e76l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testExp2Float2Float2(in, out);
-            verifyResultsExp2Float2Float2(in, out, false);
+            script.forEach_testExp2Float2Float2(inX, out);
+            verifyResultsExp2Float2Float2(inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testExp2Float2Float2(in, out);
-            verifyResultsExp2Float2Float2(in, out, true);
+            scriptRelaxed.forEach_testExp2Float2Float2(inX, out);
+            verifyResultsExp2Float2Float2(inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsExp2Float2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsExp2Float2Float2(Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 2];
+        inX.copyTo(arrayInX);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inX = arrayInX[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp2(args, target);
@@ -136,9 +136,9 @@ public class TestExp2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xcc410d98170312f4l, false);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4eed488bdd842f54l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testExp2Float3Float3(in, out);
-            verifyResultsExp2Float3Float3(in, out, false);
+            script.forEach_testExp2Float3Float3(inX, out);
+            verifyResultsExp2Float3Float3(inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testExp2Float3Float3(in, out);
-            verifyResultsExp2Float3Float3(in, out, true);
+            scriptRelaxed.forEach_testExp2Float3Float3(inX, out);
+            verifyResultsExp2Float3Float3(inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsExp2Float3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsExp2Float3Float3(Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp2(args, target);
@@ -195,9 +195,9 @@ public class TestExp2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xcc4118397609a88el, false);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4eef11a6d39f5032l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testExp2Float4Float4(in, out);
-            verifyResultsExp2Float4Float4(in, out, false);
+            script.forEach_testExp2Float4Float4(inX, out);
+            verifyResultsExp2Float4Float4(inX, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testExp2Float4Float4(in, out);
-            verifyResultsExp2Float4Float4(in, out, true);
+            scriptRelaxed.forEach_testExp2Float4Float4(inX, out);
+            verifyResultsExp2Float4Float4(inX, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp2Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsExp2Float4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsExp2Float4Float4(Allocation inX, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp2(args, target);
@@ -254,9 +254,9 @@ public class TestExp2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inX: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
