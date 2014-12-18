@@ -105,7 +105,7 @@ public class SingleSensorTests extends SensorTestCase {
      */
     public void testSensorProperties() {
         // sensor type: [getMinDelay()]
-        Map<Integer, Object[]> expectedProperties = new HashMap<Integer, Object[]>(3);
+        Map<Integer, Object[]> expectedProperties = new HashMap<>(3);
         expectedProperties.put(Sensor.TYPE_ACCELEROMETER, new Object[]{10000});
         expectedProperties.put(Sensor.TYPE_GYROSCOPE, new Object[]{10000});
         expectedProperties.put(Sensor.TYPE_MAGNETIC_FIELD, new Object[]{100000});
@@ -548,19 +548,14 @@ public class SingleSensorTests extends SensorTestCase {
         try {
             op.execute();
         } finally {
-            SensorStats.logStats(TAG, op.getStats());
+            SensorStats stats = op.getStats();
+            stats.log(TAG);
 
-            String sensorRate;
-            if (rateUs == SensorManager.SENSOR_DELAY_FASTEST) {
-                sensorRate = "fastest";
-            } else {
-                sensorRate = String.format("%.0fhz", environment.getFrequencyHz());
-            }
             String fileName = String.format(
                     "single_%s_%s.txt",
                     SensorStats.getSanitizedSensorName(environment.getSensor()),
-                    sensorRate);
-            SensorStats.logStatsToFile(fileName, op.getStats());
+                    environment.getFrequencyString());
+            stats.logToFile(fileName);
         }
     }
 }
