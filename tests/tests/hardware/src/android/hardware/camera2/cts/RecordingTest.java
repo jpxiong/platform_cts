@@ -86,6 +86,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private String mOutMediaFileName;
     private int mVideoFrameRate;
     private Size mVideoSize;
+    private long mRecordingStartTime;
 
     @Override
     protected void setUp() throws Exception {
@@ -704,9 +705,14 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 SystemClock.sleep(RECORDING_DURATION_MS / 2);
 
                 // Stop recording and preview
-                stopRecording(/* useMediaRecorder */true);
-                int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                int durationMs = stopRecording(/* useMediaRecorder */true);
+                // For non-burst test, use number of frames to also double check video frame rate.
+                // Burst video snapshot is allowed to cause frame rate drop, so do not use number
+                // of frames to estimate duration
+                if (!burstTest) {
+                    durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
                         profile.videoFrameRate);
+                }
 
                 // Validation recorded video
                 validateRecording(videoSz, durationMs);
@@ -859,6 +865,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         } else {
             // TODO: need implement MediaCodec path.
         }
+        mRecordingStartTime = SystemClock.elapsedRealtime();
     }
 
     private void startRecording(boolean useMediaRecorder)  throws Exception {
@@ -875,7 +882,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mSessionListener.getStateWaiter().waitForState(SESSION_CLOSED, SESSION_CLOSE_TIMEOUT_MS);
     }
 
-    private void stopRecording(boolean useMediaRecorder) throws Exception {
+    // Stop recording and return the estimated video duration in milliseconds.
+    private int stopRecording(boolean useMediaRecorder) throws Exception {
+        long stopRecordingTime = SystemClock.elapsedRealtime();
         if (useMediaRecorder) {
             stopCameraStreaming();
 
@@ -889,6 +898,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             mRecordingSurface.release();
             mRecordingSurface = null;
         }
+        return (int) (stopRecordingTime - mRecordingStartTime);
     }
 
     private void releaseRecorder() {
