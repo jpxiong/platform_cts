@@ -34,7 +34,7 @@ public class MyVpnService extends VpnService {
     private static int MTU = 1799;
 
     private ParcelFileDescriptor mFd = null;
-    private UdpReflector mUdpReflector = null;
+    private PacketReflector mPacketReflector = null;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -127,14 +127,14 @@ public class MyVpnService extends VpnService {
         mFd = builder.establish();
         Log.i(TAG, "Established, fd=" + (mFd == null ? "null" : mFd.getFd()));
 
-        mUdpReflector = new UdpReflector(mFd.getFileDescriptor(), MTU);
-        mUdpReflector.start();
+        mPacketReflector = new PacketReflector(mFd.getFileDescriptor(), MTU);
+        mPacketReflector.start();
     }
 
     private void stop() {
-        if (mUdpReflector != null) {
-            mUdpReflector.interrupt();
-            mUdpReflector = null;
+        if (mPacketReflector != null) {
+            mPacketReflector.interrupt();
+            mPacketReflector = null;
         }
         try {
             if (mFd != null) {
