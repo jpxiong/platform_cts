@@ -33,7 +33,7 @@ def main():
     """
     NAME = os.path.basename(__file__).split(".")[0]
 
-    RESIDUAL_THRESHOLD = 0.00005
+    RESIDUAL_THRESHOLD = 0.0003 # approximately each sample is off by 2/255
 
     # The HAL3.2 spec requires that curves up to 64 control points in length
     # must be supported.
