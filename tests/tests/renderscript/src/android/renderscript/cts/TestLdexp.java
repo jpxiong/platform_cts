@@ -35,45 +35,45 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     public class ArgumentsFloatIntFloat {
-        public float inX;
-        public int inY;
+        public float inMantissa;
+        public int inExponent;
         public Target.Floaty out;
     }
 
     private void checkLdexpFloatIntFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdeada0999238fe8bl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xdeada0999238fe8cl, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdffd225490f0e26fl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xdffd207c2e4133c4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloatIntFloat(inX, out);
-            verifyResultsLdexpFloatIntFloat(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloatIntFloat(inMantissa, out);
+            verifyResultsLdexpFloatIntFloat(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloatIntFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloatIntFloat(inX, out);
-            verifyResultsLdexpFloatIntFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloatIntFloat(inMantissa, out);
+            verifyResultsLdexpFloatIntFloat(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloatIntFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloatIntFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloatIntFloat(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 1];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inMantissa = arrayInMantissa[i];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -84,12 +84,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -109,39 +109,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat2Int2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5492762140d0ca17l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x5492762140d0ca18l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7d0b1a44fe92893l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7d0afcbed3979e8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat2Int2Float2(inX, out);
-            verifyResultsLdexpFloat2Int2Float2(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat2Int2Float2(inMantissa, out);
+            verifyResultsLdexpFloat2Int2Float2(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat2Int2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat2Int2Float2(inX, out);
-            verifyResultsLdexpFloat2Int2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat2Int2Float2(inMantissa, out);
+            verifyResultsLdexpFloat2Int2Float2(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat2Int2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat2Int2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat2Int2Float2(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 2];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 2];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inMantissa = arrayInMantissa[i * 2 + j];
+                args.inExponent = arrayInExponent[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -152,12 +152,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -177,39 +177,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat3Int3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7a48b484368336d0l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x7a48b484368336d1l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa8e041253fa3335el, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xa8e03f4cdcf384b3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat3Int3Float3(inX, out);
-            verifyResultsLdexpFloat3Int3Float3(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat3Int3Float3(inMantissa, out);
+            verifyResultsLdexpFloat3Int3Float3(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat3Int3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat3Int3Float3(inX, out);
-            verifyResultsLdexpFloat3Int3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat3Int3Float3(inMantissa, out);
+            verifyResultsLdexpFloat3Int3Float3(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat3Int3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat3Int3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat3Int3Float3(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inMantissa = arrayInMantissa[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -220,12 +220,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -245,39 +245,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat4Int4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9ffef2e72c35a389l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x9ffef2e72c35a38al, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x49efd0a62f5d3e29l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x49efcecdccad8f7el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat4Int4Float4(inX, out);
-            verifyResultsLdexpFloat4Int4Float4(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat4Int4Float4(inMantissa, out);
+            verifyResultsLdexpFloat4Int4Float4(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat4Int4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat4Int4Float4(inX, out);
-            verifyResultsLdexpFloat4Int4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat4Int4Float4(inMantissa, out);
+            verifyResultsLdexpFloat4Int4Float4(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat4Int4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat4Int4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat4Int4Float4(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inMantissa = arrayInMantissa[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -288,12 +288,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -313,39 +313,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat2IntFloat2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xa2b6e0c39777b8c1l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xa2b6e0c39777b8c2l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6a72b89838bd38d1l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6a72b6bfd60d8a26l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat2IntFloat2(inX, out);
-            verifyResultsLdexpFloat2IntFloat2(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat2IntFloat2(inMantissa, out);
+            verifyResultsLdexpFloat2IntFloat2(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat2IntFloat2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat2IntFloat2(inX, out);
-            verifyResultsLdexpFloat2IntFloat2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat2IntFloat2(inMantissa, out);
+            verifyResultsLdexpFloat2IntFloat2(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat2IntFloat2: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat2IntFloat2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat2IntFloat2(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 2];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i];
+                args.inMantissa = arrayInMantissa[i * 2 + j];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -356,12 +356,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -381,39 +381,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat3IntFloat3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xcd4401424a114a65l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xcd4401424a114a66l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x49ba40205150f83dl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x49ba3e47eea14992l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat3IntFloat3(inX, out);
-            verifyResultsLdexpFloat3IntFloat3(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat3IntFloat3(inMantissa, out);
+            verifyResultsLdexpFloat3IntFloat3(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat3IntFloat3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat3IntFloat3(inX, out);
-            verifyResultsLdexpFloat3IntFloat3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat3IntFloat3(inMantissa, out);
+            verifyResultsLdexpFloat3IntFloat3(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat3IntFloat3: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat3IntFloat3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat3IntFloat3(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i];
+                args.inMantissa = arrayInMantissa[i * 4 + j];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -424,12 +424,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -449,39 +449,39 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloat4IntFloat4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf7d121c0fcaadc09l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xf7d121c0fcaadc0al, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2901c7a869e4b7a9l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x2901c5d0073508fel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testLdexpFloat4IntFloat4(inX, out);
-            verifyResultsLdexpFloat4IntFloat4(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testLdexpFloat4IntFloat4(inMantissa, out);
+            verifyResultsLdexpFloat4IntFloat4(inMantissa, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat4IntFloat4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testLdexpFloat4IntFloat4(inX, out);
-            verifyResultsLdexpFloat4IntFloat4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testLdexpFloat4IntFloat4(inMantissa, out);
+            verifyResultsLdexpFloat4IntFloat4(inMantissa, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLdexpFloat4IntFloat4: " + e.toString());
         }
     }
 
-    private void verifyResultsLdexpFloat4IntFloat4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsLdexpFloat4IntFloat4(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        inMantissa.copyTo(arrayInMantissa);
+        int[] arrayInExponent = new int[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i];
+                args.inMantissa = arrayInMantissa[i * 4 + j];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLdexp(args, target);
@@ -492,12 +492,12 @@ public class TestLdexp extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMantissa: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMantissa, Float.floatToRawIntBits(args.inMantissa), args.inMantissa));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

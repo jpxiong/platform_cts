@@ -570,15 +570,15 @@ public class CoreMathVerifier {
     }
 
     static public void computeAbs(TestAbs.ArgumentsCharUchar args) {
-        args.out = (byte)Math.abs(args.inValue);
+        args.out = (byte)Math.abs(args.inN);
     }
 
     static public void computeAbs(TestAbs.ArgumentsShortUshort args) {
-        args.out = (short)Math.abs(args.inValue);
+        args.out = (short)Math.abs(args.inN);
     }
 
     static public void computeAbs(TestAbs.ArgumentsIntUint args) {
-        args.out = Math.abs(args.inValue);
+        args.out = Math.abs(args.inN);
     }
 
     static public void computeAcos(TestAcos.ArgumentsFloatFloat args, Target t) {
@@ -1057,12 +1057,12 @@ public class CoreMathVerifier {
 
     static public void computeCosh(TestCosh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
-        args.out = cosh(args.in, t);
+        args.out = cosh(args.inX, t);
     }
 
     static public void computeCospi(TestCospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
-        args.out = cospi(args.in, t);
+        args.out = cospi(args.inX, t);
     }
 
     static public void computeCross(TestCross.ArgumentsFloatNFloatNFloatN args, Target t) {
@@ -1125,29 +1125,29 @@ public class CoreMathVerifier {
 
     static public void computeExp(TestExp.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
-        args.out = exp(args.in, t);
+        args.out = exp(args.inX, t);
     }
 
     static public void computeExp10(TestExp10.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 32, false);
-        args.out = exp10(args.in, t);
+        args.out = exp10(args.inX, t);
     }
 
     static public void computeExp2(TestExp2.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
-        args.out = exp2(args.in, t);
+        args.out = exp2(args.inX, t);
     }
 
     static public void computeExpm1(TestExpm1.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
-        args.out = expm1(args.in, t);
+        args.out = expm1(args.inX, t);
     }
 
     static public void computeFabs(TestFabs.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
-        Target.Floaty in = t.new32(args.in);
+        Target.Floaty in = t.new32(args.inX);
         args.out = t.new32(
-            Math.abs(args.in),
+            Math.abs(args.inX),
             Math.abs(in.min32()),
             Math.abs(in.max32()));
     }
@@ -1265,7 +1265,7 @@ public class CoreMathVerifier {
         t.setPrecision(0, 0, false);
         FrexpResult result = frexp(args.inV);
         args.out = t.new32(result.significand);
-        args.outIptr = result.exponent;
+        args.outExpo = result.exponent;
     }
 
     static public void computeHalfRecip(TestHalfRecip.ArgumentsFloatFloat args, Target t) {
@@ -1306,11 +1306,11 @@ public class CoreMathVerifier {
 
     static public void computeLdexp(TestLdexp.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(1, 1, false);
-        Target.Floaty inX = t.new32(args.inX);
+        Target.Floaty inMantissa = t.new32(args.inMantissa);
         args.out = t.new32(
-            ldexp(inX.mid32(), args.inY),
-            ldexp(inX.min32(), args.inY),
-            ldexp(inX.max32(), args.inY));
+            ldexp(inMantissa.mid32(), args.inExponent),
+            ldexp(inMantissa.min32(), args.inExponent),
+            ldexp(inMantissa.max32(), args.inExponent));
     }
 
     static public void computeLength(TestLength.ArgumentsFloatFloat args, Target t) {
@@ -1357,15 +1357,15 @@ public class CoreMathVerifier {
          * It should set the sign to -1 but sets it to 1.
          */
         if (!expectedOut.couldBe(args.out) ||
-            (args.outY != result.gammaSign && !isNegativeZero)) {
+            (args.outSign != result.gammaSign && !isNegativeZero)) {
             StringBuilder message = new StringBuilder();
             message.append(String.format("Input in %14.8g {%8x}:\n", args.inX, Float.floatToRawIntBits(args.inX)));
             message.append("Expected out: ");
             message.append(expectedOut.toString());
             message.append("\n");
             message.append(String.format("Actual   out: %14.8g {%8x}", args.out, Float.floatToRawIntBits(args.out)));
-            message.append(String.format("Expected outY: %d\n", result.gammaSign));
-            message.append(String.format("Actual   outY: %d\n", args.outY));
+            message.append(String.format("Expected outSign: %d\n", result.gammaSign));
+            message.append(String.format("Actual   outSign: %d\n", args.outSign));
             return message.toString();
         }
 
@@ -1386,7 +1386,7 @@ public class CoreMathVerifier {
 
     static public void computeLog1p(TestLog1p.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(2, 16, false);
-        args.out = log1p(args.in, t);
+        args.out = log1p(args.inV, t);
     }
 
     static public void computeLog2(TestLog2.ArgumentsFloatFloat args, Target t) {
@@ -1582,7 +1582,7 @@ public class CoreMathVerifier {
 
     static public void computeNativeCospi(TestNativeCospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
-        args.out = cospi(args.in, t);
+        args.out = cospi(args.inX, t);
     }
 
     static public void computeNativeDistance(TestNativeDistance.ArgumentsFloatFloatFloat args, Target t) {
@@ -1732,7 +1732,7 @@ public class CoreMathVerifier {
 
     static public void computeNativeSinpi(TestNativeSinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
-        args.out = sinpi(args.in, t);
+        args.out = sinpi(args.inX, t);
     }
 
     static public void computeNativeSqrt(TestNativeSqrt.ArgumentsFloatFloat args, Target t) {
@@ -1752,7 +1752,7 @@ public class CoreMathVerifier {
 
     static public void computeNativeTanpi(TestNativeTanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
-        args.out = tanpi(args.in, t);
+        args.out = tanpi(args.inX, t);
     }
 
     static public void computeNextafter(TestNextafter.ArgumentsFloatFloatFloat args, Target t) {
@@ -1893,7 +1893,7 @@ public class CoreMathVerifier {
 
     static public void computeSinpi(TestSinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
-        args.out = sinpi(args.in, t);
+        args.out = sinpi(args.inX, t);
     }
 
     static public void computeSqrt(TestSqrt.ArgumentsFloatFloat args, Target t) {
@@ -1908,7 +1908,7 @@ public class CoreMathVerifier {
 
     static public void computeTan(TestTan.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
-        args.out = tan(args.in, t);
+        args.out = tan(args.inX, t);
     }
 
     static public void computeTanh(TestTanh.ArgumentsFloatFloat args, Target t) {
@@ -1918,7 +1918,7 @@ public class CoreMathVerifier {
 
     static public void computeTanpi(TestTanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
-        args.out = tanpi(args.in, t);
+        args.out = tanpi(args.inX, t);
     }
 
     static public void computeTgamma(TestTgamma.ArgumentsFloatFloat args, Target t) {

@@ -35,38 +35,38 @@ public class TestAbs extends RSBaseCompute {
     }
 
     public class ArgumentsCharUchar {
-        public byte inValue;
+        public byte inN;
         public byte out;
     }
 
     private void checkAbsCharUchar() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x4c0d03eb0d0c5a91l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x79257810f7393e9el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
-            script.forEach_testAbsCharUchar(inValue, out);
-            verifyResultsAbsCharUchar(inValue, out, false);
+            script.forEach_testAbsCharUchar(inN, out);
+            verifyResultsAbsCharUchar(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsCharUchar: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsCharUchar(inValue, out);
-            verifyResultsAbsCharUchar(inValue, out, true);
+            scriptRelaxed.forEach_testAbsCharUchar(inN, out);
+            verifyResultsAbsCharUchar(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsCharUchar: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsCharUchar(Allocation inValue, Allocation out, boolean relaxed) {
-        byte[] arrayInValue = new byte[INPUTSIZE * 1];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsCharUchar(Allocation inN, Allocation out, boolean relaxed) {
+        byte[] arrayInN = new byte[INPUTSIZE * 1];
+        inN.copyTo(arrayInN);
         byte[] arrayOut = new byte[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
-                args.inValue = arrayInValue[i];
+                args.inN = arrayInN[i];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -76,8 +76,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -96,33 +96,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsChar2Uchar2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x901d551e7f67bb87l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xff611dd40e5e4074l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            script.forEach_testAbsChar2Uchar2(inValue, out);
-            verifyResultsAbsChar2Uchar2(inValue, out, false);
+            script.forEach_testAbsChar2Uchar2(inN, out);
+            verifyResultsAbsChar2Uchar2(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar2Uchar2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsChar2Uchar2(inValue, out);
-            verifyResultsAbsChar2Uchar2(inValue, out, true);
+            scriptRelaxed.forEach_testAbsChar2Uchar2(inN, out);
+            verifyResultsAbsChar2Uchar2(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar2Uchar2: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsChar2Uchar2(Allocation inValue, Allocation out, boolean relaxed) {
-        byte[] arrayInValue = new byte[INPUTSIZE * 2];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsChar2Uchar2(Allocation inN, Allocation out, boolean relaxed) {
+        byte[] arrayInN = new byte[INPUTSIZE * 2];
+        inN.copyTo(arrayInN);
         byte[] arrayOut = new byte[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
-                args.inValue = arrayInValue[i * 2 + j];
+                args.inN = arrayInN[i * 2 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -132,8 +132,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -152,33 +152,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsChar3Uchar3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xb5d1caa5c8a5e105l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xff62e6ef04796152l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            script.forEach_testAbsChar3Uchar3(inValue, out);
-            verifyResultsAbsChar3Uchar3(inValue, out, false);
+            script.forEach_testAbsChar3Uchar3(inN, out);
+            verifyResultsAbsChar3Uchar3(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar3Uchar3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsChar3Uchar3(inValue, out);
-            verifyResultsAbsChar3Uchar3(inValue, out, true);
+            scriptRelaxed.forEach_testAbsChar3Uchar3(inN, out);
+            verifyResultsAbsChar3Uchar3(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar3Uchar3: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsChar3Uchar3(Allocation inValue, Allocation out, boolean relaxed) {
-        byte[] arrayInValue = new byte[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsChar3Uchar3(Allocation inN, Allocation out, boolean relaxed) {
+        byte[] arrayInN = new byte[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -188,8 +188,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -208,33 +208,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsChar4Uchar4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xdb86402d11e40683l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xff64b009fa948230l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            script.forEach_testAbsChar4Uchar4(inValue, out);
-            verifyResultsAbsChar4Uchar4(inValue, out, false);
+            script.forEach_testAbsChar4Uchar4(inN, out);
+            verifyResultsAbsChar4Uchar4(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar4Uchar4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsChar4Uchar4(inValue, out);
-            verifyResultsAbsChar4Uchar4(inValue, out, true);
+            scriptRelaxed.forEach_testAbsChar4Uchar4(inN, out);
+            verifyResultsAbsChar4Uchar4(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar4Uchar4: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsChar4Uchar4(Allocation inValue, Allocation out, boolean relaxed) {
-        byte[] arrayInValue = new byte[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsChar4Uchar4(Allocation inN, Allocation out, boolean relaxed) {
+        byte[] arrayInN = new byte[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsCharUchar args = new ArgumentsCharUchar();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -244,8 +244,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -264,38 +264,38 @@ public class TestAbs extends RSBaseCompute {
     }
 
     public class ArgumentsShortUshort {
-        public short inValue;
+        public short inN;
         public short out;
     }
 
     private void checkAbsShortUshort() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xaead1a96b6ea02a7l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xfab837da0648194l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
-            script.forEach_testAbsShortUshort(inValue, out);
-            verifyResultsAbsShortUshort(inValue, out, false);
+            script.forEach_testAbsShortUshort(inN, out);
+            verifyResultsAbsShortUshort(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShortUshort: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsShortUshort(inValue, out);
-            verifyResultsAbsShortUshort(inValue, out, true);
+            scriptRelaxed.forEach_testAbsShortUshort(inN, out);
+            verifyResultsAbsShortUshort(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShortUshort: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsShortUshort(Allocation inValue, Allocation out, boolean relaxed) {
-        short[] arrayInValue = new short[INPUTSIZE * 1];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsShortUshort(Allocation inN, Allocation out, boolean relaxed) {
+        short[] arrayInN = new short[INPUTSIZE * 1];
+        inN.copyTo(arrayInN);
         short[] arrayOut = new short[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
-                args.inValue = arrayInValue[i];
+                args.inN = arrayInN[i];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -305,8 +305,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -325,33 +325,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsShort2Ushort2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x41a1894ff6b0da9l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x231450e16856b936l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            script.forEach_testAbsShort2Ushort2(inValue, out);
-            verifyResultsAbsShort2Ushort2(inValue, out, false);
+            script.forEach_testAbsShort2Ushort2(inN, out);
+            verifyResultsAbsShort2Ushort2(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort2Ushort2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsShort2Ushort2(inValue, out);
-            verifyResultsAbsShort2Ushort2(inValue, out, true);
+            scriptRelaxed.forEach_testAbsShort2Ushort2(inN, out);
+            verifyResultsAbsShort2Ushort2(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort2Ushort2: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsShort2Ushort2(Allocation inValue, Allocation out, boolean relaxed) {
-        short[] arrayInValue = new short[INPUTSIZE * 2];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsShort2Ushort2(Allocation inN, Allocation out, boolean relaxed) {
+        short[] arrayInN = new short[INPUTSIZE * 2];
+        inN.copyTo(arrayInN);
         short[] arrayOut = new short[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
-                args.inValue = arrayInValue[i * 2 + j];
+                args.inN = arrayInN[i * 2 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -361,8 +361,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -381,33 +381,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsShort3Ushort3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x5969cbec377ba515l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x23611868beb24a62l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            script.forEach_testAbsShort3Ushort3(inValue, out);
-            verifyResultsAbsShort3Ushort3(inValue, out, false);
+            script.forEach_testAbsShort3Ushort3(inN, out);
+            verifyResultsAbsShort3Ushort3(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort3Ushort3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsShort3Ushort3(inValue, out);
-            verifyResultsAbsShort3Ushort3(inValue, out, true);
+            scriptRelaxed.forEach_testAbsShort3Ushort3(inN, out);
+            verifyResultsAbsShort3Ushort3(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort3Ushort3: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsShort3Ushort3(Allocation inValue, Allocation out, boolean relaxed) {
-        short[] arrayInValue = new short[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsShort3Ushort3(Allocation inN, Allocation out, boolean relaxed) {
+        short[] arrayInN = new short[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         short[] arrayOut = new short[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -417,8 +417,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -437,33 +437,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsShort4Ushort4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xaeb97f436f8c3c81l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x23addff0150ddb8el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            script.forEach_testAbsShort4Ushort4(inValue, out);
-            verifyResultsAbsShort4Ushort4(inValue, out, false);
+            script.forEach_testAbsShort4Ushort4(inN, out);
+            verifyResultsAbsShort4Ushort4(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort4Ushort4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsShort4Ushort4(inValue, out);
-            verifyResultsAbsShort4Ushort4(inValue, out, true);
+            scriptRelaxed.forEach_testAbsShort4Ushort4(inN, out);
+            verifyResultsAbsShort4Ushort4(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort4Ushort4: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsShort4Ushort4(Allocation inValue, Allocation out, boolean relaxed) {
-        short[] arrayInValue = new short[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsShort4Ushort4(Allocation inN, Allocation out, boolean relaxed) {
+        short[] arrayInN = new short[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         short[] arrayOut = new short[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsShortUshort args = new ArgumentsShortUshort();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -473,8 +473,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -493,38 +493,38 @@ public class TestAbs extends RSBaseCompute {
     }
 
     public class ArgumentsIntUint {
-        public int inValue;
+        public int inN;
         public int out;
     }
 
     private void checkAbsIntUint() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xcda40fd4fa1abbd1l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6adb1880ac5b83del, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            script.forEach_testAbsIntUint(inValue, out);
-            verifyResultsAbsIntUint(inValue, out, false);
+            script.forEach_testAbsIntUint(inN, out);
+            verifyResultsAbsIntUint(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsIntUint: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsIntUint(inValue, out);
-            verifyResultsAbsIntUint(inValue, out, true);
+            scriptRelaxed.forEach_testAbsIntUint(inN, out);
+            verifyResultsAbsIntUint(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsIntUint: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsIntUint(Allocation inValue, Allocation out, boolean relaxed) {
-        int[] arrayInValue = new int[INPUTSIZE * 1];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsIntUint(Allocation inN, Allocation out, boolean relaxed) {
+        int[] arrayInN = new int[INPUTSIZE * 1];
+        inN.copyTo(arrayInN);
         int[] arrayOut = new int[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsIntUint args = new ArgumentsIntUint();
-                args.inValue = arrayInValue[i];
+                args.inN = arrayInN[i];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -534,8 +534,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -554,33 +554,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsInt2Uint2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x71326739aabbb4a5l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xc8728053938616f2l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            script.forEach_testAbsInt2Uint2(inValue, out);
-            verifyResultsAbsInt2Uint2(inValue, out, false);
+            script.forEach_testAbsInt2Uint2(inN, out);
+            verifyResultsAbsInt2Uint2(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt2Uint2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsInt2Uint2(inValue, out);
-            verifyResultsAbsInt2Uint2(inValue, out, true);
+            scriptRelaxed.forEach_testAbsInt2Uint2(inN, out);
+            verifyResultsAbsInt2Uint2(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt2Uint2: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsInt2Uint2(Allocation inValue, Allocation out, boolean relaxed) {
-        int[] arrayInValue = new int[INPUTSIZE * 2];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsInt2Uint2(Allocation inN, Allocation out, boolean relaxed) {
+        int[] arrayInN = new int[INPUTSIZE * 2];
+        inN.copyTo(arrayInN);
         int[] arrayOut = new int[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsIntUint args = new ArgumentsIntUint();
-                args.inValue = arrayInValue[i * 2 + j];
+                args.inN = arrayInN[i * 2 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -590,8 +590,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -610,33 +610,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsInt3Uint3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x9bbf87f7a6fae959l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xc8728af4f28ddbe6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            script.forEach_testAbsInt3Uint3(inValue, out);
-            verifyResultsAbsInt3Uint3(inValue, out, false);
+            script.forEach_testAbsInt3Uint3(inN, out);
+            verifyResultsAbsInt3Uint3(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt3Uint3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsInt3Uint3(inValue, out);
-            verifyResultsAbsInt3Uint3(inValue, out, true);
+            scriptRelaxed.forEach_testAbsInt3Uint3(inN, out);
+            verifyResultsAbsInt3Uint3(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt3Uint3: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsInt3Uint3(Allocation inValue, Allocation out, boolean relaxed) {
-        int[] arrayInValue = new int[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsInt3Uint3(Allocation inN, Allocation out, boolean relaxed) {
+        int[] arrayInN = new int[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         int[] arrayOut = new int[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsIntUint args = new ArgumentsIntUint();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -646,8 +646,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
@@ -666,33 +666,33 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsInt4Uint4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xc64ca8b5a33a1e0dl, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xc87295965195a0dal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
-            script.forEach_testAbsInt4Uint4(inValue, out);
-            verifyResultsAbsInt4Uint4(inValue, out, false);
+            script.forEach_testAbsInt4Uint4(inN, out);
+            verifyResultsAbsInt4Uint4(inN, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt4Uint4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testAbsInt4Uint4(inValue, out);
-            verifyResultsAbsInt4Uint4(inValue, out, true);
+            scriptRelaxed.forEach_testAbsInt4Uint4(inN, out);
+            verifyResultsAbsInt4Uint4(inN, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt4Uint4: " + e.toString());
         }
     }
 
-    private void verifyResultsAbsInt4Uint4(Allocation inValue, Allocation out, boolean relaxed) {
-        int[] arrayInValue = new int[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsAbsInt4Uint4(Allocation inN, Allocation out, boolean relaxed) {
+        int[] arrayInN = new int[INPUTSIZE * 4];
+        inN.copyTo(arrayInN);
         int[] arrayOut = new int[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsIntUint args = new ArgumentsIntUint();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inN = arrayInN[i * 4 + j];
                 // Figure out what the outputs should have been.
                 CoreMathVerifier.computeAbs(args);
                 // Validate the outputs.
@@ -702,8 +702,8 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    message.append("Input inN: ");
+                    message.append(String.format("%d", args.inN));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(String.format("0x%x", args.out));
