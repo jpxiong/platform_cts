@@ -29,12 +29,15 @@ import android.test.AndroidTestCase;
 public class AlarmManagerTest extends AndroidTestCase {
     public static final String MOCKACTION = "android.app.AlarmManagerTest.TEST_ALARMRECEIVER";
     public static final String MOCKACTION2 = "android.app.AlarmManagerTest.TEST_ALARMRECEIVER2";
+    private static final String DUMMYACTION = "android.app.AlarmManagerTest.DUMMY";
 
     private AlarmManager mAm;
     private Intent mIntent;
     private PendingIntent mSender;
     private Intent mIntent2;
     private PendingIntent mSender2;
+    private Intent mDummyIntent;
+    private PendingIntent mDummySender;
 
     /*
      *  The default snooze delay: 5 seconds
@@ -55,10 +58,21 @@ public class AlarmManagerTest extends AndroidTestCase {
     // Constants used for validating exact vs inexact alarm batching immunity.  We run a few
     // trials of an exact alarm that is placed within an inexact alarm's window of opportunity,
     // and mandate that the average observed delivery skew between the two be statistically
-    // significant -- i.e. that the two alarms are not being coalesced.
+    // significant -- i.e. that the two alarms are not being coalesced.  We also place an
+    // additional exact alarm only a short time after the inexact alarm's nominal trigger time.
+    // If exact alarms are allowed to batch with inexact ones this will tend to have no effect,
+    // but in the correct behavior -- inexact alarms not permitted to batch with exact ones --
+    // this additional exact alarm will have the effect of guaranteeing that the inexact alarm
+    // must fire no later than it -- i.e. a considerable time before the significant, later
+    // exact alarm.
+    //
+    // The test essentially amounts to requiring that the inexact MOCKACTION alarm and
+    // the much later exact MOCKACTION2 alarm fire far apart, always.
     private static final long TEST_WINDOW_LENGTH = 5 * 1000L;
     private static final long TEST_EXACT_OFFSET = TEST_WINDOW_LENGTH * 9 / 10;
+    private static final long TEST_DUMMY_OFFSET = TEST_WINDOW_LENGTH / 10;
     private static final long TEST_ALARM_FUTURITY = 6 * 1000L;
+    private static final long REQUIRED_DELTA = (TEST_EXACT_OFFSET - TEST_DUMMY_OFFSET)/2;
     private static final long NUM_TRIALS = 4;
 
     // Delta between the center of the window and the exact alarm's trigger time.  We expect
@@ -82,6 +96,10 @@ public class AlarmManagerTest extends AndroidTestCase {
                 .addFlags(Intent.FLAG_RECEIVER_FOREGROUND | Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         mSender2 = PendingIntent.getBroadcast(mContext, 0, mIntent2, 0);
         mMockAlarmReceiver2 = new MockAlarmReceiver(mIntent2.getAction());
+
+        mDummyIntent = new Intent(DUMMYACTION)
+                .addFlags(Intent.FLAG_RECEIVER_FOREGROUND | Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+        mDummySender = PendingIntent.getBroadcast(mContext, 0, mDummyIntent, 0);
 
         IntentFilter filter = new IntentFilter(mIntent.getAction());
         mContext.registerReceiver(mMockAlarmReceiver, filter);
@@ -170,16 +188,17 @@ public class AlarmManagerTest extends AndroidTestCase {
     }
 
     public void testExactAlarmBatching() throws Exception {
-        long deltaSum = 0;
         for (int i = 0; i < NUM_TRIALS; i++) {
             final long now = System.currentTimeMillis();
             final long windowStart = now + TEST_ALARM_FUTURITY;
             final long exactStart = windowStart + TEST_EXACT_OFFSET;
+            final long dummyStart = windowStart + TEST_DUMMY_OFFSET;
 
             mMockAlarmReceiver.setAlarmedFalse();
             mMockAlarmReceiver2.setAlarmedFalse();
             mAm.setWindow(AlarmManager.RTC_WAKEUP, windowStart, TEST_WINDOW_LENGTH, mSender);
             mAm.setExact(AlarmManager.RTC_WAKEUP, exactStart, mSender2);
+            mAm.setExact(AlarmManager.RTC_WAKEUP, dummyStart, mDummySender);
 
             // Wait until a half-second beyond its target window, just to provide a
             // little safety slop.
@@ -200,15 +219,13 @@ public class AlarmManagerTest extends AndroidTestCase {
                 }
             }.run();
 
-            final long delta = Math.abs(mMockAlarmReceiver2.rtcTime - mMockAlarmReceiver.rtcTime);
-            deltaSum += delta;
+            // Success when we observe that the exact and windowed alarm are not being often
+            // delivered close together -- that is, when we can be confident that they are not
+            // being coalesced.
+            final long delta = mMockAlarmReceiver2.rtcTime - mMockAlarmReceiver.rtcTime;
+            assertTrue("Exact alarms appear to be coalescing with inexact alarms",
+                    delta >= REQUIRED_DELTA);
         }
-
-        // Success when we observe that the exact and windowed alarm are not being often
-        // delivered close together -- that is, when we can be confident that they are not
-        // being coalesced.
-        assertTrue("Exact alarms appear to be coalescing with inexact alarms",
-                deltaSum > NUM_TRIALS * AVERAGE_WINDOWED_TO_EXACT_SKEW / 2);
     }
 
     public void testSetRepeating() throws Exception {
