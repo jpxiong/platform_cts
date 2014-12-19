@@ -35,32 +35,32 @@ float3 __attribute__((kernel)) testLgammaFloat3Float3(float3 in) {
 float4 __attribute__((kernel)) testLgammaFloat4Float4(float4 in) {
     return lgamma(in);
 }
-rs_allocation gAllocOutY;
+rs_allocation gAllocOutSign;
 
 float __attribute__((kernel)) testLgammaFloatIntFloat(float inX, unsigned int x) {
-    int outY = 0;
-    float out = lgamma(inX, &outY);
-    rsSetElementAt_int(gAllocOutY, outY, x);
+    int outSign = 0;
+    float out = lgamma(inX, &outSign);
+    rsSetElementAt_int(gAllocOutSign, outSign, x);
     return out;
 }
 
 float2 __attribute__((kernel)) testLgammaFloat2Int2Float2(float2 inX, unsigned int x) {
-    int2 outY = 0;
-    float2 out = lgamma(inX, &outY);
-    rsSetElementAt_int2(gAllocOutY, outY, x);
+    int2 outSign = 0;
+    float2 out = lgamma(inX, &outSign);
+    rsSetElementAt_int2(gAllocOutSign, outSign, x);
     return out;
 }
 
 float3 __attribute__((kernel)) testLgammaFloat3Int3Float3(float3 inX, unsigned int x) {
-    int3 outY = 0;
-    float3 out = lgamma(inX, &outY);
-    rsSetElementAt_int3(gAllocOutY, outY, x);
+    int3 outSign = 0;
+    float3 out = lgamma(inX, &outSign);
+    rsSetElementAt_int3(gAllocOutSign, outSign, x);
     return out;
 }
 
 float4 __attribute__((kernel)) testLgammaFloat4Int4Float4(float4 inX, unsigned int x) {
-    int4 outY = 0;
-    float4 out = lgamma(inX, &outY);
-    rsSetElementAt_int4(gAllocOutY, outY, x);
+    int4 outSign = 0;
+    float4 out = lgamma(inX, &outSign);
+    rsSetElementAt_int4(gAllocOutSign, outSign, x);
     return out;
 }
