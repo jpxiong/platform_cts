@@ -35,38 +35,38 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkCbrtFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4e2c540726cc677al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x21721d33845561d4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testCbrtFloatFloat(in, out);
-            verifyResultsCbrtFloatFloat(in, out, false);
+            script.forEach_testCbrtFloatFloat(inV, out);
+            verifyResultsCbrtFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testCbrtFloatFloat(in, out);
-            verifyResultsCbrtFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testCbrtFloatFloat(inV, out);
+            verifyResultsCbrtFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsCbrtFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsCbrtFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCbrt(args, target);
@@ -77,9 +77,9 @@ public class TestCbrt extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9e2a09a2eb8fdb46l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x910f9e5d9129d518l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testCbrtFloat2Float2(in, out);
-            verifyResultsCbrtFloat2Float2(in, out, false);
+            script.forEach_testCbrtFloat2Float2(inV, out);
+            verifyResultsCbrtFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testCbrtFloat2Float2(in, out);
-            verifyResultsCbrtFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testCbrtFloat2Float2(inV, out);
+            verifyResultsCbrtFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsCbrtFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsCbrtFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCbrt(args, target);
@@ -136,9 +136,9 @@ public class TestCbrt extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9e2a14444a9670e0l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x911167788744f5f6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testCbrtFloat3Float3(in, out);
-            verifyResultsCbrtFloat3Float3(in, out, false);
+            script.forEach_testCbrtFloat3Float3(inV, out);
+            verifyResultsCbrtFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testCbrtFloat3Float3(in, out);
-            verifyResultsCbrtFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testCbrtFloat3Float3(inV, out);
+            verifyResultsCbrtFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsCbrtFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsCbrtFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCbrt(args, target);
@@ -195,9 +195,9 @@ public class TestCbrt extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9e2a1ee5a99d067al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x911330937d6016d4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testCbrtFloat4Float4(in, out);
-            verifyResultsCbrtFloat4Float4(in, out, false);
+            script.forEach_testCbrtFloat4Float4(inV, out);
+            verifyResultsCbrtFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testCbrtFloat4Float4(in, out);
-            verifyResultsCbrtFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testCbrtFloat4Float4(inV, out);
+            verifyResultsCbrtFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCbrtFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsCbrtFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsCbrtFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCbrt(args, target);
@@ -254,9 +254,9 @@ public class TestCbrt extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

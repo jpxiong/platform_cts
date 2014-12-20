@@ -35,38 +35,38 @@ public class TestErfc extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkErfcFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb41907c64db86b2bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x40344e4f0dfa008fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testErfcFloatFloat(in, out);
-            verifyResultsErfcFloatFloat(in, out, false);
+            script.forEach_testErfcFloatFloat(inV, out);
+            verifyResultsErfcFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testErfcFloatFloat(in, out);
-            verifyResultsErfcFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testErfcFloatFloat(inV, out);
+            verifyResultsErfcFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsErfcFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsErfcFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeErfc(args, target);
@@ -77,9 +77,9 @@ public class TestErfc extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestErfc extends RSBaseCompute {
     }
 
     private void checkErfcFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc8c849430a3684afl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb9a44e42b72849bbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testErfcFloat2Float2(in, out);
-            verifyResultsErfcFloat2Float2(in, out, false);
+            script.forEach_testErfcFloat2Float2(inV, out);
+            verifyResultsErfcFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testErfcFloat2Float2(in, out);
-            verifyResultsErfcFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testErfcFloat2Float2(inV, out);
+            verifyResultsErfcFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsErfcFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsErfcFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeErfc(args, target);
@@ -136,9 +136,9 @@ public class TestErfc extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestErfc extends RSBaseCompute {
     }
 
     private void checkErfcFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc8c853e4693d1a49l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb9a6175dad436a99l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testErfcFloat3Float3(in, out);
-            verifyResultsErfcFloat3Float3(in, out, false);
+            script.forEach_testErfcFloat3Float3(inV, out);
+            verifyResultsErfcFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testErfcFloat3Float3(in, out);
-            verifyResultsErfcFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testErfcFloat3Float3(inV, out);
+            verifyResultsErfcFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsErfcFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsErfcFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeErfc(args, target);
@@ -195,9 +195,9 @@ public class TestErfc extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestErfc extends RSBaseCompute {
     }
 
     private void checkErfcFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc8c85e85c843afe3l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb9a7e078a35e8b77l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testErfcFloat4Float4(in, out);
-            verifyResultsErfcFloat4Float4(in, out, false);
+            script.forEach_testErfcFloat4Float4(inV, out);
+            verifyResultsErfcFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testErfcFloat4Float4(in, out);
-            verifyResultsErfcFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testErfcFloat4Float4(inV, out);
+            verifyResultsErfcFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testErfcFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsErfcFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsErfcFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeErfc(args, target);
@@ -254,9 +254,9 @@ public class TestErfc extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

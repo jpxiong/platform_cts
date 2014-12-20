@@ -35,45 +35,45 @@ public class TestCopysign extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inX;
-        public float inY;
+        public float inMagnitudeValue;
+        public float inSignValue;
         public Target.Floaty out;
     }
 
     private void checkCopysignFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeebba96e8c48145l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeebba96e8c48146l, false);
+        Allocation inMagnitudeValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4218ae4ccf086614l, false);
+        Allocation inSignValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd95dacad9d8d3ef5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testCopysignFloatFloatFloat(inX, out);
-            verifyResultsCopysignFloatFloatFloat(inX, inY, out, false);
+            script.set_gAllocInSignValue(inSignValue);
+            script.forEach_testCopysignFloatFloatFloat(inMagnitudeValue, out);
+            verifyResultsCopysignFloatFloatFloat(inMagnitudeValue, inSignValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testCopysignFloatFloatFloat(inX, out);
-            verifyResultsCopysignFloatFloatFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInSignValue(inSignValue);
+            scriptRelaxed.forEach_testCopysignFloatFloatFloat(inMagnitudeValue, out);
+            verifyResultsCopysignFloatFloatFloat(inMagnitudeValue, inSignValue, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsCopysignFloatFloatFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsCopysignFloatFloatFloat(Allocation inMagnitudeValue, Allocation inSignValue, Allocation out, boolean relaxed) {
+        float[] arrayInMagnitudeValue = new float[INPUTSIZE * 1];
+        inMagnitudeValue.copyTo(arrayInMagnitudeValue);
+        float[] arrayInSignValue = new float[INPUTSIZE * 1];
+        inSignValue.copyTo(arrayInSignValue);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inMagnitudeValue = arrayInMagnitudeValue[i];
+                args.inSignValue = arrayInSignValue[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCopysign(args, target);
@@ -84,13 +84,13 @@ public class TestCopysign extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMagnitudeValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMagnitudeValue, Float.floatToRawIntBits(args.inMagnitudeValue), args.inMagnitudeValue));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inSignValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inSignValue, Float.floatToRawIntBits(args.inSignValue), args.inSignValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestCopysign extends RSBaseCompute {
     }
 
     private void checkCopysignFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbeb0e1cc912e993bl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbeb0e1cc912e993cl, false);
+        Allocation inMagnitudeValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8efe093722e9f786l, false);
+        Allocation inSignValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb33b4a8420cec72bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testCopysignFloat2Float2Float2(inX, out);
-            verifyResultsCopysignFloat2Float2Float2(inX, inY, out, false);
+            script.set_gAllocInSignValue(inSignValue);
+            script.forEach_testCopysignFloat2Float2Float2(inMagnitudeValue, out);
+            verifyResultsCopysignFloat2Float2Float2(inMagnitudeValue, inSignValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testCopysignFloat2Float2Float2(inX, out);
-            verifyResultsCopysignFloat2Float2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInSignValue(inSignValue);
+            scriptRelaxed.forEach_testCopysignFloat2Float2Float2(inMagnitudeValue, out);
+            verifyResultsCopysignFloat2Float2Float2(inMagnitudeValue, inSignValue, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsCopysignFloat2Float2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsCopysignFloat2Float2Float2(Allocation inMagnitudeValue, Allocation inSignValue, Allocation out, boolean relaxed) {
+        float[] arrayInMagnitudeValue = new float[INPUTSIZE * 2];
+        inMagnitudeValue.copyTo(arrayInMagnitudeValue);
+        float[] arrayInSignValue = new float[INPUTSIZE * 2];
+        inSignValue.copyTo(arrayInSignValue);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inMagnitudeValue = arrayInMagnitudeValue[i * 2 + j];
+                args.inSignValue = arrayInSignValue[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCopysign(args, target);
@@ -153,13 +153,13 @@ public class TestCopysign extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMagnitudeValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMagnitudeValue, Float.floatToRawIntBits(args.inMagnitudeValue), args.inMagnitudeValue));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inSignValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inSignValue, Float.floatToRawIntBits(args.inSignValue), args.inSignValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestCopysign extends RSBaseCompute {
     }
 
     private void checkCopysignFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1315bfec930c9adcl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1315bfec930c9addl, false);
+        Allocation inMagnitudeValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9a9db55e1b468741l, false);
+        Allocation inSignValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8ec9f3bdc39ab32cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testCopysignFloat3Float3Float3(inX, out);
-            verifyResultsCopysignFloat3Float3Float3(inX, inY, out, false);
+            script.set_gAllocInSignValue(inSignValue);
+            script.forEach_testCopysignFloat3Float3Float3(inMagnitudeValue, out);
+            verifyResultsCopysignFloat3Float3Float3(inMagnitudeValue, inSignValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testCopysignFloat3Float3Float3(inX, out);
-            verifyResultsCopysignFloat3Float3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInSignValue(inSignValue);
+            scriptRelaxed.forEach_testCopysignFloat3Float3Float3(inMagnitudeValue, out);
+            verifyResultsCopysignFloat3Float3Float3(inMagnitudeValue, inSignValue, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsCopysignFloat3Float3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsCopysignFloat3Float3Float3(Allocation inMagnitudeValue, Allocation inSignValue, Allocation out, boolean relaxed) {
+        float[] arrayInMagnitudeValue = new float[INPUTSIZE * 4];
+        inMagnitudeValue.copyTo(arrayInMagnitudeValue);
+        float[] arrayInSignValue = new float[INPUTSIZE * 4];
+        inSignValue.copyTo(arrayInSignValue);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inMagnitudeValue = arrayInMagnitudeValue[i * 4 + j];
+                args.inSignValue = arrayInSignValue[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCopysign(args, target);
@@ -222,13 +222,13 @@ public class TestCopysign extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMagnitudeValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMagnitudeValue, Float.floatToRawIntBits(args.inMagnitudeValue), args.inMagnitudeValue));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inSignValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inSignValue, Float.floatToRawIntBits(args.inSignValue), args.inSignValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestCopysign extends RSBaseCompute {
     }
 
     private void checkCopysignFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x677a9e0c94ea9c7dl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x677a9e0c94ea9c7el, false);
+        Allocation inMagnitudeValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa63d618513a316fcl, false);
+        Allocation inSignValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6a589cf766669f2dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testCopysignFloat4Float4Float4(inX, out);
-            verifyResultsCopysignFloat4Float4Float4(inX, inY, out, false);
+            script.set_gAllocInSignValue(inSignValue);
+            script.forEach_testCopysignFloat4Float4Float4(inMagnitudeValue, out);
+            verifyResultsCopysignFloat4Float4Float4(inMagnitudeValue, inSignValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testCopysignFloat4Float4Float4(inX, out);
-            verifyResultsCopysignFloat4Float4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInSignValue(inSignValue);
+            scriptRelaxed.forEach_testCopysignFloat4Float4Float4(inMagnitudeValue, out);
+            verifyResultsCopysignFloat4Float4Float4(inMagnitudeValue, inSignValue, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCopysignFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsCopysignFloat4Float4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsCopysignFloat4Float4Float4(Allocation inMagnitudeValue, Allocation inSignValue, Allocation out, boolean relaxed) {
+        float[] arrayInMagnitudeValue = new float[INPUTSIZE * 4];
+        inMagnitudeValue.copyTo(arrayInMagnitudeValue);
+        float[] arrayInSignValue = new float[INPUTSIZE * 4];
+        inSignValue.copyTo(arrayInSignValue);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inMagnitudeValue = arrayInMagnitudeValue[i * 4 + j];
+                args.inSignValue = arrayInSignValue[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeCopysign(args, target);
@@ -291,13 +291,13 @@ public class TestCopysign extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inMagnitudeValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inMagnitudeValue, Float.floatToRawIntBits(args.inMagnitudeValue), args.inMagnitudeValue));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inSignValue: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inSignValue, Float.floatToRawIntBits(args.inSignValue), args.inSignValue));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

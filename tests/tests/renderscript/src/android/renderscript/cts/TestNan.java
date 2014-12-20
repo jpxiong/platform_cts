@@ -35,38 +35,38 @@ public class TestNan extends RSBaseCompute {
     }
 
     public class ArgumentsUintFloat {
-        public int in;
+        public int inV;
         public Target.Floaty out;
     }
 
     private void checkNanUintFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x757e939c0e627774l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xbc42cb366a8a10d2l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testNanUintFloat(in, out);
-            verifyResultsNanUintFloat(in, out, false);
+            script.forEach_testNanUintFloat(inV, out);
+            verifyResultsNanUintFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testNanUintFloat(in, out);
-            verifyResultsNanUintFloat(in, out, true);
+            scriptRelaxed.forEach_testNanUintFloat(inV, out);
+            verifyResultsNanUintFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNanUintFloat(Allocation in, Allocation out, boolean relaxed) {
-        int[] arrayIn = new int[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsNanUintFloat(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsUintFloat args = new ArgumentsUintFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNan(args, target);
@@ -77,8 +77,8 @@ public class TestNan extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
-                    message.append(String.format("0x%x", args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

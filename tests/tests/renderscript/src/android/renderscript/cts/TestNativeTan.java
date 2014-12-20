@@ -35,38 +35,38 @@ public class TestNativeTan extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkNativeTanFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5b9a224e25042b47l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x62e3c32037b34543l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testNativeTanFloatFloat(in, out);
-            verifyResultsNativeTanFloatFloat(in, out, false);
+            script.forEach_testNativeTanFloatFloat(inV, out);
+            verifyResultsNativeTanFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeTanFloatFloat(in, out);
-            verifyResultsNativeTanFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testNativeTanFloatFloat(inV, out);
+            verifyResultsNativeTanFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeTanFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeTanFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeTan(args, target);
@@ -77,9 +77,9 @@ public class TestNativeTan extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestNativeTan extends RSBaseCompute {
     }
 
     private void checkNativeTanFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9c40e8650c550eebl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3ee708f9124981cfl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testNativeTanFloat2Float2(in, out);
-            verifyResultsNativeTanFloat2Float2(in, out, false);
+            script.forEach_testNativeTanFloat2Float2(inV, out);
+            verifyResultsNativeTanFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeTanFloat2Float2(in, out);
-            verifyResultsNativeTanFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testNativeTanFloat2Float2(inV, out);
+            verifyResultsNativeTanFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeTanFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeTanFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeTan(args, target);
@@ -136,9 +136,9 @@ public class TestNativeTan extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestNativeTan extends RSBaseCompute {
     }
 
     private void checkNativeTanFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9c40f3066b5ba485l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3ee8d2140864a2adl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testNativeTanFloat3Float3(in, out);
-            verifyResultsNativeTanFloat3Float3(in, out, false);
+            script.forEach_testNativeTanFloat3Float3(inV, out);
+            verifyResultsNativeTanFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeTanFloat3Float3(in, out);
-            verifyResultsNativeTanFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testNativeTanFloat3Float3(inV, out);
+            verifyResultsNativeTanFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeTanFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeTanFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeTan(args, target);
@@ -195,9 +195,9 @@ public class TestNativeTan extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestNativeTan extends RSBaseCompute {
     }
 
     private void checkNativeTanFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9c40fda7ca623a1fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3eea9b2efe7fc38bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testNativeTanFloat4Float4(in, out);
-            verifyResultsNativeTanFloat4Float4(in, out, false);
+            script.forEach_testNativeTanFloat4Float4(inV, out);
+            verifyResultsNativeTanFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeTanFloat4Float4(in, out);
-            verifyResultsNativeTanFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testNativeTanFloat4Float4(inV, out);
+            verifyResultsNativeTanFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeTanFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeTanFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeTanFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeTan(args, target);
@@ -254,9 +254,9 @@ public class TestNativeTan extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

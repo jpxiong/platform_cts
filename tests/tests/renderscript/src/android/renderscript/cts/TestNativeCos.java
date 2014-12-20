@@ -35,38 +35,38 @@ public class TestNativeCos extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkNativeCosFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x95ef4a20c73e7e3dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2f317381777f3495l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testNativeCosFloatFloat(in, out);
-            verifyResultsNativeCosFloatFloat(in, out, false);
+            script.forEach_testNativeCosFloatFloat(inV, out);
+            verifyResultsNativeCosFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeCosFloatFloat(in, out);
-            verifyResultsNativeCosFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testNativeCosFloatFloat(inV, out);
+            verifyResultsNativeCosFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeCosFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeCosFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeCos(args, target);
@@ -77,9 +77,9 @@ public class TestNativeCos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestNativeCos extends RSBaseCompute {
     }
 
     private void checkNativeCosFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xed4d88bac39641b1l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdc05f75eda3d0911l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testNativeCosFloat2Float2(in, out);
-            verifyResultsNativeCosFloat2Float2(in, out, false);
+            script.forEach_testNativeCosFloat2Float2(inV, out);
+            verifyResultsNativeCosFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeCosFloat2Float2(in, out);
-            verifyResultsNativeCosFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testNativeCosFloat2Float2(inV, out);
+            verifyResultsNativeCosFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeCosFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeCosFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeCos(args, target);
@@ -136,9 +136,9 @@ public class TestNativeCos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestNativeCos extends RSBaseCompute {
     }
 
     private void checkNativeCosFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xed4d935c229cd74bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdc07c079d05829efl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testNativeCosFloat3Float3(in, out);
-            verifyResultsNativeCosFloat3Float3(in, out, false);
+            script.forEach_testNativeCosFloat3Float3(inV, out);
+            verifyResultsNativeCosFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeCosFloat3Float3(in, out);
-            verifyResultsNativeCosFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testNativeCosFloat3Float3(inV, out);
+            verifyResultsNativeCosFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeCosFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeCosFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeCos(args, target);
@@ -195,9 +195,9 @@ public class TestNativeCos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestNativeCos extends RSBaseCompute {
     }
 
     private void checkNativeCosFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xed4d9dfd81a36ce5l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdc098994c6734acdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testNativeCosFloat4Float4(in, out);
-            verifyResultsNativeCosFloat4Float4(in, out, false);
+            script.forEach_testNativeCosFloat4Float4(inV, out);
+            verifyResultsNativeCosFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeCosFloat4Float4(in, out);
-            verifyResultsNativeCosFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testNativeCosFloat4Float4(inV, out);
+            verifyResultsNativeCosFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeCosFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeCosFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsNativeCosFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeCos(args, target);
@@ -254,9 +254,9 @@ public class TestNativeCos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

@@ -35,45 +35,45 @@ public class TestPown extends RSBaseCompute {
     }
 
     public class ArgumentsFloatIntFloat {
-        public float inX;
-        public int inY;
+        public float inBase;
+        public int inExponent;
         public Target.Floaty out;
     }
 
     private void checkPownFloatIntFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xde633e0d2c462948l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xde633e0d2c462949l, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe020952d622f0405l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x9c3888e9096b9f1bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testPownFloatIntFloat(inX, out);
-            verifyResultsPownFloatIntFloat(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testPownFloatIntFloat(inBase, out);
+            verifyResultsPownFloatIntFloat(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloatIntFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testPownFloatIntFloat(inX, out);
-            verifyResultsPownFloatIntFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testPownFloatIntFloat(inBase, out);
+            verifyResultsPownFloatIntFloat(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloatIntFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsPownFloatIntFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsPownFloatIntFloat(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 1];
+        inBase.copyTo(arrayInBase);
+        int[] arrayInExponent = new int[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inBase = arrayInBase[i];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computePown(args, target);
@@ -84,12 +84,12 @@ public class TestPown extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -109,39 +109,39 @@ public class TestPown extends RSBaseCompute {
     }
 
     private void checkPownFloat2Int2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1685dc0ea821329el, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x1685dc0ea821329fl, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7571c02be438467l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xe6177b3249076ddl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testPownFloat2Int2Float2(inX, out);
-            verifyResultsPownFloat2Int2Float2(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testPownFloat2Int2Float2(inBase, out);
+            verifyResultsPownFloat2Int2Float2(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat2Int2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testPownFloat2Int2Float2(inX, out);
-            verifyResultsPownFloat2Int2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testPownFloat2Int2Float2(inBase, out);
+            verifyResultsPownFloat2Int2Float2(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat2Int2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsPownFloat2Int2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsPownFloat2Int2Float2(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 2];
+        inBase.copyTo(arrayInBase);
+        int[] arrayInExponent = new int[INPUTSIZE * 2];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inBase = arrayInBase[i * 2 + j];
+                args.inExponent = arrayInExponent[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computePown(args, target);
@@ -152,12 +152,12 @@ public class TestPown extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -177,39 +177,39 @@ public class TestPown extends RSBaseCompute {
     }
 
     private void checkPownFloat3Int3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3c3c1a719dd39f57l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x3c3c1a719dd39f58l, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5e88c45be35ff8a2l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xaf710734144a81a8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testPownFloat3Int3Float3(inX, out);
-            verifyResultsPownFloat3Int3Float3(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testPownFloat3Int3Float3(inBase, out);
+            verifyResultsPownFloat3Int3Float3(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat3Int3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testPownFloat3Int3Float3(inX, out);
-            verifyResultsPownFloat3Int3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testPownFloat3Int3Float3(inBase, out);
+            verifyResultsPownFloat3Int3Float3(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat3Int3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsPownFloat3Int3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsPownFloat3Int3Float3(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 4];
+        inBase.copyTo(arrayInBase);
+        int[] arrayInExponent = new int[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inBase = arrayInBase[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computePown(args, target);
@@ -220,12 +220,12 @@ public class TestPown extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -245,39 +245,39 @@ public class TestPown extends RSBaseCompute {
     }
 
     private void checkPownFloat4Int4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x61f258d493860c10l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x61f258d493860c11l, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb5ba6cb5087c6cddl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x508096b504048c73l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testPownFloat4Int4Float4(inX, out);
-            verifyResultsPownFloat4Int4Float4(inX, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testPownFloat4Int4Float4(inBase, out);
+            verifyResultsPownFloat4Int4Float4(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat4Int4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testPownFloat4Int4Float4(inX, out);
-            verifyResultsPownFloat4Int4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testPownFloat4Int4Float4(inBase, out);
+            verifyResultsPownFloat4Int4Float4(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat4Int4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsPownFloat4Int4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayInY = new int[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsPownFloat4Int4Float4(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 4];
+        inBase.copyTo(arrayInBase);
+        int[] arrayInExponent = new int[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inBase = arrayInBase[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computePown(args, target);
@@ -288,12 +288,12 @@ public class TestPown extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
-                    message.append(String.format("%d", args.inY));
+                    message.append("Input inExponent: ");
+                    message.append(String.format("%d", args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

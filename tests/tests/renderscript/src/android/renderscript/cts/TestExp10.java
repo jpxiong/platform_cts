@@ -35,38 +35,38 @@ public class TestExp10 extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float inX;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkExp10FloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc5df97aec123e2efl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc5df97aec123e2edl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testExp10FloatFloat(inX, out);
-            verifyResultsExp10FloatFloat(inX, out, false);
+            script.forEach_testExp10FloatFloat(inV, out);
+            verifyResultsExp10FloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10FloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testExp10FloatFloat(inX, out);
-            verifyResultsExp10FloatFloat(inX, out, true);
+            scriptRelaxed.forEach_testExp10FloatFloat(inV, out);
+            verifyResultsExp10FloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10FloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsExp10FloatFloat(Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
+    private void verifyResultsExp10FloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inX = arrayInX[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp10(args, target);
@@ -77,9 +77,9 @@ public class TestExp10 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestExp10 extends RSBaseCompute {
     }
 
     private void checkExp10Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2bc94277c0ac42abl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2bc94277c0ac42a9l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testExp10Float2Float2(inX, out);
-            verifyResultsExp10Float2Float2(inX, out, false);
+            script.forEach_testExp10Float2Float2(inV, out);
+            verifyResultsExp10Float2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testExp10Float2Float2(inX, out);
-            verifyResultsExp10Float2Float2(inX, out, true);
+            scriptRelaxed.forEach_testExp10Float2Float2(inV, out);
+            verifyResultsExp10Float2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsExp10Float2Float2(Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
+    private void verifyResultsExp10Float2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp10(args, target);
@@ -136,9 +136,9 @@ public class TestExp10 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestExp10 extends RSBaseCompute {
     }
 
     private void checkExp10Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2bcb0b92b6c76389l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2bcb0b92b6c76387l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testExp10Float3Float3(inX, out);
-            verifyResultsExp10Float3Float3(inX, out, false);
+            script.forEach_testExp10Float3Float3(inV, out);
+            verifyResultsExp10Float3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testExp10Float3Float3(inX, out);
-            verifyResultsExp10Float3Float3(inX, out, true);
+            scriptRelaxed.forEach_testExp10Float3Float3(inV, out);
+            verifyResultsExp10Float3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsExp10Float3Float3(Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
+    private void verifyResultsExp10Float3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp10(args, target);
@@ -195,9 +195,9 @@ public class TestExp10 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestExp10 extends RSBaseCompute {
     }
 
     private void checkExp10Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2bccd4adace28467l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2bccd4adace28465l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testExp10Float4Float4(inX, out);
-            verifyResultsExp10Float4Float4(inX, out, false);
+            script.forEach_testExp10Float4Float4(inV, out);
+            verifyResultsExp10Float4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testExp10Float4Float4(inX, out);
-            verifyResultsExp10Float4Float4(inX, out, true);
+            scriptRelaxed.forEach_testExp10Float4Float4(inV, out);
+            verifyResultsExp10Float4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsExp10Float4Float4(Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
+    private void verifyResultsExp10Float4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeExp10(args, target);
@@ -254,9 +254,9 @@ public class TestExp10 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

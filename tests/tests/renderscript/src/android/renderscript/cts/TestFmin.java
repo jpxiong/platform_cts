@@ -35,45 +35,45 @@ public class TestFmin extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inX;
-        public float inY;
+        public float inA;
+        public float inB;
         public Target.Floaty out;
     }
 
     private void checkFminFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b106fl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1070l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1058l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1059l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloatFloatFloat(inX, out);
-            verifyResultsFminFloatFloatFloat(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloatFloatFloat(inA, out);
+            verifyResultsFminFloatFloatFloat(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloatFloatFloat(inX, out);
-            verifyResultsFminFloatFloatFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloatFloatFloat(inA, out);
+            verifyResultsFminFloatFloatFloat(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloatFloatFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloatFloatFloat(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 1];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inA = arrayInA[i];
+                args.inB = arrayInB[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -84,13 +84,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa59l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa5al, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa42l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa43l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat2Float2Float2(inX, out);
-            verifyResultsFminFloat2Float2Float2(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat2Float2Float2(inA, out);
+            verifyResultsFminFloat2Float2Float2(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat2Float2Float2(inX, out);
-            verifyResultsFminFloat2Float2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat2Float2Float2(inA, out);
+            verifyResultsFminFloat2Float2Float2(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat2Float2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat2Float2Float2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 2];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 2];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inA = arrayInA[i * 2 + j];
+                args.inB = arrayInB[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -153,13 +153,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabfal, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabfbl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabe3l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabe4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat3Float3Float3(inX, out);
-            verifyResultsFminFloat3Float3Float3(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat3Float3Float3(inA, out);
+            verifyResultsFminFloat3Float3Float3(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat3Float3Float3(inX, out);
-            verifyResultsFminFloat3Float3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat3Float3Float3(inA, out);
+            verifyResultsFminFloat3Float3Float3(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat3Float3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat3Float3Float3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -222,13 +222,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad9bl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad9cl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad84l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad85l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat4Float4Float4(inX, out);
-            verifyResultsFminFloat4Float4Float4(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat4Float4Float4(inA, out);
+            verifyResultsFminFloat4Float4Float4(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat4Float4Float4(inX, out);
-            verifyResultsFminFloat4Float4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat4Float4Float4(inA, out);
+            verifyResultsFminFloat4Float4Float4(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat4Float4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat4Float4Float4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -291,13 +291,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -317,39 +317,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat2FloatFloat2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4dd5869724457687l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4dd5869724457688l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4dd5869724457670l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4dd5869724457671l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat2FloatFloat2(inX, out);
-            verifyResultsFminFloat2FloatFloat2(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat2FloatFloat2(inA, out);
+            verifyResultsFminFloat2FloatFloat2(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2FloatFloat2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat2FloatFloat2(inX, out);
-            verifyResultsFminFloat2FloatFloat2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat2FloatFloat2(inA, out);
+            verifyResultsFminFloat2FloatFloat2(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2FloatFloat2: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat2FloatFloat2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat2FloatFloat2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 2];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i];
+                args.inA = arrayInA[i * 2 + j];
+                args.inB = arrayInB[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -360,13 +360,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -386,39 +386,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat3FloatFloat3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa32539af12b06ae3l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa32539af12b06ae4l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa32539af12b06accl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa32539af12b06acdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat3FloatFloat3(inX, out);
-            verifyResultsFminFloat3FloatFloat3(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat3FloatFloat3(inA, out);
+            verifyResultsFminFloat3FloatFloat3(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3FloatFloat3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat3FloatFloat3(inX, out);
-            verifyResultsFminFloat3FloatFloat3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat3FloatFloat3(inA, out);
+            verifyResultsFminFloat3FloatFloat3(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3FloatFloat3: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat3FloatFloat3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat3FloatFloat3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -429,13 +429,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -455,39 +455,39 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloat4FloatFloat4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf874ecc7011b5f3fl, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf874ecc7011b5f40l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf874ecc7011b5f28l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf874ecc7011b5f29l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFminFloat4FloatFloat4(inX, out);
-            verifyResultsFminFloat4FloatFloat4(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testFminFloat4FloatFloat4(inA, out);
+            verifyResultsFminFloat4FloatFloat4(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4FloatFloat4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFminFloat4FloatFloat4(inX, out);
-            verifyResultsFminFloat4FloatFloat4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testFminFloat4FloatFloat4(inA, out);
+            verifyResultsFminFloat4FloatFloat4(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4FloatFloat4: " + e.toString());
         }
     }
 
-    private void verifyResultsFminFloat4FloatFloat4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFminFloat4FloatFloat4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmin(args, target);
@@ -498,13 +498,13 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

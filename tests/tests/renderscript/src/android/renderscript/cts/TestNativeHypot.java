@@ -35,45 +35,45 @@ public class TestNativeHypot extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inX;
-        public float inY;
+        public float inA;
+        public float inB;
         public Target.Floaty out;
     }
 
     private void checkNativeHypotFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3d61f129bdf66018l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3d61f129bdf66019l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3d61f129bdf66001l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3d61f129bdf66002l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativeHypotFloatFloatFloat(inX, out);
-            verifyResultsNativeHypotFloatFloatFloat(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testNativeHypotFloatFloatFloat(inA, out);
+            verifyResultsNativeHypotFloatFloatFloat(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativeHypotFloatFloatFloat(inX, out);
-            verifyResultsNativeHypotFloatFloatFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testNativeHypotFloatFloatFloat(inA, out);
+            verifyResultsNativeHypotFloatFloatFloat(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeHypotFloatFloatFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativeHypotFloatFloatFloat(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 1];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inA = arrayInA[i];
+                args.inB = arrayInB[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeHypot(args, target);
@@ -84,13 +84,13 @@ public class TestNativeHypot extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestNativeHypot extends RSBaseCompute {
     }
 
     private void checkNativeHypotFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x92a8064760a50e64l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x92a8064760a50e65l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x92a8064760a50e4dl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x92a8064760a50e4el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativeHypotFloat2Float2Float2(inX, out);
-            verifyResultsNativeHypotFloat2Float2Float2(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testNativeHypotFloat2Float2Float2(inA, out);
+            verifyResultsNativeHypotFloat2Float2Float2(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativeHypotFloat2Float2Float2(inX, out);
-            verifyResultsNativeHypotFloat2Float2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testNativeHypotFloat2Float2Float2(inA, out);
+            verifyResultsNativeHypotFloat2Float2Float2(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeHypotFloat2Float2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativeHypotFloat2Float2Float2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 2];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 2];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inA = arrayInA[i * 2 + j];
+                args.inB = arrayInB[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeHypot(args, target);
@@ -153,13 +153,13 @@ public class TestNativeHypot extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestNativeHypot extends RSBaseCompute {
     }
 
     private void checkNativeHypotFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe70ce46762831005l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe70ce46762831006l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe70ce46762830feel, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe70ce46762830fefl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativeHypotFloat3Float3Float3(inX, out);
-            verifyResultsNativeHypotFloat3Float3Float3(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testNativeHypotFloat3Float3Float3(inA, out);
+            verifyResultsNativeHypotFloat3Float3Float3(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativeHypotFloat3Float3Float3(inX, out);
-            verifyResultsNativeHypotFloat3Float3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testNativeHypotFloat3Float3Float3(inA, out);
+            verifyResultsNativeHypotFloat3Float3Float3(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeHypotFloat3Float3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativeHypotFloat3Float3Float3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeHypot(args, target);
@@ -222,13 +222,13 @@ public class TestNativeHypot extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestNativeHypot extends RSBaseCompute {
     }
 
     private void checkNativeHypotFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3b71c287646111a6l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3b71c287646111a7l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3b71c2876461118fl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3b71c28764611190l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativeHypotFloat4Float4Float4(inX, out);
-            verifyResultsNativeHypotFloat4Float4Float4(inX, inY, out, false);
+            script.set_gAllocInB(inB);
+            script.forEach_testNativeHypotFloat4Float4Float4(inA, out);
+            verifyResultsNativeHypotFloat4Float4Float4(inA, inB, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativeHypotFloat4Float4Float4(inX, out);
-            verifyResultsNativeHypotFloat4Float4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testNativeHypotFloat4Float4Float4(inA, out);
+            verifyResultsNativeHypotFloat4Float4Float4(inA, inB, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeHypotFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeHypotFloat4Float4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativeHypotFloat4Float4Float4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeHypot(args, target);
@@ -291,13 +291,13 @@ public class TestNativeHypot extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inA: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inB: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
