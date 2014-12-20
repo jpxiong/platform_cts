@@ -293,7 +293,8 @@ public class SensorBatchingTests extends SensorTestCase {
         try {
             operation.execute();
         } finally {
-            SensorStats.logStats(TAG, operation.getStats());
+            SensorStats stats = operation.getStats();
+            stats.log(TAG);
 
             String sensorRate;
             if (environment.getRequestedSamplingPeriodUs() == SensorManager.SENSOR_DELAY_FASTEST) {
@@ -309,7 +310,7 @@ public class SensorBatchingTests extends SensorTestCase {
                     sensorRate,
                     batching,
                     flush);
-            SensorStats.logStatsToFile(fileName, operation.getStats());
+            stats.logToFile(fileName);
         }
     }
 }
