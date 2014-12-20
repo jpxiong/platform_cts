@@ -35,45 +35,45 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inLhs;
-        public float inRhs;
+        public float inLeftVector;
+        public float inRightVector;
         public Target.Floaty out;
     }
 
     private void checkFastDistanceFloatFloatFloat() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfe7e5e843bff0cb7l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfe7e5e843bff380dl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeb32e5abb9b28b1al, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x83606d459f1626e3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testFastDistanceFloatFloatFloat(inLhs, out);
-            verifyResultsFastDistanceFloatFloatFloat(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testFastDistanceFloatFloatFloat(inLeftVector, out);
+            verifyResultsFastDistanceFloatFloatFloat(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testFastDistanceFloatFloatFloat(inLhs, out);
-            verifyResultsFastDistanceFloatFloatFloat(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testFastDistanceFloatFloatFloat(inLeftVector, out);
+            verifyResultsFastDistanceFloatFloatFloat(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsFastDistanceFloatFloatFloat(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 1];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 1];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsFastDistanceFloatFloatFloat(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 1];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 1];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
             // Create the appropriate sized arrays in args
             // Fill args with the input values
-            args.inLhs = arrayInLhs[i];
-            args.inRhs = arrayInRhs[i];
+            args.inLeftVector = arrayInLeftVector[i];
+            args.inRightVector = arrayInRightVector[i];
             Target target = new Target(relaxed);
             CoreMathVerifier.computeFastDistance(args, target);
 
@@ -84,13 +84,13 @@ public class TestFastDistance extends RSBaseCompute {
             }
             if (!valid) {
                 StringBuilder message = new StringBuilder();
-                message.append("Input inLhs: ");
+                message.append("Input inLeftVector: ");
                 message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInLhs[i], Float.floatToRawIntBits(arrayInLhs[i]), arrayInLhs[i]));
+                        arrayInLeftVector[i], Float.floatToRawIntBits(arrayInLeftVector[i]), arrayInLeftVector[i]));
                 message.append("\n");
-                message.append("Input inRhs: ");
+                message.append("Input inRightVector: ");
                 message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInRhs[i], Float.floatToRawIntBits(arrayInRhs[i]), arrayInRhs[i]));
+                        arrayInRightVector[i], Float.floatToRawIntBits(arrayInRightVector[i]), arrayInRightVector[i]));
                 message.append("\n");
                 message.append("Expected output out: ");
                 message.append(args.out.toString());
@@ -109,50 +109,50 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     public class ArgumentsFloatNFloatNFloat {
-        public float[] inLhs;
-        public float[] inRhs;
+        public float[] inLeftVector;
+        public float[] inRightVector;
         public Target.Floaty out;
     }
 
     private void checkFastDistanceFloat2Float2Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x422e8a00560ac063l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x422e8a00560aebb9l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x580238eac7fabd9el, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xca3368dd0536a30fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testFastDistanceFloat2Float2Float(inLhs, out);
-            verifyResultsFastDistanceFloat2Float2Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testFastDistanceFloat2Float2Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat2Float2Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat2Float2Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testFastDistanceFloat2Float2Float(inLhs, out);
-            verifyResultsFastDistanceFloat2Float2Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testFastDistanceFloat2Float2Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat2Float2Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat2Float2Float: " + e.toString());
         }
     }
 
-    private void verifyResultsFastDistanceFloat2Float2Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 2];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 2];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsFastDistanceFloat2Float2Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 2];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 2];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[2];
-            args.inRhs = new float[2];
+            args.inLeftVector = new float[2];
+            args.inRightVector = new float[2];
             // Fill args with the input values
             for (int j = 0; j < 2 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 2 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 2 + j];
             }
             for (int j = 0; j < 2 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 2 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 2 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeFastDistance(args, target);
@@ -165,15 +165,15 @@ public class TestFastDistance extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 2 + j], Float.floatToRawIntBits(arrayInLhs[i * 2 + j]), arrayInLhs[i * 2 + j]));
+                            arrayInLeftVector[i * 2 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 2 + j]), arrayInLeftVector[i * 2 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 2 + j], Float.floatToRawIntBits(arrayInRhs[i * 2 + j]), arrayInRhs[i * 2 + j]));
+                            arrayInRightVector[i * 2 + j], Float.floatToRawIntBits(arrayInRightVector[i * 2 + j]), arrayInRightVector[i * 2 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
@@ -193,44 +193,44 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloat3Float3Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f1fd960a620dbbdl, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f1fd960a6210713l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x26ab5e68e99971ecl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x809cb50caadeec29l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testFastDistanceFloat3Float3Float(inLhs, out);
-            verifyResultsFastDistanceFloat3Float3Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testFastDistanceFloat3Float3Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat3Float3Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat3Float3Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testFastDistanceFloat3Float3Float(inLhs, out);
-            verifyResultsFastDistanceFloat3Float3Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testFastDistanceFloat3Float3Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat3Float3Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat3Float3Float: " + e.toString());
         }
     }
 
-    private void verifyResultsFastDistanceFloat3Float3Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsFastDistanceFloat3Float3Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[3];
-            args.inRhs = new float[3];
+            args.inLeftVector = new float[3];
+            args.inRightVector = new float[3];
             // Fill args with the input values
             for (int j = 0; j < 3 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 3 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeFastDistance(args, target);
@@ -243,15 +243,15 @@ public class TestFastDistance extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
@@ -271,44 +271,44 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloat4Float4Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9c1128c0f636f717l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9c1128c0f637226dl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf55483e70b38263al, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3706013c50873543l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testFastDistanceFloat4Float4Float(inLhs, out);
-            verifyResultsFastDistanceFloat4Float4Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testFastDistanceFloat4Float4Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat4Float4Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat4Float4Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testFastDistanceFloat4Float4Float(inLhs, out);
-            verifyResultsFastDistanceFloat4Float4Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testFastDistanceFloat4Float4Float(inLeftVector, out);
+            verifyResultsFastDistanceFloat4Float4Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat4Float4Float: " + e.toString());
         }
     }
 
-    private void verifyResultsFastDistanceFloat4Float4Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsFastDistanceFloat4Float4Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[4];
-            args.inRhs = new float[4];
+            args.inLeftVector = new float[4];
+            args.inRightVector = new float[4];
             // Fill args with the input values
             for (int j = 0; j < 4 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 4 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeFastDistance(args, target);
@@ -321,15 +321,15 @@ public class TestFastDistance extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");

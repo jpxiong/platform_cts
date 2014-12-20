@@ -35,45 +35,45 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inLhs;
-        public float inRhs;
+        public float inLeftVector;
+        public float inRightVector;
         public Target.Floaty out;
     }
 
     private void checkNativeDivideFloatFloatFloat() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe2845ef0c23d02del, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe2845ef0c23d2e34l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x73477387751754efl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5ed4412e19040daal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testNativeDivideFloatFloatFloat(inLhs, out);
-            verifyResultsNativeDivideFloatFloatFloat(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testNativeDivideFloatFloatFloat(inLeftVector, out);
+            verifyResultsNativeDivideFloatFloatFloat(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testNativeDivideFloatFloatFloat(inLhs, out);
-            verifyResultsNativeDivideFloatFloatFloat(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testNativeDivideFloatFloatFloat(inLeftVector, out);
+            verifyResultsNativeDivideFloatFloatFloat(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeDivideFloatFloatFloat(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 1];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 1];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsNativeDivideFloatFloatFloat(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 1];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 1];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inLhs = arrayInLhs[i];
-                args.inRhs = arrayInRhs[i];
+                args.inLeftVector = arrayInLeftVector[i];
+                args.inRightVector = arrayInRightVector[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeDivide(args, target);
@@ -84,13 +84,13 @@ public class TestNativeDivide extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                            args.inLeftVector, Float.floatToRawIntBits(args.inLeftVector), args.inLeftVector));
                     message.append("\n");
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                            args.inRightVector, Float.floatToRawIntBits(args.inRightVector), args.inRightVector));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat2Float2Float2() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x51c6d6ecaeab1c48l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x51c6d6ecaeab479el, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x752d5a1207785d6dl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb071fa74af507ad4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testNativeDivideFloat2Float2Float2(inLhs, out);
-            verifyResultsNativeDivideFloat2Float2Float2(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testNativeDivideFloat2Float2Float2(inLeftVector, out);
+            verifyResultsNativeDivideFloat2Float2Float2(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testNativeDivideFloat2Float2Float2(inLhs, out);
-            verifyResultsNativeDivideFloat2Float2Float2(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testNativeDivideFloat2Float2Float2(inLeftVector, out);
+            verifyResultsNativeDivideFloat2Float2Float2(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeDivideFloat2Float2Float2(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 2];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 2];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsNativeDivideFloat2Float2Float2(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 2];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 2];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inLhs = arrayInLhs[i * 2 + j];
-                args.inRhs = arrayInRhs[i * 2 + j];
+                args.inLeftVector = arrayInLeftVector[i * 2 + j];
+                args.inRightVector = arrayInRightVector[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeDivide(args, target);
@@ -153,13 +153,13 @@ public class TestNativeDivide extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                            args.inLeftVector, Float.floatToRawIntBits(args.inLeftVector), args.inLeftVector));
                     message.append("\n");
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                            args.inRightVector, Float.floatToRawIntBits(args.inRightVector), args.inRightVector));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat3Float3Float3() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xde4f2c1a2b24e021l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xde4f2c1a2b250b77l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5623c6c05fb90198l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x79d63bbd822c0e0dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testNativeDivideFloat3Float3Float3(inLhs, out);
-            verifyResultsNativeDivideFloat3Float3Float3(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testNativeDivideFloat3Float3Float3(inLeftVector, out);
+            verifyResultsNativeDivideFloat3Float3Float3(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testNativeDivideFloat3Float3Float3(inLhs, out);
-            verifyResultsNativeDivideFloat3Float3Float3(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testNativeDivideFloat3Float3Float3(inLeftVector, out);
+            verifyResultsNativeDivideFloat3Float3Float3(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeDivideFloat3Float3Float3(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsNativeDivideFloat3Float3Float3(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inLhs = arrayInLhs[i * 4 + j];
-                args.inRhs = arrayInRhs[i * 4 + j];
+                args.inLeftVector = arrayInLeftVector[i * 4 + j];
+                args.inRightVector = arrayInRightVector[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeDivide(args, target);
@@ -222,13 +222,13 @@ public class TestNativeDivide extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                            args.inLeftVector, Float.floatToRawIntBits(args.inLeftVector), args.inLeftVector));
                     message.append("\n");
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                            args.inRightVector, Float.floatToRawIntBits(args.inRightVector), args.inRightVector));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat4Float4Float4() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6ad78147a79ea3fal, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6ad78147a79ecf50l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x371a336eb7f9a5c3l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x433a7d065507a146l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testNativeDivideFloat4Float4Float4(inLhs, out);
-            verifyResultsNativeDivideFloat4Float4Float4(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testNativeDivideFloat4Float4Float4(inLeftVector, out);
+            verifyResultsNativeDivideFloat4Float4Float4(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testNativeDivideFloat4Float4Float4(inLhs, out);
-            verifyResultsNativeDivideFloat4Float4Float4(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testNativeDivideFloat4Float4Float4(inLeftVector, out);
+            verifyResultsNativeDivideFloat4Float4Float4(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeDivideFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeDivideFloat4Float4Float4(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsNativeDivideFloat4Float4Float4(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inLhs = arrayInLhs[i * 4 + j];
-                args.inRhs = arrayInRhs[i * 4 + j];
+                args.inLeftVector = arrayInLeftVector[i * 4 + j];
+                args.inRightVector = arrayInRightVector[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeDivide(args, target);
@@ -291,13 +291,13 @@ public class TestNativeDivide extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inLhs, Float.floatToRawIntBits(args.inLhs), args.inLhs));
+                            args.inLeftVector, Float.floatToRawIntBits(args.inLeftVector), args.inLeftVector));
                     message.append("\n");
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inRhs, Float.floatToRawIntBits(args.inRhs), args.inRhs));
+                            args.inRightVector, Float.floatToRawIntBits(args.inRightVector), args.inRightVector));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

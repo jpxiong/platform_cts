@@ -35,45 +35,45 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inV;
-        public float inY;
+        public float inBase;
+        public float inExponent;
         public Target.Floaty out;
     }
 
     private void checkNativePowrFloatFloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3c3550bdff7a10c2l, 0, 256);
-        Allocation inY = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3c3550bdff7a10c5l, -15, 15);
+        Allocation inBase = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x22637077834d1839l, 0, 256);
+        Allocation inExponent = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xef7b0ab4f9181f0fl, -15, 15);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativePowrFloatFloatFloat(inV, out);
-            verifyResultsNativePowrFloatFloatFloat(inV, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testNativePowrFloatFloatFloat(inBase, out);
+            verifyResultsNativePowrFloatFloatFloat(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativePowrFloatFloatFloat(inV, out);
-            verifyResultsNativePowrFloatFloatFloat(inV, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testNativePowrFloatFloatFloat(inBase, out);
+            verifyResultsNativePowrFloatFloatFloat(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativePowrFloatFloatFloat(Allocation inV, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInV = new float[INPUTSIZE * 1];
-        inV.copyTo(arrayInV);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativePowrFloatFloatFloat(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 1];
+        inBase.copyTo(arrayInBase);
+        float[] arrayInExponent = new float[INPUTSIZE * 1];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inV = arrayInV[i];
-                args.inY = arrayInY[i];
+                args.inBase = arrayInBase[i];
+                args.inExponent = arrayInExponent[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativePowr(args, target);
@@ -84,13 +84,13 @@ public class TestNativePowr extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inExponent: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inExponent, Float.floatToRawIntBits(args.inExponent), args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat2Float2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdbc56fbe7733c926l, 0, 256);
-        Allocation inY = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdbc56fbe7733c929l, -15, 15);
+        Allocation inBase = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47afceb7283b11a5l, 0, 256);
+        Allocation inExponent = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x65ac261bb67d4abbl, -15, 15);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativePowrFloat2Float2Float2(inV, out);
-            verifyResultsNativePowrFloat2Float2Float2(inV, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testNativePowrFloat2Float2Float2(inBase, out);
+            verifyResultsNativePowrFloat2Float2Float2(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativePowrFloat2Float2Float2(inV, out);
-            verifyResultsNativePowrFloat2Float2Float2(inV, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testNativePowrFloat2Float2Float2(inBase, out);
+            verifyResultsNativePowrFloat2Float2Float2(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativePowrFloat2Float2Float2(Allocation inV, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInV = new float[INPUTSIZE * 2];
-        inV.copyTo(arrayInV);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativePowrFloat2Float2Float2(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 2];
+        inBase.copyTo(arrayInBase);
+        float[] arrayInExponent = new float[INPUTSIZE * 2];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inV = arrayInV[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inBase = arrayInBase[i * 2 + j];
+                args.inExponent = arrayInExponent[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativePowr(args, target);
@@ -153,13 +153,13 @@ public class TestNativePowr extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inExponent: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inExponent, Float.floatToRawIntBits(args.inExponent), args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat3Float3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x302a4dde7911cac7l, 0, 256);
-        Allocation inY = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x302a4dde7911cacal, -15, 15);
+        Allocation inBase = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe2961d5b10aef718l, 0, 256);
+        Allocation inExponent = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x411aa11d0d9fcd3el, -15, 15);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativePowrFloat3Float3Float3(inV, out);
-            verifyResultsNativePowrFloat3Float3Float3(inV, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testNativePowrFloat3Float3Float3(inBase, out);
+            verifyResultsNativePowrFloat3Float3Float3(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativePowrFloat3Float3Float3(inV, out);
-            verifyResultsNativePowrFloat3Float3Float3(inV, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testNativePowrFloat3Float3Float3(inBase, out);
+            verifyResultsNativePowrFloat3Float3Float3(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativePowrFloat3Float3Float3(Allocation inV, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInV = new float[INPUTSIZE * 4];
-        inV.copyTo(arrayInV);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativePowrFloat3Float3Float3(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 4];
+        inBase.copyTo(arrayInBase);
+        float[] arrayInExponent = new float[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inV = arrayInV[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inBase = arrayInBase[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativePowr(args, target);
@@ -222,13 +222,13 @@ public class TestNativePowr extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inExponent: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inExponent, Float.floatToRawIntBits(args.inExponent), args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat4Float4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x848f2bfe7aefcc68l, 0, 256);
-        Allocation inY = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x848f2bfe7aefcc6bl, -15, 15);
+        Allocation inBase = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7d7c6bfef922dc8bl, 0, 256);
+        Allocation inExponent = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1c891c1e64c24fc1l, -15, 15);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testNativePowrFloat4Float4Float4(inV, out);
-            verifyResultsNativePowrFloat4Float4Float4(inV, inY, out, false);
+            script.set_gAllocInExponent(inExponent);
+            script.forEach_testNativePowrFloat4Float4Float4(inBase, out);
+            verifyResultsNativePowrFloat4Float4Float4(inBase, inExponent, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testNativePowrFloat4Float4Float4(inV, out);
-            verifyResultsNativePowrFloat4Float4Float4(inV, inY, out, true);
+            scriptRelaxed.set_gAllocInExponent(inExponent);
+            scriptRelaxed.forEach_testNativePowrFloat4Float4Float4(inBase, out);
+            verifyResultsNativePowrFloat4Float4Float4(inBase, inExponent, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativePowrFloat4Float4Float4(Allocation inV, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInV = new float[INPUTSIZE * 4];
-        inV.copyTo(arrayInV);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsNativePowrFloat4Float4Float4(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
+        float[] arrayInBase = new float[INPUTSIZE * 4];
+        inBase.copyTo(arrayInBase);
+        float[] arrayInExponent = new float[INPUTSIZE * 4];
+        inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inV = arrayInV[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inBase = arrayInBase[i * 4 + j];
+                args.inExponent = arrayInExponent[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativePowr(args, target);
@@ -291,13 +291,13 @@ public class TestNativePowr extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
+                    message.append("Input inBase: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                            args.inBase, Float.floatToRawIntBits(args.inBase), args.inBase));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inExponent: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inExponent, Float.floatToRawIntBits(args.inExponent), args.inExponent));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

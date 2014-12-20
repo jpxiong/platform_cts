@@ -35,51 +35,51 @@ public class TestCross extends RSBaseCompute {
     }
 
     public class ArgumentsFloatNFloatNFloatN {
-        public float[] inLhs;
-        public float[] inRhs;
+        public float[] inLeftVector;
+        public float[] inRightVector;
         public Target.Floaty[] out;
     }
 
     private void checkCrossFloat3Float3Float3() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2995edb5l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2996190bl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3505ebf7382f1ad4l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe9d27bf3de024b21l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testCrossFloat3Float3Float3(inLhs, out);
-            verifyResultsCrossFloat3Float3Float3(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testCrossFloat3Float3Float3(inLeftVector, out);
+            verifyResultsCrossFloat3Float3Float3(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testCrossFloat3Float3Float3(inLhs, out);
-            verifyResultsCrossFloat3Float3Float3(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testCrossFloat3Float3Float3(inLeftVector, out);
+            verifyResultsCrossFloat3Float3Float3(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsCrossFloat3Float3Float3(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsCrossFloat3Float3Float3(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[3];
-            args.inRhs = new float[3];
+            args.inLeftVector = new float[3];
+            args.inRightVector = new float[3];
             args.out = new Target.Floaty[3];
             // Fill args with the input values
             for (int j = 0; j < 3 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 3 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeCross(args, target);
@@ -94,15 +94,15 @@ public class TestCross extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
@@ -124,45 +124,45 @@ public class TestCross extends RSBaseCompute {
     }
 
     private void checkCrossFloat4Float4Float4() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a60fb18el, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a60fdce4l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x15fc58a5906fbeffl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb336bd3cb0ddde5al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testCrossFloat4Float4Float4(inLhs, out);
-            verifyResultsCrossFloat4Float4Float4(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testCrossFloat4Float4Float4(inLeftVector, out);
+            verifyResultsCrossFloat4Float4Float4(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testCrossFloat4Float4Float4(inLhs, out);
-            verifyResultsCrossFloat4Float4Float4(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testCrossFloat4Float4Float4(inLeftVector, out);
+            verifyResultsCrossFloat4Float4Float4(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsCrossFloat4Float4Float4(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsCrossFloat4Float4Float4(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[4];
-            args.inRhs = new float[4];
+            args.inLeftVector = new float[4];
+            args.inRightVector = new float[4];
             args.out = new Target.Floaty[4];
             // Fill args with the input values
             for (int j = 0; j < 4 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 4 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeCross(args, target);
@@ -177,15 +177,15 @@ public class TestCross extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {

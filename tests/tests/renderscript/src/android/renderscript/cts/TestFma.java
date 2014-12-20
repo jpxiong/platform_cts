@@ -35,52 +35,52 @@ public class TestFma extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloatFloat {
-        public float inA;
-        public float inB;
-        public float inC;
+        public float inMultiplicand1;
+        public float inMultiplicand2;
+        public float inOffset;
         public Target.Floaty out;
     }
 
     private void checkFmaFloatFloatFloatFloat() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c2l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c3l, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c4l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x716293a685c419bel, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x716293a685c419bfl, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4a235a109d441b0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInB(inB);
-            script.set_gAllocInC(inC);
-            script.forEach_testFmaFloatFloatFloatFloat(inA, out);
-            verifyResultsFmaFloatFloatFloatFloat(inA, inB, inC, out, false);
+            script.set_gAllocInMultiplicand2(inMultiplicand2);
+            script.set_gAllocInOffset(inOffset);
+            script.forEach_testFmaFloatFloatFloatFloat(inMultiplicand1, out);
+            verifyResultsFmaFloatFloatFloatFloat(inMultiplicand1, inMultiplicand2, inOffset, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloatFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInB(inB);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.forEach_testFmaFloatFloatFloatFloat(inA, out);
-            verifyResultsFmaFloatFloatFloatFloat(inA, inB, inC, out, true);
+            scriptRelaxed.set_gAllocInMultiplicand2(inMultiplicand2);
+            scriptRelaxed.set_gAllocInOffset(inOffset);
+            scriptRelaxed.forEach_testFmaFloatFloatFloatFloat(inMultiplicand1, out);
+            verifyResultsFmaFloatFloatFloatFloat(inMultiplicand1, inMultiplicand2, inOffset, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloatFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsFmaFloatFloatFloatFloat(Allocation inA, Allocation inB, Allocation inC, Allocation out, boolean relaxed) {
-        float[] arrayInA = new float[INPUTSIZE * 1];
-        inA.copyTo(arrayInA);
-        float[] arrayInB = new float[INPUTSIZE * 1];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 1];
-        inC.copyTo(arrayInC);
+    private void verifyResultsFmaFloatFloatFloatFloat(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
+        float[] arrayInMultiplicand1 = new float[INPUTSIZE * 1];
+        inMultiplicand1.copyTo(arrayInMultiplicand1);
+        float[] arrayInMultiplicand2 = new float[INPUTSIZE * 1];
+        inMultiplicand2.copyTo(arrayInMultiplicand2);
+        float[] arrayInOffset = new float[INPUTSIZE * 1];
+        inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
-                args.inA = arrayInA[i];
-                args.inB = arrayInB[i];
-                args.inC = arrayInC[i];
+                args.inMultiplicand1 = arrayInMultiplicand1[i];
+                args.inMultiplicand2 = arrayInMultiplicand2[i];
+                args.inOffset = arrayInOffset[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFma(args, target);
@@ -91,17 +91,17 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
+                    message.append("Input inMultiplicand1: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
                     message.append("\n");
-                    message.append("Input inB: ");
+                    message.append("Input inMultiplicand2: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inOffset: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -121,45 +121,45 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat2Float2Float2Float2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dal, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dbl, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dcl, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1bb42af9dda15056l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1bb42af9dda15057l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x667fbd778aeda396l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInB(inB);
-            script.set_gAllocInC(inC);
-            script.forEach_testFmaFloat2Float2Float2Float2(inA, out);
-            verifyResultsFmaFloat2Float2Float2Float2(inA, inB, inC, out, false);
+            script.set_gAllocInMultiplicand2(inMultiplicand2);
+            script.set_gAllocInOffset(inOffset);
+            script.forEach_testFmaFloat2Float2Float2Float2(inMultiplicand1, out);
+            verifyResultsFmaFloat2Float2Float2Float2(inMultiplicand1, inMultiplicand2, inOffset, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat2Float2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInB(inB);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.forEach_testFmaFloat2Float2Float2Float2(inA, out);
-            verifyResultsFmaFloat2Float2Float2Float2(inA, inB, inC, out, true);
+            scriptRelaxed.set_gAllocInMultiplicand2(inMultiplicand2);
+            scriptRelaxed.set_gAllocInOffset(inOffset);
+            scriptRelaxed.forEach_testFmaFloat2Float2Float2Float2(inMultiplicand1, out);
+            verifyResultsFmaFloat2Float2Float2Float2(inMultiplicand1, inMultiplicand2, inOffset, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat2Float2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsFmaFloat2Float2Float2Float2(Allocation inA, Allocation inB, Allocation inC, Allocation out, boolean relaxed) {
-        float[] arrayInA = new float[INPUTSIZE * 2];
-        inA.copyTo(arrayInA);
-        float[] arrayInB = new float[INPUTSIZE * 2];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 2];
-        inC.copyTo(arrayInC);
+    private void verifyResultsFmaFloat2Float2Float2Float2(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
+        float[] arrayInMultiplicand1 = new float[INPUTSIZE * 2];
+        inMultiplicand1.copyTo(arrayInMultiplicand1);
+        float[] arrayInMultiplicand2 = new float[INPUTSIZE * 2];
+        inMultiplicand2.copyTo(arrayInMultiplicand2);
+        float[] arrayInOffset = new float[INPUTSIZE * 2];
+        inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
-                args.inA = arrayInA[i * 2 + j];
-                args.inB = arrayInB[i * 2 + j];
-                args.inC = arrayInC[i * 2 + j];
+                args.inMultiplicand1 = arrayInMultiplicand1[i * 2 + j];
+                args.inMultiplicand2 = arrayInMultiplicand2[i * 2 + j];
+                args.inOffset = arrayInOffset[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFma(args, target);
@@ -170,17 +170,17 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
+                    message.append("Input inMultiplicand1: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
                     message.append("\n");
-                    message.append("Input inB: ");
+                    message.append("Input inMultiplicand2: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inOffset: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -200,45 +200,45 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat3Float3Float3Float3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d76l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d77l, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d78l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x19169f2d349697b2l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x19169f2d349697b3l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3a56bf5454d5ec8al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInB(inB);
-            script.set_gAllocInC(inC);
-            script.forEach_testFmaFloat3Float3Float3Float3(inA, out);
-            verifyResultsFmaFloat3Float3Float3Float3(inA, inB, inC, out, false);
+            script.set_gAllocInMultiplicand2(inMultiplicand2);
+            script.set_gAllocInOffset(inOffset);
+            script.forEach_testFmaFloat3Float3Float3Float3(inMultiplicand1, out);
+            verifyResultsFmaFloat3Float3Float3Float3(inMultiplicand1, inMultiplicand2, inOffset, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat3Float3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInB(inB);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.forEach_testFmaFloat3Float3Float3Float3(inA, out);
-            verifyResultsFmaFloat3Float3Float3Float3(inA, inB, inC, out, true);
+            scriptRelaxed.set_gAllocInMultiplicand2(inMultiplicand2);
+            scriptRelaxed.set_gAllocInOffset(inOffset);
+            scriptRelaxed.forEach_testFmaFloat3Float3Float3Float3(inMultiplicand1, out);
+            verifyResultsFmaFloat3Float3Float3Float3(inMultiplicand1, inMultiplicand2, inOffset, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat3Float3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsFmaFloat3Float3Float3Float3(Allocation inA, Allocation inB, Allocation inC, Allocation out, boolean relaxed) {
-        float[] arrayInA = new float[INPUTSIZE * 4];
-        inA.copyTo(arrayInA);
-        float[] arrayInB = new float[INPUTSIZE * 4];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 4];
-        inC.copyTo(arrayInC);
+    private void verifyResultsFmaFloat3Float3Float3Float3(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
+        float[] arrayInMultiplicand1 = new float[INPUTSIZE * 4];
+        inMultiplicand1.copyTo(arrayInMultiplicand1);
+        float[] arrayInMultiplicand2 = new float[INPUTSIZE * 4];
+        inMultiplicand2.copyTo(arrayInMultiplicand2);
+        float[] arrayInOffset = new float[INPUTSIZE * 4];
+        inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
-                args.inA = arrayInA[i * 4 + j];
-                args.inB = arrayInB[i * 4 + j];
-                args.inC = arrayInC[i * 4 + j];
+                args.inMultiplicand1 = arrayInMultiplicand1[i * 4 + j];
+                args.inMultiplicand2 = arrayInMultiplicand2[i * 4 + j];
+                args.inOffset = arrayInOffset[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFma(args, target);
@@ -249,17 +249,17 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
+                    message.append("Input inMultiplicand1: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
                     message.append("\n");
-                    message.append("Input inB: ");
+                    message.append("Input inMultiplicand2: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inOffset: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -279,45 +279,45 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat4Float4Float4Float4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab712l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab713l, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab714l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x167913608b8bdf0el, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x167913608b8bdf0fl, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe2dc1311ebe357el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInB(inB);
-            script.set_gAllocInC(inC);
-            script.forEach_testFmaFloat4Float4Float4Float4(inA, out);
-            verifyResultsFmaFloat4Float4Float4Float4(inA, inB, inC, out, false);
+            script.set_gAllocInMultiplicand2(inMultiplicand2);
+            script.set_gAllocInOffset(inOffset);
+            script.forEach_testFmaFloat4Float4Float4Float4(inMultiplicand1, out);
+            verifyResultsFmaFloat4Float4Float4Float4(inMultiplicand1, inMultiplicand2, inOffset, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat4Float4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInB(inB);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.forEach_testFmaFloat4Float4Float4Float4(inA, out);
-            verifyResultsFmaFloat4Float4Float4Float4(inA, inB, inC, out, true);
+            scriptRelaxed.set_gAllocInMultiplicand2(inMultiplicand2);
+            scriptRelaxed.set_gAllocInOffset(inOffset);
+            scriptRelaxed.forEach_testFmaFloat4Float4Float4Float4(inMultiplicand1, out);
+            verifyResultsFmaFloat4Float4Float4Float4(inMultiplicand1, inMultiplicand2, inOffset, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat4Float4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsFmaFloat4Float4Float4Float4(Allocation inA, Allocation inB, Allocation inC, Allocation out, boolean relaxed) {
-        float[] arrayInA = new float[INPUTSIZE * 4];
-        inA.copyTo(arrayInA);
-        float[] arrayInB = new float[INPUTSIZE * 4];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 4];
-        inC.copyTo(arrayInC);
+    private void verifyResultsFmaFloat4Float4Float4Float4(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
+        float[] arrayInMultiplicand1 = new float[INPUTSIZE * 4];
+        inMultiplicand1.copyTo(arrayInMultiplicand1);
+        float[] arrayInMultiplicand2 = new float[INPUTSIZE * 4];
+        inMultiplicand2.copyTo(arrayInMultiplicand2);
+        float[] arrayInOffset = new float[INPUTSIZE * 4];
+        inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
-                args.inA = arrayInA[i * 4 + j];
-                args.inB = arrayInB[i * 4 + j];
-                args.inC = arrayInC[i * 4 + j];
+                args.inMultiplicand1 = arrayInMultiplicand1[i * 4 + j];
+                args.inMultiplicand2 = arrayInMultiplicand2[i * 4 + j];
+                args.inOffset = arrayInOffset[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFma(args, target);
@@ -328,17 +328,17 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
+                    message.append("Input inMultiplicand1: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
                     message.append("\n");
-                    message.append("Input inB: ");
+                    message.append("Input inMultiplicand2: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inOffset: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

@@ -35,45 +35,45 @@ public class TestFmod extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inX;
-        public float inY;
+        public float inNumerator;
+        public float inDenominator;
         public Target.Floaty out;
     }
 
     private void checkFmodFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x51ab5ae4481379a7l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x51ab5ae4481379a8l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xed70b65ddcc790e8l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeff8dc0a04b044e1l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFmodFloatFloatFloat(inX, out);
-            verifyResultsFmodFloatFloatFloat(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testFmodFloatFloatFloat(inNumerator, out);
+            verifyResultsFmodFloatFloatFloat(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFmodFloatFloatFloat(inX, out);
-            verifyResultsFmodFloatFloatFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testFmodFloatFloatFloat(inNumerator, out);
+            verifyResultsFmodFloatFloatFloat(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsFmodFloatFloatFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFmodFloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inNumerator = arrayInNumerator[i];
+                args.inDenominator = arrayInDenominator[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmod(args, target);
@@ -84,13 +84,13 @@ public class TestFmod extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestFmod extends RSBaseCompute {
     }
 
     private void checkFmodFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1ed79fa3ec4de581l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1ed79fa3ec4de582l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x84bcef91ebd95a82l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb582050adc295e2bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFmodFloat2Float2Float2(inX, out);
-            verifyResultsFmodFloat2Float2Float2(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testFmodFloat2Float2Float2(inNumerator, out);
+            verifyResultsFmodFloat2Float2Float2(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFmodFloat2Float2Float2(inX, out);
-            verifyResultsFmodFloat2Float2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testFmodFloat2Float2Float2(inNumerator, out);
+            verifyResultsFmodFloat2Float2Float2(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsFmodFloat2Float2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFmodFloat2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inNumerator = arrayInNumerator[i * 2 + j];
+                args.inDenominator = arrayInDenominator[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmod(args, target);
@@ -153,13 +153,13 @@ public class TestFmod extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestFmod extends RSBaseCompute {
     }
 
     private void checkFmodFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x733c7dc3ee2be722l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x733c7dc3ee2be723l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x604b98cb8ea54683l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7ee64653af04f164l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFmodFloat3Float3Float3(inX, out);
-            verifyResultsFmodFloat3Float3Float3(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testFmodFloat3Float3Float3(inNumerator, out);
+            verifyResultsFmodFloat3Float3Float3(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFmodFloat3Float3Float3(inX, out);
-            verifyResultsFmodFloat3Float3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testFmodFloat3Float3Float3(inNumerator, out);
+            verifyResultsFmodFloat3Float3Float3(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsFmodFloat3Float3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFmodFloat3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmod(args, target);
@@ -222,13 +222,13 @@ public class TestFmod extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestFmod extends RSBaseCompute {
     }
 
     private void checkFmodFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc7a15be3f009e8c3l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc7a15be3f009e8c4l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3bda420531713284l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x484a879c81e0849dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testFmodFloat4Float4Float4(inX, out);
-            verifyResultsFmodFloat4Float4Float4(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testFmodFloat4Float4Float4(inNumerator, out);
+            verifyResultsFmodFloat4Float4Float4(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testFmodFloat4Float4Float4(inX, out);
-            verifyResultsFmodFloat4Float4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testFmodFloat4Float4Float4(inNumerator, out);
+            verifyResultsFmodFloat4Float4Float4(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmodFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsFmodFloat4Float4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsFmodFloat4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeFmod(args, target);
@@ -291,13 +291,13 @@ public class TestFmod extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

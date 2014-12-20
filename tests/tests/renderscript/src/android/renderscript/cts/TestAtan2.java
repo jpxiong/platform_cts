@@ -35,45 +35,45 @@ public class TestAtan2 extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inY;
-        public float inX;
+        public float inNumerator;
+        public float inDenominator;
         public Target.Floaty out;
     }
 
     private void checkAtan2FloatFloatFloat() {
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x8f58f1f953c03c32l, false);
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x8f58f1f953c03c31l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x717c0d8e261d332l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x37738e957bd90d5bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInX(inX);
-            script.forEach_testAtan2FloatFloatFloat(inY, out);
-            verifyResultsAtan2FloatFloatFloat(inY, inX, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testAtan2FloatFloatFloat(inNumerator, out);
+            verifyResultsAtan2FloatFloatFloat(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2FloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInX(inX);
-            scriptRelaxed.forEach_testAtan2FloatFloatFloat(inY, out);
-            verifyResultsAtan2FloatFloatFloat(inY, inX, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testAtan2FloatFloatFloat(inNumerator, out);
+            verifyResultsAtan2FloatFloatFloat(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2FloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsAtan2FloatFloatFloat(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
+    private void verifyResultsAtan2FloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inY = arrayInY[i];
-                args.inX = arrayInX[i];
+                args.inNumerator = arrayInNumerator[i];
+                args.inDenominator = arrayInDenominator[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeAtan2(args, target);
@@ -84,13 +84,13 @@ public class TestAtan2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inY: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inX: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestAtan2 extends RSBaseCompute {
     }
 
     private void checkAtan2Float2Float2Float2() {
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbe78dcdcd414b6c0l, false);
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbe78dcdcd414b6bfl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8658ecfeefb30700l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x552b6d6bab583839l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInX(inX);
-            script.forEach_testAtan2Float2Float2Float2(inY, out);
-            verifyResultsAtan2Float2Float2Float2(inY, inX, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testAtan2Float2Float2Float2(inNumerator, out);
+            verifyResultsAtan2Float2Float2Float2(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInX(inX);
-            scriptRelaxed.forEach_testAtan2Float2Float2Float2(inY, out);
-            verifyResultsAtan2Float2Float2Float2(inY, inX, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testAtan2Float2Float2Float2(inNumerator, out);
+            verifyResultsAtan2Float2Float2Float2(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsAtan2Float2Float2Float2(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
+    private void verifyResultsAtan2Float2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inY = arrayInY[i * 2 + j];
-                args.inX = arrayInX[i * 2 + j];
+                args.inNumerator = arrayInNumerator[i * 2 + j];
+                args.inDenominator = arrayInDenominator[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeAtan2(args, target);
@@ -153,13 +153,13 @@ public class TestAtan2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inY: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inX: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestAtan2 extends RSBaseCompute {
     }
 
     private void checkAtan2Float3Float3Float3() {
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x12ddbafcd5f2b861l, false);
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x12ddbafcd5f2b860l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x61e79638927ef301l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1e8faeb47e33cb72l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInX(inX);
-            script.forEach_testAtan2Float3Float3Float3(inY, out);
-            verifyResultsAtan2Float3Float3Float3(inY, inX, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testAtan2Float3Float3Float3(inNumerator, out);
+            verifyResultsAtan2Float3Float3Float3(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInX(inX);
-            scriptRelaxed.forEach_testAtan2Float3Float3Float3(inY, out);
-            verifyResultsAtan2Float3Float3Float3(inY, inX, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testAtan2Float3Float3Float3(inNumerator, out);
+            verifyResultsAtan2Float3Float3Float3(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsAtan2Float3Float3Float3(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
+    private void verifyResultsAtan2Float3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inY = arrayInY[i * 4 + j];
-                args.inX = arrayInX[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeAtan2(args, target);
@@ -222,13 +222,13 @@ public class TestAtan2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inY: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inX: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestAtan2 extends RSBaseCompute {
     }
 
     private void checkAtan2Float4Float4Float4() {
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6742991cd7d0ba02l, false);
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6742991cd7d0ba01l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3d763f72354adf02l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe7f3effd510f5eabl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInX(inX);
-            script.forEach_testAtan2Float4Float4Float4(inY, out);
-            verifyResultsAtan2Float4Float4Float4(inY, inX, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testAtan2Float4Float4Float4(inNumerator, out);
+            verifyResultsAtan2Float4Float4Float4(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInX(inX);
-            scriptRelaxed.forEach_testAtan2Float4Float4Float4(inY, out);
-            verifyResultsAtan2Float4Float4Float4(inY, inX, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testAtan2Float4Float4Float4(inNumerator, out);
+            verifyResultsAtan2Float4Float4Float4(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAtan2Float4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsAtan2Float4Float4Float4(Allocation inY, Allocation inX, Allocation out, boolean relaxed) {
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
+    private void verifyResultsAtan2Float4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inY = arrayInY[i * 4 + j];
-                args.inX = arrayInX[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeAtan2(args, target);
@@ -291,13 +291,13 @@ public class TestAtan2 extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inY: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inX: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
