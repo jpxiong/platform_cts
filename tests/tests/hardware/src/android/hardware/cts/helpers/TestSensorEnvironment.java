@@ -199,6 +199,17 @@ public class TestSensorEnvironment {
     }
 
     /**
+     * @return A string representing the frequency equivalent to
+     * {@link #getRequestedSamplingPeriodUs()}.
+     */
+    public String getFrequencyString() {
+        if (mSamplingPeriodUs == SensorManager.SENSOR_DELAY_FASTEST) {
+            return "fastest";
+        }
+        return String.format("%.0fhz", getFrequencyHz());
+    }
+
+    /**
      * @return The requested collection max batch report latency in microseconds.
      */
     public int getMaxReportLatencyUs() {
@@ -313,6 +324,17 @@ public class TestSensorEnvironment {
                 reportLatencySec = 0;
         }
         return TimeUnit.SECONDS.toNanos(reportLatencySec);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Sensor='%s', SamplingRateOverloaded=%s, SamplingPeriod=%sus, "
+                        + "MaxReportLatency=%sus",
+                mSensor,
+                isSensorSamplingRateOverloaded(),
+                mSamplingPeriodUs,
+                mMaxReportLatencyUs);
     }
 
     /**

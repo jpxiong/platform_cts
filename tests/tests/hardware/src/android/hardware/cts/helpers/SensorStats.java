@@ -123,8 +123,8 @@ public class SensorStats {
     /**
      * Utility method to log the stats to the logcat.
      */
-    public static void logStats(String tag, SensorStats stats) {
-        final Map<String, Object> flattened = stats.flatten();
+    public void log(String tag) {
+        final Map<String, Object> flattened = flatten();
         for (String key : getSortedKeys(flattened)) {
             Object value = flattened.get(key);
             Log.v(tag, String.format("%s: %s", key, getValueString(value)));
@@ -134,35 +134,25 @@ public class SensorStats {
     /**
      * Utility method to log the stats to a file. Will overwrite the file if it already exists.
      */
-    public static void logStatsToFile(String fileName, SensorStats stats) throws IOException {
+    public void logToFile(String fileName) throws IOException {
         File statsDirectory = SensorCtsHelper.getSensorTestDataDirectory("stats/");
         File logFile = new File(statsDirectory, fileName);
-        final BufferedWriter writer =
-                new BufferedWriter(new FileWriter(logFile, false /* append */));
-        final Map<String, Object> flattened = stats.flatten();
-        try {
+        final Map<String, Object> flattened = flatten();
+        FileWriter fileWriter = new FileWriter(logFile, false /* append */);
+        try (BufferedWriter writer = new BufferedWriter(fileWriter)) {
             for (String key : getSortedKeys(flattened)) {
                 Object value = flattened.get(key);
                 writer.write(String.format("%s: %s\n", key, getValueString(value)));
             }
-        } finally {
-            writer.flush();
-            writer.close();
         }
     }
 
     /**
      * Provides a sanitized sensor name, that can be used in file names.
-     * See {@link #logStatsToFile(String, SensorStats)}.
+     * See {@link #logToFile(String)}.
      */
-    public static String getSanitizedSensorName(Sensor sensor) throws IOException {
-        String sensorType = sensor.getStringType();
-        String sanitizedSensorType = sensorType.replaceAll("[^a-zA-Z0-9_\\-]", "_");
-        if (sanitizedSensorType.matches("_*")) {
-            throw new IOException("Unable to sanitize sensor type (" + sensorType + "). This is a"
-                    + " 'test framework' issue and the sanitation routine must be fixed.");
-        }
-        return sanitizedSensorType;
+    public static String getSanitizedSensorName(Sensor sensor) throws SensorTestPlatformException {
+        return SensorCtsHelper.sanitizeStringForFileName(sensor.getStringType());
     }
 
     private static List<String> getSortedKeys(Map<String, Object> flattenedStats) {

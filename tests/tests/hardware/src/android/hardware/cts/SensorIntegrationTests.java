@@ -97,7 +97,7 @@ public class SensorIntegrationTests extends SensorTestCase {
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
         operation.execute();
-        SensorStats.logStats(TAG, operation.getStats());
+        operation.getStats().log(TAG);
     }
 
     /**
@@ -153,7 +153,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         }
 
         operation.execute();
-        SensorStats.logStats(TAG, operation.getStats());
+        operation.getStats().log(TAG);
     }
 
     /**
@@ -243,11 +243,11 @@ public class SensorIntegrationTests extends SensorTestCase {
         ParallelSensorOperation operation = new ParallelSensorOperation();
         operation.add(tester, testee);
         operation.execute();
-        SensorStats.logStats(TAG, operation.getStats());
+        operation.getStats().log(TAG);
 
         testee = testee.clone();
         testee.execute();
-        SensorStats.logStats(TAG, testee.getStats());
+        testee.getStats().log(TAG);
     }
 
     /**
