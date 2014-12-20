@@ -219,6 +219,25 @@ public class SensorCtsHelper {
     }
 
     /**
+     * Sanitizes a string so it can be used in file names.
+     *
+     * @param value The string to sanitize.
+     * @return The sanitized string.
+     *
+     * @throws SensorTestPlatformException If the string cannot be sanitized.
+     */
+    public static String sanitizeStringForFileName(String value)
+            throws SensorTestPlatformException {
+        String sanitizedValue = value.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+        if (sanitizedValue.matches("_*")) {
+            throw new SensorTestPlatformException(
+                    "Unable to sanitize string '%s' for file name.",
+                    value);
+        }
+        return sanitizedValue;
+    }
+
+    /**
      * Ensures that the directory structure represented by the given {@link File} is created.
      */
     private static File createDirectoryStructure(File directoryStructure) throws IOException {
