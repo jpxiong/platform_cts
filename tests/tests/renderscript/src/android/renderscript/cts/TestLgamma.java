@@ -35,38 +35,38 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkLgammaFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe748c67429cab138l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd9395583050bc4bel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testLgammaFloatFloat(in, out);
-            verifyResultsLgammaFloatFloat(in, out, false);
+            script.forEach_testLgammaFloatFloat(inV, out);
+            verifyResultsLgammaFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testLgammaFloatFloat(in, out);
-            verifyResultsLgammaFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testLgammaFloatFloat(inV, out);
+            verifyResultsLgammaFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsLgammaFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLgamma(args, target);
@@ -77,9 +77,9 @@ public class TestLgamma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7ca07efd8a327894l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xeef55496367a4132l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testLgammaFloat2Float2(in, out);
-            verifyResultsLgammaFloat2Float2(in, out, false);
+            script.forEach_testLgammaFloat2Float2(inV, out);
+            verifyResultsLgammaFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testLgammaFloat2Float2(in, out);
-            verifyResultsLgammaFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testLgammaFloat2Float2(inV, out);
+            verifyResultsLgammaFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsLgammaFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLgamma(args, target);
@@ -136,9 +136,9 @@ public class TestLgamma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7ca0899ee9390e2el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xeef71db12c956210l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testLgammaFloat3Float3(in, out);
-            verifyResultsLgammaFloat3Float3(in, out, false);
+            script.forEach_testLgammaFloat3Float3(inV, out);
+            verifyResultsLgammaFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testLgammaFloat3Float3(in, out);
-            verifyResultsLgammaFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testLgammaFloat3Float3(inV, out);
+            verifyResultsLgammaFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsLgammaFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLgamma(args, target);
@@ -195,9 +195,9 @@ public class TestLgamma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7ca09440483fa3c8l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xeef8e6cc22b082eel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testLgammaFloat4Float4(in, out);
-            verifyResultsLgammaFloat4Float4(in, out, false);
+            script.forEach_testLgammaFloat4Float4(inV, out);
+            verifyResultsLgammaFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testLgammaFloat4Float4(in, out);
-            verifyResultsLgammaFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testLgammaFloat4Float4(inV, out);
+            verifyResultsLgammaFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsLgammaFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeLgamma(args, target);
@@ -254,9 +254,9 @@ public class TestLgamma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input in: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -276,47 +276,47 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     public class ArgumentsFloatIntFloat {
-        public float inX;
-        public int outSign;
+        public float inV;
+        public int outSignOfGamma;
         public float out;
     }
 
     private void checkLgammaFloatIntFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a62d992979c4bb9l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a62d992979c4bb7l, false);
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocOutSign(outSign);
-            script.forEach_testLgammaFloatIntFloat(inX, out);
-            verifyResultsLgammaFloatIntFloat(inX, outSign, out, false);
+            script.set_gAllocOutSignOfGamma(outSignOfGamma);
+            script.forEach_testLgammaFloatIntFloat(inV, out);
+            verifyResultsLgammaFloatIntFloat(inV, outSignOfGamma, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatIntFloat: " + e.toString());
         }
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutSign(outSign);
-            scriptRelaxed.forEach_testLgammaFloatIntFloat(inX, out);
-            verifyResultsLgammaFloatIntFloat(inX, outSign, out, true);
+            scriptRelaxed.set_gAllocOutSignOfGamma(outSignOfGamma);
+            scriptRelaxed.forEach_testLgammaFloatIntFloat(inV, out);
+            verifyResultsLgammaFloatIntFloat(inV, outSignOfGamma, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatIntFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloatIntFloat(Allocation inX, Allocation outSign, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        int[] arrayOutSign = new int[INPUTSIZE * 1];
-        outSign.copyTo(arrayOutSign);
+    private void verifyResultsLgammaFloatIntFloat(Allocation inV, Allocation outSignOfGamma, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
+        int[] arrayOutSignOfGamma = new int[INPUTSIZE * 1];
+        outSignOfGamma.copyTo(arrayOutSignOfGamma);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i];
+                args.inV = arrayInV[i];
                 // Extract the outputs.
-                args.outSign = arrayOutSign[i * 1 + j];
+                args.outSignOfGamma = arrayOutSignOfGamma[i * 1 + j];
                 args.out = arrayOut[i * 1 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -324,12 +324,12 @@ public class TestLgamma extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Output outSign: ");
-                    message.append(String.format("%d", args.outSign));
+                    message.append("Output outSignOfGamma: ");
+                    message.append(String.format("%d", args.outSignOfGamma));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -343,41 +343,41 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat2Int2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x409fb9a5984bcf81l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x409fb9a5984bcf7fl, false);
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocOutSign(outSign);
-            script.forEach_testLgammaFloat2Int2Float2(inX, out);
-            verifyResultsLgammaFloat2Int2Float2(inX, outSign, out, false);
+            script.set_gAllocOutSignOfGamma(outSignOfGamma);
+            script.forEach_testLgammaFloat2Int2Float2(inV, out);
+            verifyResultsLgammaFloat2Int2Float2(inV, outSignOfGamma, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Int2Float2: " + e.toString());
         }
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutSign(outSign);
-            scriptRelaxed.forEach_testLgammaFloat2Int2Float2(inX, out);
-            verifyResultsLgammaFloat2Int2Float2(inX, outSign, out, true);
+            scriptRelaxed.set_gAllocOutSignOfGamma(outSignOfGamma);
+            scriptRelaxed.forEach_testLgammaFloat2Int2Float2(inV, out);
+            verifyResultsLgammaFloat2Int2Float2(inV, outSignOfGamma, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Int2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat2Int2Float2(Allocation inX, Allocation outSign, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        int[] arrayOutSign = new int[INPUTSIZE * 2];
-        outSign.copyTo(arrayOutSign);
+    private void verifyResultsLgammaFloat2Int2Float2(Allocation inV, Allocation outSignOfGamma, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOutSignOfGamma = new int[INPUTSIZE * 2];
+        outSignOfGamma.copyTo(arrayOutSignOfGamma);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Extract the outputs.
-                args.outSign = arrayOutSign[i * 2 + j];
+                args.outSignOfGamma = arrayOutSignOfGamma[i * 2 + j];
                 args.out = arrayOut[i * 2 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -385,12 +385,12 @@ public class TestLgamma extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Output outSign: ");
-                    message.append(String.format("%d", args.outSign));
+                    message.append("Output outSignOfGamma: ");
+                    message.append(String.format("%d", args.outSignOfGamma));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -404,41 +404,41 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat3Int3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6655f8088dfe3c3al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6655f8088dfe3c38l, false);
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocOutSign(outSign);
-            script.forEach_testLgammaFloat3Int3Float3(inX, out);
-            verifyResultsLgammaFloat3Int3Float3(inX, outSign, out, false);
+            script.set_gAllocOutSignOfGamma(outSignOfGamma);
+            script.forEach_testLgammaFloat3Int3Float3(inV, out);
+            verifyResultsLgammaFloat3Int3Float3(inV, outSignOfGamma, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Int3Float3: " + e.toString());
         }
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutSign(outSign);
-            scriptRelaxed.forEach_testLgammaFloat3Int3Float3(inX, out);
-            verifyResultsLgammaFloat3Int3Float3(inX, outSign, out, true);
+            scriptRelaxed.set_gAllocOutSignOfGamma(outSignOfGamma);
+            scriptRelaxed.forEach_testLgammaFloat3Int3Float3(inV, out);
+            verifyResultsLgammaFloat3Int3Float3(inV, outSignOfGamma, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Int3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat3Int3Float3(Allocation inX, Allocation outSign, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayOutSign = new int[INPUTSIZE * 4];
-        outSign.copyTo(arrayOutSign);
+    private void verifyResultsLgammaFloat3Int3Float3(Allocation inV, Allocation outSignOfGamma, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOutSignOfGamma = new int[INPUTSIZE * 4];
+        outSignOfGamma.copyTo(arrayOutSignOfGamma);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Extract the outputs.
-                args.outSign = arrayOutSign[i * 4 + j];
+                args.outSignOfGamma = arrayOutSignOfGamma[i * 4 + j];
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -446,12 +446,12 @@ public class TestLgamma extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Output outSign: ");
-                    message.append(String.format("%d", args.outSign));
+                    message.append("Output outSignOfGamma: ");
+                    message.append(String.format("%d", args.outSignOfGamma));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -465,41 +465,41 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat4Int4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8c0c366b83b0a8f3l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8c0c366b83b0a8f1l, false);
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocOutSign(outSign);
-            script.forEach_testLgammaFloat4Int4Float4(inX, out);
-            verifyResultsLgammaFloat4Int4Float4(inX, outSign, out, false);
+            script.set_gAllocOutSignOfGamma(outSignOfGamma);
+            script.forEach_testLgammaFloat4Int4Float4(inV, out);
+            verifyResultsLgammaFloat4Int4Float4(inV, outSignOfGamma, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Int4Float4: " + e.toString());
         }
         try {
-            Allocation outSign = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation outSignOfGamma = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutSign(outSign);
-            scriptRelaxed.forEach_testLgammaFloat4Int4Float4(inX, out);
-            verifyResultsLgammaFloat4Int4Float4(inX, outSign, out, true);
+            scriptRelaxed.set_gAllocOutSignOfGamma(outSignOfGamma);
+            scriptRelaxed.forEach_testLgammaFloat4Int4Float4(inV, out);
+            verifyResultsLgammaFloat4Int4Float4(inV, outSignOfGamma, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Int4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsLgammaFloat4Int4Float4(Allocation inX, Allocation outSign, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        int[] arrayOutSign = new int[INPUTSIZE * 4];
-        outSign.copyTo(arrayOutSign);
+    private void verifyResultsLgammaFloat4Int4Float4(Allocation inV, Allocation outSignOfGamma, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOutSignOfGamma = new int[INPUTSIZE * 4];
+        outSignOfGamma.copyTo(arrayOutSignOfGamma);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
-                args.inX = arrayInX[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Extract the outputs.
-                args.outSign = arrayOutSign[i * 4 + j];
+                args.outSignOfGamma = arrayOutSignOfGamma[i * 4 + j];
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -507,12 +507,12 @@ public class TestLgamma extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Output outSign: ");
-                    message.append(String.format("%d", args.outSign));
+                    message.append("Output outSignOfGamma: ");
+                    message.append(String.format("%d", args.outSignOfGamma));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));

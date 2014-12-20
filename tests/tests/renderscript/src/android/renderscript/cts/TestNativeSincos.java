@@ -36,37 +36,37 @@ public class TestNativeSincos extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inV;
-        public Target.Floaty outCosptr;
+        public Target.Floaty outCos;
         public Target.Floaty out;
     }
 
     private void checkNativeSincosFloatFloatFloat() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe15df2366436cc13l, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocOutCosptr(outCosptr);
+            script.set_gAllocOutCos(outCos);
             script.forEach_testNativeSincosFloatFloatFloat(inV, out);
-            verifyResultsNativeSincosFloatFloatFloat(inV, outCosptr, out, false);
+            verifyResultsNativeSincosFloatFloatFloat(inV, outCos, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutCosptr(outCosptr);
+            scriptRelaxed.set_gAllocOutCos(outCos);
             scriptRelaxed.forEach_testNativeSincosFloatFloatFloat(inV, out);
-            verifyResultsNativeSincosFloatFloatFloat(inV, outCosptr, out, true);
+            verifyResultsNativeSincosFloatFloatFloat(inV, outCos, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeSincosFloatFloatFloat(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+    private void verifyResultsNativeSincosFloatFloatFloat(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
         inV.copyTo(arrayInV);
-        float[] arrayOutCosptr = new float[INPUTSIZE * 1];
-        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOutCos = new float[INPUTSIZE * 1];
+        outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -79,7 +79,7 @@ public class TestNativeSincos extends RSBaseCompute {
                 CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j], 0.0005)) {
+                if (!args.outCos.couldBe(arrayOutCos[i * 1 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
@@ -91,13 +91,13 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Expected output outCosptr: ");
-                    message.append(args.outCosptr.toString());
+                    message.append("Expected output outCos: ");
+                    message.append(args.outCos.toString());
                     message.append("\n");
-                    message.append("Actual   output outCosptr: ");
+                    message.append("Actual   output outCos: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCosptr[i * 1 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
-                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j], 0.0005)) {
+                            arrayOutCos[i * 1 + j], Float.floatToRawIntBits(arrayOutCos[i * 1 + j]), arrayOutCos[i * 1 + j]));
+                    if (!args.outCos.couldBe(arrayOutCos[i * 1 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -121,30 +121,30 @@ public class TestNativeSincos extends RSBaseCompute {
     private void checkNativeSincosFloat2Float2Float2() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe5a1f1dcda676ea9l, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocOutCosptr(outCosptr);
+            script.set_gAllocOutCos(outCos);
             script.forEach_testNativeSincosFloat2Float2Float2(inV, out);
-            verifyResultsNativeSincosFloat2Float2Float2(inV, outCosptr, out, false);
+            verifyResultsNativeSincosFloat2Float2Float2(inV, outCos, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutCosptr(outCosptr);
+            scriptRelaxed.set_gAllocOutCos(outCos);
             scriptRelaxed.forEach_testNativeSincosFloat2Float2Float2(inV, out);
-            verifyResultsNativeSincosFloat2Float2Float2(inV, outCosptr, out, true);
+            verifyResultsNativeSincosFloat2Float2Float2(inV, outCos, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeSincosFloat2Float2Float2(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+    private void verifyResultsNativeSincosFloat2Float2Float2(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
         inV.copyTo(arrayInV);
-        float[] arrayOutCosptr = new float[INPUTSIZE * 2];
-        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOutCos = new float[INPUTSIZE * 2];
+        outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -157,7 +157,7 @@ public class TestNativeSincos extends RSBaseCompute {
                 CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j], 0.0005)) {
+                if (!args.outCos.couldBe(arrayOutCos[i * 2 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
@@ -169,13 +169,13 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Expected output outCosptr: ");
-                    message.append(args.outCosptr.toString());
+                    message.append("Expected output outCos: ");
+                    message.append(args.outCos.toString());
                     message.append("\n");
-                    message.append("Actual   output outCosptr: ");
+                    message.append("Actual   output outCos: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCosptr[i * 2 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
-                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j], 0.0005)) {
+                            arrayOutCos[i * 2 + j], Float.floatToRawIntBits(arrayOutCos[i * 2 + j]), arrayOutCos[i * 2 + j]));
+                    if (!args.outCos.couldBe(arrayOutCos[i * 2 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -199,30 +199,30 @@ public class TestNativeSincos extends RSBaseCompute {
     private void checkNativeSincosFloat3Float3Float3() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3a06cffcdc45704al, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocOutCosptr(outCosptr);
+            script.set_gAllocOutCos(outCos);
             script.forEach_testNativeSincosFloat3Float3Float3(inV, out);
-            verifyResultsNativeSincosFloat3Float3Float3(inV, outCosptr, out, false);
+            verifyResultsNativeSincosFloat3Float3Float3(inV, outCos, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutCosptr(outCosptr);
+            scriptRelaxed.set_gAllocOutCos(outCos);
             scriptRelaxed.forEach_testNativeSincosFloat3Float3Float3(inV, out);
-            verifyResultsNativeSincosFloat3Float3Float3(inV, outCosptr, out, true);
+            verifyResultsNativeSincosFloat3Float3Float3(inV, outCos, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeSincosFloat3Float3Float3(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+    private void verifyResultsNativeSincosFloat3Float3Float3(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
         inV.copyTo(arrayInV);
-        float[] arrayOutCosptr = new float[INPUTSIZE * 4];
-        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOutCos = new float[INPUTSIZE * 4];
+        outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -235,7 +235,7 @@ public class TestNativeSincos extends RSBaseCompute {
                 CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j], 0.0005)) {
+                if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
@@ -247,13 +247,13 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Expected output outCosptr: ");
-                    message.append(args.outCosptr.toString());
+                    message.append("Expected output outCos: ");
+                    message.append(args.outCos.toString());
                     message.append("\n");
-                    message.append("Actual   output outCosptr: ");
+                    message.append("Actual   output outCos: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
-                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j], 0.0005)) {
+                            arrayOutCos[i * 4 + j], Float.floatToRawIntBits(arrayOutCos[i * 4 + j]), arrayOutCos[i * 4 + j]));
+                    if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
@@ -277,30 +277,30 @@ public class TestNativeSincos extends RSBaseCompute {
     private void checkNativeSincosFloat4Float4Float4() {
         Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8e6bae1cde2371ebl, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocOutCosptr(outCosptr);
+            script.set_gAllocOutCos(outCos);
             script.forEach_testNativeSincosFloat4Float4Float4(inV, out);
-            verifyResultsNativeSincosFloat4Float4Float4(inV, outCosptr, out, false);
+            verifyResultsNativeSincosFloat4Float4Float4(inV, outCos, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocOutCosptr(outCosptr);
+            scriptRelaxed.set_gAllocOutCos(outCos);
             scriptRelaxed.forEach_testNativeSincosFloat4Float4Float4(inV, out);
-            verifyResultsNativeSincosFloat4Float4Float4(inV, outCosptr, out, true);
+            verifyResultsNativeSincosFloat4Float4Float4(inV, outCos, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeSincosFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeSincosFloat4Float4Float4(Allocation inV, Allocation outCosptr, Allocation out, boolean relaxed) {
+    private void verifyResultsNativeSincosFloat4Float4Float4(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
         inV.copyTo(arrayInV);
-        float[] arrayOutCosptr = new float[INPUTSIZE * 4];
-        outCosptr.copyTo(arrayOutCosptr);
+        float[] arrayOutCos = new float[INPUTSIZE * 4];
+        outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -313,7 +313,7 @@ public class TestNativeSincos extends RSBaseCompute {
                 CoreMathVerifier.computeNativeSincos(args, target);
                 // Validate the outputs.
                 boolean valid = true;
-                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j], 0.0005)) {
+                if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                     valid = false;
                 }
                 if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
@@ -325,13 +325,13 @@ public class TestNativeSincos extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append("Expected output outCosptr: ");
-                    message.append(args.outCosptr.toString());
+                    message.append("Expected output outCos: ");
+                    message.append(args.outCos.toString());
                     message.append("\n");
-                    message.append("Actual   output outCosptr: ");
+                    message.append("Actual   output outCos: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
-                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j], 0.0005)) {
+                            arrayOutCos[i * 4 + j], Float.floatToRawIntBits(arrayOutCos[i * 4 + j]), arrayOutCos[i * 4 + j]));
+                    if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");

@@ -35,38 +35,38 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float inIn;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkNativeAtanhFloatFloat() {
-        Allocation inIn = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe13e715ccd0cedebl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x46ba02a2e7004d04l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testNativeAtanhFloatFloat(inIn, out);
-            verifyResultsNativeAtanhFloatFloat(inIn, out, false);
+            script.forEach_testNativeAtanhFloatFloat(inV, out);
+            verifyResultsNativeAtanhFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeAtanhFloatFloat(inIn, out);
-            verifyResultsNativeAtanhFloatFloat(inIn, out, true);
+            scriptRelaxed.forEach_testNativeAtanhFloatFloat(inV, out);
+            verifyResultsNativeAtanhFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeAtanhFloatFloat(Allocation inIn, Allocation out, boolean relaxed) {
-        float[] arrayInIn = new float[INPUTSIZE * 1];
-        inIn.copyTo(arrayInIn);
+    private void verifyResultsNativeAtanhFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inIn = arrayInIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeAtanh(args, target);
@@ -77,9 +77,9 @@ public class TestNativeAtanh extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inIn: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inIn, Float.floatToRawIntBits(args.inIn), args.inIn));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat2Float2() {
-        Allocation inIn = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd5bd3a2802f7f5d7l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd557bfdd35a682c8l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testNativeAtanhFloat2Float2(inIn, out);
-            verifyResultsNativeAtanhFloat2Float2(inIn, out, false);
+            script.forEach_testNativeAtanhFloat2Float2(inV, out);
+            verifyResultsNativeAtanhFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeAtanhFloat2Float2(inIn, out);
-            verifyResultsNativeAtanhFloat2Float2(inIn, out, true);
+            scriptRelaxed.forEach_testNativeAtanhFloat2Float2(inV, out);
+            verifyResultsNativeAtanhFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeAtanhFloat2Float2(Allocation inIn, Allocation out, boolean relaxed) {
-        float[] arrayInIn = new float[INPUTSIZE * 2];
-        inIn.copyTo(arrayInIn);
+    private void verifyResultsNativeAtanhFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inIn = arrayInIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeAtanh(args, target);
@@ -136,9 +136,9 @@ public class TestNativeAtanh extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inIn: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inIn, Float.floatToRawIntBits(args.inIn), args.inIn));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat3Float3() {
-        Allocation inIn = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd60a01af59867b21l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd55988f82bc1a3a6l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testNativeAtanhFloat3Float3(inIn, out);
-            verifyResultsNativeAtanhFloat3Float3(inIn, out, false);
+            script.forEach_testNativeAtanhFloat3Float3(inV, out);
+            verifyResultsNativeAtanhFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeAtanhFloat3Float3(inIn, out);
-            verifyResultsNativeAtanhFloat3Float3(inIn, out, true);
+            scriptRelaxed.forEach_testNativeAtanhFloat3Float3(inV, out);
+            verifyResultsNativeAtanhFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeAtanhFloat3Float3(Allocation inIn, Allocation out, boolean relaxed) {
-        float[] arrayInIn = new float[INPUTSIZE * 4];
-        inIn.copyTo(arrayInIn);
+    private void verifyResultsNativeAtanhFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inIn = arrayInIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeAtanh(args, target);
@@ -195,9 +195,9 @@ public class TestNativeAtanh extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inIn: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inIn, Float.floatToRawIntBits(args.inIn), args.inIn));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat4Float4() {
-        Allocation inIn = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd656c936b015006bl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd55b521321dcc484l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testNativeAtanhFloat4Float4(inIn, out);
-            verifyResultsNativeAtanhFloat4Float4(inIn, out, false);
+            script.forEach_testNativeAtanhFloat4Float4(inV, out);
+            verifyResultsNativeAtanhFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testNativeAtanhFloat4Float4(inIn, out);
-            verifyResultsNativeAtanhFloat4Float4(inIn, out, true);
+            scriptRelaxed.forEach_testNativeAtanhFloat4Float4(inV, out);
+            verifyResultsNativeAtanhFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeAtanhFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsNativeAtanhFloat4Float4(Allocation inIn, Allocation out, boolean relaxed) {
-        float[] arrayInIn = new float[INPUTSIZE * 4];
-        inIn.copyTo(arrayInIn);
+    private void verifyResultsNativeAtanhFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inIn = arrayInIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeNativeAtanh(args, target);
@@ -254,9 +254,9 @@ public class TestNativeAtanh extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inIn: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inIn, Float.floatToRawIntBits(args.inIn), args.inIn));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

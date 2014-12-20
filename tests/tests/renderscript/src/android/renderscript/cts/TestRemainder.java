@@ -35,45 +35,45 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inX;
-        public float inY;
+        public float inNumerator;
+        public float inDenominator;
         public Target.Floaty out;
     }
 
     private void checkRemainderFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x27d6330966022888l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x27d6330966022889l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd47c3f07317ea229l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb246eb0ee2ebe35al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testRemainderFloatFloatFloat(inX, out);
-            verifyResultsRemainderFloatFloatFloat(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testRemainderFloatFloatFloat(inNumerator, out);
+            verifyResultsRemainderFloatFloatFloat(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testRemainderFloatFloatFloat(inX, out);
-            verifyResultsRemainderFloatFloatFloat(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testRemainderFloatFloatFloat(inNumerator, out);
+            verifyResultsRemainderFloatFloatFloat(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsRemainderFloatFloatFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 1];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 1];
-        inY.copyTo(arrayInY);
+    private void verifyResultsRemainderFloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i];
-                args.inY = arrayInY[i];
+                args.inNumerator = arrayInNumerator[i];
+                args.inDenominator = arrayInDenominator[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeRemainder(args, target);
@@ -84,13 +84,13 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -110,39 +110,39 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     private void checkRemainderFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb2eaf332420c6b4l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb2eaf332420c6b5l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x27d975633fdcf8d5l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xce8489f2aa4be3a6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testRemainderFloat2Float2Float2(inX, out);
-            verifyResultsRemainderFloat2Float2Float2(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testRemainderFloat2Float2Float2(inNumerator, out);
+            verifyResultsRemainderFloat2Float2Float2(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testRemainderFloat2Float2Float2(inX, out);
-            verifyResultsRemainderFloat2Float2Float2(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testRemainderFloat2Float2Float2(inNumerator, out);
+            verifyResultsRemainderFloat2Float2Float2(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsRemainderFloat2Float2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 2];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 2];
-        inY.copyTo(arrayInY);
+    private void verifyResultsRemainderFloat2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 2 + j];
-                args.inY = arrayInY[i * 2 + j];
+                args.inNumerator = arrayInNumerator[i * 2 + j];
+                args.inDenominator = arrayInDenominator[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeRemainder(args, target);
@@ -153,13 +153,13 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -179,39 +179,39 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     private void checkRemainderFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4f938d5325fec855l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4f938d5325fec856l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3681e9ce2a8e4d6l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x97e8cb3b7d2776dfl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testRemainderFloat3Float3Float3(inX, out);
-            verifyResultsRemainderFloat3Float3Float3(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testRemainderFloat3Float3Float3(inNumerator, out);
+            verifyResultsRemainderFloat3Float3Float3(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testRemainderFloat3Float3Float3(inX, out);
-            verifyResultsRemainderFloat3Float3Float3(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testRemainderFloat3Float3Float3(inNumerator, out);
+            verifyResultsRemainderFloat3Float3Float3(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsRemainderFloat3Float3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsRemainderFloat3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeRemainder(args, target);
@@ -222,13 +222,13 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -248,39 +248,39 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     private void checkRemainderFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa3f86b7327dcc9f6l, false);
-        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa3f86b7327dcc9f7l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdef6c7d68574d0d7l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x614d0c8450030a18l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInY(inY);
-            script.forEach_testRemainderFloat4Float4Float4(inX, out);
-            verifyResultsRemainderFloat4Float4Float4(inX, inY, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.forEach_testRemainderFloat4Float4Float4(inNumerator, out);
+            verifyResultsRemainderFloat4Float4Float4(inNumerator, inDenominator, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInY(inY);
-            scriptRelaxed.forEach_testRemainderFloat4Float4Float4(inX, out);
-            verifyResultsRemainderFloat4Float4Float4(inX, inY, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.forEach_testRemainderFloat4Float4Float4(inNumerator, out);
+            verifyResultsRemainderFloat4Float4Float4(inNumerator, inDenominator, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsRemainderFloat4Float4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
-        float[] arrayInX = new float[INPUTSIZE * 4];
-        inX.copyTo(arrayInX);
-        float[] arrayInY = new float[INPUTSIZE * 4];
-        inY.copyTo(arrayInY);
+    private void verifyResultsRemainderFloat4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
-                args.inX = arrayInX[i * 4 + j];
-                args.inY = arrayInY[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeRemainder(args, target);
@@ -291,13 +291,13 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inX: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inY: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
