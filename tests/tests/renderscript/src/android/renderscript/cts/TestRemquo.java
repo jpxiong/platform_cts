@@ -35,54 +35,54 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatIntFloat {
-        public float inB;
-        public float inC;
-        public int outD;
+        public float inNumerator;
+        public float inDenominator;
+        public int outQuotient;
         public float out;
     }
 
     private void checkRemquoFloatFloatIntFloat() {
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b13l, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b14l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xcd5efc69edd4ff2al, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4ff0c9312eb19f93l, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInC(inC);
-            script.set_gAllocOutD(outD);
-            script.forEach_testRemquoFloatFloatIntFloat(inB, out);
-            verifyResultsRemquoFloatFloatIntFloat(inB, inC, outD, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.set_gAllocOutQuotient(outQuotient);
+            script.forEach_testRemquoFloatFloatIntFloat(inNumerator, out);
+            verifyResultsRemquoFloatFloatIntFloat(inNumerator, inDenominator, outQuotient, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloatFloatIntFloat: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.set_gAllocOutD(outD);
-            scriptRelaxed.forEach_testRemquoFloatFloatIntFloat(inB, out);
-            verifyResultsRemquoFloatFloatIntFloat(inB, inC, outD, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.set_gAllocOutQuotient(outQuotient);
+            scriptRelaxed.forEach_testRemquoFloatFloatIntFloat(inNumerator, out);
+            verifyResultsRemquoFloatFloatIntFloat(inNumerator, inDenominator, outQuotient, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloatFloatIntFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsRemquoFloatFloatIntFloat(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
-        float[] arrayInB = new float[INPUTSIZE * 1];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 1];
-        inC.copyTo(arrayInC);
-        int[] arrayOutD = new int[INPUTSIZE * 1];
-        outD.copyTo(arrayOutD);
+    private void verifyResultsRemquoFloatFloatIntFloat(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        inDenominator.copyTo(arrayInDenominator);
+        int[] arrayOutQuotient = new int[INPUTSIZE * 1];
+        outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
-                args.inB = arrayInB[i];
-                args.inC = arrayInC[i];
+                args.inNumerator = arrayInNumerator[i];
+                args.inDenominator = arrayInDenominator[i];
                 // Extract the outputs.
-                args.outD = arrayOutD[i * 1 + j];
+                args.outQuotient = arrayOutQuotient[i * 1 + j];
                 args.out = arrayOut[i * 1 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -90,16 +90,16 @@ public class TestRemquo extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inB: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
-                    message.append("Output outD: ");
-                    message.append(String.format("%d", args.outD));
+                    message.append("Output outQuotient: ");
+                    message.append(String.format("%d", args.outQuotient));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -113,47 +113,47 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat2Float2Int2Float2() {
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9b98a1a6b125f903l, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9b98a1a6b125f904l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x28c14abc3a27171al, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x58f8799a6ba08403l, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.set_gAllocInC(inC);
-            script.set_gAllocOutD(outD);
-            script.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
-            verifyResultsRemquoFloat2Float2Int2Float2(inB, inC, outD, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.set_gAllocOutQuotient(outQuotient);
+            script.forEach_testRemquoFloat2Float2Int2Float2(inNumerator, out);
+            verifyResultsRemquoFloat2Float2Int2Float2(inNumerator, inDenominator, outQuotient, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat2Float2Int2Float2: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.set_gAllocOutD(outD);
-            scriptRelaxed.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
-            verifyResultsRemquoFloat2Float2Int2Float2(inB, inC, outD, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.set_gAllocOutQuotient(outQuotient);
+            scriptRelaxed.forEach_testRemquoFloat2Float2Int2Float2(inNumerator, out);
+            verifyResultsRemquoFloat2Float2Int2Float2(inNumerator, inDenominator, outQuotient, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat2Float2Int2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsRemquoFloat2Float2Int2Float2(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
-        float[] arrayInB = new float[INPUTSIZE * 2];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 2];
-        inC.copyTo(arrayInC);
-        int[] arrayOutD = new int[INPUTSIZE * 2];
-        outD.copyTo(arrayOutD);
+    private void verifyResultsRemquoFloat2Float2Int2Float2(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        inDenominator.copyTo(arrayInDenominator);
+        int[] arrayOutQuotient = new int[INPUTSIZE * 2];
+        outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
-                args.inB = arrayInB[i * 2 + j];
-                args.inC = arrayInC[i * 2 + j];
+                args.inNumerator = arrayInNumerator[i * 2 + j];
+                args.inDenominator = arrayInDenominator[i * 2 + j];
                 // Extract the outputs.
-                args.outD = arrayOutD[i * 2 + j];
+                args.outQuotient = arrayOutQuotient[i * 2 + j];
                 args.out = arrayOut[i * 2 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -161,16 +161,16 @@ public class TestRemquo extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inB: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
-                    message.append("Output outD: ");
-                    message.append(String.format("%d", args.outD));
+                    message.append("Output outQuotient: ");
+                    message.append(String.format("%d", args.outQuotient));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -184,47 +184,47 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat3Float3Int3Float3() {
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa049a00a6911ca8fl, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa049a00a6911ca90l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf60211df96052526l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd1d6c7fcf273f8afl, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.set_gAllocInC(inC);
-            script.set_gAllocOutD(outD);
-            script.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
-            verifyResultsRemquoFloat3Float3Int3Float3(inB, inC, outD, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.set_gAllocOutQuotient(outQuotient);
+            script.forEach_testRemquoFloat3Float3Int3Float3(inNumerator, out);
+            verifyResultsRemquoFloat3Float3Int3Float3(inNumerator, inDenominator, outQuotient, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat3Float3Int3Float3: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.set_gAllocOutD(outD);
-            scriptRelaxed.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
-            verifyResultsRemquoFloat3Float3Int3Float3(inB, inC, outD, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.set_gAllocOutQuotient(outQuotient);
+            scriptRelaxed.forEach_testRemquoFloat3Float3Int3Float3(inNumerator, out);
+            verifyResultsRemquoFloat3Float3Int3Float3(inNumerator, inDenominator, outQuotient, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat3Float3Int3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsRemquoFloat3Float3Int3Float3(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
-        float[] arrayInB = new float[INPUTSIZE * 4];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 4];
-        inC.copyTo(arrayInC);
-        int[] arrayOutD = new int[INPUTSIZE * 4];
-        outD.copyTo(arrayOutD);
+    private void verifyResultsRemquoFloat3Float3Int3Float3(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
+        int[] arrayOutQuotient = new int[INPUTSIZE * 4];
+        outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
-                args.inB = arrayInB[i * 4 + j];
-                args.inC = arrayInC[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Extract the outputs.
-                args.outD = arrayOutD[i * 4 + j];
+                args.outQuotient = arrayOutQuotient[i * 4 + j];
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -232,16 +232,16 @@ public class TestRemquo extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inB: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
-                    message.append("Output outD: ");
-                    message.append(String.format("%d", args.outD));
+                    message.append("Output outQuotient: ");
+                    message.append(String.format("%d", args.outQuotient));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));
@@ -255,47 +255,47 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat4Float4Int4Float4() {
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa4fa9e6e20fd9c1bl, false);
-        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa4fa9e6e20fd9c1cl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc342d902f1e33332l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4ab5165f79476d5bl, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.set_gAllocInC(inC);
-            script.set_gAllocOutD(outD);
-            script.forEach_testRemquoFloat4Float4Int4Float4(inB, out);
-            verifyResultsRemquoFloat4Float4Int4Float4(inB, inC, outD, out, false);
+            script.set_gAllocInDenominator(inDenominator);
+            script.set_gAllocOutQuotient(outQuotient);
+            script.forEach_testRemquoFloat4Float4Int4Float4(inNumerator, out);
+            verifyResultsRemquoFloat4Float4Int4Float4(inNumerator, inDenominator, outQuotient, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat4Float4Int4Float4: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInC(inC);
-            scriptRelaxed.set_gAllocOutD(outD);
-            scriptRelaxed.forEach_testRemquoFloat4Float4Int4Float4(inB, out);
-            verifyResultsRemquoFloat4Float4Int4Float4(inB, inC, outD, out, true);
+            scriptRelaxed.set_gAllocInDenominator(inDenominator);
+            scriptRelaxed.set_gAllocOutQuotient(outQuotient);
+            scriptRelaxed.forEach_testRemquoFloat4Float4Int4Float4(inNumerator, out);
+            verifyResultsRemquoFloat4Float4Int4Float4(inNumerator, inDenominator, outQuotient, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat4Float4Int4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsRemquoFloat4Float4Int4Float4(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
-        float[] arrayInB = new float[INPUTSIZE * 4];
-        inB.copyTo(arrayInB);
-        float[] arrayInC = new float[INPUTSIZE * 4];
-        inC.copyTo(arrayInC);
-        int[] arrayOutD = new int[INPUTSIZE * 4];
-        outD.copyTo(arrayOutD);
+    private void verifyResultsRemquoFloat4Float4Int4Float4(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
+        float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        inNumerator.copyTo(arrayInNumerator);
+        float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        inDenominator.copyTo(arrayInDenominator);
+        int[] arrayOutQuotient = new int[INPUTSIZE * 4];
+        outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
-                args.inB = arrayInB[i * 4 + j];
-                args.inC = arrayInC[i * 4 + j];
+                args.inNumerator = arrayInNumerator[i * 4 + j];
+                args.inDenominator = arrayInDenominator[i * 4 + j];
                 // Extract the outputs.
-                args.outD = arrayOutD[i * 4 + j];
+                args.outQuotient = arrayOutQuotient[i * 4 + j];
                 args.out = arrayOut[i * 4 + j];
                 // Ask the CoreMathVerifier to validate.
                 Target target = new Target(relaxed);
@@ -303,16 +303,16 @@ public class TestRemquo extends RSBaseCompute {
                 boolean valid = errorMessage == null;
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inB: ");
+                    message.append("Input inNumerator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
                     message.append("\n");
-                    message.append("Input inC: ");
+                    message.append("Input inDenominator: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
                     message.append("\n");
-                    message.append("Output outD: ");
-                    message.append(String.format("%d", args.outD));
+                    message.append("Output outQuotient: ");
+                    message.append(String.format("%d", args.outQuotient));
                     message.append("\n");
                     message.append("Output out: ");
                     message.append(Float.toString(args.out));

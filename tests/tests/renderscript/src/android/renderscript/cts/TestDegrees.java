@@ -35,38 +35,38 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float inValue;
+        public float inV;
         public Target.Floaty out;
     }
 
     private void checkDegreesFloatFloat() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3325fa58542a6bb5l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x606ed077c5dde30al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testDegreesFloatFloat(inValue, out);
-            verifyResultsDegreesFloatFloat(inValue, out, false);
+            script.forEach_testDegreesFloatFloat(inV, out);
+            verifyResultsDegreesFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testDegreesFloatFloat(inValue, out);
-            verifyResultsDegreesFloatFloat(inValue, out, true);
+            scriptRelaxed.forEach_testDegreesFloatFloat(inV, out);
+            verifyResultsDegreesFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsDegreesFloatFloat(Allocation inValue, Allocation out, boolean relaxed) {
-        float[] arrayInValue = new float[INPUTSIZE * 1];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsDegreesFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inValue = arrayInValue[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeDegrees(args, target);
@@ -77,9 +77,9 @@ public class TestDegrees extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -99,33 +99,33 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat2Float2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7a202f393d2a289l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x803a665ae417141el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testDegreesFloat2Float2(inValue, out);
-            verifyResultsDegreesFloat2Float2(inValue, out, false);
+            script.forEach_testDegreesFloat2Float2(inV, out);
+            verifyResultsDegreesFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testDegreesFloat2Float2(inValue, out);
-            verifyResultsDegreesFloat2Float2(inValue, out, true);
+            scriptRelaxed.forEach_testDegreesFloat2Float2(inV, out);
+            verifyResultsDegreesFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsDegreesFloat2Float2(Allocation inValue, Allocation out, boolean relaxed) {
-        float[] arrayInValue = new float[INPUTSIZE * 2];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsDegreesFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inValue = arrayInValue[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeDegrees(args, target);
@@ -136,9 +136,9 @@ public class TestDegrees extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -158,33 +158,33 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat3Float3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2d56787add10c807l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x803c2f75da3234fcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testDegreesFloat3Float3(inValue, out);
-            verifyResultsDegreesFloat3Float3(inValue, out, false);
+            script.forEach_testDegreesFloat3Float3(inV, out);
+            verifyResultsDegreesFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testDegreesFloat3Float3(inValue, out);
-            verifyResultsDegreesFloat3Float3(inValue, out, true);
+            scriptRelaxed.forEach_testDegreesFloat3Float3(inV, out);
+            verifyResultsDegreesFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsDegreesFloat3Float3(Allocation inValue, Allocation out, boolean relaxed) {
-        float[] arrayInValue = new float[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsDegreesFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeDegrees(args, target);
@@ -195,9 +195,9 @@ public class TestDegrees extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -217,33 +217,33 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat4Float4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x530aee02264eed85l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x803df890d04d55dal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testDegreesFloat4Float4(inValue, out);
-            verifyResultsDegreesFloat4Float4(inValue, out, false);
+            script.forEach_testDegreesFloat4Float4(inV, out);
+            verifyResultsDegreesFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testDegreesFloat4Float4(inValue, out);
-            verifyResultsDegreesFloat4Float4(inValue, out, true);
+            scriptRelaxed.forEach_testDegreesFloat4Float4(inV, out);
+            verifyResultsDegreesFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDegreesFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsDegreesFloat4Float4(Allocation inValue, Allocation out, boolean relaxed) {
-        float[] arrayInValue = new float[INPUTSIZE * 4];
-        inValue.copyTo(arrayInValue);
+    private void verifyResultsDegreesFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.inValue = arrayInValue[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeDegrees(args, target);
@@ -254,9 +254,9 @@ public class TestDegrees extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append("Input inValue: ");
+                    message.append("Input inV: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

@@ -37,41 +37,41 @@ public class TestMix extends RSBaseCompute {
     public class ArgumentsFloatFloatFloatFloat {
         public float inStart;
         public float inStop;
-        public float inAmount;
+        public float inFraction;
         public Target.Floaty out;
     }
 
     private void checkMixFloatFloatFloatFloat() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9f4beff6471d6db1l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6ede0b88b4422e8fl, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc1c14e5d52dc3fe5l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6d2f014ec6a51d9fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloatFloatFloatFloat(inStart, out);
-            verifyResultsMixFloatFloatFloatFloat(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloatFloatFloatFloat(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloatFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloatFloatFloatFloat(inStart, out);
-            verifyResultsMixFloatFloatFloatFloat(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloatFloatFloatFloat(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloatFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloatFloatFloatFloat(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloatFloatFloatFloat(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 1];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 1];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 1];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 1];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -80,7 +80,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i];
                 args.inStop = arrayInStop[i];
-                args.inAmount = arrayInAmount[i];
+                args.inFraction = arrayInFraction[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -99,9 +99,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -123,34 +123,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat2Float2Float2Float2() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x45502e8f0a2d9ce9l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xba2b8a035395e837l, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xa477d20616942e4dl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe56bef3c621e0ac7l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat2Float2Float2Float2(inStart, out);
-            verifyResultsMixFloat2Float2Float2Float2(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat2Float2Float2Float2(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat2Float2Float2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat2Float2Float2Float2(inStart, out);
-            verifyResultsMixFloat2Float2Float2Float2(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat2Float2Float2Float2(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat2Float2Float2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat2Float2Float2Float2(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat2Float2Float2Float2(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 2];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 2];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 2];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 2];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -159,7 +159,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 2 + j];
                 args.inStop = arrayInStop[i * 2 + j];
-                args.inAmount = arrayInAmount[i * 2 + j];
+                args.inFraction = arrayInFraction[i * 2 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -178,9 +178,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -202,34 +202,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat3Float3Float3Float3() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xeb4701726b009c5l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9b21f6b3249ee4cbl, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x784ed3e2e07c7741l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf15862eab0d4f51bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat3Float3Float3Float3(inStart, out);
-            verifyResultsMixFloat3Float3Float3Float3(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat3Float3Float3Float3(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat3Float3Float3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat3Float3Float3Float3(inStart, out);
-            verifyResultsMixFloat3Float3Float3Float3(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat3Float3Float3Float3(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat3Float3Float3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat3Float3Float3Float3(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat3Float3Float3Float3(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 4];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 4];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -238,7 +238,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 4 + j];
                 args.inStop = arrayInStop[i * 4 + j];
-                args.inAmount = arrayInAmount[i * 4 + j];
+                args.inFraction = arrayInFraction[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -257,9 +257,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -281,34 +281,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat4Float4Float4Float4() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd818b19f433276a1l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7c186362f5a7e15fl, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4c25d5bfaa64c035l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfd44d698ff8bdf6fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat4Float4Float4Float4(inStart, out);
-            verifyResultsMixFloat4Float4Float4Float4(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat4Float4Float4Float4(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat4Float4Float4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat4Float4Float4Float4(inStart, out);
-            verifyResultsMixFloat4Float4Float4Float4(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat4Float4Float4Float4(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat4Float4Float4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat4Float4Float4Float4(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat4Float4Float4Float4(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 4];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 4];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -317,7 +317,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 4 + j];
                 args.inStop = arrayInStop[i * 4 + j];
-                args.inAmount = arrayInAmount[i * 4 + j];
+                args.inFraction = arrayInFraction[i * 4 + j];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -336,9 +336,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -360,34 +360,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat2Float2FloatFloat2() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf811b2d52bd1d7c3l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x17a127e13c8dd1c5l, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaaf909cdbd2a10ebl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe0b7d03e92afd1f5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat2Float2FloatFloat2(inStart, out);
-            verifyResultsMixFloat2Float2FloatFloat2(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat2Float2FloatFloat2(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat2Float2FloatFloat2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat2Float2FloatFloat2(inStart, out);
-            verifyResultsMixFloat2Float2FloatFloat2(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat2Float2FloatFloat2(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat2Float2FloatFloat2: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat2Float2FloatFloat2(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat2Float2FloatFloat2(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 2];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 2];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 1];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 1];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -396,7 +396,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 2 + j];
                 args.inStop = arrayInStop[i * 2 + j];
-                args.inAmount = arrayInAmount[i];
+                args.inFraction = arrayInFraction[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -415,9 +415,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -439,34 +439,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat3Float3FloatFloat3() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xae7aff441b20fa80l, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe64a4d60d6f4de7cl, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4ea8e06fef74e6aal, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x21bd09bbd131a27cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat3Float3FloatFloat3(inStart, out);
-            verifyResultsMixFloat3Float3FloatFloat3(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat3Float3FloatFloat3(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat3Float3FloatFloat3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat3Float3FloatFloat3(inStart, out);
-            verifyResultsMixFloat3Float3FloatFloat3(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat3Float3FloatFloat3(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat3Float3FloatFloat3: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat3Float3FloatFloat3(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat3Float3FloatFloat3(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 1];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 1];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -475,7 +475,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 4 + j];
                 args.inStop = arrayInStop[i * 4 + j];
-                args.inAmount = arrayInAmount[i];
+                args.inFraction = arrayInFraction[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -494,9 +494,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());
@@ -518,34 +518,34 @@ public class TestMix extends RSBaseCompute {
     private void checkMixFloat4Float4FloatFloat4() {
         Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x64e44bb30a701d3dl, false);
         Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb4f372e0715beb33l, false);
-        Allocation inAmount = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf258b71221bfbc69l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x62c243390fb37303l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInStop(inStop);
-            script.set_gAllocInAmount(inAmount);
+            script.set_gAllocInFraction(inFraction);
             script.forEach_testMixFloat4Float4FloatFloat4(inStart, out);
-            verifyResultsMixFloat4Float4FloatFloat4(inStart, inStop, inAmount, out, false);
+            verifyResultsMixFloat4Float4FloatFloat4(inStart, inStop, inFraction, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat4Float4FloatFloat4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInStop(inStop);
-            scriptRelaxed.set_gAllocInAmount(inAmount);
+            scriptRelaxed.set_gAllocInFraction(inFraction);
             scriptRelaxed.forEach_testMixFloat4Float4FloatFloat4(inStart, out);
-            verifyResultsMixFloat4Float4FloatFloat4(inStart, inStop, inAmount, out, true);
+            verifyResultsMixFloat4Float4FloatFloat4(inStart, inStop, inFraction, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMixFloat4Float4FloatFloat4: " + e.toString());
         }
     }
 
-    private void verifyResultsMixFloat4Float4FloatFloat4(Allocation inStart, Allocation inStop, Allocation inAmount, Allocation out, boolean relaxed) {
+    private void verifyResultsMixFloat4Float4FloatFloat4(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
         inStop.copyTo(arrayInStop);
-        float[] arrayInAmount = new float[INPUTSIZE * 1];
-        inAmount.copyTo(arrayInAmount);
+        float[] arrayInFraction = new float[INPUTSIZE * 1];
+        inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
@@ -554,7 +554,7 @@ public class TestMix extends RSBaseCompute {
                 ArgumentsFloatFloatFloatFloat args = new ArgumentsFloatFloatFloatFloat();
                 args.inStart = arrayInStart[i * 4 + j];
                 args.inStop = arrayInStop[i * 4 + j];
-                args.inAmount = arrayInAmount[i];
+                args.inFraction = arrayInFraction[i];
                 // Figure out what the outputs should have been.
                 Target target = new Target(relaxed);
                 CoreMathVerifier.computeMix(args, target);
@@ -573,9 +573,9 @@ public class TestMix extends RSBaseCompute {
                     message.append(String.format("%14.8g {%8x} %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append("Input inAmount: ");
+                    message.append("Input inFraction: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
+                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
                     message.append("\n");
                     message.append("Expected output out: ");
                     message.append(args.out.toString());

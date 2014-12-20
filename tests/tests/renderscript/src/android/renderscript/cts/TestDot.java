@@ -35,45 +35,45 @@ public class TestDot extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloatFloat {
-        public float inLhs;
-        public float inRhs;
+        public float inLeftVector;
+        public float inRightVector;
         public Target.Floaty out;
     }
 
     private void checkDotFloatFloatFloat() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x93a0502d7b6ecc43l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x93a0502d7b6ef799l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x38fe5ebdf7ff2d3el, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x948dc35615f562efl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testDotFloatFloatFloat(inLhs, out);
-            verifyResultsDotFloatFloatFloat(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testDotFloatFloatFloat(inLeftVector, out);
+            verifyResultsDotFloatFloatFloat(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloatFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testDotFloatFloatFloat(inLhs, out);
-            verifyResultsDotFloatFloatFloat(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testDotFloatFloatFloat(inLeftVector, out);
+            verifyResultsDotFloatFloatFloat(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloatFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsDotFloatFloatFloat(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 1];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 1];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsDotFloatFloatFloat(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 1];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 1];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
             // Create the appropriate sized arrays in args
             // Fill args with the input values
-            args.inLhs = arrayInLhs[i];
-            args.inRhs = arrayInRhs[i];
+            args.inLeftVector = arrayInLeftVector[i];
+            args.inRightVector = arrayInRightVector[i];
             Target target = new Target(relaxed);
             CoreMathVerifier.computeDot(args, target);
 
@@ -84,13 +84,13 @@ public class TestDot extends RSBaseCompute {
             }
             if (!valid) {
                 StringBuilder message = new StringBuilder();
-                message.append("Input inLhs: ");
+                message.append("Input inLeftVector: ");
                 message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInLhs[i], Float.floatToRawIntBits(arrayInLhs[i]), arrayInLhs[i]));
+                        arrayInLeftVector[i], Float.floatToRawIntBits(arrayInLeftVector[i]), arrayInLeftVector[i]));
                 message.append("\n");
-                message.append("Input inRhs: ");
+                message.append("Input inRightVector: ");
                 message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInRhs[i], Float.floatToRawIntBits(arrayInRhs[i]), arrayInRhs[i]));
+                        arrayInRightVector[i], Float.floatToRawIntBits(arrayInRightVector[i]), arrayInRightVector[i]));
                 message.append("\n");
                 message.append("Expected output out: ");
                 message.append(args.out.toString());
@@ -109,50 +109,50 @@ public class TestDot extends RSBaseCompute {
     }
 
     public class ArgumentsFloatNFloatNFloat {
-        public float[] inLhs;
-        public float[] inRhs;
+        public float[] inLeftVector;
+        public float[] inRightVector;
         public Target.Floaty out;
     }
 
     private void checkDotFloat2Float2Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6458f96b84293a8fl, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6458f96b842965e5l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3a9fadaebf79d3a2l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdaa605c7978f55bbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testDotFloat2Float2Float(inLhs, out);
-            verifyResultsDotFloat2Float2Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testDotFloat2Float2Float(inLeftVector, out);
+            verifyResultsDotFloat2Float2Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat2Float2Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testDotFloat2Float2Float(inLhs, out);
-            verifyResultsDotFloat2Float2Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testDotFloat2Float2Float(inLeftVector, out);
+            verifyResultsDotFloat2Float2Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat2Float2Float: " + e.toString());
         }
     }
 
-    private void verifyResultsDotFloat2Float2Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 2];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 2];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsDotFloat2Float2Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 2];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 2];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[2];
-            args.inRhs = new float[2];
+            args.inLeftVector = new float[2];
+            args.inRightVector = new float[2];
             // Fill args with the input values
             for (int j = 0; j < 2 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 2 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 2 + j];
             }
             for (int j = 0; j < 2 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 2 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 2 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeDot(args, target);
@@ -165,15 +165,15 @@ public class TestDot extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 2 + j], Float.floatToRawIntBits(arrayInLhs[i * 2 + j]), arrayInLhs[i * 2 + j]));
+                            arrayInLeftVector[i * 2 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 2 + j]), arrayInLeftVector[i * 2 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 2 + j], Float.floatToRawIntBits(arrayInRhs[i * 2 + j]), arrayInRhs[i * 2 + j]));
+                            arrayInRightVector[i * 2 + j], Float.floatToRawIntBits(arrayInRightVector[i * 2 + j]), arrayInRightVector[i * 2 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
@@ -193,44 +193,44 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloat3Float3Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x914a48cbd43f55e9l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x914a48cbd43f813fl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x948d32ce11887f0l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x910f51f73d379ed5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testDotFloat3Float3Float(inLhs, out);
-            verifyResultsDotFloat3Float3Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testDotFloat3Float3Float(inLeftVector, out);
+            verifyResultsDotFloat3Float3Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat3Float3Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testDotFloat3Float3Float(inLhs, out);
-            verifyResultsDotFloat3Float3Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testDotFloat3Float3Float(inLeftVector, out);
+            verifyResultsDotFloat3Float3Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat3Float3Float: " + e.toString());
         }
     }
 
-    private void verifyResultsDotFloat3Float3Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsDotFloat3Float3Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[3];
-            args.inRhs = new float[3];
+            args.inLeftVector = new float[3];
+            args.inRightVector = new float[3];
             // Fill args with the input values
             for (int j = 0; j < 3 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 3 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeDot(args, target);
@@ -243,15 +243,15 @@ public class TestDot extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
@@ -271,44 +271,44 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloat4Float4Float() {
-        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbe3b982c24557143l, false);
-        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbe3b982c24559c99l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd7f1f8ab02b73c3el, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x47789e26e2dfe7efl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.set_gAllocInRhs(inRhs);
-            script.forEach_testDotFloat4Float4Float(inLhs, out);
-            verifyResultsDotFloat4Float4Float(inLhs, inRhs, out, false);
+            script.set_gAllocInRightVector(inRightVector);
+            script.forEach_testDotFloat4Float4Float(inLeftVector, out);
+            verifyResultsDotFloat4Float4Float(inLeftVector, inRightVector, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat4Float4Float: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInRhs(inRhs);
-            scriptRelaxed.forEach_testDotFloat4Float4Float(inLhs, out);
-            verifyResultsDotFloat4Float4Float(inLhs, inRhs, out, true);
+            scriptRelaxed.set_gAllocInRightVector(inRightVector);
+            scriptRelaxed.forEach_testDotFloat4Float4Float(inLeftVector, out);
+            verifyResultsDotFloat4Float4Float(inLeftVector, inRightVector, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat4Float4Float: " + e.toString());
         }
     }
 
-    private void verifyResultsDotFloat4Float4Float(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
-        float[] arrayInLhs = new float[INPUTSIZE * 4];
-        inLhs.copyTo(arrayInLhs);
-        float[] arrayInRhs = new float[INPUTSIZE * 4];
-        inRhs.copyTo(arrayInRhs);
+    private void verifyResultsDotFloat4Float4Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
+        float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        inLeftVector.copyTo(arrayInLeftVector);
+        float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
-            args.inLhs = new float[4];
-            args.inRhs = new float[4];
+            args.inLeftVector = new float[4];
+            args.inRightVector = new float[4];
             // Fill args with the input values
             for (int j = 0; j < 4 ; j++) {
-                args.inLhs[j] = arrayInLhs[i * 4 + j];
+                args.inLeftVector[j] = arrayInLeftVector[i * 4 + j];
             }
             for (int j = 0; j < 4 ; j++) {
-                args.inRhs[j] = arrayInRhs[i * 4 + j];
+                args.inRightVector[j] = arrayInRightVector[i * 4 + j];
             }
             Target target = new Target(relaxed);
             CoreMathVerifier.computeDot(args, target);
@@ -321,15 +321,15 @@ public class TestDot extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inLhs: ");
+                    message.append("Input inLeftVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inRhs: ");
+                    message.append("Input inRightVector: ");
                     message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
