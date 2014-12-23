@@ -37,6 +37,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
+    private static final String FEATURE_BLUETOOTH = "android.hardware.bluetooth";
     private int mUserId;
 
     @Override
@@ -196,6 +197,23 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "Expected SecurityException when starting the activity "
                         + addRestrictionCommandOutput,
                 addRestrictionCommandOutput.contains("SecurityException"));
+    }
+
+    // Test the bluetooth API from a managed profile.
+    public void testBluetooth() throws Exception {
+        boolean mHasBluetooth = hasDeviceFeatures(new String[] {FEATURE_BLUETOOTH});
+        if (!mHasFeature || !mHasBluetooth) {
+            return ;
+        }
+
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".BluetoothTest",
+                "testEnableDisable", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".BluetoothTest",
+                "testGetAddress", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".BluetoothTest",
+                "testListenUsingRfcommWithServiceRecord", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".BluetoothTest",
+                "testGetRemoteDevice", mUserId));
     }
 
     private void disableActivityForUser(String activityName, int userId)
