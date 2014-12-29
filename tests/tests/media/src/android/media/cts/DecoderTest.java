@@ -1914,8 +1914,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 break;
             }
         }
-        assertTrue(timeOut > System.currentTimeMillis(),
-                "Tunneled video playback timeout exceeded!");
+        assertTrue("Tunneled video playback timeout exceeded!",
+                timeOut > System.currentTimeMillis());
 
         Log.d(TAG, "playVideo player.reset()");
         mMediaCodecPlayer.reset();
