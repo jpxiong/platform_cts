@@ -228,7 +228,7 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         }
     }
 
-    private boolean hasDeviceFeatures(String[] requiredFeatures)
+    protected boolean hasDeviceFeatures(String[] requiredFeatures)
             throws DeviceNotAvailableException {
         // TODO: Move this logic to ITestDevice.
         String command = "pm list features";
