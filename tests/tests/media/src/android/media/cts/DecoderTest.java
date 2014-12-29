@@ -25,12 +25,15 @@ import android.content.res.Resources;
 import android.cts.util.MediaUtils;
 import android.graphics.ImageFormat;
 import android.media.Image;
+import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.media.MediaCodecList;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
+import android.net.Uri;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -40,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.CRC32;
+import java.util.concurrent.TimeUnit;
 
 public class DecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
@@ -56,6 +60,24 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     private Resources mResources;
     short[] mMasterBuffer;
+
+    private MediaCodecTunneledPlayer mMediaCodecPlayer;
+    private static final int SLEEP_TIME_MS = 1000;
+    private static final long PLAY_TIME_MS = TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES);
+    private static final Uri AUDIO_URL = Uri.parse(
+            "http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
+                + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
+                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
+                + "&key=test_key1&user=android-device-test");  // H.264 Base + AAC
+    private static final Uri VIDEO_URL = Uri.parse(
+            "http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
+                + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
+                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
+                + "&key=test_key1&user=android-device-test");  // H.264 Base + AAC
 
     @Override
     protected void setUp() throws Exception {
@@ -1850,5 +1872,81 @@ public class DecoderTest extends MediaPlayerTestBase {
         return maxvalue;
     }
 
+    /* return true if a particular video feature is supported for the given mimetype */
+    private boolean isVideoFeatureSupported(String mimeType, String feature) {
+        MediaFormat format = MediaFormat.createVideoFormat( mimeType, 1920, 1080);
+        format.setFeatureEnabled(feature, true);
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        String codecName = mcl.findDecoderForFormat(format);
+        return (codecName == null) ? false : true;
+    }
+
+
+    /**
+     * Test tunneled video playback mode if supported
+     */
+    public void testTunneledVideoPlayback() throws Exception {
+        if (!isVideoFeatureSupported(MediaFormat.MIMETYPE_VIDEO_AVC,
+                MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback)) {
+            MediaUtils.skipTest(TAG, "No tunneled video playback codec found!");
+            return;
+        }
+
+        AudioManager am = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
+        mMediaCodecPlayer = new MediaCodecTunneledPlayer(
+                getActivity().getSurfaceHolder(), true, am.generateAudioSessionId());
+
+        mMediaCodecPlayer.setAudioDataSource(AUDIO_URL, null);
+        mMediaCodecPlayer.setVideoDataSource(VIDEO_URL, null);
+        assertTrue("MediaCodecPlayer.start() failed!", mMediaCodecPlayer.start());
+        assertTrue("MediaCodecPlayer.prepare() failed!", mMediaCodecPlayer.prepare());
+
+        // starts video playback
+        mMediaCodecPlayer.startThread();
+
+        long timeOut = System.currentTimeMillis() + 4*PLAY_TIME_MS;
+        while (timeOut > System.currentTimeMillis() && !mMediaCodecPlayer.isEnded()) {
+            Thread.sleep(SLEEP_TIME_MS);
+            if (mMediaCodecPlayer.getCurrentPosition() >= mMediaCodecPlayer.getDuration() ) {
+                Log.d(TAG, "testTunneledVideoPlayback -- current pos = " +
+                        mMediaCodecPlayer.getCurrentPosition() +
+                        ">= duration = " + mMediaCodecPlayer.getDuration());
+                break;
+            }
+        }
+        assertTrue(timeOut > System.currentTimeMillis(),
+                "Tunneled video playback timeout exceeded!");
+
+        Log.d(TAG, "playVideo player.reset()");
+        mMediaCodecPlayer.reset();
+    }
+
+    /**
+     * Test tunneled video playback flush if supported
+     */
+    public void testTunneledVideoFlush() throws Exception {
+        if (!isVideoFeatureSupported(MediaFormat.MIMETYPE_VIDEO_AVC,
+                MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback)) {
+            MediaUtils.skipTest(TAG, "No tunneled video playback codec found!");
+            return;
+        }
+
+        AudioManager am = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
+        mMediaCodecPlayer = new MediaCodecTunneledPlayer(
+                getActivity().getSurfaceHolder(), true, am.generateAudioSessionId());
+
+        mMediaCodecPlayer.setAudioDataSource(AUDIO_URL, null);
+        mMediaCodecPlayer.setVideoDataSource(VIDEO_URL, null);
+        assertTrue("MediaCodecPlayer.start() failed!", mMediaCodecPlayer.start());
+        assertTrue("MediaCodecPlayer.prepare() failed!", mMediaCodecPlayer.prepare());
+
+        // starts video playback
+        mMediaCodecPlayer.startThread();
+        Thread.sleep(SLEEP_TIME_MS);
+        mMediaCodecPlayer.pause();
+        mMediaCodecPlayer.flush();
+        Thread.sleep(SLEEP_TIME_MS);
+        mMediaCodecPlayer.reset();
+    }
 }
 

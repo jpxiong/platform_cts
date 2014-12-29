@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
 /**
  * General MediaCodec tests.
  *
