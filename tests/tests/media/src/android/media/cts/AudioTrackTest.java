@@ -1396,18 +1396,18 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                     final long MILLISECONDS_PER_SECOND = 1000;
                     AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
                             TEST_CONF, TEST_FORMAT, bufferSize, TEST_MODE);
-                    assertEquals(TEST_NAME, track.getState(), AudioTrack.STATE_NO_STATIC_DATA);
+                    assertEquals(TEST_NAME, AudioTrack.STATE_NO_STATIC_DATA, track.getState());
 
                     // -------- test --------------
 
                     // test setLoopPoints and setPosition can be called here.
                     assertEquals(TEST_NAME,
-                            track.setPlaybackHeadPosition(bufferFrames/2),
-                            android.media.AudioTrack.SUCCESS);
+                            android.media.AudioTrack.SUCCESS,
+                            track.setPlaybackHeadPosition(bufferFrames/2));
                     assertEquals(TEST_NAME,
+                            android.media.AudioTrack.SUCCESS,
                             track.setLoopPoints(
-                                    0 /*startInFrames*/, bufferFrames, 10 /*loopCount*/),
-                            android.media.AudioTrack.SUCCESS);
+                                    0 /*startInFrames*/, bufferFrames, 10 /*loopCount*/));
                     // only need to write once to the static track
                     switch (TEST_FORMAT) {
                     case AudioFormat.ENCODING_PCM_8BIT: {
@@ -1415,35 +1415,35 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
-                                track.write(data, 0 /*offsetInBytes*/, data.length),
-                                bufferSamples);
+                                bufferSamples,
+                                track.write(data, 0 /*offsetInBytes*/, data.length));
                         } break;
                     case AudioFormat.ENCODING_PCM_16BIT: {
                         short data[] = createSoundDataInShortArray(
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
-                                track.write(data, 0 /*offsetInBytes*/, data.length),
-                                bufferSamples);
+                                bufferSamples,
+                                track.write(data, 0 /*offsetInBytes*/, data.length));
                         } break;
                     case AudioFormat.ENCODING_PCM_FLOAT: {
                         float data[] = createSoundDataInFloatArray(
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
+                                bufferSamples,
                                 track.write(data, 0 /*offsetInBytes*/, data.length,
-                                        AudioTrack.WRITE_BLOCKING),
-                                bufferSamples);
+                                        AudioTrack.WRITE_BLOCKING));
                         } break;
                     }
-                    assertEquals(TEST_NAME, track.getState(), AudioTrack.STATE_INITIALIZED);
+                    assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
                     // test setLoopPoints and setPosition can be called here.
                     assertEquals(TEST_NAME,
-                            track.setPlaybackHeadPosition(0 /*positionInFrames*/),
-                            android.media.AudioTrack.SUCCESS);
+                            android.media.AudioTrack.SUCCESS,
+                            track.setPlaybackHeadPosition(0 /*positionInFrames*/));
                     assertEquals(TEST_NAME,
-                            track.setLoopPoints(0 /*startInFrames*/, bufferFrames, TEST_LOOPS),
-                            android.media.AudioTrack.SUCCESS);
+                            android.media.AudioTrack.SUCCESS,
+                            track.setLoopPoints(0 /*startInFrames*/, bufferFrames, TEST_LOOPS));
 
                     track.play();
                     Thread.sleep(seconds * MILLISECONDS_PER_SECOND * (TEST_LOOPS + 1));
@@ -1452,7 +1452,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                     // Check position after looping. AudioTrack.getPlaybackHeadPosition() returns
                     // the running count of frames played, not the actual static buffer position.
                     int position = track.getPlaybackHeadPosition();
-                    assertEquals(TEST_NAME, position, bufferFrames * (TEST_LOOPS + 1));
+                    assertEquals(TEST_NAME, bufferFrames * (TEST_LOOPS + 1), position);
 
                     track.stop();
                     Thread.sleep(WAIT_MSEC);
