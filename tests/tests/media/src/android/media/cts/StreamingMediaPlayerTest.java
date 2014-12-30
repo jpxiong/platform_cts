@@ -59,51 +59,51 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=13&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=6F5AEC448AAF88466D7A10EBB76020745405D33F."
-                + "5050D35AE997E1535FE828B0DE99EF31A699D9D0"
-                + "&key=test_key1&user=android-device-test", 176, 144);
+                + "&signature=5729247E22691EBB3E804DDD523EC42DC17DD8CE"
+                + ".443B81C1E8E6D64E4E1555F568BA46C206507D78"
+                + "&key=ik0&user=android-device-test", 176, 144);
     }
     public void testHTTP_H263_AMR_Video2() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
                 + "&itag=13&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=71749754E28115FD1C233E3BE96CDDC3F430CB74."
-                + "49D1506DE694CC8FCEE63CB4F3AD41EB76C198CE"
-                + "&key=test_key1&user=android-device-test", 176, 144);
+                + "&signature=508D82AB36939345BF6B8D0623CB6CABDD9C64C3"
+                + ".9B3336A96846DF38E5343C46AA57F6CF2956E427"
+                + "&key=ik0&user=android-device-test", 176, 144);
     }
 
     public void testHTTP_MPEG4SP_AAC_Video1() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=17&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=197A9742C1EFCA95725F2F26DFFD512FC48C149F."
-                + "A59B42FD490F6B591B292F3B2659A9723B980351"
-                + "&key=test_key1&user=android-device-test", 176, 144);
+                + "&signature=837198AAADF6F36BA6B2D324F690A7C5B7AFE3FF"
+                + ".7138CE5E36D718220726C1FC305497FF2D082249"
+                + "&key=ik0&user=android-device-test", 176, 144);
     }
     public void testHTTP_MPEG4SP_AAC_Video2() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
                 + "&itag=17&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=0F84740A7E06F884127E78A6D7DE6DEA8F4B8BFD."
-                + "248DF1E90B8137C30769C79BF23147F6BB3DFCDF"
-                + "&key=test_key1&user=android-device-test", 176, 144);
+                + "&signature=70E979A621001201BC18622BDBF914FA870BDA40"
+                + ".6E78890B80F4A33A18835F775B1FF64F0A4D0003"
+                + "&key=ik0&user=android-device-test", 176, 144);
     }
 
     public void testHTTP_H264Base_AAC_Video1() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=3CFCAFB87EB9FC943FACDC54FEC8C725A801642C."
-                + "7D77ACBC4CAF40349BF093E302B635757E45F345"
-                + "&key=test_key1&user=android-device-test", 640, 360);
+                + "&signature=667AEEF54639926662CE62361400B8F8C1753B3F"
+                + ".15F46C382C68A9F121BA17BF1F56BEDEB4B06091"
+                + "&key=ik0&user=android-device-test", 640, 360);
     }
     public void testHTTP_H264Base_AAC_Video2() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
                 + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
-                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
-                + "&key=test_key1&user=android-device-test", 640, 360);
+                + "&signature=46A04ED550CA83B79B60060BA80C79FDA5853D26"
+                + ".49582D382B4A9AFAA163DED38D2AE531D85603C0"
+                + "&key=ik0&user=android-device-test", 640, 360);
     }
 
     // Streaming HLS video from YouTube
