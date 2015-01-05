@@ -340,6 +340,10 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
             }
         }
 
+        for (int i = 0; i < codec.length; i++) {
+            codec[i].release();
+        }
+
         return trackbytes;
     }
 
