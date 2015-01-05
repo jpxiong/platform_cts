@@ -21,13 +21,15 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
-import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.os.Debug;
+import android.app.UiAutomation;
+import android.content.Context;
+import android.util.Log;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +41,7 @@ import com.android.cts.view.R;
 public class AnimatorInflaterTest
         extends ActivityInstrumentationTestCase2<AnimationTestCtsActivity> {
 
+    private static final String TAG = "AnimatorInflaterTest";
     Set<Integer> identityHashes = new HashSet<Integer>();
 
     public AnimatorInflaterTest() {
@@ -58,7 +61,9 @@ public class AnimatorInflaterTest
     public void testLoadAnimatorWithDifferentInterpolators() throws Throwable {
         Animator anim1 = AnimatorInflater
                 .loadAnimator(getActivity(), R.anim.changing_test_animator);
-        rotate();
+        if (!rotate()) {
+            return;//cancel test
+        }
         Animator anim2 = AnimatorInflater
                 .loadAnimator(getActivity(), R.anim.changing_test_animator);
         assertNotSame(anim1, anim2);
@@ -109,7 +114,9 @@ public class AnimatorInflaterTest
                 assertEquals(targetY, dummyObject.y);
             }
             if (i == 0) {
-                rotate();
+                if (!rotate()) {
+                    return;//cancel test
+                }
             }
             anim1 = AnimatorInflater.loadAnimator(getActivity(), R.anim.test_animator);
             anim2 = AnimatorInflater.loadAnimator(getActivity(), R.anim.test_animator);
@@ -117,27 +124,43 @@ public class AnimatorInflaterTest
         }
     }
 
-    private void rotate() throws Throwable {
-        final Activity activity = getActivity();
-        int orientation = activity.getResources().getConfiguration().orientation;
-        final int nextOrientation = orientation == Configuration.ORIENTATION_LANDSCAPE
-                ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+    private boolean rotate() throws Throwable {
+        WindowManager mWindowManager = (WindowManager) getActivity()
+                .getSystemService(Context.WINDOW_SERVICE);
+        Display display = mWindowManager.getDefaultDisplay();
+
         Instrumentation.ActivityMonitor monitor = new Instrumentation.ActivityMonitor(
-                activity.getClass().getName(), null, false);
+                getActivity().getClass().getName(), null, false);
         getInstrumentation().addMonitor(monitor);
-        runTestOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                activity.setRequestedOrientation(nextOrientation);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        Activity newAct = getInstrumentation()
-                .waitForMonitorWithTimeout(monitor, TimeUnit.SECONDS.toMillis(2));
-        if (newAct != null) {
-            setActivity(newAct);
+        int nextRotation = 0;
+        switch (display.getRotation()) {
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                nextRotation = UiAutomation.ROTATION_FREEZE_90;
+                break;
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                nextRotation = UiAutomation.ROTATION_FREEZE_0;
+                break;
+            default:
+                Log.e(TAG, "Cannot get rotation, test is canceled");
+                return false;
         }
+        boolean rotated = getInstrumentation().getUiAutomation().setRotation(nextRotation);
+        Thread.sleep(500);
+        if (!rotated) {
+            Log.e(TAG, "Rotation failed, test is canceled");
+        }
+        getInstrumentation().waitForIdleSync();
+        if (!getActivity().waitUntilVisible()) {
+            Log.e(TAG, "Activity failed to complete rotation, canceling test");
+            return false;
+        }
+        if (getActivity().getWindowManager().getDefaultDisplay().getRotation() != nextRotation) {
+            Log.e(TAG, "New activity orientation does not match. Canceling test");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -158,7 +181,10 @@ public class AnimatorInflaterTest
      */
     public void testLoadStateListAnimatorWithChangingResetState() throws Throwable {
         loadStateListAnimatorWithChangingResetStateTest();
-        rotate();
+        if (!rotate()) {
+            return;//cancel test
+        }
+
         loadStateListAnimatorWithChangingResetStateTest();
     }
 
@@ -185,7 +211,9 @@ public class AnimatorInflaterTest
      */
     public void testLoadChangingStateListAnimator() throws Throwable {
         loadChangingStateListAnimatorTest();
-        rotate();
+        if (!rotate()) {
+            return;//cancel test
+        }
         loadChangingStateListAnimatorTest();
     }
 
