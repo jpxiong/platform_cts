@@ -20,17 +20,20 @@ import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.util.Log;
+import android.util.Pair;
 import android.util.Size;
 
 import junit.framework.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -239,6 +242,9 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
     private void validateCapability(Integer capability, boolean isCapabilityAvailable) {
         List<CaptureRequest.Key<?>> requestKeys = new ArrayList<>();
         Set<CaptureResult.Key<?>> resultKeys = new HashSet<>();
+        // Capability requirements other than key presences
+        List<Pair<String, Boolean>> additionalRequirements = new ArrayList<>();
+
         /* For available capabilities, only check request keys in this test
            Characteristics keys are tested in ExtendedCameraCharacteristicsTest
            Result keys are tested in CaptureResultTest */
@@ -297,11 +303,21 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.COLOR_CORRECTION_TRANSFORM);
                 requestKeys.add(CaptureRequest.SHADING_MODE);
                 requestKeys.add(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE);
-                if (mStaticInfo.isHardwareLevelFull()) {
-                    requestKeys.add(CaptureRequest.TONEMAP_CURVE);
-                    requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
-                }
+                requestKeys.add(CaptureRequest.TONEMAP_CURVE);
+                requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
 
+                int[] tonemapModes = mStaticInfo.getAvailableToneMapModesChecked();
+                List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(tonemapModes));
+                Boolean contrastCurveModeSupported =
+                        modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE);
+                int[] colorAberrationModes = mStaticInfo.getAvailableColorAberrationModesChecked();
+                modeList = Arrays.asList(CameraTestUtils.toObject(colorAberrationModes));
+                Boolean offColorAberrationModeSupported =
+                        modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF);
+                additionalRequirements.add(new Pair<String, Boolean>(
+                        "Tonemap mode must include CONTRAST_CURVE", contrastCurveModeSupported));
+                additionalRequirements.add(new Pair<String, Boolean>(
+                        "Color aberration mode must include OFF", offColorAberrationModeSupported));
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR:
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR";
@@ -341,19 +357,47 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 return;
         }
 
+        // Check additional requirements and exit early if possible
+        if (!isCapabilityAvailable) {
+            for (Pair<String, Boolean> p : additionalRequirements) {
+                String requirement = p.first;
+                Boolean meetRequirement = p.second;
+                // No further check is needed if we've found why capability cannot be advertised
+                if (!meetRequirement) {
+                    Log.v(TAG, String.format(
+                            "Camera %s doesn't list capability %s becasue of requirement: %s",
+                            mCameraId, capabilityName, requirement));
+                    return;
+                }
+            }
+        }
+
         boolean matchExpectation = true;
         if (!requestKeys.isEmpty()) {
-            matchExpectation &= validateRequestKeysPresence(capabilityName, requestKeys, isCapabilityAvailable);
+            matchExpectation &= validateRequestKeysPresence(
+                    capabilityName, requestKeys, isCapabilityAvailable);
         }
         if(!resultKeys.isEmpty()) {
-            matchExpectation &= validateResultKeysPresence(capabilityName, resultKeys, isCapabilityAvailable);
+            matchExpectation &= validateResultKeysPresence(
+                    capabilityName, resultKeys, isCapabilityAvailable);
+        }
+
+        // Check additional requirements
+        for (Pair<String, Boolean> p : additionalRequirements) {
+            String requirement = p.first;
+            Boolean meetRequirement = p.second;
+            if (isCapabilityAvailable && !meetRequirement) {
+                mCollector.addMessage(String.format(
+                        "Camera %s list capability %s but does not meet the requirement: %s",
+                        mCameraId, capabilityName, requirement));
+            }
         }
 
         // In case of isCapabilityAvailable == true, error has been filed in
         // validateRequest/ResultKeysPresence
         if (!matchExpectation && !isCapabilityAvailable) {
             mCollector.addMessage(String.format(
-                    "Camera %s doesn't list capability %s but contain all required keys",
+                    "Camera %s doesn't list capability %s but meets all requirements",
                     mCameraId, capabilityName));
         }
     }

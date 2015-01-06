@@ -666,8 +666,9 @@ public class StaticMetadata {
         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, " Camera devices must always support FAST mode",
                 modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
-        if (isHardwareLevelFull()) {
-            checkTrueForKey(key, "Full-capability camera devices must support"
+        if (isCapabilitySupported(
+                CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING)) {
+            checkTrueForKey(key, "MANUAL_POST_PROCESSING supported camera devices must support"
                     + "CONTRAST_CURVE mode",
                     modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
                     modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
@@ -1439,8 +1440,9 @@ public class StaticMetadata {
         }
 
         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
-        checkTrueForKey(key, " Camera devices must always support OFF mode",
-                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF));
+        checkTrueForKey(key, " Camera devices must always support either OFF or FAST mode",
+                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF) ||
+                modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_FAST));
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes,
                 CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF,
