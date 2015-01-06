@@ -25,17 +25,21 @@ import android.os.SystemClock;
  * this class  receive alarm from AlarmManagerTest
  */
 public class MockAlarmReceiver extends BroadcastReceiver {
-    public boolean alarmed = false;
-    private Object mSync = new Object();
-    public static final String MOCKACTION = "android.app.AlarmManagerTest.TEST_ALARMRECEIVER";
+    private final Object mSync = new Object();
+    public final String mTargetAction;
 
-    public long elapsedTime;
-    public long rtcTime;
+    public volatile boolean alarmed = false;
+    public volatile long elapsedTime;
+    public volatile long rtcTime;
+
+    public MockAlarmReceiver(String targetAction) {
+        mTargetAction = targetAction;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
-        if (action.equals(MOCKACTION)) {
+        if (action.equals(mTargetAction)) {
             synchronized (mSync) {
                 alarmed = true;
                 elapsedTime = SystemClock.elapsedRealtime();
