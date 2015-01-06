@@ -84,10 +84,10 @@ public class BoxInsetLayout extends FrameLayout {
             requestLayout();
         }
         mInsets.set(
-                insets.getSystemWindowInsetLeft(),
-                insets.getSystemWindowInsetTop(),
-                insets.getSystemWindowInsetRight(),
-                insets.getSystemWindowInsetBottom());
+            insets.getSystemWindowInsetLeft(),
+            insets.getSystemWindowInsetTop(),
+            insets.getSystemWindowInsetRight(),
+            insets.getSystemWindowInsetBottom());
         return insets;
     }
 
@@ -278,7 +278,7 @@ public class BoxInsetLayout extends FrameLayout {
                 int paddingBottom = child.getPaddingBottom();
 
                 // If the child's width is match_parent, we ignore gravity and set boxInset padding
-                // on both sides, with a left position of 0.
+                // on both sides, with a left position of parentLeft + the child's left margin.
                 if (lp.width == LayoutParams.MATCH_PARENT) {
                     if (mLastKnownRound && ((lp.boxedEdges & LayoutParams.BOX_LEFT) != 0)) {
                         paddingLeft = boxInset;
@@ -286,7 +286,7 @@ public class BoxInsetLayout extends FrameLayout {
                     if (mLastKnownRound && ((lp.boxedEdges & LayoutParams.BOX_RIGHT) != 0)) {
                         paddingRight = boxInset;
                     }
-                    childLeft = 0;
+                    childLeft = parentLeft + lp.leftMargin;
                 } else {
                     switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
                         case Gravity.CENTER_HORIZONTAL:
@@ -316,7 +316,8 @@ public class BoxInsetLayout extends FrameLayout {
                 }
 
                 // If the child's height is match_parent, we ignore gravity and set boxInset padding
-                // on both top and bottom, with a top position of 0.
+                // on both top and bottom, with a top position of parentTop + the child's top
+                // margin.
                 if (lp.height == LayoutParams.MATCH_PARENT) {
                     if (mLastKnownRound && ((lp.boxedEdges & LayoutParams.BOX_TOP) != 0)) {
                         paddingTop = boxInset;
@@ -324,7 +325,7 @@ public class BoxInsetLayout extends FrameLayout {
                     if (mLastKnownRound && ((lp.boxedEdges & LayoutParams.BOX_BOTTOM) != 0)) {
                         paddingBottom = boxInset;
                     }
-                    childTop = 0;
+                    childTop = parentTop + lp.topMargin;
                 } else {
                     switch (verticalGravity) {
                         case Gravity.TOP:
