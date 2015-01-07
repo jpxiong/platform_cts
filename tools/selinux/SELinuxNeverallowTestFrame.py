@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 src_header = """/*
  * Copyright (C) 2014 The Android Open Source Project
