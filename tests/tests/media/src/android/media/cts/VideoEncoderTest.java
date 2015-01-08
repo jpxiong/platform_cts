@@ -62,6 +62,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
     class VideoStorage {
         private LinkedList<Pair<ByteBuffer, BufferInfo>> mStream;
         private MediaFormat mFormat;
+        private int mInputBufferSize;
 
         public VideoStorage() {
             mStream = new LinkedList<Pair<ByteBuffer, BufferInfo>>();
@@ -73,7 +74,9 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
         public void addBuffer(ByteBuffer buffer, BufferInfo info) {
             ByteBuffer savedBuffer = ByteBuffer.allocate(info.size);
-            savedBuffer.put(buffer);
+            if (info.size > mInputBufferSize) {
+                mInputBufferSize = info.size;
+            }
             BufferInfo savedInfo = new BufferInfo();
             savedInfo.set(0, savedBuffer.position(), info.presentationTimeUs, info.flags);
             mStream.addLast(Pair.create(savedBuffer, savedInfo));
@@ -96,7 +99,16 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     if (it.hasNext()) {
                         Pair<ByteBuffer, BufferInfo> el = it.next();
                         el.first.clear();
-                        codec.getInputBuffer(ix).put(el.first);
+                        try {
+                            codec.getInputBuffer(ix).put(el.first);
+                        } catch (java.nio.BufferOverflowException e) {
+                            Log.e(TAG, "cannot fit " + el.first.limit()
+                                    + "-byte encoded buffer into "
+                                    + codec.getInputBuffer(ix).remaining()
+                                    + "-byte input buffer of " + codec.getName()
+                                    + " configured for " + codec.getInputFormat());
+                            throw e;
+                        }
                         BufferInfo info = el.second;
                         codec.queueInputBuffer(
                                 ix, 0, info.size, info.presentationTimeUs, info.flags);
@@ -110,6 +122,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     Log.i(TAG, "got output format " + format);
                 }
             });
+            mFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, mInputBufferSize);
             decoder.configure(mFormat, surface, null /* crypto */, 0 /* flags */);
             decoder.start();
             synchronized (condition) {
