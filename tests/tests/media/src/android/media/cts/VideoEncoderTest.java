@@ -74,6 +74,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
         public void addBuffer(ByteBuffer buffer, BufferInfo info) {
             ByteBuffer savedBuffer = ByteBuffer.allocate(info.size);
+            savedBuffer.put(buffer);
             if (info.size > mInputBufferSize) {
                 mInputBufferSize = info.size;
             }
