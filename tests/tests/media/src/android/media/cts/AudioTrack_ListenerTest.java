@@ -18,6 +18,7 @@ package android.media.cts;
 
 import java.util.Vector;
 
+import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -25,16 +26,24 @@ import android.media.AudioTrack.OnPlaybackPositionUpdateListener;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.test.AndroidTestCase;
 import android.util.Log;
+import com.android.cts.util.ReportLog;
+import com.android.cts.util.ResultType;
+import com.android.cts.util.ResultUnit;
 
-public class AudioTrack_ListenerTest extends AndroidTestCase {
-    private final String TAG = "AudioTrack_ListenerTest";
+public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
+    private final static String TAG = "AudioTrack_ListenerTest";
+    private final static int TEST_SR = 11025;
+    private final static int TEST_CONF = AudioFormat.CHANNEL_OUT_MONO;
+    private final static int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT;
+    private final static int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+    private final static int TEST_LOOP_FACTOR = 2; // # loops (>= 1) for static tracks
+                                                   // simulated for streaming.
+    private final static int TEST_BUFFER_FACTOR = 25;
     private boolean mIsHandleMessageCalled;
-    private final int TEST_SR = 11025;
-    private final int TEST_CONF = AudioFormat.CHANNEL_OUT_MONO;
-    private final int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT;
-    private final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+    private int mMarkerPeriodInFrames;
+    private int mMarkerPosition;
+    private int mFrameCount;
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -44,40 +53,97 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
     };
 
     public void testAudioTrackCallback() throws Exception {
-        doTest(false /*customHandler*/, AudioTrack.MODE_STREAM);
+        doTest("Streaming Local Looper", true /*localTrack*/, false /*customHandler*/,
+                30 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/, AudioTrack.MODE_STREAM);
     }
 
     public void testAudioTrackCallbackWithHandler() throws Exception {
-        doTest(true /*customHandler*/, AudioTrack.MODE_STREAM);
+        // with 100 periods per second, trigger back-to-back notifications.
+        doTest("Streaming Private Handler", false /*localTrack*/, true /*customHandler*/,
+                100 /*periodsPerSecond*/, 10 /*markerPeriodsPerSecond*/, AudioTrack.MODE_STREAM);
         // verify mHandler is used only for accessing its associated Looper
         assertFalse(mIsHandleMessageCalled);
     }
 
     public void testStaticAudioTrackCallback() throws Exception {
-        doTest(false /*customHandler*/, AudioTrack.MODE_STATIC);
+        doTest("Static", false /*localTrack*/, false /*customHandler*/,
+                100 /*periodsPerSecond*/, 10 /*markerPeriodsPerSecond*/, AudioTrack.MODE_STATIC);
     }
 
     public void testStaticAudioTrackCallbackWithHandler() throws Exception {
-        doTest(true /*customHandler*/, AudioTrack.MODE_STATIC);
+        doTest("Static Private Handler", false /*localTrack*/, true /*customHandler*/,
+                30 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/, AudioTrack.MODE_STATIC);
         // verify mHandler is used only for accessing its associated Looper
         assertFalse(mIsHandleMessageCalled);
     }
 
-    private void doTest(boolean customHandler, final int mode) throws Exception {
+    private class Stat {
+        public void add(double value) {
+            final double absValue = Math.abs(value);
+            mSum += value;
+            mSumAbs += absValue;
+            mMaxAbs = Math.max(mMaxAbs, absValue);
+            ++mCount;
+        }
+
+        public double getAvg() {
+            if (mCount == 0) {
+                return 0;
+            }
+            return mSum / mCount;
+        }
+
+        public double getAvgAbs() {
+            if (mCount == 0) {
+                return 0;
+            }
+            return mSumAbs / mCount;
+        }
+
+        public double getMaxAbs() {
+            return mMaxAbs;
+        }
+
+        private int mCount = 0;
+        private double mSum = 0;
+        private double mSumAbs = 0;
+        private double mMaxAbs = 0;
+    }
+
+    private void doTest(String reportName, boolean localTrack, boolean customHandler,
+            int periodsPerSecond, int markerPeriodsPerSecond, final int mode) throws Exception {
+        mIsHandleMessageCalled = false;
         final int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        final int bufferSizeInBytes = minBuffSize * 8;
-        final int periodsPerSecond = 20;
-        final MakeSomethingAsynchronouslyAndLoop<AudioTrack> makeSomething =
-                new MakeSomethingAsynchronouslyAndLoop<AudioTrack>(
-                new MakesSomething<AudioTrack>() {
-                    @Override
-                    public AudioTrack makeSomething() {
-                        return new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
-                            TEST_FORMAT, bufferSizeInBytes, mode);
+        final int bufferSizeInBytes;
+        if (mode == AudioTrack.MODE_STATIC && TEST_LOOP_FACTOR > 1) {
+            // use setLoopPoints for static mode
+            bufferSizeInBytes = minBuffSize * TEST_BUFFER_FACTOR;
+            mFrameCount = bufferSizeInBytes * TEST_LOOP_FACTOR;
+        } else {
+            bufferSizeInBytes = minBuffSize * TEST_BUFFER_FACTOR * TEST_LOOP_FACTOR;
+            mFrameCount = bufferSizeInBytes;
+        }
+
+        final AudioTrack track;
+        final MakeSomethingAsynchronouslyAndLoop<AudioTrack> makeSomething;
+        if (localTrack) {
+            makeSomething = null;
+            track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
+                    TEST_FORMAT, bufferSizeInBytes, mode);
+        } else {
+            makeSomething =
+                    new MakeSomethingAsynchronouslyAndLoop<AudioTrack>(
+                    new MakesSomething<AudioTrack>() {
+                        @Override
+                        public AudioTrack makeSomething() {
+                            return new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
+                                TEST_FORMAT, bufferSizeInBytes, mode);
+                        }
                     }
-                }
-            );
-        final AudioTrack track = makeSomething.make();
+                );
+           // create audiotrack on different thread's looper.
+           track = makeSomething.make();
+        }
         final MockOnPlaybackPositionUpdateListener listener;
         if (customHandler) {
             listener = new MockOnPlaybackPositionUpdateListener(track, mHandler);
@@ -86,13 +152,22 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         }
 
         byte[] vai = AudioTrackTest.createSoundDataInByteArray(bufferSizeInBytes, TEST_SR, 1024);
-        final int markerInFrames = vai.length / 4;
-        assertEquals(AudioTrack.SUCCESS, track.setNotificationMarkerPosition(markerInFrames));
-        final int periods = Math.max(3, vai.length * periodsPerSecond / TEST_SR);
-        final int periodInFrames = vai.length / periods;
-        assertEquals(AudioTrack.SUCCESS, track.setPositionNotificationPeriod(periodInFrames));
+        int markerPeriods = Math.max(3, mFrameCount * markerPeriodsPerSecond / TEST_SR);
+        mMarkerPeriodInFrames = mFrameCount / markerPeriods;
+        markerPeriods = mFrameCount / mMarkerPeriodInFrames; // recalculate due to round-down
+        mMarkerPosition = mMarkerPeriodInFrames;
+        assertEquals(AudioTrack.SUCCESS,
+                track.setNotificationMarkerPosition(mMarkerPosition));
+        int updatePeriods = Math.max(3, mFrameCount * periodsPerSecond / TEST_SR);
+        final int updatePeriodInFrames = mFrameCount / updatePeriods;
+        updatePeriods = mFrameCount / updatePeriodInFrames; // recalculate due to round-down
+        assertEquals(AudioTrack.SUCCESS,
+                track.setPositionNotificationPeriod(updatePeriodInFrames));
         // set NotificationPeriod before running to ensure better period positional accuracy.
 
+        if (mode == AudioTrack.MODE_STATIC && TEST_LOOP_FACTOR > 1) {
+            track.setLoopPoints(0, vai.length, TEST_LOOP_FACTOR - 1);
+        }
         // write data with single blocking write, then play.
         assertEquals(vai.length, track.write(vai, 0 /* offsetInBytes */, vai.length));
         track.play();
@@ -102,25 +177,11 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         final int numChannels =  AudioFormat.channelCountFromOutChannelMask(TEST_CONF);
         final int bytesPerSample = AudioFormat.getBytesPerSample(TEST_FORMAT);
         final int bytesPerFrame = numChannels * bytesPerSample;
-        final int sampleLengthMs = (int)((double)vai.length * 1000 / TEST_SR / bytesPerFrame);
-        Thread.sleep(sampleLengthMs + 1000);
+        final int trackLengthMs = (int)((double)mFrameCount * 1000 / TEST_SR / bytesPerFrame);
+        Thread.sleep(trackLengthMs + 1000);
 
-        final Vector<Integer> markerList = listener.getMarkerList();
-        final Vector<Integer> periodicList = listener.getPeriodicList();
-        // Verify count of markers and periodic notifications.
-        assertEquals(1, markerList.size());
-        assertEquals(periods, periodicList.size());
-        // Verify actual playback head positions returned (should be within 40ms)
-        // but system load and stability will affect this test.
-        final int tolerance80MsInFrames = TEST_SR * 80 / 1000;
-        assertEquals(markerInFrames, markerList.get(0), tolerance80MsInFrames);
-        for (int i = 0; i < periods; ++i) {
-            final int expected = periodInFrames * (i + 1);
-            final int actual = periodicList.get(i);
-            // Log.d(TAG, "expected(" + expected + ")  actual(" + actual
-            //        + ")  absdiff(" + Math.abs(expected - actual) + ")");
-            assertEquals(expected, actual, tolerance80MsInFrames);
-        }
+        // stop listening - we should be done.
+        listener.stop();
 
         // Beware: stop() resets the playback head position for both static and streaming
         // audio tracks, so stop() cannot be called while we're still logging playback
@@ -128,9 +189,61 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         track.stop();
 
         // clean up
-        makeSomething.join();
+        if (makeSomething != null) {
+            makeSomething.join();
+        }
         listener.release();
         track.release();
+
+        // collect statistics
+        final Vector<Integer> markerList = listener.getMarkerList();
+        final Vector<Integer> periodicList = listener.getPeriodicList();
+        // verify count of markers and periodic notifications.
+        assertEquals(markerPeriods, markerList.size());
+        assertEquals(updatePeriods, periodicList.size());
+        // verify actual playback head positions returned.
+        // the max diff should really be around 24 ms,
+        // but system load and stability will affect this test;
+        // we use 80ms limit here for failure.
+        final int tolerance80MsInFrames = TEST_SR * 80 / 1000;
+
+        Stat markerStat = new Stat();
+        for (int i = 0; i < markerPeriods; ++i) {
+            final int expected = mMarkerPeriodInFrames * (i + 1) * 1;
+            final int actual = markerList.get(i);
+            // Log.d(TAG, "Marker: expected(" + expected + ")  actual(" + actual
+            //        + ")  diff(" + (actual - expected) + ")");
+            assertEquals(expected, actual, tolerance80MsInFrames);
+            markerStat.add((double)(actual - expected) * 1000 / TEST_SR);
+        }
+
+        Stat periodicStat = new Stat();
+        for (int i = 0; i < updatePeriods; ++i) {
+            final int expected = updatePeriodInFrames * (i + 1);
+            final int actual = periodicList.get(i);
+            // Log.d(TAG, "Update: expected(" + expected + ")  actual(" + actual
+            //        + ")  diff(" + (actual - expected) + ")");
+            assertEquals(expected, actual, tolerance80MsInFrames);
+            periodicStat.add((double)(actual - expected) * 1000 / TEST_SR);
+        }
+
+        // report this
+        ReportLog log = getReportLog();
+        log.printValue(reportName + ": Average Marker diff", markerStat.getAvg(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": Maximum Marker abs diff", markerStat.getMaxAbs(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": Average Marker abs diff", markerStat.getAvgAbs(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": Average Periodic diff", periodicStat.getAvg(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": Maximum Periodic abs diff", periodicStat.getMaxAbs(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": Average Periodic abs diff", periodicStat.getAvgAbs(),
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printSummary(reportName + ": Unified abs diff",
+                (periodicStat.getAvgAbs() + markerStat.getAvgAbs()) / 2,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
     }
 
     // lightweight java.util.concurrent.Future*
@@ -215,7 +328,7 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
         }
     }
 
-    private static class MockOnPlaybackPositionUpdateListener
+    private class MockOnPlaybackPositionUpdateListener
                                         implements OnPlaybackPositionUpdateListener {
         public MockOnPlaybackPositionUpdateListener(AudioTrack track) {
             mAudioTrack = track;
@@ -227,19 +340,32 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
             track.setPlaybackPositionUpdateListener(this, handler);
         }
 
-        public void onMarkerReached(AudioTrack track) {
-            // Note: Called from another thread than AudioTrack.write().
-            // No synchronization is necessary - other thread is sleeping
-            // and calls here should be thread-safe wrt other thread.
-            mOnMarkerReachedCalled.add(mAudioTrack.getPlaybackHeadPosition());
+        public synchronized void onMarkerReached(AudioTrack track) {
+            if (mIsTestActive) {
+                int position = mAudioTrack.getPlaybackHeadPosition();
+                mOnMarkerReachedCalled.add(position);
+                mMarkerPosition += mMarkerPeriodInFrames;
+                if (mMarkerPosition <= mFrameCount) {
+                    assertEquals(AudioTrack.SUCCESS,
+                            mAudioTrack.setNotificationMarkerPosition(mMarkerPosition));
+                }
+            } else {
+                fail("onMarkerReached called when not active");
+            }
         }
 
-        public void onPeriodicNotification(AudioTrack track) {
-            // Note: Called from another thread than AudioTrack.write().
-            mOnPeriodicNotificationCalled.add(mAudioTrack.getPlaybackHeadPosition());
+        public synchronized void onPeriodicNotification(AudioTrack track) {
+            if (mIsTestActive) {
+                mOnPeriodicNotificationCalled.add(mAudioTrack.getPlaybackHeadPosition());
+            } else {
+                fail("onPeriodicNotification called when not active");
+            }
         }
 
-        // no copy is made, use Vector implicit thread synchronization
+        public synchronized void stop() {
+            mIsTestActive = false;
+        }
+
         public Vector<Integer> getMarkerList() {
             return mOnMarkerReachedCalled;
         }
@@ -248,13 +374,13 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
             return mOnPeriodicNotificationCalled;
         }
 
-        public void release() {
+        public synchronized void release() {
             mAudioTrack.setPlaybackPositionUpdateListener(null);
             mAudioTrack = null;
         }
 
+        private boolean mIsTestActive = true;
         private AudioTrack mAudioTrack;
-        // use Vector instead of ArrayList for implicit synchronization
         private Vector<Integer> mOnMarkerReachedCalled = new Vector<Integer>();
         private Vector<Integer> mOnPeriodicNotificationCalled = new Vector<Integer>();
     }
