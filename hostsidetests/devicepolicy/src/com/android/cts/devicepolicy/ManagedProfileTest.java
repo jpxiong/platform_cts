@@ -188,6 +188,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
+        // If adb is running as root, then the adb uid is 0 instead of SHELL_UID,
+        // so the DISALLOW_DEBUGGING_FEATURES restriction does not work and this test
+        // fails.
         String restriction = "no_debugging_features";  // UserManager.DISALLOW_DEBUGGING_FEATURES
         String command = "add-restriction";
 
