@@ -109,14 +109,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
               + getDevice().executeShellCommand(command));
         assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, MANAGED_PROFILE_PKG + ".PrimaryUserTest"));
         // TODO: Test with startActivity
-    }
-
-    public void testSettingsIntents() throws Exception {
-        if (!mHasFeature) {
-            return;
-        }
-
-        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".SettingsIntentsTest", mUserId));
+        // TODO: Test with CtsVerifier for disambiguation cases
     }
 
     public void testCrossProfileContent() throws Exception {
