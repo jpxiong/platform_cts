@@ -1802,6 +1802,70 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         }
     }
 
+    public void testVariableRatePlayback() throws Exception {
+        final String TEST_NAME = "testVariableRatePlayback";
+        final int TEST_SR = 24000;
+        final int TEST_FINAL_SR = 96000;
+        final int TEST_CONF = AudioFormat.CHANNEL_OUT_MONO;
+        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT; // required for test
+        final int TEST_MODE = AudioTrack.MODE_STATIC; // required for test
+        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+
+        final int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
+        final int bufferSizeInBytes = minBuffSize * 100;
+        final int numChannels =  AudioFormat.channelCountFromOutChannelMask(TEST_CONF);
+        final int bytesPerSample = AudioFormat.getBytesPerSample(TEST_FORMAT);
+        final int bytesPerFrame = numChannels * bytesPerSample;
+        final int frameCount = bufferSizeInBytes / bytesPerFrame;
+
+        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
+                TEST_FORMAT, bufferSizeInBytes, TEST_MODE);
+
+        // create byte array and write it
+        byte[] vai = createSoundDataInByteArray(bufferSizeInBytes, TEST_SR, 600);
+        assertEquals(vai.length, track.write(vai, 0 /* offsetInBytes */, vai.length));
+
+        // sweep up test and sweep down test
+        int[] sampleRates = {TEST_SR, TEST_FINAL_SR};
+        int[] deltaMss = {10, 10};
+        int[] deltaFreqs = {200, -200};
+
+        for (int i = 0; i < 2; ++i) {
+            int remainingTime;
+            int sampleRate = sampleRates[i];
+            final int deltaMs = deltaMss[i];
+            final int deltaFreq = deltaFreqs[i];
+            final int lastCheckMs = 500; // check the last 500 ms
+
+            assertEquals(TEST_NAME, AudioTrack.SUCCESS, track.setPlaybackRate(sampleRate));
+            track.play();
+            do {
+                Thread.sleep(deltaMs);
+                final int position = track.getPlaybackHeadPosition();
+                sampleRate += deltaFreq;
+                sampleRate = Math.min(TEST_FINAL_SR, Math.max(TEST_SR, sampleRate));
+                assertEquals(TEST_NAME, AudioTrack.SUCCESS, track.setPlaybackRate(sampleRate));
+                remainingTime = (int)((double)(frameCount - position) * 1000
+                        / sampleRate / bytesPerFrame);
+            } while (remainingTime >= lastCheckMs + deltaMs);
+
+            // ensure the final frequency set is constant and plays frames as expected
+            final int position1 = track.getPlaybackHeadPosition();
+            Thread.sleep(lastCheckMs);
+            final int position2 = track.getPlaybackHeadPosition();
+
+            final int tolerance60MsInFrames = sampleRate * 60 / 1000;
+            final int expected = lastCheckMs * sampleRate / 1000;
+            final int actual = position2 - position1;
+
+            // Log.d(TAG, "Variable Playback: expected(" + expected + ")  actual(" + actual
+            //        + ")  diff(" + (expected - actual) + ")");
+            assertEquals(expected, actual, tolerance60MsInFrames);
+            track.stop();
+        }
+        track.release();
+    }
+
 /* Do not run in JB-MR1. will be re-opened in the next platform release.
     public void testResourceLeakage() throws Exception {
         final int BUFFER_SIZE = 600 * 1024;
