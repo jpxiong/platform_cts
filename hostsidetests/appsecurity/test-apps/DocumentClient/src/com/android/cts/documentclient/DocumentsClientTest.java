@@ -33,6 +33,7 @@ import android.support.test.uiautomator.UiSelector;
 import android.test.InstrumentationTestCase;
 import android.test.MoreAsserts;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.android.cts.documentclient.MyActivity.Result;
 
@@ -47,10 +48,12 @@ import java.io.OutputStream;
  * like {@link Intent#ACTION_OPEN_DOCUMENT}.
  */
 public class DocumentsClientTest extends InstrumentationTestCase {
+    private static final String TAG = "DocumentsClientTest";
+
     private UiDevice mDevice;
     private MyActivity mActivity;
 
-    private static final long TIMEOUT = 10 * DateUtils.SECOND_IN_MILLIS;
+    private static final long TIMEOUT = 30 * DateUtils.SECOND_IN_MILLIS;
 
     @Override
     public void setUp() throws Exception {
@@ -72,6 +75,15 @@ public class DocumentsClientTest extends InstrumentationTestCase {
         final UiSelector rootsList = new UiSelector().resourceId(
                 "com.android.documentsui:id/container_roots").childSelector(
                 new UiSelector().resourceId("android:id/list"));
+
+        // We might need to expand drawer if not visible
+        if (!new UiObject(rootsList).waitForExists(TIMEOUT)) {
+            Log.d(TAG, "Failed to find roots list; trying to expand");
+            final UiSelector hamburger = new UiSelector().resourceId(
+                    "com.android.documentsui:id/toolbar").childSelector(
+                    new UiSelector().className("android.widget.ImageButton").clickable(true));
+            new UiObject(hamburger).click();
+        }
 
         // Wait for the first list item to appear
         assertTrue("First list item",
