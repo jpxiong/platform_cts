@@ -57,6 +57,7 @@ public class AudioManagerTest extends AndroidTestCase {
     private final static long TIME_TO_PLAY = 2000;
     private AudioManager mAudioManager;
     private boolean mHasVibrator;
+    private boolean mUseMasterVolume;
     private boolean mUseFixedVolume;
     private int[] mMasterVolumeRamp;
     private TreeMap<Integer, Integer> mMasterVolumeMap = new TreeMap<Integer, Integer>();
@@ -68,6 +69,8 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
+        mUseMasterVolume = mContext.getResources().getBoolean(
+                Resources.getSystem().getIdentifier("config_useMasterVolume", "bool", "android"));
         mUseFixedVolume = mContext.getResources().getBoolean(
                 Resources.getSystem().getIdentifier("config_useFixedVolume", "bool", "android"));
         mMasterVolumeRamp = mContext.getResources().getIntArray(
@@ -464,6 +467,9 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     private int getVolumeDelta(int volume) {
+        if (!mUseMasterVolume) {
+            return 1;
+        }
         int volumeDelta = mMasterVolumeMap.floorEntry(volume).getValue();
         assertTrue(volumeDelta > 0);
         return volumeDelta;
