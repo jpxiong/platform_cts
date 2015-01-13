@@ -29,6 +29,7 @@ import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.MediaCodecList;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -929,6 +930,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testH264SecureDecode30fps1280x720Tv() throws Exception {
+        if (checkTv()) {
+            verifySecureVideoDecodeSupport(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 30);
+        }
+    }
+
     public void testH264Decode30fps1280x720() throws Exception {
         testDecode(R.raw.video_1280x720_mp4_h264_8192kbps_30fps_aac_stereo_128kbps_44100hz, 299);
     }
@@ -936,6 +943,12 @@ public class DecoderTest extends MediaPlayerTestBase {
     public void testH264Decode60fps1280x720Tv() throws Exception {
         if (checkTv()) {
             assertTrue(MediaUtils.canDecodeVideo(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 60));
+        }
+    }
+
+    public void testH264SecureDecode60fps1280x720Tv() throws Exception {
+        if (checkTv()) {
+            verifySecureVideoDecodeSupport(MediaFormat.MIMETYPE_VIDEO_AVC, 1280, 720, 60);
         }
     }
 
@@ -949,6 +962,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testH264SecureDecode30fps1920x1080Tv() throws Exception {
+        if (checkTv()) {
+            verifySecureVideoDecodeSupport(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 30);
+        }
+    }
+
     public void testH264Decode30fps1920x1080() throws Exception {
         testDecode(R.raw.video_1920x1080_mp4_h264_20480kbps_30fps_aac_stereo_128kbps_44100hz, 299);
     }
@@ -956,6 +975,12 @@ public class DecoderTest extends MediaPlayerTestBase {
     public void testH264Decode60fps1920x1080Tv() throws Exception {
         if (checkTv()) {
             assertTrue(MediaUtils.canDecodeVideo(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 60));
+        }
+    }
+
+    public void testH264SecureDecode60fps1920x1080Tv() throws Exception {
+        if (checkTv()) {
+            verifySecureVideoDecodeSupport(MediaFormat.MIMETYPE_VIDEO_AVC, 1920, 1080, 60);
         }
     }
 
@@ -1216,6 +1241,23 @@ public class DecoderTest extends MediaPlayerTestBase {
         int frames3 = countFrames(video, RESET_MODE_FLUSH, -1 /* eosframe */, s);
         assertEquals("different number of frames when using reconfigured codec", frames1, frames2);
         assertEquals("different number of frames when using flushed codec", frames1, frames3);
+    }
+
+    private static void verifySecureVideoDecodeSupport(String mime, int width, int height, float rate) {
+        MediaFormat baseFormat = new MediaFormat();
+        baseFormat.setString(MediaFormat.KEY_MIME, mime);
+        baseFormat.setFeatureEnabled(CodecCapabilities.FEATURE_SecurePlayback, true);
+
+        MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
+        format.setFeatureEnabled(CodecCapabilities.FEATURE_SecurePlayback, true);
+        format.setFloat(MediaFormat.KEY_FRAME_RATE, rate);
+
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        if (mcl.findDecoderForFormat(baseFormat) == null) {
+            MediaUtils.skipTest("no secure decoder for " + mime);
+            return;
+        }
+        assertNotNull("no decoder for " + format, mcl.findDecoderForFormat(format));
     }
 
     private static MediaCodec createDecoder(String mime) {
@@ -1612,12 +1654,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         // Log.d(TAG, "color format: " + String.format("0x%08x", colorFormat));
         switch (colorFormat) {
         // these are the formats we know how to handle for this test
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
+            case CodecCapabilities.COLOR_FormatYUV420Planar:
+            case CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+            case CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+            case CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+            case CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+            case CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
                 /*
                  * TODO: Check newer formats or ignore.
                  * OMX_SEC_COLOR_FormatNV12Tiled = 0x7FC00002
@@ -1887,7 +1929,7 @@ public class DecoderTest extends MediaPlayerTestBase {
      */
     public void testTunneledVideoPlayback() throws Exception {
         if (!isVideoFeatureSupported(MediaFormat.MIMETYPE_VIDEO_AVC,
-                MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback)) {
+                CodecCapabilities.FEATURE_TunneledPlayback)) {
             MediaUtils.skipTest(TAG, "No tunneled video playback codec found!");
             return;
         }
@@ -1926,7 +1968,7 @@ public class DecoderTest extends MediaPlayerTestBase {
      */
     public void testTunneledVideoFlush() throws Exception {
         if (!isVideoFeatureSupported(MediaFormat.MIMETYPE_VIDEO_AVC,
-                MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback)) {
+                CodecCapabilities.FEATURE_TunneledPlayback)) {
             MediaUtils.skipTest(TAG, "No tunneled video playback codec found!");
             return;
         }
