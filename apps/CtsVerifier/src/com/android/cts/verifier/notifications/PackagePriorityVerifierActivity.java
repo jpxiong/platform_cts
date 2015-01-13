@@ -18,6 +18,7 @@ package com.android.cts.verifier.notifications;
 
 import android.app.Notification;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class PackagePriorityVerifierActivity
     protected List<InteractiveTestCase> createTestItems() {
         mAppLabel = getString(R.string.app_name);
         List<InteractiveTestCase> tests = new ArrayList<>(17);
+        tests.add(new CheckForBot());
         tests.add(new IsEnabledTest());
         tests.add(new ServiceStartedTest());
         tests.add(new WaitForSetPriorityDefault());
@@ -67,6 +69,27 @@ public class PackagePriorityVerifierActivity
     }
 
     // Tests
+
+    /** Make sure the helper package is installed. */
+    protected class CheckForBot extends InteractiveTestCase {
+        @Override
+        View inflate(ViewGroup parent) {
+            return createAutoItem(parent, R.string.package_priority_bot);
+        }
+
+        @Override
+        void test() {
+            PackageManager pm = mContext.getPackageManager();
+            try {
+                pm.getPackageInfo(NOTIFICATION_BOT_PACKAGE, 0);
+                status = PASS;
+            } catch (PackageManager.NameNotFoundException e) {
+                status = FAIL;
+                logFail("You must install the CTS Robot helper, aka " + NOTIFICATION_BOT_PACKAGE);
+            }
+            next();
+        }
+    }
 
     /** Wait for the user to set the target package priority to default. */
     protected class WaitForSetPriorityDefault extends InteractiveTestCase {
