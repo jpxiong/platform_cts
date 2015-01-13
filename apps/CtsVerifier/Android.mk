@@ -32,8 +32,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni \
-	#libcameraanalyzer # Needed for the disabled CameraAnalyzer tests
+LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
