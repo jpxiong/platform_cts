@@ -265,7 +265,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
 
     private void setProfileOwner(String componentName, int userId)
             throws DeviceNotAvailableException {
-        String command = "dpm set-profile-owner '" + componentName + "' " + userId;
+        String command = "dpm set-profile-owner --user " + userId + " '" + componentName + "'";
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
         assertTrue(commandOutput + " expected to start with \"Success:\"",
