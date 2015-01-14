@@ -35,7 +35,11 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Container for CTS test info.
@@ -76,6 +80,9 @@ class TestPackageDef implements ITestPackageDef {
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
     // also maintain an index of known test classes
     private Collection<String> mTestClasses = new LinkedHashSet<String>();
+    // store instance arguments in order too for consistency
+    private Map<TestIdentifier, List<Map<String, String>>> mTestInstanceArguments =
+            new LinkedHashMap<>();
 
     // dynamic options, not parsed from package xml
     private String mClassName;
@@ -379,10 +386,21 @@ class TestPackageDef implements ITestPackageDef {
     void addTest(TestIdentifier testDef, int timeout) {
         mTests.add(testDef);
         mTestClasses.add(testDef.getClassName());
+        mTestInstanceArguments.put(testDef, new LinkedList<Map<String, String>>());
         // 0 means no timeout, so keep 0 if already is.
         if ((timeout > mTimeoutInMins) && (mTimeoutInMins != 0)) {
             mTimeoutInMins = timeout;
         }
+    }
+
+    /**
+     * Add a test instance to an existing {@link TestIdentifier}.
+     */
+    void addTestInstance(TestIdentifier testDef, Map<String, String> instanceArguments) {
+        if (!mTestInstanceArguments.containsKey(testDef)) {
+            throw new IllegalStateException("test id does not name an existing test");
+        }
+        mTestInstanceArguments.get(testDef).add(instanceArguments);
     }
 
     /**
@@ -391,6 +409,15 @@ class TestPackageDef implements ITestPackageDef {
     @Override
     public Collection<TestIdentifier> getTests() {
         return mTests;
+    }
+
+    /**
+     * Get the instance argument map for tests.
+     * <p/>
+     * Exposed for unit testing.
+     */
+    public Map<TestIdentifier, List<Map<String, String>>> getTestInstanceArguments() {
+        return mTestInstanceArguments;
     }
 
     /**
