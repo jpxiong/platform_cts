@@ -306,14 +306,24 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.TONEMAP_CURVE);
                 requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
 
-                int[] tonemapModes = mStaticInfo.getAvailableToneMapModesChecked();
-                List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(tonemapModes));
-                Boolean contrastCurveModeSupported =
-                        modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE);
-                int[] colorAberrationModes = mStaticInfo.getAvailableColorAberrationModesChecked();
-                modeList = Arrays.asList(CameraTestUtils.toObject(colorAberrationModes));
-                Boolean offColorAberrationModeSupported =
-                        modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF);
+                // Legacy mode always doesn't support these requirements
+                Boolean contrastCurveModeSupported = false;
+                Boolean offColorAberrationModeSupported = false;
+                if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                    int[] tonemapModes = mStaticInfo.getAvailableToneMapModesChecked();
+                    List<Integer> modeList = (tonemapModes.length == 0) ?
+                            new ArrayList<Integer>() :
+                            Arrays.asList(CameraTestUtils.toObject(tonemapModes));
+                    contrastCurveModeSupported =
+                            modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE);
+                    int[] colorAberrationModes =
+                            mStaticInfo.getAvailableColorAberrationModesChecked();
+                    modeList = (colorAberrationModes.length == 0) ?
+                            new ArrayList<Integer>() :
+                            Arrays.asList(CameraTestUtils.toObject(colorAberrationModes));
+                    offColorAberrationModeSupported =
+                            modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF);
+                }
                 additionalRequirements.add(new Pair<String, Boolean>(
                         "Tonemap mode must include CONTRAST_CURVE", contrastCurveModeSupported));
                 additionalRequirements.add(new Pair<String, Boolean>(
@@ -365,7 +375,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 // No further check is needed if we've found why capability cannot be advertised
                 if (!meetRequirement) {
                     Log.v(TAG, String.format(
-                            "Camera %s doesn't list capability %s becasue of requirement: %s",
+                            "Camera %s doesn't list capability %s because of requirement: %s",
                             mCameraId, capabilityName, requirement));
                     return;
                 }
