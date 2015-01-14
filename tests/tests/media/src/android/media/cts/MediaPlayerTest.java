@@ -250,9 +250,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
 
-            assertFalse(mp.isPlaying());
             mp.start();
-            assertTrue(mp.isPlaying());
 
             assertFalse(mp.isLooping());
             mp.setLooping(true);
@@ -266,13 +264,6 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp.seekTo(pos + seekDuration);
             assertEquals(pos + seekDuration, mp.getCurrentPosition(), tolerance);
 
-            // test pause and restart
-            mp.pause();
-            Thread.sleep(SLEEP_TIME);
-            assertFalse(mp.isPlaying());
-            mp.start();
-            assertTrue(mp.isPlaying());
-
             // test stop and restart
             mp.stop();
             mp.reset();
@@ -280,14 +271,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             afd.close();
             mp.prepare();
-            assertFalse(mp.isPlaying());
             mp.start();
-            assertTrue(mp.isPlaying());
 
-            // waiting to complete
-            while(mp.isPlaying()) {
-                Thread.sleep(SLEEP_TIME);
-            }
+            Thread.sleep(SLEEP_TIME);
         } finally {
             mp.release();
         }
