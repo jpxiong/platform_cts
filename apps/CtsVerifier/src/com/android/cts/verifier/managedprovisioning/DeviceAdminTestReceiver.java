@@ -50,6 +50,7 @@ public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
             IntentFilter filter = new IntentFilter();
             filter.addAction(ByodHelperActivity.ACTION_QUERY_PROFILE_OWNER);
             filter.addAction(ByodHelperActivity.ACTION_REMOVE_PROFILE_OWNER);
+            filter.addAction(ByodHelperActivity.ACTION_INSTALL_APK);
             filter.addAction(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
             dpm.addCrossProfileIntentFilter(getWho(context), filter,
                     DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
