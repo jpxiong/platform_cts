@@ -19,6 +19,7 @@ package android.hardware.cts.helpers.sensoroperations;
 import junit.framework.Assert;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class ParallelSensorOperation extends SensorOperation {
      * operations, the first exception will be thrown once all operations are completed.
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(final ISensorTestNode parent) throws InterruptedException {
         int operationsCount = mOperations.size();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 operationsCount,
@@ -91,12 +92,13 @@ public class ParallelSensorOperation extends SensorOperation {
         executor.allowCoreThreadTimeOut(true);
         executor.prestartAllCoreThreads();
 
+        final ISensorTestNode currentNode = asTestNode(parent);
         ArrayList<Future<SensorOperation>> futures = new ArrayList<>();
         for (final SensorOperation operation : mOperations) {
             Future<SensorOperation> future = executor.submit(new Callable<SensorOperation>() {
                 @Override
                 public SensorOperation call() throws Exception {
-                    operation.execute();
+                    operation.execute(currentNode);
                     return operation;
                 }
             });

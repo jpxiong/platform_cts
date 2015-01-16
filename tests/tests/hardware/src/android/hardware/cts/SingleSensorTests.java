@@ -544,9 +544,9 @@ public class SingleSensorTests extends SensorTestCase {
         TestSensorOperation op =
                 TestSensorOperation.createOperation(environment, 5, TimeUnit.SECONDS);
         op.addDefaultVerifications();
-        op.setLogEvents(true);
+
         try {
-            op.execute();
+            op.execute(getCurrentTestNode());
         } finally {
             SensorStats stats = op.getStats();
             stats.log(TAG);

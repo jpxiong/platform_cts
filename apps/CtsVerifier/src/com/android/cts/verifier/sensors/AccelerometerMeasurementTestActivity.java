@@ -101,7 +101,7 @@ public class AccelerometerMeasurementTestActivity extends SensorCtsVerifierTestA
         verifyMeasurements.addVerification(new MeanVerification(
                 expectations,
                 new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */));
-        verifyMeasurements.execute();
+        verifyMeasurements.execute(getCurrentTestNode());
         return null;
     }
 

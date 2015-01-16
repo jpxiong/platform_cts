@@ -150,8 +150,7 @@ public class BatchingTestActivity extends SensorCtsVerifierTestActivity {
 
     private String executeTest(TestSensorOperation operation) throws InterruptedException {
         operation.addDefaultVerifications();
-        operation.setLogEvents(true);
-        operation.execute();
+        operation.execute(getCurrentTestNode());
         return null;
     }
 }

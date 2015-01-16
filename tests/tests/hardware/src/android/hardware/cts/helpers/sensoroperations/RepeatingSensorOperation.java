@@ -17,6 +17,8 @@
 package android.hardware.cts.helpers.sensoroperations;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestPlatformException;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 
 /**
  * A {@link SensorOperation} that executes a single {@link SensorOperation} a given number of
@@ -40,7 +42,6 @@ public class RepeatingSensorOperation extends SensorOperation {
         }
         mOperation = operation;
         mIterations = iterations;
-
     }
 
     /**
@@ -48,11 +49,12 @@ public class RepeatingSensorOperation extends SensorOperation {
      * one iterations, it is thrown and all subsequent iterations will not run.
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
+        ISensorTestNode currentNode = asTestNode(parent);
         for(int i = 0; i < mIterations; ++i) {
             SensorOperation operation = mOperation.clone();
             try {
-                operation.execute();
+                operation.execute(new TestNode(currentNode, i));
             } catch (AssertionError e) {
                 String msg = String.format("Iteration %d failed: \"%s\"", i, e.getMessage());
                 getStats().addValue(SensorStats.ERROR, msg);
@@ -69,5 +71,20 @@ public class RepeatingSensorOperation extends SensorOperation {
     @Override
     public RepeatingSensorOperation clone() {
         return new RepeatingSensorOperation(mOperation.clone(), mIterations);
+    }
+
+    private class TestNode implements ISensorTestNode {
+        private final ISensorTestNode mTestNode;
+        private final int mIteration;
+
+        public TestNode(ISensorTestNode parent, int iteration) {
+            mTestNode = asTestNode(parent);
+            mIteration = iteration;
+        }
+
+        @Override
+        public String getName() throws SensorTestPlatformException {
+            return String.format("%s-iteration%d", mTestNode.getName(), mIteration);
+        }
     }
 }
