@@ -247,7 +247,8 @@ class TestPackageDef implements ITestPackageDef {
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (DEQP_TEST.equals(mTestType)) {
-            DeqpTestRunner deqpTest = new DeqpTestRunner(mAppPackageName, mName, mTests);
+            DeqpTestRunner deqpTest =
+                    new DeqpTestRunner(mAppPackageName, mName, mTests, mTestInstanceArguments);
             deqpTest.setAbi(mAbi);
             return deqpTest;
         } else if (NATIVE_TEST.equals(mTestType)) {
