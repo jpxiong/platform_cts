@@ -158,7 +158,6 @@ class CtsBuilder(object):
     # CTS Stable plan
     plan = tools.TestPlan(packages)
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-stable')
@@ -167,7 +166,6 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.android\.cts\.browserbench')
-    plan.Include(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.Include(package+'$')
       plan.IncludeTests(package, test_list)
@@ -175,6 +173,7 @@ class CtsBuilder(object):
 
     small_tests = BuildAospSmallSizeTestList()
     medium_tests = BuildAospMediumSizeTestList()
+    new_test_packages = BuildCtsVettedNewPackagesList()
 
     # CTS - sub plan for public, small size tests
     plan = tools.TestPlan(packages)
@@ -182,7 +181,6 @@ class CtsBuilder(object):
     for package, test_list in small_tests.iteritems():
       plan.Include(package+'$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-small')
@@ -193,7 +191,6 @@ class CtsBuilder(object):
     for package, test_list in medium_tests.iteritems():
       plan.Include(package+'$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-medium')
@@ -203,7 +200,6 @@ class CtsBuilder(object):
     plan.Exclude('.*')
     plan.Include(r'android\.hardware$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-hardware')
@@ -214,7 +210,6 @@ class CtsBuilder(object):
     plan.Include(r'android\.media$')
     plan.Include(r'android\.view$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-media')
@@ -224,26 +219,47 @@ class CtsBuilder(object):
     plan.Exclude('.*')
     plan.Include(r'android\.mediastress$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-mediastress')
 
-    # CTS - sub plan for new test packages added for staging
+    # CTS - sub plan for new tests that is vetted for L launch
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in new_test_packages.iteritems():
+      plan.Include(package+'$')
+    plan.Exclude(r'com\.android\.cts\.browserbench')
+    for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-l-tests')
+
+    #CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
     for package, test_list in small_tests.iteritems():
       plan.Exclude(package+'$')
     for package, test_list in medium_tests.iteritems():
+      plan.Exclude(package+'$')
+    for package, tests_list in new_test_packages.iteritems():
       plan.Exclude(package+'$')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
     plan.Exclude(r'android\.view$')
     plan.Exclude(r'android\.mediastress$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    plan.Exclude(r'com\.android\.cts\.filesystemperf\.RandomRWTest$')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
+
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'com\.drawelements\.')
+    self.__WritePlan(plan, 'CTS-DEQP')
+
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'android\.webgl')
+    self.__WritePlan(plan, 'CTS-webview')
+
 
 def BuildAospMediumSizeTestList():
   """ Construct a defaultdic that lists package names of medium tests
@@ -326,9 +342,42 @@ def BuildAospSmallSizeTestList():
       'com.android.cts.videoperf' : [],
       'zzz.android.monkey' : []}
 
+def BuildCtsVettedNewPackagesList():
+  """ Construct a defaultdict that maps package names that is vetted for L. """
+  return {
+      'android.JobScheduler' : [],
+      'android.core.tests.libcore.package.harmony_annotation' : [],
+      'android.core.tests.libcore.package.harmony_beans' : [],
+      'android.core.tests.libcore.package.harmony_java_io' : [],
+      'android.core.tests.libcore.package.harmony_java_lang' : [],
+      'android.core.tests.libcore.package.harmony_java_math' : [],
+      'android.core.tests.libcore.package.harmony_java_net' : [],
+      'android.core.tests.libcore.package.harmony_java_nio' : [],
+      'android.core.tests.libcore.package.harmony_java_util' : [],
+      'android.core.tests.libcore.package.harmony_java_text' : [],
+      'android.core.tests.libcore.package.harmony_javax_security' : [],
+      'android.core.tests.libcore.package.harmony_logging' : [],
+      'android.core.tests.libcore.package.harmony_prefs' : [],
+      'android.core.tests.libcore.package.harmony_sql' : [],
+      'android.core.tests.libcore.package.jsr166' : [],
+      'android.core.tests.libcore.package.okhttp' : [],
+      'android.display' : [],
+      'android.host.theme' : [],
+      'android.jdwp' : [],
+      'android.location2' : [],
+      'android.print' : [],
+      'android.renderscriptlegacy' : [],
+      'android.signature' : [],
+      'android.tv' : [],
+      'android.uiautomation' : [],
+      'android.uirendering' : [],
+      'android.webgl' : [],
+      'com.drawelements.deqp.gles3' : [],
+      'com.drawelements.deqp.gles31' : []}
+
 def BuildCtsFlakyTestList():
   """ Construct a defaultdict that maps package name to a list of tests
-      that are known to be flaky. """
+      that are known to be flaky in the lab or not passing on userdebug builds. """
   return {
       'android.app' : [
           'cts.ActivityManagerTest#testIsRunningInTestHarness',],
@@ -363,7 +412,11 @@ def BuildCtsFlakyTestList():
           'cts.SELinuxDomainTest#testSuDomain',
           'cts.SELinuxHostTest#testAllEnforcing',],
       'android.webkit' : [
-          'cts.WebViewClientTest#testOnUnhandledKeyEvent',]}
+          'cts.WebViewClientTest#testOnUnhandledKeyEvent',],
+      'com.android.cts.filesystemperf' : [
+          'RandomRWTest#testRandomRead',
+          'RandomRWTest#testRandomUpdate',],
+      '' : []}
 
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name
