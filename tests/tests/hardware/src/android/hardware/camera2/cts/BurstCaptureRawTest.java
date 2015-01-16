@@ -23,6 +23,7 @@ import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
@@ -121,6 +122,17 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
         performTestRoutine(new TestManualAutoSwitch());
 
         Log.i(TAG, "End testManualAutoSwitch");
+    }
+
+    /**
+     * Per frame timestamp test in RAW10/16
+     */
+    public void testTimestamp() throws Exception {
+        Log.i(TAG, "Begin testTimestamp");
+
+        performTestRoutine(new TestTimestamp());
+
+        Log.i(TAG, "End testTimestamp");
     }
 
     /*
@@ -339,6 +351,90 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Implementation of timestamp test
+     */
+    class TestTimestamp implements TestRoutine
+    {
+        private final double THRESHOLD = 5000000.0; // 5ms
+        private final long EXPOSURE_MULTIPLIERS_PRIVATE[] = {
+                1, 1, 1 };
+        private final int SENSITIVITY_MLTIPLIERS_PRIVATE[] = {
+                1, 1, 1 };
+        private final int MAX_FRAMES_BURST_PRIVATE =
+                EXPOSURE_MULTIPLIERS_PRIVATE.length * SENSITIVITY_MLTIPLIERS_PRIVATE.length;
+
+        @Override
+        public void execute(Builder rawBurstBuilder, SimpleCaptureCallback rawCaptureCallback,
+                SimpleImageReaderListener rawReaderListener, int rawFormat) throws Exception {
+            // prepare some local variables
+            ArrayList<Long> sensorTime = new ArrayList<Long>(MAX_FRAMES_BURST_PRIVATE);
+
+            // build burst capture
+            ArrayList<CaptureRequest> rawRequestList = createBurstRequest(rawBurstBuilder,
+                    EXPOSURE_MULTIPLIERS_PRIVATE, SENSITIVITY_MLTIPLIERS_PRIVATE);
+
+            // submit capture while recording timestamp
+            Log.i(TAG, "Submitting Burst Request.");
+            mSession.captureBurst(rawRequestList, rawCaptureCallback, mHandler);
+
+            // receive frames while recording timestamp
+            for (int i = 0; i < MAX_FRAMES_BURST_PRIVATE; i++) {
+                CaptureResult result = rawCaptureCallback.getCaptureResult(
+                        CAPTURE_IMAGE_TIMEOUT_MS);
+                long resultExposure = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
+                int resultSensitivity = result.get(CaptureResult.SENSOR_SENSITIVITY);
+                long resultTimestamp = result.get(CaptureResult.SENSOR_TIMESTAMP);
+                Log.i(TAG, String.format(
+                        "Received capture result, exposure = %d, sensitivity = %d, timestamp = %d",
+                        resultExposure, resultSensitivity, resultTimestamp));
+
+                sensorTime.add(resultTimestamp);
+            }
+
+            // compare sensor time and compute the difference
+            ArrayList<Long> deltaList = new ArrayList<Long>();
+            for (int i = 1; i < MAX_FRAMES_BURST_PRIVATE; i++)
+            {
+                deltaList.add(sensorTime.get(i) - sensorTime.get(i - 1));
+            }
+
+            // compute the average and standard deviation of the differences
+            double average = 0.0;
+            for (int i = 0; i < deltaList.size(); i++)
+            {
+                average += deltaList.get(i);
+            }
+            average /= deltaList.size();
+
+            double stddev = 0.0;
+            for (int i = 0; i < deltaList.size(); i++)
+            {
+                double diff = deltaList.get(i) - average;
+                stddev += diff * diff;
+            }
+            stddev = Math.sqrt(stddev / deltaList.size());
+
+            Log.i(TAG, String.format("average = %.2f, stddev = %.2f", average, stddev));
+
+            StringBuilder sensorTimestampMessage = new StringBuilder();
+            for (int i = 0; i < sensorTime.size(); i++)
+            {
+                sensorTimestampMessage.append("frame [");
+                sensorTimestampMessage.append(i);
+                sensorTimestampMessage.append("] SENSOR_TIMESTAMP = ");
+                sensorTimestampMessage.append(sensorTime.get(i));
+                sensorTimestampMessage.append("\n");
+            }
+
+            mCollector.expectLessOrEqual(
+                    "The standard deviation of frame interval is larger then threshold: " +
+                    String.format("stddev = %.2f, threshold = %.2f.\n", stddev, THRESHOLD) +
+                    sensorTimestampMessage.toString(),
+                    THRESHOLD, stddev);
+        }
+    }
+
+    /**
      * Check sensor capability prior to the test.
      *
      * @return true if the it is has the capability to execute the test.
@@ -431,7 +527,13 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
      * @param rawBurstBuilder The builder needs to have targets setup.
      * @return An array list capture request for burst.
      */
-    private ArrayList<CaptureRequest> createBurstRequest(CaptureRequest.Builder rawBurstBuilder) {
+    private ArrayList<CaptureRequest> createBurstRequest(CaptureRequest.Builder rawBurstBuilder)
+    {
+        return createBurstRequest(rawBurstBuilder, EXPOSURE_MULTIPLIERS, SENSITIVITY_MLTIPLIERS);
+    }
+
+    private ArrayList<CaptureRequest> createBurstRequest(CaptureRequest.Builder rawBurstBuilder,
+            long[] exposureMultipliers, int[] sensitivityMultipliers) {
         // set manual mode
         rawBurstBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
         rawBurstBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_OFF);
@@ -455,17 +557,18 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
                 isoRange.getLower()));
 
         // building burst request
-        Log.i(TAG, String.format("Setting up burst = %d frames.", MAX_FRAMES_BURST));
-        ArrayList<CaptureRequest> rawRequestList = new ArrayList<CaptureRequest>(MAX_FRAMES_BURST);
+        int maxFramesBurst = exposureMultipliers.length * sensitivityMultipliers.length;
+        Log.i(TAG, String.format("Setting up burst = %d frames.", maxFramesBurst));
+        ArrayList<CaptureRequest> rawRequestList = new ArrayList<CaptureRequest>(maxFramesBurst);
 
-        for (int i = 0; i < EXPOSURE_MULTIPLIERS.length; i++) {
-            for (int j = 0; j < SENSITIVITY_MLTIPLIERS.length; j++) {
+        for (int i = 0; i < exposureMultipliers.length; i++) {
+            for (int j = 0; j < sensitivityMultipliers.length; j++) {
                 long desiredExposure = Math.min(
-                        exposureRangeNs.getLower() * EXPOSURE_MULTIPLIERS[i],
+                        exposureRangeNs.getLower() * exposureMultipliers[i],
                         exposureRangeNs.getUpper());
 
                 int desiredSensitivity =
-                        Math.min(isoRange.getLower() * SENSITIVITY_MLTIPLIERS[j],
+                        Math.min(isoRange.getLower() * sensitivityMultipliers[j],
                                 isoRange.getUpper());
 
                 rawBurstBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, desiredExposure);
