@@ -20,10 +20,12 @@ import junit.framework.Assert;
 
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestPlatformException;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.hardware.cts.helpers.TestSensorEventListener;
 import android.hardware.cts.helpers.TestSensorManager;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 import android.hardware.cts.helpers.sensorverification.EventGapVerification;
 import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 import android.hardware.cts.helpers.sensorverification.EventTimestampSynchronizationVerification;
@@ -34,7 +36,9 @@ import android.hardware.cts.helpers.sensorverification.MagnitudeVerification;
 import android.hardware.cts.helpers.sensorverification.MeanVerification;
 import android.hardware.cts.helpers.sensorverification.StandardDeviationVerification;
 import android.os.Handler;
+import android.util.Log;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,19 +47,19 @@ import java.util.concurrent.TimeUnit;
  * A {@link SensorOperation} used to verify that sensor events and sensor values are correct.
  * <p>
  * Provides methods to set test expectations as well as providing a set of default expectations
- * depending on sensor type.  When {{@link #execute()} is called, the sensor will collect the
- * events and then run all the tests.
+ * depending on sensor type.  When {{@link #execute(ISensorTestNode)} is called, the sensor will
+ * collect the events and then run all the tests.
  * </p>
  */
 public class TestSensorOperation extends SensorOperation {
+    private static final String TAG = "TestSensorOperation";
+
     private final HashSet<ISensorVerification> mVerifications = new HashSet<>();
 
     private final TestSensorManager mSensorManager;
     private final TestSensorEnvironment mEnvironment;
     private final Executor mExecutor;
     private final Handler mHandler;
-
-    private boolean mLogEvents;
 
     /**
      * An interface that defines an abstraction for operations to be performed by the
@@ -87,13 +91,6 @@ public class TestSensorOperation extends SensorOperation {
     }
 
     /**
-     * Set whether to log events.
-     */
-    public void setLogEvents(boolean logEvents) {
-        mLogEvents = logEvents;
-    }
-
-    /**
      * Set all of the default test expectations.
      */
     public void addDefaultVerifications() {
@@ -117,10 +114,9 @@ public class TestSensorOperation extends SensorOperation {
      * Collect the specified number of events from the sensor and run all enabled verifications.
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
         getStats().addValue("sensor_name", mEnvironment.getSensor().getName());
         TestSensorEventListener listener = new TestSensorEventListener(mEnvironment, mHandler);
-
         mExecutor.execute(mSensorManager, listener);
 
         boolean failed = false;
@@ -131,6 +127,8 @@ public class TestSensorOperation extends SensorOperation {
         }
 
         if (failed) {
+            trySaveCollectedEvents(parent, listener);
+
             String msg = SensorCtsHelper
                     .formatAssertionMessage("VerifySensorOperation", mEnvironment, sb.toString());
             getStats().addValue(SensorStats.ERROR, msg);
@@ -170,6 +168,34 @@ public class TestSensorOperation extends SensorOperation {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Tries to save collected {@link TestSensorEvent}s to a file.
+     *
+     * NOTE: it is more important to handle verifications and its results, than failing if the file
+     * cannot be created. So we silently fail if necessary.
+     */
+    private void trySaveCollectedEvents(ISensorTestNode parent, TestSensorEventListener listener) {
+        String sanitizedFileName;
+        try {
+            String fileName = asTestNode(parent).getName();
+            sanitizedFileName = String.format(
+                    "%s-%s-%s_%dus.txt",
+                    SensorCtsHelper.sanitizeStringForFileName(fileName),
+                    SensorStats.getSanitizedSensorName(mEnvironment.getSensor()),
+                    mEnvironment.getFrequencyString(),
+                    mEnvironment.getMaxReportLatencyUs());
+        } catch (SensorTestPlatformException e) {
+            Log.w(TAG, "Unable to generate file name to save collected events", e);
+            return;
+        }
+
+        try {
+            listener.logCollectedEventsToFile(sanitizedFileName);
+        } catch (IOException e) {
+            Log.w(TAG, "Unable to save collected events to file: " + sanitizedFileName, e);
+        }
     }
 
     /**

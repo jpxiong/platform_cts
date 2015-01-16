@@ -17,6 +17,8 @@
 package android.hardware.cts.helpers.sensoroperations;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestPlatformException;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 
 /**
  * Base class used by all sensor operations. This allows for complex operations such as chaining
@@ -24,11 +26,12 @@ import android.hardware.cts.helpers.SensorStats;
  * <p>
  * Certain restrictions exist for {@link SensorOperation}s:
  * <p><ul>
- * <li>{@link #execute()} should only be called once and behavior is undefined for subsequent calls.
- * Once {@link #execute()} is called, the class should not be modified. Generally, there is no
- * synchronization for operations.</li>
- * <li>{@link #getStats()} should only be called after {@link #execute()}. If it is called before,
- * the returned value is undefined.</li>
+ * <li>{@link #execute(ISensorTestNode)} should only be called once and behavior is undefined for
+ * subsequent calls.
+ * Once {@link #execute(ISensorTestNode)} is called, the class should not be modified. Generally,
+ * there is no synchronization for operations.</li>
+ * <li>{@link #getStats()} should only be called after {@link #execute(ISensorTestNode)}. If it
+ * is called before, the returned value is undefined.</li>
  * <li>{@link #clone()} may be called any time and should return an operation with the same
  * parameters as the original.</li>
  * </ul>
@@ -59,7 +62,7 @@ public abstract class SensorOperation {
      * - cleaning up on {@link InterruptedException}
      * - propagating the exception down the stack
      */
-    public abstract void execute() throws InterruptedException;
+    public abstract void execute(ISensorTestNode parent) throws InterruptedException;
 
     /**
      * @return The cloned {@link SensorOperation}.
@@ -84,5 +87,24 @@ public abstract class SensorOperation {
      */
     protected void addSensorStats(String key, int index, SensorStats stats) {
         addSensorStats(String.format("%s_%03d", key, index), stats);
+    }
+
+    protected ISensorTestNode asTestNode(ISensorTestNode parent) {
+        return new SensorTestNode(parent, this);
+    }
+
+    private class SensorTestNode implements ISensorTestNode {
+        private final ISensorTestNode mParent;
+        private final SensorOperation mOperation;
+
+        public SensorTestNode(ISensorTestNode parent, SensorOperation operation) {
+            mParent = parent;
+            mOperation = operation;
+        }
+
+        @Override
+        public String getName() throws SensorTestPlatformException {
+            return mParent.getName() + "-" + mOperation.getClass().getSimpleName();
+        }
     }
 }

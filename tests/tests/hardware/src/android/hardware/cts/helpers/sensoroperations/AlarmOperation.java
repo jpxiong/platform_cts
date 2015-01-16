@@ -22,7 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -76,7 +76,7 @@ public class AlarmOperation extends SensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
         // Start alarm
         IntentFilter intentFilter = new IntentFilter(ACTION);
         BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -96,18 +96,10 @@ public class AlarmOperation extends SensorOperation {
 
         // Execute operation
         try {
-            mOperation.execute();
+            mOperation.execute(asTestNode(parent));
         } finally {
             releaseWakeLock();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SensorStats getStats() {
-        return mOperation.getStats();
     }
 
     /**

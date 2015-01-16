@@ -18,7 +18,6 @@ package android.hardware.cts;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
@@ -96,7 +95,7 @@ public class SensorIntegrationTests extends SensorTestCase {
             batchingOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
-        operation.execute();
+        operation.execute(getCurrentTestNode());
         operation.getStats().log(TAG);
     }
 
@@ -152,7 +151,7 @@ public class SensorIntegrationTests extends SensorTestCase {
             }
         }
 
-        operation.execute();
+        operation.execute(getCurrentTestNode());
         operation.getStats().log(TAG);
     }
 
@@ -242,11 +241,11 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         ParallelSensorOperation operation = new ParallelSensorOperation();
         operation.add(tester, testee);
-        operation.execute();
+        operation.execute(getCurrentTestNode());
         operation.getStats().log(TAG);
 
         testee = testee.clone();
-        testee.execute();
+        testee.execute(getCurrentTestNode());
         testee.getStats().log(TAG);
     }
 

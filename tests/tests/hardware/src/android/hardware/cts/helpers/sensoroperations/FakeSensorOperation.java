@@ -16,9 +16,10 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
-import junit.framework.Assert;
-
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
+
+import junit.framework.Assert;
 
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +57,7 @@ public class FakeSensorOperation extends SensorOperation {
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
+    public void execute(ISensorTestNode parent) {
         long delayNs = TimeUnit.NANOSECONDS.convert(mDelay, mTimeUnit);
         try {
             Thread.sleep(delayNs / NANOS_PER_MILLI, (int) (delayNs % NANOS_PER_MILLI));

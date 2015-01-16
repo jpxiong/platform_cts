@@ -17,6 +17,7 @@
 package android.hardware.cts.helpers.sensoroperations;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 
 import java.util.ArrayList;
 
@@ -47,11 +48,12 @@ public class SequentialSensorOperation extends SensorOperation {
      * in one operation, it is thrown and all subsequent operations will not run.
      */
     @Override
-    public void execute() throws InterruptedException {
+    public void execute(ISensorTestNode parent) throws InterruptedException {
+        ISensorTestNode currentNode = asTestNode(parent);
         for (int i = 0; i < mOperations.size(); i++) {
             SensorOperation operation = mOperations.get(i);
             try {
-                operation.execute();
+                operation.execute(currentNode);
             } catch (AssertionError e) {
                 String msg = String.format("Operation %d failed: \"%s\"", i, e.getMessage());
                 getStats().addValue(SensorStats.ERROR, msg);
