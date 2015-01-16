@@ -19,6 +19,8 @@ package android.hardware.cts.helpers.sensoroperations;
 import junit.framework.TestCase;
 
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestPlatformException;
+import android.hardware.cts.helpers.reporting.ISensorTestNode;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,13 @@ import java.util.concurrent.TimeUnit;
 public class SensorOperationTest extends TestCase {
     private static final long TEST_DURATION_THRESHOLD_MS = TimeUnit.SECONDS.toMillis(5);
 
+    private final ISensorTestNode mTestNode = new ISensorTestNode() {
+        @Override
+        public String getName() throws SensorTestPlatformException {
+            return "SensorOperationUnitTest";
+        }
+    };
+
     /**
      * Test that the {@link FakeSensorOperation} functions correctly. Other tests in this class
      * rely on this operation.
@@ -42,14 +51,14 @@ public class SensorOperationTest extends TestCase {
 
         assertFalse(op.getStats().flatten().containsKey("executed"));
         long start = System.currentTimeMillis();
-        op.execute();
+        op.execute(mTestNode);
         long duration = System.currentTimeMillis() - start;
         assertTrue(Math.abs(opDurationMs - duration) < TEST_DURATION_THRESHOLD_MS);
         assertTrue(op.getStats().flatten().containsKey("executed"));
 
         op = new FakeSensorOperation(true, 0, TimeUnit.MILLISECONDS);
         try {
-            op.execute();
+            op.execute(mTestNode);
             fail("AssertionError expected");
         } catch (AssertionError e) {
             // Expected
@@ -68,7 +77,7 @@ public class SensorOperationTest extends TestCase {
         SensorOperation op = new DelaySensorOperation(subOp, opDurationMs, TimeUnit.MILLISECONDS);
 
         long startMs = System.currentTimeMillis();
-        op.execute();
+        op.execute(mTestNode);
         long durationMs = System.currentTimeMillis() - startMs;
         long durationDeltaMs = Math.abs(opDurationMs + subOpDurationMs - durationMs);
         assertTrue(durationDeltaMs < TEST_DURATION_THRESHOLD_MS);
@@ -92,7 +101,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         long start = System.currentTimeMillis();
-        op.execute();
+        op.execute(mTestNode);
         long durationMs = System.currentTimeMillis() - start;
         long durationDeltaMs = Math.abs(subOpDurationMs - durationMs);
         String message = String.format(
@@ -132,7 +141,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         try {
-            op.execute();
+            op.execute(mTestNode);
             fail("AssertionError expected");
         } catch (AssertionError e) {
             // Expected
@@ -172,7 +181,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         try {
-            op.execute();
+            op.execute(mTestNode);
             fail("AssertionError expected");
         } catch (AssertionError e) {
             // Expected
@@ -203,7 +212,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         long start = System.currentTimeMillis();
-        op.execute();
+        op.execute(mTestNode);
         long duration = System.currentTimeMillis() - start;
         assertTrue(Math.abs(subOpDurationMs * iterations - duration) < TEST_DURATION_THRESHOLD_MS);
 
@@ -228,8 +237,8 @@ public class SensorOperationTest extends TestCase {
             private SensorStats mFakeStats = new SensorStats();
 
             @Override
-            public void execute() {
-                super.execute();
+            public void execute(ISensorTestNode parent) {
+                super.execute(parent);
                 mExecutedCount++;
 
                 if (failCount == mExecutedCount) {
@@ -255,7 +264,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         try {
-            op.execute();
+            op.execute(mTestNode);
             fail("AssertionError expected");
         } catch (AssertionError e) {
             // Expected
@@ -292,7 +301,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         long start = System.currentTimeMillis();
-        op.execute();
+        op.execute(mTestNode);
         long duration = System.currentTimeMillis() - start;
         assertTrue(Math.abs(subOpDurationMs * subOpCount - duration) < TEST_DURATION_THRESHOLD_MS);
 
@@ -324,7 +333,7 @@ public class SensorOperationTest extends TestCase {
         assertEquals(0, statsKeys.size());
 
         try {
-            op.execute();
+            op.execute(mTestNode);
             fail("AssertionError expected");
         } catch (AssertionError e) {
             // Expected

@@ -364,7 +364,7 @@ public class SensorTest extends SensorTestCase {
         }
 
         Log.i(TAG, "Testing batch/flush for sensors: " + builder);
-        parallelSensorOperation.execute();
+        parallelSensorOperation.execute(getCurrentTestNode());
     }
 
     private void assertSensorValues(Sensor sensor) {
@@ -436,7 +436,7 @@ public class SensorTest extends SensorTestCase {
                     EventTimestampSynchronizationVerification.getDefault(environment));
 
             Log.i(TAG, "Running timestamp test on: " + sensor.getName());
-            operation.execute();
+            operation.execute(getCurrentTestNode());
         } catch (InterruptedException e) {
             // propagate so the test can stop
             throw e;
@@ -471,7 +471,7 @@ public class SensorTest extends SensorTestCase {
             TestSensorOperation operation = new TestSensorOperation(environment, executor, handler);
 
             Log.i(TAG, "Running flush test on: " + sensor.getName());
-            operation.execute();
+            operation.execute(getCurrentTestNode());
         } catch (InterruptedException e) {
             // propagate so the test can stop
             throw e;

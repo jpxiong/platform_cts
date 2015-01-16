@@ -87,7 +87,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
         verifyNorm.addVerification(new MagnitudeVerification(
                 expectedMagneticFieldEarth,
                 magneticFieldEarthThreshold));
-        verifyNorm.execute();
+        verifyNorm.execute(getCurrentTestNode());
         return null;
     }
 
@@ -127,7 +127,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
 
         verifyStdDev.addVerification(new StandardDeviationVerification(
                 new float[]{2f, 2f, 2f} /* uT */));
-        verifyStdDev.execute();
+        verifyStdDev.execute(getCurrentTestNode());
         return null;
     }
 
@@ -169,6 +169,7 @@ public class MagneticFieldMeasurementTestActivity extends SensorCtsVerifierTestA
                 getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_NORMAL);
+
         TestSensorEventListener listener = new TestSensorEventListener(environment) {
             @Override
             public void onSensorChanged(SensorEvent event) {

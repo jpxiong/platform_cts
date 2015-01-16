@@ -167,7 +167,7 @@ public class GyroscopeMeasurementTestActivity extends SensorCtsVerifierTestActiv
         sensorOperation.addVerification(integrationVerification);
 
         try {
-            sensorOperation.execute();
+            sensorOperation.execute(getCurrentTestNode());
         } finally {
             playSound();
         }
