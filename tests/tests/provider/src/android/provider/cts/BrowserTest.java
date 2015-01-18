@@ -84,7 +84,9 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     value.put(colNames[i], cursor.getFloat(i));
                     break;
                 case Cursor.FIELD_TYPE_INTEGER:
-                    value.put(colNames[i], cursor.getLong(i));
+                    if (!"_ID".equalsIgnoreCase(colNames[i])) {
+                        value.put(colNames[i], cursor.getLong(i));
+                    }
                     break;
                 case Cursor.FIELD_TYPE_STRING:
                     value.put(colNames[i], cursor.getString(i));
