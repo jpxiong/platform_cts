@@ -18,12 +18,12 @@ LOCAL_SHARED_LIBRARIES += \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
+    libBionicCtsGtestMain \
 
 LOCAL_STATIC_LIBRARIES += \
     libtinyxml2 \
     liblog \
     libgtest \
-    libgtest_main \
 
 LOCAL_CTS_TEST_PACKAGE := android.bionic
 include $(BUILD_CTS_EXECUTABLE)
@@ -39,15 +39,12 @@ LOCAL_MULTILIB := both
 LOCAL_MODULE_STEM_32 := $(LOCAL_MODULE)
 LOCAL_MODULE_STEM_64 := $(LOCAL_MODULE)64
 
-# A main without the extra output from the gtest main.
-LOCAL_SRC_FILES := \
-    main.cpp \
-
 LOCAL_LDLIBS += \
     -lrt -ldl -lutil \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
+    libBionicCtsGtestMain \
 
 LOCAL_CXX_STL := libc++
 
