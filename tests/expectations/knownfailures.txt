@@ -171,20 +171,6 @@
   bug: 17890673
 },
 {
-
-  description: "These tests fail on some devices.",
-  names: [
-    "android.uirendering.cts.testclasses.ExactCanvasTests#testBlueRect",
-    "android.uirendering.cts.testclasses.ExactCanvasTests#testBluePaddedSquare",
-    "android.uirendering.cts.testclasses.ViewClippingTests#testSimplePaddingClip",
-    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleClipBoundsClip",
-    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleOutlineClip",
-    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleBoundsClip",
-    "android.uirendering.cts.testclasses.InfrastructureTests#testViewInitializer"
-  ],
-  bug: 17511118
-},
-{
   description: "This test failed on devices that use effect off loading. In addition it uses hidden apis",
   names: [
     "android.media.cts.AudioEffectTest#test1_1ConstructorFromUuid"

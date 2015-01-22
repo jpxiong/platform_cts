@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.webkit.WebView;
 
@@ -41,6 +42,8 @@ public class DrawActivity extends Activity {
 
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
         mHandler = new RenderSpecHandler();
         int uiMode = getResources().getConfiguration().uiMode;
         mOnWatch = (uiMode & Configuration.UI_MODE_TYPE_WATCH) == Configuration.UI_MODE_TYPE_WATCH;
@@ -83,39 +86,40 @@ public class DrawActivity extends Activity {
         }
 
         public void handleMessage(Message message) {
-            int webViewBuffer = 0;
+            int drawCountDelay = 0;
+            setContentView(R.layout.test_container);
+            ViewStub stub = (ViewStub) findViewById(R.id.test_content_stub);
             switch (message.what) {
                 case LAYOUT_MSG: {
-                    setContentView(message.arg1);
-                    mView = findViewById(R.id.test_root);
-                    if (mView == null) {
-                        throw new IllegalStateException("test_root failed to inflate");
-                    }
+                    stub.setLayoutResource(message.arg1);
+                    mView = stub.inflate();
                 } break;
 
                 case CANVAS_MSG: {
-                    mView = new CanvasClientView(getApplicationContext(),
-                            (CanvasClient) (message.obj), ActivityTestBase.TEST_WIDTH,
-                            ActivityTestBase.TEST_HEIGHT);
-                    setContentView(mView);
+                    stub.setLayoutResource(R.layout.test_content_canvasclientview);
+                    mView = stub.inflate();
+                    ((CanvasClientView) mView).setCanvasClient((CanvasClient) (message.obj));
                 } break;
 
                 case WEB_VIEW_MSG: {
-                    mView = new WebView(getApplicationContext());
+                    stub.setLayoutResource(R.layout.test_content_webview);
+                    mView = stub.inflate();
                     ((WebView) mView).loadUrl((String) message.obj);
                     ((WebView) mView).setInitialScale(100);
-                    setContentView(mView);
-                    webViewBuffer = 10;
+                    drawCountDelay = 10;
                 } break;
+            }
+
+            if (mView == null) {
+                throw new IllegalStateException("failed to inflate test content");
             }
 
             if (mViewInitializer != null) {
                 mViewInitializer.intializeView(mView);
             }
-
             mView.setLayerType(message.arg2, null);
 
-            DrawCounterListener onDrawListener = new DrawCounterListener(webViewBuffer);
+            DrawCounterListener onDrawListener = new DrawCounterListener(drawCountDelay);
 
             mView.getViewTreeObserver().addOnPreDrawListener(onDrawListener);
 
