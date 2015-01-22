@@ -47,6 +47,7 @@ public class AlarmManagerTest extends AndroidTestCase {
 
     private static final int TIME_DELTA = 1000;
     private static final int TIME_DELAY = 10000;
+    private static final int REPEAT_PERIOD = 60000;
 
     // Receiver registration/unregistration between tests races with the system process, so
     // we add a little buffer time here to allow the system to process before we proceed.
@@ -221,46 +222,54 @@ public class AlarmManagerTest extends AndroidTestCase {
 
     public void testSetRepeating() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
-        mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, TIME_DELAY / 2, mSender);
-        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+        mWakeupTime = System.currentTimeMillis() + TEST_ALARM_FUTURITY;
+        mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, REPEAT_PERIOD, mSender);
+
+        // wait slightly beyond the initial alarm to verify that it fires the first time
+        new PollingCheck(TEST_ALARM_FUTURITY + TIME_DELTA) {
             @Override
             protected boolean check() {
                 return mMockAlarmReceiver.alarmed;
             }
         }.run();
+        assertTrue(mMockAlarmReceiver.alarmed);
+
+        // Now reset the receiver and wait for the intended repeat alarm to fire as expected
         mMockAlarmReceiver.setAlarmedFalse();
-        new PollingCheck(TIME_DELAY) {
+        new PollingCheck(REPEAT_PERIOD*2 + TIME_DELTA) {
             @Override
             protected boolean check() {
                 return mMockAlarmReceiver.alarmed;
             }
         }.run();
+        assertTrue(mMockAlarmReceiver.alarmed);
+
         mAm.cancel(mSender);
     }
 
     public void testCancel() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
-        mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
-        mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, 1000, mSender);
-        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
-            @Override
-            protected boolean check() {
-                return mMockAlarmReceiver.alarmed;
-            }
-        }.run();
-        mMockAlarmReceiver.setAlarmedFalse();
+        mMockAlarmReceiver2.setAlarmedFalse();
+
+        // set two alarms
+        final long when1 = System.currentTimeMillis() + TEST_ALARM_FUTURITY;
+        mAm.setExact(AlarmManager.RTC_WAKEUP, when1, mSender);
+        final long when2 = when1 + TIME_DELTA; // will fire after when1's target time
+        mAm.setExact(AlarmManager.RTC_WAKEUP, when2, mSender2);
+
+        // cancel the earlier one
+        mAm.cancel(mSender);
+
+        // and verify that only the later one fired
         new PollingCheck(TIME_DELAY) {
             @Override
             protected boolean check() {
-                return mMockAlarmReceiver.alarmed;
+                return mMockAlarmReceiver2.alarmed;
             }
         }.run();
-        mAm.cancel(mSender);
-        Thread.sleep(TIME_DELAY);
-        mMockAlarmReceiver.setAlarmedFalse();
-        Thread.sleep(TIME_DELAY * 5);
+
         assertFalse(mMockAlarmReceiver.alarmed);
+        assertTrue(mMockAlarmReceiver2.alarmed);
     }
 
     public void testSetInexactRepeating() throws Exception {
