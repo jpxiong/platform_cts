@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import com.android.cts.uirendering.R;
 
 public class PathClippingTests extends ActivityTestBase {
-    // draw circle with whole in it, with stroked circle
+    // draw circle with hole in it, with stroked circle
     static final CanvasClient sCircleDrawCanvasClient = new CanvasClient() {
         @Override
         public String getDebugString() {
@@ -31,11 +31,11 @@ public class PathClippingTests extends ActivityTestBase {
             paint.setColor(Color.BLUE);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(20);
-            canvas.drawCircle(50, 50, 40, paint);
+            canvas.drawCircle(30, 30, 40, paint);
         }
     };
 
-    // draw circle with whole in it, by path operations + path clipping
+    // draw circle with hole in it, by path operations + path clipping
     static final CanvasClient sCircleClipCanvasClient = new CanvasClient() {
         @Override
         public String getDebugString() {
@@ -47,8 +47,8 @@ public class PathClippingTests extends ActivityTestBase {
             canvas.save();
 
             Path path = new Path();
-            path.addCircle(50, 50, 50, Path.Direction.CW);
-            path.addCircle(50, 50, 30, Path.Direction.CCW);
+            path.addCircle(30, 30, 50, Path.Direction.CW);
+            path.addCircle(30, 30, 30, Path.Direction.CCW);
 
             canvas.clipPath(path);
             canvas.drawColor(Color.BLUE);
@@ -72,12 +72,12 @@ public class PathClippingTests extends ActivityTestBase {
                 .runWithVerifier(new SamplePointVerifier(
                         new Point[] {
                                 // inside of circle
-                                new Point(50, 50),
+                                new Point(30, 50),
                                 // on circle
-                                new Point(50 + 32, 50 + 32),
+                                new Point(30 + 32, 30 + 32),
                                 // outside of circle
-                                new Point(50 + 38, 50 + 38),
-                                new Point(100, 100)
+                                new Point(30 + 38, 30 + 38),
+                                new Point(80, 80)
                         },
                         new int[] {
                                 Color.WHITE,
@@ -96,8 +96,8 @@ public class PathClippingTests extends ActivityTestBase {
                         ViewGroup rootView = (ViewGroup) view;
                         rootView.setClipChildren(true);
                         View childView = rootView.getChildAt(0);
-                        childView.setPivotX(50);
-                        childView.setPivotY(50);
+                        childView.setPivotX(40);
+                        childView.setPivotY(40);
                         childView.setRotation(45f);
 
                     }
@@ -105,11 +105,11 @@ public class PathClippingTests extends ActivityTestBase {
                 .runWithVerifier(new SamplePointVerifier(
                         new Point[] {
                                 // inside of rotated rect
-                                new Point(50, 50),
-                                new Point(50 + 32, 50 + 32),
+                                new Point(40, 40),
+                                new Point(40 + 25, 40 + 25),
                                 // outside of rotated rect
-                                new Point(50 + 38, 50 + 38),
-                                new Point(100, 100)
+                                new Point(40 + 31, 40 + 31),
+                                new Point(80, 80)
                         },
                         new int[] {
                                 Color.BLUE,
@@ -128,15 +128,15 @@ public class PathClippingTests extends ActivityTestBase {
                         canvas.save();
 
                         Path path = new Path();
-                        path.addCircle(0, 50, 50, Path.Direction.CW);
-                        path.addCircle(100, 50, 50, Path.Direction.CW);
+                        path.addCircle(0, 45, 45, Path.Direction.CW);
+                        path.addCircle(90, 45, 45, Path.Direction.CW);
                         canvas.clipPath(path);
 
                         Paint paint = new Paint();
                         paint.setAntiAlias(true);
-                        paint.setTextSize(100);
+                        paint.setTextSize(90);
                         paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                        canvas.drawText("STRING", 0, 100, paint);
+                        canvas.drawText("STRING", 0, 90, paint);
 
                         canvas.restore();
                     }
