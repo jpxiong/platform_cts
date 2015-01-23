@@ -34,6 +34,7 @@ cts_security_apps_list := \
     CtsSplitApp_arm64-v8a \
     CtsSplitApp_mips64 \
     CtsSplitApp_mips \
+    CtsSplitAppDiffRevision \
     CtsSplitAppDiffVersion \
     CtsSplitAppDiffCert \
     CtsSplitAppFeature \
