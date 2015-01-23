@@ -18,6 +18,7 @@ package android.hardware.camera2.cts;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraManager;
@@ -25,11 +26,13 @@ import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.params.BlackLevelPattern;
 import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.ImageReader;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.util.Rational;
 import android.util.Range;
 import android.util.Size;
+import android.view.Surface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -437,6 +440,179 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     }
 
     /**
+     * Cross-check StreamConfigurationMap output
+     */
+    public void testStreamConfigurationMap() {
+        int counter = 0;
+        for (CameraCharacteristics c : mCharacteristics) {
+            Log.i(TAG, "testStreamConfigurationMap: Testing camera ID " + mIds[counter]);
+            StreamConfigurationMap config =
+                    c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            assertNotNull(String.format("No stream configuration map found for: ID %s",
+                            mIds[counter]), config);
+
+            assertTrue("ImageReader must be supported",
+                    config.isOutputSupportedFor(android.media.ImageReader.class));
+            assertTrue("MediaRecorder must be supported",
+                    config.isOutputSupportedFor(android.media.MediaRecorder.class));
+            assertTrue("MediaCodec must be supported",
+                    config.isOutputSupportedFor(android.media.MediaCodec.class));
+            assertTrue("Allocation must be supported",
+                    config.isOutputSupportedFor(android.renderscript.Allocation.class));
+            assertTrue("SurfaceHolder must be supported",
+                    config.isOutputSupportedFor(android.view.SurfaceHolder.class));
+            assertTrue("SurfaceTexture must be supported",
+                    config.isOutputSupportedFor(android.graphics.SurfaceTexture.class));
+
+            assertTrue("YUV_420_888 must be supported",
+                    config.isOutputSupportedFor(ImageFormat.YUV_420_888));
+            assertTrue("JPEG must be supported",
+                    config.isOutputSupportedFor(ImageFormat.JPEG));
+
+            // Legacy YUV formats should not be listed
+            assertTrue("NV21 must not be supported",
+                    !config.isOutputSupportedFor(ImageFormat.NV21));
+
+            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    actualCapabilities);
+            if (arrayContains(actualCapabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+                assertTrue("RAW_SENSOR must be supported if RAW capability is advertised",
+                    config.isOutputSupportedFor(ImageFormat.RAW_SENSOR));
+            }
+
+            // Cross check public formats and sizes
+
+            int[] supportedFormats = config.getOutputFormats();
+            for (int format : supportedFormats) {
+                assertTrue("Format " + format + " fails cross check",
+                        config.isOutputSupportedFor(format));
+                Size[] supportedSizes = config.getOutputSizes(format);
+                assertTrue("Supported format " + format + " has no sizes listed",
+                        supportedSizes.length > 0);
+                for (Size size : supportedSizes) {
+                    if (VERBOSE) {
+                        Log.v(TAG,
+                                String.format("Testing camera %s, format %d, size %s",
+                                        mIds[counter], format, size.toString()));
+                    }
+
+                    long stallDuration = config.getOutputStallDuration(format, size);
+                    switch(format) {
+                        case ImageFormat.YUV_420_888:
+                            assertTrue("YUV_420_888 may not have a non-zero stall duration",
+                                    stallDuration == 0);
+                            break;
+                        default:
+                            assertTrue("Negative stall duration for format " + format,
+                                    stallDuration >= 0);
+                            break;
+                    }
+                    long minDuration = config.getOutputMinFrameDuration(format, size);
+                    if (arrayContains(actualCapabilities,
+                            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                        assertTrue("MANUAL_SENSOR capability, need positive min frame duration for"
+                                + "format " + format,
+                                minDuration > 0);
+                    } else {
+                        assertTrue("Need non-negative min frame duration for format " + format,
+                                minDuration >= 0);
+                    }
+
+                    ImageReader testReader = ImageReader.newInstance(
+                        size.getWidth(),
+                        size.getHeight(),
+                        format,
+                        1);
+                    Surface testSurface = testReader.getSurface();
+
+                    assertTrue(
+                        String.format("isOutputSupportedFor fails for config %s, format %d",
+                                size.toString(), format),
+                        config.isOutputSupportedFor(testSurface));
+
+                    testReader.close();
+
+                } // sizes
+
+                // Try an invalid size in this format, should round
+                Size invalidSize = findInvalidSize(supportedSizes);
+                int MAX_ROUNDING_WIDTH = 1920;
+                if (invalidSize.getWidth() <= MAX_ROUNDING_WIDTH) {
+                    ImageReader testReader = ImageReader.newInstance(
+                                                                     invalidSize.getWidth(),
+                                                                     invalidSize.getHeight(),
+                                                                     format,
+                                                                     1);
+                    Surface testSurface = testReader.getSurface();
+
+                    assertTrue(
+                               String.format("isOutputSupportedFor fails for config %s, %d",
+                                       invalidSize.toString(), format),
+                               config.isOutputSupportedFor(testSurface));
+
+                    testReader.close();
+                }
+            } // formats
+
+            // Cross-check opaque format and sizes
+
+            SurfaceTexture st = new SurfaceTexture(1);
+            Surface surf = new Surface(st);
+
+            Size[] opaqueSizes = config.getOutputSizes(SurfaceTexture.class);
+            assertTrue("Opaque format has no sizes listed",
+                    opaqueSizes.length > 0);
+            for (Size size : opaqueSizes) {
+                long stallDuration = config.getOutputStallDuration(SurfaceTexture.class, size);
+                assertTrue("Opaque output may not have a non-zero stall duration",
+                        stallDuration == 0);
+
+                long minDuration = config.getOutputMinFrameDuration(SurfaceTexture.class, size);
+                if (arrayContains(actualCapabilities,
+                                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    assertTrue("MANUAL_SENSOR capability, need positive min frame duration for"
+                            + "opaque format",
+                            minDuration > 0);
+                } else {
+                    assertTrue("Need non-negative min frame duration for opaque format ",
+                            minDuration >= 0);
+                }
+                st.setDefaultBufferSize(size.getWidth(), size.getHeight());
+
+                assertTrue(
+                    String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
+                            size.toString()),
+                    config.isOutputSupportedFor(surf));
+
+            } // opaque sizes
+
+            // Try invalid opaque size, should get rounded
+            Size invalidSize = findInvalidSize(opaqueSizes);
+            st.setDefaultBufferSize(invalidSize.getWidth(), invalidSize.getHeight());
+            assertTrue(
+                String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
+                        invalidSize.toString()),
+                config.isOutputSupportedFor(surf));
+
+            counter++;
+        } // mCharacteristics
+
+    }
+
+    /**
+     * Create an invalid size that's close to one of the good sizes in the list, but not one of them
+     */
+    private Size findInvalidSize(Size[] goodSizes) {
+        Size invalidSize = new Size(goodSizes[0].getWidth() + 1, goodSizes[0].getHeight());
+        while(arrayContains(goodSizes, invalidSize)) {
+            invalidSize = new Size(invalidSize.getWidth() + 1, invalidSize.getHeight());
+        }
+        return invalidSize;
+    }
+
+    /**
      * Check key is present in characteristics if the hardware level is at least {@code hwLevel};
      * check that the key is present if the actual capabilities are one of {@code capabilities}.
      *
@@ -502,6 +678,20 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
         for (int elem : arr) {
             if (elem == needle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static <T> boolean arrayContains(T[] arr, T needle) {
+        if (arr == null) {
+            return false;
+        }
+
+        for (T elem : arr) {
+            if (elem.equals(needle)) {
                 return true;
             }
         }
