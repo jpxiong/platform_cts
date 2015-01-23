@@ -184,7 +184,6 @@ public class PrintTestRemoteTestRunner implements IRemoteAndroidTestRunner {
         addBooleanArg(COVERAGE_ARG_NAME, coverage);
     }
 
-    @Override
     public void setTestCollection(boolean b) {
         throw new UnsupportedOperationException("Test Collection mode is not supported");
     }
