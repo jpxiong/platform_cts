@@ -369,7 +369,8 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         Log.i(TAG, String.format("Testing Camera %s, config %s",
                         cameraId, MaxOutputSizes.configToString(config)));
 
-        final int TIMEOUT_FOR_RESULT_MS = 1000;
+        // Timeout is relaxed by 500ms for LEGACY devices to reduce false positive rate in CTS
+        final int TIMEOUT_FOR_RESULT_MS = (mStaticInfo.isHardwareLevelLegacy()) ? 1500 : 1000;
         final int MIN_RESULT_COUNT = 3;
 
         ImageDropperListener imageDropperListener = new ImageDropperListener();
