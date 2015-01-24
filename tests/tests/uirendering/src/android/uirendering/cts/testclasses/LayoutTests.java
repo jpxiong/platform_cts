@@ -34,7 +34,7 @@ public class LayoutTests extends ActivityTestBase {
     @SmallTest
     public void testSimpleRectLayout() {
         createTest().addLayout(R.layout.simple_rect_layout, null, false).runWithVerifier(
-                new RectVerifier(Color.WHITE, Color.BLUE, new Rect(0, 0, 100, 100)));
+                new RectVerifier(Color.WHITE, Color.BLUE, new Rect(5, 5, 85, 85)));
     }
 }
 

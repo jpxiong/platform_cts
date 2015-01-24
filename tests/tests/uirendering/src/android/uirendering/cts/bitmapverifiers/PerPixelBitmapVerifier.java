@@ -26,38 +26,54 @@ import android.util.Log;
  */
 public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
     private static final String TAG = "PerPixelBitmapVerifer";
-    private int mTolerance;
+    public static final int DEFAULT_THRESHOLD = 48;
 
-    public PerPixelBitmapVerifier(int tolerance) {
-        mTolerance = tolerance;
+    // total color difference tolerated without the pixel failing
+    private int mColorTolerance;
+
+    // portion of bitmap allowed to fail pixel check
+    private float mSpatialTolerance;
+
+    public PerPixelBitmapVerifier() {
+        this(DEFAULT_THRESHOLD, 0);
+    }
+
+    public PerPixelBitmapVerifier(int colorTolerance) {
+        this(colorTolerance, 0);
+    }
+
+    public PerPixelBitmapVerifier(int colorTolerance, float spatialTolerance) {
+        mColorTolerance = colorTolerance;
+        mSpatialTolerance = spatialTolerance;
     }
 
     protected int getExpectedColor(int x, int y) {
         return Color.WHITE;
     }
 
-
     public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
-        int failCount = 0;
+        int failures = 0;
         int[] differenceMap = new int[bitmap.length];
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 int index = indexFromXAndY(x, y, stride, offset);
-                int expectedColor = getExpectedColor(x, y);
-                if (!verifyPixel(bitmap[index], expectedColor)) {
-                    if (failCount < 50) {
-                        Log.d(TAG, "Expected : " + Integer.toHexString(expectedColor)
+                if (!verifyPixel(x, y, bitmap[index])) {
+                    if (failures < 50) {
+                        Log.d(TAG, "Expected : " + Integer.toHexString(getExpectedColor(x, y))
                                 + " received : " + Integer.toHexString(bitmap[index])
                                 + " at position (" + x + "," + y + ")");
                     }
-                    failCount++;
+                    failures++;
                     differenceMap[index] = FAIL_COLOR;
                 } else {
                     differenceMap[index] = PASS_COLOR;
                 }
             }
         }
-        boolean success = failCount == 0;
+        int toleratedFailures = (int) (mSpatialTolerance * width * height);
+        boolean success = failures <= toleratedFailures;
+        Log.d(TAG, failures + " failures observed out of "
+                + toleratedFailures + " tolerated failures");
         if (!success) {
             mDifferenceBitmap = Bitmap.createBitmap(ActivityTestBase.TEST_WIDTH,
                     ActivityTestBase.TEST_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -67,7 +83,9 @@ public abstract class PerPixelBitmapVerifier extends BitmapVerifier {
         return success;
     }
 
-    protected boolean verifyPixel(int color, int expectedColor) {
-        return CompareUtils.verifyPixelWithThreshold(color, expectedColor, mTolerance);
+
+    protected boolean verifyPixel(int x, int y, int observedColor) {
+        int expectedColor = getExpectedColor(x, y);
+        return CompareUtils.verifyPixelWithThreshold(observedColor, expectedColor, mColorTolerance);
     }
 }
