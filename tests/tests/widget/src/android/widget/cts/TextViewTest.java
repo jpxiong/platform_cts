@@ -2845,15 +2845,19 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertEquals(1, mTextView.getImeActionId());
     }
 
-    @UiThreadTest
     public void testSetTextLong() {
-        final int MAX_COUNT = 1 << 21;
-        char[] longText = new char[MAX_COUNT];
-        for (int n = 0; n < MAX_COUNT; n++) {
-            longText[n] = 'm';
-        }
-        mTextView = findTextView(R.id.textview_text);
-        mTextView.setText(new String(longText));
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                final int MAX_COUNT = 1 << 21;
+                char[] longText = new char[MAX_COUNT];
+                for (int n = 0; n < MAX_COUNT; n++) {
+                    longText[n] = 'm';
+                }
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setText(new String(longText));
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     @UiThreadTest
