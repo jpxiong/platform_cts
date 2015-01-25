@@ -60,6 +60,7 @@ import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -73,11 +74,11 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     private static final long OPERATION_TIMEOUT = 100000000;
 
-    private static final String ARG_PRIVILEGED_OPS = "ARG_PRIVILEGED_OPS";
-
     private static final String PRINT_SPOOLER_PACKAGE_NAME = "com.android.printspooler";
 
     protected static final String PRINT_JOB_NAME = "Test";
+
+    private static final String PM_CLEAR_SUCCESS_OUTPUT = "Success";
 
     private PrintDocumentActivity mActivity;
 
@@ -94,6 +95,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     public void setUp() throws Exception {
         // Make sure we start with a clean slate.
         clearPrintSpoolerData();
+        enablePrintServices();
 
         // Workaround for dexmaker bug: https://code.google.com/p/dexmaker/issues/detail?id=2
         // Dexmaker is used by mockito.
@@ -139,6 +141,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
             resources.updateConfiguration(newConfiguration, displayMetrics);
         }
 
+        disablePrintServices();
         // Make sure the spooler is cleaned.
         clearPrintSpoolerData();
     }
@@ -306,9 +309,34 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     }
 
     protected void clearPrintSpoolerData() throws Exception {
-        IPrivilegedOperations privilegedOps = IPrivilegedOperations.Stub.asInterface(
-                getParams().getBinder(ARG_PRIVILEGED_OPS));
-        privilegedOps.clearApplicationUserData(PRINT_SPOOLER_PACKAGE_NAME);
+        assertTrue("failed to clear print spooler data",
+                runShellCommand(String.format("pm clear %s", PRINT_SPOOLER_PACKAGE_NAME))
+                    .contains(PM_CLEAR_SUCCESS_OUTPUT));
+    }
+
+    protected String runShellCommand(String cmd) throws Exception {
+        ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation().executeShellCommand(cmd);
+        byte[] buf = new byte[512];
+        int bytesRead;
+        FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd);
+        StringBuffer stdout = new StringBuffer();
+        while ((bytesRead = fis.read(buf)) != -1) {
+            stdout.append(new String(buf, 0, bytesRead));
+        }
+        fis.close();
+        return stdout.toString();
+    }
+
+    private void enablePrintServices() throws Exception {
+        String pkgName = getInstrumentation().getContext().getPackageName();
+        String enabledServicesValue = String.format("%s/%s:%s/%s",
+                pkgName, FirstPrintService.class.getCanonicalName(),
+                pkgName, SecondPrintService.class.getCanonicalName());
+        runShellCommand("settings put secure enabled_print_services " + enabledServicesValue);
+    }
+
+    private void disablePrintServices() throws Exception {
+        runShellCommand("settings put secure enabled_print_services \"\"");
     }
 
     protected void verifyLayoutCall(InOrder inOrder, PrintDocumentAdapter mock,
