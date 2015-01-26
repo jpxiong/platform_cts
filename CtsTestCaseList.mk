@@ -203,9 +203,6 @@ cts_device_jars := \
     CtsDeviceJank \
     CtsPrintInstrument
 
-cts_device_executables := \
-    print-instrument
-
 cts_target_junit_tests := \
     CtsJdwp
 

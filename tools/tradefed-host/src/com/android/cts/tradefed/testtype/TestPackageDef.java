@@ -53,8 +53,6 @@ class TestPackageDef implements ITestPackageDef {
             "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
     public static final String ACCESSIBILITY_SERVICE_TEST =
             "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
-    public static final String PRINT_TEST =
-            "com.android.cts.tradefed.testtype.PrintTestRunner";
     public static final String DISPLAY_TEST =
             "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
@@ -255,9 +253,6 @@ class TestPackageDef implements ITestPackageDef {
         } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
             AccessibilityTestRunner test = new AccessibilityTestRunner();
             return setInstrumentationTest(test, testCaseDir);
-        } else if (PRINT_TEST.equals(mTestType)) {
-            PrintTestRunner test = new PrintTestRunner();
-            return setPrintTest(test, testCaseDir);
         } else if (ACCESSIBILITY_SERVICE_TEST.equals(mTestType)) {
             @SuppressWarnings("deprecation")
             AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
@@ -289,19 +284,6 @@ class TestPackageDef implements ITestPackageDef {
             }
             return setInstrumentationTest(instrTest, testCaseDir);
         }
-    }
-
-    private PrintTestRunner setPrintTest(PrintTestRunner printTest,
-            File testCaseDir) {
-        printTest.setRunName(mAppPackageName);
-        printTest.setPackageName(mAppNameSpace);
-        printTest.setRunnerName(mRunner);
-        printTest.setTestPackageName(mTestPackageName);
-        printTest.setClassName(mClassName);
-        printTest.setMethodName(mMethodName);
-        printTest.setAbi(mAbi);
-        mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
-        return printTest;
     }
 
     /**
