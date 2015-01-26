@@ -200,8 +200,7 @@ cts_ui_tests := \
     CtsUiAutomatorTests
 
 cts_device_jars := \
-    CtsDeviceJank \
-    CtsPrintInstrument
+    CtsDeviceJank
 
 cts_target_junit_tests := \
     CtsJdwp
