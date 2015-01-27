@@ -27,6 +27,8 @@ import android.uirendering.cts.differencevisualizers.PassFailVisualizer;
 import android.uirendering.cts.util.BitmapDumper;
 import android.util.Log;
 
+import android.support.test.InstrumentationRegistry;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,6 +79,10 @@ public abstract class ActivityTestBase extends
      */
     @Override
     public void setUp() {
+        // As the way to access Instrumentation is changed in the new runner, we need to inject it
+        // manually into ActivityInstrumentationTestCase2. ActivityInstrumentationTestCase2 will
+        // be marked as deprecated and replaced with ActivityTestRule.
+        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         mDifferenceVisualizer = new PassFailVisualizer();
         if (USE_RS) {
             mRenderScript = RenderScript.create(getActivity().getApplicationContext());
