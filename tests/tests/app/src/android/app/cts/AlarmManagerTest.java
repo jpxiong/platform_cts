@@ -225,8 +225,8 @@ public class AlarmManagerTest extends AndroidTestCase {
         mWakeupTime = System.currentTimeMillis() + TEST_ALARM_FUTURITY;
         mAm.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, REPEAT_PERIOD, mSender);
 
-        // wait slightly beyond the initial alarm to verify that it fires the first time
-        new PollingCheck(TEST_ALARM_FUTURITY + TIME_DELTA) {
+        // wait beyond the initial alarm's possible delivery window to verify that it fires the first time
+        new PollingCheck(TEST_ALARM_FUTURITY + REPEAT_PERIOD) {
             @Override
             protected boolean check() {
                 return mMockAlarmReceiver.alarmed;
@@ -236,7 +236,7 @@ public class AlarmManagerTest extends AndroidTestCase {
 
         // Now reset the receiver and wait for the intended repeat alarm to fire as expected
         mMockAlarmReceiver.setAlarmedFalse();
-        new PollingCheck(REPEAT_PERIOD*2 + TIME_DELTA) {
+        new PollingCheck(REPEAT_PERIOD*2) {
             @Override
             protected boolean check() {
                 return mMockAlarmReceiver.alarmed;
