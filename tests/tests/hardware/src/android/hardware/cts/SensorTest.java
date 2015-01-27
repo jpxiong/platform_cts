@@ -33,6 +33,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -502,15 +503,23 @@ public class SensorTest extends SensorTestCase {
     // Call registerListener for multiple sensors at a time and call flush.
     public void testBatchAndFlushWithMutipleSensors() throws Exception {
         final int MAX_SENSORS = 3;
-        int numSensors = mSensorList.size() < MAX_SENSORS ? mSensorList.size() : MAX_SENSORS;
-        if (numSensors == 0) {
+        List<Sensor> sensorsToTest = new ArrayList<Sensor>();
+        for (Sensor sensor : mSensorList) {
+            if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
+                sensorsToTest.add(sensor);
+                if (sensorsToTest.size()  == MAX_SENSORS) break;
+            }
+        }
+
+        final int numSensorsToTest = sensorsToTest.size();
+        if (numSensorsToTest == 0) {
             return;
         }
         final int numEvents = 500;
         int rateUs = 0; // DELAY_FASTEST
         final int maxBatchReportLatencyUs = 10000000;
-        final CountDownLatch eventsRemaining = new CountDownLatch(numSensors * numEvents);
-        final CountDownLatch flushReceived = new CountDownLatch(numSensors);
+        final CountDownLatch eventsRemaining = new CountDownLatch(numSensorsToTest * numEvents);
+        final CountDownLatch flushReceived = new CountDownLatch(numSensorsToTest);
         SensorEventListener2 listener = new SensorEventListener2() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -530,29 +539,20 @@ public class SensorTest extends SensorTestCase {
         try {
             mWakeLock.acquire();
             StringBuilder registeredSensors = new StringBuilder(30);
-            for (Sensor sensor : mSensorList) {
-                // Skip all non-continuous sensors.
-                if (sensor.getReportingMode() != Sensor.REPORTING_MODE_CONTINUOUS) {
-                    continue;
-                }
+            for (Sensor sensor : sensorsToTest) {
                 rateUs = Math.max(sensor.getMinDelay(), rateUs);
                 boolean result = mSensorManager.registerListener(listener, sensor,
                         SensorManager.SENSOR_DELAY_FASTEST, maxBatchReportLatencyUs);
                 assertTrue("registerListener failed for " + sensor.getName(), result);
                 registeredSensors.append(sensor.getName());
                 registeredSensors.append(" ");
-                if (--numSensors == 0) {
-                    break;
-                }
-            }
-            if (registeredSensors.toString().isEmpty()) {
-                return;
             }
 
             Log.i(TAG, "testBatchAndFlushWithMutipleSensors " + registeredSensors);
             long timeToWaitUs =
-                    numEvents*(long)(rateUs/MIN_SAMPLING_FREQUENCY_MULTIPLIER_TOLERANCE) +
-                    maxBatchReportLatencyUs + TIMEOUT_TOLERANCE_US;
+                numEvents*(long)(rateUs/MIN_SAMPLING_FREQUENCY_MULTIPLIER_TOLERANCE) +
+                maxBatchReportLatencyUs + TIMEOUT_TOLERANCE_US;
+
             long totalTimeWaitedUs = waitToCollectAllEvents(timeToWaitUs, maxBatchReportLatencyUs,
                     eventsRemaining);
             if (eventsRemaining.getCount() > 0) {
@@ -563,10 +563,10 @@ public class SensorTest extends SensorTestCase {
             boolean result = mSensorManager.flush(listener);
             assertTrue("flush failed " + registeredSensors.toString(), result);
             boolean collectedFlushEvent =
-                    flushReceived.await(TIMEOUT_TOLERANCE_US, TimeUnit.MICROSECONDS);
+                flushReceived.await(TIMEOUT_TOLERANCE_US, TimeUnit.MICROSECONDS);
             if (!collectedFlushEvent) {
                 fail("Timed out waiting for flushCompleteEvent from " +
-                      registeredSensors.toString() + " waited for=" + timeToWaitUs/1000 + "ms");
+                        registeredSensors.toString() + " waited for=" + timeToWaitUs/1000 + "ms");
             }
             Log.i(TAG, "testBatchAndFlushWithMutipleSensors PASS'd");
         } finally {
