@@ -27,6 +27,7 @@ import android.media.audiofx.Visualizer;
 import android.media.audiofx.Visualizer.MeasurementPeakRms;
 import android.os.Looper;
 import android.test.AndroidTestCase;
+import java.util.UUID;
 import android.util.Log;
 
 public class VisualizerTest extends PostProcTestBase {
@@ -281,6 +282,7 @@ public class VisualizerTest extends PostProcTestBase {
 
     //Test case 4.1: test measurement of peak / RMS
     public void test4_1MeasurePeakRms() throws Exception {
+        AudioEffect vc = null;
         try {
             // this test will play a 1kHz sine wave with peaks at -40dB
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sine1khzm40db);
@@ -288,6 +290,15 @@ public class VisualizerTest extends PostProcTestBase {
             final int EXPECTED_RMS_MB =  -4300;
             final int MAX_MEASUREMENT_ERROR_MB = 2000;
             assertNotNull("null MediaPlayer", mp);
+
+            // creating a volume controller on output mix ensures that ro.audio.silent mutes
+            // audio after the effects and not before
+            vc = new AudioEffect(
+                    AudioEffect.EFFECT_TYPE_NULL,
+                    UUID.fromString(BUNDLE_VOLUME_EFFECT_UUID),
+                    0,
+                    mp.getAudioSessionId());
+            vc.setEnabled(true);
 
             AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
             assertNotNull("null AudioManager", am);
@@ -333,12 +344,15 @@ public class VisualizerTest extends PostProcTestBase {
         } catch (InterruptedException e) {
             fail("sleep() interrupted");
         } finally {
+            if (vc != null)
+                vc.release();
             releaseVisualizer();
         }
     }
 
     //Test case 4.2: test measurement of peak / RMS in Long MP3
     public void test4_2MeasurePeakRmsLongMP3() throws Exception {
+        AudioEffect vc = null;
         try {
             // this test will play a 1kHz sine wave with peaks at -40dB
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sine1khzs40dblong);
@@ -346,6 +360,15 @@ public class VisualizerTest extends PostProcTestBase {
             final int EXPECTED_RMS_MB =  -4300;
             final int MAX_MEASUREMENT_ERROR_MB = 2000;
             assertNotNull("null MediaPlayer", mp);
+
+            // creating a volume controller on output mix ensures that ro.audio.silent mutes
+            // audio after the effects and not before
+            vc = new AudioEffect(
+                    AudioEffect.EFFECT_TYPE_NULL,
+                    UUID.fromString(BUNDLE_VOLUME_EFFECT_UUID),
+                    0,
+                    mp.getAudioSessionId());
+            vc.setEnabled(true);
 
             AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
             assertNotNull("null AudioManager", am);
@@ -390,6 +413,8 @@ public class VisualizerTest extends PostProcTestBase {
         } catch (InterruptedException e) {
             fail("sleep() interrupted");
         } finally {
+            if (vc != null)
+                vc.release();
             releaseVisualizer();
         }
     }
