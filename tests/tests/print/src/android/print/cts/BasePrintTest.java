@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.cts.util.SystemUtil;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.CancellationSignal;
@@ -60,7 +61,6 @@ import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -310,21 +310,9 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     protected void clearPrintSpoolerData() throws Exception {
         assertTrue("failed to clear print spooler data",
-                runShellCommand(String.format("pm clear %s", PRINT_SPOOLER_PACKAGE_NAME))
-                    .contains(PM_CLEAR_SUCCESS_OUTPUT));
-    }
-
-    protected String runShellCommand(String cmd) throws Exception {
-        ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation().executeShellCommand(cmd);
-        byte[] buf = new byte[512];
-        int bytesRead;
-        FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd);
-        StringBuffer stdout = new StringBuffer();
-        while ((bytesRead = fis.read(buf)) != -1) {
-            stdout.append(new String(buf, 0, bytesRead));
-        }
-        fis.close();
-        return stdout.toString();
+                SystemUtil.runShellCommand(getInstrumentation(),
+                        String.format("pm clear %s", PRINT_SPOOLER_PACKAGE_NAME))
+                            .contains(PM_CLEAR_SUCCESS_OUTPUT));
     }
 
     private void enablePrintServices() throws Exception {
@@ -332,11 +320,13 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         String enabledServicesValue = String.format("%s/%s:%s/%s",
                 pkgName, FirstPrintService.class.getCanonicalName(),
                 pkgName, SecondPrintService.class.getCanonicalName());
-        runShellCommand("settings put secure enabled_print_services " + enabledServicesValue);
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure enabled_print_services " + enabledServicesValue);
     }
 
     private void disablePrintServices() throws Exception {
-        runShellCommand("settings put secure enabled_print_services \"\"");
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure enabled_print_services \"\"");
     }
 
     protected void verifyLayoutCall(InOrder inOrder, PrintDocumentAdapter mock,
