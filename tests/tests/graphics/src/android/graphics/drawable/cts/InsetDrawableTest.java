@@ -24,8 +24,11 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
@@ -315,6 +318,24 @@ public class InsetDrawableTest extends AndroidTestCase {
 
         ConstantState constantState = insetDrawable.getConstantState();
         assertNotNull(constantState);
+    }
+
+    public void testMutate() {
+        // Obtain the first instance, then mutate and modify a property held by
+        // constant state. If mutate() works correctly, the property should not
+        // be modified on the second or third instances.
+        Resources res = mContext.getResources();
+        InsetDrawable first = (InsetDrawable) res.getDrawable(R.drawable.inset_mutate, null);
+        InsetDrawable pre = (InsetDrawable) res.getDrawable(R.drawable.inset_mutate, null);
+
+        first.mutate().setAlpha(128);
+
+        assertEquals("Modified first loaded instance", 128, first.getDrawable().getAlpha());
+        assertEquals("Did not modify pre-mutate() instance", 255, pre.getDrawable().getAlpha());
+
+        InsetDrawable post = (InsetDrawable) res.getDrawable(R.drawable.inset_mutate, null);
+
+        assertEquals("Did not modify post-mutate() instance", 255, post.getDrawable().getAlpha());
     }
 
     private class MockInsetDrawable extends InsetDrawable {
