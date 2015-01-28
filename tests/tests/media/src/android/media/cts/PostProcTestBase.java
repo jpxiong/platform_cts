@@ -31,6 +31,8 @@ public class PostProcTestBase extends AndroidTestCase {
     protected Looper mLooper = null;
     protected final Object mLock = new Object();
     protected int mChangedParameter = -1;
+    protected final static String BUNDLE_VOLUME_EFFECT_UUID =
+            "119341a0-8469-11df-81f9-0002a5d5c51b";
 
     protected boolean hasAudioOutput() {
         return getContext().getPackageManager().hasSystemFeature(
