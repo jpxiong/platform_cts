@@ -53,9 +53,6 @@ public class Settings_SystemTest extends AndroidTestCase {
 
         selection = System.NAME + "=\"" + STRING_FIELD + "\"";
         cr.delete(System.CONTENT_URI, selection, null);
-
-        selection = System.NAME + "=\"" + System.SHOW_GTALK_SERVICE_STATUS + "\"";
-        cr.delete(System.CONTENT_URI, selection, null);
     }
 
     public void testSystemSettings() throws SettingNotFoundException {
@@ -76,16 +73,15 @@ public class Settings_SystemTest extends AndroidTestCase {
 
             String stringValue = "cts";
 
-            // insert 5 rows, and update 1 rows
+            // insert 4 rows, and update 1 rows
             assertTrue(System.putInt(cr, INT_FIELD, 10));
             assertTrue(System.putLong(cr, LONG_FIELD, 20l));
             assertTrue(System.putFloat(cr, FLOAT_FIELD, 30.0f));
             assertTrue(System.putString(cr, STRING_FIELD, stringValue));
-            System.setShowGTalkServiceStatus(cr, true);
 
             c = cr.query(System.CONTENT_URI, null, null, null, null);
             assertNotNull(c);
-            assertEquals(origCount + 5, c.getCount());
+            assertEquals(origCount + 4, c.getCount());
             c.close();
 
             // get these rows to assert
@@ -94,7 +90,6 @@ public class Settings_SystemTest extends AndroidTestCase {
             assertEquals(30.0f, System.getFloat(cr, FLOAT_FIELD), 0.001);
 
             assertEquals(stringValue, System.getString(cr, STRING_FIELD));
-            assertTrue(System.getShowGTalkServiceStatus(cr));
 
             // delete the tested rows again
             deleteTestedRows();
