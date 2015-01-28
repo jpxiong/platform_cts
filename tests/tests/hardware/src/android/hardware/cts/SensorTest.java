@@ -341,26 +341,30 @@ public class SensorTest extends SensorTestCase {
     public void testBatchAndFlushWithMutipleSensors() throws Exception {
         final int maxSensors = 3;
         final int maxReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(10);
-        int sensorsCount = mSensorList.size();
-        int numSensors = sensorsCount < maxSensors ? sensorsCount : maxSensors;
+        List<Sensor> sensorsToTest = new ArrayList<Sensor>();
+        for (Sensor sensor : mSensorList) {
+            if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
+                sensorsToTest.add(sensor);
+                if (sensorsToTest.size()  == maxSensors) break;
+            }
+        }
+        final int numSensorsToTest = sensorsToTest.size();
+        if (numSensorsToTest == 0) {
+            return;
+        }
 
         StringBuilder builder = new StringBuilder();
         ParallelSensorOperation parallelSensorOperation = new ParallelSensorOperation();
-        for (int i = 0; i < sensorsCount && numSensors > 0; ++i) {
-            Sensor sensor = mSensorList.get(i);
-            // skip all non-continuous sensors
-            if (sensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
-                TestSensorEnvironment environment = new TestSensorEnvironment(
-                        getContext(),
-                        sensor,
-                        shouldEmulateSensorUnderLoad(),
-                        SensorManager.SENSOR_DELAY_FASTEST,
-                        maxReportLatencyUs);
-                FlushExecutor executor = new FlushExecutor(environment, 500 /* eventCount */);
-                parallelSensorOperation.add(new TestSensorOperation(environment, executor));
-                --numSensors;
-                builder.append(sensor.getName()).append(", ");
-            }
+        for (Sensor sensor : sensorsToTest) {
+            TestSensorEnvironment environment = new TestSensorEnvironment(
+                    getContext(),
+                    sensor,
+                    shouldEmulateSensorUnderLoad(),
+                    SensorManager.SENSOR_DELAY_FASTEST,
+                    maxReportLatencyUs);
+            FlushExecutor executor = new FlushExecutor(environment, 500 /* eventCount */);
+            parallelSensorOperation.add(new TestSensorOperation(environment, executor));
+            builder.append(sensor.getName()).append(", ");
         }
 
         Log.i(TAG, "Testing batch/flush for sensors: " + builder);
