@@ -18,6 +18,7 @@ package android.media.cts;
 
 import android.content.pm.PackageManager;
 import android.cts.util.CtsAndroidTestCase;
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTimestamp;
@@ -1663,6 +1664,136 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                             Thread.sleep(WAIT_MSEC);
                             // -------- tear down --------------
                             track.release();
+                            frequency += 200; // increment test tone frequency
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void testPlayChannelIndexStreamBuffer() throws Exception {
+        // should hear 4 tones played 3 or 4 times depending
+        // on the device output capabilities (e.g. stereo or 5.1 or otherwise)
+        final String TEST_NAME = "testPlayChannelIndexStreamBuffer";
+        final int TEST_FORMAT_ARRAY[] = {
+                AudioFormat.ENCODING_PCM_8BIT,
+                //AudioFormat.ENCODING_PCM_16BIT,
+                //AudioFormat.ENCODING_PCM_FLOAT,
+        };
+        final int TEST_SR_ARRAY[] = {
+                48000,
+        };
+        // The following channel index masks are iterated over and route
+        // the AudioTrack channels to the output sink channels based on
+        // the set bits in counting order (lsb to msb).
+        //
+        // For a stereo output sink, the sound may come from L and R, L only, none, or R only.
+        // For a 5.1 output sink, the sound may come from a variety of outputs
+        // as commented below.
+        final int TEST_CONF_ARRAY[] = { // matches output sink channels:
+                (1 << 0) | (1 << 1), // Stereo(L, R) 5.1(FL, FR)
+                (1 << 0) | (1 << 2), // Stereo(L)    5.1(FL, FC)
+                (1 << 4) | (1 << 5), // Stereo(None) 5.1(BL, BR)
+                (1 << 1) | (1 << 2), // Stereo(R)    5.1(FR, FC)
+        };
+        final int TEST_WRITE_MODE_ARRAY[] = {
+                AudioTrack.WRITE_BLOCKING,
+                AudioTrack.WRITE_NON_BLOCKING,
+        };
+
+        for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
+            for (int TEST_CONF : TEST_CONF_ARRAY) {
+                double frequency = 800; // frequency changes for each test
+                for (int TEST_SR : TEST_SR_ARRAY) {
+                    for (int TEST_WRITE_MODE : TEST_WRITE_MODE_ARRAY) {
+                        for (int useDirect = 0; useDirect < 2; ++useDirect) {
+                            AudioFormat format = new AudioFormat.Builder()
+                                    .setEncoding(TEST_FORMAT)
+                                    .setSampleRate(TEST_SR)
+                                    .setChannelIndexMask(TEST_CONF)
+                                    .build();
+                            AudioTrack track = new AudioTrack.Builder()
+                                    .setAudioFormat(format)
+                                    .build();
+                            assertEquals(TEST_NAME,
+                                    AudioTrack.STATE_INITIALIZED, track.getState());
+
+                            // create the byte buffer and fill with test data
+                            final int frameSize = AudioHelper.frameSizeFromFormat(format);
+                            final int frameCount =
+                                    AudioHelper.frameCountFromMsec(300 /* ms */, format);
+                            final int bufferSize = frameCount * frameSize;
+                            final int bufferSamples = frameCount * format.getChannelCount();
+                            ByteBuffer bb = (useDirect == 1)
+                                    ? ByteBuffer.allocateDirect(bufferSize)
+                                            : ByteBuffer.allocate(bufferSize);
+                            bb.order(java.nio.ByteOrder.nativeOrder());
+
+                            switch (TEST_FORMAT) {
+                            case AudioFormat.ENCODING_PCM_8BIT: {
+                                byte data[] = createSoundDataInByteArray(
+                                        bufferSamples, TEST_SR,
+                                        frequency);
+                                bb.put(data);
+                                bb.flip();
+                            } break;
+                            case AudioFormat.ENCODING_PCM_16BIT: {
+                                short data[] = createSoundDataInShortArray(
+                                        bufferSamples, TEST_SR,
+                                        frequency);
+                                ShortBuffer sb = bb.asShortBuffer();
+                                sb.put(data);
+                                bb.limit(sb.limit() * 2);
+                            } break;
+                            case AudioFormat.ENCODING_PCM_FLOAT: {
+                                float data[] = createSoundDataInFloatArray(
+                                        bufferSamples, TEST_SR,
+                                        frequency);
+                                FloatBuffer fb = bb.asFloatBuffer();
+                                fb.put(data);
+                                bb.limit(fb.limit() * 4);
+                            } break;
+                            }
+
+                            // start the AudioTrack
+                            // This can be done before or after the first write.
+                            // Current behavior for streaming tracks is that
+                            // actual playback does not begin before the internal
+                            // data buffer is completely full.
+                            track.play();
+
+                            // write data
+                            final long startTime = System.currentTimeMillis();
+                            final long maxDuration = frameCount * 1000 / TEST_SR + 1000;
+                            for (int written = 0; written < bufferSize; ) {
+                                // ret may return a short count if write
+                                // is non blocking or even if write is blocking
+                                // when a stop/pause/flush is issued from another thread.
+                                final int kBatchFrames = 1000;
+                                int ret = track.write(bb,
+                                        Math.min(bufferSize - written, frameSize * kBatchFrames),
+                                        TEST_WRITE_MODE);
+                                // for non-blocking mode, this loop may spin quickly
+                                assertTrue(TEST_NAME + ": write error " + ret, ret >= 0);
+                                assertTrue(TEST_NAME + ": write timeout",
+                                        (System.currentTimeMillis() - startTime) <= maxDuration);
+                                written += ret;
+                            }
+
+                            // for streaming tracks, stop will allow the rest of the data to
+                            // drain out, but we don't know how long to wait unless
+                            // we check the position before stop. if we check position
+                            // after we stop, we read 0.
+                            final int position = track.getPlaybackHeadPosition();
+                            final int remainingTimeMs = (int)((double)(frameCount - position)
+                                    * 1000 / TEST_SR);
+                            track.stop();
+                            Thread.sleep(remainingTimeMs);
+                            // tear down
+                            track.release();
+                            // add a gap to make tones distinct
+                            Thread.sleep(100 /* millis */);
                             frequency += 200; // increment test tone frequency
                         }
                     }
