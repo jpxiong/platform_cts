@@ -61,7 +61,7 @@
             android:name="com.android.cts.deviceowner.ApplicationRestrictionActivity" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.deviceowner"
                      android:label="Device Owner CTS tests"/>
 </manifest>
