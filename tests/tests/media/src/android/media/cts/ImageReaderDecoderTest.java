@@ -62,7 +62,8 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
     private static final long WAIT_FOR_IMAGE_TIMEOUT_MS = 1000;
     private static final String DEBUG_FILE_NAME_BASE = "/sdcard/";
     private static final int NUM_FRAME_DECODED = 100;
-    private static final int MAX_NUM_IMAGES = 3;
+    // video decoders only support a single outstanding image with the consumer
+    private static final int MAX_NUM_IMAGES = 1;
 
     private Resources mResources;
     private MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
