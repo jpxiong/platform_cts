@@ -64,3 +64,6 @@ $(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/pac
 						-b $(CTS_UNSUPPORTED_ABIS) \
 						-a $(CTS_TARGET_ARCH) \
 						-o $@
+
+# Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
+$(my_register_name) : $(cts_package_apk) $(cts_package_xml)
