@@ -447,21 +447,25 @@ public class CameraTestUtils extends Assert {
             assertTrue("rowStride " + rowStride + " should be >= width " + w , rowStride >= w);
             for (int row = 0; row < h; row++) {
                 int bytesPerPixel = ImageFormat.getBitsPerPixel(format) / 8;
+                int length;
                 if (pixelStride == bytesPerPixel) {
                     // Special case: optimized read of the entire row
-                    int length = w * bytesPerPixel;
+                    length = w * bytesPerPixel;
                     buffer.get(data, offset, length);
-                    // Advance buffer the remainder of the row stride
-                    buffer.position(buffer.position() + rowStride - length);
                     offset += length;
                 } else {
                     // Generic case: should work for any pixelStride but slower.
                     // Use intermediate buffer to avoid read byte-by-byte from
                     // DirectByteBuffer, which is very bad for performance
-                    buffer.get(rowData, 0, rowStride);
+                    length = (w - 1) * pixelStride + bytesPerPixel;
+                    buffer.get(rowData, 0, length);
                     for (int col = 0; col < w; col++) {
                         data[offset++] = rowData[col * pixelStride];
                     }
+                }
+                // Advance buffer the remainder of the row stride
+                if (row < h - 1) {
+                    buffer.position(buffer.position() + rowStride - length);
                 }
             }
             if (VERBOSE) Log.v(TAG, "Finished reading data from plane " + i);
