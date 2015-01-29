@@ -779,14 +779,21 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             // initialize arbitrary sizes
             for (int i = 1; i <= 7; ++i) {
                 int j = ((7 * i) % 11) + 1;
-                int width = alignedPointInRange(i * 0.125, xAlign, mCaps.getSupportedWidths());
-                int height = alignedPointInRange(
-                        j * 0.077, yAlign, mCaps.getSupportedHeightsFor(width));
-                mArbitrary.add(new Size(width, height));
+                int width, height;
+                try {
+                    width = alignedPointInRange(i * 0.125, xAlign, mCaps.getSupportedWidths());
+                    height = alignedPointInRange(
+                            j * 0.077, yAlign, mCaps.getSupportedHeightsFor(width));
+                    mArbitrary.add(new Size(width, height));
+                } catch (IllegalArgumentException e) {
+                }
 
-                height = alignedPointInRange(i * 0.125, yAlign, mCaps.getSupportedHeights());
-                width = alignedPointInRange(j * 0.077, xAlign, mCaps.getSupportedWidthsFor(height));
-                mArbitrary.add(new Size(width, height));
+                try {
+                    height = alignedPointInRange(i * 0.125, yAlign, mCaps.getSupportedHeights());
+                    width = alignedPointInRange(j * 0.077, xAlign, mCaps.getSupportedWidthsFor(height));
+                    mArbitrary.add(new Size(width, height));
+                } catch (IllegalArgumentException e) {
+                }
             }
             mArbitrary.removeAll(mSizes);
             mSizes.addAll(mArbitrary);
