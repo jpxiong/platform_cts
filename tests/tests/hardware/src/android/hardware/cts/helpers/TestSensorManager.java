@@ -23,6 +23,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * A test class that performs the actions of {@link SensorManager} on a single sensor.
  * This class allows for a single sensor to be registered and unregistered as well as performing
@@ -85,6 +87,33 @@ public class TestSensorManager {
     }
 
     /**
+     * Register the listener. This method will perform a no-op if the sensor is already registered.
+     *
+     * @return A CountDownLatch initialized with eventCount which is used to wait for sensor
+     * events.
+     * @throws AssertionError if there was an error registering the listener with the
+     * {@link SensorManager}
+     */
+    public CountDownLatch registerListener(TestSensorEventListener listener, int eventCount) {
+        if (mTestSensorEventListener != null) {
+            Log.w(LOG_TAG, "Listener already registered, returning.");
+            return null;
+        }
+
+        CountDownLatch latch = listener.getLatchForSensorEvents(eventCount);
+        mTestSensorEventListener = listener;
+        String message = SensorCtsHelper.formatAssertionMessage("registerListener", mEnvironment);
+        boolean result = mSensorManager.registerListener(
+                mTestSensorEventListener,
+                mEnvironment.getSensor(),
+                mEnvironment.getRequestedSamplingPeriodUs(),
+                mEnvironment.getMaxReportLatencyUs(),
+                mTestSensorEventListener.getHandler());
+        Assert.assertTrue(message, result);
+        return latch;
+    }
+
+    /**
      * Unregister the listener. This method will perform a no-op if the sensor is not registered.
      */
     public void unregisterListener() {
@@ -101,15 +130,18 @@ public class TestSensorManager {
      * Call {@link SensorManager#flush(SensorEventListener)}. This method will perform a no-op if
      * the sensor is not registered.
      *
+     * @return A CountDownLatch which can be used to wait for a flush complete event.
      * @throws AssertionError if {@link SensorManager#flush(SensorEventListener)} fails.
      */
-    public void requestFlush() {
+    public CountDownLatch requestFlush() {
         if (mTestSensorEventListener == null) {
             Log.w(LOG_TAG, "No listener registered, returning.");
-            return;
+            return null;
         }
+        CountDownLatch latch = mTestSensorEventListener.getLatchForFlushCompleteEvent();
         Assert.assertTrue(
                 SensorCtsHelper.formatAssertionMessage("Flush", mEnvironment),
                 mSensorManager.flush(mTestSensorEventListener));
+        return latch;
     }
 }
