@@ -106,6 +106,31 @@ public class TestSensorEventListener implements SensorEventListener2 {
     }
 
     /**
+     * @param eventCount
+     * @return A CountDownLatch initialzed with eventCount and decremented as sensor events arrive
+     * for this listerner.
+     */
+    public CountDownLatch getLatchForSensorEvents(int eventCount) {
+        CountDownLatch latch = new CountDownLatch(eventCount);
+        synchronized (mEventLatches) {
+            mEventLatches.add(latch);
+        }
+        return latch;
+    }
+
+    /**
+     * @return A CountDownLatch initialzed with 1 and decremented as a flush complete arrives
+     * for this listerner.
+     */
+    public CountDownLatch getLatchForFlushCompleteEvent() {
+        CountDownLatch latch = new CountDownLatch(1);
+        synchronized (mFlushLatches) {
+            mFlushLatches.add(latch);
+        }
+        return latch;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -182,13 +207,8 @@ public class TestSensorEventListener implements SensorEventListener2 {
      *
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
-    public void waitForFlushComplete() throws InterruptedException {
+    public void waitForFlushComplete(CountDownLatch latch) throws InterruptedException {
         clearEvents();
-        CountDownLatch latch = new CountDownLatch(1);
-        synchronized (mFlushLatches) {
-            mFlushLatches.add(latch);
-        }
-
         try {
             String message = SensorCtsHelper.formatAssertionMessage(
                     "WaitForFlush",
@@ -208,13 +228,8 @@ public class TestSensorEventListener implements SensorEventListener2 {
      *
      * @throws AssertionError if there was a timeout after {@link #FLUSH_TIMEOUT_US} &micro;s
      */
-    public void waitForEvents(int eventCount) throws InterruptedException {
+    public void waitForEvents(CountDownLatch latch, int eventCount) throws InterruptedException {
         clearEvents();
-        CountDownLatch eventLatch = new CountDownLatch(eventCount);
-        synchronized (mEventLatches) {
-            mEventLatches.add(eventLatch);
-        }
-
         try {
             long samplingPeriodUs = mEnvironment.getMaximumExpectedSamplingPeriodUs();
             // timeout is 2 * event count * expected period + batch timeout + default wait
@@ -224,20 +239,20 @@ public class TestSensorEventListener implements SensorEventListener2 {
             long timeoutUs = (2 * eventCount * samplingPeriodUs)
                     + mEnvironment.getMaxReportLatencyUs()
                     + EVENT_TIMEOUT_US;
-            boolean success = eventLatch.await(timeoutUs, TimeUnit.MICROSECONDS);
+            boolean success = latch.await(timeoutUs, TimeUnit.MICROSECONDS);
             if (!success) {
                 String message = SensorCtsHelper.formatAssertionMessage(
                         "WaitForEvents",
                         mEnvironment,
                         "requested=%d, received=%d, timeout=%dus",
                         eventCount,
-                        eventCount - eventLatch.getCount(),
+                        eventCount - latch.getCount(),
                         timeoutUs);
                 Assert.fail(message);
             }
         } finally {
             synchronized (mEventLatches) {
-                mEventLatches.remove(eventLatch);
+                mEventLatches.remove(latch);
             }
         }
     }
