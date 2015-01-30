@@ -39,6 +39,6 @@ $(cts_library_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/pac
 										| grep --only-matching -e " abis=\"[^\"]*\""))
 	
 # Patch xml caselist with supported abi
-	$(hide) $(SED_EXTENDED) -e 's:^<Test (.*)/>$$:<Test \1 $(supported_abi_attr) />:' \
+	$(hide) $(SED_EXTENDED) -e 's:^<Test ((.[^/]|[^/])*)(/?)>$$:<Test \1 $(supported_abi_attr) \3>:' \
 				< $(MUSTPASS_XML_FILE) \
 				> $@
