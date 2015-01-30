@@ -41,6 +41,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -212,8 +213,8 @@ public class TestSensorOperation extends SensorOperation {
             public void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
                     throws InterruptedException {
                 try {
-                    sensorManager.registerListener(listener);
-                    listener.waitForEvents(eventCount);
+                    CountDownLatch latch = sensorManager.registerListener(listener, eventCount);
+                    listener.waitForEvents(latch, eventCount);
                 } finally {
                     sensorManager.unregisterListener();
                 }
@@ -267,8 +268,8 @@ public class TestSensorOperation extends SensorOperation {
                 try {
                     sensorManager.registerListener(listener);
                     SensorCtsHelper.sleep(duration, timeUnit);
-                    sensorManager.requestFlush();
-                    listener.waitForFlushComplete();
+                    CountDownLatch latch = sensorManager.requestFlush();
+                    listener.waitForFlushComplete(latch);
                 } finally {
                     sensorManager.unregisterListener();
                 }
