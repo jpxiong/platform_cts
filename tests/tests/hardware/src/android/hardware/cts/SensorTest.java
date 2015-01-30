@@ -47,6 +47,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class SensorTest extends SensorTestCase {
@@ -329,10 +330,10 @@ public class SensorTest extends SensorTestCase {
         Handler handler = new Handler(handlerThread.getLooper());
         TestSensorEventListener listener = new TestSensorEventListener(environment, handler);
 
-        sensorManager.registerListener(listener);
-        listener.waitForEvents(1);
-        sensorManager.requestFlush();
-        listener.waitForFlushComplete();
+        CountDownLatch eventLatch = sensorManager.registerListener(listener, 1);
+        listener.waitForEvents(eventLatch, 1);
+        CountDownLatch flushLatch = sensorManager.requestFlush();
+        listener.waitForFlushComplete(flushLatch);
         listener.assertEventsReceivedInHandler();
     }
 
@@ -527,12 +528,12 @@ public class SensorTest extends SensorTestCase {
                 throws InterruptedException {
             int sensorReportingMode = mEnvironment.getSensor().getReportingMode();
             try {
-                sensorManager.registerListener(listener);
+                CountDownLatch eventLatch = sensorManager.registerListener(listener, mEventCount);
                 if (sensorReportingMode == Sensor.REPORTING_MODE_CONTINUOUS) {
-                    listener.waitForEvents(mEventCount);
+                    listener.waitForEvents(eventLatch, mEventCount);
                 }
-                sensorManager.requestFlush();
-                listener.waitForFlushComplete();
+                CountDownLatch flushLatch = sensorManager.requestFlush();
+                listener.waitForFlushComplete(flushLatch);
             } finally {
                 sensorManager.unregisterListener();
             }
