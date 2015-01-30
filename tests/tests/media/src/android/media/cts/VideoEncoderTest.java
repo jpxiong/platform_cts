@@ -746,7 +746,8 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
 
         final private Map<Size, Set<Size>> mMinMax;     // extreme sizes
         final private Map<Size, Set<Size>> mNearMinMax; // sizes near extreme
-        final private Set<Size> mArbitrary;             // arbitrary sizes in the middle
+        final private Set<Size> mArbitraryW;            // arbitrary widths in the middle
+        final private Set<Size> mArbitraryH;            // arbitrary heights in the middle
         final private Set<Size> mSizes;                 // all non-specifically tested sizes
 
         final private int xAlign;
@@ -760,7 +761,8 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             /* calculate min/max sizes */
             mMinMax = new HashMap<Size, Set<Size>>();
             mNearMinMax = new HashMap<Size, Set<Size>>();
-            mArbitrary = new HashSet<Size>();
+            mArbitraryW = new HashSet<Size>();
+            mArbitraryH = new HashSet<Size>();
             mSizes = new HashSet<Size>();
 
             xAlign = mCaps.getWidthAlignment();
@@ -784,20 +786,23 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     width = alignedPointInRange(i * 0.125, xAlign, mCaps.getSupportedWidths());
                     height = alignedPointInRange(
                             j * 0.077, yAlign, mCaps.getSupportedHeightsFor(width));
-                    mArbitrary.add(new Size(width, height));
+                    mArbitraryW.add(new Size(width, height));
                 } catch (IllegalArgumentException e) {
                 }
 
                 try {
                     height = alignedPointInRange(i * 0.125, yAlign, mCaps.getSupportedHeights());
                     width = alignedPointInRange(j * 0.077, xAlign, mCaps.getSupportedWidthsFor(height));
-                    mArbitrary.add(new Size(width, height));
+                    mArbitraryH.add(new Size(width, height));
                 } catch (IllegalArgumentException e) {
                 }
             }
-            mArbitrary.removeAll(mSizes);
-            mSizes.addAll(mArbitrary);
-            if (DEBUG) Log.i(TAG, "arbitrary=" + mArbitrary);
+            mArbitraryW.removeAll(mArbitraryH);
+            mArbitraryW.removeAll(mSizes);
+            mSizes.addAll(mArbitraryW);
+            mArbitraryH.removeAll(mSizes);
+            mSizes.addAll(mArbitraryH);
+            if (DEBUG) Log.i(TAG, "arbitrary=" + mArbitraryW + "/" + mArbitraryH);
         }
 
         private void addExtremeSizesFor(int x, int y) {
@@ -899,9 +904,9 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             return !skipped;
         }
 
-        public boolean testArbitrary(boolean flexYUV) {
+        public boolean testArbitrary(boolean flexYUV, boolean widths) {
             boolean skipped = true;
-            for (Size s : mArbitrary) {
+            for (Size s : (widths ? mArbitraryW : mArbitraryH)) {
                 if (test(s.getWidth(), s.getHeight(), false /* optional */, flexYUV)) {
                     skipped = false;
                 }
@@ -997,11 +1002,14 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                     || info.getName().toLowerCase().startsWith("omx.google.") != goog) {
                 continue;
             }
+            CodecCapabilities caps = null;
             try {
-                CodecCapabilities caps = info.getCapabilitiesForType(mime);
-                result.add(new Encoder(info.getName(), mime, caps));
+                caps = info.getCapabilitiesForType(mime);
             } catch (IllegalArgumentException e) { // mime is not supported
+                continue;
             }
+            assertNotNull(info.getName() + " capabilties for " + mime + " returned null", caps);
+            result.add(new Encoder(info.getName(), mime, caps));
         }
         return result.toArray(new Encoder[result.size()]);
     }
@@ -1214,31 +1222,57 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
     public void testOtherVP9FlexNearMaxMax()   { nearmaxmax(otherVP9(),   true /* flex */); }
     public void testOtherVP9SurfNearMaxMax()   { nearmaxmax(otherVP9(),   false /* flex */); }
 
-    public void testGoogH265FlexArbitrary()   { arbitrary(googH265(),   true /* flex */); }
-    public void testGoogH265SurfArbitrary()   { arbitrary(googH265(),   false /* flex */); }
-    public void testGoogH264FlexArbitrary()   { arbitrary(googH264(),   true /* flex */); }
-    public void testGoogH264SurfArbitrary()   { arbitrary(googH264(),   false /* flex */); }
-    public void testGoogH263FlexArbitrary()   { arbitrary(googH263(),   true /* flex */); }
-    public void testGoogH263SurfArbitrary()   { arbitrary(googH263(),   false /* flex */); }
-    public void testGoogMpeg4FlexArbitrary()  { arbitrary(googMpeg4(),  true /* flex */); }
-    public void testGoogMpeg4SurfArbitrary()  { arbitrary(googMpeg4(),  false /* flex */); }
-    public void testGoogVP8FlexArbitrary()    { arbitrary(googVP8(),    true /* flex */); }
-    public void testGoogVP8SurfArbitrary()    { arbitrary(googVP8(),    false /* flex */); }
-    public void testGoogVP9FlexArbitrary()    { arbitrary(googVP9(),    true /* flex */); }
-    public void testGoogVP9SurfArbitrary()    { arbitrary(googVP9(),    false /* flex */); }
+    public void testGoogH265FlexArbitraryW()   { arbitraryw(googH265(),   true /* flex */); }
+    public void testGoogH265SurfArbitraryW()   { arbitraryw(googH265(),   false /* flex */); }
+    public void testGoogH264FlexArbitraryW()   { arbitraryw(googH264(),   true /* flex */); }
+    public void testGoogH264SurfArbitraryW()   { arbitraryw(googH264(),   false /* flex */); }
+    public void testGoogH263FlexArbitraryW()   { arbitraryw(googH263(),   true /* flex */); }
+    public void testGoogH263SurfArbitraryW()   { arbitraryw(googH263(),   false /* flex */); }
+    public void testGoogMpeg4FlexArbitraryW()  { arbitraryw(googMpeg4(),  true /* flex */); }
+    public void testGoogMpeg4SurfArbitraryW()  { arbitraryw(googMpeg4(),  false /* flex */); }
+    public void testGoogVP8FlexArbitraryW()    { arbitraryw(googVP8(),    true /* flex */); }
+    public void testGoogVP8SurfArbitraryW()    { arbitraryw(googVP8(),    false /* flex */); }
+    public void testGoogVP9FlexArbitraryW()    { arbitraryw(googVP9(),    true /* flex */); }
+    public void testGoogVP9SurfArbitraryW()    { arbitraryw(googVP9(),    false /* flex */); }
 
-    public void testOtherH265FlexArbitrary()  { arbitrary(otherH265(),  true /* flex */); }
-    public void testOtherH265SurfArbitrary()  { arbitrary(otherH265(),  false /* flex */); }
-    public void testOtherH264FlexArbitrary()  { arbitrary(otherH264(),  true /* flex */); }
-    public void testOtherH264SurfArbitrary()  { arbitrary(otherH264(),  false /* flex */); }
-    public void testOtherH263FlexArbitrary()  { arbitrary(otherH263(),  true /* flex */); }
-    public void testOtherH263SurfArbitrary()  { arbitrary(otherH263(),  false /* flex */); }
-    public void testOtherMpeg4FlexArbitrary() { arbitrary(otherMpeg4(), true /* flex */); }
-    public void testOtherMpeg4SurfArbitrary() { arbitrary(otherMpeg4(), false /* flex */); }
-    public void testOtherVP8FlexArbitrary()   { arbitrary(otherVP8(),   true /* flex */); }
-    public void testOtherVP8SurfArbitrary()   { arbitrary(otherVP8(),   false /* flex */); }
-    public void testOtherVP9FlexArbitrary()   { arbitrary(otherVP9(),   true /* flex */); }
-    public void testOtherVP9SurfArbitrary()   { arbitrary(otherVP9(),   false /* flex */); }
+    public void testOtherH265FlexArbitraryW()  { arbitraryw(otherH265(),  true /* flex */); }
+    public void testOtherH265SurfArbitraryW()  { arbitraryw(otherH265(),  false /* flex */); }
+    public void testOtherH264FlexArbitraryW()  { arbitraryw(otherH264(),  true /* flex */); }
+    public void testOtherH264SurfArbitraryW()  { arbitraryw(otherH264(),  false /* flex */); }
+    public void testOtherH263FlexArbitraryW()  { arbitraryw(otherH263(),  true /* flex */); }
+    public void testOtherH263SurfArbitraryW()  { arbitraryw(otherH263(),  false /* flex */); }
+    public void testOtherMpeg4FlexArbitraryW() { arbitraryw(otherMpeg4(), true /* flex */); }
+    public void testOtherMpeg4SurfArbitraryW() { arbitraryw(otherMpeg4(), false /* flex */); }
+    public void testOtherVP8FlexArbitraryW()   { arbitraryw(otherVP8(),   true /* flex */); }
+    public void testOtherVP8SurfArbitraryW()   { arbitraryw(otherVP8(),   false /* flex */); }
+    public void testOtherVP9FlexArbitraryW()   { arbitraryw(otherVP9(),   true /* flex */); }
+    public void testOtherVP9SurfArbitraryW()   { arbitraryw(otherVP9(),   false /* flex */); }
+
+    public void testGoogH265FlexArbitraryH()   { arbitraryh(googH265(),   true /* flex */); }
+    public void testGoogH265SurfArbitraryH()   { arbitraryh(googH265(),   false /* flex */); }
+    public void testGoogH264FlexArbitraryH()   { arbitraryh(googH264(),   true /* flex */); }
+    public void testGoogH264SurfArbitraryH()   { arbitraryh(googH264(),   false /* flex */); }
+    public void testGoogH263FlexArbitraryH()   { arbitraryh(googH263(),   true /* flex */); }
+    public void testGoogH263SurfArbitraryH()   { arbitraryh(googH263(),   false /* flex */); }
+    public void testGoogMpeg4FlexArbitraryH()  { arbitraryh(googMpeg4(),  true /* flex */); }
+    public void testGoogMpeg4SurfArbitraryH()  { arbitraryh(googMpeg4(),  false /* flex */); }
+    public void testGoogVP8FlexArbitraryH()    { arbitraryh(googVP8(),    true /* flex */); }
+    public void testGoogVP8SurfArbitraryH()    { arbitraryh(googVP8(),    false /* flex */); }
+    public void testGoogVP9FlexArbitraryH()    { arbitraryh(googVP9(),    true /* flex */); }
+    public void testGoogVP9SurfArbitraryH()    { arbitraryh(googVP9(),    false /* flex */); }
+
+    public void testOtherH265FlexArbitraryH()  { arbitraryh(otherH265(),  true /* flex */); }
+    public void testOtherH265SurfArbitraryH()  { arbitraryh(otherH265(),  false /* flex */); }
+    public void testOtherH264FlexArbitraryH()  { arbitraryh(otherH264(),  true /* flex */); }
+    public void testOtherH264SurfArbitraryH()  { arbitraryh(otherH264(),  false /* flex */); }
+    public void testOtherH263FlexArbitraryH()  { arbitraryh(otherH263(),  true /* flex */); }
+    public void testOtherH263SurfArbitraryH()  { arbitraryh(otherH263(),  false /* flex */); }
+    public void testOtherMpeg4FlexArbitraryH() { arbitraryh(otherMpeg4(), true /* flex */); }
+    public void testOtherMpeg4SurfArbitraryH() { arbitraryh(otherMpeg4(), false /* flex */); }
+    public void testOtherVP8FlexArbitraryH()   { arbitraryh(otherVP8(),   true /* flex */); }
+    public void testOtherVP8SurfArbitraryH()   { arbitraryh(otherVP8(),   false /* flex */); }
+    public void testOtherVP9FlexArbitraryH()   { arbitraryh(otherVP9(),   true /* flex */); }
+    public void testOtherVP9SurfArbitraryH()   { arbitraryh(otherVP9(),   false /* flex */); }
 
     public void testGoogH265FlexQCIF()   { specific(googH265(),   176, 144, true /* flex */); }
     public void testGoogH265SurfQCIF()   { specific(googH265(),   176, 144, false /* flex */); }
@@ -1478,20 +1512,28 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
         }
     }
 
-    private void arbitrary(Encoder[] encoders, boolean flexYUV) {
+    private void arbitrary(Encoder[] encoders, boolean flexYUV, boolean widths) {
         boolean skipped = true;
         if (encoders.length == 0) {
             MediaUtils.skipTest("no such encoder present");
             return;
         }
         for (Encoder encoder: encoders) {
-            if (encoder.testArbitrary(flexYUV)) {
+            if (encoder.testArbitrary(flexYUV, widths)) {
                 skipped = false;
             }
         }
         if (skipped) {
             MediaUtils.skipTest("duplicate resolution");
         }
+    }
+
+    private void arbitraryw(Encoder[] encoders, boolean flexYUV) {
+        arbitrary(encoders, flexYUV, true /* widths */);
+    }
+
+    private void arbitraryh(Encoder[] encoders, boolean flexYUV) {
+        arbitrary(encoders, flexYUV, false /* widths */);
     }
 
     /* test specific size */
