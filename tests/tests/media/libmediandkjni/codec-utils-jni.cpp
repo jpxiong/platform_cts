@@ -27,6 +27,8 @@
 #include <ScopedLocalRef.h>
 #include <JNIHelp.h>
 
+#include <math.h>
+
 typedef ssize_t offs_t;
 
 struct NativeImage {
@@ -154,7 +156,7 @@ void initializeGlobalFields(JNIEnv *env) {
     gFieldsInitialized = true;
 }
 
-NativeImage *getNativeImage(JNIEnv *env, jobject image) {
+NativeImage *getNativeImage(JNIEnv *env, jobject image, jobject area = NULL) {
     if (image == NULL) {
         jniThrowNullPointerException(env, "image is null");
         return NULL;
@@ -168,17 +170,25 @@ NativeImage *getNativeImage(JNIEnv *env, jobject image) {
     img->height = env->CallIntMethod(image, gFields.methodHeight);
     img->timestamp = env->CallLongMethod(image, gFields.methodTimestamp);
 
-    jobject cropRect = env->CallObjectMethod(image, gFields.methodCrop);
-    img->crop.left   = env->GetIntField(cropRect, gFields.fieldLeft);
-    img->crop.top    = env->GetIntField(cropRect, gFields.fieldTop);
-    img->crop.right  = env->GetIntField(cropRect, gFields.fieldRight);
-    img->crop.bottom = env->GetIntField(cropRect, gFields.fieldBottom);
+    jobject cropRect = NULL;
+    if (area == NULL) {
+        cropRect = env->CallObjectMethod(image, gFields.methodCrop);
+        area = cropRect;
+    }
+
+    img->crop.left   = env->GetIntField(area, gFields.fieldLeft);
+    img->crop.top    = env->GetIntField(area, gFields.fieldTop);
+    img->crop.right  = env->GetIntField(area, gFields.fieldRight);
+    img->crop.bottom = env->GetIntField(area, gFields.fieldBottom);
     if (img->crop.right == 0 && img->crop.bottom == 0) {
         img->crop.right  = img->width;
         img->crop.bottom = img->height;
     }
-    env->DeleteLocalRef(cropRect);
-    cropRect = NULL;
+
+    if (cropRect != NULL) {
+        env->DeleteLocalRef(cropRect);
+        cropRect = NULL;
+    }
 
     if (img->format != gFields.YUV_420_888) {
         jniThrowException(
@@ -292,4 +302,187 @@ extern "C" void Java_android_media_cts_CodecUtils_copyFlexYUVImage(JNIEnv *env,
             }
         }
     }
+}
+
+extern "C" void Java_android_media_cts_CodecUtils_fillImageRectWithYUV(JNIEnv *env,
+        jclass /*clazz*/, jobject image, jobject area, jint y, jint u, jint v)
+{
+    NativeImage *img = getNativeImage(env, image, area);
+    if (img == NULL) {
+        return;
+    }
+
+    for (size_t ix = 0; ix < img->numPlanes; ++ix) {
+        const uint8_t *row = img->plane[ix].buffer + img->plane[ix].cropOffs;
+        uint8_t val = ix == 0 ? y : ix == 1 ? u : v;
+        for (size_t y = img->plane[ix].cropHeight; y > 0; --y) {
+            uint8_t *col = (uint8_t *)row;
+            ssize_t colInc = img->plane[ix].colInc;
+            for (size_t x = img->plane[ix].cropWidth; x > 0; --x) {
+                *col = val;
+                col += colInc;
+            }
+            row += img->plane[ix].rowInc;
+        }
+    }
+}
+
+void getRawStats(NativeImage *img, jlong rawStats[10])
+{
+    // this works best if crop area is even
+
+    uint64_t sum_x[3]  = { 0, 0, 0 }; // Y, U, V
+    uint64_t sum_xx[3] = { 0, 0, 0 }; // YY, UU, VV
+    uint64_t sum_xy[3] = { 0, 0, 0 }; // YU, YV, UV
+
+    const uint8_t *yrow = img->plane[0].buffer + img->plane[0].cropOffs;
+    const uint8_t *urow = img->plane[1].buffer + img->plane[1].cropOffs;
+    const uint8_t *vrow = img->plane[2].buffer + img->plane[2].cropOffs;
+
+    ssize_t ycolInc = img->plane[0].colInc;
+    ssize_t ucolInc = img->plane[1].colInc;
+    ssize_t vcolInc = img->plane[2].colInc;
+
+    ssize_t yrowInc = img->plane[0].rowInc;
+    ssize_t urowInc = img->plane[1].rowInc;
+    ssize_t vrowInc = img->plane[2].rowInc;
+
+    size_t rightOdd = img->crop.right & 1;
+    size_t bottomOdd = img->crop.bottom & 1;
+
+    for (size_t y = img->plane[0].cropHeight; y; --y) {
+        uint8_t *ycol = (uint8_t *)yrow;
+        uint8_t *ucol = (uint8_t *)urow;
+        uint8_t *vcol = (uint8_t *)vrow;
+
+        for (size_t x = img->plane[0].cropWidth; x; --x) {
+            uint64_t Y = *ycol;
+            uint64_t U = *ucol;
+            uint64_t V = *vcol;
+
+            sum_x[0] += Y;
+            sum_x[1] += U;
+            sum_x[2] += V;
+            sum_xx[0] += Y * Y;
+            sum_xx[1] += U * U;
+            sum_xx[2] += V * V;
+            sum_xy[0] += Y * U;
+            sum_xy[1] += Y * V;
+            sum_xy[2] += U * V;
+
+            ycol += ycolInc;
+            if (rightOdd ^ (x & 1)) {
+                ucol += ucolInc;
+                vcol += vcolInc;
+            }
+        }
+
+        yrow += yrowInc;
+        if (bottomOdd ^ (y & 1)) {
+            urow += urowInc;
+            vrow += vrowInc;
+        }
+    }
+
+    rawStats[0] = img->plane[0].cropWidth * (uint64_t)img->plane[0].cropHeight;
+    for (size_t i = 0; i < 3; i++) {
+        rawStats[i + 1] = sum_x[i];
+        rawStats[i + 4] = sum_xx[i];
+        rawStats[i + 7] = sum_xy[i];
+    }
+}
+
+bool Raw2YUVStats(jlong rawStats[10], jfloat stats[9]) {
+    int64_t sum_x[3], sum_xx[3]; // Y, U, V
+    int64_t sum_xy[3];           // YU, YV, UV
+
+    int64_t num = rawStats[0];   // #Y,U,V
+    for (size_t i = 0; i < 3; i++) {
+        sum_x[i] = rawStats[i + 1];
+        sum_xx[i] = rawStats[i + 4];
+        sum_xy[i] = rawStats[i + 7];
+    }
+
+    if (num > 0) {
+        stats[0] = sum_x[0] / (float)num;  // y average
+        stats[1] = sum_x[1] / (float)num;  // u average
+        stats[2] = sum_x[2] / (float)num;  // v average
+
+        // 60 bits for 4Mpixel image
+        // adding 1 to avoid degenerate case when deviation is 0
+        stats[3] = sqrtf((sum_xx[0] + 1) * num - sum_x[0] * sum_x[0]) / num; // y stdev
+        stats[4] = sqrtf((sum_xx[1] + 1) * num - sum_x[1] * sum_x[1]) / num; // u stdev
+        stats[5] = sqrtf((sum_xx[2] + 1) * num - sum_x[2] * sum_x[2]) / num; // v stdev
+
+        // yu covar
+        stats[6] = (float)(sum_xy[0] + 1 - sum_x[0] * sum_x[1] / num) / num / stats[3] / stats[4];
+        // yv covar
+        stats[7] = (float)(sum_xy[1] + 1 - sum_x[0] * sum_x[2] / num) / num / stats[3] / stats[5];
+        // uv covar
+        stats[8] = (float)(sum_xy[2] + 1 - sum_x[1] * sum_x[2] / num) / num / stats[4] / stats[5];
+        return true;
+    } else {
+        return false;
+    }
+}
+
+extern "C" jobject Java_android_media_cts_CodecUtils_getRawStats(JNIEnv *env,
+        jclass /*clazz*/, jobject image, jobject area)
+{
+    NativeImage *img = getNativeImage(env, image, area);
+    if (img == NULL) {
+        return NULL;
+    }
+
+    jlong rawStats[10];
+    getRawStats(img, rawStats);
+    jlongArray jstats = env->NewLongArray(10);
+    if (jstats != NULL) {
+        env->SetLongArrayRegion(jstats, 0, 10, rawStats);
+    }
+    return jstats;
+}
+
+extern "C" jobject Java_android_media_cts_CodecUtils_getYUVStats(JNIEnv *env,
+        jclass /*clazz*/, jobject image, jobject area)
+{
+    NativeImage *img = getNativeImage(env, image, area);
+    if (img == NULL) {
+        return NULL;
+    }
+
+    jlong rawStats[10];
+    getRawStats(img, rawStats);
+    jfloat stats[9];
+    jfloatArray jstats = NULL;
+    if (Raw2YUVStats(rawStats, stats)) {
+        jstats = env->NewFloatArray(9);
+        if (jstats != NULL) {
+            env->SetFloatArrayRegion(jstats, 0, 9, stats);
+        }
+    } else {
+        jniThrowRuntimeException(env, "empty area");
+    }
+
+    return jstats;
+}
+
+extern "C" jobject Java_android_media_cts_CodecUtils_Raw2YUVStats(JNIEnv *env,
+        jclass /*clazz*/, jobject jrawStats)
+{
+    jfloatArray jstats = NULL;
+    jlong rawStats[10];
+    env->GetLongArrayRegion((jlongArray)jrawStats, 0, 10, rawStats);
+    if (!env->ExceptionCheck()) {
+        jfloat stats[9];
+        if (Raw2YUVStats(rawStats, stats)) {
+            jstats = env->NewFloatArray(9);
+            if (jstats != NULL) {
+                env->SetFloatArrayRegion(jstats, 0, 9, stats);
+            }
+        } else {
+            jniThrowRuntimeException(env, "no raw statistics");
+        }
+    }
+    return jstats;
 }
