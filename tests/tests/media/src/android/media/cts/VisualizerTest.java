@@ -319,7 +319,7 @@ public class VisualizerTest extends PostProcTestBase {
             int currentPosition = mp.getCurrentPosition();
             final int maxTry = 100;
             int tryCount = 0;
-            while (currentPosition < 400 && tryCount < maxTry) {
+            while (currentPosition < 200 && tryCount < maxTry) {
                 Thread.sleep(50);
                 currentPosition = mp.getCurrentPosition();
                 tryCount++;
