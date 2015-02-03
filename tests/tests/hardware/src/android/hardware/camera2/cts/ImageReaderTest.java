@@ -30,6 +30,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
+import android.hardware.camera2.cts.rs.BitmapUtils;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
@@ -364,7 +365,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                                     yuvPatch.width(), yuvPatch.height(), /*filter*/true);
 
                             // Compare two patches using average of per-pixel differences
-                            double difference = findDifferenceMetric(yuvBmap, jpegBmap);
+                            double difference = BitmapUtils.calcDifferenceMetric(yuvBmap, jpegBmap);
 
                             Log.i(TAG, "Difference for resolution " + captureSz + " is: " +
                                     difference);
@@ -410,39 +411,6 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 closeDevice(id);
             }
         }
-    }
-
-    /**
-     * Find the difference between two bitmaps using average of per-pixel differences.
-     *
-     * @param a first {@link Bitmap}.
-     * @param b second {@link Bitmap}.
-     * @return the difference.
-     */
-    private static double findDifferenceMetric(Bitmap a, Bitmap b) {
-        if (a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
-            throw new IllegalArgumentException("Bitmap dimensions for arguments do not match a=" +
-                    a.getWidth() + "x" + a.getHeight() + ", b=" + b.getWidth() + "x" +
-                    b.getHeight());
-        }
-        // TODO: Optimize this in renderscript to avoid copy.
-        int[] aPixels = new int[a.getHeight() * a.getWidth()];
-        int[] bPixels = new int[aPixels.length];
-        a.getPixels(aPixels, /*offset*/0, /*stride*/a.getWidth(), /*x*/0, /*y*/0, a.getWidth(),
-                a.getHeight());
-        b.getPixels(bPixels, /*offset*/0, /*stride*/b.getWidth(), /*x*/0, /*y*/0, b.getWidth(),
-                b.getHeight());
-        double diff = 0;
-        for (int i = 0; i < aPixels.length; i++) {
-            int aPix = aPixels[i];
-            int bPix = bPixels[i];
-
-            diff += Math.abs(Color.red(aPix) - Color.red(bPix)); // red
-            diff += Math.abs(Color.green(aPix) - Color.green(bPix)); // green
-            diff += Math.abs(Color.blue(aPix) - Color.blue(bPix)); // blue
-        }
-        diff /= (aPixels.length * 3);
-        return diff;
     }
 
     /**
