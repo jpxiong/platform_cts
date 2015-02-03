@@ -81,9 +81,23 @@ def main():
     else:
         events, frames = load_data()
 
+    # Sanity check camera timestamps are enclosed by sensor timestamps
+    # This will catch bugs where camera and gyro timestamps go completely out
+    # of sync
+    cam_times = get_cam_times(events["cam"])
+    min_cam_time = min(cam_times) * NSEC_TO_SEC
+    max_cam_time = max(cam_times) * NSEC_TO_SEC
+    gyro_times = [e["time"] for e in events["gyro"]]
+    min_gyro_time = min(gyro_times) * NSEC_TO_SEC
+    max_gyro_time = max(gyro_times) * NSEC_TO_SEC
+    if not (min_cam_time > min_gyro_time and max_cam_time < max_gyro_time):
+        print "Test failed: camera timestamps [%f,%f] " \
+              "are not enclosed by gyro timestamps [%f, %f]" % (
+            min_cam_time, max_cam_time, min_gyro_time, max_gyro_time)
+        assert(0)
+
     # Compute the camera rotation displacements (rad) between each pair of
     # adjacent frames.
-    cam_times = get_cam_times(events["cam"])
     cam_rots = get_cam_rotations(frames)
     if max(abs(cam_rots)) < THRESH_MIN_ROT:
         print "Device wasn't moved enough"
