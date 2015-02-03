@@ -28,12 +28,10 @@
         <TextView android:id="@+id/message"
                 style="@style/InstructionsSmallFont"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/provisioning_byod_workapps_visible_instruction" />
+                android:layout_height="wrap_content" />
     </ScrollView>
 
     <ImageView android:id="@+id/sample_icon"
-            android:src="@drawable/badged_icon"
             android:layout_width="56dip"
             android:layout_height="56dip"
             android:layout_gravity="center_horizontal" />
