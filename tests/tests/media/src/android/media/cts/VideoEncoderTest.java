@@ -552,6 +552,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
             implements SurfaceTexture.OnFrameAvailableListener {
         private static final String TAG = "SurfaceVideoProcessor";
         private boolean mFrameAvailable;
+        private boolean mEncoderIsActive;
         private boolean mGotDecoderEOS;
         private boolean mSignaledEncoderEOS;
 
@@ -594,7 +595,7 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                         try {
                             // wait for mFrameAvailable, which is set by onFrameAvailable().
                             // Use a timeout to avoid stalling the test if it doesn't arrive.
-                            if (!mFrameAvailable && !mCompleted) {
+                            if (!mFrameAvailable && !mCompleted && !mEncoderIsActive) {
                                 mCondition.wait(FRAME_TIMEOUT_MS);
                             }
                         } catch (InterruptedException ie) {
@@ -602,6 +603,11 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                         }
                         if (mCompleted) {
                             break;
+                        }
+                        if (mEncoderIsActive) {
+                            mEncoderIsActive = false;
+                            if (DEBUG) Log.d(TAG, "encoder is still active, continue");
+                            continue;
                         }
                         assertTrue("still waiting for image", mFrameAvailable);
                         if (DEBUG) Log.v(TAG, "got image");
@@ -704,6 +710,12 @@ public class VideoEncoderTest extends MediaPlayerTestBase {
                 }
             } else if (mediaCodec == mEncoder) {
                 emptyEncoderOutputBuffer(ix, info);
+                synchronized(mCondition) {
+                    if (!mCompleted) {
+                        mEncoderIsActive = true;
+                        mCondition.notifyAll();
+                    }
+                }
             } else {
                 fail("received output buffer on " + mediaCodec.getName());
             }
