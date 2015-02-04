@@ -37,14 +37,13 @@ public class MediaUtils {
 
     private static final MediaCodecList sMCL = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
 
-
     /**
-     * Finds test name (heuristically) and prints out standard skip message.
+     * Returns the test name (heuristically).
      *
      * Since it uses heuristics, this method has only been verified for media
-     * tests. This centralizes the way to signal a skipped test.
+     * tests. This centralizes the way to signal errors during a test.
      */
-    public static void skipTest(String tag, String reason) {
+    public static String getTestName() {
         int bestScore = -1;
         String testName = "test???";
         Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
@@ -110,8 +109,17 @@ public class MediaUtils {
                 }
             }
         }
+        return testName;
+    }
 
-        Log.i(tag, "SKIPPING " + testName + "(): " + reason);
+    /**
+     * Finds test name (heuristically) and prints out standard skip message.
+     *
+     * Since it uses heuristics, this method has only been verified for media
+     * tests. This centralizes the way to signal a skipped test.
+     */
+    public static void skipTest(String tag, String reason) {
+        Log.i(tag, "SKIPPING " + getTestName() + "(): " + reason);
     }
 
     /**
