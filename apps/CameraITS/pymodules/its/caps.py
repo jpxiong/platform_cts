@@ -198,7 +198,6 @@ def flash(props):
     return props.has_key("android.flash.info.available") and \
            props["android.flash.info.available"] == 1
 
-
 def per_frame_control(props):
     """Returns whether a device supports per frame control
 
@@ -210,6 +209,18 @@ def per_frame_control(props):
     """
     return props.has_key("android.sync.maxLatency") and \
            props["android.sync.maxLatency"] == 0
+
+def ev_compensation(props):
+    """Returns whether a device supports ev compensation
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key("android.control.aeCompensationRange") and \
+           props["android.control.aeCompensationRange"] != [0, 0]
 
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.

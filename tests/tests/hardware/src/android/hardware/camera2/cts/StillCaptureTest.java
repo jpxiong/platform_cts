@@ -1230,6 +1230,11 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
     private void aeCompensationTestByCamera() throws Exception {
         Range<Integer> compensationRange = mStaticInfo.getAeCompensationRangeChecked();
+        // Skip the test if exposure compensation is not supported.
+        if (compensationRange.equals(Range.create(0, 0))) {
+            return;
+        }
+
         Rational step = mStaticInfo.getAeCompensationStepChecked();
         float stepF = (float) step.getNumerator() / step.getDenominator();
         int stepsPerEv = (int) Math.round(1.0 / stepF);
