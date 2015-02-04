@@ -131,12 +131,6 @@
   bug: 17508787
 },
 {
-  description: "New tests recently added for Android Enterprise. To be moved out of CTS-staging as soon as they show that they are stable",
-  names: [
-    "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileCopyPaste"
-  ]
-},
-{
   description: "This test failed on devices that use effect off loading. In addition it uses hidden apis",
   names: [
     "android.media.cts.AudioEffectTest#test1_1ConstructorFromUuid"
