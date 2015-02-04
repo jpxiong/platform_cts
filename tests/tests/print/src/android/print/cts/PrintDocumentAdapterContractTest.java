@@ -353,6 +353,12 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         // Wait for layout.
         waitForLayoutAdapterCallbackCount(5);
 
+        // Change the duplex.
+        changeDuplex("Short edge");
+
+        // Wait for layout.
+        waitForLayoutAdapterCallbackCount(6);
+
         // Click the print button.
         clickPrintButton();
 
@@ -394,6 +400,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
                 .setMinMargins(Margins.NO_MARGINS)
                 .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
@@ -406,6 +413,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
                 .setMinMargins(Margins.NO_MARGINS)
                 .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, thirdOldAttributes, thirdNewAttributes, true);
 
@@ -418,6 +426,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
                 .setMinMargins(Margins.NO_MARGINS)
                 .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, fourthOldAttributes, fourthNewAttributes, true);
 
@@ -430,11 +439,25 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
                 .setMinMargins(Margins.NO_MARGINS)
                 .setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, fifthOldAttributes, fifthNewAttributes, true);
 
+        // We changed the duplex which triggers a layout. Since we passed
+        // false to the layout callback meaning that the content didn't change,
+        // there shouldn't be a next call to write.
+        PrintAttributes sixthOldAttributes = fifthNewAttributes;
+        PrintAttributes sixthNewAttributes = new PrintAttributes.Builder()
+                .setMediaSize(MediaSize.ISO_A4.asLandscape())
+                .setResolution(new Resolution("300x300", "300x300", 300, 300))
+                .setMinMargins(Margins.NO_MARGINS)
+                .setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_SHORT_EDGE)
+                .build();
+        verifyLayoutCall(inOrder, adapter, sixthOldAttributes, sixthNewAttributes, true);
+
         // When print is pressed we ask for a layout which is *not* for preview.
-        verifyLayoutCall(inOrder, adapter, fifthNewAttributes, fifthNewAttributes, false);
+        verifyLayoutCall(inOrder, adapter, sixthNewAttributes, sixthNewAttributes, false);
 
         // When print is pressed we ask for all selected pages but we got
         // them when asking for the ones for a preview, and the adapter does
@@ -1573,8 +1596,13 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                         .addResolution(new Resolution("200x200", "200x200", 200, 200), true)
                         .addResolution(new Resolution("300x300", "300x300", 300, 300), false)
                         .setColorModes(PrintAttributes.COLOR_MODE_COLOR
-                                | PrintAttributes.COLOR_MODE_MONOCHROME,
-                                PrintAttributes.COLOR_MODE_MONOCHROME)
+                                        | PrintAttributes.COLOR_MODE_MONOCHROME,
+                                PrintAttributes.COLOR_MODE_MONOCHROME
+                        )
+                        .setDuplexModes(PrintAttributes.DUPLEX_MODE_LONG_EDGE
+                                        | PrintAttributes.DUPLEX_MODE_SHORT_EDGE,
+                                PrintAttributes.DUPLEX_MODE_LONG_EDGE
+                        )
                         .build();
                     PrinterInfo secondPrinter = new PrinterInfo.Builder(secondPrinterId,
                             "Second printer", PrinterInfo.STATUS_IDLE)

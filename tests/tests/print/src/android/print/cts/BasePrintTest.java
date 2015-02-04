@@ -275,6 +275,19 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         }
     }
 
+    protected void changeDuplex(String duplex) throws UiObjectNotFoundException {
+        try {
+            UiObject duplexSpinner = new UiObject(new UiSelector().resourceId(
+                    "com.android.printspooler:id/duplex_spinner"));
+            duplexSpinner.click();
+            UiObject duplexOption = new UiObject(new UiSelector().text(duplex));
+            duplexOption.click();
+        } catch (UiObjectNotFoundException e) {
+            dumpWindowHierarchy();
+            throw new UiObjectNotFoundException(e);
+        }
+    }
+
     protected void clickPrintButton() throws UiObjectNotFoundException {
         try {
             UiObject printButton = new UiObject(new UiSelector().resourceId(
