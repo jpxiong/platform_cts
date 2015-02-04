@@ -43,6 +43,7 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
+import com.android.tradefed.testtype.InstrumentationTest;
 import com.android.tradefed.util.AbiFormatter;
 import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
@@ -82,6 +83,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String TEST_OPTION = "test";
     public static final String CONTINUE_OPTION = "continue-session";
     public static final String RUN_KNOWN_FAILURES_OPTION = "run-known-failures";
+    private static final String FILTERS_OPTION = "filters";
+    private static final String INSTRUMENTATION_INCLUDE_ANNOTATION_KEY = "INST_INCLUDE_ANNOTATION";
+    private static final String INSTRUMENTATION_EXCLUDE_ANNOTATION_KEY = "INST_EXCLUDE_ANNOTATION";
 
     public static final String PACKAGE_NAME_METRIC = "packageName";
     public static final String PACKAGE_ABI_METRIC = "packageAbi";
@@ -180,9 +184,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "Collect dEQP logs from the device.")
     private boolean mCollectDeqpLogs = false;
 
+    @Option(name = FILTERS_OPTION,
+            description = "Additional filters to pass to tests.")
+    private Map<String, String> mFilters = new HashMap<String, String>();
+
     @Option(name = "min-pre-reboot-package-count", description =
             "The minimum number of packages to require a pre test reboot")
-
     private int mMinPreRebootPackageCount = 2;
     private final int mShardAssignment;
     private final int mTotalShards;
@@ -524,6 +531,18 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 }
                 if (test instanceof DeqpTestRunner) {
                     ((DeqpTestRunner)test).setCollectLogs(mCollectDeqpLogs);
+                }
+                if (test instanceof InstrumentationTest) {
+                    String annotation = mFilters.get(INSTRUMENTATION_INCLUDE_ANNOTATION_KEY);
+                    if (annotation != null) {
+                        ((InstrumentationTest)test).addInstrumentationArg(
+                                "annotation", annotation);
+                    }
+                    String notAnnotation = mFilters.get(INSTRUMENTATION_EXCLUDE_ANNOTATION_KEY);
+                    if (notAnnotation != null) {
+                        ((InstrumentationTest)test).addInstrumentationArg(
+                                "notAnnotation", notAnnotation);
+                    }
                 }
 
                 forwardPackageDetails(testPackage.getPackageDef(), listener);
