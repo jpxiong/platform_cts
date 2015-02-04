@@ -24,7 +24,7 @@ LOCAL_PACKAGE_NAME := CtsKeySetSigningAUpgradeA
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/keysets/cts-keyset-test-a
 LOCAL_DEX_PREOPT := false
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_SUPPORT_PACKAGE)
 
 #apks signed by cts-keyset-test-b
 include $(CLEAR_VARS)
@@ -35,7 +35,7 @@ LOCAL_PACKAGE_NAME := CtsKeySetSigningBUpgradeA
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/keysets/cts-keyset-test-b
 LOCAL_DEX_PREOPT := false
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_SUPPORT_PACKAGE)
 
 #apks signed by cts-keyset-test-a and cts-keyset-test-b
 include $(CLEAR_VARS)
@@ -47,4 +47,4 @@ LOCAL_PACKAGE_NAME := CtsKeySetSigningAAndBUpgradeA
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/keysets/cts-keyset-test-a
 LOCAL_ADDITIONAL_CERTIFICATES := cts/hostsidetests/appsecurity/certs/keysets/cts-keyset-test-b
 LOCAL_DEX_PREOPT := false
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_SUPPORT_PACKAGE)

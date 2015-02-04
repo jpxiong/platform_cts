@@ -16,7 +16,7 @@ LOCAL_PATH := $(call my-dir)
 
 # Test XMLs, native executables, and packages will be placed in this
 # directory before creating the final CTS distribution.
-CTS_TESTCASES_OUT := $(HOST_OUT)/cts-testcases
+CTS_TESTCASES_OUT := $(HOST_OUT)/cts/android-cts/repository/testcases
 
 # Scanners of source files for tests which are then inputed into
 # the XML generator to produce test XMLs.
@@ -39,7 +39,7 @@ CTS_TARGET_ARCH := $(TARGET_ARCH)
 # Functions to get the paths of the build outputs.
 
 define cts-get-lib-paths
-	$(foreach lib,$(1),$(HOST_OUT_JAVA_LIBRARIES)/$(lib).jar)
+	$(foreach lib,$(1),$(CTS_TESTCASES_OUT)/$(lib).jar)
 endef
 
 define cts-get-ui-lib-paths
@@ -47,7 +47,7 @@ define cts-get-ui-lib-paths
 endef
 
 define cts-get-native-paths
-	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe),,,$(3))/$(exe)$(2))
+	$(foreach exe,$(1),$(CTS_TESTCASES_OUT)/$(exe)$(2))
 endef
 
 define cts-get-package-paths

@@ -19,3 +19,4 @@ BUILD_CTS_HOST_JAVA_LIBRARY := cts/build/test_host_java_library.mk
 BUILD_CTS_TARGET_JAVA_LIBRARY := cts/build/test_target_java_library.mk
 BUILD_CTS_UI_JAVA_LIBRARY := cts/build/test_uiautomator.mk
 BUILD_CTS_DEQP_PACKAGE := cts/build/test_deqp_package.mk
+BUILD_CTS_SUPPORT_PACKAGE := cts/build/support_package.mk

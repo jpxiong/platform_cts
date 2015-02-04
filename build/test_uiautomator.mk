@@ -21,18 +21,15 @@ LOCAL_DEX_PREOPT := false
 
 include $(BUILD_JAVA_LIBRARY)
 
-cts_library_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml 
 cts_library_jar := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).jar
+$(cts_library_jar): $(LOCAL_BUILT_MODULE)
+	$(call copy-file-to-target)
 
 cts_src_dirs := $(LOCAL_PATH)/src
 cts_src_dirs += $(sort $(dir $(LOCAL_GENERATED_SOURCES)))
 cts_src_dirs := $(addprefix -s , $(cts_src_dirs))
 
-$(cts_library_jar): PRIVATE_MODULE := $(LOCAL_MODULE)
-$(cts_library_jar): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))/javalib.jar | $(ACP)
-	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
-	$(hide) $(ACP) -fp $(call intermediates-dir-for,JAVA_LIBRARIES,$(PRIVATE_MODULE))/javalib.jar $@
-
+cts_library_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml
 $(cts_library_xml): PRIVATE_SRC_DIRS := $(cts_src_dirs)
 $(cts_library_xml): PRIVATE_TEST_APP_PACKAGE := $(LOCAL_CTS_TEST_APP_PACKAGE)
 $(cts_library_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
