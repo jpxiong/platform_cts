@@ -673,19 +673,36 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testSetFeatureDrawableUri() {
+    public void testSetFeatureDrawableUri() throws Throwable {
         startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
-        mActivity.getDialog().setFeatureDrawableUri(0, Uri.parse("http://www.google.com"));
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mActivity.getDialog().setFeatureDrawableUri(Window.FEATURE_LEFT_ICON,
+                        Uri.parse("http://www.google.com"));
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
-    public void testSetFeatureDrawable() {
+    public void testSetFeatureDrawable() throws Throwable {
         startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
-        mActivity.getDialog().setFeatureDrawable(0, new MockDrawable());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mActivity.getDialog().setFeatureDrawable(Window.FEATURE_LEFT_ICON, 
+                        new MockDrawable());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
-    public void testSetFeatureDrawableAlpha() {
+    public void testSetFeatureDrawableAlpha() throws Throwable {
         startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
-        mActivity.getDialog().setFeatureDrawableAlpha(0, 0);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mActivity.getDialog().setFeatureDrawableAlpha(Window.FEATURE_LEFT_ICON, 0);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     public void testGetLayoutInflater() {
