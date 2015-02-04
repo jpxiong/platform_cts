@@ -56,6 +56,14 @@ public class NativeCodeTest extends TestCase {
                    doFutexTest());
     }
 
+    public void testNvmapIocFromId() throws Exception {
+        assertTrue("Device is vulnerable to CVE-2014-5332. "
+                   + "NVIDIA has released code fixes to upstream repositories and device vendors. "
+                   + "For more information, see "
+                   + "https://nvidia.custhelp.com/app/answers/detail/a_id/3618",
+                   doNvmapIocFromIdTest());
+    }
+
     /**
      * Returns true iff this device is vulnerable to CVE-2013-2094.
      * A patch for CVE-2013-2094 can be found at
@@ -108,6 +116,16 @@ public class NativeCodeTest extends TestCase {
      * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=e9c243a5a6de0be8e584c604d353412584b592f8
      */
     private static native boolean doFutexTest();
+
+    /**
+     * ANDROID-17453812 / CVE-2014-5332
+     *
+     * Returns true if the device is patched against the NVMAP_IOC_FROM_ID ioctl call.
+     *
+     * More information on this vulnreability is available at
+     * https://nvidia.custhelp.com/app/answers/detail/a_id/3618
+     */
+    private static native boolean doNvmapIocFromIdTest();
 
     /**
      * Returns true if the device is immune to CVE-2014-1710,
