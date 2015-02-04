@@ -71,6 +71,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final Location sTestLocation0 = new Location(LocationManager.GPS_PROVIDER);
     private static final Location sTestLocation1 = new Location(LocationManager.GPS_PROVIDER);
     private static final Location sTestLocation2 = new Location(LocationManager.NETWORK_PROVIDER);
+    private static final int RELAXED_CAPTURE_IMAGE_TIMEOUT_MS = CAPTURE_IMAGE_TIMEOUT_MS + 1000;
     static {
         sTestLocation0.setTime(1199145600L);
         sTestLocation0.setLatitude(37.736071);
@@ -637,7 +638,8 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 prepareStillCaptureAndStartPreview(previewRequest, stillRequest, previewSz,
                         stillSz, resultListener, imageListener);
                 mSession.capture(stillRequest.build(), resultListener, mHandler);
-                Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                Image image = imageListener.getImage((mStaticInfo.isHardwareLevelLegacy()) ?
+                        RELAXED_CAPTURE_IMAGE_TIMEOUT_MS : CAPTURE_IMAGE_TIMEOUT_MS);
                 validateJpegCapture(image, stillSz);
                 // stopPreview must be called here to make sure next time a preview stream
                 // is created with new size.
