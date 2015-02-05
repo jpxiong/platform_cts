@@ -60,6 +60,7 @@ include $(BUILD_HOST_JAVA_LIBRARY)
 # Buid android.core.vm-tests-tf.jar
 # ============================================================
 #
+include $(CLEAR_VARS)
 
 intermediates := $(call intermediates-dir-for,JAVA_LIBRARIES,vm-tests-tf,HOST)
 vmteststf_jar := $(intermediates)/android.core.vm-tests-tf.jar
@@ -70,7 +71,7 @@ vmteststf_dep_jars += $(private_jill_jarjar_asm)
 $(vmteststf_jar): PRIVATE_JACK_VM_ARGS := $(LOCAL_JACK_VM_ARGS)
 $(vmteststf_jar): PRIVATE_JACK_EXTRA_ARGS := $(LOCAL_JACK_EXTRA_ARGS)
 
-ifeq ($(strip $(LOCAL_USE_JACK)),true)
+ifdef LOCAL_JACK_ENABLED
     vmteststf_dep_jars += $(cts-tf-dalvik-lib.jack)
 endif
 
@@ -82,7 +83,7 @@ $(vmteststf_jar): PRIVATE_INTERMEDIATES_DEXCORE_JAR := $(intermediates)/tests/do
 $(vmteststf_jar): PRIVATE_INTERMEDIATES_MAIN_FILES := $(intermediates)/main_files
 $(vmteststf_jar): PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES := $(intermediates)/hostjunit_files
 $(vmteststf_jar): PRIVATE_CLASS_PATH := $(subst $(space),:,$(vmteststf_dep_jars)):$(HOST_JDK_TOOLS_JAR)
-ifneq ($(strip $(LOCAL_USE_JACK)),true)
+ifndef LOCAL_JACK_ENABLED
 $(vmteststf_jar) : $(vmteststf_dep_jars) $(JACK_JAR) $(JILL_JAR) $(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar
 	$(hide) rm -rf $(dir $@) && mkdir -p $(dir $@)
 	$(hide) mkdir -p $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit $(dir $(PRIVATE_INTERMEDIATES_DEXCORE_JAR))
@@ -98,7 +99,7 @@ $(vmteststf_jar) : $(vmteststf_dep_jars) $(JACK_JAR) $(JILL_JAR) $(HOST_OUT_JAVA
 		$(if $(NO_OPTIMIZE_DX), --no-optimize) $(PRIVATE_INTERMEDIATES_DEXCORE_JAR).jar && rm -f $(PRIVATE_INTERMEDIATES_DEXCORE_JAR).jar
 	$(hide) cd $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/classes && zip -q -r ../../android.core.vm-tests-tf.jar .
 	$(hide) cd $(dir $@) && zip -q -r android.core.vm-tests-tf.jar tests
-else # LOCAL_USE_JACK
+else # LOCAL_JACK_ENABLED
 $(vmteststf_jar) : $(vmteststf_dep_jars) $(JACK_JAR) $(JILL_JAR) out/target/common/obj/JAVA_LIBRARIES/core-libart_intermediates/classes.jack $(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar $(LOCAL_PATH)/lib/junit.jar
 	$(hide) rm -rf $(dir $@) && mkdir -p $(dir $@)
 	$(hide) mkdir -p $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit $(dir $(PRIVATE_INTERMEDIATES_DEXCORE_JAR))
@@ -117,7 +118,7 @@ $(vmteststf_jar) : $(vmteststf_dep_jars) $(JACK_JAR) $(JILL_JAR) out/target/comm
 	$(hide) cd $(PRIVATE_INTERMEDIATES_DEXCORE_JAR).tmp && zip -q -r $(abspath $(PRIVATE_INTERMEDIATES_DEXCORE_JAR)) .
 	$(hide) cd $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/classes && zip -q -r ../../android.core.vm-tests-tf.jar .
 	$(hide) cd $(dir $@) && zip -q -r android.core.vm-tests-tf.jar tests
-endif # LOCAL_USE_JACK
+endif # LOCAL_JACK_ENABLED
 
 # Clean up temp vars
 intermediates :=
