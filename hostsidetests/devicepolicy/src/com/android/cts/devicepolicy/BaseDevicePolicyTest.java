@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
  */
 public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiver {
 
-    private static final String RUNNER = "android.test.InstrumentationTestRunner";
+    private static final String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
 
     private static final String[] REQUIRED_DEVICE_FEATURES = new String[] {
         "android.software.managed_users",
