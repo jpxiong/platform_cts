@@ -166,7 +166,9 @@ public class ItsUtils {
                         int length = w * bytesPerPixel;
                         buffer.get(data, offset, length);
                         // Advance buffer the remainder of the row stride
-                        buffer.position(buffer.position() + rowStride - length);
+                        if (row < h - 1) {
+                            buffer.position(buffer.position() + rowStride - length);
+                        }
                         offset += length;
                     } else {
                         // Generic case: should work for any pixelStride but slower.
