@@ -196,27 +196,4 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "Output for command " + adbCommand + ": " + commandOutput);
         return commandOutput;
     }
-
-    private int createManagedProfile() throws DeviceNotAvailableException {
-        String command =
-                "pm create-user --profileOf 0 --managed TestProfile_" + System.currentTimeMillis();
-        String commandOutput = getDevice().executeShellCommand(command);
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-
-        // Extract the id of the new user.
-        String[] tokens = commandOutput.split("\\s+");
-        assertTrue(commandOutput + " expected to have format \"Success: {USER_ID}\"",
-                tokens.length > 0);
-        assertEquals(commandOutput, "Success:", tokens[0]);
-        return Integer.parseInt(tokens[tokens.length-1]);
-    }
-
-    private void setProfileOwner(String componentName, int userId)
-            throws DeviceNotAvailableException {
-        String command = "dpm set-profile-owner '" + componentName + "' " + userId;
-        String commandOutput = getDevice().executeShellCommand(command);
-        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput + " expected to start with \"Success:\"",
-                commandOutput.startsWith("Success:"));
-    }
 }

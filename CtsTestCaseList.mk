@@ -70,9 +70,12 @@ cts_support_packages := \
     CtsDeviceUi \
     CtsIntentReceiverApp \
     CtsIntentSenderApp \
+    CtsLauncherAppsTests \
+    CtsLauncherAppsTestsSupport \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsSimpleApp \
     CtsSomeAccessibilityServices \
     CtsThemeDeviceApp \
     TestDeviceSetup \
