@@ -33,7 +33,8 @@ def main():
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.manual_sensor(props) and
                              its.caps.manual_post_proc(props) and
-                             its.caps.per_frame_control(props))
+                             its.caps.per_frame_control(props) and
+                             its.caps.ev_compensation(props))
 
         evs = range(-4,5)
         lumas = []
