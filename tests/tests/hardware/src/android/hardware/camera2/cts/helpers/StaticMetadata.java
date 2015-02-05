@@ -1307,14 +1307,15 @@ public class StaticMetadata {
         Rational compensationStep = getAeCompensationStepChecked();
         float compensationStepF = compensationStep.floatValue();
         final Range<Integer> DEFAULT_RANGE = Range.create(
-                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStepF),
+                (int)(0 / compensationStepF),
                 (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStepF));
+        final Range<Integer> ZERO_RANGE = Range.create(0, 0);
         if (compensationRange == null) {
-            return DEFAULT_RANGE;
+            return ZERO_RANGE;
         }
 
         // Legacy devices don't have a minimum range requirement
-        if (isHardwareLevelLimitedOrBetter()) {
+        if (isHardwareLevelLimitedOrBetter() && !compensationRange.equals(ZERO_RANGE)) {
             checkTrueForKey(key, " range value must be at least " + DEFAULT_RANGE
                     + ", actual " + compensationRange + ", compensation step " + compensationStep,
                    compensationRange.getLower() <= DEFAULT_RANGE.getLower() &&
