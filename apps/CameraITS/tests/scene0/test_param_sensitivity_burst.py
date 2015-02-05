@@ -24,6 +24,7 @@ def main():
     """
 
     NUM_STEPS = 3
+    ERROR_TOLERANCE = 0.97 # Allow ISO to be rounded down by 3%
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
@@ -41,7 +42,8 @@ def main():
         for i,cap in enumerate(caps):
             s_req = sens_list[i]
             s_res = cap["metadata"]["android.sensor.sensitivity"]
-            assert(s_req == s_res)
+            assert(s_req >= s_res)
+            assert(s_res/float(s_req) > ERROR_TOLERANCE)
 
 if __name__ == '__main__':
     main()

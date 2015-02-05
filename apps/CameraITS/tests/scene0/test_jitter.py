@@ -33,7 +33,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.manual_sensor(props))
+        its.caps.skip_unless(its.caps.manual_sensor(props) and
+                             its.caps.sensor_fusion(props))
 
         req, fmt = its.objects.get_fastest_manual_capture_settings(props)
         caps = cam.do_capture([req]*50, [fmt])
