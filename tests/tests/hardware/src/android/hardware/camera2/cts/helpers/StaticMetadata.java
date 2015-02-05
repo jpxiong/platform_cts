@@ -1307,7 +1307,7 @@ public class StaticMetadata {
         Rational compensationStep = getAeCompensationStepChecked();
         float compensationStepF = compensationStep.floatValue();
         final Range<Integer> DEFAULT_RANGE = Range.create(
-                (int)(0 / compensationStepF),
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStepF),
                 (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStepF));
         final Range<Integer> ZERO_RANGE = Range.create(0, 0);
         if (compensationRange == null) {
