@@ -62,6 +62,7 @@ include $(BUILD_HOST_JAVA_LIBRARY)
 #
 include $(CLEAR_VARS)
 
+LOCAL_JACK_ENABLED := $(strip $(LOCAL_JACK_ENABLED))
 intermediates := $(call intermediates-dir-for,JAVA_LIBRARIES,vm-tests-tf,HOST)
 vmteststf_jar := $(intermediates)/android.core.vm-tests-tf.jar
 vmteststf_dep_jars := $(addprefix $(HOST_OUT_JAVA_LIBRARIES)/, cts-tf-dalvik-buildutil.jar dasm.jar dx.jar cfassembler.jar junit.jar)
