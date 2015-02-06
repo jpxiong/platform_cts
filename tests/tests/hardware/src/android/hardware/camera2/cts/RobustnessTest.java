@@ -79,6 +79,10 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 ImageReader imageReader = ImageReader.newInstance(weirdSize.getWidth(),
                         weirdSize.getHeight(), ImageFormat.YUV_420_888, 3);
 
+                // Setup ImageReaderListener
+                SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+                imageReader.setOnImageAvailableListener(imageListener, mHandler);
+
                 Surface surface = imageReader.getSurface();
                 List<Surface> surfaces = new ArrayList<>();
                 surfaces.add(surface);
@@ -87,8 +91,6 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 CaptureRequest.Builder request =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 request.addTarget(surface);
-                CameraCaptureSession.CaptureCallback mockCaptureListener =
-                        mock(CameraCaptureSession.CaptureCallback.class);
 
                 // Check that correct session callback is hit.
                 CameraCaptureSession.StateCallback sessionListener =
@@ -114,7 +116,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 verify(captureListener, never()).onCaptureFailed(any(CameraCaptureSession.class),
                         any(CaptureRequest.class), any(CaptureFailure.class));
 
-                Image image = imageReader.acquireLatestImage();
+                Image image = imageListener.getImage(CAPTURE_TIMEOUT);
                 int imageWidth = image.getWidth();
                 int imageHeight = image.getHeight();
                 Size actualSize = new Size(imageWidth, imageHeight);
