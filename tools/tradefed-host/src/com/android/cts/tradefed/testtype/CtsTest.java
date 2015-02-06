@@ -37,7 +37,12 @@ import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.ResultForwarder;
+import com.android.tradefed.targetprep.BuildError;
+import com.android.tradefed.targetprep.ITargetCleaner;
+import com.android.tradefed.targetprep.ITargetPreparer;
+import com.android.tradefed.targetprep.TargetSetupError;
 import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -64,6 +69,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -557,7 +563,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 }
 
                 forwardPackageDetails(testPackage.getPackageDef(), listener);
+                performPackagePrepareSetup(testPackage.getPackageDef());
                 test.run(filterMap.get(testPackage.getPackageDef().getId()));
+                performPackagePreparerTearDown(testPackage.getPackageDef());
                 if (i < mTestPackageList.size() - 1) {
                     TestPackage nextPackage = mTestPackageList.get(i + 1);
                     rebootIfNecessary(testPackage, nextPackage);
@@ -587,6 +595,54 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         } finally {
             for (ResultFilter filter : filterMap.values()) {
                 filter.reportUnexecutedTests();
+            }
+        }
+    }
+
+    /**
+     * Invokes {@link ITargetPreparer}s configured for the test package. {@link TargetSetupError}s
+     * thrown by any preparer will be rethrown as {@link RuntimeException} so that the entire test
+     * package will be skipped for execution. Note that preparers will be invoked in the same order
+     * as they are defined in the module test config.
+     * @param packageDef definition for the test package
+     * @throws DeviceNotAvailableException
+     */
+    private void performPackagePrepareSetup(ITestPackageDef packageDef)
+            throws DeviceNotAvailableException {
+        for (ITargetPreparer preparer : packageDef.getPackagePreparers()) {
+            if (preparer instanceof IAbiReceiver) {
+                ((IAbiReceiver)preparer).setAbi(packageDef.getAbi());
+            }
+            try {
+                preparer.setUp(getDevice(), mBuildInfo);
+            } catch (BuildError e) {
+                // This should only happen for flashing new build
+                CLog.e("Unexpected BuildError from preparer: %s",
+                        preparer.getClass().getCanonicalName());
+            } catch (TargetSetupError e) {
+                // log preparer class then rethrow & let caller handle
+                CLog.e("TargetSetupError in preparer: %s",
+                        preparer.getClass().getCanonicalName());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Invokes clean up step for {@link ITargetCleaner}s configured for the test package. Note that
+     * the cleaners will be invoked in the reverse order as they are defined in module test config.
+     * @param packageDef definition for the test package
+     * @throws DeviceNotAvailableException
+     */
+    private void performPackagePreparerTearDown(ITestPackageDef packageDef)
+            throws DeviceNotAvailableException {
+        List<ITargetPreparer> preparers = packageDef.getPackagePreparers();
+        ListIterator<ITargetPreparer> itr = preparers.listIterator(preparers.size());
+        // do teardown in reverse order
+        while (itr.hasPrevious()) {
+            ITargetPreparer preparer = itr.previous();
+            if (preparer instanceof ITargetCleaner) {
+                ((ITargetCleaner) preparer).tearDown(getDevice(), mBuildInfo, null);
             }
         }
     }

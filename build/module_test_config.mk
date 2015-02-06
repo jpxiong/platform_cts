@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE_TAGS := optional
-
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
-
-LOCAL_PACKAGE_NAME := CtsAccessibilityTestCases
-
-LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
-
-include $(BUILD_CTS_PACKAGE)
+cts_module_test_config := $(if $(wildcard \
+	$(LOCAL_PATH)/$(CTS_MODULE_TEST_CONFIG)), \
+	$(CTS_TESTCASES_OUT)/$(LOCAL_PACKAGE_NAME).config)
+ifneq ($(cts_module_test_config),)
+$(cts_module_test_config): $(LOCAL_PATH)/$(CTS_MODULE_TEST_CONFIG)
+	$(call copy-file-to-target)
+endif
