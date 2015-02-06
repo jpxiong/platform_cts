@@ -1,4 +1,6 @@
-/*
+#!/usr/bin/python
+
+src_header = """/*
  * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +19,6 @@
 package android.cts.security;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.Log;
-import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
@@ -26,23 +26,18 @@ import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.FileOutputStream;
 import java.lang.String;
 import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Host-side SELinux tests.
- *
- * These tests analyze the policy file in use on the subject device directly or
- * run as the shell user to evaluate aspects of the state of SELinux on the test
- * device which otherwise would not be available to a normal apk.
+ * Neverallow Rules SELinux tests.
  */
-public class SELinuxHostTest extends DeviceTestCase {
-
+public class SELinuxNeverallowRulesTest extends DeviceTestCase {
     private File sepolicyAnalyze;
     private File devicePolicyFile;
 
@@ -80,17 +75,19 @@ public class SELinuxHostTest extends DeviceTestCase {
         mDevice.executeAdbCommand("pull", "/sys/fs/selinux/policy",
                 devicePolicyFile.getAbsolutePath());
     }
+"""
+src_body = ""
+src_footer = """}
+"""
 
-    /**
-     * Tests that all domains in the running policy file are in enforcing mode
-     *
-     * @throws Exception
-     */
-    public void testAllEnforcing() throws Exception {
+src_method = """
+    public void testNeverallowRules() throws Exception {
+        String neverallowRule = "$NEVERALLOW_RULE_HERE$";
 
-        /* run sepolicy-analyze permissive check on policy file */
+        /* run sepolicy-analyze neverallow check on policy file using given neverallow rules */
         ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
-                devicePolicyFile.getAbsolutePath(), "permissive");
+                devicePolicyFile.getAbsolutePath(), "neverallow", "-n",
+                neverallowRule);
         pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -100,9 +97,10 @@ public class SELinuxHostTest extends DeviceTestCase {
         StringBuilder errorString = new StringBuilder();
         while ((line = result.readLine()) != null) {
             errorString.append(line);
-            errorString.append("\n");
+            errorString.append("\\n");
         }
-        assertTrue("The following SELinux domains were found to be in permissive mode:\n"
-                   + errorString, errorString.length() == 0);
+        assertTrue("The following errors were encountered when validating the SELinux"
+                   + "neverallow rule:\\n" + neverallowRule + "\\n" + errorString,
+                   errorString.length() == 0);
     }
-}
+"""
