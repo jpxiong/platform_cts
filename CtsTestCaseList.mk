@@ -72,9 +72,12 @@ cts_support_packages := \
     CtsHostsideNetworkTestsApp \
     CtsIntentReceiverApp \
     CtsIntentSenderApp \
+    CtsLauncherAppsTests \
+    CtsLauncherAppsTestsSupport \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsSimpleApp \
     CtsSomeAccessibilityServices \
     CtsThemeDeviceApp \
     TestDeviceSetup \
