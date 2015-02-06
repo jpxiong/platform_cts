@@ -513,7 +513,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     if (arrayContains(actualCapabilities,
                             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
                         assertTrue("MANUAL_SENSOR capability, need positive min frame duration for"
-                                + "format " + format,
+                                + "format " + format + " for size " + size + " minDuration " +
+                                minDuration,
                                 minDuration > 0);
                     } else {
                         assertTrue("Need non-negative min frame duration for format " + format,
