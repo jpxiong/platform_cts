@@ -45,6 +45,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.provider.Settings.System;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
@@ -455,6 +456,88 @@ public class AudioManagerTest extends AndroidTestCase {
         mp.release();
         Thread.sleep(TIME_TO_PLAY);
         assertFalse(mAudioManager.isMusicActive());
+    }
+
+    public void testMute() {
+        int[] streams = {
+                AudioManager.STREAM_VOICE_CALL,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.STREAM_RING,
+                AudioManager.STREAM_ALARM,
+                AudioManager.STREAM_NOTIFICATION,
+                AudioManager.STREAM_SYSTEM };
+
+        int muteAffectedStreams = System.getInt(mContext.getContentResolver(),
+                System.MUTE_STREAMS_AFFECTED,
+                        // Same defaults as in AudioService. Should be kept in
+                        // sync.
+                        ((1 << AudioManager.STREAM_MUSIC) |
+                                (1 << AudioManager.STREAM_RING) |
+                                (1 << AudioManager.STREAM_NOTIFICATION) |
+                                (1 << AudioManager.STREAM_SYSTEM)));
+        if (mUseFixedVolume) {
+            for (int i = 0; i < streams.length; i++) {
+                mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_MUTE, 0);
+                assertFalse("Muting should not affect a fixed volume device.",
+                        mAudioManager.isStreamMute(streams[i]));
+
+                mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_TOGGLE_MUTE, 0);
+                assertFalse("Toggling mute should not affect a fixed volume device.",
+                        mAudioManager.isStreamMute(streams[i]));
+
+                mAudioManager.setStreamMute(streams[i], true);
+                assertFalse("Muting should not affect a fixed volume device.",
+                        mAudioManager.isStreamMute(streams[i]));
+            }
+            return;
+        }
+        // This ensures we're out of vibrate or silent modes.
+        mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
+        for (int i = 0; i < streams.length; i++) {
+            // ensure each stream is on and turned up.
+            mAudioManager.setStreamVolume(streams[i], mAudioManager.getStreamMaxVolume(streams[i]),
+                    0);
+            if (((1 << streams[i]) & muteAffectedStreams) == 0) {
+                mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_MUTE, 0);
+                assertFalse("Stream " + streams[i] + " should not be affected by mute.",
+                        mAudioManager.isStreamMute(streams[i]));
+                mAudioManager.setStreamMute(streams[i], true);
+                assertFalse("Stream " + streams[i] + " should not be affected by mute.",
+                        mAudioManager.isStreamMute(streams[i]));
+                mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_TOGGLE_MUTE, 0);
+                assertFalse("Stream " + streams[i] + " should not be affected by mute.",
+                        mAudioManager.isStreamMute(streams[i]));
+                continue;
+            }
+            mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_MUTE, 0);
+            assertTrue("Muting stream " + streams[i] + " failed.",
+                    mAudioManager.isStreamMute(streams[i]));
+
+            mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_UNMUTE, 0);
+            assertFalse("Unmuting stream " + streams[i] + " failed.",
+                    mAudioManager.isStreamMute(streams[i]));
+
+            mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_TOGGLE_MUTE, 0);
+            assertTrue("Toggling mute on stream " + streams[i] + " failed.",
+                    mAudioManager.isStreamMute(streams[i]));
+
+            mAudioManager.adjustStreamVolume(streams[i], AudioManager.ADJUST_TOGGLE_MUTE, 0);
+            assertFalse("Toggling mute on stream " + streams[i] + " failed.",
+                    mAudioManager.isStreamMute(streams[i]));
+
+            mAudioManager.setStreamMute(streams[i], true);
+            assertTrue("Muting stream " + streams[i] + " using setStreamMute failed",
+                    mAudioManager.isStreamMute(streams[i]));
+
+            // mute it three more times to verify the ref counting is gone.
+            mAudioManager.setStreamMute(streams[i], true);
+            mAudioManager.setStreamMute(streams[i], true);
+            mAudioManager.setStreamMute(streams[i], true);
+
+            mAudioManager.setStreamMute(streams[i], false);
+            assertFalse("Unmuting stream " + streams[i] + " using setStreamMute failed.",
+                    mAudioManager.isStreamMute(streams[i]));
+        }
     }
 
     public void testSetInvalidRingerMode() {
