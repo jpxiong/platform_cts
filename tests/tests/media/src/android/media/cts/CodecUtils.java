@@ -16,6 +16,7 @@
 
 package android.media.cts;
 
+import android.graphics.Rect;
 import android.media.cts.CodecImage;
 import android.media.Image;
 import android.util.Log;
@@ -116,5 +117,26 @@ public class CodecUtils  {
                 ImageWrapper.createFromImage(target),
                 ImageWrapper.createFromImage(source));
     }
+
+    public native static void fillImageRectWithYUV(
+            CodecImage image, Rect area, int y, int u, int v);
+
+    public static void fillImageRectWithYUV(Image image, Rect area, int y, int u, int v) {
+        fillImageRectWithYUV(ImageWrapper.createFromImage(image), area, y, u, v);
+    }
+
+    public native static long[] getRawStats(CodecImage image, Rect area);
+
+    public static long[] getRawStats(Image image, Rect area) {
+        return getRawStats(ImageWrapper.createFromImage(image), area);
+    }
+
+    public native static float[] getYUVStats(CodecImage image, Rect area);
+
+    public static float[] getYUVStats(Image image, Rect area) {
+        return getYUVStats(ImageWrapper.createFromImage(image), area);
+    }
+
+    public native static float[] Raw2YUVStats(long[] rawStats);
 }
 
