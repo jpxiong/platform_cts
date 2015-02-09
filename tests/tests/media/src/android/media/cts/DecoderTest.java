@@ -69,16 +69,16 @@ public class DecoderTest extends MediaPlayerTestBase {
             "http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
                 + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
-                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
-                + "&key=test_key1&user=android-device-test");  // H.264 Base + AAC
+                + "&signature=46A04ED550CA83B79B60060BA80C79FDA5853D26."
+                + "49582D382B4A9AFAA163DED38D2AE531D85603C0"
+                + "&key=ik0&user=android-device-test");  // H.264 Base + AAC
     private static final Uri VIDEO_URL = Uri.parse(
             "http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
                 + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
                 + "&sparams=ip,ipbits,expire,id,itag,source"
-                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
-                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
-                + "&key=test_key1&user=android-device-test");  // H.264 Base + AAC
+                + "&signature=46A04ED550CA83B79B60060BA80C79FDA5853D26."
+                + "49582D382B4A9AFAA163DED38D2AE531D85603C0"
+                + "&key=ik0&user=android-device-test");  // H.264 Base + AAC
 
     @Override
     protected void setUp() throws Exception {
