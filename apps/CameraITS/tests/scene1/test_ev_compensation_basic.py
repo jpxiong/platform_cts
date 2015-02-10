@@ -31,7 +31,10 @@ def main():
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.ev_compensation(props))
 
-        evs = range(-4,5)
+        ev_per_step = its.objects.rational_to_float(
+                props['android.control.aeCompensationStep'])
+        steps_per_ev = int(1.0 / ev_per_step)
+        evs = range(-2 * steps_per_ev, 2 * steps_per_ev + 1, steps_per_ev)
         lumas = []
         for ev in evs:
             # Re-converge 3A, and lock AE once converged. skip AF trigger as
@@ -51,6 +54,11 @@ def main():
         pylab.plot(evs, lumas, 'r')
         matplotlib.pyplot.savefig("%s_plot_means.png" % (NAME))
 
+        # trim trailing 1.0s (for saturated image)
+        while lumas and lumas[-1] == 1.0:
+            lumas.pop(-1)
+        # Only allow positive EVs to give saturated image
+        assert(len(lumas) > 2)
         luma_diffs = numpy.diff(lumas)
         min_luma_diffs = min(luma_diffs)
         print "Min of the luma value difference between adjacent ev comp: ", \

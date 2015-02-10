@@ -36,7 +36,13 @@ def main():
                              its.caps.per_frame_control(props) and
                              its.caps.ev_compensation(props))
 
-        evs = range(-4,5)
+        ev_compensation_range = props['android.control.aeCompensationRange']
+        range_min = ev_compensation_range[0]
+        range_max = ev_compensation_range[1]
+        ev_per_step = its.objects.rational_to_float(
+                props['android.control.aeCompensationStep'])
+        steps_per_ev = int(1.0 / ev_per_step)
+        evs = range(range_min, range_max + 1, steps_per_ev)
         lumas = []
         for ev in evs:
             # Re-converge 3A, and lock AE once converged. skip AF trigger as
@@ -59,10 +65,8 @@ def main():
             tile = its.image.get_image_patch(y, 0.45,0.45,0.1,0.1)
             lumas.append(its.image.compute_image_means(tile)[0])
 
-        ev_step_size_in_stops = its.objects.rational_to_float(
-                props['android.control.aeCompensationStep'])
-        luma_increase_per_step = pow(2, ev_step_size_in_stops)
-        print "ev_step_size_in_stops", ev_step_size_in_stops
+        luma_increase_per_step = pow(2, ev_per_step)
+        print "ev_step_size_in_stops", ev_per_step
         imid = len(lumas) / 2
         expected_lumas = [lumas[imid] / pow(luma_increase_per_step, i)
                           for i in range(imid , 0, -1)]  + \
