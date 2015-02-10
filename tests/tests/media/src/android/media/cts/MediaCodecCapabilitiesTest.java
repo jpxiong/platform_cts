@@ -59,10 +59,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=160&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
-                + "&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&signature=341692D20FACCAE25B90EA2C131EA6ADCD8E2384."
-                + "9EB08C174BE401AAD20FB85EE4DBA51A2882BB60"
-                + "&key=test_key1", 256, 144, PLAY_TIME_MS);
+                + "&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&signature=9EDCA0B395B8A949C511FD5E59B9F805CFF797FD."
+                + "702DE9BA7AF96785FD6930AD2DD693A0486C880E"
+                + "&key=ik0", 256, 144, PLAY_TIME_MS);
     }
 
     public void testAvcBaseline30() throws Exception {
@@ -77,10 +77,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=18&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
-                + "&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&signature=8701A45F6422229D46ABB25A22E2C00C94024606."
-                + "08BCDF16C3F744C49D4C8A8AD1C38B3DC1810918"
-                + "&key=test_key1", 640, 360, PLAY_TIME_MS);
+                + "&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&signature=7DCDE3A6594D0B91A27676A3CDC3A87B149F82EA."
+                + "7A83031734CB1EDCE06766B6228842F954927960"
+                + "&key=ik0", 640, 360, PLAY_TIME_MS);
     }
 
     public void testAvcHigh31() throws Exception {
@@ -95,11 +95,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=22&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
-                + "&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&signature=42969CA8F7FFAE432B7135BC811F96F7C4172C3F."
-                + "1A8A92EA714C1B7C98A05DDF2DE90854CDD7638B"
-                + "&key=test_key1", 1280, 720, PLAY_TIME_MS);
-
+                + "&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&signature=179525311196616BD8E1381759B0E5F81A9E91B5."
+                + "C4A50E44059FEBCC6BBC78E3B3A4E0E0065777"
+                + "&key=ik0", 1280, 720, PLAY_TIME_MS);
     }
 
     public void testAvcHigh40() throws Exception {
@@ -118,10 +117,10 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=137&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
-                + "&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&signature=2C836E04C4DDC98649CD44C8B91813D98342D1D1."
-                + "870A848D54CA08C197E5FDC34ED45E6ED7DB5CDA"
-                + "&key=test_key1", 1920, 1080, PLAY_TIME_MS);
+                + "&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&signature=B0976085596DD42DEA3F08307F76587241CB132B."
+                + "043B719C039E8B92F45391ADC0BE3665E2332930"
+                + "&key=ik0", 1920, 1080, PLAY_TIME_MS);
     }
 
     public void testHevcMain1() throws Exception {
