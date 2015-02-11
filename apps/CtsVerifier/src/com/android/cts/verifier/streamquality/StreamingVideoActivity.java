@@ -138,7 +138,7 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
                 "http://redirector.c.play.google.com/"
                 + "videoplayback?id=271de9756065677e"
                 + "&itag=18&ip=0.0.0.0&ipbits=0&expire=19000000000"
-                + "&sparams=ip,ipbits,expire,ip,id,itag"
+                + "&sparams=ip,ipbits,expire,id,itag"
                 + "&signature=75627CD4CEA73D7868CBDE3CE5C4011955164107"
                 + ".1DCFB0EF1372B48DDCFBE69645FE137AC02AF561"
                 + "&source=youtube"
