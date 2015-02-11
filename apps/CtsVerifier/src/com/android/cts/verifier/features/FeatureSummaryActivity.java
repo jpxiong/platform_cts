@@ -221,7 +221,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_VERIFIED_BOOT, false),
 
             // Features explicitly made optional in L
-            new Feature("PackageManager.FEATURE_LOCATION_NETWORK", false),
+            new Feature(PackageManager.FEATURE_LOCATION_NETWORK, false),
 
             // New hidden features in L
             new Feature("android.hardware.ethernet", false),
