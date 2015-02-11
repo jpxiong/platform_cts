@@ -46,11 +46,6 @@ public class DrawActivity extends Activity {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
         mHandler = new RenderSpecHandler();
         int uiMode = getResources().getConfiguration().uiMode;
-        mOnWatch = (uiMode & Configuration.UI_MODE_TYPE_WATCH) == Configuration.UI_MODE_TYPE_WATCH;
-    }
-
-    public boolean getOnWatch() {
-        return mOnWatch;
     }
 
     public void enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
