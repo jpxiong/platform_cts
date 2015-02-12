@@ -15,7 +15,6 @@
  */
 package android.webkit.cts;
 
-import libcore.io.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -44,6 +43,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -947,7 +947,7 @@ public class CtsTestServer {
          * for the result.
          */
         private static KeyManager[] getKeyManagers() throws Exception {
-            byte[] bytes = Base64.decode(SERVER_KEYS_BKS.getBytes());
+            byte[] bytes = Base64.decode(SERVER_KEYS_BKS.getBytes(), Base64.DEFAULT);
             InputStream inputStream = new ByteArrayInputStream(bytes);
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
