@@ -49,6 +49,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             Log.i(TAG, "AvcBaseline12 not supported");
             return;  // TODO: Can we make this mandatory?
         }
+
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=160&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
