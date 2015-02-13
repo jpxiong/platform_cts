@@ -44,7 +44,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         super.setUp();
 
         // We need multi user to be supported in order to create a profile of the user owner.
-        mHasFeature = mHasFeature && (getMaxNumberOfUsersSupported() > 1);
+        mHasFeature = mHasFeature && (getMaxNumberOfUsersSupported() > 1) && hasDeviceFeature(
+                "android.software.managed_users");
 
         if (mHasFeature) {
             mUserId = createManagedProfile();
