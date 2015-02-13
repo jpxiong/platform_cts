@@ -19,12 +19,11 @@
 CTS_DEQP_CONFIG_PATH := $(call my-dir)
 
 cts_library_xml := $(CTS_TESTCASES_OUT)/com.drawelements.deqp.$(DEQP_API).xml
-
 $(cts_library_xml): MUSTPASS_XML_FILE := external/deqp/android/cts/com.drawelements.deqp.$(DEQP_API).xml
 $(cts_library_xml): PRIVATE_TEST_NAME := $(DEQP_TEST_NAME)
 $(cts_library_xml): PRIVATE_TEST_PACKAGE := com.drawelements.deqp.$(DEQP_API)
 $(cts_library_xml): PRIVATE_DUMMY_CASELIST := $(CTS_DEQP_CONFIG_PATH)/deqp_dummy_test_list
-$(cts_library_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/package.apk external/deqp/android/cts/com.drawelements.deqp.$(DEQP_API).xml $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_XML_GENERATOR)
+$(cts_library_xml): external/deqp/android/cts/com.drawelements.deqp.$(DEQP_API).xml $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for $(PRIVATE_TEST_NAME)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	

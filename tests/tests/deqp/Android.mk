@@ -24,3 +24,9 @@ LOCAL_PACKAGE_NAME := com.drawelements.deqp
 include $(LOCAL_PATH)/deqp_gles2.mk
 include $(LOCAL_PATH)/deqp_gles3.mk
 include $(LOCAL_PATH)/deqp_gles31.mk
+
+# Make the deqp app and copy it to CTS out dir.
+cts_deqp_name := com.drawelements.deqp
+cts_deqp_apk := $(CTS_TESTCASES_OUT)/$(cts_deqp_name).apk
+$(cts_deqp_apk): $(call intermediates-dir-for,APPS,$(cts_deqp_name))/package.apk
+	$(call copy-file-to-target)

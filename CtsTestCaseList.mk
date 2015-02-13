@@ -219,14 +219,8 @@ CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
     $(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
     $(call cts-get-ui-lib-paths,$(cts_device_jars)) \
     $(call cts-get-ui-lib-paths,$(cts_target_junit_tests)) \
-    $(call cts-get-executable-paths,$(cts_device_executables))
-
-# NOTE: If compiling on a 64 bit target, TARGET_2ND_ARCH will be non-empty
-# and will cause the function to expand to the secondary arch object
-# directory. If compiling on a 32 bit target, TARGET_2ND_ARCH will be
-# empty and will cause the function to expand to the primary arch object
-# directory.
-CTS_TEST_CASES += $(call cts-get-native-paths,$(cts_native_tests),32,$(TARGET_2ND_ARCH))
+    $(call cts-get-executable-paths,$(cts_device_executables)) \
+    $(call cts-get-native-paths,$(cts_native_tests),32)
 
 ifeq ($(TARGET_IS_64_BIT),true)
 CTS_TEST_CASES += $(call cts-get-native-paths,$(cts_native_tests),64)

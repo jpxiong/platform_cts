@@ -59,6 +59,7 @@ public class DeviceInfoCollector {
         File apkFile = new File(testApkDir, String.format("%s.apk", APK_NAME));
         if (!apkFile.exists()) {
             Log.e(LOG_TAG, String.format("Could not find %s", apkFile.getAbsolutePath()));
+            return;
         }
         // collect the instrumentation bundle results using instrumentation test
         // should work even though no tests will actually be run
