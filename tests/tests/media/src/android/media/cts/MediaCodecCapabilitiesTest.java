@@ -153,6 +153,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         if (!checkDecoder(MIMETYPE_VIDEO_AVC, AVCProfileBaseline, AVCLevel12)) {
             return; // skip
         }
+
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
                 + "&itag=160&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
