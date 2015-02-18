@@ -54,8 +54,6 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     protected static final String ADMIN_RECEIVER_TEST_CLASS =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
-    private static final String RUNNER = "android.test.InstrumentationTestRunner";
-
     private CtsBuildHelper mCtsBuild;
 
     private HashSet<String> mAvailableFeatures;
