@@ -116,8 +116,8 @@ public class PlanCreator {
     public ITestPlan createDerivedPlan(CtsBuildHelper build, Set<String> abis)
             throws ConfigurationException {
         checkFields(build);
-        ITestPackageRepo pkgDefRepo = new TestPackageRepo(build.getTestCasesDir(),
-                abis, mIncludeKnownFailures);
+        ITestPackageRepo pkgDefRepo =
+                new TestPackageRepo(build.getTestCasesDir(), mIncludeKnownFailures);
         ITestPlan derivedPlan = new TestPlan(mPlanName, abis);
         for (TestPackageResult pkg : mResult.getPackages()) {
             Collection<TestIdentifier> filteredTests = pkg.getTestsWithStatus(mResultFilter);

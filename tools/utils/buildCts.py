@@ -208,6 +208,7 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'android\.media$')
+    plan.Include(r'android\.view$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
@@ -242,23 +243,12 @@ class CtsBuilder(object):
       plan.Exclude(package+'$')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
+    plan.Exclude(r'android\.view$')
     plan.Exclude(r'android\.mediastress$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
-
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    plan.Include(r'android\.core\.tests\.libcore\.')
-    plan.Include(r'android\.jdwp')
-    for package, test_list in small_tests.iteritems():
-      plan.Exclude(package+'$')
-    for package, test_list in medium_tests.iteritems():
-      plan.Exclude(package+'$')
-    for package, tests_list in new_test_packages.iteritems():
-      plan.Exclude(package+'$')
-    self.__WritePlan(plan, 'CTS-ART')
 
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
@@ -342,7 +332,6 @@ def BuildAospSmallSizeTestList():
       'android.theme' : [],
       'android.usb' : [],
       'android.util' : [],
-      'android.view' : [],
       'com.android.cts.dram' : [],
       'com.android.cts.filesystemperf' : [],
       'com.android.cts.jank' : [],
@@ -356,6 +345,7 @@ def BuildAospSmallSizeTestList():
 def BuildCtsVettedNewPackagesList():
   """ Construct a defaultdict that maps package names that is vetted for L. """
   return {
+      'android.JobScheduler' : [],
       'android.core.tests.libcore.package.harmony_annotation' : [],
       'android.core.tests.libcore.package.harmony_beans' : [],
       'android.core.tests.libcore.package.harmony_java_io' : [],
@@ -382,6 +372,7 @@ def BuildCtsVettedNewPackagesList():
       'android.uiautomation' : [],
       'android.uirendering' : [],
       'android.webgl' : [],
+      'com.drawelements.deqp.gles3' : [],
       'com.drawelements.deqp.gles31' : []}
 
 def BuildCtsFlakyTestList():

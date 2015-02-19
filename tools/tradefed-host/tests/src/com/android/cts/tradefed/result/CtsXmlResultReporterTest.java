@@ -22,6 +22,8 @@ import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.log.LogUtil.CLog;
+import com.android.tradefed.result.LogDataType;
+import com.android.tradefed.result.LogFile;
 import com.android.tradefed.result.TestSummary;
 import com.android.tradefed.result.XmlResultReporter;
 import com.android.tradefed.util.FileUtil;
@@ -162,6 +164,8 @@ public class CtsXmlResultReporterTest extends TestCase {
         mResultReporter.testFailed(testId, trace);
         mResultReporter.testEnded(testId, emptyMap);
         mResultReporter.testRunEnded(3, emptyMap);
+        mResultReporter.testLogSaved("logcat-foo-bar", LogDataType.TEXT, null,
+                new LogFile("path", "url"));
         mResultReporter.invocationEnded(1);
         String output = getOutput();
         // TODO: consider doing xml based compare
@@ -171,6 +175,37 @@ public class CtsXmlResultReporterTest extends TestCase {
                 "<FailedScene message=\"this is a trace&#10;more trace\">     " +
                 "<StackTrace>this is a tracemore traceyet more trace</StackTrace>";
         assertTrue(output.contains(failureTag));
+
+        // Check that no TestLog tags were added, because the flag wasn't enabled.
+        final String testLogTag = String.format("<TestLog type=\"logcat\" url=\"url\" />");
+        assertFalse(output, output.contains(testLogTag));
+    }
+
+    /**
+     * Test that flips the include-test-log-tags flag and checks that logs are written to the XML.
+     */
+    public void testIncludeTestLogTags() {
+        Map<String, String> emptyMap = Collections.emptyMap();
+        final TestIdentifier testId = new TestIdentifier("FooTest", "testFoo");
+        final String trace = "this is a trace\nmore trace\nyet more trace";
+
+        // Include TestLogTags in the XML.
+        mResultReporter.setIncludeTestLogTags(true);
+
+        mResultReporter.invocationStarted(mMockBuild);
+        mResultReporter.testRunStarted(AbiUtils.createId(UnitTests.ABI.getName(), "run"), 1);
+        mResultReporter.testStarted(testId);
+        mResultReporter.testFailed(testId, trace);
+        mResultReporter.testEnded(testId, emptyMap);
+        mResultReporter.testRunEnded(3, emptyMap);
+        mResultReporter.testLogSaved("logcat-foo-bar", LogDataType.TEXT, null,
+                new LogFile("path", "url"));
+        mResultReporter.invocationEnded(1);
+
+        // Check for TestLog tags because the flag was enabled via setIncludeTestLogTags.
+        final String output = getOutput();
+        final String testLogTag = String.format("<TestLog type=\"logcat\" url=\"url\" />");
+        assertTrue(output, output.contains(testLogTag));
     }
 
     public void testDeviceSetup() {

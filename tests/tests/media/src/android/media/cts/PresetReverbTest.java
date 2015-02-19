@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class PresetReverbTest extends AndroidTestCase {
+public class PresetReverbTest extends PostProcTestBase {
 
     private String TAG = "PresetReverbTest";
     private final static short FIRST_PRESET = PresetReverb.PRESET_NONE;
@@ -33,13 +33,6 @@ public class PresetReverbTest extends AndroidTestCase {
 
     private PresetReverb mReverb = null;
     private PresetReverb mReverb2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
@@ -52,10 +45,12 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         PresetReverb reverb = null;
         try {
             reverb = new PresetReverb(0, 0);
-            assertNotNull("could not create PresetReverb", reverb);
             try {
                 assertTrue("invalid effect ID", (reverb.getId() != 0));
             } catch (IllegalStateException e) {
@@ -78,6 +73,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 1.0: test presets
     public void test1_0Presets() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             for (short preset = FIRST_PRESET;
@@ -99,6 +97,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 1.1: test properties
     public void test1_1Properties() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             PresetReverb.Settings settings = mReverb.getProperties();
@@ -127,6 +128,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             mReverb.setEnabled(true);
@@ -142,6 +146,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         mReverb.release();
         try {
@@ -159,6 +166,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
          synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -181,6 +191,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
          synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -205,6 +218,9 @@ public class PresetReverbTest extends AndroidTestCase {
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
+        if (!isPresetReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -377,5 +393,4 @@ public class PresetReverbTest extends AndroidTestCase {
             mReverb2 = null;
         }
     }
-
 }

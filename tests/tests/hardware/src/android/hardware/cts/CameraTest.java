@@ -1859,6 +1859,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
         initializeMessageLooper(cameraId);
 
         // Test if the parameters exists and minimum fps <= maximum fps.
+        final int INTERVAL_ERROR_THRESHOLD = 10;
         int[] defaultFps = new int[2];
         Parameters parameters = mCamera.getParameters();
         parameters.getPreviewFpsRange(defaultFps);
@@ -1919,6 +1920,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
             // See if any frame duration violations occurred during preview run
             AssertionFailedError e = callback.getDurationException();
             if (e != null) throw(e);
+            int numIntervalError = callback.getNumIntervalError();
+            if (numIntervalError > INTERVAL_ERROR_THRESHOLD) {
+                fail(String.format(
+                        "Too many preview callback frame intervals out of bounds: " +
+                                "Count is %d, limit is %d",
+                        numIntervalError, INTERVAL_ERROR_THRESHOLD));
+            }
         }
 
         // Test the invalid fps cases.
@@ -1948,6 +1956,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
         private ArrayList<Long> mFrames = new ArrayList<Long>();
         private long firstFrameArrivalTime;
         private AssertionFailedError mDurationException = null;
+        private int numIntervalError;
 
         public void reset(double minFps, double maxFps) {
             this.mMinFps = minFps;
@@ -1960,6 +1969,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
             mFrames.clear();
             firstFrameArrivalTime = 0;
             mDurationException = null;
+            numIntervalError = 0;
         }
 
         // This method tests if the actual fps is between minimum and maximum.
@@ -1997,18 +2007,15 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
                 long lastArrivalTime = mFrames.get(mFrames.size() - 1);
                 double interval = arrivalTime - lastArrivalTime;
                 if (VERBOSE) Log.v(TAG, "Frame interval=" + interval);
-                try {
-                    assertTrue("Frame interval (" + interval + "ms) is too " +
-                            "large. mMaxFrameInterval=" +
-                             mMaxFrameInterval + "ms",
-                            interval < mMaxFrameInterval *
-                            (1.0 + intervalMargin));
-                    assertTrue("Frame interval (" + interval + "ms) is too " +
-                            "small. mMinFrameInterval=" +
-                            mMinFrameInterval + "ms",
-                            interval > mMinFrameInterval *
-                            (1.0 - intervalMargin));
 
+                try {
+                    if (interval > mMaxFrameInterval * (1.0 + intervalMargin) ||
+                            interval < mMinFrameInterval * (1.0 - intervalMargin)) {
+                        Log.i(TAG, "Bad frame interval=" + interval + "ms. Out out range " +
+                                mMinFrameInterval * (1.0 - intervalMargin) + "/" +
+                                mMaxFrameInterval * (1.0 + intervalMargin));
+                        numIntervalError++;
+                    }
                     // Check if the fps is within range.
                     double fpsMargin = 0.5; // x100 = percent
                     double avgInterval = (double)(arrivalTime - mFrames.get(0))
@@ -2034,6 +2041,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
 
         public AssertionFailedError getDurationException() {
             return mDurationException;
+        }
+        public int getNumIntervalError() {
+            return numIntervalError;
         }
     }
 

@@ -24,9 +24,7 @@ import com.android.tradefed.result.ResultForwarder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -134,5 +132,10 @@ class ResultFilter extends ResultForwarder {
             super.testStarted(test);
         }
         super.testRunEnded(0, new HashMap<String, String>());
+    }
+
+    /** @return the number of known tests */
+    public int getKnownTestCount() {
+        return mKnownTests.size();
     }
 }

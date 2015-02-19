@@ -55,3 +55,6 @@ $(cts_library_xml): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_MODULE))
 						-b $(CTS_UNSUPPORTED_ABIS) \
 						-a $(CTS_TARGET_ARCH) \
 						-o $@
+
+# Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
+$(my_register_name) : $(cts_library_jar) $(cts_library_xml)

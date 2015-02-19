@@ -70,6 +70,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
     private int mPreviewTexWidth;
     private int mPreviewTexHeight;
     private int mPreviewRotation;
+    private int mVideoRotation;
 
     private VideoView mPlaybackView;
 
@@ -162,7 +163,10 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         // Step 5: set preview output
         // This is not necessary since preview has been taken care of
 
-        // Step 6: prepare configured MediaRecorder
+        // Step 6: set orientation hint
+        mMediaRecorder.setOrientationHint(mVideoRotation);
+
+        // Step 7: prepare configured MediaRecorder
         try {
             mMediaRecorder.prepare();
         } catch (IOException e) {
@@ -644,10 +648,11 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
 
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            mPreviewRotation = (info.orientation + degrees) % 360;
-            mPreviewRotation = (360 - mPreviewRotation) % 360;  // compensate the mirror
+            mVideoRotation = (info.orientation + degrees) % 360;
+            mPreviewRotation = (360 - mVideoRotation) % 360;  // compensate the mirror
         } else {  // back-facing
-            mPreviewRotation = (info.orientation - degrees + 360) % 360;
+            mVideoRotation = (info.orientation - degrees + 360) % 360;
+            mPreviewRotation = mVideoRotation;
         }
         if (mPreviewRotation != 0 && mPreviewRotation != 180) {
             Log.w(TAG,

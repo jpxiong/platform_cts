@@ -35,7 +35,6 @@ public class RSColorMatrixTest extends RSCppTest {
     public void testRSColorMatrix0() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251107, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -66,18 +65,16 @@ public class RSColorMatrixTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 0);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
-
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
     }
 
     public void testRSColorMatrix1() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251106, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -98,18 +95,17 @@ public class RSColorMatrixTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 1);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
 
     }
 
     public void testRSColorMatrix2() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251105, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -134,18 +130,17 @@ public class RSColorMatrixTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 2);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
 
     }
 
     public void testRSColorMatrix3() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251104, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -166,18 +161,17 @@ public class RSColorMatrixTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 3);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
 
     }
 
     public void testRSColorMatrix4() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251103, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y * 4];
         for (int i = 0; i < X * Y * 4; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -198,11 +192,11 @@ public class RSColorMatrixTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
         colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 4);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
 
     }
 

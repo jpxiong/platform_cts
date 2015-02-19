@@ -53,6 +53,8 @@ public class BleAdvertiserService extends Service {
     public static final int COMMAND_START_UNSCANNABLE = 6;
     public static final int COMMAND_STOP_UNSCANNABLE = 7;
 
+    public static final String BLE_ADV_NOT_SUPPORT =
+            "com.android.cts.verifier.bluetooth.BLE_ADV_NOT_SUPPORT";
     public static final String BLE_START_ADVERTISE =
             "com.android.cts.verifier.bluetooth.BLE_START_ADVERTISE";
     public static final String BLE_STOP_ADVERTISE =
@@ -147,11 +149,15 @@ public class BleAdvertiserService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (mAdvertiser != null) {
-            mAdvertiser.stopAdvertising(mCallback);
+            stopAdvertiser();
         }
     }
 
     private void stopAdvertiser() {
+        if (mAdvertiser == null) {
+            mAdvertiserStatus = 0;
+            return;
+        }
         if ((mAdvertiserStatus & (1 << COMMAND_START_ADVERTISE)) > 0) {
             mAdvertiser.stopAdvertising(mCallback);
         }
@@ -186,8 +192,12 @@ public class BleAdvertiserService extends Service {
     }
 
     private void handleIntent(Intent intent) {
-        if (mAdvertiser == null) {
-            showMessage("Multi advertising not supported on this device");
+        if (mBluetoothAdapter != null && !mBluetoothAdapter.isMultipleAdvertisementSupported()) {
+            showMessage("Multiple advertisement is not supported.");
+            sendBroadcast(new Intent(BLE_ADV_NOT_SUPPORT));
+            return;
+        } else if (mAdvertiser == null) {
+            showMessage("Cannot start advertising on this device.");
             return;
         }
         int command = intent.getIntExtra(EXTRA_COMMAND, -1);

@@ -16,7 +16,10 @@
 
 /* Original code copied from NDK Native-media sample code */
 
-#undef NDEBUG
+//#define LOG_NDEBUG 0
+#define TAG "NativeMedia"
+#include <log/log.h>
+
 #include <assert.h>
 #include <jni.h>
 #include <pthread.h>
@@ -26,13 +29,6 @@
 #include <semaphore.h>
 
 #include <android/native_window_jni.h>
-
-// for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
-#include <android/log.h>
-#define TAG "NativeMedia"
-#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
-#define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 
 #include "ndk/NdkMediaExtractor.h"
 #include "ndk/NdkMediaCodec.h"
@@ -592,14 +588,14 @@ extern "C" jboolean Java_android_media_cts_NativeDecoderTest_testPsshNative(JNIE
         return false;
     }
 
-    ALOGI("pssh has %u entries", info->numentries);
+    ALOGI("pssh has %zd entries", info->numentries);
     if (info->numentries != 2) {
         return false;
     }
 
     for (size_t i = 0; i < info->numentries; i++) {
         PsshEntry *entry = &info->entries[i];
-        ALOGI("entry uuid %02x%02x..%02x%02x, data size %u",
+        ALOGI("entry uuid %02x%02x..%02x%02x, data size %zd",
                 entry->uuid[0],
                 entry->uuid[1],
                 entry->uuid[14],

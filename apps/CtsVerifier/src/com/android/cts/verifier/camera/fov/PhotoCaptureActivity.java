@@ -77,6 +77,8 @@ public class PhotoCaptureActivity extends Activity
     private int mResolutionSpinnerIndex = -1;
     private WakeLock mWakeLock;
     private long shutterStartTime;
+    private int mPreviewOrientation;
+    private int mJpegOrientation;
 
     private ArrayList<Integer> mPreviewSizeCamerasToProcess = new ArrayList<Integer>();
 
@@ -171,7 +173,7 @@ public class PhotoCaptureActivity extends Activity
                     mReportedFovPrePictureTaken = mCamera.getParameters().getHorizontalViewAngle();
 
                     mResolutionSpinnerIndex = position;
-                    initializeCamera();
+                    startPreview();
                 }
             }
 
@@ -395,6 +397,10 @@ public class PhotoCaptureActivity extends Activity
     }
 
     private void initializeCamera() {
+        initializeCamera(true);
+    }
+
+    private void initializeCamera(boolean startPreviewAfterInit) {
         if (mCamera == null || mSurfaceHolder.getSurface() == null) {
             return;
         }
@@ -406,6 +412,8 @@ public class PhotoCaptureActivity extends Activity
             Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
+
+        calculateOrientations(this, mSelectedResolution.cameraId, mCamera);
         Camera.Parameters params = setCameraParams(mCamera);
 
         // Either use chosen preview size for current camera or automatically
@@ -417,18 +425,21 @@ public class PhotoCaptureActivity extends Activity
             mCamera.setParameters(params);
             mCameraInitialized = true;
         }
-        startPreview();
+
+        if (startPreviewAfterInit) {
+          startPreview();
+        }
     }
 
     private void startPreview() {
         if (mCameraInitialized && mCamera != null) {
-            setCameraDisplayOrientation(this, mSelectedResolution.cameraId, mCamera);
+            mCamera.setDisplayOrientation(mPreviewOrientation);
             mCamera.startPreview();
             mPreviewActive = true;
         }
     }
 
-    private void switchToCamera(SelectableResolution resolution, boolean initializeCamera) {
+    private void switchToCamera(SelectableResolution resolution, boolean startPreview) {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
@@ -437,9 +448,7 @@ public class PhotoCaptureActivity extends Activity
         mSelectedResolution = resolution;
         mCamera = Camera.open(mSelectedResolution.cameraId);
 
-        if (initializeCamera){
-          initializeCamera();
-        }
+        initializeCamera(startPreview);
     }
 
     /**
@@ -474,6 +483,7 @@ public class PhotoCaptureActivity extends Activity
         Camera.Parameters params = camera.getParameters();
         params.setJpegThumbnailSize(0, 0);
         params.setJpegQuality(100);
+        params.setRotation(mJpegOrientation);
         params.setFocusMode(getFocusMode(camera));
         params.setZoom(0);
         params.setPictureSize(mSelectedResolution.width, mSelectedResolution.height);
@@ -501,7 +511,7 @@ public class PhotoCaptureActivity extends Activity
         return result;
     }
 
-    public static void setCameraDisplayOrientation(Activity activity,
+    private void calculateOrientations(Activity activity,
             int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
@@ -516,13 +526,12 @@ public class PhotoCaptureActivity extends Activity
             case Surface.ROTATION_270: degrees = 270; break;
         }
 
-        int result;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
+            mJpegOrientation = (info.orientation + degrees) % 360;
+            mPreviewOrientation = (360 - mJpegOrientation) % 360;  // compensate the mirror
         } else {  // back-facing
-            result = (info.orientation - degrees + 360) % 360;
+            mJpegOrientation = (info.orientation - degrees + 360) % 360;
+            mPreviewOrientation = mJpegOrientation;
         }
-        camera.setDisplayOrientation(result);
     }
 }

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for accessing test plan data.
@@ -40,6 +41,11 @@ public interface ITestPlan {
      * Gets a sorted list of test ids contained in this plan.
      */
     public Collection<String> getTestIds();
+
+    /**
+     * Gets a sorted {@link List} of test names contained in this plan.
+     */
+    public List<String> getTestNames();
 
     /**
      * Gets the {@link TestFilter} that should be used to filter tests from given package.

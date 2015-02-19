@@ -169,6 +169,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     };
 
     public static final Feature[] ALL_JELLY_BEAN_FEATURES = {
+            // Required features in prior releases that became optional
+            new Feature(PackageManager.FEATURE_FAKETOUCH, false),
+
+            //new feature in JB
             new Feature(PackageManager.FEATURE_TELEVISION, false),
     };
 
@@ -190,13 +194,40 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_KITKAT_WATCH_FEATURES = {
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE, false),
+            new Feature(PackageManager.FEATURE_BACKUP, false),
+            new Feature(PackageManager.FEATURE_PRINTING, false),
+            new Feature(PackageManager.FEATURE_WATCH, false),
+            new Feature(PackageManager.FEATURE_WEBVIEW, false),
+            new Feature(PackageManager.FEATURE_CAMERA_EXTERNAL, false),
     };
 
-    public static final Feature[] ALL_LMP_FEATURES = {
+    public static final Feature[] ALL_LOLLIPOP_FEATURES = {
+            // New features in L
+            new Feature(PackageManager.FEATURE_AUDIO_OUTPUT, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_MANUAL_POST_PROCESSING, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_MANUAL_SENSOR, false),
+            new Feature(PackageManager.FEATURE_CAMERA_CAPABILITY_RAW, false),
+            new Feature(PackageManager.FEATURE_CAMERA_LEVEL_FULL, false),
+            new Feature(PackageManager.FEATURE_CONNECTION_SERVICE, false),
+            new Feature(PackageManager.FEATURE_GAMEPAD, false),
+            new Feature(PackageManager.FEATURE_LEANBACK, false),
+            new Feature(PackageManager.FEATURE_LIVE_TV, false),
+            new Feature(PackageManager.FEATURE_MANAGED_USERS, false),
+            new Feature(PackageManager.FEATURE_OPENGLES_EXTENSION_PACK, false),
+            new Feature(PackageManager.FEATURE_SECURELY_REMOVES_USERS, false),
+            new Feature(PackageManager.FEATURE_SENSOR_AMBIENT_TEMPERATURE, false),
             new Feature(PackageManager.FEATURE_SENSOR_HEART_RATE_ECG, false),
+            new Feature(PackageManager.FEATURE_SENSOR_RELATIVE_HUMIDITY, false),
+            new Feature(PackageManager.FEATURE_VERIFIED_BOOT, false),
+
+            // Features explicitly made optional in L
+            new Feature(PackageManager.FEATURE_LOCATION_NETWORK, false),
+
+            // New hidden features in L
             new Feature("android.hardware.ethernet", false),
-            new Feature("android.software.backup", false),
-            new Feature("android.software.print", false),
+            new Feature("android.hardware.hdmi.cec", false),
+            new Feature("android.software.leanback_only", false),
+            new Feature("android.software.voice_recognizers", false),
     };
 
     @Override
@@ -210,6 +241,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         // features
         boolean hasWifi = false;
         boolean hasTelephony = false;
+        boolean hasBluetooth = false;
         boolean hasIllegalFeature = false;
 
         // get list of all features device thinks it has, & store in a HashMap
@@ -230,7 +262,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
         if (apiVersion >= Build.VERSION_CODES.LOLLIPOP) {
-            Collections.addAll(features, ALL_LMP_FEATURES);
+            Collections.addAll(features, ALL_LOLLIPOP_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.KITKAT_WATCH) {
             Collections.addAll(features, ALL_KITKAT_WATCH_FEATURES);
@@ -276,6 +308,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
                 // device reports it -- yay! set the happy icon
                 hasWifi = hasWifi || PackageManager.FEATURE_WIFI.equals(f.name);
                 hasTelephony = hasTelephony || PackageManager.FEATURE_TELEPHONY.equals(f.name);
+                hasBluetooth = hasBluetooth || PackageManager.FEATURE_BLUETOOTH.equals(f.name);
                 statusIcon = R.drawable.fs_good;
                 actualFeatures.remove(f.name);
             } else if (!present && f.required) {
@@ -360,9 +393,11 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         if (hasIllegalFeature) {
             sb.append(getResources().getString(R.string.fs_disallowed)).append("\n");
         }
-        if (!hasWifi && !hasTelephony) {
+
+        if (!hasWifi && !hasTelephony && !hasBluetooth) {
             sb.append(getResources().getString(R.string.fs_missing_wifi_telephony)).append("\n");
         }
+
         String warnings = sb.toString().trim();
         if (warnings == null || "".equals(warnings)) {
             ((TextView) (findViewById(R.id.fs_warnings))).setVisibility(View.GONE);

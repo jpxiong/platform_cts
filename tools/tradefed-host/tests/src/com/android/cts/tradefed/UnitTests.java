@@ -21,6 +21,7 @@ import com.android.cts.tradefed.result.TestPackageResultTest;
 import com.android.cts.tradefed.result.TestResultsTest;
 import com.android.cts.tradefed.result.TestSummaryXmlTest;
 import com.android.cts.tradefed.result.TestTest;
+import com.android.cts.tradefed.result.TestLogTest;
 import com.android.cts.tradefed.testtype.Abi;
 import com.android.cts.tradefed.testtype.CtsTestTest;
 import com.android.cts.tradefed.testtype.DeqpTestRunnerTest;
@@ -55,6 +56,7 @@ public class UnitTests extends TestSuite {
         addTestSuite(TestResultsTest.class);
         addTestSuite(TestSummaryXmlTest.class);
         addTestSuite(TestTest.class);
+        addTestSuite(TestLogTest.class);
 
         // testtype package
         addTestSuite(CtsTestTest.class);

@@ -22,12 +22,14 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,13 @@ import java.util.Map;
  *             <meta-data android:name="test_excluded_features" android:value="android.hardware.type.television" />
  *         </pre>
  *     </li>
+ *     <li>OPTIONAL: Add a meta data attribute to indicate features such that, if any present,
+ *         the test is applicable to run. If the device has any of the applicable features then
+ *         the test will appear in the test list. Use a colon (:) to specify multiple features
+ *         <pre>
+ *             <meta-data android:name="test_applicable_features" android:value="android.hardware.sensor.compass" />
+ *         </pre>
+ *     </li>
  *
  * </ol>
  */
@@ -88,14 +97,26 @@ public class ManifestTestListAdapter extends TestListAdapter {
 
     private static final String TEST_EXCLUDED_FEATURES_META_DATA = "test_excluded_features";
 
+    private static final String TEST_APPLICABLE_FEATURES_META_DATA = "test_applicable_features";
+
+    private final HashSet<String> mDisabledTests;
+
     private Context mContext;
 
     private String mTestParent;
 
-    public ManifestTestListAdapter(Context context, String testParent) {
+    public ManifestTestListAdapter(Context context, String testParent, String[] disabledTestArray) {
         super(context);
         mContext = context;
         mTestParent = testParent;
+        mDisabledTests = new HashSet<>(disabledTestArray.length);
+        for (int i = 0; i < disabledTestArray.length; i++) {
+            mDisabledTests.add(disabledTestArray[i]);
+        }
+    }
+
+    public ManifestTestListAdapter(Context context, String testParent) {
+        this(context, testParent, context.getResources().getStringArray(R.array.disabled_tests));
     }
 
     @Override
@@ -158,13 +179,18 @@ public class ManifestTestListAdapter extends TestListAdapter {
         int size = list.size();
         for (int i = 0; i < size; i++) {
             ResolveInfo info = list.get(i);
+            if (info.activityInfo == null || mDisabledTests.contains(info.activityInfo.name)) {
+                Log.w("CtsVerifier", "ignoring disabled test: " + info.activityInfo.name);
+                continue;
+            }
             String title = getTitle(mContext, info.activityInfo);
             String testName = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);
             String[] requiredFeatures = getRequiredFeatures(info.activityInfo.metaData);
             String[] excludedFeatures = getExcludedFeatures(info.activityInfo.metaData);
-            TestListItem item = TestListItem.newTest(title, testName, intent,
-                                                     requiredFeatures, excludedFeatures);
+            String[] applicableFeatures = getApplicableFeatures(info.activityInfo.metaData);
+            TestListItem item = TestListItem.newTest(title, testName, intent, requiredFeatures,
+                    excludedFeatures, applicableFeatures);
 
             String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
             addTestToCategory(testsByCategory, testCategory, item);
@@ -207,6 +233,19 @@ public class ManifestTestListAdapter extends TestListAdapter {
             return null;
         } else {
             String value = metaData.getString(TEST_EXCLUDED_FEATURES_META_DATA);
+            if (value == null) {
+                return null;
+            } else {
+                return value.split(":");
+            }
+        }
+    }
+
+    static String[] getApplicableFeatures(Bundle metaData) {
+        if (metaData == null) {
+            return null;
+        } else {
+            String value = metaData.getString(TEST_APPLICABLE_FEATURES_META_DATA);
             if (value == null) {
                 return null;
             } else {
@@ -268,10 +307,10 @@ public class ManifestTestListAdapter extends TestListAdapter {
     List<TestListItem> filterTests(List<TestListItem> tests) {
         List<TestListItem> filteredTests = new ArrayList<TestListItem>();
         for (TestListItem test : tests) {
-            String[] excludedFeatures = test.excludedFeatures;
-            String[] requiredFeatures = test.requiredFeatures;
-            if (!hasAnyFeature(excludedFeatures) && hasAllFeatures(requiredFeatures)) {
-                filteredTests.add(test);
+            if (!hasAnyFeature(test.excludedFeatures) && hasAllFeatures(test.requiredFeatures)) {
+                if (test.applicableFeatures == null || hasAnyFeature(test.applicableFeatures)) {
+                    filteredTests.add(test);
+                }
             }
         }
         return filteredTests;

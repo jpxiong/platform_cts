@@ -42,3 +42,6 @@ $(cts_library_xml): $(HOST_OUT_JAVA_LIBRARIES)/$(LOCAL_MODULE).jar $(CTS_EXPECTA
 						-b $(CTS_UNSUPPORTED_ABIS) \
 						-a $(CTS_TARGET_ARCH) \
 						-o $@
+
+# Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
+$(my_register_name) : $(cts_library_xml)

@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Implementation of {@link TestPlan}.
@@ -144,6 +145,18 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
         List<String> ids = new ArrayList<String>(mIdFilterMap.keySet());
         Collections.sort(ids);
         return ids;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getTestNames() {
+        TreeSet<String> testNameSet = new TreeSet<>();
+        for (String id : mIdFilterMap.keySet()) {
+            testNameSet.add(AbiUtils.parseTestName(id));
+        }
+        return new ArrayList<>(testNameSet);
     }
 
     /**

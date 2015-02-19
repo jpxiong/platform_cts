@@ -84,9 +84,10 @@ public final class BitmapDumper {
         int[] visualizerArray = differenceVisualizer.getDifferences(idealArray, testedArray);
         visualizerBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         visualizerBitmap.setPixels(visualizerArray, 0, width, 0, 0, width, height);
+        Bitmap croppedBitmap = Bitmap.createBitmap(testedBitmap, 0, 0, width, height);
 
         saveFile(className, testName, IDEAL_RENDERING_FILE_NAME, idealBitmap);
-        saveFile(className, testName, TESTED_RENDERING_FILE_NAME, testedBitmap);
+        saveFile(className, testName, TESTED_RENDERING_FILE_NAME, croppedBitmap);
         saveFile(className, testName, VISUALIZER_RENDERING_FILE_NAME, visualizerBitmap);
     }
 
@@ -98,9 +99,25 @@ public final class BitmapDumper {
         saveFile(className, testName, SINGULAR_FILE_NAME, bitmap);
     }
 
+    private static void logIfBitmapSolidColor(String bitmapName, Bitmap bitmap) {
+        int firstColor = bitmap.getPixel(0, 0);
+        for (int x = 0; x < bitmap.getWidth(); x++) {
+            for (int y = 0; y < bitmap.getHeight(); y++) {
+                if (bitmap.getPixel(x, y) != firstColor) {
+                    return;
+                }
+            }
+        }
+
+        Log.w(TAG, String.format("%s entire bitmap color is %x", bitmapName, firstColor));
+    }
+
     private static void saveFile(String className, String testName, String fileName, Bitmap bitmap) {
-        Log.d(TAG, "Saving file : " + testName + "_" + fileName + " in directory : " + className);
-        File file = new File(CAPTURE_SUB_DIRECTORY + className, testName + "_" + fileName);
+        String bitmapName = testName + "_" + fileName;
+        Log.d(TAG, "Saving file : " + bitmapName + " in directory : " + className);
+        logIfBitmapSolidColor(bitmapName, bitmap);
+
+        File file = new File(CAPTURE_SUB_DIRECTORY + className, bitmapName);
         FileOutputStream fileStream = null;
         try {
             fileStream = new FileOutputStream(file);

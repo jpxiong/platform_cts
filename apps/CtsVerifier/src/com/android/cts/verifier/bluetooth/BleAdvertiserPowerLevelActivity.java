@@ -67,6 +67,7 @@ public class BleAdvertiserPowerLevelActivity extends PassFailButtons.Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BleAdvertiserService.BLE_START_POWER_LEVEL);
         filter.addAction(BleAdvertiserService.BLE_STOP_POWER_LEVEL);
+        filter.addAction(BleAdvertiserService.BLE_ADV_NOT_SUPPORT);
         registerReceiver(onBroadcast, filter);
     }
 
@@ -94,6 +95,10 @@ public class BleAdvertiserPowerLevelActivity extends PassFailButtons.Activity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    private void pass() {
+        this.setTestResultAndFinish(true);
+    }
+
     private BroadcastReceiver onBroadcast = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -103,6 +108,9 @@ public class BleAdvertiserPowerLevelActivity extends PassFailButtons.Activity {
                     break;
                 case BleAdvertiserService.BLE_STOP_POWER_LEVEL:
                     showMessage("Stop advertising");
+                    break;
+                case BleAdvertiserService.BLE_ADV_NOT_SUPPORT:
+                    pass();
                     break;
             }
         }

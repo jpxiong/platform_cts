@@ -24,7 +24,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class EnvReverbTest extends AndroidTestCase {
+public class EnvReverbTest extends PostProcTestBase {
 
     private String TAG = "EnvReverbTest";
     private final static int MILLIBEL_TOLERANCE = 100;            // +/-1dB
@@ -34,13 +34,6 @@ public class EnvReverbTest extends AndroidTestCase {
 
     private EnvironmentalReverb mReverb = null;
     private EnvironmentalReverb mReverb2 = null;
-    private int mSession = -1;
-    private boolean mHasControl = false;
-    private boolean mIsEnabled = false;
-    private int mChangedParameter = -1;
-    private boolean mInitialized = false;
-    private Looper mLooper = null;
-    private final Object mLock = new Object();
     private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
@@ -53,10 +46,12 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         EnvironmentalReverb envReverb = null;
          try {
             envReverb = new EnvironmentalReverb(0, 0);
-            assertNotNull("could not create EnvironmentalReverb", envReverb);
             try {
                 assertTrue("invalid effect ID", (envReverb.getId() != 0));
             } catch (IllegalStateException e) {
@@ -80,6 +75,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.0: test room level and room HF level
     public void test1_0Room() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             short level = mReverb.getRoomLevel();
@@ -111,6 +109,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.1: test decay time and ratio
     public void test1_1Decay() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             int time = mReverb.getDecayTime();
@@ -142,6 +143,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.2: test reverb level and delay
     public void test1_2Reverb() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             short level = mReverb.getReverbLevel();
@@ -175,6 +179,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.3: test early reflections level and delay
     public void test1_3Reflections() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
 // FIXME:uncomment actual test when early reflections are implemented in the reverb
@@ -213,6 +220,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.4: test diffusion and density
     public void test1_4DiffusionAndDensity() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             short ratio = mReverb.getDiffusion();
@@ -244,6 +254,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 1.5: test properties
     public void test1_5Properties() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             EnvironmentalReverb.Settings settings = mReverb.getProperties();
@@ -273,6 +286,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
     public void test2_0SetEnabledGetEnabled() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         try {
             mReverb.setEnabled(true);
@@ -288,6 +304,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 2.1: test setEnabled() throws exception after release
     public void test2_1SetEnabledAfterRelease() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         getReverb(0);
         mReverb.release();
         try {
@@ -306,6 +325,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mHasControl = true;
             mInitialized = false;
@@ -328,6 +350,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
          synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, true, false);
@@ -352,6 +377,9 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
+        if (!isEnvReverbAvailable()) {
+            return;
+        }
         synchronized(mLock) {
             mInitialized = false;
             createListenerLooper(false, false, true);
@@ -523,5 +551,4 @@ public class EnvReverbTest extends AndroidTestCase {
             mReverb2 = null;
         }
     }
-
 }

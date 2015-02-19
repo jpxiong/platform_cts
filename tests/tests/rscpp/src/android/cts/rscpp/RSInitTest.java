@@ -30,8 +30,8 @@ public class RSInitTest extends RSCppTest {
     native boolean initTest(String path);
     public void testRSInit() {
         for (int i = 0; i < 1000; i++) {
-            RenderScript mRS = RenderScript.create(getContext());
-            mRS.destroy();
+            RenderScript mRSt = RenderScript.create(getContext());
+            mRSt.destroy();
             Log.d("rscpptest", "Java iteration " + i);
         }
         assertTrue(initTest(this.getContext().getCacheDir().toString()));

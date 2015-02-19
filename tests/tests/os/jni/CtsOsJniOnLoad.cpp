@@ -25,6 +25,8 @@ extern int register_android_os_cts_TaggedPointer(JNIEnv*);
 
 extern int register_android_os_cts_OSFeatures(JNIEnv*);
 
+extern int register_android_os_cts_NoExecutePermissionTest(JNIEnv*);
+
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = NULL;
 
@@ -45,6 +47,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_os_cts_OSFeatures(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_os_cts_NoExecutePermissionTest(env)) {
         return JNI_ERR;
     }
 

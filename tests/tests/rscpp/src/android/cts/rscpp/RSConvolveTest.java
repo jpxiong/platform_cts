@@ -46,7 +46,6 @@ public class RSConvolveTest extends RSCppTest {
         coeffs[8] =  .5f;
 
         RSUtils.genRandom(0x1DEFFD0, 255, 1, -128, baseAlloc);
-        RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y];
         for (int i = 0; i < X * Y; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
@@ -65,12 +64,11 @@ public class RSConvolveTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y];
         convolveTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, true);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
-
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
     }
 
     public void testConvolve5x5() {
@@ -123,11 +121,11 @@ public class RSConvolveTest extends RSCppTest {
 
         byte[] nativeByteAlloc = new byte[X * Y];
         convolveTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, false);
-        rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y; i++) {
-            assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
-        }
+        Allocation rsCppOutput = Allocation.createTyped(mRS, build.create());
+        rsCppOutput.copyFromUnchecked(nativeByteAlloc);
+        mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
+        checkForErrors();
 
     }
 
