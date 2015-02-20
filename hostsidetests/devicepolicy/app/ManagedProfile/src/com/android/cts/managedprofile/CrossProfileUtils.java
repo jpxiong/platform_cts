@@ -40,8 +40,8 @@ public class CrossProfileUtils extends AndroidTestCase {
 
     private static String ACTION_COPY_TO_CLIPBOARD = "com.android.cts.action.COPY_TO_CLIPBOARD";
 
-    public void addParentCanAccessManagedFilters() {
-        removeAllFilters();
+    public void testAddParentCanAccessManagedFilters() {
+        testRemoveAllFilters();
 
         final DevicePolicyManager dpm = (DevicePolicyManager) getContext().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
@@ -49,8 +49,8 @@ public class CrossProfileUtils extends AndroidTestCase {
                 DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
     }
 
-    public void addManagedCanAccessParentFilters() {
-        removeAllFilters();
+    public void testAddManagedCanAccessParentFilters() {
+        testRemoveAllFilters();
 
         final DevicePolicyManager dpm = (DevicePolicyManager) getContext().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
@@ -67,20 +67,20 @@ public class CrossProfileUtils extends AndroidTestCase {
         return intentFilter;
     }
 
-    public void removeAllFilters() {
+    public void testRemoveAllFilters() {
         final DevicePolicyManager dpm = (DevicePolicyManager) getContext().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         dpm.clearCrossProfileIntentFilters(ADMIN_RECEIVER_COMPONENT);
     }
 
-    public void disallowCrossProfileCopyPaste() {
+    public void testDisallowCrossProfileCopyPaste() {
         DevicePolicyManager dpm = (DevicePolicyManager)
                getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
         dpm.addUserRestriction(ADMIN_RECEIVER_COMPONENT,
                 UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
     }
 
-    public void allowCrossProfileCopyPaste() {
+    public void testAllowCrossProfileCopyPaste() {
         DevicePolicyManager dpm = (DevicePolicyManager)
                getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
         dpm.clearUserRestriction(ADMIN_RECEIVER_COMPONENT,
