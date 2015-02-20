@@ -128,16 +128,16 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
 
         // Test from parent to managed
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "removeAllFilters", mUserId));
+                "testRemoveAllFilters", mUserId));
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "addManagedCanAccessParentFilters", mUserId));
+                "testAddManagedCanAccessParentFilters", mUserId));
         assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".ContentTest", 0));
 
         // Test from managed to parent
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "removeAllFilters", mUserId));
+                "testRemoveAllFilters", mUserId));
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "addParentCanAccessManagedFilters", mUserId));
+                "testAddParentCanAccessManagedFilters", mUserId));
         assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".ContentTest", mUserId));
 
     }
@@ -148,14 +148,14 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         }
 
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "allowCrossProfileCopyPaste", mUserId));
+                "testAllowCrossProfileCopyPaste", mUserId));
         // Test that managed can see what is copied in the parent.
         testCrossProfileCopyPasteInternal(mUserId, true);
         // Test that the parent can see what is copied in managed.
         testCrossProfileCopyPasteInternal(0, true);
 
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "disallowCrossProfileCopyPaste", mUserId));
+                "testDisallowCrossProfileCopyPaste", mUserId));
         // Test that managed can still see what is copied in the parent.
         testCrossProfileCopyPasteInternal(mUserId, true);
         // Test that the parent cannot see what is copied in managed.
@@ -164,10 +164,11 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
 
     private void testCrossProfileCopyPasteInternal(int userId, boolean shouldSucceed)
             throws DeviceNotAvailableException {
-        final String direction = (userId == 0) ? "addManagedCanAccessParentFilters"
-                : "addParentCanAccessManagedFilters";
+        final String direction = (userId == 0)
+                ? "testAddManagedCanAccessParentFilters"
+                : "testAddParentCanAccessManagedFilters";
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
-                "removeAllFilters", mUserId));
+                "testRemoveAllFilters", mUserId));
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
                 direction, mUserId));
         if (shouldSucceed) {
