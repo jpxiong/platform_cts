@@ -152,6 +152,14 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         Thread.sleep(60 * 1000);
     }
 
+    protected void removeTestUsers() throws Exception {
+        for (int userId : listUsers()) {
+            if (userId != 0) {
+                removeUser(userId);
+            }
+        }
+    }
+
     /** Returns true if the specified tests passed. Tests are run as user owner. */
     protected boolean runDeviceTests(String pkgName, @Nullable String testClassName)
             throws DeviceNotAvailableException {

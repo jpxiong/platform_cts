@@ -49,6 +49,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "android.software.managed_users");
 
         if (mHasFeature) {
+            removeTestUsers();
             mUserId = createManagedProfile();
             installApp(MANAGED_PROFILE_APK);
             installApp(INTENT_RECEIVER_APK);
