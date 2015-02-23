@@ -294,11 +294,6 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
     private static class PrepareFailedException extends Exception {}
 
-    public boolean hasAudioOutput() {
-        return getInstrumentation().getTargetContext().getPackageManager()
-            .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
-    }
-
     public boolean isTv() {
         PackageManager pm = getInstrumentation().getTargetContext().getPackageManager();
         return pm.hasSystemFeature(pm.FEATURE_TELEVISION)

@@ -1360,6 +1360,11 @@ public class AudioTrackTest extends CtsAndroidTestCase {
     }
 
     public void testPlayStaticData() throws Exception {
+        if (!hasAudioOutput()) {
+            Log.w(TAG,"AUDIO_OUTPUT feature not found. This system might not have a valid "
+                    + "audio output HAL");
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testPlayStaticData";
         final int TEST_FORMAT_ARRAY[] = {  // 6 chirps repeated (TEST_LOOPS+1) times, 3 times
@@ -1673,9 +1678,10 @@ public class AudioTrackTest extends CtsAndroidTestCase {
 
     public void testGetTimestamp() throws Exception {
         if (!hasAudioOutput()) {
+            Log.w(TAG,"AUDIO_OUTPUT feature not found. This system might not have a valid "
+                    + "audio output HAL");
             return;
         }
-        
         // constants for test
         final String TEST_NAME = "testGetTimestamp";
         final int TEST_SR = 22050;

@@ -348,10 +348,6 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testPlayAudioTwice() throws Exception {
-        if (!hasAudioOutput()) {
-            Log.i(LOG_TAG, "SKIPPING testPlayAudioTwice(). No audio output.");
-            return;
-        }
 
         final int resid = R.raw.camera_click;
 
@@ -599,10 +595,6 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     private void testGapless(int resid1, int resid2) throws Exception {
-        if (!hasAudioOutput()) {
-            Log.i(LOG_TAG, "SKIPPING testPlayAudioTwice(). No audio output.");
-            return;
-        }
 
         MediaPlayer mp1 = new MediaPlayer();
         mp1.setAudioStreamType(AudioManager.STREAM_MUSIC);

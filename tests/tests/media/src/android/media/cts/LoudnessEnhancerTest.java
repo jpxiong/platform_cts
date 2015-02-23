@@ -43,9 +43,6 @@ public class LoudnessEnhancerTest extends PostProcTestBase {
 
     //Test case 0.0: test constructor and release
     public void test0_0ConstructorAndRelease() throws Exception {
-        if (!hasAudioOutput()) {
-            return;
-        }
         AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         assertNotNull("null AudioManager", am);
         getLoudnessEnhancer(0);
@@ -63,9 +60,6 @@ public class LoudnessEnhancerTest extends PostProcTestBase {
 
     //Test case 1.0: test set/get target gain
     public void test1_0TargetGain() throws Exception {
-        if (!hasAudioOutput()) {
-            return;
-        }
         getLoudnessEnhancer(0);
         try {
             mLE.setTargetGain(0);
