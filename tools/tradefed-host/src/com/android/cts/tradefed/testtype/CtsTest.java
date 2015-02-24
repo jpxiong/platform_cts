@@ -83,9 +83,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String TEST_OPTION = "test";
     public static final String CONTINUE_OPTION = "continue-session";
     public static final String RUN_KNOWN_FAILURES_OPTION = "run-known-failures";
-    private static final String FILTERS_OPTION = "filters";
-    private static final String INSTRUMENTATION_INCLUDE_ANNOTATION_KEY = "INST_INCLUDE_ANNOTATION";
-    private static final String INSTRUMENTATION_EXCLUDE_ANNOTATION_KEY = "INST_EXCLUDE_ANNOTATION";
+    private static final String INCLUDE_FILTERS_OPTION = "include";
+    private static final String EXCLUDE_FILTERS_OPTION = "exclude";
 
     public static final String PACKAGE_NAME_METRIC = "packageName";
     public static final String PACKAGE_ABI_METRIC = "packageAbi";
@@ -184,9 +183,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "Collect dEQP logs from the device.")
     private boolean mCollectDeqpLogs = false;
 
-    @Option(name = FILTERS_OPTION,
-            description = "Additional filters to pass to tests.")
-    private Map<String, String> mFilters = new HashMap<String, String>();
+    @Option(name = INCLUDE_FILTERS_OPTION, description = "Positive filters to pass to tests.")
+    private List<String> mPositiveFilters = new ArrayList<> ();
+
+    @Option(name = EXCLUDE_FILTERS_OPTION, description = "Negative filters to pass to tests.")
+    private List<String> mNegativeFilters = new ArrayList<> ();
 
     @Option(name = "min-pre-reboot-package-count", description =
             "The minimum number of packages to require a pre test reboot")
@@ -532,14 +533,24 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 if (test instanceof DeqpTestRunner) {
                     ((DeqpTestRunner)test).setCollectLogs(mCollectDeqpLogs);
                 }
+                if (test instanceof GeeTest) {
+                    if (!mPositiveFilters.isEmpty()) {
+                        String positivePatterns = join(mPositiveFilters, ":");
+                        ((GeeTest)test).setPositiveFilters(positivePatterns);
+                    }
+                    if (!mNegativeFilters.isEmpty()) {
+                        String negativePatterns = join(mNegativeFilters, ":");
+                        ((GeeTest)test).setPositiveFilters(negativePatterns);
+                    }
+                }
                 if (test instanceof InstrumentationTest) {
-                    String annotation = mFilters.get(INSTRUMENTATION_INCLUDE_ANNOTATION_KEY);
-                    if (annotation != null) {
+                    if (!mPositiveFilters.isEmpty()) {
+                        String annotation = join(mPositiveFilters, ",");
                         ((InstrumentationTest)test).addInstrumentationArg(
                                 "annotation", annotation);
                     }
-                    String notAnnotation = mFilters.get(INSTRUMENTATION_EXCLUDE_ANNOTATION_KEY);
-                    if (notAnnotation != null) {
+                    if (!mNegativeFilters.isEmpty()) {
+                        String notAnnotation = join(mNegativeFilters, ",");
                         ((InstrumentationTest)test).addInstrumentationArg(
                                 "notAnnotation", notAnnotation);
                     }
@@ -578,6 +589,26 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 filter.reportUnexecutedTests();
             }
         }
+    }
+
+    /**
+     * Helper method to join strings. Exposed for unit tests
+     * @param input
+     * @param conjunction
+     * @return string with elements of the input list with interleaved conjunction.
+     */
+    protected static String join(List<String> input, String conjunction) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String item : input) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(conjunction);
+            }
+            sb.append(item);
+        }
+        return sb.toString();
     }
 
     /**

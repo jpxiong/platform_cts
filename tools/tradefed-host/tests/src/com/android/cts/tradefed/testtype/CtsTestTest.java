@@ -34,6 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -375,6 +376,34 @@ public class CtsTestTest extends TestCase {
         } catch (IllegalArgumentException e) {
             // expected
         }
+    }
+
+    /**
+     * Test {@link CtsTestTest#join} works.
+     * @throws DeviceNotAvailableException
+     */
+    public void testJoin() throws DeviceNotAvailableException {
+        String expected = "a@b@c";
+        String actual = mCtsTest.join(new ArrayList<String>(Arrays.asList("a", "b", "c")), "@");
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Test {@link CtsTestTest#join} for a single element list.
+     * @throws DeviceNotAvailableException
+     */
+    public void testSingleJoin() throws DeviceNotAvailableException {
+        String actual = mCtsTest.join(new ArrayList<String>(Arrays.asList("foo")), "@");
+        assertEquals("foo", actual);
+    }
+
+    /**
+     * Test {@link CtsTestTest#join} for an empty list.
+     * @throws DeviceNotAvailableException
+     */
+    public void testEmptyJoin() throws DeviceNotAvailableException {
+        String actual = mCtsTest.join(new ArrayList<String>(), "@");
+        assertEquals("", actual);
     }
 
     private void replayMocks(Object... mocks) {
