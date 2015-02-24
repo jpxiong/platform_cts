@@ -846,6 +846,11 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         deqpCmdLine.append(" ");
         deqpCmdLine.append(getRunConfigDisplayCmdLine(runConfig));
 
+        // If we are not logging data, do not bother outputting the images from the test exe.
+        if (!mLogData) {
+            deqpCmdLine.append(" --deqp-log-images=disable");
+        }
+
         final String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \"%s\""
                     + " -e deqpLogData \"%s\" %s",

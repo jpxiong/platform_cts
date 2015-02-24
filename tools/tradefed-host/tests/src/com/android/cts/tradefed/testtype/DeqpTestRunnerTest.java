@@ -165,7 +165,8 @@ public class DeqpTestRunnerTest extends TestCase {
                     "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
                         + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                         + "--deqp-screen-rotation=unspecified "
-                        + "--deqp-surface-type=window\" "
+                        + "--deqp-surface-type=window "
+                        + "--deqp-log-images=disable\" "
                         + "-e deqpLogData \"%s\" %s",
                     AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                     CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -327,7 +328,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
                     + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                     + "--deqp-screen-rotation=unspecified "
-                    + "--deqp-surface-type=window\" "
+                    + "--deqp-surface-type=window "
+                    + "--deqp-log-images=disable\" "
                     + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -519,7 +521,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
                     + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                     + "--deqp-screen-rotation=unspecified "
-                    + "--deqp-surface-type=window\" "
+                    + "--deqp-surface-type=window "
+                    + "--deqp-log-images=disable\" "
                     + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -789,7 +792,8 @@ public class DeqpTestRunnerTest extends TestCase {
                     "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
                         + "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                         + "--deqp-screen-rotation=%s "
-                        + "--deqp-surface-type=window\" "
+                        + "--deqp-surface-type=window "
+                        + "--deqp-log-images=disable\" "
                         + "-e deqpLogData \"%s\" %s",
                     AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                     CASE_LIST_FILE_NAME, rotation, false, INSTRUMENTATION_NAME);
@@ -1301,7 +1305,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
-                + "--deqp-surface-type=window", instrumentationAnswerConfigA);
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable", instrumentationAnswerConfigA);
 
         // query for config B
         expectRenderConfigQueryAndReturn(mockDevice, "--deqp-gl-config-name=rgba8888d24s8 "
@@ -1316,7 +1321,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
-                + "--deqp-surface-type=window", instrumentationAnswerConfigB);
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable", instrumentationAnswerConfigB);
 
         // query for config C
         expectRenderConfigQueryAndReturn(mockDevice, "--deqp-gl-config-name=rgba8888d24s8 "
@@ -1331,7 +1337,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=180 "
-                + "--deqp-surface-type=window", instrumentationAnswerConfigC);
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable" , instrumentationAnswerConfigC);
 
         // query for unsupported config
         expectRenderConfigQueryAndReturn(mockDevice, "--deqp-gl-config-name=rgb565d16s0 "
@@ -1509,7 +1516,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
-                + "--deqp-surface-type=window", instrumentationAnswerFine);
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable", instrumentationAnswerFine);
 
         // query config B
         expectRenderConfigQueryAndReturn(mockDevice, "--deqp-gl-config-name=rgba8888d24s8 "
@@ -1533,7 +1541,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "--deqp-caselist-file=%s"
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
-                + "--deqp-surface-type=window\" "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable\" "
                 + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
