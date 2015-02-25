@@ -25,11 +25,12 @@ LOCAL_SRC_FILES := \
 		CtsOsJniOnLoad.cpp \
 		android_os_cts_CpuInstructions.cpp.arm \
 		android_os_cts_TaggedPointer.cpp \
+		android_os_cts_HardwareName.cpp \
 		android_os_cts_OSFeatures.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog libdl
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog libdl libcutils
 
 LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
 LOCAL_C_INCLUDES += ndk/sources/cpufeatures
