@@ -19,7 +19,6 @@ package android.content.cts;
 import com.android.cts.content.R;
 import com.android.internal.util.XmlUtils;
 
-
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
@@ -30,6 +29,7 @@ import android.content.res.Resources.Theme;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
+import android.view.WindowManager;
 
 import java.io.IOException;
 
@@ -153,6 +153,24 @@ public class ContextTest extends AndroidTestCase {
         assertNotNull(testTypedArray);
         assertEquals(attrs.length, testTypedArray.length());
         testTypedArray.recycle();
+    }
+
+    public void testGetSystemService() {
+        // Test invalid service name
+        assertNull(mContext.getSystemService("invalid"));
+
+        // Test valid service name
+        assertNotNull(mContext.getSystemService(Context.WINDOW_SERVICE));
+    }
+
+    public void testGetSystemServiceByClass() {
+        // Test invalid service class
+        assertNull(mContext.getSystemService(Object.class));
+
+        // Test valid service name
+        assertNotNull(mContext.getSystemService(WindowManager.class));
+        assertEquals(mContext.getSystemService(Context.WINDOW_SERVICE),
+                mContext.getSystemService(WindowManager.class));
     }
 
     private AttributeSet getAttributeSet(int resourceId) {
