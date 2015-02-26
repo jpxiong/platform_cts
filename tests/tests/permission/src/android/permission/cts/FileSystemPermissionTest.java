@@ -717,39 +717,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertTrue(mountPoint + " is not mounted read-only", pm.isMountReadOnly(mountPoint));
     }
 
-    /**
-     * Test that the /system directory, as mounted by init, is mounted read-only.
-     * Different processes can have different mount namespaces, so init
-     * may be in a different mount namespace than Zygote spawned processes.
-     *
-     * This test assumes that init's filesystem layout is roughly identical
-     * to Zygote's filesystem layout. If this assumption ever changes, we should
-     * delete this test.
-     */
-    public void testSystemMountedRO_init() throws IOException {
-        ParsedMounts pm = new ParsedMounts("/proc/1/mounts");
-        String mountPoint = pm.findMountPointContaining(new File("/system"));
-        assertTrue(mountPoint + " is not mounted read-only", pm.isMountReadOnly(mountPoint));
-    }
-
     public void testRootMountedRO() throws IOException {
         ParsedMounts pm = new ParsedMounts("/proc/self/mounts");
-        String mountPoint = pm.findMountPointContaining(new File("/"));
-        assertTrue("The root directory \"" + mountPoint + "\" is not mounted read-only",
-                   pm.isMountReadOnly(mountPoint));
-    }
-
-    /**
-     * Test that the root directory, as mounted by init, is mounted read-only.
-     * Different processes can have different mount namespaces, so init
-     * may be in a different mount namespace than Zygote spawned processes.
-     *
-     * This test assumes that init's filesystem layout is roughly identical
-     * to Zygote's filesystem layout. If this assumption ever changes, we should
-     * delete this test.
-     */
-    public void testRootMountedRO_init() throws IOException {
-        ParsedMounts pm = new ParsedMounts("/proc/1/mounts");
         String mountPoint = pm.findMountPointContaining(new File("/"));
         assertTrue("The root directory \"" + mountPoint + "\" is not mounted read-only",
                    pm.isMountReadOnly(mountPoint));
