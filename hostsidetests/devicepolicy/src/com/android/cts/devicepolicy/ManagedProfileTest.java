@@ -229,6 +229,56 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "testGetRemoteDevice", mUserId));
     }
 
+    public void testManagedContacts() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+
+        try {
+            // Insert Primary profile Contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testPrimaryProfilePhoneLookup_insertedAndfound", 0));
+            // Insert Managed profile Contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testManagedProfilePhoneLookup_insertedAndfound", mUserId));
+
+            // Set cross profile caller id to enabled
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testSetCrossProfileCallerIdDisabled_false", mUserId));
+
+            // Managed user can use ENTERPRISE_CONTENT_FILTER_URI
+            // To access managed contacts but not primary contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testManagedProfilePhoneLookup_canAccessEnterpriseContact", mUserId));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testManagedProfilePhoneLookup_canNotAccessPrimaryContact", mUserId));
+
+            // Primary user can use ENTERPRISE_CONTENT_FILTER_URI
+            // To access both primary and managed contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testPrimaryProfileEnterprisePhoneLookup_canAccessEnterpriseContact", 0));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testPrimaryProfilePhoneLookup_canAccessPrimaryContact", 0));
+
+            // Set cross profile caller id to disabled
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testSetCrossProfileCallerIdDisabled_true", mUserId));
+
+            // Primary user cannot use ENTERPRISE_CONTENT_FILTER_URI to access managed contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testPrimaryProfilePhoneLookup_canNotAccessEnterpriseContact", 0));
+            // Managed user cannot use ENTERPRISE_CONTENT_FILTER_URI to access primary contacts
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testManagedProfilePhoneLookup_canNotAccessPrimaryContact", mUserId));
+        } finally {
+            // Clean up in managed profile and primary profile
+            runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testCurrentProfileContacts_removeContacts", mUserId);
+            runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testCurrentProfileContacts_removeContacts", 0);
+        }
+    }
+
     private void disableActivityForUser(String activityName, int userId)
             throws DeviceNotAvailableException {
         String command = "am start -W --user " + userId
