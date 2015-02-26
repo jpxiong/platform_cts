@@ -1325,25 +1325,115 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    @UiThreadTest
     public void testUndoSetText() {
-        mTextView = findTextView(R.id.textview_text);
-        mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
-        mTextView.setText("", BufferType.EDITABLE);
+        initTextViewForTyping();
 
-        // Setting text programmatically does not undo.
-        mTextView.setText("Hello", BufferType.EDITABLE);
-        mTextView.onTextContextMenuItem(android.R.id.undo);
-        assertEquals("Hello", mTextView.getText().toString());
+        // Type some text. This creates an undo entry.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Calling setText() clears the undo stack, so undo doesn't happen.
+                mTextView.setText("Hello", BufferType.EDITABLE);
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("Hello", mTextView.getText().toString());
 
-        // TODO: Appending text programmatically does not undo.
+                // Clearing text programmatically does not undo either.
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
 
-        // Clearing text programmatically does not undo.
-        mTextView.setText("", BufferType.EDITABLE);
-        mTextView.onTextContextMenuItem(android.R.id.undo);
-        assertEquals("", mTextView.getText().toString());
+    public void testRedoSetText() {
+        initTextViewForTyping();
 
-        // TODO: Setting text after typing something does not undo.
+        // Type some text. This creates an undo entry.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Undo the typing to create a redo entry.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+
+                // Calling setText() clears the redo stack, so redo doesn't happen.
+                mTextView.setText("Hello", BufferType.EDITABLE);
+                mTextView.onTextContextMenuItem(android.R.id.redo);
+                assertEquals("Hello", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testUndoDirectAppend() {
+        initTextViewForTyping();
+
+        // Type some text.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Programmatically append some text.
+                mTextView.append("def");
+                assertEquals("abcdef", mTextView.getText().toString());
+
+                // Undo removes the append as a separate step.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("abc", mTextView.getText().toString());
+
+                // Another undo removes the original typing.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testUndoDirectInsert() {
+        initTextViewForTyping();
+
+        // Type some text.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Directly modify the underlying Editable to insert some text.
+                // NOTE: This is a violation of the API of getText() which specifies that the
+                // returned object should not be modified. However, some apps do this anyway and
+                // the framework needs to handle it.
+                Editable text = (Editable) mTextView.getText();
+                text.insert(0, "def");
+                assertEquals("defabc", mTextView.getText().toString());
+
+                // Undo removes the insert as a separate step.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("abc", mTextView.getText().toString());
+
+                // Another undo removes the original typing.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testUndoTextWatcher() {
+        initTextViewForTyping();
+
+        // Add a TextWatcher that converts the text to spaces on each change.
+        mTextView.addTextChangedListener(new ConvertToSpacesTextWatcher());
+
+        // Type some text.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // TextWatcher altered the text.
+                assertEquals("   ", mTextView.getText().toString());
+
+                // Undo reverses both changes in one step.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     public void testUndoShortcuts() {
@@ -1356,13 +1446,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
                 // Pressing Control-Z triggers undo.
                 KeyEvent control = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z, 0,
                         KeyEvent.META_CTRL_LEFT_ON);
-                mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, control);
+                assertTrue(mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, control));
                 assertEquals("", mTextView.getText().toString());
 
                 // Pressing Control-Shift-Z triggers redo.
                 KeyEvent controlShift = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z,
                         0, KeyEvent.META_CTRL_LEFT_ON | KeyEvent.META_SHIFT_LEFT_ON);
-                mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, controlShift);
+                assertTrue(mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, controlShift));
                 assertEquals("abc", mTextView.getText().toString());
             }
         });
@@ -4112,6 +4202,37 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
             if (!mIsMenuItemsBlank) {
                 menu.add("menu item");
             }
+        }
+    }
+
+    /**
+     * A TextWatcher that converts the text to spaces whenever the text changes.
+     */
+    private static class ConvertToSpacesTextWatcher implements TextWatcher {
+        boolean mChangingText;
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // Avoid infinite recursion.
+            if (mChangingText) {
+                return;
+            }
+            mChangingText = true;
+            // Create a string of s.length() spaces.
+            StringBuilder builder = new StringBuilder(s.length());
+            for (int i = 0; i < s.length(); i++) {
+                builder.append(' ');
+            }
+            s.replace(0, s.length(), builder.toString());
+            mChangingText = false;
         }
     }
 }
