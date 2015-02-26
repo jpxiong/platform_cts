@@ -128,21 +128,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation = getInstrumentation();
     }
 
-    /**
-     * Promotes the TextView to editable and places focus in it to allow simulated typing.
-     */
-    private void initTextViewForTyping() {
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView = findTextView(R.id.textview_text);
-                mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-    }
-
     public void testConstructor() {
         new TextView(mActivity);
 
@@ -1257,24 +1242,30 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
     }
 
     public void testUndoRedo() {
-        initTextViewForTyping();
+        // Set up an editable TextView and focus it.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
 
         // Type some text.
         mInstrumentation.sendStringSync("abc");
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                // Precondition: The cursor is at the end of the text.
-                assertEquals(3, mTextView.getSelectionStart());
+                assertEquals("abc", mTextView.getText().toString());
 
                 // Undo removes the typed string in one step.
                 mTextView.onTextContextMenuItem(android.R.id.undo);
                 assertEquals("", mTextView.getText().toString());
-                assertEquals(0, mTextView.getSelectionStart());
 
-                // Redo restores the text and cursor position.
+                // Redo restores the text.
                 mTextView.onTextContextMenuItem(android.R.id.redo);
                 assertEquals("abc", mTextView.getText().toString());
-                assertEquals(3, mTextView.getSelectionStart());
 
                 // Undoing the redo clears the text again.
                 mTextView.onTextContextMenuItem(android.R.id.undo);
@@ -1286,70 +1277,28 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
             }
         });
         mInstrumentation.waitForIdleSync();
-    }
 
-    public void testUndoDelete() {
-        initTextViewForTyping();
+        // TODO: Simulate deleting text and undoing it.
 
-        // Simulate deleting text and undoing it.
-        mInstrumentation.sendStringSync("xyz");
-        sendKeys(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_DEL);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                // Precondition: The text was actually deleted.
-                assertEquals("", mTextView.getText().toString());
-                assertEquals(0, mTextView.getSelectionStart());
-
-                // Undo restores the typed string and cursor position in one step.
+                // Setting text programmatically does not undo.
+                mTextView.setText("Hello", BufferType.EDITABLE);
                 mTextView.onTextContextMenuItem(android.R.id.undo);
-                assertEquals("xyz", mTextView.getText().toString());
-                assertEquals(3, mTextView.getSelectionStart());
+                assertEquals("Hello", mTextView.getText().toString());
 
-                // Redo removes the text in one step.
-                mTextView.onTextContextMenuItem(android.R.id.redo);
-                assertEquals("", mTextView.getText().toString());
-                assertEquals(0, mTextView.getSelectionStart());
+                // TODO: Appending text programmatically does not undo.
 
-                // Undoing the redo restores the text again.
-                mTextView.onTextContextMenuItem(android.R.id.undo);
-                assertEquals("xyz", mTextView.getText().toString());
-                assertEquals(3, mTextView.getSelectionStart());
-
-                // Undoing again undoes the original typing.
+                // Clearing text programmatically does not undo.
+                mTextView.setText("", BufferType.EDITABLE);
                 mTextView.onTextContextMenuItem(android.R.id.undo);
                 assertEquals("", mTextView.getText().toString());
-                assertEquals(0, mTextView.getSelectionStart());
             }
         });
         mInstrumentation.waitForIdleSync();
-    }
 
-    @UiThreadTest
-    public void testUndoSetText() {
-        mTextView = findTextView(R.id.textview_text);
-        mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
-        mTextView.setText("", BufferType.EDITABLE);
-
-        // Setting text programmatically does not undo.
-        mTextView.setText("Hello", BufferType.EDITABLE);
-        mTextView.onTextContextMenuItem(android.R.id.undo);
-        assertEquals("Hello", mTextView.getText().toString());
-
-        // TODO: Appending text programmatically does not undo.
-
-        // Clearing text programmatically does not undo.
-        mTextView.setText("", BufferType.EDITABLE);
-        mTextView.onTextContextMenuItem(android.R.id.undo);
-        assertEquals("", mTextView.getText().toString());
-
-        // TODO: Setting text after typing something does not undo.
-    }
-
-    public void testUndoShortcuts() {
-        initTextViewForTyping();
-
-        // Type some text.
-        mInstrumentation.sendStringSync("abc");
+        // Type more text.
+        mInstrumentation.sendStringSync("def");
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 // Pressing Control-Z triggers undo.
@@ -1362,7 +1311,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
                 KeyEvent controlShift = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z,
                         0, KeyEvent.META_CTRL_LEFT_ON | KeyEvent.META_SHIFT_LEFT_ON);
                 mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, controlShift);
-                assertEquals("abc", mTextView.getText().toString());
+                assertEquals("def", mTextView.getText().toString());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -1710,7 +1659,17 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
     }
 
     public void testPressKey() {
-        initTextViewForTyping();
+        final QwertyKeyListener qwertyKeyListener
+                = QwertyKeyListener.getInstance(false, Capitalize.NONE);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setKeyListener(qwertyKeyListener);
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
 
         mInstrumentation.sendStringSync("a");
         assertEquals("a", mTextView.getText().toString());
