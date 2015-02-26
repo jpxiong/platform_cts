@@ -171,7 +171,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 super.init();
                 mLastMessage = 10;
                 mHandler.sendEmptyMessage(0);
-                mBarrierToken1 = Looper.myLooper().postSyncBarrier();
+                mBarrierToken1 = Looper.myQueue().postSyncBarrier();
                 mHandler.sendEmptyMessage(5);
                 sendAsyncMessage(1);
                 sendAsyncMessage(2);
@@ -183,15 +183,15 @@ public class MessageQueueTest extends AndroidTestCase {
                 super.handleMessage(msg);
                 if (msg.what == 3) {
                     mHandler.sendEmptyMessage(7);
-                    mBarrierToken2 = Looper.myLooper().postSyncBarrier();
+                    mBarrierToken2 = Looper.myQueue().postSyncBarrier();
                     sendAsyncMessage(4);
                     sendAsyncMessage(8);
                 } else if (msg.what == 4) {
-                    Looper.myLooper().removeSyncBarrier(mBarrierToken1);
+                    Looper.myQueue().removeSyncBarrier(mBarrierToken1);
                     sendAsyncMessage(9);
                     mHandler.sendEmptyMessage(10);
                 } else if (msg.what == 8) {
-                    Looper.myLooper().removeSyncBarrier(mBarrierToken2);
+                    Looper.myQueue().removeSyncBarrier(mBarrierToken2);
                 }
             }
 
@@ -206,19 +206,21 @@ public class MessageQueueTest extends AndroidTestCase {
     }
 
     public void testReleaseSyncBarrierThrowsIfTokenNotValid() throws Exception {
+        MessageQueue queue = Looper.getMainLooper().getQueue();
+
         // Invalid token
         try {
-            Looper.getMainLooper().removeSyncBarrier(-1);
+            queue.removeSyncBarrier(-1);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
         }
 
         // Token already removed.
-        int barrierToken = Looper.getMainLooper().postSyncBarrier();
-        Looper.getMainLooper().removeSyncBarrier(barrierToken);
+        int barrierToken = queue.postSyncBarrier();
+        queue.removeSyncBarrier(barrierToken);
         try {
-            Looper.getMainLooper().removeSyncBarrier(barrierToken);
+            queue.removeSyncBarrier(barrierToken);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
