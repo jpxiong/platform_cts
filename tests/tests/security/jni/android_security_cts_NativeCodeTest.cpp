@@ -198,6 +198,35 @@ static jboolean android_security_cts_NativeCodeTest_doFutexTest(JNIEnv*, jobject
     return (ret == -1 && errno == EINVAL);
 }
 
+static jboolean android_security_cts_NativeCodeTest_doNvmapIocFromIdTest(JNIEnv*, jobject)
+{
+    /*
+     * IOCTL code specified from the original Qualcomm notification.
+     * Also available in:
+     *     .../kernel/tegra/drivers/video/tegra/nvmap/nvmap_ioctl.h
+     * #define NVMAP_IOC_MAGIC 'N'
+     * #define NVMAP_IOC_FROM_ID _IOWR(NVMAP_IOC_MAGIC, 2, struct nvmap_create_handle)
+     */
+    const int NVMAP_IOC_FROM_ID = 0xc0084e02;
+    int       nvmap = open("/dev/nvmap", O_RDWR | O_CLOEXEC, 0);
+    bool      vulnerable = false;
+
+    if (nvmap >= 0) {
+        if (0 >= ioctl(nvmap, NVMAP_IOC_FROM_ID)) {
+            /* IOCTL succeeded */
+            vulnerable = true;
+        }
+        else if (errno != ENOTTY) {
+            /* IOCTL failed, but provided the wrong error number */
+            vulnerable = true;
+        }
+
+        close(nvmap);
+    }
+
+    return !vulnerable;
+}
+
 
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
@@ -210,6 +239,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_NativeCodeTest_doCVE20141710Test },
     {  "doFutexTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doFutexTest },
+    {  "doFutexTest", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doNvmapIocFromIdTest },
 };
 
 int register_android_security_cts_NativeCodeTest(JNIEnv* env)
