@@ -19,7 +19,9 @@ package android.permission.cts;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.system.Os;
 import android.system.OsConstants;
+import android.system.StructStatVfs;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -711,17 +713,20 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         return retval;
     }
 
-    public void testSystemMountedRO() throws IOException {
-        ParsedMounts pm = new ParsedMounts("/proc/self/mounts");
-        String mountPoint = pm.findMountPointContaining(new File("/system"));
-        assertTrue(mountPoint + " is not mounted read-only", pm.isMountReadOnly(mountPoint));
+    public void testSystemMountedRO() throws Exception {
+        StructStatVfs vfs = Os.statvfs("/system");
+        assertTrue("/system is not mounted read-only", (vfs.f_flag & OsConstants.ST_RDONLY) != 0);
     }
 
-    public void testRootMountedRO() throws IOException {
-        ParsedMounts pm = new ParsedMounts("/proc/self/mounts");
-        String mountPoint = pm.findMountPointContaining(new File("/"));
-        assertTrue("The root directory \"" + mountPoint + "\" is not mounted read-only",
-                   pm.isMountReadOnly(mountPoint));
+    public void testRootMountedRO() throws Exception {
+        StructStatVfs vfs = Os.statvfs("/");
+        assertTrue("rootfs is not mounted read-only", (vfs.f_flag & OsConstants.ST_RDONLY) != 0);
+    }
+
+    public void testDataMountedNoSuidNoDev() throws Exception {
+        StructStatVfs vfs = Os.statvfs(getContext().getFilesDir().getAbsolutePath());
+        assertTrue("/data is not mounted NOSUID", (vfs.f_flag & OsConstants.ST_NOSUID) != 0);
+        assertTrue("/data is not mounted NODEV", (vfs.f_flag & OsConstants.ST_NODEV) != 0);
     }
 
     public void testAllBlockDevicesAreSecure() throws Exception {
@@ -1018,48 +1023,4 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         return !f.getAbsolutePath().equals(f.getCanonicalPath());
     }
 
-    private static class ParsedMounts {
-        private HashMap<String, Boolean> mFileReadOnlyMap = new HashMap<String, Boolean>();
-
-        private ParsedMounts(String filename) throws IOException {
-            BufferedReader br = new BufferedReader(new FileReader(filename));
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] fields = line.split(" ");
-                    String mountPoint = fields[1];
-                    String all_options = fields[3];
-                    String[] options = all_options.split(",");
-                    boolean foundRo = false;
-                    for (String option : options) {
-                        if ("ro".equals(option)) {
-                            foundRo = true;
-                            break;
-                        }
-                    }
-                    mFileReadOnlyMap.put(mountPoint, foundRo);
-                }
-           } finally {
-               br.close();
-           }
-        }
-
-        private boolean isMountReadOnly(String s) {
-            return mFileReadOnlyMap.get(s).booleanValue();
-        }
-
-        private String findMountPointContaining(File f) throws IOException {
-            while (f != null) {
-                f = f.getCanonicalFile();
-                String path = f.getPath();
-                if (mFileReadOnlyMap.containsKey(path)) {
-                    return path;
-                }
-                f = f.getParentFile();
-            }
-            // This should NEVER be reached, as we'll eventually hit the
-            // root directory.
-            throw new AssertionError("Unable to find mount point");
-        }
-    }
 }
