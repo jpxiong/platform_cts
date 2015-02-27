@@ -40,6 +40,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -1239,6 +1240,125 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
             fail("Should throw exception with illegal id");
         } catch (NotFoundException e) {
         }
+    }
+
+    public void testUndoRedo() {
+        // Set up an editable TextView and focus it.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Type some text.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals("abc", mTextView.getText().toString());
+
+                // Undo removes the typed string in one step.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+
+                // Redo restores the text.
+                mTextView.onTextContextMenuItem(android.R.id.redo);
+                assertEquals("abc", mTextView.getText().toString());
+
+                // Undoing the redo clears the text again.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+
+                // Undo when the undo stack is empty does nothing.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // TODO: Simulate deleting text and undoing it.
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Setting text programmatically does not undo.
+                mTextView.setText("Hello", BufferType.EDITABLE);
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("Hello", mTextView.getText().toString());
+
+                // TODO: Appending text programmatically does not undo.
+
+                // Clearing text programmatically does not undo.
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Type more text.
+        mInstrumentation.sendStringSync("def");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Pressing Control-Z triggers undo.
+                KeyEvent control = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z, 0,
+                        KeyEvent.META_CTRL_LEFT_ON);
+                mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, control);
+                assertEquals("", mTextView.getText().toString());
+
+                // Pressing Control-Shift-Z triggers redo.
+                KeyEvent controlShift = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z,
+                        0, KeyEvent.META_CTRL_LEFT_ON | KeyEvent.META_SHIFT_LEFT_ON);
+                mTextView.onKeyShortcut(KeyEvent.KEYCODE_Z, controlShift);
+                assertEquals("def", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testUndoSaveInstanceState() {
+        // Set up an editable TextView and focus it.
+        // TODO: Refactor this and share the code with testUndoRedo above.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Type some text to create an undo operation.
+        mInstrumentation.sendStringSync("abc");
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Parcel and unparcel the TextView.
+                Parcelable state = mTextView.onSaveInstanceState();
+                mTextView.onRestoreInstanceState(state);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Delete a character to create a new undo operation.
+        sendKeys(KeyEvent.KEYCODE_DEL);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals("ab", mTextView.getText().toString());
+
+                // Undo the delete.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("abc", mTextView.getText().toString());
+
+                // Undo the typing, which verifies that the original undo operation was parceled
+                // correctly.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     @UiThreadTest
