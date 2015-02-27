@@ -18,17 +18,17 @@ JUNIT_HOST_JAR := $(HOST_OUT_JAVA_LIBRARIES)/junit.jar
 HOSTTESTLIB_JAR := $(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar
 TF_JAR := $(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar
 CTS_TF_JAR := $(HOST_OUT_JAVA_LIBRARIES)/cts-tradefed.jar
-CTS_TF_EXEC_PATH := $(HOST_OUT_EXECUTABLES)/cts-tradefed
+CTS_TF_EXEC_PATH ?= $(HOST_OUT_EXECUTABLES)/cts-tradefed
 
 cts_prebuilt_jar := $(HOST_OUT)/cts/android-cts/tools/cts-prebuilt.jar
 $(cts_prebuilt_jar): PRIVATE_TESTS_DIR := $(HOST_OUT)/cts/android-cts/repository/testcases
 $(cts_prebuilt_jar): PRIVATE_PLANS_DIR := $(HOST_OUT)/cts/android-cts/repository/plans
 $(cts_prebuilt_jar): PRIVATE_TOOLS_DIR := $(HOST_OUT)/cts/android-cts/tools
-$(cts_prebuilt_jar): $(JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(TF_JAR) $(CTS_TF_JAR) $(CTS_TF_EXEC_PATH) | $(ACP) $(HOST_OUT_EXECUTABLES)/adb
+$(cts_prebuilt_jar): $(JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(TF_JAR) $(CTS_TF_JAR) $(CTS_TF_EXEC_PATH) $(ADDITIONAL_TF_JARS) | $(ACP) $(HOST_OUT_EXECUTABLES)/adb
 	mkdir -p $(PRIVATE_TESTS_DIR)
 	mkdir -p $(PRIVATE_PLANS_DIR)
 	mkdir -p $(PRIVATE_TOOLS_DIR)
-	$(ACP) -fp $(JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(TF_JAR) $(CTS_TF_JAR) $(CTS_TF_EXEC_PATH) $(PRIVATE_TOOLS_DIR)
+	$(ACP) -fp $(JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(TF_JAR) $(CTS_TF_JAR) $(CTS_TF_EXEC_PATH) $(ADDITIONAL_TF_JARS) $(PRIVATE_TOOLS_DIR)
 
 .PHONY: cts-harness
 cts-harness : $(cts_prebuilt_jar)
