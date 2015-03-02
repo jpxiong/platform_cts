@@ -1397,6 +1397,44 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
                 // correctly.
                 mTextView.onTextContextMenuItem(android.R.id.undo);
                 assertEquals("", mTextView.getText().toString());
+
+                // Parcel and unparcel the undo stack (which is empty but has been used and may
+                // contain other state).
+                Parcelable state = mTextView.onSaveInstanceState();
+                mTextView.onRestoreInstanceState(state);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testUndoSaveInstanceStateEmpty() {
+        initTextViewForTyping();
+
+        // Type and delete to create two new undo operations.
+        mInstrumentation.sendStringSync("a");
+        sendKeys(KeyEvent.KEYCODE_DEL);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Empty the undo stack then parcel and unparcel the TextView. While the undo
+                // stack contains no operations it may contain other state.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                Parcelable state = mTextView.onSaveInstanceState();
+                mTextView.onRestoreInstanceState(state);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Create two more undo operations.
+        mInstrumentation.sendStringSync("b");
+        sendKeys(KeyEvent.KEYCODE_DEL);
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Verify undo still works.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("b", mTextView.getText().toString());
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
             }
         });
         mInstrumentation.waitForIdleSync();
