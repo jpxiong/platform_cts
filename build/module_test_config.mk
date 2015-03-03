@@ -16,6 +16,6 @@ cts_module_test_config := $(if $(wildcard \
 	$(LOCAL_PATH)/$(CTS_MODULE_TEST_CONFIG)), \
 	$(CTS_TESTCASES_OUT)/$(LOCAL_PACKAGE_NAME).config)
 ifneq ($(cts_module_test_config),)
-$(cts_module_test_config): $(LOCAL_PATH)/$(CTS_MODULE_TEST_CONFIG)
+$(cts_module_test_config): $(LOCAL_PATH)/$(CTS_MODULE_TEST_CONFIG) | $(ACP)
 	$(call copy-file-to-target)
 endif
