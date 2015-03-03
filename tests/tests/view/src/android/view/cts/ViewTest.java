@@ -3582,6 +3582,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
             return null;
         }
 
+        public ActionMode startActionModeForChild(View originalView,
+                ActionMode.Callback callback, int type) {
+            return null;
+        }
+
         public boolean hasShowContextMenuForChild() {
             return mHasShowContextMenuForChild;
         }

@@ -1113,6 +1113,11 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowCtsActivi
             return null;
         }
 
+        public ActionMode onWindowStartingActionMode(
+                ActionMode.Callback callback, int type) {
+            return null;
+        }
+
         public void onActionModeStarted(ActionMode mode) {
         }
 
