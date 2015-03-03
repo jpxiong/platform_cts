@@ -20,6 +20,7 @@ import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
+import com.android.tradefed.targetprep.ITargetPreparer;
 import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.InstrumentationTest;
@@ -53,10 +54,6 @@ class TestPackageDef implements ITestPackageDef {
     public static final String WRAPPED_NATIVE_TEST = "wrappednative";
     public static final String VM_HOST_TEST = "vmHostTest";
     public static final String DEQP_TEST = "deqpTest";
-    public static final String ACCESSIBILITY_TEST =
-            "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
-    public static final String ACCESSIBILITY_SERVICE_TEST =
-            "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
     public static final String DISPLAY_TEST =
             "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
@@ -72,6 +69,7 @@ class TestPackageDef implements ITestPackageDef {
     private String mTestPackageName = null;
     private String mDigest = null;
     private IAbi mAbi = null;
+    private List<ITargetPreparer> mPreparers = null;
 
     // use a LinkedHashSet for predictable iteration insertion-order, and fast
     // lookups
@@ -215,6 +213,22 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
+     * Setter for injecting a list of {@link ITargetPreparer}s as configured in module test config.
+     * @param preparers
+     */
+    void setPackagePreparers(List<ITargetPreparer> preparers) {
+        mPreparers = preparers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ITargetPreparer> getPackagePreparers() {
+        return mPreparers;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -258,13 +272,6 @@ class TestPackageDef implements ITestPackageDef {
             WrappedGTest wrappedGeeTest = new WrappedGTest(mAppNameSpace, mAppPackageName, mName, mRunner);
             wrappedGeeTest.setAbi(mAbi);
             return wrappedGeeTest;
-        } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
-            AccessibilityTestRunner test = new AccessibilityTestRunner();
-            return setInstrumentationTest(test, testCaseDir);
-        } else if (ACCESSIBILITY_SERVICE_TEST.equals(mTestType)) {
-            @SuppressWarnings("deprecation")
-            AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
-            return setInstrumentationTest(test, testCaseDir);
         } else if (DISPLAY_TEST.equals(mTestType)) {
             DisplayTestRunner test = new DisplayTestRunner();
             return setInstrumentationTest(test, testCaseDir);
@@ -437,8 +444,8 @@ class TestPackageDef implements ITestPackageDef {
         } catch (IOException e) {
             CLog.e(e);
         } finally {
-            StreamUtil.closeStream(d);
-            StreamUtil.closeStream(fileStream);
+            StreamUtil.close(d);
+            StreamUtil.close(fileStream);
         }
         return "failed to generate digest";
     }

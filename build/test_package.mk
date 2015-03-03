@@ -24,6 +24,7 @@ LOCAL_DEX_PREOPT := false
 LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_CTS_SUPPORT_PACKAGE)
+include $(BUILD_CTS_MODULE_TEST_CONFIG)
 
 cts_src_dirs := $(LOCAL_PATH)
 cts_src_dirs += $(sort $(dir $(LOCAL_GENERATED_SOURCES)))
@@ -41,6 +42,7 @@ endif
 $(cts_package_xml): PRIVATE_TEST_PACKAGE := $(PRIVATE_CTS_TEST_PACKAGE_NAME_)
 $(cts_package_xml): PRIVATE_MANIFEST := $(LOCAL_PATH)/AndroidManifest.xml
 $(cts_package_xml): PRIVATE_TEST_TYPE := $(if $(LOCAL_CTS_TEST_RUNNER),$(LOCAL_CTS_TEST_RUNNER),'')
+$(cts_package_xml): $(cts_module_test_config)
 $(cts_package_xml): $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for java package $(PRIVATE_PACKAGE)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
@@ -57,6 +59,5 @@ $(cts_package_xml): $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_
 						-b $(CTS_UNSUPPORTED_ABIS) \
 						-a $(CTS_TARGET_ARCH) \
 						-o $@
-
 # Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
-$(my_register_name) : $(cts_package_xml)
+$(my_register_name) : $(cts_package_xml) $(cts_module_test_config)
