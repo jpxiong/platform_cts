@@ -19,7 +19,6 @@ package android.media.cts;
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
 import static android.media.AudioManager.ADJUST_SAME;
-import static android.media.AudioManager.FLAG_ALLOW_RINGER_MODES;
 import static android.media.AudioManager.MODE_IN_CALL;
 import static android.media.AudioManager.MODE_IN_COMMUNICATION;
 import static android.media.AudioManager.MODE_NORMAL;
@@ -46,7 +45,6 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.provider.Settings.System;
-import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
 
@@ -58,10 +56,7 @@ public class AudioManagerTest extends AndroidTestCase {
     private final static long TIME_TO_PLAY = 2000;
     private AudioManager mAudioManager;
     private boolean mHasVibrator;
-    private boolean mUseMasterVolume;
     private boolean mUseFixedVolume;
-    private int[] mMasterVolumeRamp;
-    private TreeMap<Integer, Integer> mMasterVolumeMap = new TreeMap<Integer, Integer>();
     private boolean mIsTelevision;
 
     @Override
@@ -70,16 +65,8 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
-        mUseMasterVolume = mContext.getResources().getBoolean(
-                Resources.getSystem().getIdentifier("config_useMasterVolume", "bool", "android"));
         mUseFixedVolume = mContext.getResources().getBoolean(
                 Resources.getSystem().getIdentifier("config_useFixedVolume", "bool", "android"));
-        mMasterVolumeRamp = mContext.getResources().getIntArray(
-                Resources.getSystem().getIdentifier("config_masterVolumeRamp", "array", "android"));
-        assertTrue((mMasterVolumeRamp.length > 0) && (mMasterVolumeRamp.length % 2 == 0));
-        for (int i = 0; i < mMasterVolumeRamp.length; i+=2) {
-            mMasterVolumeMap.put(mMasterVolumeRamp[i], mMasterVolumeRamp[i+1]);
-        }
         PackageManager packageManager = mContext.getPackageManager();
         mIsTelevision = packageManager != null
                 && (packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
@@ -550,11 +537,6 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     private int getVolumeDelta(int volume) {
-        if (!mUseMasterVolume) {
-            return 1;
-        }
-        int volumeDelta = mMasterVolumeMap.floorEntry(volume).getValue();
-        assertTrue(volumeDelta > 0);
-        return volumeDelta;
+        return 1;
     }
 }
