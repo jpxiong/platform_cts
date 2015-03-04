@@ -86,6 +86,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -1257,7 +1258,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         }
     }
 
-    public void testUndoRedo() {
+    public void testUndo_insert() {
         initTextViewForTyping();
 
         // Type some text.
@@ -1289,7 +1290,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoDelete() {
+    public void testUndo_delete() {
         initTextViewForTyping();
 
         // Simulate deleting text and undoing it.
@@ -1325,14 +1326,110 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoSetText() {
+    // Initialize the text view for simulated IME typing. Must be called on UI thread.
+    private InputConnection initTextViewForSimulatedIme() {
+        mTextView = findTextView(R.id.textview_text);
+        mTextView.setKeyListener(QwertyKeyListener.getInstance(false, Capitalize.NONE));
+        mTextView.setText("", BufferType.EDITABLE);
+        return mTextView.onCreateInputConnection(new EditorInfo());
+    }
+
+    // Simulates IME composing text behavior.
+    private void setComposingTextInBatch(InputConnection input, CharSequence text) {
+        input.beginBatchEdit();
+        input.setComposingText(text, 1);  // Leave cursor at end.
+        input.endBatchEdit();
+    }
+
+    @UiThreadTest
+    public void testUndo_imeInsertLatin() {
+        InputConnection input = initTextViewForSimulatedIme();
+
+        // Simulate IME text entry behavior. The Latin IME enters text by replacing partial words,
+        // such as "c" -> "ca" -> "cat" -> "cat ".
+        setComposingTextInBatch(input, "c");
+        setComposingTextInBatch(input, "ca");
+
+        // The completion and space are added in the same batch.
+        input.beginBatchEdit();
+        input.commitText("cat", 1);
+        input.commitText(" ", 1);
+        input.endBatchEdit();
+
+        // The repeated replacements undo in a single step.
+        mTextView.onTextContextMenuItem(android.R.id.undo);
+        assertEquals("", mTextView.getText().toString());
+    }
+
+    @UiThreadTest
+    public void testUndo_imeInsertJapanese() {
+        InputConnection input = initTextViewForSimulatedIme();
+
+        // The Japanese IME does repeated replacements of Latin characters to hiragana to kanji.
+        final String HA = "\u306F";  // HIRAGANA LETTER HA
+        final String NA = "\u306A";  // HIRAGANA LETTER NA
+        setComposingTextInBatch(input, "h");
+        setComposingTextInBatch(input, HA);
+        setComposingTextInBatch(input, HA + "n");
+        setComposingTextInBatch(input, HA + NA);
+
+        // The result may be a surrogate pair. The composition ends in the same batch.
+        input.beginBatchEdit();
+        input.commitText("\uD83C\uDF37", 1);  // U+1F337 TULIP
+        input.setComposingText("", 1);
+        input.endBatchEdit();
+
+        // The repeated replacements are a single undo step.
+        mTextView.onTextContextMenuItem(android.R.id.undo);
+        assertEquals("", mTextView.getText().toString());
+    }
+
+    @UiThreadTest
+    public void testUndo_imeCancel() {
+        InputConnection input = initTextViewForSimulatedIme();
+        mTextView.setText("flower");
+
+        // Start typing a composition.
+        final String HA = "\u306F";  // HIRAGANA LETTER HA
+        setComposingTextInBatch(input, "h");
+        setComposingTextInBatch(input, HA);
+        setComposingTextInBatch(input, HA + "n");
+
+        // Cancel the composition.
+        setComposingTextInBatch(input, "");
+
+        // Undo and redo do nothing.
+        mTextView.onTextContextMenuItem(android.R.id.undo);
+        assertEquals("flower", mTextView.getText().toString());
+        mTextView.onTextContextMenuItem(android.R.id.redo);
+        assertEquals("flower", mTextView.getText().toString());
+    }
+
+    @UiThreadTest
+    public void testUndo_imeEmptyBatch() {
+        InputConnection input = initTextViewForSimulatedIme();
+        mTextView.setText("flower");
+
+        // Send an empty batch edit. This happens if the IME is hidden and shown.
+        input.beginBatchEdit();
+        input.endBatchEdit();
+
+        // Undo and redo do nothing.
+        mTextView.onTextContextMenuItem(android.R.id.undo);
+        assertEquals("flower", mTextView.getText().toString());
+        mTextView.onTextContextMenuItem(android.R.id.redo);
+        assertEquals("flower", mTextView.getText().toString());
+    }
+
+    public void testUndo_setText() {
         initTextViewForTyping();
 
-        // Type some text. This creates an undo entry.
-        mInstrumentation.sendStringSync("abc");
+        // Create two undo operations, an insert and a delete.
+        mInstrumentation.sendStringSync("xyz");
+        sendKeys(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_DEL);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                // Calling setText() clears the undo stack, so undo doesn't happen.
+                // Calling setText() clears both undo operations, so undo doesn't happen.
                 mTextView.setText("Hello", BufferType.EDITABLE);
                 mTextView.onTextContextMenuItem(android.R.id.undo);
                 assertEquals("Hello", mTextView.getText().toString());
@@ -1346,7 +1443,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testRedoSetText() {
+    public void testRedo_setText() {
         initTextViewForTyping();
 
         // Type some text. This creates an undo entry.
@@ -1365,7 +1462,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoDirectAppend() {
+    public void testUndo_directAppend() {
         initTextViewForTyping();
 
         // Type some text.
@@ -1388,7 +1485,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoDirectInsert() {
+    public void testUndo_directInsert() {
         initTextViewForTyping();
 
         // Type some text.
@@ -1434,7 +1531,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoTextWatcher() {
+    public void testUndo_textWatcher() {
         initTextViewForTyping();
 
         // Add a TextWatcher that converts the text to spaces on each change.
@@ -1455,7 +1552,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoShortcuts() {
+    public void testUndo_shortcuts() {
         initTextViewForTyping();
 
         // Type some text.
@@ -1478,7 +1575,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoSaveInstanceState() {
+    public void testUndo_saveInstanceState() {
         initTextViewForTyping();
 
         // Type some text to create an undo operation.
@@ -1516,7 +1613,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
-    public void testUndoSaveInstanceStateEmpty() {
+    public void testUndo_saveInstanceStateEmpty() {
         initTextViewForTyping();
 
         // Type and delete to create two new undo operations.
