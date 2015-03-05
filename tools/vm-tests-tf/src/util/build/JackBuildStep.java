@@ -64,7 +64,7 @@ public class JackBuildStep extends SourceBuildStep {
 
             try {
                 Options options = Main.parseCommandLine(commandLine);
-                Jack.run(options);
+                Jack.checkAndRun(options);
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 return false;

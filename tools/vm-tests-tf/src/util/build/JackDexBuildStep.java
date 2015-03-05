@@ -59,7 +59,7 @@ public class JackDexBuildStep extends BuildStep {
 
             try {
                Options options = Main.parseCommandLine(commandLine);
-               Jack.run(options);
+               Jack.checkAndRun(options);
                 if (deleteInputFileAfterBuild) {
                     inputFile.fileName.delete();
                 }
