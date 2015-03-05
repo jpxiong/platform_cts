@@ -842,6 +842,25 @@
     <string name="its_test_passed">All Camera ITS tests passed.  Pass button enabled!</string>
     <string name="its_test_failed">Some Camera ITS tests failed.</string>
 
+    <!-- Strings for the Camera Flashlight test activity -->
+    <string name="camera_flashlight_test">Camera Flashlight</string>
+    <string name="camera_flashlight_info">
+        This test checks the flashlight functionality. It will turn on and off the flashlight of
+        each camera device that has a flash unit. Follow the instructions on screen and observe the
+        flashlight status changing.
+    </string>
+    <string name="camera_flashlight_start_button">Start</string>
+    <string name="camera_flashlight_next_button">Next</string>
+    <string name="camera_flashlight_done_button">Done</string>
+    <string name="camera_flashlight_on_button">On</string>
+    <string name="camera_flashlight_off_button">Off</string>
+    <string name="camera_flashlight_start_text">Press Start to start flashlight test.</string>
+    <string name="camera_flashlight_question_text">Is Camera %1$s flashlight on or off?</string>
+    <string name="camera_flashlight_next_text">Ok. Press next.</string>
+    <string name="camera_flashlight_failed_text">Test failed. Press Done or Fail button.</string>
+    <string name="camera_flashlight_passed_text">All tests passed. Press Done or Pass button.
+    </string>
+
     <!-- Strings for StreamingVideoActivity -->
     <string name="streaming_video">Streaming Video Quality Verifier</string>
     <string name="streaming_video_info">This is a test for assessing the quality of streaming videos.  Play each stream and verify that the video is smooth and in sync with the audio, and that there are no quality problems.</string>
