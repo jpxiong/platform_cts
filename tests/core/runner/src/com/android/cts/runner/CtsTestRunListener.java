@@ -21,6 +21,7 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.test.internal.runner.listener.InstrumentationRunListener;
+import android.text.TextUtils;
 import android.util.Log;
 
 import junit.framework.TestCase;
@@ -28,7 +29,10 @@ import junit.framework.TestCase;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.Authenticator;
@@ -114,6 +118,31 @@ public class CtsTestRunListener extends InstrumentationRunListener {
         Log.d(TAG, "Total memory  : " + total);
         Log.d(TAG, "Used memory   : " + used);
         Log.d(TAG, "Free memory   : " + free);
+
+        String tempdir = System.getProperty("java.io.tmpdir", "");
+        if (!TextUtils.isEmpty(tempdir)) {
+            String[] commands = {"df", tempdir};
+            BufferedReader in = null;
+            try {
+                Process proc = runtime.exec(commands);
+                in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    Log.d(TAG, line);
+                }
+            } catch (IOException e) {
+                // Well, we tried
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        // Meh
+                    }
+                }
+            }
+        }
+
         Log.d(TAG, "Now executing : " + testClass.getName());
     }
 
@@ -161,8 +190,8 @@ public class CtsTestRunListener extends InstrumentationRunListener {
             mSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 
             mProperties.setProperty("user.home", "");
-            mProperties.setProperty("java.io.tmpdir", System.getProperty("java.io.tmpdir"));
-            // The CDD mandates that devices that support WiFi are the only ones that will have 
+            mProperties.setProperty("java.io.tmpdir", context.getCacheDir().getAbsolutePath());
+            // The CDD mandates that devices that support WiFi are the only ones that will have
             // multicast.
             PackageManager pm = context.getPackageManager();
             mProperties.setProperty("android.cts.device.multicast",
