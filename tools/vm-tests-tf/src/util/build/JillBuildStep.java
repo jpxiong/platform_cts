@@ -16,6 +16,7 @@
 
 package util.build;
 
+import com.android.jill.Jill;
 import com.android.jill.Main;
 import com.android.jill.Options;
 
@@ -46,7 +47,7 @@ public class JillBuildStep extends BuildStep {
 
             try {
                 Options options = Main.getOptions(commandLine);
-                Main.run(options);
+                Jill.process(options);
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 return false;
