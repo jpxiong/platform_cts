@@ -609,21 +609,24 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      */
     private void performPackagePrepareSetup(ITestPackageDef packageDef)
             throws DeviceNotAvailableException {
-        for (ITargetPreparer preparer : packageDef.getPackagePreparers()) {
-            if (preparer instanceof IAbiReceiver) {
-                ((IAbiReceiver)preparer).setAbi(packageDef.getAbi());
-            }
-            try {
-                preparer.setUp(getDevice(), mBuildInfo);
-            } catch (BuildError e) {
-                // This should only happen for flashing new build
-                CLog.e("Unexpected BuildError from preparer: %s",
+        List<ITargetPreparer> preparers = packageDef.getPackagePreparers();
+        if (preparers != null) {
+            for (ITargetPreparer preparer : preparers) {
+                if (preparer instanceof IAbiReceiver) {
+                    ((IAbiReceiver) preparer).setAbi(packageDef.getAbi());
+                }
+                try {
+                    preparer.setUp(getDevice(), mBuildInfo);
+                } catch (BuildError e) {
+                    // This should only happen for flashing new build
+                    CLog.e("Unexpected BuildError from preparer: %s",
                         preparer.getClass().getCanonicalName());
-            } catch (TargetSetupError e) {
-                // log preparer class then rethrow & let caller handle
-                CLog.e("TargetSetupError in preparer: %s",
+                } catch (TargetSetupError e) {
+                    // log preparer class then rethrow & let caller handle
+                    CLog.e("TargetSetupError in preparer: %s",
                         preparer.getClass().getCanonicalName());
-                throw new RuntimeException(e);
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -637,12 +640,14 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private void performPackagePreparerTearDown(ITestPackageDef packageDef)
             throws DeviceNotAvailableException {
         List<ITargetPreparer> preparers = packageDef.getPackagePreparers();
-        ListIterator<ITargetPreparer> itr = preparers.listIterator(preparers.size());
-        // do teardown in reverse order
-        while (itr.hasPrevious()) {
-            ITargetPreparer preparer = itr.previous();
-            if (preparer instanceof ITargetCleaner) {
-                ((ITargetCleaner) preparer).tearDown(getDevice(), mBuildInfo, null);
+        if (preparers != null) {
+            ListIterator<ITargetPreparer> itr = preparers.listIterator(preparers.size());
+            // do teardown in reverse order
+            while (itr.hasPrevious()) {
+                ITargetPreparer preparer = itr.previous();
+                if (preparer instanceof ITargetCleaner) {
+                    ((ITargetCleaner) preparer).tearDown(getDevice(), mBuildInfo, null);
+                }
             }
         }
     }
