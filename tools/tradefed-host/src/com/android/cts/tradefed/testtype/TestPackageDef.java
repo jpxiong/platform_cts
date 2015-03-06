@@ -54,8 +54,6 @@ class TestPackageDef implements ITestPackageDef {
     public static final String WRAPPED_NATIVE_TEST = "wrappednative";
     public static final String VM_HOST_TEST = "vmHostTest";
     public static final String DEQP_TEST = "deqpTest";
-    public static final String DISPLAY_TEST =
-            "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
     public static final String JUNIT_DEVICE_TEST = "jUnitDeviceTest";
 
@@ -272,9 +270,6 @@ class TestPackageDef implements ITestPackageDef {
             WrappedGTest wrappedGeeTest = new WrappedGTest(mAppNameSpace, mAppPackageName, mName, mRunner);
             wrappedGeeTest.setAbi(mAbi);
             return wrappedGeeTest;
-        } else if (DISPLAY_TEST.equals(mTestType)) {
-            DisplayTestRunner test = new DisplayTestRunner();
-            return setInstrumentationTest(test, testCaseDir);
         } else if (UIAUTOMATOR_TEST.equals(mTestType)) {
             UiAutomatorJarTest uiautomatorTest = new UiAutomatorJarTest();
             return setUiAutomatorTest(uiautomatorTest);

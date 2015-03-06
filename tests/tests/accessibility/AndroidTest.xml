@@ -15,11 +15,11 @@
 -->
 <configuration description="Base config for CTS package preparer">
     <include name="common-config" />
-    <option name="run-command:run-command" value="settings put secure enabled_accessibility_services android.view.accessibility.services/.SpeakingAccessibilityService,android.view.accessibility.services/.VibratingAccessibilityService" />
-    <option name="run-command:run-command" value="settings put secure touch_exploration_granted_accessibility_services android.view.accessibility.services/.SpeakingAccessibilityService,android.view.accessibility.services/.VibratingAccessibilityService" />
+    <option name="run-command:run-command" value="settings put secure enabled_accessibility_services android.view.accessibility.services/.SpeakingAccessibilityService:android.view.accessibility.services/.VibratingAccessibilityService" />
+    <option name="run-command:run-command" value="settings put secure touch_exploration_granted_accessibility_services android.view.accessibility.services/.SpeakingAccessibilityService:android.view.accessibility.services/.VibratingAccessibilityService" />
     <option name="run-command:run-command" value="settings put secure accessibility_enabled 1" />
-    <option name="run-command:teardown-command" value="settings put secure enabled_accessibility_services ''" />
-    <option name="run-command:teardown-command" value="settings put secure touch_exploration_granted_accessibility_services ''" />
+    <option name="run-command:teardown-command" value="settings put secure enabled_accessibility_services &quot;&quot;" />
+    <option name="run-command:teardown-command" value="settings put secure touch_exploration_granted_accessibility_services &quot;&quot;" />
     <option name="run-command:teardown-command" value="settings put secure accessibility_enabled 0" />
     <option name="cts-apk-installer:test-file-name" value="CtsSomeAccessibilityServices.apk" />
 </configuration>
