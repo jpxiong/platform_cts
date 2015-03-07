@@ -253,6 +253,22 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     }
 
     @MediumTest
+    public void testProcSelfOomAdjSane() {
+        File f = new File("/proc/self/oom_adj");
+        assertTrue(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    @MediumTest
+    public void testProcSelfOomScoreAdjSane() {
+        File f = new File("/proc/self/oom_score_adj");
+        assertTrue(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    @MediumTest
     public void testTcpDefaultRwndSane() throws Exception {
         File f = new File("/proc/sys/net/ipv4/tcp_default_init_rwnd");
         assertTrue(f.canRead());
