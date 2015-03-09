@@ -679,6 +679,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testInstallCaCert_failIfNotCertInstaller() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testInstallCaCert_failIfNotCertInstaller");
+            return;
+        }
+        try {
+            // Delegated cert installer is identified by using null as the first argument.
+            mDevicePolicyManager.installCaCert(null, TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException expected) {
+        }
+    }
+
     public void testUninstallCaCert_failIfNotProfileOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testUninstallCaCert_failIfNotProfileOwner");
@@ -693,6 +706,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testUninstallCaCert_failIfNotCertInstaller() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testUninstallCaCert_failIfNotCertInstaller");
+            return;
+        }
+        try {
+            // Delegated cert installer is identified by using null as the first argument.
+            mDevicePolicyManager.uninstallCaCert(null, TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException expected) {
+        }
+    }
+
     public void testGetInstalledCaCerts_failIfNotProfileOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testGetInstalledCaCerts_failIfNotProfileOwner");
@@ -703,6 +729,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testGetInstalledCaCerts_failIfNotCertInstaller() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testGetInstalledCaCerts_failIfNotCertInstaller");
+            return;
+        }
+        try {
+            // Delegated cert installer is identified by using null as the first argument.
+            mDevicePolicyManager.getInstalledCaCerts(null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException expected) {
         }
     }
 
@@ -720,6 +759,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testHasCaCertInstalled_failIfNotCertInstaller() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testHasCaCertInstalled_failIfNotCertInstaller");
+            return;
+        }
+        try {
+            // Delegated cert installer is identified by using null as the first argument.
+            mDevicePolicyManager.hasCaCertInstalled(null, TEST_CA_STRING1.getBytes());
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException expected) {
+        }
+    }
+
     public void testUninstallAllUserCaCerts_failIfNotProfileOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testUninstallAllUserCaCerts_failIfNotProfileOwner");
@@ -730,6 +782,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testUninstallAllUserCaCerts_failIfNotCertInstaller() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testUninstallAllUserCaCerts_failIfNotCertInstaller");
+            return;
+        }
+        try {
+            // Delegated cert installer is identified by using null as the first argument.
+            mDevicePolicyManager.uninstallAllUserCaCerts(null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException expected) {
         }
     }
 
@@ -960,5 +1025,31 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         boolean passwordResetResult = mDevicePolicyManager.resetPassword(password, /* flags= */0);
         assertTrue("Password '" + password + "' failed on " + restriction, passwordResetResult);
         assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
+    }
+
+    public void testSetDelegatedCertInstaller_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetDelegatedCertInstaller_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setCertInstallerPackage(mComponent, "com.test.package");
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
+    public void testGetDelegatedCertInstaller_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testGetDelegatedCertInstaller_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.getCertInstallerPackage(mComponent);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
     }
 }
