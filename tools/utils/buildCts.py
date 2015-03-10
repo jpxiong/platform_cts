@@ -335,6 +335,7 @@ def BuildAospSmallSizeTestList():
       'com.android.cts.dram' : [],
       'com.android.cts.filesystemperf' : [],
       'com.android.cts.jank' : [],
+      'com.android.cts.jank2' : [],
       'com.android.cts.opengl' : [],
       'com.android.cts.simplecpu' : [],
       'com.android.cts.ui' : [],
