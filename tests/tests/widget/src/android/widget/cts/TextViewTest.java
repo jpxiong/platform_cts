@@ -1415,6 +1415,25 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
+    public void testUndo_noCursor() {
+        initTextViewForTyping();
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Append some text to create an undo operation. There is no cursor present.
+                mTextView.append("cat");
+
+                // Place the cursor at the end of the text so the undo will have to change it.
+                Selection.setSelection((Spannable) mTextView.getText(), 3);
+
+                // Undo the append. This should not crash, despite not having a valid cursor
+                // position in the undo operation.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
     public void testUndoTextWatcher() {
         initTextViewForTyping();
 
