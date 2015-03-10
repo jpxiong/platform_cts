@@ -553,7 +553,8 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 List<Surface> outputSurfaces = new ArrayList<Surface>();
                 outputSurfaces.add(yuvSurface);
                 outputSurfaces.add(captureSurface);
-                CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
+                CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces,
+                        CameraDevice.TEMPLATE_PREVIEW);
                 SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
 
                 for (int i = 0; i < NUM_SINGLE_CAPTURE_TESTED; i++) {
@@ -727,28 +728,6 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 image.close();
             }
         }
-    }
-
-    private CaptureRequest prepareCaptureRequest() throws Exception {
-        List<Surface> outputSurfaces = new ArrayList<Surface>();
-        Surface surface = mReader.getSurface();
-        assertNotNull("Fail to get surface from ImageReader", surface);
-        outputSurfaces.add(surface);
-        return prepareCaptureRequestForSurfaces(outputSurfaces).build();
-    }
-
-    private CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces)
-            throws Exception {
-        createSession(surfaces);
-
-        CaptureRequest.Builder captureBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        assertNotNull("Fail to get captureRequest", captureBuilder);
-        for (Surface surface : surfaces) {
-            captureBuilder.addTarget(surface);
-        }
-
-        return captureBuilder;
     }
 
     private void validateImage(Size sz, int format, int captureCount,  boolean repeating)
