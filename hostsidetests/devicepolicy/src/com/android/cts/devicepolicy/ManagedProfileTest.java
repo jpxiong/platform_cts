@@ -88,6 +88,14 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         assertFalse(listUsers().contains(mUserId));
     }
 
+    public void testMaxUsersStrictlyMoreThanOne() throws Exception {
+        if (hasDeviceFeature("android.software.managed_users")) {
+            assertTrue("Device must support more than 1 user "
+                    + "if android.software.managed_users feature is available",
+            getMaxNumberOfUsersSupported() > 1);
+        }
+    }
+
     public void testCrossProfileIntentFilters() throws Exception {
         if (!mHasFeature) {
             return;
