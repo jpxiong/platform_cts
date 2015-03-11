@@ -117,6 +117,31 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
+     * Tests that the policy defines no booleans (runtime conditional policy).
+     *
+     * @throws Exception
+     */
+    public void testNoBooleans() throws Exception {
+
+        /* run sepolicy-analyze booleans check on policy file */
+        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
+                devicePolicyFile.getAbsolutePath(), "booleans");
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The policy contained booleans:\n"
+                   + errorString, errorString.length() == 0);
+    }
+
+    /**
      * Tests that important domain labels are being appropriately applied.
      */
 
