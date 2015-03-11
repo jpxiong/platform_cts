@@ -31,7 +31,8 @@ $(cts_library_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_library_xml): PRIVATE_LIBRARY := $(LOCAL_MODULE)
 $(cts_library_xml): PRIVATE_JAR_PATH := $(LOCAL_MODULE).jar
 $(cts_library_xml): PRIVATE_RUNTIME_ARGS := $(LOCAL_CTS_TARGET_RUNTIME_ARGS)
-$(cts_library_xml): $(TARGET_OUT_JAVA_LIBRARIES)/$(LOCAL_MODULE).jar $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
+$(cts_library_xml): $(cts_library_jar)
+$(cts_library_xml): $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for target library $(PRIVATE_LIBRARY)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
 	$(hide) $(CTS_JAVA_TEST_SCANNER) -s $(PRIVATE_PATH) \
