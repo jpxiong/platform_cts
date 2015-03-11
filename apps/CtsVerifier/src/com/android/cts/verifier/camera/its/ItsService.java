@@ -544,6 +544,8 @@ public class ItsService extends Service implements SensorEventListener {
                     doCapture(cmdObj);
                 } else if ("doVibrate".equals(cmdObj.getString("cmdName"))) {
                     doVibrate(cmdObj);
+                } else if ("getCameraIds".equals(cmdObj.getString("cmdName"))) {
+                    doGetCameraIds();
                 } else {
                     throw new ItsException("Unknown command: " + cmd);
                 }
@@ -727,6 +729,38 @@ public class ItsService extends Service implements SensorEventListener {
 
     private void doGetProps() throws ItsException {
         mSocketRunnableObj.sendResponse(mCameraCharacteristics);
+    }
+
+    private void doGetCameraIds() throws ItsException {
+        String[] devices;
+        try {
+            devices = mCameraManager.getCameraIdList();
+            if (devices == null || devices.length == 0) {
+                throw new ItsException("No camera devices");
+            }
+        } catch (CameraAccessException e) {
+            throw new ItsException("Failed to get device ID list", e);
+        }
+
+        try {
+            JSONObject obj = new JSONObject();
+            JSONArray array = new JSONArray();
+            for (String id : devices) {
+                CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(id);
+                // Only supply camera Id for non-legacy cameras since legacy camera does not
+                // support ITS
+                if (characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL) !=
+                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
+                    array.put(id);
+                }
+            }
+            obj.put("cameraIdArray", array);
+            mSocketRunnableObj.sendResponse("cameraIds", obj);
+        } catch (org.json.JSONException e) {
+            throw new ItsException("JSON error: ", e);
+        } catch (android.hardware.camera2.CameraAccessException e) {
+            throw new ItsException("Access error: ", e);
+        }
     }
 
     private void prepareCaptureReader(int[] widths, int[] heights, int formats[], int numSurfaces) {
