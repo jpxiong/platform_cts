@@ -79,6 +79,14 @@ public class SELinuxTest extends AndroidTestCase {
         assertEquals(0, files.length);
     }
 
+    public void testCTSIsUntrustedApp() throws IOException {
+        String found = KernelSettingsTest.getFile("/proc/self/attr/current");
+        String expected = "u:r:untrusted_app:s0";
+        String msg = "Expected prefix context: \"" + expected + "\"" +
+                        ", Found: \"" + found + "\"";
+        assertTrue(msg, found.startsWith(expected));
+    }
+
     private static native boolean checkSELinuxAccess(String scon, String tcon, String tclass, String perm, String extra);
 
     private static native boolean checkSELinuxContext(String con);
