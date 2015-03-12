@@ -164,6 +164,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
+        assertFalse(f.exists());
     }
 
     @MediumTest
@@ -172,6 +173,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
+        assertFalse(f.exists());
     }
 
     @MediumTest
