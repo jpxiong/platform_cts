@@ -28,6 +28,7 @@ import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +57,7 @@ public class SELinuxHostTest extends DeviceTestCase {
     private File sepolicyAnalyze;
     private File checkSeapp;
     private File checkFc;
+    private File generalSeappFile;
     private File devicePolicyFile;
     private File deviceSeappFile;
     private File deviceFcFile;
@@ -127,6 +129,9 @@ public class SELinuxHostTest extends DeviceTestCase {
         deviceSvcFile.deleteOnExit();
         mDevice.executeAdbCommand("pull", "/service_contexts",
                 deviceSvcFile.getAbsolutePath());
+
+        /* retrieve the general_seapp_contexts file from jar */
+        generalSeappFile = copyResourceToTempFile("/general_seapp_contexts");
     }
 
     /**
@@ -159,7 +164,7 @@ public class SELinuxHostTest extends DeviceTestCase {
      *
      * @throws Exception
      */
-    public void testSeappContexts() throws Exception {
+    public void testValidSeappContexts() throws Exception {
         File OutputFile = File.createTempFile("seapp_output", ".tmp");
         OutputFile.deleteOnExit();
 
@@ -181,6 +186,25 @@ public class SELinuxHostTest extends DeviceTestCase {
         }
         assertTrue("The seapp_contexts file was invalid:\n"
                    + errorString, errorString.length() == 0);
+    }
+
+    /**
+     * Tests that the seapp_contexts file on the device contains
+     * the standard AOSP entries.
+     *
+     * @throws Exception
+     */
+    public void testAOSPSeappContexts() throws Exception {
+        BufferedReader generalFile = new BufferedReader(new FileReader(generalSeappFile.getAbsolutePath()));
+        BufferedReader deviceFile = new BufferedReader(new FileReader(deviceSeappFile.getAbsolutePath()));
+        String line1, line2;
+        while ((line1 = generalFile.readLine()) != null) {
+            line2 = deviceFile.readLine();
+            assertTrue("seapp_contexts does not include AOSP entries:\n"
+                       + "AOSP had:" + line1 + "\n"
+                       + "Device had:" + line2 + "\n",
+                       line1.equals(line2));
+        }
     }
 
     /**
