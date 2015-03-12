@@ -71,8 +71,6 @@ public class SELinuxTest extends AndroidTestCase {
 
     public void testZygote() {
         assertFalse(checkSELinuxAccess("u:r:zygote:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
-        // Also check init, just as a sanity check (init is unconfined, so it should pass)
-        assertTrue(checkSELinuxAccess("u:r:init:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
     }
 
     public void testNoBooleans() throws Exception {
