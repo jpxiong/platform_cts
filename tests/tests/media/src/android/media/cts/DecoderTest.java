@@ -996,7 +996,7 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testVP9Decode640x360() throws Exception {
-        testDecode(R.raw.video_640x360_webm_vp9_1638kbps_30fps_vorbis_stereo_128kbps_48000hz, 249);
+        testDecode(R.raw.video_640x360_webm_vp9_1600kbps_30fps_vorbis_stereo_128kbps_48000hz, 249);
     }
 
     public void testVP9Decode30fps1280x720Tv() throws Exception {
