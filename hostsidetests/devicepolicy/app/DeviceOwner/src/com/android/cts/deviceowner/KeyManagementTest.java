@@ -34,11 +34,13 @@ public class KeyManagementTest extends BaseDeviceOwnerTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        // Enable credential storage by setting a nonempty password.
         assertTrue(mDevicePolicyManager.resetPassword("test", 0));
     }
 
     @Override
     protected void tearDown() throws Exception {
+        // Delete all keys by resetting our password to null, which clears the keystore.
         mDevicePolicyManager.setPasswordQuality(getWho(),
                 DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
         mDevicePolicyManager.setPasswordMinimumLength(getWho(), 0);
