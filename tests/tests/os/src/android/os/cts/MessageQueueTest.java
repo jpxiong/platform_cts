@@ -16,8 +16,6 @@
 
 package android.os.cts;
 
-
-import android.os.Debug;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -646,6 +644,81 @@ public class MessageQueueTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Since file descriptor numbers may be reused, there are some interesting
+     * edge cases around closing file descriptors within the callback and adding
+     * new ones with the same number.
+     *
+     * Register a file descriptor, make a duplicate of it, close it from within the
+     * callback before returning, return.  Look for signs that the Looper is spinning
+     * and never getting a chance to block.
+     *
+     * This test exercises special logic in Looper.cpp for rebuilding the epoll set
+     * in case it contains a file descriptor which has been closed and cannot be removed.
+     */
+    public void testPathologicalFileDescriptorReuseCallbacks4() throws Throwable {
+        // Prepare a special looper that we can catch exceptions from.
+        ParcelFileDescriptor dup = null;
+        AssertableHandlerThread thread = new AssertableHandlerThread();
+        thread.start();
+        try {
+            try {
+                final MessageQueue queue = thread.getLooper().getQueue();
+                final Handler handler = new Handler(thread.getLooper());
+
+                final ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
+                dup = pipe[0].dup();
+                try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
+                        final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
+                    // Register the callback.
+                    final boolean[] awoke = new boolean[1];
+                    queue.registerFileDescriptorCallback(reader.getFD(),
+                            FileDescriptorCallback.EVENT_ERROR, new FileDescriptorCallback() {
+                        @Override
+                        public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                            awoke[0] = true;
+
+                            // Close the file descriptor before we return.
+                            try {
+                                reader.close();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
+                            // Return 0 to unregister the callback.
+                            return 0;
+                        }
+                    });
+
+                    // Close the writer to wake up the callback (due to hangup).
+                    writer.close();
+
+                    // Wait for the looper to catch up and run the callback.
+                    syncWait(handler);
+                    assertTrue(awoke[0]);
+                }
+
+                // Wait a little bit before we stop the thread.
+                Thread.sleep(2000);
+            } finally {
+                // Check for how long the thread was running.
+                // If the Looper behaved correctly, then it should have blocked for most of
+                // the duration of the test (including that sleep above) since not much else
+                // was happening.  If we failed to actually rebuild the epoll set then the
+                // Looper may have been spinning continuously due to an FD that was never
+                // properly removed from the epoll set so the thread runtime will be very high.
+                long runtime = thread.quitAndRethrow();
+                assertFalse("Looper thread spent most of its time spinning instead of blocked.",
+                        runtime > 1000);
+            }
+        } finally {
+            // Close the duplicate now that we are done with it.
+            if (dup != null) {
+                dup.close();
+            }
+        }
+    }
+
     public void testSyncBarriers() throws Exception {
         OrderTestHelper tester = new OrderTestHelper() {
             private int mBarrierToken1;
@@ -832,6 +905,7 @@ public class MessageQueueTest extends AndroidTestCase {
      */
     private class AssertableHandlerThread extends HandlerThread {
         private Throwable mThrowable;
+        private long mRuntime;
 
         public AssertableHandlerThread() {
             super("AssertableHandlerThread");
@@ -839,19 +913,23 @@ public class MessageQueueTest extends AndroidTestCase {
 
         @Override
         public void run() {
+            final long startTime = SystemClock.currentThreadTimeMillis();
             try {
                 super.run();
             } catch (Throwable t) {
                 mThrowable = t;
+            } finally {
+                mRuntime = SystemClock.currentThreadTimeMillis() - startTime;
             }
         }
 
-        public void quitAndRethrow() throws Throwable {
+        public long quitAndRethrow() throws Throwable {
             quitSafely();
             join(TIMEOUT);
             if (mThrowable != null) {
                 throw mThrowable;
             }
+            return mRuntime;
         }
     }
 }
