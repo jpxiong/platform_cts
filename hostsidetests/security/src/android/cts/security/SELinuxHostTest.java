@@ -54,7 +54,13 @@ import java.util.Set;
 public class SELinuxHostTest extends DeviceTestCase {
 
     private File sepolicyAnalyze;
+    private File checkSeapp;
+    private File checkFc;
     private File devicePolicyFile;
+    private File deviceSeappFile;
+    private File deviceFcFile;
+    private File devicePcFile;
+    private File deviceSvcFile;
 
     /**
      * A reference to the device under test.
@@ -84,11 +90,43 @@ public class SELinuxHostTest extends DeviceTestCase {
         sepolicyAnalyze = copyResourceToTempFile("/sepolicy-analyze");
         sepolicyAnalyze.setExecutable(true);
 
+        /* retrieve the checkseapp executable from jar */
+        checkSeapp = copyResourceToTempFile("/checkseapp");
+        checkSeapp.setExecutable(true);
+
+        /* retrieve the checkfc executable from jar */
+        checkFc = copyResourceToTempFile("/checkfc");
+        checkFc.setExecutable(true);
+
         /* obtain sepolicy file from running device */
         devicePolicyFile = File.createTempFile("sepolicy", ".tmp");
         devicePolicyFile.deleteOnExit();
         mDevice.executeAdbCommand("pull", "/sys/fs/selinux/policy",
                 devicePolicyFile.getAbsolutePath());
+
+        /* obtain seapp_contexts file from running device */
+        deviceSeappFile = File.createTempFile("seapp_contexts", ".tmp");
+        deviceSeappFile.deleteOnExit();
+        mDevice.executeAdbCommand("pull", "/seapp_contexts",
+                deviceSeappFile.getAbsolutePath());
+
+        /* obtain file_contexts file from running device */
+        deviceFcFile = File.createTempFile("file_contexts", ".tmp");
+        deviceFcFile.deleteOnExit();
+        mDevice.executeAdbCommand("pull", "/file_contexts",
+                deviceFcFile.getAbsolutePath());
+
+        /* obtain property_contexts file from running device */
+        devicePcFile = File.createTempFile("property_contexts", ".tmp");
+        devicePcFile.deleteOnExit();
+        mDevice.executeAdbCommand("pull", "/property_contexts",
+                devicePcFile.getAbsolutePath());
+
+        /* obtain service_contexts file from running device */
+        deviceSvcFile = File.createTempFile("service_contexts", ".tmp");
+        deviceSvcFile.deleteOnExit();
+        mDevice.executeAdbCommand("pull", "/service_contexts",
+                deviceSvcFile.getAbsolutePath());
     }
 
     /**
@@ -117,6 +155,113 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
+     * Tests that the seapp_contexts file on the device is valid.
+     *
+     * @throws Exception
+     */
+    public void testSeappContexts() throws Exception {
+        File OutputFile = File.createTempFile("seapp_output", ".tmp");
+        OutputFile.deleteOnExit();
+
+        /* run checkseapp on seapp_contexts */
+        ProcessBuilder pb = new ProcessBuilder(checkSeapp.getAbsolutePath(),
+                "-p", devicePolicyFile.getAbsolutePath(),
+                deviceSeappFile.getAbsolutePath(),
+                "-o", OutputFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The seapp_contexts file was invalid:\n"
+                   + errorString, errorString.length() == 0);
+    }
+
+    /**
+     * Tests that the file_contexts file on the device is valid.
+     *
+     * @throws Exception
+     */
+    public void testFileContexts() throws Exception {
+
+        /* run checkfc on file_contexts */
+        ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
+                devicePolicyFile.getAbsolutePath(),
+                deviceFcFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The file_contexts file was invalid:\n"
+                   + errorString, errorString.length() == 0);
+    }
+
+    /**
+     * Tests that the property_contexts file on the device is valid.
+     *
+     * @throws Exception
+     */
+    public void testPropertyContexts() throws Exception {
+
+        /* run checkfc -p on property_contexts */
+        ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
+                "-p", devicePolicyFile.getAbsolutePath(),
+                devicePcFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The property_contexts file was invalid:\n"
+                   + errorString, errorString.length() == 0);
+    }
+
+    /**
+     * Tests that the service_contexts file on the device is valid.
+     *
+     * @throws Exception
+     */
+    public void testServiceContexts() throws Exception {
+
+        /* run checkfc -p on service_contexts */
+        ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
+                "-p", devicePolicyFile.getAbsolutePath(),
+                devicePcFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The service_contexts file was invalid:\n"
+                   + errorString, errorString.length() == 0);
+    }
+
+   /**
      * Tests that the policy defines no booleans (runtime conditional policy).
      *
      * @throws Exception
