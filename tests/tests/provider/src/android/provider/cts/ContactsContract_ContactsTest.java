@@ -101,6 +101,12 @@ public class ContactsContract_ContactsTest extends AndroidTestCase {
         assertEquals(ContentUris.withAppendedId(Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI,
                 lookupKey), contactId), lookupUri);
 
+        Uri nullLookupUri = Contacts.getLookupUri(contactId, null);
+        assertNull(nullLookupUri);
+
+        Uri emptyLookupUri = Contacts.getLookupUri(contactId, "");
+        assertNull(emptyLookupUri);
+
         Uri lookupUri2 = Contacts.getLookupUri(mResolver, contactUri);
         assertEquals(lookupUri, lookupUri2);
 
