@@ -57,7 +57,10 @@ public class SELinuxHostTest extends DeviceTestCase {
     private File sepolicyAnalyze;
     private File checkSeapp;
     private File checkFc;
-    private File generalSeappFile;
+    private File aospSeappFile;
+    private File aospFcFile;
+    private File aospPcFile;
+    private File aospSvcFile;
     private File devicePolicyFile;
     private File deviceSeappFile;
     private File deviceFcFile;
@@ -130,8 +133,11 @@ public class SELinuxHostTest extends DeviceTestCase {
         mDevice.executeAdbCommand("pull", "/service_contexts",
                 deviceSvcFile.getAbsolutePath());
 
-        /* retrieve the general_seapp_contexts file from jar */
-        generalSeappFile = copyResourceToTempFile("/general_seapp_contexts");
+        /* retrieve the AOSP *_contexts files from jar */
+        aospSeappFile = copyResourceToTempFile("/general_seapp_contexts");
+        aospFcFile = copyResourceToTempFile("/general_file_contexts");
+        aospPcFile = copyResourceToTempFile("/general_property_contexts");
+        aospSvcFile = copyResourceToTempFile("/general_service_contexts");
     }
 
     /**
@@ -189,22 +195,62 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
+     * Asserts that the actual file contents starts with the expected file
+     * contents.
+     *
+     * @param expectedFile
+     *  The file with the expected contents.
+     * @param actualFile
+     *  The actual file being checked.
+     */
+    private void assertFileStartsWith(File expectedFile, File actualFile) throws Exception {
+        BufferedReader expectedReader = new BufferedReader(new FileReader(expectedFile.getAbsolutePath()));
+        BufferedReader actualReader = new BufferedReader(new FileReader(actualFile.getAbsolutePath()));
+        String expectedLine, actualLine;
+        while ((expectedLine = expectedReader.readLine()) != null) {
+            actualLine = actualReader.readLine();
+            assertEquals("Lines do not match:", expectedLine, actualLine);
+        }
+    }
+
+    /**
      * Tests that the seapp_contexts file on the device contains
      * the standard AOSP entries.
      *
      * @throws Exception
      */
-    public void testAOSPSeappContexts() throws Exception {
-        BufferedReader generalFile = new BufferedReader(new FileReader(generalSeappFile.getAbsolutePath()));
-        BufferedReader deviceFile = new BufferedReader(new FileReader(deviceSeappFile.getAbsolutePath()));
-        String line1, line2;
-        while ((line1 = generalFile.readLine()) != null) {
-            line2 = deviceFile.readLine();
-            assertTrue("seapp_contexts does not include AOSP entries:\n"
-                       + "AOSP had:" + line1 + "\n"
-                       + "Device had:" + line2 + "\n",
-                       line1.equals(line2));
-        }
+    public void testAospSeappContexts() throws Exception {
+        assertFileStartsWith(aospSeappFile, deviceSeappFile);
+    }
+
+    /**
+     * Tests that the file_contexts file on the device contains
+     * the standard AOSP entries.
+     *
+     * @throws Exception
+     */
+    public void testAospFileContexts() throws Exception {
+        assertFileStartsWith(aospFcFile, deviceFcFile);
+    }
+
+    /**
+     * Tests that the property_contexts file on the device contains
+     * the standard AOSP entries.
+     *
+     * @throws Exception
+     */
+    public void testAospPropertyContexts() throws Exception {
+        assertFileStartsWith(aospPcFile, devicePcFile);
+    }
+
+    /**
+     * Tests that the service_contexts file on the device contains
+     * the standard AOSP entries.
+     *
+     * @throws Exception
+     */
+    public void testAospServiceContexts() throws Exception {
+        assertFileStartsWith(aospSvcFile, deviceSvcFile);
     }
 
     /**
@@ -212,7 +258,7 @@ public class SELinuxHostTest extends DeviceTestCase {
      *
      * @throws Exception
      */
-    public void testFileContexts() throws Exception {
+    public void testValidFileContexts() throws Exception {
 
         /* run checkfc on file_contexts */
         ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
@@ -238,7 +284,7 @@ public class SELinuxHostTest extends DeviceTestCase {
      *
      * @throws Exception
      */
-    public void testPropertyContexts() throws Exception {
+    public void testValidPropertyContexts() throws Exception {
 
         /* run checkfc -p on property_contexts */
         ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
@@ -264,7 +310,7 @@ public class SELinuxHostTest extends DeviceTestCase {
      *
      * @throws Exception
      */
-    public void testServiceContexts() throws Exception {
+    public void testValidServiceContexts() throws Exception {
 
         /* run checkfc -p on service_contexts */
         ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
