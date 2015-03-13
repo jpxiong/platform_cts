@@ -426,6 +426,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         waitForNumResults(resultListener, NUM_FRAMES_WAITED);
 
         stopPreview();
+
+        // Free image resources
+        image.close();
+        closeImageReader();
         return;
     }
 
@@ -595,6 +599,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
         validateJpegCapture(image, maxStillSz);
 
+        // Free image resources
+        image.close();
+
         stopPreview();
     }
 
@@ -641,6 +648,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 Image image = imageListener.getImage((mStaticInfo.isHardwareLevelLegacy()) ?
                         RELAXED_CAPTURE_IMAGE_TIMEOUT_MS : CAPTURE_IMAGE_TIMEOUT_MS);
                 validateJpegCapture(image, stillSz);
+
+                // Free image resources
+                image.close();
+
                 // stopPreview must be called here to make sure next time a preview stream
                 // is created with new size.
                 stopPreview();
@@ -690,6 +701,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             Log.d(TAG, "Dump raw file into " + rawFileName);
             dumpFile(rawFileName, rawBuffer);
         }
+
+        // Free image resources
+        image.close();
 
         stopPreview();
     }
@@ -1008,6 +1022,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             if (!mStaticInfo.isHardwareLevelLegacy()) {
                 jpegTestExifExtraTags(exif, maxStillSz, stillResult);
             }
+
+            // Free image resources
+            image.close();
         }
     }
 
