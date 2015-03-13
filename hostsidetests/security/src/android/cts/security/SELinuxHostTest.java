@@ -166,6 +166,44 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
+     * Asserts that specified type is not associated with the specified
+     * attribute.
+     *
+     * @param attribute
+     *  The attribute name.
+     * @param type
+     *  The type name.
+     */
+    private void assertNotInAttribute(String attribute, String badtype) throws Exception {
+        /* run sepolicy-analyze attribute check on policy file */
+        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
+                devicePolicyFile.getAbsolutePath(), "attribute", attribute);
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String type;
+        while ((type = result.readLine()) != null) {
+            assertFalse("Attribute " + attribute + " includes " + type + "\n",
+                        type.equals(badtype));
+        }
+    }
+
+    /**
+     * Tests that mlstrustedsubject does not include untrusted_app
+     * and that mlstrustedobject does not include app_data_file.
+     * This helps prevent circumventing the per-user isolation of
+     * normal apps via levelFrom=user.
+     *
+     * @throws Exception
+     */
+    public void testMLSAttributes() throws Exception {
+        assertNotInAttribute("mlstrustedsubject", "untrusted_app");
+        assertNotInAttribute("mlstrustedobject", "app_data_file");
+    }
+
+    /**
      * Tests that the seapp_contexts file on the device is valid.
      *
      * @throws Exception
