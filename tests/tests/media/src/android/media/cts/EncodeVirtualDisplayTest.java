@@ -86,7 +86,8 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
     // Encoder parameters.  We use the same width/height as the virtual display.
     private static final String MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC;
     private static int sFrameRate = 15;               // 15fps
-    private static final int IFRAME_INTERVAL = 10;    // 10 seconds between I-frames
+    // 100 days between I-frames
+    private static final int IFRAME_INTERVAL = 60 * 60 * 24 * 100;
     private static int sBitRate = 6000000;            // 6Mbps
 
     // Colors to test (RGB).  These must convert cleanly to and from BT.601 YUV.
