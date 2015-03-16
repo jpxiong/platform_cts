@@ -83,6 +83,7 @@ public class MmsTest extends AndroidTestCase {
 
     private Random mRandom;
     private SentReceiver mSentReceiver;
+    private TelephonyManager mTelephonyManager;
 
     private static class SentReceiver extends BroadcastReceiver {
         private final Object mLock;
@@ -161,9 +162,16 @@ public class MmsTest extends AndroidTestCase {
         super.setUp();
 
         mRandom = new Random();
+        mTelephonyManager =
+                (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
     }
 
     public void testSendMmsMessage() {
+        if (!mTelephonyManager.isSmsCapable()) {
+            Log.i(TAG, "testSendMmsMessage skipped: not SMS capable");
+            return;
+        }
+
         Log.i(TAG, "testSendMmsMessage");
         final Context context = getContext();
         // Register sent receiver
