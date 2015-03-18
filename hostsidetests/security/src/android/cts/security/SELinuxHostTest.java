@@ -590,6 +590,16 @@ public class SELinuxHostTest extends DeviceTestCase {
         assertDomainZeroOrOne("u:r:watchdogd:s0", "/sbin/watchdogd");
     }
 
+    /* logd may or may not be there */
+    public void testLogdDomain() throws DeviceNotAvailableException {
+        assertDomainZeroOrOne("u:r:logd:s0", "/system/bin/logd");
+    }
+
+    /* lmkd may or may not be there */
+    public void testLmkdDomain() throws DeviceNotAvailableException {
+        assertDomainZeroOrOne("u:r:lmkd:s0", "/system/bin/lmkd");
+    }
+
     /* Wifi may be off so cardinality of 0 or 1 is ok */
     public void testWpaDomain() throws DeviceNotAvailableException {
         assertDomainZeroOrOne("u:r:wpa:s0", "/system/bin/wpa_supplicant");
