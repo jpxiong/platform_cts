@@ -14,7 +14,7 @@
 
 # Test XMLs, native executables, and packages will be placed in this
 # directory before creating the final CTS distribution.
-CTS_TESTCASES_OUT := $(HOST_OUT)/cts/android-cts/repository/testcases
+CTS_TESTCASES_OUT := $(HOST_OUT)/cts-testcases
 
 # Scanners of source files for tests which are then inputed into
 # the XML generator to produce test XMLs.
