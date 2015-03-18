@@ -29,6 +29,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
                                compatibility-common-util-devicesidelib_v2 \
                                cts-sensors-tests \
                                ctstestrunner \
+                               apache-commons-math \
+                               androidplot \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
