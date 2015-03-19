@@ -569,79 +569,79 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeAbs(TestAbs.ArgumentsCharUchar args) {
+    static public void computeAbs(GeneratedTestAbs.ArgumentsCharUchar args) {
         args.out = (byte)Math.abs(args.inV);
     }
 
-    static public void computeAbs(TestAbs.ArgumentsShortUshort args) {
+    static public void computeAbs(GeneratedTestAbs.ArgumentsShortUshort args) {
         args.out = (short)Math.abs(args.inV);
     }
 
-    static public void computeAbs(TestAbs.ArgumentsIntUint args) {
+    static public void computeAbs(GeneratedTestAbs.ArgumentsIntUint args) {
         args.out = Math.abs(args.inV);
     }
 
-    static public void computeAcos(TestAcos.ArgumentsFloatFloat args, Target t) {
+    static public void computeAcos(GeneratedTestAcos.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = acos(args.inV, t);
     }
 
-    static public void computeAcosh(TestAcosh.ArgumentsFloatFloat args, Target t) {
+    static public void computeAcosh(GeneratedTestAcosh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = acosh(args.inV, t);
     }
 
-    static public void computeAcospi(TestAcospi.ArgumentsFloatFloat args, Target t) {
+    static public void computeAcospi(GeneratedTestAcospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = acospi(args.inV, t);
     }
 
-    static public void computeAsin(TestAsin.ArgumentsFloatFloat args, Target t) {
+    static public void computeAsin(GeneratedTestAsin.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = asin(args.inV, t);
     }
 
-    static public void computeAsinh(TestAsinh.ArgumentsFloatFloat args, Target t) {
+    static public void computeAsinh(GeneratedTestAsinh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = asinh(args.inV, t);
     }
 
-    static public void computeAsinpi(TestAsinpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeAsinpi(GeneratedTestAsinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = asinpi(args.inV, t);
     }
 
-    static public void computeAtan(TestAtan.ArgumentsFloatFloat args, Target t) {
+    static public void computeAtan(GeneratedTestAtan.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = atan(args.inV, t);
     }
 
-    static public void computeAtanh(TestAtanh.ArgumentsFloatFloat args, Target t) {
+    static public void computeAtanh(GeneratedTestAtanh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = atanh(args.inV, t);
     }
 
-    static public void computeAtanpi(TestAtanpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeAtanpi(GeneratedTestAtanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = atanpi(args.inV, t);
     }
 
-    static public void computeAtan2(TestAtan2.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeAtan2(GeneratedTestAtan2.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(6, 128, false);
         args.out = atan2(args.inNumerator, args.inDenominator, t);
     }
 
-    static public void computeAtan2pi(TestAtan2pi.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeAtan2pi(GeneratedTestAtan2pi.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(6, 128, false);
         args.out = atan2pi(args.inNumerator, args.inDenominator, t);
     }
 
-    static public void computeCbrt(TestCbrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeCbrt(GeneratedTestCbrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(2, 128, false);
         args.out = cbrt(args.inV, t);
     }
 
-    static public void computeCeil(TestCeil.ArgumentsFloatFloat args, Target t) {
+    static public void computeCeil(GeneratedTestCeil.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 1, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -650,451 +650,451 @@ public class CoreMathVerifier {
             ceil(in.max32()));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsCharCharCharChar args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsCharCharCharChar args) {
         args.out = minI8(args.inMaxValue, maxI8(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsUcharUcharUcharUchar args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsUcharUcharUcharUchar args) {
         args.out = minU8(args.inMaxValue, maxU8(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsShortShortShortShort args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsShortShortShortShort args) {
         args.out = minI16(args.inMaxValue, maxI16(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsUshortUshortUshortUshort args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsUshortUshortUshortUshort args) {
         args.out = minU16(args.inMaxValue, maxU16(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsIntIntIntInt args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsIntIntIntInt args) {
         args.out = minI32(args.inMaxValue, maxI32(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsUintUintUintUint args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsUintUintUintUint args) {
         args.out = minU32(args.inMaxValue, maxU32(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsFloatFloatFloatFloat args, Target t) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsFloatFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(Math.min(args.inMaxValue,
                         Math.max(args.inValue, args.inMinValue)));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsLongLongLongLong args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsLongLongLongLong args) {
         args.out = minI64(args.inMaxValue, maxI64(args.inValue, args.inMinValue));
     }
 
-    static public void computeClamp(TestClamp.ArgumentsUlongUlongUlongUlong args) {
+    static public void computeClamp(GeneratedTestClamp.ArgumentsUlongUlongUlongUlong args) {
         args.out = minU64(args.inMaxValue, maxU64(args.inValue, args.inMinValue));
     }
 
-    static public void computeClz(TestClz.ArgumentsCharChar args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsCharChar args) {
         int x = args.inValue;
         args.out = (byte) (Integer.numberOfLeadingZeros(x & 0xff) - 24);
     }
 
-    static public void computeClz(TestClz.ArgumentsUcharUchar args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsUcharUchar args) {
         int x = args.inValue;
         args.out = (byte) (Integer.numberOfLeadingZeros(x & 0xff) - 24);
     }
 
-    static public void computeClz(TestClz.ArgumentsShortShort args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsShortShort args) {
         args.out = (short) (Integer.numberOfLeadingZeros(args.inValue & 0xffff) - 16);
     }
 
-    static public void computeClz(TestClz.ArgumentsUshortUshort args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsUshortUshort args) {
         args.out = (short) (Integer.numberOfLeadingZeros(args.inValue & 0xffff) - 16);
     }
 
-    static public void computeClz(TestClz.ArgumentsIntInt args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsIntInt args) {
         args.out = (int) Integer.numberOfLeadingZeros(args.inValue);
     }
 
-    static public void computeClz(TestClz.ArgumentsUintUint args) {
+    static public void computeClz(GeneratedTestClz.ArgumentsUintUint args) {
         args.out = (int) Integer.numberOfLeadingZeros(args.inValue);
     }
 
 
-    static public void computeConvert(TestConvert.ArgumentsCharChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharChar args) {
         args.out = convertCharToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharUchar args) {
         args.out = convertCharToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharShort args) {
         args.out = convertCharToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharUshort args) {
         args.out = convertCharToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharInt args) {
         args.out = convertCharToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharUint args) {
         args.out = convertCharToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharLong args) {
         args.out = convertCharToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharUlong args) {
         args.out = convertCharToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsCharFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(convertCharToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsCharDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsCharDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertCharToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsUcharChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharChar args) {
         args.out = convertUcharToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharUchar args) {
         args.out = convertUcharToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharShort args) {
         args.out = convertUcharToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharUshort args) {
         args.out = convertUcharToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharInt args) {
         args.out = convertUcharToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharUint args) {
         args.out = convertUcharToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharLong args) {
         args.out = convertUcharToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharUlong args) {
         args.out = convertUcharToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(convertUcharToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsUcharDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUcharDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertUcharToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsShortChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortChar args) {
         args.out = convertShortToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortUchar args) {
         args.out = convertShortToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortShort args) {
         args.out = convertShortToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortUshort args) {
         args.out = convertShortToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortInt args) {
         args.out = convertShortToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortUint args) {
         args.out = convertShortToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortLong args) {
         args.out = convertShortToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortUlong args) {
         args.out = convertShortToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsShortFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(convertShortToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsShortDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsShortDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertShortToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsUshortChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortChar args) {
         args.out = convertUshortToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortUchar args) {
         args.out = convertUshortToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortShort args) {
         args.out = convertUshortToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortUshort args) {
         args.out = convertUshortToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortInt args) {
         args.out = convertUshortToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortUint args) {
         args.out = convertUshortToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortLong args) {
         args.out = convertUshortToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortUlong args) {
         args.out = convertUshortToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(convertUshortToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsUshortDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUshortDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertUshortToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsIntChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntChar args) {
         args.out = convertIntToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntUchar args) {
         args.out = convertIntToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntShort args) {
         args.out = convertIntToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntUshort args) {
         args.out = convertIntToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntInt args) {
         args.out = convertIntToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntUint args) {
         args.out = convertIntToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntLong args) {
         args.out = convertIntToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntUlong args) {
         args.out = convertIntToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsIntFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new32(convertIntToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsIntDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsIntDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertIntToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsUintChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintChar args) {
         args.out = convertUintToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintUchar args) {
         args.out = convertUintToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintShort args) {
         args.out = convertUintToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintUshort args) {
         args.out = convertUintToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintInt args) {
         args.out = convertUintToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintUint args) {
         args.out = convertUintToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintLong args) {
         args.out = convertUintToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintUlong args) {
         args.out = convertUintToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUintFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new32(convertUintToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsUintDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUintDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertUintToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsLongChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongChar args) {
         args.out = convertLongToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongUchar args) {
         args.out = convertLongToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongShort args) {
         args.out = convertLongToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongUshort args) {
         args.out = convertLongToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongInt args) {
         args.out = convertLongToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongUint args) {
         args.out = convertLongToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongLong args) {
         args.out = convertLongToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongUlong args) {
         args.out = convertLongToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsLongFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new32(convertLongToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsLongDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsLongDouble args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new64(convertLongToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsUlongChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongChar args) {
         args.out = convertUlongToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongUchar args) {
         args.out = convertUlongToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongShort args) {
         args.out = convertUlongToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongUshort args) {
         args.out = convertUlongToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongInt args) {
         args.out = convertUlongToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongUint args) {
         args.out = convertUlongToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongLong args) {
         args.out = convertUlongToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongUlong args) {
         args.out = convertUlongToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new32(convertUlongToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsUlongDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsUlongDouble args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new64(convertUlongToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsFloatChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatChar args) {
         args.out = convertFloatToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatUchar args) {
         args.out = convertFloatToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatShort args) {
         args.out = convertFloatToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatUshort args) {
         args.out = convertFloatToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatInt args) {
         args.out = convertFloatToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatUint args) {
         args.out = convertFloatToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatLong args) {
         args.out = convertFloatToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatUlong args) {
         args.out = convertFloatToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(convertFloatToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsFloatDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsFloatDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertFloatToDouble(args.inV));
     }
 
-    static public void computeConvert(TestConvert.ArgumentsDoubleChar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleChar args) {
         args.out = convertDoubleToChar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleUchar args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleUchar args) {
         args.out = convertDoubleToUchar(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleShort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleShort args) {
         args.out = convertDoubleToShort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleUshort args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleUshort args) {
         args.out = convertDoubleToUshort(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleInt args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleInt args) {
         args.out = convertDoubleToInt(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleUint args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleUint args) {
         args.out = convertDoubleToUint(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleLong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleLong args) {
         args.out = convertDoubleToLong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleUlong args) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleUlong args) {
         args.out = convertDoubleToUlong(args.inV);
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleFloat args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = t.new32(convertDoubleToFloat(args.inV));
     }
-    static public void computeConvert(TestConvert.ArgumentsDoubleDouble args, Target t) {
+    static public void computeConvert(GeneratedTestConvert.ArgumentsDoubleDouble args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new64(convertDoubleToDouble(args.inV));
     }
 
-    static public void computeCopysign(TestCopysign.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeCopysign(GeneratedTestCopysign.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(Math.copySign(args.inMagnitudeValue, args.inSignValue));
     }
 
-    static public void computeCos(TestCos.ArgumentsFloatFloat args, Target t) {
+    static public void computeCos(GeneratedTestCos.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = cos(args.inV, t);
     }
 
-    static public void computeCosh(TestCosh.ArgumentsFloatFloat args, Target t) {
+    static public void computeCosh(GeneratedTestCosh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = cosh(args.inV, t);
     }
 
-    static public void computeCospi(TestCospi.ArgumentsFloatFloat args, Target t) {
+    static public void computeCospi(GeneratedTestCospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = cospi(args.inV, t);
     }
 
-    static public void computeCross(TestCross.ArgumentsFloatNFloatNFloatN args, Target t) {
+    static public void computeCross(GeneratedTestCross.ArgumentsFloatNFloatNFloatN args, Target t) {
         t.setPrecision(1, 4, false);
         cross(args.inLeftVector, args.inRightVector, args.out, t);
     }
 
-    static public void computeDegrees(TestDegrees.ArgumentsFloatFloat args, Target t) {
+    static public void computeDegrees(GeneratedTestDegrees.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 3, false);
         Target.Floaty in = t.new32(args.inV);
         Target.Floaty k = t.new32((float)(180.0 / Math.PI));
         args.out = t.multiply(in, k);
     }
 
-    static public void computeDistance(TestDistance.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeDistance(GeneratedTestDistance.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = distance(new float[] {args.inLeftVector}, new float[] {args.inRightVector}, t);
     }
 
-    static public void computeDistance(TestDistance.ArgumentsFloatNFloatNFloat args, Target t) {
+    static public void computeDistance(GeneratedTestDistance.ArgumentsFloatNFloatNFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = distance(args.inLeftVector, args.inRightVector, t);
     }
 
-    static public void computeDot(TestDot.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeDot(GeneratedTestDot.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(1, 4, false);
         Target.Floaty a = t.new32(args.inLeftVector);
         Target.Floaty b = t.new32(args.inRightVector);
         args.out = t.multiply(a, b);
     }
 
-    static public void computeDot(TestDot.ArgumentsFloatNFloatNFloat args, Target t) {
+    static public void computeDot(GeneratedTestDot.ArgumentsFloatNFloatNFloat args, Target t) {
         t.setPrecision(1, 4, false);
         Target.Floaty sum = t.new32(0.f);
         for (int i = 0; i < args.inLeftVector.length; i++) {
@@ -1105,7 +1105,7 @@ public class CoreMathVerifier {
         args.out = sum;
     }
 
-    static public void computeErf(TestErf.ArgumentsFloatFloat args, Target t) {
+    static public void computeErf(GeneratedTestErf.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1114,7 +1114,7 @@ public class CoreMathVerifier {
             erf(in.max32()));
     }
 
-    static public void computeErfc(TestErfc.ArgumentsFloatFloat args, Target t) {
+    static public void computeErfc(GeneratedTestErfc.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1123,27 +1123,27 @@ public class CoreMathVerifier {
             erfc(in.max32()));
     }
 
-    static public void computeExp(TestExp.ArgumentsFloatFloat args, Target t) {
+    static public void computeExp(GeneratedTestExp.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
         args.out = exp(args.inV, t);
     }
 
-    static public void computeExp10(TestExp10.ArgumentsFloatFloat args, Target t) {
+    static public void computeExp10(GeneratedTestExp10.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 32, false);
         args.out = exp10(args.inV, t);
     }
 
-    static public void computeExp2(TestExp2.ArgumentsFloatFloat args, Target t) {
+    static public void computeExp2(GeneratedTestExp2.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
         args.out = exp2(args.inV, t);
     }
 
-    static public void computeExpm1(TestExpm1.ArgumentsFloatFloat args, Target t) {
+    static public void computeExpm1(GeneratedTestExpm1.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
         args.out = expm1(args.inV, t);
     }
 
-    static public void computeFabs(TestFabs.ArgumentsFloatFloat args, Target t) {
+    static public void computeFabs(GeneratedTestFabs.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1152,39 +1152,39 @@ public class CoreMathVerifier {
             Math.abs(in.max32()));
     }
 
-    static public void computeFastDistance(TestFastDistance.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFastDistance(GeneratedTestFastDistance.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         args.out = distance(new float[] {args.inLeftVector}, new float[] {args.inRightVector}, t);
     }
 
-    static public void computeFastDistance(TestFastDistance.ArgumentsFloatNFloatNFloat args, Target t) {
+    static public void computeFastDistance(GeneratedTestFastDistance.ArgumentsFloatNFloatNFloat args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         args.out = distance(args.inLeftVector, args.inRightVector, t);
     }
 
-    static public void computeFastLength(TestFastLength.ArgumentsFloatFloat args, Target t) {
+    static public void computeFastLength(GeneratedTestFastLength.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         args.out = length(new float[] {args.inV}, t);
     }
 
-    static public void computeFastLength(TestFastLength.ArgumentsFloatNFloat args, Target t) {
+    static public void computeFastLength(GeneratedTestFastLength.ArgumentsFloatNFloat args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         args.out = length(args.inV, t);
     }
 
-    static public void computeFastNormalize(TestFastNormalize.ArgumentsFloatFloat args, Target t) {
+    static public void computeFastNormalize(GeneratedTestFastNormalize.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         Target.Floaty[] out = new Target.Floaty[1];
         normalize(new float[] {args.inV}, out, t);
         args.out = out[0];
     }
 
-    static public void computeFastNormalize(TestFastNormalize.ArgumentsFloatNFloatN args, Target t) {
+    static public void computeFastNormalize(GeneratedTestFastNormalize.ArgumentsFloatNFloatN args, Target t) {
         t.setPrecision(FAST_PRECISION, FAST_PRECISION, false);
         normalize(args.inV, args.out, t);
     }
 
-    static public void computeFdim(TestFdim.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFdim(GeneratedTestFdim.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         Target.Floaty inA = t.new32(args.inA);
         Target.Floaty inB = t.new32(args.inB);
@@ -1195,7 +1195,7 @@ public class CoreMathVerifier {
             Math.max(0.f, r.max32()));
     }
 
-    static public void computeFloor(TestFloor.ArgumentsFloatFloat args, Target t) {
+    static public void computeFloor(GeneratedTestFloor.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1204,13 +1204,13 @@ public class CoreMathVerifier {
             floor(in.max32()));
     }
 
-    static public void computeFma(TestFma.ArgumentsFloatFloatFloatFloat args, Target t) {
+    static public void computeFma(GeneratedTestFma.ArgumentsFloatFloatFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         Target.Floaty ab = t.multiply(t.new32(args.inMultiplicand1), t.new32(args.inMultiplicand2));
         args.out = t.add(ab, t.new32(args.inOffset));
     }
 
-    static public void computeFmax(TestFmax.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFmax(GeneratedTestFmax.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty a = t.new32(args.inA);
         Target.Floaty b = t.new32(args.inB);
@@ -1222,7 +1222,7 @@ public class CoreMathVerifier {
             Math.max(a.max32(), b.max32()));
     }
 
-    static public void computeFmin(TestFmin.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFmin(GeneratedTestFmin.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty a = t.new32(args.inA);
         Target.Floaty b = t.new32(args.inB);
@@ -1234,7 +1234,7 @@ public class CoreMathVerifier {
             Math.min(a.max32(), b.max32()));
     }
 
-    static public void computeFmod(TestFmod.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFmod(GeneratedTestFmod.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         Target.Floaty numerator = t.new32(args.inNumerator);
         Target.Floaty denominator = t.new32(args.inDenominator);
@@ -1246,7 +1246,7 @@ public class CoreMathVerifier {
             numerator.max32() % denominator.max32());
     }
 
-    static public void computeFract(TestFract.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeFract(GeneratedTestFract.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         float floor = floor(args.inV);
         args.outFloor = t.new32(floor);
@@ -1254,41 +1254,41 @@ public class CoreMathVerifier {
         args.out = t.new32(Math.min(args.inV - floor, 0x1.fffffep-1f));
     }
 
-    static public void computeFract(TestFract.ArgumentsFloatFloat args, Target t) {
+    static public void computeFract(GeneratedTestFract.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         float floor = floor(args.inV);
         // 0x1.fffffep-1f is 0.999999...
         args.out = t.new32(Math.min(args.inV - floor, 0x1.fffffep-1f));
     }
 
-    static public void computeFrexp(TestFrexp.ArgumentsFloatIntFloat args, Target t) {
+    static public void computeFrexp(GeneratedTestFrexp.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(0, 0, false);
         FrexpResult result = frexp(args.inV);
         args.out = t.new32(result.significand);
         args.outExponent = result.exponent;
     }
 
-    static public void computeHalfRecip(TestHalfRecip.ArgumentsFloatFloat args, Target t) {
+    static public void computeHalfRecip(GeneratedTestHalfRecip.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(HALF_PRECISION, HALF_PRECISION, false);
         args.out = recip(args.inV, t);
     }
 
-    static public void computeHalfRsqrt(TestHalfRsqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeHalfRsqrt(GeneratedTestHalfRsqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(HALF_PRECISION, HALF_PRECISION, false);
         args.out = rsqrt(args.inV, t);
     }
 
-    static public void computeHalfSqrt(TestHalfSqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeHalfSqrt(GeneratedTestHalfSqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(HALF_PRECISION, HALF_PRECISION, false);
         args.out = sqrt(args.inV, t);
     }
 
-    static public void computeHypot(TestHypot.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeHypot(GeneratedTestHypot.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(4, 4, false);
         args.out = hypot(args.inA, args.inB, t);
     }
 
-    static public String verifyIlogb(TestIlogb.ArgumentsFloatInt args) {
+    static public String verifyIlogb(GeneratedTestIlogb.ArgumentsFloatInt args) {
         // Special case when the input is 0.  We accept two different answers.
         if (args.inV == 0.f) {
             if (args.out != -Integer.MAX_VALUE && args.out != Integer.MIN_VALUE) {
@@ -1304,7 +1304,7 @@ public class CoreMathVerifier {
         return null;
     }
 
-    static public void computeLdexp(TestLdexp.ArgumentsFloatIntFloat args, Target t) {
+    static public void computeLdexp(GeneratedTestLdexp.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(1, 1, false);
         Target.Floaty inMantissa = t.new32(args.inMantissa);
         args.out = t.new32(
@@ -1313,17 +1313,17 @@ public class CoreMathVerifier {
             ldexp(inMantissa.max32(), args.inExponent));
     }
 
-    static public void computeLength(TestLength.ArgumentsFloatFloat args, Target t) {
+    static public void computeLength(GeneratedTestLength.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = length(new float[]{args.inV}, t);
     }
 
-    static public void computeLength(TestLength.ArgumentsFloatNFloat args, Target t) {
+    static public void computeLength(GeneratedTestLength.ArgumentsFloatNFloat args, Target t) {
         t.setPrecision(1, 1, false);
         args.out = length(args.inV, t);
     }
 
-    static public void computeLgamma(TestLgamma.ArgumentsFloatFloat args, Target t) {
+    static public void computeLgamma(GeneratedTestLgamma.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1335,7 +1335,7 @@ public class CoreMathVerifier {
     /* TODO Until -0 handling is corrected in bionic & associated drivers, we temporarily
      * disable the verification of -0.  We do this with a custom verifier.  Once bionic
      * is fixed, we can restore computeLgamma and remove verifyLgamma.
-    static public void computeLgamma(TestLgamma.ArgumentsFloatIntFloat args, Target t) {
+    static public void computeLgamma(GeneratedTestLgamma.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         LgammaResult result = lgamma2(in.mid32());
@@ -1345,7 +1345,7 @@ public class CoreMathVerifier {
         args.outY = result.gammaSign;
     }
     */
-    static public String verifyLgamma(TestLgamma.ArgumentsFloatIntFloat args, Target t) {
+    static public String verifyLgamma(GeneratedTestLgamma.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         LgammaResult result = lgamma2(in.mid32());
@@ -1374,27 +1374,27 @@ public class CoreMathVerifier {
 
     // TODO The relaxed ulf for the various log are taken from the old tests.
     // They are not consistent.
-    static public void computeLog(TestLog.ArgumentsFloatFloat args, Target t) {
+    static public void computeLog(GeneratedTestLog.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
         args.out = log(args.inV, t);
     }
 
-    static public void computeLog10(TestLog10.ArgumentsFloatFloat args, Target t) {
+    static public void computeLog10(GeneratedTestLog10.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 16, false);
         args.out = log10(args.inV, t);
     }
 
-    static public void computeLog1p(TestLog1p.ArgumentsFloatFloat args, Target t) {
+    static public void computeLog1p(GeneratedTestLog1p.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(2, 16, false);
         args.out = log1p(args.inV, t);
     }
 
-    static public void computeLog2(TestLog2.ArgumentsFloatFloat args, Target t) {
+    static public void computeLog2(GeneratedTestLog2.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 128, false);
         args.out = log2(args.inV, t);
     }
 
-    static public void computeLogb(TestLogb.ArgumentsFloatFloat args, Target t) {
+    static public void computeLogb(GeneratedTestLogb.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1403,45 +1403,45 @@ public class CoreMathVerifier {
             logb(in.max32()));
     }
 
-    static public void computeMad(TestMad.ArgumentsFloatFloatFloatFloat args, Target t) {
+    static public void computeMad(GeneratedTestMad.ArgumentsFloatFloatFloatFloat args, Target t) {
         t.setPrecision(1, 4, false);
         Target.Floaty ab = t.multiply(t.new32(args.inMultiplicand1), t.new32(args.inMultiplicand2));
         args.out = t.add(ab, t.new32(args.inOffset));
     }
 
-    static public void computeMax(TestMax.ArgumentsCharCharChar args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsCharCharChar args) {
         args.out = maxI8(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsUcharUcharUchar args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsUcharUcharUchar args) {
         args.out = maxU8(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsShortShortShort args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsShortShortShort args) {
         args.out = maxI16(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsUshortUshortUshort args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsUshortUshortUshort args) {
         args.out = maxU16(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsIntIntInt args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsIntIntInt args) {
         args.out = maxI32(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsUintUintUint args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsUintUintUint args) {
         args.out = maxU32(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsLongLongLong args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsLongLongLong args) {
         args.out = maxI64(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsUlongUlongUlong args) {
+    static public void computeMax(GeneratedTestMax.ArgumentsUlongUlongUlong args) {
         args.out = maxU64(args.inA, args.inB);
     }
 
-    static public void computeMax(TestMax.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeMax(GeneratedTestMax.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty a = t.new32(args.inA);
         Target.Floaty b = t.new32(args.inB);
@@ -1453,44 +1453,44 @@ public class CoreMathVerifier {
             Math.max(a.max32(), b.max32()));
     }
 
-    static public void computeMin(TestMin.ArgumentsCharCharChar args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsCharCharChar args) {
         args.out = minI8(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsUcharUcharUchar args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsUcharUcharUchar args) {
         args.out = minU8(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsShortShortShort args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsShortShortShort args) {
         args.out = minI16(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsUshortUshortUshort args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsUshortUshortUshort args) {
         args.out = minU16(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsIntIntInt args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsIntIntInt args) {
         args.out = minI32(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsUintUintUint args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsUintUintUint args) {
         args.out = minU32(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsLongLongLong args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsLongLongLong args) {
         args.out = minI64(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsUlongUlongUlong args) {
+    static public void computeMin(GeneratedTestMin.ArgumentsUlongUlongUlong args) {
         args.out = minU64(args.inA, args.inB);
     }
 
-    static public void computeMin(TestMin.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeMin(GeneratedTestMin.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(Math.min(args.inA, args.inB));
     }
 
-    static public void computeMix(TestMix.ArgumentsFloatFloatFloatFloat args, Target t) {
+    static public void computeMix(GeneratedTestMix.ArgumentsFloatFloatFloatFloat args, Target t) {
         t.setPrecision(1, 4, false);
         Target.Floaty start = t.new32(args.inStart);
         Target.Floaty stop = t.new32(args.inStop);
@@ -1498,146 +1498,146 @@ public class CoreMathVerifier {
         args.out = t.add(start, t.multiply(diff, t.new32(args.inFraction)));
     }
 
-    static public void computeModf(TestModf.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeModf(GeneratedTestModf.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         float ret = (float)(int)args.inV;
         args.outIntegralPart = t.new32(ret);
         args.out = t.new32(args.inV - ret);
     }
 
-    static public void computeNan(TestNan.ArgumentsUintFloat args, Target t) {
+    static public void computeNan(GeneratedTestNan.ArgumentsUintFloat args, Target t) {
         t.setPrecision(0, 0, false);
         // TODO(jeanluc) We're not using the input argument
         args.out = t.new32(Float.NaN);
     }
 
-    static public void computeNativeAcos(TestNativeAcos.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAcos(GeneratedTestNativeAcos.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = acos(args.inV, t);
     }
 
-    static public void computeNativeAcosh(TestNativeAcosh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAcosh(GeneratedTestNativeAcosh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = acosh(args.inV, t);
     }
 
-    static public void computeNativeAcospi(TestNativeAcospi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAcospi(GeneratedTestNativeAcospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = acospi(args.inV, t);
     }
 
-    static public void computeNativeAsin(TestNativeAsin.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAsin(GeneratedTestNativeAsin.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = asin(args.inV, t);
     }
 
-    static public void computeNativeAsinh(TestNativeAsinh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAsinh(GeneratedTestNativeAsinh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = asinh(args.inV, t);
     }
 
-    static public void computeNativeAsinpi(TestNativeAsinpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAsinpi(GeneratedTestNativeAsinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = asinpi(args.inV, t);
     }
 
-    static public void computeNativeAtan(TestNativeAtan.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAtan(GeneratedTestNativeAtan.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = atan(args.inV, t);
     }
 
-    static public void computeNativeAtanh(TestNativeAtanh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAtanh(GeneratedTestNativeAtanh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = atanh(args.inV, t);
     }
 
-    static public void computeNativeAtanpi(TestNativeAtanpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeAtanpi(GeneratedTestNativeAtanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = atanpi(args.inV, t);
     }
 
-    static public void computeNativeAtan2(TestNativeAtan2.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeAtan2(GeneratedTestNativeAtan2.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = atan2(args.inNumerator, args.inDenominator, t);
     }
 
-    static public void computeNativeAtan2pi(TestNativeAtan2pi.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeAtan2pi(GeneratedTestNativeAtan2pi.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = atan2pi(args.inNumerator, args.inDenominator, t);
     }
 
-    static public void computeNativeCbrt(TestNativeCbrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeCbrt(GeneratedTestNativeCbrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = cbrt(args.inV, t);
     }
 
-    static public void computeNativeCos(TestNativeCos.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeCos(GeneratedTestNativeCos.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = cos(args.inV, t);
     }
 
-    static public void computeNativeCosh(TestNativeCosh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeCosh(GeneratedTestNativeCosh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = cosh(args.inV, t);
     }
 
-    static public void computeNativeCospi(TestNativeCospi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeCospi(GeneratedTestNativeCospi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = cospi(args.inV, t);
     }
 
-    static public void computeNativeDistance(TestNativeDistance.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeDistance(GeneratedTestNativeDistance.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = distance(new float[]{args.inLeftVector}, new float[]{args.inRightVector}, t);
     }
 
-    static public void computeNativeDistance(TestNativeDistance.ArgumentsFloatNFloatNFloat args, Target t) {
+    static public void computeNativeDistance(GeneratedTestNativeDistance.ArgumentsFloatNFloatNFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = distance(args.inLeftVector, args.inRightVector, t);
     }
 
-    static public void computeNativeDivide(TestNativeDivide.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeDivide(GeneratedTestNativeDivide.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = t.divide(t.new32(args.inLeftVector), t.new32(args.inRightVector));
     }
 
-    static public void computeNativeExp(TestNativeExp.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeExp(GeneratedTestNativeExp.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = exp(args.inV, t);
     }
 
-    static public void computeNativeExp10(TestNativeExp10.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeExp10(GeneratedTestNativeExp10.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = exp10(args.inV, t);
     }
 
-    static public void computeNativeExp2(TestNativeExp2.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeExp2(GeneratedTestNativeExp2.ArgumentsFloatFloat args, Target t) {
         // TODO we would like to use NATIVE_PRECISION, NATIVE_PRECISION
         t.setPrecision(13000, 13000, true);
         args.out = exp2(args.inV, t);
     }
 
-    static public void computeNativeExpm1(TestNativeExpm1.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeExpm1(GeneratedTestNativeExpm1.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = expm1(args.inV, t);
     }
 
-    static public void computeNativeHypot(TestNativeHypot.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeHypot(GeneratedTestNativeHypot.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = hypot(args.inA, args.inB, t);
     }
 
-    static public void computeNativeLength(TestNativeLength.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeLength(GeneratedTestNativeLength.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = length(new float[] {args.inV}, t);
     }
 
-    static public void computeNativeLength(TestNativeLength.ArgumentsFloatNFloat args, Target t) {
+    static public void computeNativeLength(GeneratedTestNativeLength.ArgumentsFloatNFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = length(args.inV, t);
     }
 
-    static public void computeNativeLog(TestNativeLog.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeLog(GeneratedTestNativeLog.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         // For very small values, allow anything.
         if (Math.abs(args.inV) < 1.e-20) {
@@ -1647,7 +1647,7 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeNativeLog10(TestNativeLog10.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeLog10(GeneratedTestNativeLog10.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         // For very small values, allow anything.
         if (Math.abs(args.inV) < 1.e-20) {
@@ -1657,12 +1657,12 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeNativeLog1p(TestNativeLog1p.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeLog1p(GeneratedTestNativeLog1p.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = log1p(args.inV, t);
     }
 
-    static public void computeNativeLog2(TestNativeLog2.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeLog2(GeneratedTestNativeLog2.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         // For very small values, allow anything.
         if (Math.abs(args.inV) < 1.e-20) {
@@ -1672,19 +1672,19 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeNativeNormalize(TestNativeNormalize.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeNormalize(GeneratedTestNativeNormalize.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         Target.Floaty[] out = new Target.Floaty[1];
         normalize(new float[] {args.inV}, out, t);
         args.out = out[0];
     }
 
-    static public void computeNativeNormalize(TestNativeNormalize.ArgumentsFloatNFloatN args, Target t) {
+    static public void computeNativeNormalize(GeneratedTestNativeNormalize.ArgumentsFloatNFloatN args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         normalize(args.inV, args.out, t);
     }
 
-    static public void computeNativePowr(TestNativePowr.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativePowr(GeneratedTestNativePowr.ArgumentsFloatFloatFloat args, Target t) {
         // TODO we would like to use NATIVE_PRECISION, NATIVE_PRECISION
         t.setPrecision(32000, 32000, true);
         // For very small values, allow anything.
@@ -1695,12 +1695,12 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeNativeRecip(TestNativeRecip.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeRecip(GeneratedTestNativeRecip.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = recip(args.inV, t);
     }
 
-    static public void computeNativeRootn(TestNativeRootn.ArgumentsFloatIntFloat args, Target t) {
+    static public void computeNativeRootn(GeneratedTestNativeRootn.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         // Allow anything for zero.
         if (args.inN == 0) {
@@ -1710,70 +1710,70 @@ public class CoreMathVerifier {
         }
     }
 
-    static public void computeNativeRsqrt(TestNativeRsqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeRsqrt(GeneratedTestNativeRsqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = rsqrt(args.inV, t);
     }
 
-    static public void computeNativeSin(TestNativeSin.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeSin(GeneratedTestNativeSin.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = sin(args.inV, t);
     }
 
-    static public void computeNativeSincos(TestNativeSincos.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNativeSincos(GeneratedTestNativeSincos.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.outCos = cos(args.inV, t);
         args.out = sin(args.inV, t);
     }
 
-    static public void computeNativeSinh(TestNativeSinh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeSinh(GeneratedTestNativeSinh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = sinh(args.inV, t);
     }
 
-    static public void computeNativeSinpi(TestNativeSinpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeSinpi(GeneratedTestNativeSinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = sinpi(args.inV, t);
     }
 
-    static public void computeNativeSqrt(TestNativeSqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeSqrt(GeneratedTestNativeSqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = sqrt(args.inV, t);
     }
 
-    static public void computeNativeTan(TestNativeTan.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeTan(GeneratedTestNativeTan.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = tan(args.inV, t);
     }
 
-    static public void computeNativeTanh(TestNativeTanh.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeTanh(GeneratedTestNativeTanh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = tanh(args.inV, t);
     }
 
-    static public void computeNativeTanpi(TestNativeTanpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeNativeTanpi(GeneratedTestNativeTanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(NATIVE_PRECISION, NATIVE_PRECISION, true);
         args.out = tanpi(args.inV, t);
     }
 
-    static public void computeNextafter(TestNextafter.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeNextafter(GeneratedTestNextafter.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(Math.nextAfter(args.inV, args.inTarget));
     }
 
-    static public void computeNormalize(TestNormalize.ArgumentsFloatFloat args, Target t) {
+    static public void computeNormalize(GeneratedTestNormalize.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(1, 1, false);
         Target.Floaty[] out = new Target.Floaty[1];
         normalize(new float[] {args.inV}, out, t);
         args.out = out[0];
     }
 
-    static public void computeNormalize(TestNormalize.ArgumentsFloatNFloatN args, Target t) {
+    static public void computeNormalize(GeneratedTestNormalize.ArgumentsFloatNFloatN args, Target t) {
         t.setPrecision(1, 1, false);
         normalize(args.inV, args.out, t);
     }
 
-    static public void computePow(TestPow.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computePow(GeneratedTestPow.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty base = t.new32(args.inBase);
         Target.Floaty exponent = t.new32(args.inExponent);
@@ -1785,7 +1785,7 @@ public class CoreMathVerifier {
             pow(base.max32(), exponent.max32()));
     }
 
-    static public void computePown(TestPown.ArgumentsFloatIntFloat args, Target t) {
+    static public void computePown(GeneratedTestPown.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inBase);
         // We use double for the calculations because floats does not have enough
@@ -1798,25 +1798,25 @@ public class CoreMathVerifier {
             (float) Math.pow(in.max32(), y));
     }
 
-    static public void computePowr(TestPowr.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computePowr(GeneratedTestPowr.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         args.out = powr(args.inBase, args.inExponent, t);
     }
 
-    static public void computeRadians(TestRadians.ArgumentsFloatFloat args, Target t) {
+    static public void computeRadians(GeneratedTestRadians.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 3, false);
         Target.Floaty in = t.new32(args.inV);
         Target.Floaty k = t.new32((float)(Math.PI / 180.0));
         args.out = t.multiply(in, k);
     }
 
-    static public void computeRemainder(TestRemainder.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeRemainder(GeneratedTestRemainder.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         RemquoResult result = remquo(args.inNumerator, args.inDenominator);
         args.out = t.new32(result.remainder);
     }
 
-    static public String verifyRemquo(TestRemquo.ArgumentsFloatFloatIntFloat args, Target t) {
+    static public String verifyRemquo(GeneratedTestRemquo.ArgumentsFloatFloatIntFloat args, Target t) {
         t.setPrecision(0, 0, false);
         RemquoResult expected = remquo(args.inNumerator, args.inDenominator);
         // If the expected remainder is NaN, we don't validate the quotient.  It's because of
@@ -1843,7 +1843,7 @@ public class CoreMathVerifier {
         return null;
     }
 
-    static public void computeRint(TestRint.ArgumentsFloatFloat args, Target t) {
+    static public void computeRint(GeneratedTestRint.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1852,12 +1852,12 @@ public class CoreMathVerifier {
             rint(in.max32()));
     }
 
-    static public void computeRootn(TestRootn.ArgumentsFloatIntFloat args, Target t) {
+    static public void computeRootn(GeneratedTestRootn.ArgumentsFloatIntFloat args, Target t) {
         t.setPrecision(16, 16, false);
         args.out = rootn(args.inV, args.inN, t);
     }
 
-    static public void computeRound(TestRound.ArgumentsFloatFloat args, Target t) {
+    static public void computeRound(GeneratedTestRound.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1866,63 +1866,63 @@ public class CoreMathVerifier {
             round(in.max32()));
     }
 
-    static public void computeRsqrt(TestRsqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeRsqrt(GeneratedTestRsqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(2, 2, false);
         args.out = rsqrt(args.inV, t);
     }
 
-    static public void computeSign(TestSign.ArgumentsFloatFloat args, Target t) {
+    static public void computeSign(GeneratedTestSign.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(Math.signum(args.inV));
     }
 
-    static public void computeSin(TestSin.ArgumentsFloatFloat args, Target t) {
+    static public void computeSin(GeneratedTestSin.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = sin(args.inV, t);
     }
 
-    static public void computeSincos(TestSincos.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeSincos(GeneratedTestSincos.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.outCos = cos(args.inV,t );
         args.out = sin(args.inV, t);
     }
 
-    static public void computeSinh(TestSinh.ArgumentsFloatFloat args, Target t) {
+    static public void computeSinh(GeneratedTestSinh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = sinh(args.inV, t);
     }
 
-    static public void computeSinpi(TestSinpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeSinpi(GeneratedTestSinpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = sinpi(args.inV, t);
     }
 
-    static public void computeSqrt(TestSqrt.ArgumentsFloatFloat args, Target t) {
+    static public void computeSqrt(GeneratedTestSqrt.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(3, 3, false);
         args.out = sqrt(args.inV, t);
     }
 
-    static public void computeStep(TestStep.ArgumentsFloatFloatFloat args, Target t) {
+    static public void computeStep(GeneratedTestStep.ArgumentsFloatFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         args.out = t.new32(args.inV < args.inEdge ? 0.f : 1.f);
     }
 
-    static public void computeTan(TestTan.ArgumentsFloatFloat args, Target t) {
+    static public void computeTan(GeneratedTestTan.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = tan(args.inV, t);
     }
 
-    static public void computeTanh(TestTanh.ArgumentsFloatFloat args, Target t) {
+    static public void computeTanh(GeneratedTestTanh.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(5, 128, false);
         args.out = tanh(args.inV, t);
     }
 
-    static public void computeTanpi(TestTanpi.ArgumentsFloatFloat args, Target t) {
+    static public void computeTanpi(GeneratedTestTanpi.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(4, 128, false);
         args.out = tanpi(args.inV, t);
     }
 
-    static public void computeTgamma(TestTgamma.ArgumentsFloatFloat args, Target t) {
+    static public void computeTgamma(GeneratedTestTgamma.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(16, 128, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
@@ -1931,7 +1931,7 @@ public class CoreMathVerifier {
             tgamma(in.max32()));
     }
 
-    static public void computeTrunc(TestTrunc.ArgumentsFloatFloat args, Target t) {
+    static public void computeTrunc(GeneratedTestTrunc.ArgumentsFloatFloat args, Target t) {
         t.setPrecision(0, 0, false);
         Target.Floaty in = t.new32(args.inV);
         args.out = t.new32(
