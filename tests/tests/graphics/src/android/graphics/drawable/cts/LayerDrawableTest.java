@@ -60,9 +60,9 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertEquals(0, layerDrawable.getNumberOfLayers());
 
         try {
-            new LayerDrawable((Drawable[]) null);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
+            new LayerDrawable(null);
+            fail("Should throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
         }
     }
 
@@ -77,7 +77,7 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         assertEquals(4, layerDrawable.getNumberOfLayers());
         assertEquals(ColorDrawable.class, layerDrawable.getDrawable(0).getClass());
-        assertEquals(0x88, (((ColorDrawable) layerDrawable.getDrawable(0)).getAlpha()));
+        assertEquals(0x88, layerDrawable.getDrawable(0).getAlpha());
         assertEquals(View.NO_ID, layerDrawable.getId(0));
         assertEquals(BitmapDrawable.class, layerDrawable.getDrawable(1).getClass());
         assertEquals(View.NO_ID, layerDrawable.getId(1));
@@ -566,7 +566,8 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertFalse(layerDrawable.onStateChange(StateSet.WILD_CARD));
         assertTrue(mockDrawable1.hasCalledSetState());
         assertTrue(mockDrawable2.hasCalledSetState());
-        assertTrue(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
         mockDrawable1.reset();
         mockDrawable2.reset();
@@ -574,7 +575,8 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(layerDrawable.onStateChange(null));
         assertTrue(mockDrawable1.hasCalledSetState());
         assertTrue(mockDrawable2.hasCalledSetState());
-        assertTrue(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
         mockDrawable1.reset();
         mockDrawable2.reset();
@@ -582,7 +584,8 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(layerDrawable.onStateChange(new int[] { attr.state_checked, attr.state_empty }));
         assertTrue(mockDrawable1.hasCalledSetState());
         assertTrue(mockDrawable2.hasCalledSetState());
-        assertTrue(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
     }
 
     public void testOnLevelChange() {
@@ -591,12 +594,13 @@ public class LayerDrawableTest extends AndroidTestCase {
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
         MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
 
-        // this method will call each child's setLevel(),
-        // but just when set a different level the child's onLevelChange will be called.
+        // This method will call each child's setLevel(), but just when set a
+        // different level the child's onLevelChange will be called.
         assertFalse(layerDrawable.onLevelChange(0));
         assertFalse(mockDrawable1.hasCalledOnLevelChange());
         assertFalse(mockDrawable2.hasCalledOnLevelChange());
-        assertFalse(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
         mockDrawable1.reset();
         mockDrawable2.reset();
@@ -604,7 +608,8 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(layerDrawable.onLevelChange(Integer.MAX_VALUE));
         assertTrue(mockDrawable1.hasCalledOnLevelChange());
         assertTrue(mockDrawable2.hasCalledOnLevelChange());
-        assertTrue(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
         mockDrawable1.reset();
         mockDrawable2.reset();
@@ -612,7 +617,8 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(layerDrawable.onLevelChange(Integer.MIN_VALUE));
         assertTrue(mockDrawable1.hasCalledOnLevelChange());
         assertTrue(mockDrawable2.hasCalledOnLevelChange());
-        assertTrue(layerDrawable.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable1.hasCalledOnBoundsChange());
+        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
     }
 
     public void testOnBoundsChange() {
@@ -732,6 +738,8 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         private boolean mCalledSetState = false;
         private boolean mCalledOnLevelChange = false;
+        private boolean mCalledOnBoundsChange = false;
+
 
         private boolean mCalledDraw = false;
 
@@ -801,6 +809,7 @@ public class LayerDrawableTest extends AndroidTestCase {
 
             mCalledSetState = false;
             mCalledOnLevelChange = false;
+            mCalledOnBoundsChange = false;
 
             mCalledDraw = false;
         }
@@ -826,6 +835,16 @@ public class LayerDrawableTest extends AndroidTestCase {
             increasePadding();
             mCalledOnLevelChange = true;
             return true;
+        }
+
+        @Override
+        protected void onBoundsChange(Rect bounds) {
+            mCalledOnBoundsChange = true;
+            super.onBoundsChange(bounds);
+        }
+
+        public boolean hasCalledOnBoundsChange() {
+            return mCalledOnBoundsChange;
         }
 
         @Override
@@ -904,10 +923,9 @@ public class LayerDrawableTest extends AndroidTestCase {
     }
 
     public void testMutate() {
-        Resources resources = mContext.getResources();
-        LayerDrawable d1 = (LayerDrawable) resources.getDrawable(R.drawable.layerdrawable);
-        LayerDrawable d2 = (LayerDrawable) resources.getDrawable(R.drawable.layerdrawable);
-        LayerDrawable d3 = (LayerDrawable) resources.getDrawable(R.drawable.layerdrawable);
+        LayerDrawable d1 = (LayerDrawable) mContext.getDrawable(R.drawable.layerdrawable);
+        LayerDrawable d2 = (LayerDrawable) mContext.getDrawable(R.drawable.layerdrawable);
+        LayerDrawable d3 = (LayerDrawable) mContext.getDrawable(R.drawable.layerdrawable);
 
         d1.setAlpha(100);
         assertEquals(100, ((BitmapDrawable) d1.getDrawable(0)).getPaint().getAlpha());
