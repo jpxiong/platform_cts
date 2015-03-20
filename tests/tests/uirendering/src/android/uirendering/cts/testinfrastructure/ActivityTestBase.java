@@ -235,6 +235,11 @@ public abstract class ActivityTestBase extends
          * every test case is tested against it.
          */
         public void runWithComparer(BitmapComparer bitmapComparer) {
+            if (getActivity().getOnWatch()) {
+                Log.d(TAG, getName() + "skipped");
+                return;
+            }
+
             if (mTestCases.size() == 0) {
                 throw new IllegalStateException("Need at least one test to run");
             }
@@ -253,6 +258,11 @@ public abstract class ActivityTestBase extends
          * the verifier given.
          */
         public void runWithVerifier(BitmapVerifier bitmapVerifier) {
+            if (getActivity().getOnWatch()) {
+                Log.d(TAG, getName() + "skipped");
+                return;
+            }
+
             if (mTestCases.size() == 0) {
                 throw new IllegalStateException("Need at least one test to run");
             }
