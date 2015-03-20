@@ -18,30 +18,29 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.graphics.R;
 
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
+import android.util.StateSet;
 import android.util.Xml;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class InsetDrawableTest extends AndroidTestCase {
+
     public void testConstructor() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         new InsetDrawable(d, 1);
         new InsetDrawable(d, 1, 1, 1, 1);
 
@@ -50,8 +49,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testInflate() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
-        InsetDrawable insetDrawable = new InsetDrawable(d, 0);
+        InsetDrawable insetDrawable = new InsetDrawable(null, 0);
 
         Resources r = mContext.getResources();
         XmlPullParser parser = r.getXml(R.layout.framelayout_layout);
@@ -80,14 +78,14 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testInvalidateDrawable() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         insetDrawable.invalidateDrawable(d);
     }
 
     public void testScheduleDrawable() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         Runnable runnable = new Runnable() {
@@ -102,7 +100,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testUnscheduleDrawable() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         Runnable runnable = new Runnable() {
@@ -117,7 +115,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testDraw() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         Canvas c = new Canvas();
@@ -133,7 +131,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetChangingConfigurations() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         insetDrawable.setChangingConfigurations(11);
@@ -144,7 +142,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetPadding() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 1, 2, 3, 4);
 
         Rect r = new Rect();
@@ -186,7 +184,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testSetVisible() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         assertFalse(insetDrawable.setVisible(true, true)); /* unchanged */
@@ -195,7 +193,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testSetAlpha() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         insetDrawable.setAlpha(1);
@@ -207,7 +205,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testSetColorFilter() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         ColorFilter cf = new ColorFilter();
@@ -219,7 +217,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetOpacity() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.testimage);
+        Drawable d = mContext.getDrawable(R.drawable.testimage);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
         insetDrawable.setAlpha(255);
         assertEquals(PixelFormat.OPAQUE, insetDrawable.getOpacity());
@@ -229,28 +227,25 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testIsStateful() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
         assertFalse(insetDrawable.isStateful());
     }
 
     public void testOnStateChange() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         MockInsetDrawable insetDrawable = new MockInsetDrawable(d, 10);
-
-        Rect bounds = d.getBounds();
-        assertEquals(0, bounds.left);
-        assertEquals(0, bounds.top);
-        assertEquals(0, bounds.right);
-        assertEquals(0, bounds.bottom);
+        assertTrue("initial child state is empty", d.getState() == StateSet.WILD_CARD);
 
         int[] state = new int[] {1, 2, 3};
-        assertFalse(insetDrawable.onStateChange(state));
+        assertFalse("child did not change", insetDrawable.onStateChange(state));
+        assertTrue("child state did not change", d.getState() == StateSet.WILD_CARD);
 
-        assertEquals(10, bounds.left);
-        assertEquals(10, bounds.top);
-        assertEquals(-10, bounds.right);
-        assertEquals(-10, bounds.bottom);
+        d = mContext.getDrawable(R.drawable.statelistdrawable);
+        insetDrawable = new MockInsetDrawable(d, 10);
+        assertTrue("initial child state is null", d.getState() == null);
+        insetDrawable.onStateChange(state);
+        assertTrue("child state changed", Arrays.equals(state, d.getState()));
 
         // input null as param
         insetDrawable.onStateChange(null);
@@ -258,7 +253,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testOnBoundsChange() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         MockInsetDrawable insetDrawable = new MockInsetDrawable(d, 5);
 
         Rect bounds = d.getBounds();
@@ -285,13 +280,13 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetIntrinsicWidth() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         int expected = d.getIntrinsicWidth(); /* 31 */
         assertEquals(expected, insetDrawable.getIntrinsicWidth());
 
-        d = mContext.getResources().getDrawable(R.drawable.scenery);
+        d = mContext.getDrawable(R.drawable.scenery);
         insetDrawable = new InsetDrawable(d, 0);
 
         expected = d.getIntrinsicWidth(); /* 170 */
@@ -299,13 +294,13 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetIntrinsicHeight() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         int expected = d.getIntrinsicHeight(); /* 31 */
         assertEquals(expected, insetDrawable.getIntrinsicHeight());
 
-        d = mContext.getResources().getDrawable(R.drawable.scenery);
+        d = mContext.getDrawable(R.drawable.scenery);
         insetDrawable = new InsetDrawable(d, 0);
 
         expected = d.getIntrinsicHeight(); /* 107 */
@@ -313,7 +308,7 @@ public class InsetDrawableTest extends AndroidTestCase {
     }
 
     public void testGetConstantState() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
 
         ConstantState constantState = insetDrawable.getConstantState();

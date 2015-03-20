@@ -259,7 +259,8 @@ public class ScaleDrawableTest extends AndroidTestCase {
         MockDrawable mockDrawable = new MockDrawable();
         ScaleDrawable scaleDrawable = new ScaleDrawable(mockDrawable, Gravity.CENTER, 100, 200);
 
-        // this method will call contained drawable's getOpacity method.
+        // This method will call contained drawable's getOpacity method.
+        scaleDrawable.setLevel(1);
         scaleDrawable.getOpacity();
         assertTrue(mockDrawable.hasCalledGetOpacity());
     }
@@ -437,10 +438,9 @@ public class ScaleDrawableTest extends AndroidTestCase {
     }
 
     public void testMutate() {
-        Resources resources = mContext.getResources();
-        ScaleDrawable d1 = (ScaleDrawable) resources.getDrawable(R.drawable.scaledrawable);
-        ScaleDrawable d2 = (ScaleDrawable) resources.getDrawable(R.drawable.scaledrawable);
-        ScaleDrawable d3 = (ScaleDrawable) resources.getDrawable(R.drawable.scaledrawable);
+        ScaleDrawable d1 = (ScaleDrawable) mContext.getDrawable(R.drawable.scaledrawable);
+        ScaleDrawable d2 = (ScaleDrawable) mContext.getDrawable(R.drawable.scaledrawable);
+        ScaleDrawable d3 = (ScaleDrawable) mContext.getDrawable(R.drawable.scaledrawable);
 
         d1.setAlpha(100);
         assertEquals(100, ((BitmapDrawable) d1.getDrawable()).getPaint().getAlpha());
