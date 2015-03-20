@@ -303,4 +303,14 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     public boolean checkTv() {
         return MediaUtils.check(isTv(), "not a TV");
     }
+
+    protected void setOnErrorListener() {
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                mOnErrorCalled.signal();
+                return false;
+            }
+        });
+    }
 }
