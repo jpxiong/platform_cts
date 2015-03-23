@@ -321,9 +321,8 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
     private void startByodProvisioning() {
         Intent sending = new Intent(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE);
-        sending.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME,
-                mAdminReceiverComponent.getPackageName());
-        sending.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mAdminReceiverComponent);
+        sending.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
+                mAdminReceiverComponent);
 
         if (sending.resolveActivity(getPackageManager()) != null) {
             // ManagedProvisioning must be started with startActivityForResult, but we don't
