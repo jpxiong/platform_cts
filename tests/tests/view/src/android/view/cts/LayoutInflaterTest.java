@@ -370,6 +370,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
         verifyThemeType(container, "view_outer", R.id.view_outer, 1);
         verifyThemeType(container, "view_inner", R.id.view_inner, 2);
         verifyThemeType(container, "view_attr", R.id.view_attr, 3);
+        verifyThemeType(container, "view_include", R.id.view_include, 4);
+        verifyThemeType(container, "view_include_notheme", R.id.view_include_notheme, 5);
     }
 
     private void verifyThemeType(View container, String tag, int id, int type) {
