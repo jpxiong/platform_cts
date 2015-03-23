@@ -87,7 +87,27 @@ public class SELinuxTest extends AndroidTestCase {
         assertTrue(msg, found.startsWith(expected));
     }
 
+    public void testCTSAppDataContext() throws Exception {
+        File appDataDir = getContext().getFilesDir();
+        String found = getFileContext(appDataDir.getAbsolutePath());
+        String expected = "u:object_r:app_data_file:s0";
+        String msg = "Expected prefix context: \"" + expected + "\"" +
+                        ", Found: \"" + found + "\"";
+        assertTrue(msg, found.startsWith(expected));
+    }
+
+    public void testFileContexts() throws Exception {
+        assertEquals(getFileContext("/"), "u:object_r:rootfs:s0");
+        assertEquals(getFileContext("/dev"), "u:object_r:device:s0");
+        assertEquals(getFileContext("/system"), "u:object_r:system_file:s0");
+        assertEquals(getFileContext("/data"), "u:object_r:system_data_file:s0");
+        assertEquals(getFileContext("/cache"), "u:object_r:cache_file:s0");
+        assertEquals(getFileContext("/sys"), "u:object_r:sysfs:s0");
+    }
+
     private static native boolean checkSELinuxAccess(String scon, String tcon, String tclass, String perm, String extra);
 
     private static native boolean checkSELinuxContext(String con);
+
+    private static final native String getFileContext(String path);
 }
