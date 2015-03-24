@@ -16,8 +16,6 @@
 
 package android.hardware.camera2.cts;
 
-import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -605,7 +603,7 @@ public class CameraTestUtils extends Assert {
      * Get sorted (descending order) size list for given format. Remove the sizes larger than
      * the bound. If the bound is null, don't do the size bound filtering.
      */
-    static private List<Size> getSortedSizesForFormat(String cameraId,
+    static public List<Size> getSortedSizesForFormat(String cameraId,
             CameraManager cameraManager, int format, Size bound) throws CameraAccessException {
         Comparator<Size> comparator = new SizeComparator();
         Size[] sizes = getSupportedSizeForFormat(format, cameraId, cameraManager);
@@ -1017,5 +1015,115 @@ public class CameraTestUtils extends Assert {
                     requestRegions[i].getMeteringWeight());
         }
         return resultRegions;
+    }
+
+    /**
+     * Copy source image data to destination image.
+     *
+     * @param src The source image to be copied from.
+     * @param dst The destination image to be copied to.
+     * @throws IllegalArgumentException If the source and destination images have
+     *             different format, or one of the images is not copyable.
+     */
+    public static void ImageCopy(Image src, Image dst) {
+        if (src == null || dst == null) {
+            throw new IllegalArgumentException("Images should be non-null");
+        }
+        if (src.getFormat() != dst.getFormat()) {
+            throw new IllegalArgumentException("Src and dst images should have the same format");
+        }
+        if (src.isOpaque() || dst.isOpaque()) {
+            throw new IllegalArgumentException("Opaque image is not copyable");
+        }
+
+        // TODO: check the owner of the dst image, it must be from ImageWriter, other source may
+        // not be writable. Maybe we should add an isWritable() method in image class.
+
+        Plane[] srcPlanes = src.getPlanes();
+        Plane[] dstPlanes = dst.getPlanes();
+        ByteBuffer srcBuffer = null;
+        ByteBuffer dstBuffer = null;
+        for (int i = 0; i < srcPlanes.length; i++) {
+            srcBuffer = srcPlanes[i].getBuffer();
+            int srcPos = srcBuffer.position();
+            srcBuffer.rewind();
+            dstBuffer = dstPlanes[i].getBuffer();
+            dstBuffer.rewind();
+            dstBuffer.put(srcBuffer);
+            srcBuffer.position(srcPos);
+            dstBuffer.rewind();
+        }
+    }
+
+    /**
+     * <p>
+     * Checks whether the two images are strongly equal.
+     * </p>
+     * <p>
+     * Two images are strongly equal if and only if the data, formats, sizes, and
+     * timestamps are same. For opaque images ({@link Image#isOpaque()} returns
+     * true), the image data is not not accessible thus the data comparison is
+     * effectively skipped as the number of planes is zero.
+     * </p>
+     * <p>
+     * Note that this method compares the pixel data even outside of the crop
+     * region, which may not be necessary for general use case.
+     * </p>
+     *
+     * @param lhsImg First image to be compared with.
+     * @param rhsImg Second image to be compared with.
+     * @return true if the two images are equal, false otherwise.
+     * @throws IllegalArgumentException If either of image is null.
+     */
+    public static boolean isImageStronglyEqual(Image lhsImg, Image rhsImg) {
+        if (lhsImg == null || rhsImg == null) {
+            throw new IllegalArgumentException("Images should be non-null");
+        }
+
+        if (lhsImg.getFormat() != rhsImg.getFormat()) {
+            Log.i(TAG, "lhsImg format " + lhsImg.getFormat() + " is different with rhsImg format "
+                    + rhsImg.getFormat());
+            return false;
+        }
+
+        if (lhsImg.getWidth() != rhsImg.getWidth()) {
+            Log.i(TAG, "lhsImg width " + lhsImg.getWidth() + " is different with rhsImg width "
+                    + rhsImg.getWidth());
+            return false;
+        }
+
+        if (lhsImg.getHeight() != rhsImg.getHeight()) {
+            Log.i(TAG, "lhsImg height " + lhsImg.getHeight() + " is different with rhsImg height "
+                    + rhsImg.getHeight());
+            return false;
+        }
+
+        if (lhsImg.getTimestamp() != rhsImg.getTimestamp()) {
+            Log.i(TAG, "lhsImg timestamp " + lhsImg.getTimestamp()
+                    + " is different with rhsImg timestamp " + rhsImg.getTimestamp());
+            return false;
+        }
+
+        if (!lhsImg.getCropRect().equals(rhsImg.getCropRect())) {
+            Log.i(TAG, "lhsImg crop rect " + lhsImg.getCropRect()
+                    + " is different with rhsImg crop rect " + rhsImg.getCropRect());
+            return false;
+        }
+
+        // Compare data inside of the image.
+        Plane[] lhsPlanes = lhsImg.getPlanes();
+        Plane[] rhsPlanes = rhsImg.getPlanes();
+        ByteBuffer lhsBuffer = null;
+        ByteBuffer rhsBuffer = null;
+        for (int i = 0; i < lhsPlanes.length; i++) {
+            lhsBuffer = lhsPlanes[i].getBuffer();
+            rhsBuffer = rhsPlanes[i].getBuffer();
+            if (!lhsBuffer.equals(rhsBuffer)) {
+                Log.i(TAG, "byte buffers for plane " +  i + " don't matach.");
+                return false;
+            }
+        }
+
+        return true;
     }
 }

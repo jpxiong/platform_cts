@@ -548,7 +548,8 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
             outputSurfaces.add(captureSurface);
         }
 
-        CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
+        CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces,
+                CameraDevice.TEMPLATE_STILL_CAPTURE);
         request.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                 CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
         CameraTestUtils.SimpleCaptureCallback resultListener =
@@ -577,19 +578,5 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         stopCapture(/*fast*/false);
 
         return ret;
-    }
-
-    private CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces)
-            throws Exception {
-        createSession(surfaces);
-
-        CaptureRequest.Builder captureBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-        assertNotNull("Fail to get captureRequest", captureBuilder);
-        for (Surface surface : surfaces) {
-            captureBuilder.addTarget(surface);
-        }
-
-        return captureBuilder;
     }
 }

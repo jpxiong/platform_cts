@@ -20,6 +20,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
@@ -42,6 +43,7 @@ import android.view.Surface;
 import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.blocking.BlockingStateCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Camera2AndroidTestCase extends AndroidTestCase {
@@ -288,8 +290,15 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected ImageReader createImageReader(Size size, int format, int maxNumImages,
             ImageReader.OnImageAvailableListener listener) throws Exception {
 
-        ImageReader reader = ImageReader.newInstance(size.getWidth(), size.getHeight(),
-                format, maxNumImages);
+        ImageReader reader = null;
+        if (format == ImageFormat.UNKNOWN) {
+            // Create opaque ImageReader
+            reader = ImageReader.newOpaqueInstance(size.getWidth(), size.getHeight(), maxNumImages);
+        } else {
+            reader = ImageReader.newInstance(size.getWidth(), size.getHeight(),
+                    format, maxNumImages);
+        }
+
         reader.setOnImageAvailableListener(listener, mHandler);
         if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
         return reader;
@@ -322,5 +331,29 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
                 reader = null;
             }
         }
+    }
+
+    protected CaptureRequest prepareCaptureRequest() throws Exception {
+        List<Surface> outputSurfaces = new ArrayList<Surface>();
+        Surface surface = mReader.getSurface();
+        assertNotNull("Fail to get surface from ImageReader", surface);
+        outputSurfaces.add(surface);
+        return prepareCaptureRequestForSurfaces(outputSurfaces, CameraDevice.TEMPLATE_PREVIEW)
+                .build();
+    }
+
+    protected CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces,
+            int template)
+            throws Exception {
+        createSession(surfaces);
+
+        CaptureRequest.Builder captureBuilder =
+                mCamera.createCaptureRequest(template);
+        assertNotNull("Fail to get captureRequest", captureBuilder);
+        for (Surface surface : surfaces) {
+            captureBuilder.addTarget(surface);
+        }
+
+        return captureBuilder;
     }
 }
