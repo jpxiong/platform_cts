@@ -16,12 +16,14 @@
 
 package android.graphics.drawable.cts;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
-import android.test.AndroidTestCase;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
@@ -35,18 +37,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class AnimatedVectorDrawableTest extends AndroidTestCase {
+public class AnimatedVectorDrawableTest extends ActivityInstrumentationTestCase2<DrawableStubActivity> {
     private static final String LOGTAG = AnimatedVectorDrawableTest.class.getSimpleName();
 
     private static final int IMAGE_WIDTH = 64;
     private static final int IMAGE_HEIGHT = 64;
 
+    private DrawableStubActivity mActivity;
     private Resources mResources;
     private AnimatedVectorDrawable mAnimatedVectorDrawable;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private static final boolean DBG_DUMP_PNG = false;
     private int mResId = R.drawable.animation_vector_drawable_grouping_1;
+
+    public AnimatedVectorDrawableTest() {
+        super(DrawableStubActivity.class);
+    }
 
     @Override
     protected void setUp() throws Exception {
@@ -56,7 +63,8 @@ public class AnimatedVectorDrawableTest extends AndroidTestCase {
         mCanvas = new Canvas(mBitmap);
         mAnimatedVectorDrawable = new AnimatedVectorDrawable();
 
-        mResources = mContext.getResources();
+        mActivity = getActivity();
+        mResources = mActivity.getResources();
     }
 
     // This is only for debugging or golden image (re)generation purpose.
@@ -156,11 +164,9 @@ public class AnimatedVectorDrawableTest extends AndroidTestCase {
     }
 
     public void testMutate() {
-        Resources resources = mContext.getResources();
-
-        AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) resources.getDrawable(mResId);
-        AnimatedVectorDrawable d2 = (AnimatedVectorDrawable) resources.getDrawable(mResId);
-        AnimatedVectorDrawable d3 = (AnimatedVectorDrawable) resources.getDrawable(mResId);
+        AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+        AnimatedVectorDrawable d2 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+        AnimatedVectorDrawable d3 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
         int originalAlpha = d2.getAlpha();
         int newAlpha = (originalAlpha + 1) % 255;
 
@@ -182,5 +188,65 @@ public class AnimatedVectorDrawableTest extends AndroidTestCase {
         assertEquals(0x40, d1.getAlpha());
         assertEquals(0x20, d2.getAlpha());
         assertEquals(originalAlpha, d3.getAlpha());
+    }
+
+    public void testAddRemoveListener() {
+        AnimatorListenerAdapter listener1 = new AnimatorListenerAdapter() {};
+        AnimatorListenerAdapter listener2 = new AnimatorListenerAdapter() {};
+        AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+
+        d1.addListener(listener1);
+        d1.addListener(listener2);
+
+        assertTrue(d1.getListeners().contains(listener1));
+        assertTrue(d1.getListeners().contains(listener2));
+
+        d1.removeListener(listener1);
+        assertFalse(d1.getListeners().contains(listener1));
+
+        d1.removeListener(listener2);
+        assertTrue(d1.getListeners() == null);
+    }
+
+    public void testListener() throws InterruptedException {
+        MyListener listener = new MyListener();
+        final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+
+        d1.addListener(listener);
+        // The AVD has a duration as 100ms.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                d1.start();
+            }
+        });
+
+        Thread.sleep(200);
+
+        assertTrue(listener.mStart);
+        assertTrue(listener.mEnd);
+        assertFalse(listener.mCancel);
+    }
+
+    class MyListener implements Animator.AnimatorListener{
+        boolean mStart = false;
+        boolean mEnd = false;
+        boolean mCancel = false;
+        int mRepeat = 0;
+
+        public void onAnimationCancel(Animator animation) {
+            mCancel = true;
+        }
+
+        public void onAnimationEnd(Animator animation) {
+            mEnd = true;
+        }
+
+        public void onAnimationRepeat(Animator animation) {
+            mRepeat++;
+        }
+
+        public void onAnimationStart(Animator animation) {
+            mStart = true;
+        }
     }
 }
