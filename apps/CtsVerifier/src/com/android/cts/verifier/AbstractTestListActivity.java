@@ -20,8 +20,10 @@ import com.android.cts.verifier.TestListAdapter.TestListItem;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.ListView;
 
 /** {@link ListActivity} that displays a list of manual tests. */
@@ -57,6 +59,10 @@ public abstract class AbstractTestListActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_TYPE_MASK)
+              == Configuration.UI_MODE_TYPE_TELEVISION) {
+            getWindow().requestFeature(Window.FEATURE_OPTIONS_PANEL);
+        }
         setContentView(R.layout.list_content);
     }
 
