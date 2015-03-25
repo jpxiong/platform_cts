@@ -117,6 +117,7 @@ public class BitmapFilterTests extends ActivityTestBase {
                     canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.FILTER_BITMAP_FLAG, 0));
                 }
                 canvas.drawBitmap(scaleUp ? mSmallGridBitmap : mBigGridBitmap, 0, 0, paint);
+                canvas.setDrawFilter(null);
             }
         };
         createTest()
