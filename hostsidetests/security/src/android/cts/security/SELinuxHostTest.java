@@ -422,6 +422,7 @@ public class SELinuxHostTest extends DeviceTestCase {
      */
     private void assertDomainOne(String domain, String executable) throws DeviceNotAvailableException {
         List<ProcessDetails> procs = ProcessDetails.getProcMap(mDevice).get(domain);
+        List<ProcessDetails> exeProcs = ProcessDetails.getExeMap(mDevice).get(executable);
         String msg = "Expected 1 process in SELinux domain \"" + domain + "\""
             + " Found \"" + procs + "\"";
         assertNotNull(msg, procs);
@@ -430,6 +431,15 @@ public class SELinuxHostTest extends DeviceTestCase {
         msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
             + "Found: \"" + procs + "\"";
         assertEquals(msg, executable, procs.get(0).procTitle);
+
+        msg = "Expected 1 process with executable \"" + executable + "\""
+            + " Found \"" + procs + "\"";
+        assertNotNull(msg, exeProcs);
+        assertEquals(msg, 1, exeProcs.size());
+
+        msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+            + "Found: \"" + procs + "\"";
+        assertEquals(msg, domain, exeProcs.get(0).label);
     }
 
     /**
@@ -445,18 +455,27 @@ public class SELinuxHostTest extends DeviceTestCase {
     private void assertDomainZeroOrOne(String domain, String executable)
         throws DeviceNotAvailableException {
         List<ProcessDetails> procs = ProcessDetails.getProcMap(mDevice).get(domain);
-        if (procs == null) {
-            /* not on all devices */
-            return;
+        List<ProcessDetails> exeProcs = ProcessDetails.getExeMap(mDevice).get(executable);
+
+        if (procs != null) {
+            String msg = "Expected 1 process in SELinux domain \"" + domain + "\""
+            + " Found: \"" + procs + "\"";
+            assertEquals(msg, 1, procs.size());
+
+            msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+                + "Found: \"" + procs.get(0) + "\"";
+            assertEquals(msg, executable, procs.get(0).procTitle);
         }
 
-        String msg = "Expected 1 process in SELinux domain \"" + domain + "\""
+        if (exeProcs != null) {
+            String msg = "Expected 1 process with executable \"" + executable + "\""
             + " Found: \"" + procs + "\"";
-        assertEquals(msg, 1, procs.size());
+            assertEquals(msg, 1, exeProcs.size());
 
-        msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
-            + "Found: \"" + procs.get(0) + "\"";
-        assertEquals(msg, executable, procs.get(0).procTitle);
+            msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+                + "Found: \"" + procs.get(0) + "\"";
+            assertEquals(msg, domain, exeProcs.get(0).label);
+        }
     }
 
     /**
@@ -481,6 +500,18 @@ public class SELinuxHostTest extends DeviceTestCase {
                 + " Found: \"" + p + "\"";
             assertTrue(msg, execList.contains(p.procTitle));
         }
+
+        for (String exe : executables) {
+            List<ProcessDetails> exeProcs = ProcessDetails.getExeMap(mDevice).get(exe);
+
+            if (exeProcs != null) {
+                for (ProcessDetails p : exeProcs) {
+                    msg = "Expected executable \"" + exe + "\" in SELinux domain \""
+                        + domain + "\"" + " Found: \"" + p + "\"";
+                    assertEquals(msg, domain, p.label);
+                }
+            }
+        }
     }
 
     /**
@@ -494,16 +525,27 @@ public class SELinuxHostTest extends DeviceTestCase {
     private void assertDomainHasExecutable(String domain, String... executables)
         throws DeviceNotAvailableException {
         List<ProcessDetails> procs = ProcessDetails.getProcMap(mDevice).get(domain);
-        if (procs == null) {
-            return; // domain doesn't exist
+
+        if (procs != null) {
+            Set<String> execList = new HashSet<String>(Arrays.asList(executables));
+
+            for (ProcessDetails p : procs) {
+                String msg = "Expected one of \"" + execList + "\" in SELinux domain \""
+                    + domain + "\"" + " Found: \"" + p + "\"";
+                assertTrue(msg, execList.contains(p.procTitle));
+            }
         }
 
-        Set<String> execList = new HashSet<String>(Arrays.asList(executables));
+        for (String exe : executables) {
+            List<ProcessDetails> exeProcs = ProcessDetails.getExeMap(mDevice).get(exe);
 
-        for (ProcessDetails p : procs) {
-            String msg = "Expected one of \"" + execList + "\" in SELinux domain \""
-                + domain + "\"" + " Found: \"" + p + "\"";
-            assertTrue(msg, execList.contains(p.procTitle));
+            if (exeProcs != null) {
+                for (ProcessDetails p : exeProcs) {
+                    String msg = "Expected executable \"" + exe + "\" in SELinux domain \""
+                        + domain + "\"" + " Found: \"" + p + "\"";
+                    assertEquals(msg, domain, p.label);
+                }
+            }
         }
     }
 
@@ -650,6 +692,7 @@ public class SELinuxHostTest extends DeviceTestCase {
         public String procTitle;
 
         private static HashMap<String, ArrayList<ProcessDetails>> procMap;
+        private static HashMap<String, ArrayList<ProcessDetails>> exeMap;
         private static int kernelParentThreadpid = -1;
 
         ProcessDetails(String label, String user, int pid, int ppid, String procTitle) {
@@ -681,6 +724,7 @@ public class SELinuxHostTest extends DeviceTestCase {
                     Pattern.MULTILINE);
             Matcher m = p.matcher(psOutString);
             procMap = new HashMap<String, ArrayList<ProcessDetails>>();
+            exeMap = new HashMap<String, ArrayList<ProcessDetails>>();
             while(m.find()) {
                 String domainLabel = m.group(1);
                 String user = m.group(2);
@@ -695,6 +739,10 @@ public class SELinuxHostTest extends DeviceTestCase {
                 if (procTitle.equals("kthreadd") && ppid == 0) {
                     kernelParentThreadpid = pid;
                 }
+                if (exeMap.get(procTitle) == null) {
+                    exeMap.put(procTitle, new ArrayList<ProcessDetails>());
+                }
+                exeMap.get(procTitle).add(proc);
             }
         }
 
@@ -704,6 +752,14 @@ public class SELinuxHostTest extends DeviceTestCase {
                 createProcMap(tDevice);
             }
             return procMap;
+        }
+
+        public static HashMap<String, ArrayList<ProcessDetails>> getExeMap(ITestDevice tDevice)
+                throws DeviceNotAvailableException{
+            if (exeMap == null) {
+                createProcMap(tDevice);
+            }
+            return exeMap;
         }
 
         public boolean isKernel() {
