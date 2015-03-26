@@ -338,6 +338,12 @@ public class AudioManagerTest extends AndroidTestCase {
             mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
 
             int maxVolume = mAudioManager.getStreamMaxVolume(streams[i]);
+            int minVolume = mAudioManager.getStreamMinVolume(streams[i]);
+
+            // validate min
+            assertTrue(String.format("minVolume(%d) must be >= 0", minVolume), minVolume >= 0);
+            assertTrue(String.format("minVolume(%d) must be < maxVolume(%d)", minVolume, maxVolume),
+                    minVolume < maxVolume);
 
             mAudioManager.setStreamVolume(streams[i], 1, 0);
             if (mUseFixedVolume) {
@@ -372,7 +378,7 @@ public class AudioManagerTest extends AndroidTestCase {
             // volume lower
             mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
             volume = mAudioManager.getStreamVolume(streams[i]);
-            while (volume > 0) {
+            while (volume > minVolume) {
                 volumeDelta = getVolumeDelta(mAudioManager.getStreamVolume(streams[i]));
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, 0);
                 assertEquals(Math.max(0, volume - volumeDelta),
