@@ -1350,6 +1350,7 @@
         Then use the Back button to return to this test and mark accordingly.
     </string>
 
+    <string name="provisioning_byod_cross_profile_intent_filters">Cross profile intent filters are set</string>
     <string name="provisioning_byod_no_activity">Cannot communicate with activity in the work profile.</string>
     <string name="provisioning_byod_delete_profile">Initiate deletion of work profile.</string>
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
