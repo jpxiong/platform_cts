@@ -1552,6 +1552,26 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
+    public void testUndo_textWatcherDirectAppend() {
+        initTextViewForTyping();
+
+        // Add a TextWatcher that converts the text to spaces on each change.
+        mTextView.addTextChangedListener(new ConvertToSpacesTextWatcher());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Programmatically append some text. The TextWatcher changes it to spaces.
+                mTextView.append("abc");
+                assertEquals("   ", mTextView.getText().toString());
+
+                // Undo reverses both changes in one step.
+                mTextView.onTextContextMenuItem(android.R.id.undo);
+                assertEquals("", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
     public void testUndo_shortcuts() {
         initTextViewForTyping();
 
