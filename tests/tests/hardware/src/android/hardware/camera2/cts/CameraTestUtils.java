@@ -29,6 +29,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.params.InputConfiguration;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.cts.helpers.CameraUtils;
 import android.util.Size;
@@ -104,8 +105,14 @@ public class CameraTestUtils extends Assert {
      */
     public static ImageReader makeImageReader(Size size, int format, int maxNumImages,
             ImageReader.OnImageAvailableListener listener, Handler handler) {
-        ImageReader reader =  ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
-                maxNumImages);
+        ImageReader reader;
+        if (format == ImageFormat.PRIVATE) {
+            reader = ImageReader.newOpaqueInstance(size.getWidth(), size.getHeight(),
+                    maxNumImages);
+        } else {
+            reader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
+                    maxNumImages);
+        }
         reader.setOnImageAvailableListener(listener, handler);
         if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size);
         return reader;
@@ -197,8 +204,8 @@ public class CameraTestUtils extends Assert {
     }
 
     public static class SimpleCaptureCallback extends CameraCaptureSession.CaptureCallback {
-        private final LinkedBlockingQueue<CaptureResult> mQueue =
-                new LinkedBlockingQueue<CaptureResult>();
+        private final LinkedBlockingQueue<TotalCaptureResult> mQueue =
+                new LinkedBlockingQueue<TotalCaptureResult>();
         private AtomicLong mNumFramesArrived = new AtomicLong(0);
 
         @Override
@@ -234,8 +241,12 @@ public class CameraTestUtils extends Assert {
         }
 
         public CaptureResult getCaptureResult(long timeout) {
+            return getTotalCaptureResult(timeout);
+        }
+
+        public TotalCaptureResult getTotalCaptureResult(long timeout) {
             try {
-                CaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                TotalCaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
                 assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
                 return result;
             } catch (InterruptedException e) {
@@ -259,14 +270,33 @@ public class CameraTestUtils extends Assert {
          */
         public CaptureResult getCaptureResultForRequest(CaptureRequest myRequest,
                 int numResultsWait) {
+            return getTotalCaptureResultForRequest(myRequest, numResultsWait);
+        }
+
+        /**
+         * Get the {@link #TotalCaptureResult total capture result} for a given
+         * {@link #CaptureRequest capture request}.
+         *
+         * @param myRequest The {@link #CaptureRequest capture request} whose
+         *            corresponding {@link #TotalCaptureResult capture result} was
+         *            being waited for
+         * @param numResultsWait Number of frames to wait for the capture result
+         *            before timeout.
+         * @throws TimeoutRuntimeException If more than numResultsWait results are
+         *            seen before the result matching myRequest arrives, or each
+         *            individual wait for result times out after
+         *            {@value #CAPTURE_RESULT_TIMEOUT_MS}ms.
+         */
+        public TotalCaptureResult getTotalCaptureResultForRequest(CaptureRequest myRequest,
+                int numResultsWait) {
             if (numResultsWait < 0) {
                 throw new IllegalArgumentException("numResultsWait must be no less than 0");
             }
 
-            CaptureResult result;
+            TotalCaptureResult result;
             int i = 0;
             do {
-                result = getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+                result = getTotalCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
                 if (result.getRequest().equals(myRequest)) {
                     return result;
                 }
@@ -350,6 +380,17 @@ public class CameraTestUtils extends Assert {
             throws CameraAccessException {
         BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
         camera.createCaptureSession(outputSurfaces, sessionListener, handler);
+
+        return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+    }
+
+    public static CameraCaptureSession configureReprocessibleCameraSession(CameraDevice camera,
+            InputConfiguration inputConfiguration, List<Surface> outputSurfaces,
+            CameraCaptureSession.StateCallback listener, Handler handler)
+            throws CameraAccessException {
+        BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
+        camera.createReprocessibleCaptureSession(inputConfiguration, outputSurfaces,
+                sessionListener, handler);
 
         return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
     }

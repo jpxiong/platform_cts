@@ -1126,9 +1126,51 @@ public class StaticMetadata {
     }
 
     /**
-     * Get available sizes for given user-defined format.
+     * Get available formats for a given direction.
      *
-     * <p><strong>Does not</strong> work with implementation-defined format.</p>
+     * @param direction The stream direction, input or output.
+     * @return The formats of the given direction, empty array if no available format is found.
+     */
+    public int[] getAvailableFormats(StreamDirection direction) {
+        Key<StreamConfigurationMap> key =
+                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+        StreamConfigurationMap config = getValueFromKeyNonNull(key);
+
+        if (config == null) {
+            return new int[0];
+        }
+
+        switch (direction) {
+            case Output:
+                return config.getOutputFormats();
+            case Input:
+                return config.getInputFormats();
+            default:
+                throw new IllegalArgumentException("direction must be output or input");
+        }
+    }
+
+    /**
+     * Get valid output formats for a given input format.
+     *
+     * @param inputFormat The input format used to produce the output images.
+     * @return The output formats for the given input format, empty array if
+     *         no available format is found.
+     */
+    public int[] getValidOutputFormatsForInput(int inputFormat) {
+        Key<StreamConfigurationMap> key =
+                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+        StreamConfigurationMap config = getValueFromKeyNonNull(key);
+
+        if (config == null) {
+            return new int[0];
+        }
+
+        return config.getValidOutputFormatsForInput(inputFormat);
+    }
+
+    /**
+     * Get available sizes for given format and direction.
      *
      * @param format The format for the requested size array.
      * @param direction The stream direction, input or output.
@@ -1143,28 +1185,21 @@ public class StaticMetadata {
             return new Size[0];
         }
 
-        android.util.Size[] utilSizes;
+        Size[] sizes;
 
         switch (direction) {
             case Output:
-                utilSizes = config.getOutputSizes(format);
+                sizes = config.getOutputSizes(format);
                 break;
             case Input:
-                utilSizes = null;
+                sizes = config.getInputSizes(format);
                 break;
             default:
                 throw new IllegalArgumentException("direction must be output or input");
         }
 
-        // TODO: Get rid of android.util.Size
-        if (utilSizes == null) {
-            Log.i(TAG, "This camera doesn't support format " + format + " for " + direction);
-            return new Size[0];
-        }
-
-        Size[] sizes = new Size[utilSizes.length];
-        for (int i = 0; i < utilSizes.length; ++i) {
-            sizes[i] = new Size(utilSizes[i].getWidth(), utilSizes[i].getHeight());
+        if (sizes == null) {
+            sizes = new Size[0];
         }
 
         return sizes;
@@ -1222,9 +1257,7 @@ public class StaticMetadata {
     }
 
     /**
-     * Get available minimal frame durations for a given user-defined format.
-     *
-     * <p><strong>Does not</strong> work with implementation-defined format.</p>
+     * Get available minimal frame durations for a given format.
      *
      * @param format One of the format from {@link ImageFormat}.
      * @return HashMap of minimal frame durations for different sizes, empty HashMap
@@ -1544,7 +1577,7 @@ public class StaticMetadata {
 
         checkArrayValuesInRange(key, availableCaps,
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE);
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING);
         capList = Arrays.asList(CameraTestUtils.toObject(availableCaps));
         return capList;
     }
