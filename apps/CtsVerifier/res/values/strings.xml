@@ -1117,6 +1117,39 @@
         2. Verify that the installation of the package is refused.
     </string>
 
+    <string name="provisioning_byod_capture_image_support">Camera support cross profile image capture</string>
+    <string name="provisioning_byod_capture_image_support_info">
+        This test verifies that images can be captured from the managed profile using the primary profile camera.\n
+        1. Capture a picture using the camera.\n
+        2. Verify that the captured picture is shown.\n
+        3. Click on the close button.
+    </string>
+    <string name="provisioning_byod_capture_video_support">Camera support cross profile video capture</string>
+    <string name="provisioning_byod_capture_video_support_info">
+        This test verifies that videos can be captured from the managed profile using the primary profile camera.\n
+        1. Capture a video using the camera.\n
+        2. Click on the play button.\n
+        3. Verify that the captured video is played.\n
+        4. Click on the close button.
+    </string>
+    <string name="provisioning_byod_capture_audio_support">Sound recorder support cross profile audio capture</string>
+    <string name="provisioning_byod_capture_audio_support_info">
+        This test verifies that audio can be captured from the managed profile using the primary profile sound recorder.\n
+        1. Capture audio.\n
+        2. Click on the play button.\n
+        3. Verify that the captured audio is played.\n
+        4. Click on the close button.\n
+    </string>
+    <string name="provisioning_byod_dismiss_result_dialog">Close</string>
+    <string name="provisioning_byod_play">Play</string>
+    <string name="provisioning_byod_verify_image_title">Verify captured image</string>
+    <string name="provisioning_byod_verify_video_title">Verify captured video</string>
+    <string name="provisioning_byod_verify_audio_title">Verify captured audio</string>
+    <string name="provisioning_byod_no_image_capture_resolver">No image capture app present. Skip test.</string>
+    <string name="provisioning_byod_no_video_capture_resolver">No video capture app present. Skip test.</string>
+    <string name="provisioning_byod_no_audio_capture_resolver">No audio capture app present. Skip test.</string>
+    <string name="provisioning_byod_capture_media_error">Error while capturing media from managed profile.</string>
+
     <!-- Strings for DeskClock -->
     <string name="deskclock_tests">Alarms and Timers Tests</string>
     <string name="deskclock_tests_info">
