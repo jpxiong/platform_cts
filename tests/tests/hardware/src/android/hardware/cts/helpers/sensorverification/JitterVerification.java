@@ -25,6 +25,8 @@ import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
 import android.util.SparseIntArray;
 
+import com.android.cts.util.StatisticsUtils;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -131,7 +133,7 @@ public class JitterVerification extends AbstractSensorVerification {
         for (int i = 1; i < mTimestamps.size(); i++) {
             deltas.add(mTimestamps.get(i) - mTimestamps.get(i - 1));
         }
-        double deltaMean = SensorCtsHelper.getMean(deltas);
+        double deltaMean = StatisticsUtils.getMean(deltas);
         List<Double> jitters = new ArrayList<Double>(deltas.size());
         for (long delta : deltas) {
             jitters.add(Math.abs(delta - deltaMean));

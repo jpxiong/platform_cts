@@ -42,12 +42,6 @@ public class NativeCodeTest extends TestCase {
         assertTrue(doPerfEventTest2());
     }
 
-    public void testSockDiag() throws Exception {
-        int result = doSockDiagTest();
-        assertFalse("Encountered unexpected error: " + result + ".", (result == -1));
-        assertEquals(0, result);
-    }
-
     public void testFutex() throws Exception {
         assertTrue("Device is vulnerable to CVE-2014-3153, a vulnerability in the futex() system "
                    + "call. Please apply the security patch at "
@@ -85,12 +79,6 @@ public class NativeCodeTest extends TestCase {
      * Credit: https://github.com/deater/perf_event_tests/blob/master/exploits/arm_perf_exploit.c
      */
     private static native boolean doPerfEventTest2();
-
-    /**
-     * Hangs if device is vulnerable to CVE-2013-1763, returns -1 if
-     * unexpected error occurs, 0 otherwise.
-     */
-    private static native int doSockDiagTest();
 
     /**
      * ANDROID-11234878 / CVE-2013-6282
