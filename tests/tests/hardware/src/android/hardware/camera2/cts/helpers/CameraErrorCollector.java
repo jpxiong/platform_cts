@@ -520,6 +520,37 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Check that two sizes are similar enough by ensuring that their width and height
+     * are within {@code errorPercent} of each other.
+     *
+     * <p>Only the first error is collected, to avoid spamming several error messages when
+     * the rectangle is hugely dissimilar.</p>
+     *
+     * @param msg Message to be logged
+     * @param expected The reference 'expected' value to be used to check against
+     * @param actual The actual value that was received
+     * @param errorPercent Within how many percent the components should be
+     *
+     * @return {@code true} if all expects passed, {@code false} otherwise
+     */
+    public boolean expectSizesAreSimilar(String msg, Size expected, Size actual,
+            float errorPercent) {
+        String formattedMsg = String.format("%s: rects are not similar enough; expected (%s), " +
+                "actual (%s), error percent (%s), reason: ",
+                msg, expected, actual, errorPercent);
+
+        if (!expectSimilarValues(
+                formattedMsg, "too wide", "too narrow", actual.getWidth(), expected.getWidth(),
+                errorPercent)) return false;
+
+        if (!expectSimilarValues(
+                formattedMsg, "too tall", "too short", actual.getHeight(), expected.getHeight(),
+                errorPercent)) return false;
+
+        return true;
+    }
+
+    /**
      * Check that the rectangle is centered within a certain tolerance of {@code errorPercent},
      * with respect to the {@code bounds} bounding rectangle.
      *
