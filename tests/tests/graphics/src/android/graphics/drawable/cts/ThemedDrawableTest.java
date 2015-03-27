@@ -17,8 +17,6 @@
 package android.graphics.drawable.cts;
 
 import android.annotation.TargetApi;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
@@ -29,13 +27,11 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.test.AndroidTestCase;
-import android.util.SparseIntArray;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 
 import com.android.cts.graphics.R;
 
-@TargetApi(19)
+@TargetApi(21)
 public class ThemedDrawableTest extends AndroidTestCase {
 
     @Override

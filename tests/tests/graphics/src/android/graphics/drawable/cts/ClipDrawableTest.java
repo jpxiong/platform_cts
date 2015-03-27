@@ -22,6 +22,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -232,16 +233,24 @@ public class ClipDrawableTest extends AndroidTestCase {
     }
 
     public void testOnStateChange() {
-        MockDrawable mockDrawable = new MockDrawable();
-        MockClipDrawable mockClipDrawable = new MockClipDrawable(mockDrawable,
+        Drawable d = mContext.getDrawable(R.drawable.pass);
+        MockClipDrawable clipDrawable = new MockClipDrawable(d,
                 Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
-        assertEquals(StateSet.WILD_CARD, mockDrawable.getState());
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
 
-        int[] states = new int[] {1, 2, 3};
-        assertFalse(mockClipDrawable.onStateChange(states));
-        assertEquals(states, mockDrawable.getState());
+        int[] state = new int[] {1, 2, 3};
+        assertFalse("child did not change", clipDrawable.onStateChange(state));
+        assertEquals("child state did not change", d.getState(), StateSet.WILD_CARD);
 
-        mockClipDrawable.onStateChange(null);
+        d = mContext.getDrawable(R.drawable.statelistdrawable);
+        clipDrawable = new MockClipDrawable(d, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
+        clipDrawable.onStateChange(state);
+        assertTrue("child state changed", Arrays.equals(state, d.getState()));
+
+        // input null as param
+        clipDrawable.onStateChange(null);
+        // expected, no Exception thrown out, test success
     }
 
     public void testScheduleDrawable() {

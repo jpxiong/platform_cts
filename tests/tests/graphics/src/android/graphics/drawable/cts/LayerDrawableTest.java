@@ -39,12 +39,14 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RotateDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Debug;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.view.View;
 
 public class LayerDrawableTest extends AndroidTestCase {
+
     @SuppressWarnings("deprecation")
     public void testConstructor() {
         Drawable bitmapDrawable = new BitmapDrawable();
@@ -556,76 +558,85 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(layerDrawable.isStateful());
     }
 
-    public void testOnStateChange() {
+    public void testSetState() {
         MockDrawable mockDrawable1 = new MockDrawable(true);
         MockDrawable mockDrawable2 = new MockDrawable(true);
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
+        LayerDrawable layerDrawable = new LayerDrawable(array);
 
-        // this method will call each child's setState().
-        assertFalse(layerDrawable.onStateChange(StateSet.WILD_CARD));
-        assertTrue(mockDrawable1.hasCalledSetState());
-        assertTrue(mockDrawable2.hasCalledSetState());
+        // Call onStateChange() without actually changing the state.
+        assertFalse(layerDrawable.setState(StateSet.WILD_CARD));
+        assertFalse(mockDrawable1.hasCalledSetState());
+        assertFalse(mockDrawable2.hasCalledSetState());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
         assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
+        // Call onStateChange() to change the state from WILD_CARD to null.
+        // This alters the padding of both layers, which forces a bounds change
+        // for the second layer due to the default "nest" padding mode.
         mockDrawable1.reset();
         mockDrawable2.reset();
-        layerDrawable.reset();
-        assertTrue(layerDrawable.onStateChange(null));
+        assertTrue(layerDrawable.setState(null));
         assertTrue(mockDrawable1.hasCalledSetState());
         assertTrue(mockDrawable2.hasCalledSetState());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
-        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
+        assertTrue(mockDrawable2.hasCalledOnBoundsChange());
 
+        // Call onStateChange() to change the state from null to valid state
+        // set. This alters the padding of both layers, which forces a bounds
+        // change for the second layer due to the default "nest" padding mode.
         mockDrawable1.reset();
         mockDrawable2.reset();
-        layerDrawable.reset();
-        assertTrue(layerDrawable.onStateChange(new int[] { attr.state_checked, attr.state_empty }));
+        assertTrue(layerDrawable.setState(new int[]{
+                android.R.attr.state_checked, android.R.attr.state_empty}));
         assertTrue(mockDrawable1.hasCalledSetState());
         assertTrue(mockDrawable2.hasCalledSetState());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
-        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
+        assertTrue(mockDrawable2.hasCalledOnBoundsChange());
     }
 
-    public void testOnLevelChange() {
+    public void testSetLevel() {
         MockDrawable mockDrawable1 = new MockDrawable();
         MockDrawable mockDrawable2 = new MockDrawable();
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
+        LayerDrawable layerDrawable = new LayerDrawable(array);
 
-        // This method will call each child's setLevel(), but just when set a
-        // different level the child's onLevelChange will be called.
-        assertFalse(layerDrawable.onLevelChange(0));
+        // Call onLevelChange() without actually changing the level.
+        assertFalse(layerDrawable.setLevel(0));
         assertFalse(mockDrawable1.hasCalledOnLevelChange());
         assertFalse(mockDrawable2.hasCalledOnLevelChange());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
         assertFalse(mockDrawable2.hasCalledOnBoundsChange());
 
+        // Call onLevelChange() to change the level from 0 to MAX_VALUE. This
+        // alters the padding of both layers, which forces a bounds change for
+        // the second layer due to the default "nest" padding mode.
         mockDrawable1.reset();
         mockDrawable2.reset();
-        layerDrawable.reset();
-        assertTrue(layerDrawable.onLevelChange(Integer.MAX_VALUE));
+        assertTrue(layerDrawable.setLevel(Integer.MAX_VALUE));
         assertTrue(mockDrawable1.hasCalledOnLevelChange());
         assertTrue(mockDrawable2.hasCalledOnLevelChange());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
-        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
+        assertTrue(mockDrawable2.hasCalledOnBoundsChange());
 
+        // Call onLevelChange() to change the level from MAX_VALUE to
+        // MIN_VALUE. This alters the padding of both layers, which forces a
+        // bounds change for the second layer due to the default "nest" padding
+        // mode.
         mockDrawable1.reset();
         mockDrawable2.reset();
-        layerDrawable.reset();
-        assertTrue(layerDrawable.onLevelChange(Integer.MIN_VALUE));
+        assertTrue(layerDrawable.setLevel(Integer.MIN_VALUE));
         assertTrue(mockDrawable1.hasCalledOnLevelChange());
         assertTrue(mockDrawable2.hasCalledOnLevelChange());
         assertFalse(mockDrawable1.hasCalledOnBoundsChange());
-        assertFalse(mockDrawable2.hasCalledOnBoundsChange());
+        assertTrue(mockDrawable2.hasCalledOnBoundsChange());
     }
 
-    public void testOnBoundsChange() {
+    public void testSetBounds() {
         MockDrawable mockDrawable1 = new MockDrawable();
         MockDrawable mockDrawable2 = new MockDrawable();
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
+        LayerDrawable layerDrawable = new LayerDrawable(array);
 
         Rect inset1 = new Rect(1, 2, 3, 4);
         Rect inset2 = new Rect(2, 4, 6, 7);
@@ -648,7 +659,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertEquals(0, mockDrawable2.getBounds().bottom);
 
         Rect bounds = new Rect(10, 20, 30, 40);
-        layerDrawable.onBoundsChange(bounds);
+        layerDrawable.setBounds(bounds);
 
         // all children's bounds will be changed after call onBoundsChange
         assertEquals(bounds.left + inset1.left, mockDrawable1.getBounds().left);
@@ -667,7 +678,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         MockDrawable mockDrawable1 = new MockDrawable();
         MockDrawable mockDrawable2 = new MockDrawable();
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
+        LayerDrawable layerDrawable = new LayerDrawable(array);
         assertEquals(mockDrawable1.getIntrinsicWidth(), layerDrawable.getIntrinsicWidth());
 
         Rect inset1 = new Rect(1, 2, 3, 4);
@@ -694,7 +705,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         MockDrawable mockDrawable1 = new MockDrawable();
         MockDrawable mockDrawable2 = new MockDrawable();
         Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        MockLayerDrawable layerDrawable = new MockLayerDrawable(array);
+        LayerDrawable layerDrawable = new LayerDrawable(array);
         assertEquals(mockDrawable1.getIntrinsicHeight(), layerDrawable.getIntrinsicHeight());
 
         Rect inset1 = new Rect(1, 2, 3, 4);
@@ -816,7 +827,8 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         @Override
         protected boolean onStateChange(int[] state) {
-            return true;
+            increasePadding();
+            return mIsStateful;
         }
 
         private void increasePadding() {
@@ -858,7 +870,6 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         @Override
         public boolean setState(final int[] stateSet) {
-            increasePadding();
             mCalledSetState = true;
             return super.setState(stateSet);
         }
@@ -886,39 +897,6 @@ public class LayerDrawableTest extends AndroidTestCase {
             } else {
                 return super.getPadding(padding);
             }
-        }
-    }
-
-    private static class MockLayerDrawable extends LayerDrawable {
-        private boolean mCalledOnBoundsChange = false;
-
-        public MockLayerDrawable(Drawable[] array) {
-            super(array);
-        }
-
-        // override protected methods
-        @Override
-        protected boolean onStateChange(int[] state) {
-            return super.onStateChange(state);
-        }
-
-        @Override
-        protected boolean onLevelChange(int level) {
-            return super.onLevelChange(level);
-        }
-
-        @Override
-        protected void onBoundsChange(Rect bounds) {
-            mCalledOnBoundsChange = true;
-            super.onBoundsChange(bounds);
-        }
-
-        public boolean hasCalledOnBoundsChange() {
-            return mCalledOnBoundsChange;
-        }
-
-        public void reset() {
-            mCalledOnBoundsChange = false;
         }
     }
 

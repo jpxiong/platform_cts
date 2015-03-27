@@ -235,15 +235,15 @@ public class InsetDrawableTest extends AndroidTestCase {
     public void testOnStateChange() {
         Drawable d = mContext.getDrawable(R.drawable.pass);
         MockInsetDrawable insetDrawable = new MockInsetDrawable(d, 10);
-        assertTrue("initial child state is empty", d.getState() == StateSet.WILD_CARD);
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
 
         int[] state = new int[] {1, 2, 3};
         assertFalse("child did not change", insetDrawable.onStateChange(state));
-        assertTrue("child state did not change", d.getState() == StateSet.WILD_CARD);
+        assertEquals("child state did not change", d.getState(), StateSet.WILD_CARD);
 
         d = mContext.getDrawable(R.drawable.statelistdrawable);
         insetDrawable = new MockInsetDrawable(d, 10);
-        assertTrue("initial child state is null", d.getState() == null);
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
         insetDrawable.onStateChange(state);
         assertTrue("child state changed", Arrays.equals(state, d.getState()));
 
