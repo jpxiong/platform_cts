@@ -16,13 +16,14 @@
 
 package android.media.cts;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.AudioTrack.OnPlaybackPositionUpdateListener;
+import android.media.cts.AudioHelper;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -77,39 +78,6 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         assertFalse(mIsHandleMessageCalled);
     }
 
-    private class Stat {
-        public void add(double value) {
-            final double absValue = Math.abs(value);
-            mSum += value;
-            mSumAbs += absValue;
-            mMaxAbs = Math.max(mMaxAbs, absValue);
-            ++mCount;
-        }
-
-        public double getAvg() {
-            if (mCount == 0) {
-                return 0;
-            }
-            return mSum / mCount;
-        }
-
-        public double getAvgAbs() {
-            if (mCount == 0) {
-                return 0;
-            }
-            return mSumAbs / mCount;
-        }
-
-        public double getMaxAbs() {
-            return mMaxAbs;
-        }
-
-        private int mCount = 0;
-        private double mSum = 0;
-        private double mSumAbs = 0;
-        private double mMaxAbs = 0;
-    }
-
     private void doTest(String reportName, boolean localTrack, boolean customHandler,
             int periodsPerSecond, int markerPeriodsPerSecond, final int mode) throws Exception {
         mIsHandleMessageCalled = false;
@@ -125,15 +93,15 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         }
 
         final AudioTrack track;
-        final MakeSomethingAsynchronouslyAndLoop<AudioTrack> makeSomething;
+        final AudioHelper.MakeSomethingAsynchronouslyAndLoop<AudioTrack> makeSomething;
         if (localTrack) {
             makeSomething = null;
             track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
                     TEST_FORMAT, bufferSizeInBytes, mode);
         } else {
             makeSomething =
-                    new MakeSomethingAsynchronouslyAndLoop<AudioTrack>(
-                    new MakesSomething<AudioTrack>() {
+                    new AudioHelper.MakeSomethingAsynchronouslyAndLoop<AudioTrack>(
+                    new AudioHelper.MakesSomething<AudioTrack>() {
                         @Override
                         public AudioTrack makeSomething() {
                             return new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
@@ -196,8 +164,8 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         track.release();
 
         // collect statistics
-        final Vector<Integer> markerList = listener.getMarkerList();
-        final Vector<Integer> periodicList = listener.getPeriodicList();
+        final ArrayList<Integer> markerList = listener.getMarkerList();
+        final ArrayList<Integer> periodicList = listener.getPeriodicList();
         // verify count of markers and periodic notifications.
         assertEquals(markerPeriods, markerList.size());
         assertEquals(updatePeriods, periodicList.size());
@@ -207,9 +175,9 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         // we use 80ms limit here for failure.
         final int tolerance80MsInFrames = TEST_SR * 80 / 1000;
 
-        Stat markerStat = new Stat();
+        AudioHelper.Statistics markerStat = new AudioHelper.Statistics();
         for (int i = 0; i < markerPeriods; ++i) {
-            final int expected = mMarkerPeriodInFrames * (i + 1) * 1;
+            final int expected = mMarkerPeriodInFrames * (i + 1);
             final int actual = markerList.get(i);
             // Log.d(TAG, "Marker: expected(" + expected + ")  actual(" + actual
             //        + ")  diff(" + (actual - expected) + ")");
@@ -217,7 +185,7 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
             markerStat.add((double)(actual - expected) * 1000 / TEST_SR);
         }
 
-        Stat periodicStat = new Stat();
+        AudioHelper.Statistics periodicStat = new AudioHelper.Statistics();
         for (int i = 0; i < updatePeriods; ++i) {
             final int expected = updatePeriodInFrames * (i + 1);
             final int actual = periodicList.get(i);
@@ -244,88 +212,6 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         log.printSummary(reportName + ": Unified abs diff",
                 (periodicStat.getAvgAbs() + markerStat.getAvgAbs()) / 2,
                 ResultType.LOWER_BETTER, ResultUnit.MS);
-    }
-
-    // lightweight java.util.concurrent.Future*
-    private static class FutureLatch<T>
-    {
-        private T mValue;
-        private boolean mSet;
-        public void set(T value)
-        {
-            synchronized (this) {
-                assert !mSet;
-                mValue = value;
-                mSet = true;
-                notify();
-            }
-        }
-        public T get()
-        {
-            T value;
-            synchronized (this) {
-                while (!mSet) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        ;
-                    }
-                }
-                value = mValue;
-            }
-            return value;
-        }
-    }
-
-    // represents a factory for T
-    private interface MakesSomething<T>
-    {
-        T makeSomething();
-    }
-
-    // used to construct an object in the context of an asynchronous thread with looper
-    private static class MakeSomethingAsynchronouslyAndLoop<T>
-    {
-        private Thread mThread;
-        volatile private Looper mLooper;
-        private final MakesSomething<T> mWhatToMake;
-
-        public MakeSomethingAsynchronouslyAndLoop(MakesSomething<T> whatToMake)
-        {
-            assert whatToMake != null;
-            mWhatToMake = whatToMake;
-        }
-
-        public T make()
-        {
-            final FutureLatch<T> futureLatch = new FutureLatch<T>();
-            mThread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    Looper.prepare();
-                    mLooper = Looper.myLooper();
-                    T something = mWhatToMake.makeSomething();
-                    futureLatch.set(something);
-                    Looper.loop();
-                }
-            };
-            mThread.start();
-            return futureLatch.get();
-        }
-        public void join()
-        {
-            mLooper.quit();
-            try {
-                mThread.join();
-            } catch (InterruptedException e) {
-                ;
-            }
-            // avoid dangling references
-            mLooper = null;
-            mThread = null;
-        }
     }
 
     private class MockOnPlaybackPositionUpdateListener
@@ -366,11 +252,11 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
             mIsTestActive = false;
         }
 
-        public Vector<Integer> getMarkerList() {
+        public ArrayList<Integer> getMarkerList() {
             return mOnMarkerReachedCalled;
         }
 
-        public Vector<Integer> getPeriodicList() {
+        public ArrayList<Integer> getPeriodicList() {
             return mOnPeriodicNotificationCalled;
         }
 
@@ -381,7 +267,7 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
 
         private boolean mIsTestActive = true;
         private AudioTrack mAudioTrack;
-        private Vector<Integer> mOnMarkerReachedCalled = new Vector<Integer>();
-        private Vector<Integer> mOnPeriodicNotificationCalled = new Vector<Integer>();
+        private ArrayList<Integer> mOnMarkerReachedCalled = new ArrayList<Integer>();
+        private ArrayList<Integer> mOnPeriodicNotificationCalled = new ArrayList<Integer>();
     }
 }
