@@ -539,7 +539,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
                 // Try an invalid size in this format, should round
                 Size invalidSize = findInvalidSize(supportedSizes);
-                int MAX_ROUNDING_WIDTH = 1920;
+                // WAR: the intended threshold is 1920, but to counter the bug
+                // in Lollipop framework, we need to set it to 1080 here.
+                // The threshold will be changed back to 1920 in next Android release.
+                int MAX_ROUNDING_WIDTH = 1080;
                 if (invalidSize.getWidth() <= MAX_ROUNDING_WIDTH) {
                     ImageReader testReader = ImageReader.newInstance(
                                                                      invalidSize.getWidth(),
