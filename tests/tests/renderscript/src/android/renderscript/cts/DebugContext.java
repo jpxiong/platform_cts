@@ -58,7 +58,8 @@ public class DebugContext extends RSBaseCompute {
      * Test whether we are detect out-of-bounds allocation accesses
      * from an invokable.
      */
-    public void testDebugContextI() {
+    // TODO Temporarily disable the test.
+    public void dontTestDebugContextI() {
         setupDebugContext();
         Soob.invoke_write_i(7, 1);  // Write to invalid location.
         for (int i = 0; i < 100; i++) {
@@ -79,7 +80,8 @@ public class DebugContext extends RSBaseCompute {
      * Test whether we are detect out-of-bounds allocation accesses
      * from a kernel.
      */
-    public void testDebugContextK() {
+    // TODO Temporarily disable the test.
+    public void dontTestDebugContextK() {
         setupDebugContext();
         Soob.forEach_write_k(AUnused);  // Write to invalid location.
         for (int i = 0; i < 100; i++) {
