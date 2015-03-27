@@ -1000,9 +1000,23 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             }
 
             // Validate capture result vs. request
+            Size resultThumbnailSize = stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE);
+            int orientationTested = EXIF_TEST_DATA[i].jpegOrientation;
+            if ((orientationTested == 90 || orientationTested == 270)) {
+                int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        /*defaultValue*/-1);
+                if (exifOrientation == ExifInterface.ORIENTATION_UNDEFINED) {
+                    // Device physically rotated image+thumbnail data
+                    // Expect thumbnail size to be also rotated
+                    resultThumbnailSize = new Size(
+                            resultThumbnailSize.getHeight(),
+                            resultThumbnailSize.getWidth());
+                }
+            }
+
             mCollector.expectEquals("JPEG thumbnail size result and request should match",
                     testThumbnailSizes[i],
-                    stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE));
+                    resultThumbnailSize);
             if (mCollector.expectKeyValueNotNull(stillResult, CaptureResult.JPEG_GPS_LOCATION) !=
                     null) {
                 mCollector.expectTrue("GPS location result and request should match.",
