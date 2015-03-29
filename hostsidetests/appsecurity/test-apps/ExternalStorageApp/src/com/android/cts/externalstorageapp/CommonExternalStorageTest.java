@@ -327,7 +327,9 @@ public class CommonExternalStorageTest extends AndroidTestCase {
             }
 
             File[] dirs = removeWhiteList(dir.listFiles());
-            assertEquals(0, dirs.length);
+            if (dirs.length != 0) {
+                fail("Expected wiped storage but found: " + Arrays.toString(dirs));
+            }
         }
     }
 

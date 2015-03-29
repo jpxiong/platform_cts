@@ -93,6 +93,17 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         assertEquals(readInt(TEST_FILE), 32);
     }
 
+    public void testWriteExternalStorageDirs() throws Exception {
+        final File probe = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                "100CTS");
+
+        assertFalse(probe.exists());
+        assertTrue(probe.mkdirs());
+
+        assertDirReadWriteAccess(probe);
+    }
+
     /**
      * Verify that legacy filesystem paths continue working, and that they all
      * point to same location.

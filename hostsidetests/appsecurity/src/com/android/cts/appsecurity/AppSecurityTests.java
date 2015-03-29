@@ -585,7 +585,10 @@ public class AppSecurityTests extends DeviceTestCase implements IAbiReceiver, IB
         final String output = device.executeShellCommand("pm create-user " + name);
         if (output.startsWith("Success")) {
             try {
-                return Integer.parseInt(output.substring(output.lastIndexOf(" ")).trim());
+                final int userId = Integer.parseInt(
+                        output.substring(output.lastIndexOf(" ")).trim());
+                device.executeShellCommand("am start-user " + userId);
+                return userId;
             } catch (NumberFormatException e) {
                 fail("Failed to parse result: " + output);
             }
