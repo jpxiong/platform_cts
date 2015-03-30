@@ -10,6 +10,3 @@ void __attribute__((kernel)) write_k(int unused) {
     rsSetElementAt_int(aInt, 1, 1);
 }
 
-void send_msg() {
-    rsSendToClientBlocking(RS_MSG_TEST_PASSED);
-}
