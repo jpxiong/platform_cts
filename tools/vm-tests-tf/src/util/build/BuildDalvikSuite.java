@@ -222,6 +222,8 @@ public class BuildDalvikSuite {
         curJunitFileData = getWarningMessage() +
         "package " + pName + ";\n" +
         "import java.io.IOException;\n" +
+        "import java.util.concurrent.TimeUnit;\n\n" +
+        "import com.android.tradefed.device.CollectingOutputReceiver;\n" +
         "import com.android.tradefed.testtype.IAbi;\n" +
         "import com.android.tradefed.testtype.IAbiReceiver;\n" +
         "import com.android.tradefed.testtype.DeviceTestCase;\n" +
@@ -234,10 +236,15 @@ public class BuildDalvikSuite {
       String cmd = String.format("ANDROID_DATA=%s dalvikvm|#ABI#| -Xmx512M -Xss32K " +
               "-Djava.io.tmpdir=%s -classpath %s %s", TARGET_JAR_ROOT_PATH, TARGET_JAR_ROOT_PATH,
               classpath, mainclass);
-      return "    String cmd = AbiFormatter.formatCmdForAbi(\"" + cmd + "\", mAbi.getBitness());\n" +
-              "    String res = getDevice().executeShellCommand(cmd);\n" +
-              "    // A sucessful adb shell command returns an empty string.\n" +
-              "    assertEquals(cmd, \"\", res);";
+      StringBuilder code = new StringBuilder();
+      code.append("    String cmd = AbiFormatter.formatCmdForAbi(\"")
+          .append(cmd)
+          .append("\", mAbi.getBitness());\n")
+          .append("    CollectingOutputReceiver receiver = new CollectingOutputReceiver();\n")
+          .append("    getDevice().executeShellCommand(cmd, receiver, 6, TimeUnit.MINUTES, 1);\n")
+          .append("    // A sucessful adb shell command returns an empty string.\n")
+          .append("    assertEquals(cmd, \"\", receiver.getOutput());");
+      return code.toString();
     }
 
     private String getWarningMessage() {
