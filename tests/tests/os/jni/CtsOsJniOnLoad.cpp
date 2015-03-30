@@ -23,8 +23,6 @@ extern int register_android_os_cts_CpuInstructions(JNIEnv*);
 
 extern int register_android_os_cts_TaggedPointer(JNIEnv*);
 
-extern int register_android_os_cts_HardwareName(JNIEnv*);
-
 extern int register_android_os_cts_OSFeatures(JNIEnv*);
 
 extern int register_android_os_cts_NoExecutePermissionTest(JNIEnv*);
@@ -45,10 +43,6 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_os_cts_TaggedPointer(env)) {
-        return JNI_ERR;
-    }
-
-    if (register_android_os_cts_HardwareName(env)) {
         return JNI_ERR;
     }
 

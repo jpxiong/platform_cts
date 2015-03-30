@@ -46,6 +46,7 @@ public class DateFormatTest extends AndroidTestCase {
 
     private boolean mIs24HourFormat;
     private Locale mDefaultLocale;
+    private String mDefaultFormat;
 
     @Override
     protected void setUp() throws Exception {
@@ -54,6 +55,8 @@ public class DateFormatTest extends AndroidTestCase {
         mContentResolver = mContext.getContentResolver();
         mIs24HourFormat = DateFormat.is24HourFormat(mContext);
         mDefaultLocale = Locale.getDefault();
+        mDefaultFormat = Settings.System.getString(mContext.getContentResolver(),
+                Settings.System.DATE_FORMAT);
     }
 
     @Override
@@ -64,7 +67,7 @@ public class DateFormatTest extends AndroidTestCase {
         if (!Locale.getDefault().equals(mDefaultLocale)) {
             Locale.setDefault(mDefaultLocale);
         }
-
+        Settings.System.putString(mContentResolver, Settings.System.DATE_FORMAT, mDefaultFormat);
         super.tearDown();
     }
 
@@ -142,6 +145,12 @@ public class DateFormatTest extends AndroidTestCase {
         source = dateFormat.format(date);
         assertTrue(source.indexOf("5") >= 0);
         assertTrue(source.indexOf("30") >= 0);
+
+        String testFormat = "yyyy-MM-dd";
+        String testOrder = "yMd";
+        Settings.System.putString(mContentResolver, Settings.System.DATE_FORMAT, testFormat);
+        String actualOrder = String.valueOf(DateFormat.getDateFormatOrder(mContext));
+        assertEquals(testOrder, actualOrder);
 
         String format = "MM/dd/yy";
         String expectedString = "12/18/08";

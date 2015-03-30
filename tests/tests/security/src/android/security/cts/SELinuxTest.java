@@ -71,20 +71,14 @@ public class SELinuxTest extends AndroidTestCase {
 
     public void testZygote() {
         assertFalse(checkSELinuxAccess("u:r:zygote:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
+        // Also check init, just as a sanity check (init is unconfined, so it should pass)
+        assertTrue(checkSELinuxAccess("u:r:init:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
     }
 
     public void testNoBooleans() throws Exception {
         // Intentionally not using JNI bindings to keep things simple
         File[] files = new File("/sys/fs/selinux/booleans/").listFiles();
         assertEquals(0, files.length);
-    }
-
-    public void testCTSIsUntrustedApp() throws IOException {
-        String found = KernelSettingsTest.getFile("/proc/self/attr/current");
-        String expected = "u:r:untrusted_app:s0";
-        String msg = "Expected prefix context: \"" + expected + "\"" +
-                        ", Found: \"" + found + "\"";
-        assertTrue(msg, found.startsWith(expected));
     }
 
     private static native boolean checkSELinuxAccess(String scon, String tcon, String tclass, String perm, String extra);

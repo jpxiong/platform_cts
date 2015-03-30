@@ -115,7 +115,7 @@ public class KernelSettingsTest extends TestCase {
 
     private static native boolean supportsXattr();
 
-    static String getFile(String filename) throws IOException {
+    private String getFile(String filename) throws IOException {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new FileReader(filename));

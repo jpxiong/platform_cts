@@ -26,17 +26,16 @@ in_file="$1"
 
 # Output file. If not specified, the file will be named <hash>.0 where "hash"
 # is the certificate's subject hash produced by:
-#   openssl x509 -in cert_file -subject_hash_old -noout
+#   openssl x509 -in cert_file -subject_hash -noout
 out_file="$2"
 
 # Detect whether the input file is PEM or DER.
-# It must use old_hash(MD5) function.
 in_form="pem"
-subject_hash=$("$OPENSSL" x509 -in "$in_file" -inform $in_form -subject_hash_old \
+subject_hash=$("$OPENSSL" x509 -in "$in_file" -inform $in_form -subject_hash \
     -noout 2>/dev/null)
 if [ "$?" != "0" ]; then
   in_form="der"
-  subject_hash=$("$OPENSSL" x509 -in "$in_file" -inform $in_form -subject_hash_old \
+  subject_hash=$("$OPENSSL" x509 -in "$in_file" -inform $in_form -subject_hash \
       -noout)
   if [ "$?" != "0" ]; then
     echo "Certificate file format is neither PEM nor DER"

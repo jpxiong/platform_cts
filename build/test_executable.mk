@@ -23,7 +23,6 @@
 #    as needed by CTS.
 #
 
-LOCAL_CXX_STL := libc++
 include $(BUILD_EXECUTABLE)
 
 cts_executable_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml

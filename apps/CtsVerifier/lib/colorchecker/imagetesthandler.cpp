@@ -19,7 +19,6 @@
 #include <utils/Log.h>
 #include <utils/Timers.h>
 #include <cmath>
-#include <cstring>
 
 #include "vec2.h"
 #include "vec3.h"

@@ -65,11 +65,6 @@ public class DebugContext extends RSBaseCompute {
             Soob.invoke_write_i(9, 0);
             mRS.finish();
         }
-
-        // Flush messages through the pipeline.
-        Soob.invoke_send_msg();
-        waitForMessage();
-
         Soob.destroy();
         assertTrue(mRanErrorHandler);
         checkForErrors();
@@ -86,11 +81,6 @@ public class DebugContext extends RSBaseCompute {
             Soob.invoke_write_i(9, 0);
             mRS.finish();
         }
-
-        // Flush messages through the pipeline.
-        Soob.invoke_send_msg();
-        waitForMessage();
-
         Soob.destroy();
         assertTrue(mRanErrorHandler);
         checkForErrors();

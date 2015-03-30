@@ -71,19 +71,9 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_SELinuxTest_checkSELinuxContext },
 };
 
-static int log_callback(int type __attribute__((unused)), const char *fmt __attribute__((unused)), ...)
-{
-    /* do nothing - silence the avc denials */
-    return 0;
-}
-
 int register_android_security_cts_SELinuxTest(JNIEnv* env)
 {
     jclass clazz = env->FindClass("android/security/cts/SELinuxTest");
-    union selinux_callback cb;
-    cb.func_log = log_callback;
-    selinux_set_callback(SELINUX_CB_LOG, cb);
-
     return env->RegisterNatives(clazz, gMethods,
             sizeof(gMethods) / sizeof(JNINativeMethod));
 }

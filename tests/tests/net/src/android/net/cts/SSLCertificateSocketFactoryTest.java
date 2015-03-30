@@ -26,7 +26,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import android.net.SSLCertificateSocketFactory;
 import android.test.AndroidTestCase;
 
-import libcore.javax.net.ssl.SSLConfigurationAsserts;
+import libcore.javax.net.ssl.SSLDefaultConfigurationAsserts;
 
 public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
     private SSLCertificateSocketFactory mFactory;
@@ -40,7 +40,7 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
     }
 
     public void testDefaultConfiguration() throws Exception {
-        SSLConfigurationAsserts.assertSSLSocketFactoryDefaultConfiguration(mFactory);
+        SSLDefaultConfigurationAsserts.assertSSLSocketFactory(mFactory);
     }
 
     public void testAccessProperties() throws Exception {

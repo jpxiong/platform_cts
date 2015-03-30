@@ -16,7 +16,7 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+include external/stlport/libstlport.mk
 
 LOCAL_MODULE := libcameraanalyzer
 
@@ -31,12 +31,10 @@ LOCAL_SRC_FILES := com_android_cts_verifier_camera_analyzer_CameraTests.cpp \
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker $(JNI_H_INCLUDE)
 
-LOCAL_CXX_STL := libc++
 LOCAL_STATIC_LIBRARIES := libcolorchecker
-LOCAL_SHARED_LIBRARIES := \
-    libjnigraphics \
-    libcutils \
-    libutils \
-    liblog \
+LOCAL_SHARED_LIBRARIES := libjnigraphics \
+                          libstlport \
+                          libcutils \
+                          libutils liblog
 
 include $(BUILD_SHARED_LIBRARY)

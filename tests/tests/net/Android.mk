@@ -26,15 +26,15 @@ LOCAL_MULTILIB := both
 
 LOCAL_JAVA_LIBRARIES := voip-common conscrypt
 
-LOCAL_JNI_SHARED_LIBRARIES := libcts_jni libnativedns_jni
+LOCAL_JNI_SHARED_LIBRARIES := libnativedns_jni
 
 # include CtsTestServer as a temporary hack to free net.cts from cts.stub.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsNetTestCases
 
-LOCAL_STATIC_JAVA_LIBRARIES := core-tests-support  ctsdeviceutil \
-                               ctstestrunner ctstestserver mockwebserver
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestserver ctsdeviceutil ctstestrunner \
+                               core-tests-support
 
 # uncomment when b/13249961 is fixed
 #LOCAL_SDK_VERSION := current

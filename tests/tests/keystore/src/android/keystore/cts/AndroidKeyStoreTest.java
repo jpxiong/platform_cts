@@ -16,17 +16,14 @@
 
 package android.keystore.cts;
 
-import android.security.KeyPairGeneratorSpec;
 import android.security.KeyStoreParameter;
 import android.test.AndroidTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -44,7 +41,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -52,11 +48,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.x500.X500Principal;
 
 public class AndroidKeyStoreTest extends AndroidTestCase {
     private KeyStore mKeyStore;
@@ -2255,52 +2249,5 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
         assertEquals(Arrays.toString(expectedSecret.getEncoded()),
                 Arrays.toString(actualSecret.getEncoded()));
-    }
-
-    public void testKeyStore_Encrypting_RSA_NONE_NOPADDING() throws Exception {
-
-        String alias = "MyKey";
-        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
-        assertNotNull(ks);
-        ks.load(null);
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(1944, 5, 6);
-        Date now = cal.getTime();
-        cal.clear();
-
-        cal.set(1945, 8, 2);
-        Date end = cal.getTime();
-
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
-        assertNotNull(kpg);
-        kpg.initialize(new KeyPairGeneratorSpec.Builder(mContext)
-                .setAlias(alias)
-                .setStartDate(now)
-                .setEndDate(end)
-                .setSerialNumber(BigInteger.valueOf(1))
-                .setSubject(new X500Principal("CN=test1"))
-                .build());
-
-        kpg.generateKeyPair();
-
-        RSAPrivateKey key = (RSAPrivateKey) ks.getKey(alias, null);
-        assertNotNull(key);
-        String cipher = key.getAlgorithm() + "/NONE/NOPADDING";
-        Cipher encrypt = Cipher.getInstance(cipher);
-        assertNotNull(encrypt);
-        encrypt.init(Cipher.ENCRYPT_MODE, key);
-
-        byte[] plainText = new byte[encrypt.getBlockSize()];
-        Arrays.fill(plainText, (byte) 0xFF);
-
-        // We expect a BadPaddingException here as the message size (plaintext)
-        // is bigger than the modulus.
-        try {
-            encrypt.doFinal(plainText);
-            fail("Expected BadPaddingException");
-        } catch (BadPaddingException e) {
-            // pass on exception as it is expected
-        }
     }
 }

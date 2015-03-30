@@ -149,23 +149,18 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testDecodeMonoMp3() throws Exception {
-        monoTest(R.raw.monotestmp3, 44100);
+        monoTest(R.raw.monotestmp3);
         testTimeStampOrdering(R.raw.monotestmp3);
     }
 
     public void testDecodeMonoM4a() throws Exception {
-        monoTest(R.raw.monotestm4a, 44100);
+        monoTest(R.raw.monotestm4a);
         testTimeStampOrdering(R.raw.monotestm4a);
     }
 
     public void testDecodeMonoOgg() throws Exception {
-        monoTest(R.raw.monotestogg, 44100);
+        monoTest(R.raw.monotestogg);
         testTimeStampOrdering(R.raw.monotestogg);
-    }
-
-    public void testDecodeMonoGsm() throws Exception {
-        monoTest(R.raw.monotestgsm, 8000);
-        testTimeStampOrdering(R.raw.monotestgsm);
     }
 
     public void testDecodeAacTs() throws Exception {
@@ -503,11 +498,11 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
 
-    private void monoTest(int res, int expectedLength) throws Exception {
+    private void monoTest(int res) throws Exception {
         short [] mono = decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, null);
-        if (mono.length == expectedLength) {
+        if (mono.length == 44100) {
             // expected
-        } else if (mono.length == expectedLength * 2) {
+        } else if (mono.length == 88200) {
             // the decoder output 2 channels instead of 1, check that the left and right channel
             // are identical
             for (int i = 0; i < mono.length; i += 2) {
@@ -518,18 +513,10 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
 
         short [] mono2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, CONFIG_MODE_NONE, -1, null);
-
-        assertEquals("count different after reconfigure: ", mono.length, mono2.length);
-        for (int i = 0; i < mono.length; i++) {
-            assertEquals("samples at " + i + " don't match", mono[i], mono2[i]);
-        }
+        assertTrue(Arrays.equals(mono, mono2));
 
         short [] mono3 = decodeToMemory(res, RESET_MODE_FLUSH, CONFIG_MODE_NONE, -1, null);
-
-        assertEquals("count different after flush: ", mono.length, mono3.length);
-        for (int i = 0; i < mono.length; i++) {
-            assertEquals("samples at " + i + " don't match", mono[i], mono3[i]);
-        }
+        assertTrue(Arrays.equals(mono, mono3));
     }
 
     /**
