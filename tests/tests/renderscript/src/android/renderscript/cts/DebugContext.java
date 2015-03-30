@@ -58,43 +58,37 @@ public class DebugContext extends RSBaseCompute {
      * Test whether we are detect out-of-bounds allocation accesses
      * from an invokable.
      */
-    // TODO Temporarily disable the test.
-    public void dontTestDebugContextI() {
+    public void testDebugContextI() {
         setupDebugContext();
         Soob.invoke_write_i(7, 1);  // Write to invalid location.
-        for (int i = 0; i < 100; i++) {
-            Soob.invoke_write_i(9, 0);
-            mRS.finish();
-        }
 
         // Flush messages through the pipeline.
-        Soob.invoke_send_msg();
+        mRS.sendMessage(RS_MSG_TEST_FLUSH, null);
         waitForMessage();
 
         Soob.destroy();
         assertTrue(mRanErrorHandler);
-        checkForErrors();
+
+        // The context is dead at this point so make sure it's not reused
+        RenderScript.releaseAllContexts();
     }
 
     /**
      * Test whether we are detect out-of-bounds allocation accesses
      * from a kernel.
      */
-    // TODO Temporarily disable the test.
-    public void dontTestDebugContextK() {
+    public void testDebugContextK() {
         setupDebugContext();
         Soob.forEach_write_k(AUnused);  // Write to invalid location.
-        for (int i = 0; i < 100; i++) {
-            Soob.invoke_write_i(9, 0);
-            mRS.finish();
-        }
 
         // Flush messages through the pipeline.
-        Soob.invoke_send_msg();
+        mRS.sendMessage(RS_MSG_TEST_FLUSH, null);
         waitForMessage();
 
         Soob.destroy();
         assertTrue(mRanErrorHandler);
-        checkForErrors();
+
+        // The context is dead at this point so make sure it's not reused
+        RenderScript.releaseAllContexts();
     }
 }

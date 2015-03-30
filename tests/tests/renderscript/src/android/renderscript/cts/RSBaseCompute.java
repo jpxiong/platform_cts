@@ -39,10 +39,6 @@ public class RSBaseCompute extends RSBase {
 
     @Override
     protected void tearDown() throws Exception {
-        if (mRS != null) {
-            mRS.destroy();
-            mRS = null;
-        }
         super.tearDown();
     }
 
