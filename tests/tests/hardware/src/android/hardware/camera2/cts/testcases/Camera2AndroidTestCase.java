@@ -291,7 +291,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
             ImageReader.OnImageAvailableListener listener) throws Exception {
 
         ImageReader reader = null;
-        if (format == ImageFormat.UNKNOWN) {
+        if (format == ImageFormat.PRIVATE) {
             // Create opaque ImageReader
             reader = ImageReader.newOpaqueInstance(size.getWidth(), size.getHeight(), maxNumImages);
         } else {

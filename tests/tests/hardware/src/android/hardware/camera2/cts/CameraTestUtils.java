@@ -544,7 +544,8 @@ public class CameraTestUtils extends Assert {
         StreamConfigurationMap configMap =
                 properties.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         Size[] availableSizes = configMap.getOutputSizes(format);
-        assertArrayNotEmpty(availableSizes, "availableSizes should not be empty");
+        assertArrayNotEmpty(availableSizes, "availableSizes should not be empty for format: "
+                + format);
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
     }
@@ -1025,7 +1026,7 @@ public class CameraTestUtils extends Assert {
      * @throws IllegalArgumentException If the source and destination images have
      *             different format, or one of the images is not copyable.
      */
-    public static void ImageCopy(Image src, Image dst) {
+    public static void imageCopy(Image src, Image dst) {
         if (src == null || dst == null) {
             throw new IllegalArgumentException("Images should be non-null");
         }

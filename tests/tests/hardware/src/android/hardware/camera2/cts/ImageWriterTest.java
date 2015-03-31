@@ -19,11 +19,11 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureCallback;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.ImageWriter;
@@ -48,8 +48,8 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
     // Max number of images can be accessed simultaneously from ImageReader.
-    private static final int MAX_NUM_IMAGES = 5;
-    private static final int CAMERA_OPAQUE_FORMAT = PixelFormat.OPAQUE;
+    private static final int MAX_NUM_IMAGES = 3;
+    private static final int CAMERA_OPAQUE_FORMAT = ImageFormat.PRIVATE;
     private ImageReader mReaderForWriter;
     private ImageWriter mWriter;
 
@@ -161,10 +161,16 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         // Create ImageReader for camera output.
         SimpleImageReaderListener listenerForCamera  = new SimpleImageReaderListener();
         createDefaultImageReader(maxSize, format, MAX_NUM_IMAGES, listenerForCamera);
+        if (VERBOSE) {
+            Log.v(TAG, "Created camera output ImageReader");
+        }
 
         // Create ImageReader for ImageWriter output
         SimpleImageReaderListener listenerForWriter  = new SimpleImageReaderListener();
         mReaderForWriter = createImageReader(maxSize, format, MAX_NUM_IMAGES, listenerForWriter);
+        if (VERBOSE) {
+            Log.v(TAG, "Created ImageWriter output ImageReader");
+        }
 
         // Create ImageWriter
         Surface surface = mReaderForWriter.getSurface();
@@ -183,13 +189,16 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         startCapture(requestBuilder.build(), /*repeating*/false, captureListener, mHandler);
         // Capture 2nd image.
         startCapture(requestBuilder.build(), /*repeating*/false, captureListener, mHandler);
+        if (VERBOSE) {
+            Log.v(TAG, "Submitted 2 captures");
+        }
 
         // Image from the first ImageReader.
-        Image image1 = null;
+        Image cameraImage = null;
         // ImageWriter input image.
         Image inputImage = null;
         // Image from the second ImageReader.
-        Image outputImage2 = null;
+        Image outputImage = null;
         if (format == CAMERA_OPAQUE_FORMAT) {
             assertTrue("First ImageReader should be opaque",
                     mReader.isOpaque());
@@ -199,64 +208,120 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
                     mReader.getImageFormat() == CAMERA_OPAQUE_FORMAT);
             assertTrue(" Format of second ImageReader should be opaque",
                     mReaderForWriter.getImageFormat() == CAMERA_OPAQUE_FORMAT);
+            assertTrue(" Format of ImageWriter should be opaque",
+                    mWriter.getFormat() == CAMERA_OPAQUE_FORMAT);
+
+            // Validate 2 images
+            validateOpaqueImages(maxSize, listenerForCamera, listenerForWriter, captureListener,
+                    /*numImages*/2, writerImageListener);
         } else {
             // Test case 1: Explicit data copy, only applicable for explicit formats.
 
             // Get 1st image from first ImageReader, and copy the data to ImageWrtier input image
-            image1 = listenerForCamera.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            cameraImage = listenerForCamera.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             inputImage = mWriter.dequeueInputImage();
-            inputImage.setTimestamp(image1.getTimestamp());
-            ImageCopy(image1, inputImage);
+            inputImage.setTimestamp(cameraImage.getTimestamp());
+            if (VERBOSE) {
+                Log.v(TAG, "Image is being copied");
+            }
+            imageCopy(cameraImage, inputImage);
+            if (VERBOSE) {
+                Log.v(TAG, "Image copy is done");
+            }
             mCollector.expectTrue(
                     "ImageWriter 1st input image should match camera 1st output image",
-                    isImageStronglyEqual(inputImage, image1));
+                    isImageStronglyEqual(inputImage, cameraImage));
+
             mWriter.queueInputImage(inputImage);
-            outputImage2 = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
 
             mCollector.expectTrue("ImageWriter 1st output image should match 1st input image",
-                    isImageStronglyEqual(image1, outputImage2));
+                    isImageStronglyEqual(cameraImage, outputImage));
             if (DEBUG) {
                 String img1FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize + "_image1_copy.yuv";
                 String outputImg1FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize
                         + "_outputImage2_copy.yuv";
-                dumpFile(img1FileName, getDataFromImage(image1));
-                dumpFile(outputImg1FileName, getDataFromImage(outputImage2));
+                dumpFile(img1FileName, getDataFromImage(cameraImage));
+                dumpFile(outputImg1FileName, getDataFromImage(outputImage));
             }
             // No need to close inputImage, as it is sent to the surface after queueInputImage;
-            image1.close();
-            outputImage2.close();
+            cameraImage.close();
+            outputImage.close();
+
+            // Make sure ImageWriter listener callback is fired.
+            writerImageListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
+
+            // Test case 2: Directly inject the image into ImageWriter: works for all formats.
+
+            // Get 2nd image and queue it directly to ImageWrier
+            cameraImage = listenerForCamera.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            // make a copy of image1 data, as it will be closed after queueInputImage;
+            byte[] img1Data = getDataFromImage(cameraImage);
+            if (DEBUG) {
+                String img2FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize + "_image2.yuv";
+                dumpFile(img2FileName, img1Data);
+            }
+            mWriter.queueInputImage(cameraImage);
+            outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            byte[] outputImageData = getDataFromImage(outputImage);
+
+            mCollector.expectTrue("ImageWriter 2nd output image should match camera "
+                    + "2nd output image", Arrays.equals(img1Data, outputImageData));
+
+            if (DEBUG) {
+                String outputImgFileName = DEBUG_FILE_NAME_BASE + "/" + maxSize +
+                        "_outputImage2.yuv";
+                dumpFile(outputImgFileName, outputImageData);
+            }
+            // No need to close inputImage, as it is sent to the surface after queueInputImage;
+            outputImage.close();
 
             // Make sure ImageWriter listener callback is fired.
             writerImageListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
         }
 
-        // Test case 2: Directly inject the image into ImageWriter: works for all formats.
-
-        // Get 2nd image and queue it directly to ImageWrier
-        image1 = listenerForCamera.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-        // make a copy of image1 data, as it will be closed after queueInputImage;
-        byte[] img1Data = getDataFromImage(image1);
-        if (DEBUG) {
-            String img2FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize + "_image2.yuv";
-            dumpFile(img2FileName, img1Data);
-        }
-        mWriter.queueInputImage(image1);
-        outputImage2 = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-        byte[] outputImage2Data = getDataFromImage(outputImage2);
-
-        mCollector.expectTrue("ImageWriter 2nd output image should match camera 2nd output image",
-                Arrays.equals(img1Data, outputImage2Data));
-
-        if (DEBUG) {
-            String outputImg2FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize + "_outputImage2.yuv";
-            dumpFile(outputImg2FileName, outputImage2Data);
-        }
-        // No need to close inputImage, as it is sent to the surface after queueInputImage;
-        outputImage2.close();
-
-        // Make sure ImageWriter listener callback is fired.
-        writerImageListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
-
         stopCapture(/*fast*/false);
+        mReader.close();
+        mReader = null;
+        mReaderForWriter.close();
+        mReaderForWriter = null;
+        mWriter.close();
+        mWriter = null;
+    }
+
+    private void validateOpaqueImages(Size maxSize, SimpleImageReaderListener listenerForCamera,
+            SimpleImageReaderListener listenerForWriter, SimpleCaptureCallback captureListener,
+            int numImages, SimpleImageWriterListener writerListener) throws Exception {
+        Image cameraImage;
+        Image outputImage;
+        for (int i = 0; i < numImages; i++) {
+            cameraImage = listenerForCamera.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            CaptureResult result = captureListener.getCaptureResult(CAPTURE_IMAGE_TIMEOUT_MS);
+            validateOpaqueImage(cameraImage, "Opaque image " + i + "from camera: ", maxSize,
+                    result);
+            mWriter.queueInputImage(cameraImage);
+            outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            validateOpaqueImage(outputImage, "First Opaque image output by ImageWriter: ",
+                    maxSize, result);
+            outputImage.close();
+            writerListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
+        }
+    }
+
+    private void validateOpaqueImage(Image image, String msg, Size imageSize,
+            CaptureResult result) {
+        assertNotNull("Opaque image Capture result should not be null", result != null);
+        mCollector.expectTrue(msg + "Opaque image format should be: " + CAMERA_OPAQUE_FORMAT,
+                image.getFormat() == CAMERA_OPAQUE_FORMAT);
+        mCollector.expectTrue(msg + "Opaque image format should be: " + CAMERA_OPAQUE_FORMAT,
+                image.getFormat() == CAMERA_OPAQUE_FORMAT);
+        mCollector.expectTrue(msg + "Opaque image number planes should be zero",
+                image.getPlanes().length == 0);
+        mCollector.expectTrue(msg + "Opaque image size should be " + imageSize,
+                image.getWidth() == imageSize.getWidth() &&
+                image.getHeight() == imageSize.getHeight());
+        long timestampNs = result.get(CaptureResult.SENSOR_TIMESTAMP);
+        mCollector.expectTrue(msg + "Opaque image timestamp should be " + timestampNs,
+                image.getTimestamp() == timestampNs);
     }
 }
