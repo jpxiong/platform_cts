@@ -221,7 +221,7 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     public void testGetPreferredNetworkType() {
         try {
             if (isSimCardPresent()) {
-                TelephonyManager.getDefault().getPreferredNetworkType();
+                TelephonyManager.getDefault().getPreferredNetworkType(0);
                 fail("Expected SecurityException. App doesn't have carrier privileges.");
             }
         } catch (SecurityException expected) {
