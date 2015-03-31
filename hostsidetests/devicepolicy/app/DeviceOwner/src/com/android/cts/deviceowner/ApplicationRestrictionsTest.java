@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,7 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
     // Should be consistent with assertBundle0
     private Bundle createBundle0() {
         Bundle result = new Bundle();
-        // Tests for four allowed types: Integer, Boolean, String and String[]
+        // Tests for 6 allowed types: Integer, Boolean, String, String[], Bundle and Parcelable[]
         // Also test for string escaping handling
         result.putBoolean("boolean_0", false);
         result.putBoolean("boolean_1", true);
@@ -115,12 +116,28 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
         result.putString("empty", "");
         result.putString("string", "text");
         result.putStringArray("string[]", testStrings);
+
+        // Adding a bundle, which contain 2 nested restrictions - bundle_string and bundle_int
+        Bundle bundle = new Bundle();
+        bundle.putString("bundle_string", "bundle_string");
+        bundle.putInt("bundle_int", 1);
+        result.putBundle("bundle", bundle);
+
+        // Adding an array of 2 bundles
+        Bundle[] bundleArray = new Bundle[2];
+        bundleArray[0] = new Bundle();
+        bundleArray[0].putString("bundle_array_string", "bundle_array_string");
+        // Put bundle inside bundle
+        bundleArray[0].putBundle("bundle_array_bundle", bundle);
+        bundleArray[1] = new Bundle();
+        bundleArray[1].putString("bundle_array_string2", "bundle_array_string2");
+        result.putParcelableArray("bundle_array", bundleArray);
         return result;
     }
 
     // Should be consistent with createBundle0
     private void assertBundle0(Bundle bundle) {
-        assertEquals(6, bundle.size());
+        assertEquals(8, bundle.size());
         assertEquals(false, bundle.getBoolean("boolean_0"));
         assertEquals(true, bundle.getBoolean("boolean_1"));
         assertEquals(0x7fffffff, bundle.getInt("integer"));
@@ -132,6 +149,23 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
         for (int i = 0; i < strings.length; i++) {
             assertEquals(strings[i], testStrings[i]);
         }
+
+        Bundle childBundle = bundle.getBundle("bundle");
+        assertEquals("bundle_string", childBundle.getString("bundle_string"));
+        assertEquals(1, childBundle.getInt("bundle_int"));
+
+        Parcelable[] bundleArray = bundle.getParcelableArray("bundle_array");
+        assertEquals(2, bundleArray.length);
+        // Verifying bundle_array[0]
+        Bundle bundle1 = (Bundle) bundleArray[0];
+        assertEquals("bundle_array_string", bundle1.getString("bundle_array_string"));
+        Bundle bundle1ChildBundle = bundle1.getBundle("bundle_array_bundle");
+        assertNotNull(bundle1ChildBundle);
+        assertEquals("bundle_string", bundle1ChildBundle.getString("bundle_string"));
+        assertEquals(1, bundle1ChildBundle.getInt("bundle_int"));
+        // Verifying bundle_array[1]
+        Bundle bundle2 = (Bundle) bundleArray[1];
+        assertEquals("bundle_array_string2", bundle2.getString("bundle_array_string2"));
     }
 
     // Should be consistent with assertBundle1
