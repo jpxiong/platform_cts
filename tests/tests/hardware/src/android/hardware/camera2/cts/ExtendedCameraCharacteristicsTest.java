@@ -83,6 +83,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING;
     private static final int RAW =
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW;
+    private static final int YUV_REPROCESS =
+            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING;
+    private static final int OPAQUE_REPROCESS =
+            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING;
 
     @Override
     public void setContext(Context context) {
@@ -221,6 +225,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE                , LIMITED  ,   NONE                 );
                 expectKeyAvailable(c, CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES                  , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS                   , OPT      ,   YUV_REPROCESS, OPAQUE_REPROCESS);
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC                     , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING            , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW                      , LEGACY   ,   BC                   );
@@ -440,6 +445,72 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     }
 
     /**
+     * Check reprocessing capabilities.
+     */
+    public void testReprocessingCharacteristics() {
+        int counter = 0;
+
+        for (CameraCharacteristics c : mCharacteristics) {
+            Log.i(TAG, "testReprocessingCharacteristics: Testing camera ID " + mIds[counter]);
+
+            int[] capabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    capabilities);
+            boolean supportYUV = arrayContains(capabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING);
+            boolean supportOpaque = arrayContains(capabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING);
+            StreamConfigurationMap configs =
+                    c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            Integer maxNumInputStreams =
+                    c.get(CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS);
+
+            int[] inputFormats = configs.getInputFormats();
+
+            assertFalse("Doesn't support reprocessing but report input format: " +
+                    Arrays.toString(inputFormats), !supportYUV && !supportOpaque &&
+                    inputFormats.length > 0);
+
+            assertFalse("Doesn't support reprocessing but max number of input stream is " +
+                    maxNumInputStreams, !supportYUV && !supportOpaque &&
+                    maxNumInputStreams != null && maxNumInputStreams != 0);
+
+            if (supportYUV || supportOpaque) {
+                assertTrue("Support reprocessing but max number of input stream is " +
+                        maxNumInputStreams, maxNumInputStreams != null && maxNumInputStreams > 0);
+
+                // Verify mandatory input formats are supported
+                assertTrue("YUV_420_888 input must be supported for YUV reprocessing",
+                        !supportYUV || arrayContains(inputFormats, ImageFormat.YUV_420_888));
+                assertTrue("PRIVATE input must be supported for OPAQUE reprocessing",
+                        !supportOpaque || arrayContains(inputFormats, ImageFormat.PRIVATE));
+
+                for (int input : inputFormats) {
+                    // Verify mandatory output formats are supported
+                    int[] outputFormats = configs.getValidOutputFormatsForInput(input);
+                    assertTrue("YUV_420_888 output must be supported for reprocessing",
+                            arrayContains(outputFormats, ImageFormat.YUV_420_888));
+                    assertTrue("JPEG output must be supported for reprocessing",
+                            arrayContains(outputFormats, ImageFormat.JPEG));
+
+                    // Verify camera can output the reprocess input formats and sizes.
+                    Size[] inputSizes = configs.getInputSizes(input);
+                    Size[] outputSizes = configs.getOutputSizes(input);
+                    assertTrue("no input size supported for format " + input,
+                            inputSizes.length > 0);
+                    assertTrue("no output size supported for format " + input,
+                            outputSizes.length > 0);
+
+                    for (Size inputSize : inputSizes) {
+                        assertTrue("Camera must be able to output the supported reprocessing " +
+                            "input size", arrayContains(outputSizes, inputSize));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Cross-check StreamConfigurationMap output
      */
     public void testStreamConfigurationMap() {
@@ -521,26 +592,30 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 minDuration >= 0);
                     }
 
-                    ImageReader testReader = ImageReader.newInstance(
-                        size.getWidth(),
-                        size.getHeight(),
-                        format,
-                        1);
-                    Surface testSurface = testReader.getSurface();
+                    // todo: test opaque image reader when it's supported.
+                    if (format != ImageFormat.PRIVATE) {
+                        ImageReader testReader = ImageReader.newInstance(
+                            size.getWidth(),
+                            size.getHeight(),
+                            format,
+                            1);
+                        Surface testSurface = testReader.getSurface();
 
-                    assertTrue(
-                        String.format("isOutputSupportedFor fails for config %s, format %d",
-                                size.toString(), format),
-                        config.isOutputSupportedFor(testSurface));
+                        assertTrue(
+                            String.format("isOutputSupportedFor fails for config %s, format %d",
+                                    size.toString(), format),
+                            config.isOutputSupportedFor(testSurface));
 
-                    testReader.close();
-
+                        testReader.close();
+                    }
                 } // sizes
 
                 // Try an invalid size in this format, should round
                 Size invalidSize = findInvalidSize(supportedSizes);
                 int MAX_ROUNDING_WIDTH = 1920;
-                if (invalidSize.getWidth() <= MAX_ROUNDING_WIDTH) {
+                // todo: test opaque image reader when it's supported.
+                if (format != ImageFormat.PRIVATE &&
+                        invalidSize.getWidth() <= MAX_ROUNDING_WIDTH) {
                     ImageReader testReader = ImageReader.newInstance(
                                                                      invalidSize.getWidth(),
                                                                      invalidSize.getHeight(),
