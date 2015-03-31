@@ -49,6 +49,7 @@ public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
             filter.addAction(ByodHelperActivity.ACTION_QUERY_PROFILE_OWNER);
             filter.addAction(ByodHelperActivity.ACTION_REMOVE_PROFILE_OWNER);
             filter.addAction(ByodHelperActivity.ACTION_INSTALL_APK);
+            filter.addAction(ByodHelperActivity.ACTION_CHECK_INTENT_FILTERS);
             filter.addAction(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
             filter.addAction(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION);
             filter.addAction(WorkNotificationTestActivity.ACTION_CLEAR_WORK_NOTIFICATION);

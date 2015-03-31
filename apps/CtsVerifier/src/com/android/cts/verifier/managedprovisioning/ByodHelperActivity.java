@@ -61,6 +61,12 @@ public class ByodHelperActivity extends Activity {
     public static final String ACTION_INSTALL_APK = "com.android.cts.verifier.managedprovisioning.BYOD_INSTALL_APK";
     public static final String EXTRA_ALLOW_NON_MARKET_APPS = INSTALL_NON_MARKET_APPS;
 
+    // Primary -> managed intent: check if the required cross profile intent filters are set.
+    public static final String ACTION_CHECK_INTENT_FILTERS =
+            "com.android.cts.verifier.managedprovisioning.action.CHECK_INTENT_FILTERS";
+
+    public static final int RESULT_FAILED = RESULT_FIRST_USER;
+
     private static final int REQUEST_INSTALL_PACKAGE = 1;
 
     private static final String ORIGINAL_SETTINGS_NAME = "original settings";
@@ -120,6 +126,12 @@ public class ByodHelperActivity extends Activity {
 
             // Not yet ready to finish- wait until the result comes back
             return;
+            // Queried by CtsVerifier in the primary side using startActivityForResult.
+        } else if (action.equals(ACTION_CHECK_INTENT_FILTERS)) {
+            final boolean intentFiltersSetForManagedIntents =
+                    new IntentFiltersTestHelper(this).checkCrossProfileIntentFilters(
+                            IntentFiltersTestHelper.FLAG_INTENTS_FROM_MANAGED);
+            setResult(intentFiltersSetForManagedIntents? RESULT_OK : RESULT_FAILED, null);
         }
         // This activity has no UI and is only used to respond to CtsVerifier in the primary side.
         finish();

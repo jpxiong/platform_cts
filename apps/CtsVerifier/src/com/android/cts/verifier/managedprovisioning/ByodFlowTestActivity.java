@@ -58,7 +58,8 @@ import java.util.List;
 public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
     private final String TAG = "ByodFlowTestActivity";
-    private static final int REQUEST_STATUS = 1;
+    private static final int REQUEST_PROFILE_OWNER_STATUS = 1;
+    private static final int REQUEST_INTENT_FILTERS_STATUS = 2;
 
     private ComponentName mAdminReceiverComponent;
 
@@ -80,6 +81,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mLocationSettingsVisibleTest;
     private TestItem mCredSettingsVisibleTest;
     private TestItem mPrintSettingsVisibleTest;
+    private TestItem mIntentFiltersTest;
 
     private int mCurrentTestPosition;
 
@@ -137,10 +139,13 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Called after queryProfileOwner()
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_STATUS && resultCode == RESULT_OK) {
+        // Called after queryProfileOwner()
+        if (requestCode == REQUEST_PROFILE_OWNER_STATUS && resultCode == RESULT_OK) {
             handleStatusUpdate(data);
+            // Called after checkIntentFilters()
+        } else if (requestCode == REQUEST_INTENT_FILTERS_STATUS) {
+            handleIntentFiltersStatus(resultCode);
         }
     }
 
@@ -224,6 +229,15 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 R.string.provisioning_byod_cross_profile_instruction,
                 chooser);
 
+        // Test for checking if the required intent filters are set during managed provisioning.
+        mIntentFiltersTest = new TestItem(this,
+                R.string.provisioning_byod_cross_profile_intent_filters) {
+            @Override
+            public void performTest(ByodFlowTestActivity activity) {
+                checkIntentFilters();
+            }
+        };
+
         mTests.add(mProfileOwnerInstalled);
 
         // Badge related tests
@@ -241,6 +255,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         mTests.add(mCrossProfileIntentFiltersTest);
         mTests.add(mDisableNonMarketTest);
         mTests.add(mEnableNonMarketTest);
+        mTests.add(mIntentFiltersTest);
     }
 
     @Override
@@ -336,7 +351,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private void queryProfileOwner(boolean showToast) {
         try {
             Intent intent = new Intent(ByodHelperActivity.ACTION_QUERY_PROFILE_OWNER);
-            startActivityForResult(intent, REQUEST_STATUS);
+            startActivityForResult(intent, REQUEST_PROFILE_OWNER_STATUS);
         }
         catch (ActivityNotFoundException e) {
             Log.d(TAG, "queryProfileOwner: ActivityNotFoundException", e);
@@ -356,6 +371,35 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         catch (ActivityNotFoundException e) {
             Log.d(TAG, "requestDeleteProfileOwner: ActivityNotFoundException", e);
         }
+    }
+
+    private void checkIntentFilters() {
+        try {
+            // We disable the ByodHelperActivity in the primary profile. So, this intent
+            // will be handled by the ByodHelperActivity in the managed profile.
+            Intent intent = new Intent(ByodHelperActivity.ACTION_CHECK_INTENT_FILTERS);
+            startActivityForResult(intent, REQUEST_INTENT_FILTERS_STATUS);
+        } catch (ActivityNotFoundException e) {
+            Log.d(TAG, "checkIntentFilters: ActivityNotFoundException", e);
+            setTestResult(mIntentFiltersTest, TestResult.Failed);
+            showToast(R.string.provisioning_byod_no_activity);
+        }
+    }
+
+    private void handleIntentFiltersStatus(int resultCode) {
+        // we use the resultCode from ByodHelperActivity in the managed profile to know if certain
+        // intents fired from the managed profile are forwarded.
+        final boolean intentFiltersSetForManagedIntents = (resultCode == RESULT_OK);
+        // Since the ByodFlowTestActivity is running in the primary profile, we directly use
+        // the IntentFiltersTestHelper to know if certain intents fired from the primary profile
+        // are forwarded.
+        final boolean intentFiltersSetForPrimaryIntents =
+                new IntentFiltersTestHelper(this).checkCrossProfileIntentFilters(
+                        IntentFiltersTestHelper.FLAG_INTENTS_FROM_PRIMARY);
+        final boolean intentFiltersSet =
+                intentFiltersSetForPrimaryIntents & intentFiltersSetForManagedIntents;
+        setTestResult(mIntentFiltersTest,
+                intentFiltersSet ? TestResult.Passed : TestResult.Failed);
     }
 
     private void disableComponent() {
