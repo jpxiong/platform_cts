@@ -1033,4 +1033,35 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
+    public void testHasGlyph() {
+        Paint p = new Paint();
+
+        // This method tests both the logic of hasGlyph and the sanity of fonts present
+        // on the device.
+        assertTrue(p.hasGlyph("A"));
+        assertFalse(p.hasGlyph("\uFFFE"));  // U+FFFE is guaranteed to be a noncharacter
+
+        // Roboto 2 (the default typeface) does have an "fi" glyph and is mandated by CDD
+        assertTrue(p.hasGlyph("fi"));
+        assertFalse(p.hasGlyph("ab"));  // but it does not contain an "ab" glyph
+        assertTrue(p.hasGlyph("\u02E5\u02E9"));  // IPA tone mark ligature
+
+        // variation selectors
+        assertFalse(p.hasGlyph("a\uFE0F"));
+        assertFalse(p.hasGlyph("a\uDB40\uDDEF"));  // UTF-16 encoding of U+E01EF
+        assertFalse(p.hasGlyph("\u2229\uFE0F"));  // base character is in mathematical symbol font
+        // Note: U+FE0F is variation selection, unofficially reserved for emoji
+
+        // regional indicator symbols
+        assertTrue(p.hasGlyph("\uD83C\uDDEF\uD83C\uDDF5"));   // "JP" U+1F1EF U+1F1F5
+        assertFalse(p.hasGlyph("\uD83C\uDDFF\uD83C\uDDFF"));  // "ZZ" U+1F1FF U+1F1FF
+
+        // Mongolian, which is an optional font, but if present, should support FVS
+        if (p.hasGlyph("\u182D")) {
+            assertTrue(p.hasGlyph("\u182D\u180B"));
+        }
+
+        // TODO: when we support variation selectors, add positive tests
+    }
+
 }
