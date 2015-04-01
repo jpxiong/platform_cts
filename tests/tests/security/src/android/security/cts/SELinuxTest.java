@@ -99,8 +99,13 @@ public class SELinuxTest extends AndroidTestCase {
     public void testFileContexts() throws Exception {
         assertEquals(getFileContext("/"), "u:object_r:rootfs:s0");
         assertEquals(getFileContext("/dev"), "u:object_r:device:s0");
+        assertEquals(getFileContext("/dev/socket"), "u:object_r:socket_device:s0");
+        assertEquals(getFileContext("/dev/binder"), "u:object_r:binder_device:s0");
         assertEquals(getFileContext("/system"), "u:object_r:system_file:s0");
+        assertEquals(getFileContext("/system/bin/app_process"), "u:object_r:zygote_exec:s0");
         assertEquals(getFileContext("/data"), "u:object_r:system_data_file:s0");
+        assertEquals(getFileContext("/data/app"), "u:object_r:apk_data_file:s0");
+        assertEquals(getFileContext("/data/local/tmp"), "u:object_r:shell_data_file:s0");
         assertEquals(getFileContext("/cache"), "u:object_r:cache_file:s0");
         assertEquals(getFileContext("/sys"), "u:object_r:sysfs:s0");
     }
