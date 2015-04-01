@@ -56,6 +56,8 @@ public class JackBuildStep extends SourceBuildStep {
                 return false;
             }
             List<String> commandLine = new ArrayList(4 + sourceFiles.size());
+            commandLine.add("--verbose");
+            commandLine.add("error");
             commandLine.add("--classpath");
             commandLine.add(classPath);
             commandLine.add("--output-jack");
