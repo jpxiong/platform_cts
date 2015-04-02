@@ -223,6 +223,9 @@ public class VisualizerTest extends PostProcTestBase {
 
     //Test case 3.0: test setting NONE measurement mode
     public void test3_0MeasurementModeNone() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             getVisualizer(0);
             mVisualizer.setEnabled(true);
@@ -252,6 +255,9 @@ public class VisualizerTest extends PostProcTestBase {
 
     //Test case 4.0: test setting peak / RMS measurement mode
     public void test4_0MeasurementModePeakRms() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         try {
             getVisualizer(0);
             mVisualizer.setEnabled(true);
@@ -277,6 +283,9 @@ public class VisualizerTest extends PostProcTestBase {
 
     //Test case 4.1: test measurement of peak / RMS
     public void test4_1MeasurePeakRms() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         AudioEffect vc = null;
         try {
             // this test will play a 1kHz sine wave with peaks at -40dB
@@ -347,6 +356,9 @@ public class VisualizerTest extends PostProcTestBase {
 
     //Test case 4.2: test measurement of peak / RMS in Long MP3
     public void test4_2MeasurePeakRmsLongMP3() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         AudioEffect vc = null;
         try {
             // this test will play a 1kHz sine wave with peaks at -40dB
