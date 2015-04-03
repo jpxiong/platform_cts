@@ -52,6 +52,8 @@ public class JackDexBuildStep extends BuildStep {
             }
 
             List<String> commandLine = new ArrayList<String>(4);
+            commandLine.add("--verbose");
+            commandLine.add("error");
             commandLine.add("--output-dex-zip");
             commandLine.add(outputFilePath);
             commandLine.add("--import");
