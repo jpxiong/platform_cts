@@ -376,7 +376,11 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             mGotTestResult = false;
 
             // mark instance as started
-            mPendingResults.get(mCurrentTestId).remainingConfigs.remove(mRunConfig);
+            if (mPendingResults.get(mCurrentTestId) != null) {
+                mPendingResults.get(mCurrentTestId).remainingConfigs.remove(mRunConfig);
+            } else {
+                CLog.w("Got unexpected start of %s", mCurrentTestId);
+            }
         }
 
         /**
@@ -384,18 +388,23 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
          */
         private void handleEndTestCase(Map<String, String> values) {
             final PendingResult result = mPendingResults.get(mCurrentTestId);
-            if (!mGotTestResult) {
-                result.allInstancesPassed = false;
-                result.errorMessages.put(mRunConfig, INCOMPLETE_LOG_MESSAGE);
-            }
 
-            if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
-                result.testLogs.put(mRunConfig, mCurrentTestLog);
-            }
+            if (result != null) {
+                if (!mGotTestResult) {
+                    result.allInstancesPassed = false;
+                    result.errorMessages.put(mRunConfig, INCOMPLETE_LOG_MESSAGE);
+                }
 
-            // Pending result finished, report result
-            if (result.remainingConfigs.isEmpty()) {
-                forwardFinalizedPendingResult();
+                if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
+                    result.testLogs.put(mRunConfig, mCurrentTestLog);
+                }
+
+                // Pending result finished, report result
+                if (result.remainingConfigs.isEmpty()) {
+                    forwardFinalizedPendingResult();
+                }
+            } else {
+                CLog.w("Got unexpected end of %s", mCurrentTestId);
             }
             mCurrentTestId = null;
         }
@@ -406,6 +415,12 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         private void handleTestCaseResult(Map<String, String> values) {
             String code = values.get("dEQP-TestCaseResult-Code");
             String details = values.get("dEQP-TestCaseResult-Details");
+
+            if (mPendingResults.get(mCurrentTestId) == null) {
+                CLog.w("Got unexpected result for %s", mCurrentTestId);
+                mGotTestResult = true;
+                return;
+            }
 
             if (code.compareTo("Pass") == 0) {
                 mGotTestResult = true;
@@ -437,14 +452,18 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         private void handleTestCaseTerminate(Map<String, String> values) {
             final PendingResult result = mPendingResults.get(mCurrentTestId);
 
-            String reason = values.get("dEQP-TerminateTestCase-Reason");
-            mPendingResults.get(mCurrentTestId).allInstancesPassed = false;
-            mPendingResults.get(mCurrentTestId)
-                    .errorMessages.put(mRunConfig, "Terminated: " + reason);
+            if (result != null) {
+                String reason = values.get("dEQP-TerminateTestCase-Reason");
+                mPendingResults.get(mCurrentTestId).allInstancesPassed = false;
+                mPendingResults.get(mCurrentTestId)
+                        .errorMessages.put(mRunConfig, "Terminated: " + reason);
 
-            // Pending result finished, report result
-            if (result.remainingConfigs.isEmpty()) {
-                forwardFinalizedPendingResult();
+                // Pending result finished, report result
+                if (result.remainingConfigs.isEmpty()) {
+                    forwardFinalizedPendingResult();
+                }
+            } else {
+                CLog.w("Got unexpected termination of %s", mCurrentTestId);
             }
 
             mCurrentTestId = null;
@@ -502,6 +521,11 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         public void onDeviceLost() {
             if (mCurrentTestId != null) {
                 final PendingResult result = mPendingResults.get(mCurrentTestId);
+
+                if (result == null) {
+                    CLog.e("Device lost in invalid state: %s", mCurrentTestId);
+                    return;
+                }
 
                 // kill current test
                 result.allInstancesPassed = false;
