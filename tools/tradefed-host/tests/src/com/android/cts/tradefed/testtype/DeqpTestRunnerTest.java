@@ -162,7 +162,8 @@ public class DeqpTestRunnerTest extends TestCase {
                     "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                     + "--deqp-screen-rotation=unspecified "
                     + "--deqp-surface-type=window "
-                    + "--deqp-log-images=disable",
+                    + "--deqp-log-images=disable "
+                    + "--deqp-watchdog=enable",
                     CASE_LIST_FILE_NAME);
 
             runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine,
@@ -304,7 +305,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable",
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable",
                 CASE_LIST_FILE_NAME);
 
         runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine, output);
@@ -473,7 +475,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable",
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable",
                 CASE_LIST_FILE_NAME);
 
         runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine, output);
@@ -720,7 +723,8 @@ public class DeqpTestRunnerTest extends TestCase {
                     "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
                     + "--deqp-screen-rotation=%s "
                     + "--deqp-surface-type=window "
-                    + "--deqp-log-images=disable",
+                    + "--deqp-log-images=disable "
+                    + "--deqp-watchdog=enable",
                     CASE_LIST_FILE_NAME, rotation);
 
             runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine,
@@ -1221,7 +1225,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable", instrumentationAnswerConfigA);
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigA);
 
         // query for config B
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1238,7 +1243,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable", instrumentationAnswerConfigB);
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigB);
 
         // query for config C
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1255,7 +1261,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=180 "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable" , instrumentationAnswerConfigC);
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable" , instrumentationAnswerConfigC);
 
         // query for unsupported config
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1448,7 +1455,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=unspecified "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable", instrumentationAnswerFine);
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerFine);
 
         // query config B
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1474,7 +1482,8 @@ public class DeqpTestRunnerTest extends TestCase {
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
                 + "--deqp-surface-type=window "
-                + "--deqp-log-images=disable\" "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable\" "
                 + "-e deqpLogData \"%s\" %s",
                 AbiUtils.createAbiFlag(UnitTests.ABI.getName()), LOG_FILE_NAME,
                 CASE_LIST_FILE_NAME, false, INSTRUMENTATION_NAME);
@@ -1518,7 +1527,8 @@ public class DeqpTestRunnerTest extends TestCase {
                     + " --deqp-gl-config-name=rgba8888d24s8 "
                     + "--deqp-screen-rotation=180 "
                     + "--deqp-surface-type=window "
-                    + "--deqp-log-images=disable", instrumentationAnswerFine);
+                    + "--deqp-log-images=disable "
+                    + "--deqp-watchdog=enable", instrumentationAnswerFine);
         }
 
         mockListener.testRunStarted(ID, 1);

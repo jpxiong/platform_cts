@@ -1183,6 +1183,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             deqpCmdLine.append(" --deqp-log-images=disable");
         }
 
+        deqpCmdLine.append(" --deqp-watchdog=enable");
+
         final String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \"%s\""
                     + " -e deqpLogData \"%s\" %s",
