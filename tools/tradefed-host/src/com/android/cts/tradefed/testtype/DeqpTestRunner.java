@@ -2,7 +2,11 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.util.AbiUtils;
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
+import com.android.ddmlib.ShellCommandUnresponsiveException;
+import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
@@ -18,6 +22,9 @@ import com.android.tradefed.testtype.IRemoteTest;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test runner for dEQP tests
@@ -52,16 +60,23 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private static final BatchRunConfiguration DEFAULT_CONFIG =
         new BatchRunConfiguration("rgba8888d24s8", "unspecified", "window");
 
+    private static final int UNRESPOSIVE_CMD_TIMEOUT_MS = 60000; // one minute
+
     private final String mPackageName;
     private final String mName;
     private final Collection<TestIdentifier> mRemainingTests;
     private final Map<TestIdentifier, Set<BatchRunConfiguration>> mTestInstances;
-    private final TestInstanceResultListener mInstanceListerner;
+    private final TestInstanceResultListener mInstanceListerner = new TestInstanceResultListener();
     private IAbi mAbi;
     private CtsBuildHelper mCtsBuild;
-    private boolean mLogData;
+    private boolean mLogData = false;
     private ITestDevice mDevice;
     private Set<String> mDeviceFeatures;
+
+    private IRecovery mDeviceRecovery = new Recovery();
+    {
+        mDeviceRecovery.setSleepProvider(new SleepProvider());
+    }
 
     public DeqpTestRunner(String packageName, String name, Collection<TestIdentifier> tests,
             Map<TestIdentifier, List<Map<String,String>>> testInstances) {
@@ -69,8 +84,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         mName = name;
         mRemainingTests = new LinkedList<>(tests); // avoid modifying arguments
         mTestInstances = parseTestInstances(tests, testInstances);
-        mInstanceListerner = new TestInstanceResultListener();
-        mLogData = false;
     }
 
     /**
@@ -120,6 +133,15 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     @Override
     public ITestDevice getDevice() {
         return mDevice;
+    }
+
+    /**
+     * Set recovery handler.
+     *
+     * Exposed for unit testing.
+     */
+    public void setRecovery(IRecovery deviceRecovery) {
+        mDeviceRecovery = deviceRecovery;
     }
 
     private static final class CapabilityQueryFailureException extends Exception {
@@ -221,13 +243,23 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         }
 
         /**
+         * Get currently processed test id, or null if not currently processing a test case
+         */
+        public TestIdentifier getCurrentTestId() {
+            return mCurrentTestId;
+        }
+
+        /**
          * Forward result to sink
          */
         private void forwardFinalizedPendingResult() {
             if (mRemainingTests.contains(mCurrentTestId)) {
                 final PendingResult result = mPendingResults.get(mCurrentTestId);
 
+                mPendingResults.remove(mCurrentTestId);
                 mRemainingTests.remove(mCurrentTestId);
+
+                // Forward results to the sink
                 mSink.testStarted(mCurrentTestId);
 
                 // Test Log
@@ -262,10 +294,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                     mSink.testFailed(mCurrentTestId, errorLog.toString());
                 }
 
-                // Clear all that won't be used again. The memory usage of these might
-                // add up to quite large numbers
-                result.testLogs = null;
-                result.errorMessages = null;
                 final Map<String, String> emptyMap = Collections.emptyMap();
                 mSink.testEnded(mCurrentTestId, emptyMap);
             }
@@ -292,7 +320,20 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         public boolean isPendingTestInstance(TestIdentifier testId,
                 BatchRunConfiguration config) {
             final PendingResult result = mPendingResults.get(testId);
-            return result.remainingConfigs.contains(config);
+            if (result == null) {
+                // test is not in the current working batch of the runner, i.e. it cannot be
+                // "partially" completed.
+                if (!mRemainingTests.contains(testId)) {
+                    // The test has been fully executed. Not pending.
+                    return false;
+                } else {
+                    // Test has not yet been executed. Check if such instance exists
+                    return mTestInstances.get(testId).contains(config);
+                }
+            } else {
+                // could be partially completed, check this particular config
+                return result.remainingConfigs.contains(config);
+            }
         }
 
         /**
@@ -613,6 +654,257 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     }
 
     /**
+     * Interface for sleeping.
+     *
+     * Exposed for unit testing
+     */
+    public static interface ISleepProvider {
+        public void sleep(int milliseconds);
+    };
+
+    private static class SleepProvider implements ISleepProvider {
+        public void sleep(int milliseconds) {
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException ex) {
+            }
+        }
+    };
+
+    /**
+     * Interface for failure recovery.
+     *
+     * Exposed for unit testing
+     */
+    public static interface IRecovery {
+        /**
+         * Sets the sleep provider IRecovery works on
+         */
+        public void setSleepProvider(ISleepProvider sleepProvider);
+
+        /**
+         * Sets the device IRecovery works on
+         */
+        public void setDevice(ITestDevice device);
+
+        /**
+         * Informs Recovery that test execution has progressed since the last recovery
+         */
+        public void onExecutionProgressed();
+
+        /**
+         * Tries to recover device after failed refused connection.
+         *
+         * @throws DeviceNotAvailableException if recovery did not succeed
+         */
+        public void recoverConnectionRefused() throws DeviceNotAvailableException;
+
+        /**
+         * Tries to recover device after abnormal execution termination or link failure.
+         *
+         * @param progressedSinceLastCall true if test execution has progressed since last call
+         * @throws DeviceNotAvailableException if recovery did not succeed
+         */
+        public void recoverComLinkKilled() throws DeviceNotAvailableException;
+    };
+
+    /**
+     * State machine for execution failure recovery.
+     *
+     * Exposed for unit testing
+     */
+    public static class Recovery implements IRecovery {
+        private int RETRY_COOLDOWN_MS = 6000; // 6 seconds
+
+        private static enum MachineState {
+            WAIT, // recover by waiting
+            RECOVER, // recover by calling recover()
+            REBOOT, // recover by rebooting
+            FAIL, // cannot recover
+        };
+
+        private MachineState mState = MachineState.WAIT;
+        private ITestDevice mDevice;
+        private ISleepProvider mSleepProvider;
+
+        /**
+         * {@inheritDoc}
+         */
+        public void setSleepProvider(ISleepProvider sleepProvider) {
+            mSleepProvider = sleepProvider;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setDevice(ITestDevice device) {
+            mDevice = device;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onExecutionProgressed() {
+            mState = MachineState.WAIT;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void recoverConnectionRefused() throws DeviceNotAvailableException {
+            switch (mState) {
+                case WAIT: // not a valid stratedy for connection refusal, fallthrough
+                case RECOVER:
+                    // First failure, just try to recover
+                    CLog.w("ADB connection failed, trying to recover");
+                    mState = MachineState.REBOOT; // the next step is to reboot
+
+                    try {
+                        recoverDevice();
+                    } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverConnectionRefused();
+                    }
+                    break;
+
+                case REBOOT:
+                    // Second failure in a row, try to reboot
+                    CLog.w("ADB connection failed after recovery, rebooting device");
+                    mState = MachineState.FAIL; // the next step is to fail
+
+                    try {
+                        rebootDevice();
+                    } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverConnectionRefused();
+                    }
+                    break;
+
+                case FAIL:
+                    // Third failure in a row, just fail
+                    CLog.w("Cannot recover ADB connection");
+                    throw new DeviceNotAvailableException("failed to connect after reboot");
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void recoverComLinkKilled() throws DeviceNotAvailableException {
+            switch (mState) {
+                case WAIT:
+                    // First failure, just try to wait and try again
+                    CLog.w("ADB link failed, retrying after a cooldown period");
+                    mState = MachineState.RECOVER; // the next step is to recover the device
+
+                    waitCooldown();
+
+                    // even if the link to deqp on-device process was killed, the process might
+                    // still be alive. Locate and terminate such unwanted processes.
+                    try {
+                        killDeqpProcess();
+                    } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverComLinkKilled();
+                    }
+                    break;
+
+                case RECOVER:
+                    // Second failure, just try to recover
+                    CLog.w("ADB link failed, trying to recover");
+                    mState = MachineState.REBOOT; // the next step is to reboot
+
+                    try {
+                        recoverDevice();
+                        killDeqpProcess();
+                    } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverComLinkKilled();
+                    }
+                    break;
+
+                case REBOOT:
+                    // Third failure in a row, try to reboot
+                    CLog.w("ADB link failed after recovery, rebooting device");
+                    mState = MachineState.FAIL; // the next step is to fail
+
+                    try {
+                        rebootDevice();
+                    } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverComLinkKilled();
+                    }
+                    break;
+
+                case FAIL:
+                    // Fourth failure in a row, just fail
+                    CLog.w("Cannot recover ADB connection");
+                    throw new DeviceNotAvailableException("link killed after reboot");
+            }
+        }
+
+        private void waitCooldown() {
+            mSleepProvider.sleep(RETRY_COOLDOWN_MS);
+        }
+
+        private void killDeqpProcess() throws DeviceNotAvailableException {
+            final String processes = mDevice.executeShellCommand("ps | grep com.drawelements");
+            final String[] lines = processes.split("(\\r|\\n)+");
+            for (String line : lines) {
+                final String[] fields = line.split("\\s+");
+                if (fields.length < 2) {
+                    continue;
+                }
+
+                final int processId;
+                try {
+                    processId = Integer.parseInt(fields[1], 10);
+                } catch (NumberFormatException ex) {
+                    continue;
+                }
+
+                mDevice.executeShellCommand(String.format("kill -9 %d", processId));
+            }
+        }
+
+        public void recoverDevice() throws DeviceNotAvailableException {
+            // Work around the API. We need to call recoverDevice() on the test device and
+            // we know that mDevice is a TestDevice. However even though the recoverDevice()
+            // method is public suggesting it should be publicly accessible, the class itself
+            // and its super-interface (IManagedTestDevice) are package-private.
+            final Method recoverDeviceMethod;
+            try {
+                recoverDeviceMethod = mDevice.getClass().getMethod("recoverDevice");
+                recoverDeviceMethod.setAccessible(true);
+            } catch (NoSuchMethodException ex) {
+                throw new AssertionError("Test device must have recoverDevice()");
+            }
+
+            try {
+                recoverDeviceMethod.invoke(mDevice);
+            } catch (InvocationTargetException ex) {
+                if (ex.getCause() instanceof DeviceNotAvailableException) {
+                    throw (DeviceNotAvailableException)ex.getCause();
+                } else if (ex.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException)ex.getCause();
+                } else {
+                    throw new AssertionError("unexpected throw", ex);
+                }
+            } catch (IllegalAccessException ex) {
+                throw new AssertionError("unexpected throw", ex);
+            }
+        }
+
+        private void rebootDevice() throws DeviceNotAvailableException {
+            mDevice.reboot();
+        }
+    };
+
+    /**
      * Parse map of instance arguments to map of BatchRunConfigurations
      */
     private static Map<TestIdentifier, Set<BatchRunConfiguration>> parseTestInstances(
@@ -755,6 +1047,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
      * Executes tests on the device.
      */
     private void runTests() throws DeviceNotAvailableException, CapabilityQueryFailureException {
+        mDeviceRecovery.setDevice(mDevice);
+
         while (!mRemainingTests.isEmpty()) {
             // select tests for the batch
             final ArrayList<TestIdentifier> batchTests = new ArrayList<>(TESTCASE_BATCH_LIMIT);
@@ -829,6 +1123,44 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         }
     }
 
+    private static final class AdbComLinkOpenError extends Exception {
+        public AdbComLinkOpenError(String description, Throwable inner) {
+            super(description, inner);
+        }
+    };
+    private static final class AdbComLinkKilledError extends Exception {
+        public AdbComLinkKilledError(String description, Throwable inner) {
+            super(description, inner);
+        }
+    };
+
+    /**
+     * Executes a given command in adb shell
+     *
+     * @throws AdbComLinkOpenError if connection cannot be established.
+     * @throws AdbComLinkKilledError if established connection is killed prematurely.
+     */
+    private void executeShellCommandAndReadOutput(final String command,
+            final IShellOutputReceiver receiver)
+            throws AdbComLinkOpenError, AdbComLinkKilledError {
+        try {
+            mDevice.getIDevice().executeShellCommand(command, receiver,
+                    UNRESPOSIVE_CMD_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException ex) {
+            // Opening connection timed out
+            throw new AdbComLinkOpenError("opening connection timed out", ex);
+        } catch (AdbCommandRejectedException ex) {
+            // Command rejected
+            throw new AdbComLinkOpenError("command rejected", ex);
+        } catch (IOException ex) {
+            // shell command channel killed
+            throw new AdbComLinkKilledError("command link killed", ex);
+        } catch (ShellCommandUnresponsiveException ex) {
+            // shell command halted
+            throw new AdbComLinkKilledError("command link hung", ex);
+        }
+    }
+
     private void executeTestRunBatch(Collection<TestIdentifier> tests,
             BatchRunConfiguration runConfig) throws DeviceNotAvailableException {
         final String testCases = generateTestCaseTrie(tests);
@@ -857,10 +1189,37 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                 AbiUtils.createAbiFlag(mAbi.getName()), LOG_FILE_NAME, deqpCmdLine.toString(),
                 mLogData, instrumentationName);
 
+        final int numRemainingInstancesBefore = getNumRemainingInstances();
+        final InstrumentationParser parser = new InstrumentationParser(mInstanceListerner);
+        Throwable interruptingError = null;
+
         try {
-            final InstrumentationParser parser = new InstrumentationParser(mInstanceListerner);
-            mDevice.executeShellCommand(command, parser);
+            executeShellCommandAndReadOutput(command, parser);
+        } catch (Throwable ex) {
+            interruptingError = ex;
+        } finally {
             parser.flush();
+        }
+
+        try {
+            final boolean progressedSinceLastCall =
+                    mInstanceListerner.getCurrentTestId() != null ||
+                    getNumRemainingInstances() < numRemainingInstancesBefore;
+
+            if (progressedSinceLastCall) {
+                mDeviceRecovery.onExecutionProgressed();
+            }
+
+            if (interruptingError == null) {
+                // execution finished successfully, do nothing
+            } else if (interruptingError instanceof AdbComLinkOpenError) {
+                mDeviceRecovery.recoverConnectionRefused();
+            } else if (interruptingError instanceof AdbComLinkKilledError) {
+                mDeviceRecovery.recoverComLinkKilled();
+            } else {
+                CLog.e(interruptingError);
+                throw new RuntimeException(interruptingError);
+            }
         } catch (DeviceNotAvailableException ex) {
             // Device lost. We must signal the tradedef by rethrowing this execption. However,
             // there is a possiblity that the device loss was caused by the currently run test
@@ -899,6 +1258,21 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             deqpCmdLine.append(runConfig.getSurfaceType());
         }
         return deqpCmdLine.toString();
+    }
+
+    private int getNumRemainingInstances() {
+        int retVal = 0;
+        for (TestIdentifier testId : mRemainingTests) {
+            // If case is in current working set, sum only not yet executed instances.
+            // If case is not in current working set, sum all instances (since they are not yet
+            // executed).
+            if (mInstanceListerner.mPendingResults.containsKey(testId)) {
+                retVal += mInstanceListerner.mPendingResults.get(testId).remainingConfigs.size();
+            } else {
+                retVal += mTestInstances.get(testId).size();
+            }
+        }
+        return retVal;
     }
 
     /**
