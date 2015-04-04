@@ -21,6 +21,7 @@ LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicCtsGtestMain \
 
 LOCAL_STATIC_LIBRARIES += \
+    libbase \
     libtinyxml2 \
     liblog \
     libgtest \
@@ -45,6 +46,11 @@ LOCAL_LDLIBS += \
 LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
     libBionicCtsGtestMain \
+
+LOCAL_STATIC_LIBRARIES += \
+    libbase \
+    liblog \
+    libcutils \
 
 LOCAL_CXX_STL := libc++
 
