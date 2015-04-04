@@ -16,6 +16,7 @@ import sys
 import its.device
 import its.objects
 import its.image
+import its.caps
 
 def main():
     """capture a yuv image and save it to argv[1]
@@ -39,8 +40,10 @@ def main():
         cam.do_3a(do_af=True, lock_ae=True, lock_awb=True)
         props = cam.get_camera_properties()
         req = its.objects.fastest_auto_capture_request(props)
-        req["android.control.awbLock"] = True
-        req["android.control.aeLock"] = True
+        if its.caps.ae_lock(props):
+            req["android.control.awbLock"] = True
+        if its.caps.awb_lock(props):
+            req["android.control.aeLock"] = True
         while True:
             print "Capture an image to check the test scene"
             cap = cam.do_capture(req)

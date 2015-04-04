@@ -523,7 +523,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             // LEGACY Devices don't have the AWB_STATE reported in results, so just wait
             waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
         }
-        previewRequest.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+        boolean canSetAwbLock = mStaticInfo.isAwbLockSupported();
+        if (canSetAwbLock) {
+            previewRequest.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+        }
         mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         // Validate the next result immediately for region and mode.
         result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
@@ -1281,7 +1284,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         CaptureRequest.Builder stillRequest =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-        stillRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
+        boolean canSetAeLock = mStaticInfo.isAeLockSupported();
+
+        if (canSetAeLock) {
+            stillRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
+        }
+
         CaptureResult normalResult;
         CaptureResult compensatedResult;
 
@@ -1291,7 +1299,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         long maxExposureValuePreview = -1;
         long maxExposureValueStill = -1;
         if (mStaticInfo.isCapabilitySupported(
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
             // Minimum exposure settings is mostly static while maximum exposure setting depends on
             // frame rate range which in term depends on capture request.
             minExposureValue = mStaticInfo.getSensitivityMinimumOrDefault() *
@@ -1319,7 +1327,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             long normalExposureValue = -1;
             if (mStaticInfo.isCapabilitySupported(
-                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
                 // get and check if current exposure value is valid
                 normalExposureValue = getExposureValue(normalResult);
                 mCollector.expectInRange("Exposure setting out of bound", normalExposureValue,
@@ -1343,9 +1351,15 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             // frames to go back to locked state
             previewRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,
                     exposureCompensation);
-            previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
+            if (canSetAeLock) {
+                previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
+            }
             mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
-            waitForAeLocked(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            if (canSetAeLock) {
+                waitForAeLocked(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            } else {
+                waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            }
 
             // Issue still capture
             if (VERBOSE) {
@@ -1361,7 +1375,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     request, WAIT_FOR_RESULT_TIMEOUT_MS);
 
             if (mStaticInfo.isCapabilitySupported(
-                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
                 // Verify the exposure value compensates as requested
                 long compensatedExposureValue = getExposureValue(compensatedResult);
                 mCollector.expectInRange("Exposure setting out of bound", compensatedExposureValue,
@@ -1388,8 +1402,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             mCollector.expectEquals("Exposure compensation result should match requested value.",
                     exposureCompensation,
                     compensatedResult.get(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION));
-            mCollector.expectTrue("Exposure lock should be set",
-                    compensatedResult.get(CaptureResult.CONTROL_AE_LOCK));
+            if (canSetAeLock) {
+                mCollector.expectTrue("Exposure lock should be set",
+                        compensatedResult.get(CaptureResult.CONTROL_AE_LOCK));
+            }
 
             Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             validateJpegCapture(image, maxStillSz);
@@ -1397,7 +1413,9 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
 
             // Recover AE compensation and lock
             previewRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 0);
-            previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, false);
+            if (canSetAeLock) {
+                previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, false);
+            }
             mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
         }
     }

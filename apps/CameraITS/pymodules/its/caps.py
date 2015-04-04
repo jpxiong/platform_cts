@@ -222,6 +222,30 @@ def ev_compensation(props):
     return props.has_key("android.control.aeCompensationRange") and \
            props["android.control.aeCompensationRange"] != [0, 0]
 
+def ae_lock(props):
+    """Returns whether a device supports AE lock
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key("android.control.aeLockAvailable") and \
+           props["android.control.aeLockAvailable"] == 1
+
+def awb_lock(props):
+    """Returns whether a device supports AWB lock
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key("android.control.awbLockAvailable") and \
+           props["android.control.awbLockAvailable"] == 1
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
