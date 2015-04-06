@@ -19,12 +19,15 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Log;
 import android.util.Size;
 
@@ -56,8 +59,14 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
      * Test the available capability for different hardware support level devices.
      */
     public void testHwSupportedLevel() throws Exception {
+        Key<StreamConfigurationMap> key =
+                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+        final float SIZE_ERROR_MARGIN = 0.03f;
         for (String id : mCameraIds) {
             initStaticMetadata(id);
+            StreamConfigurationMap configs = mStaticInfo.getValueFromKeyNonNull(key);
+            Rect activeRect = mStaticInfo.getActiveArraySizeChecked();
+            Size sensorSize = new Size(activeRect.width(), activeRect.height());
             List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
 
             mCollector.expectTrue("All device must contains BACKWARD_COMPATIBLE capability",
@@ -71,6 +80,13 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                         availableCaps.contains(
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING));
 
+                // Max yuv resolution must be very close to  sensor resolution
+                Size[] yuvSizes = configs.getOutputSizes(ImageFormat.YUV_420_888);
+                Size maxYuvSize = CameraTestUtils.getMaxSize(yuvSizes);
+                mCollector.expectSizesAreSimilar(
+                        "Active array size and max YUV size should be similar",
+                        sensorSize, maxYuvSize, SIZE_ERROR_MARGIN);
+
                 // Max resolution fps must be >= 20.
                 mCollector.expectTrue("Full device must support at least 20fps for max resolution",
                         getFpsForMaxSize(id) >= MIN_FPS_FOR_FULL_DEVICE);
@@ -79,6 +95,13 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 mCollector.expectTrue("Full device must support per frame control",
                         mStaticInfo.isPerFrameControlSupported());
             }
+
+            // Max jpeg resolution must be very close to  sensor resolution
+            Size[] jpegSizes = configs.getOutputSizes(ImageFormat.JPEG);
+            Size maxJpegSize = CameraTestUtils.getMaxSize(jpegSizes);
+            mCollector.expectSizesAreSimilar(
+                    "Active array size and max JPEG size should be similar",
+                    sensorSize, maxJpegSize, SIZE_ERROR_MARGIN);
 
             // TODO: test all the keys mandatory for all capability devices.
         }
