@@ -587,14 +587,16 @@ public class StaticMetadata {
                     modeList.contains(CameraMetadata.HOT_PIXEL_MODE_FAST));
         }
 
-        // FAST and HIGH_QUALITY mode must be both present or both not present
-        List<Integer> coupledModes = Arrays.asList(new Integer[] {
-                CameraMetadata.HOT_PIXEL_MODE_FAST,
-                CameraMetadata.HOT_PIXEL_MODE_HIGH_QUALITY
-        });
-        checkTrueForKey(key, " FAST and HIGH_QUALITY mode must both present or both not present",
-                containsAllOrNone(modeList, coupledModes));
-
+        if (isHardwareLevelLimitedOrBetter()) {
+            // FAST and HIGH_QUALITY mode must be both present or both not present
+            List<Integer> coupledModes = Arrays.asList(new Integer[] {
+                    CameraMetadata.HOT_PIXEL_MODE_FAST,
+                    CameraMetadata.HOT_PIXEL_MODE_HIGH_QUALITY
+            });
+            checkTrueForKey(
+                    key, " FAST and HIGH_QUALITY mode must both present or both not present",
+                    containsAllOrNone(modeList, coupledModes));
+        }
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes, CameraMetadata.HOT_PIXEL_MODE_OFF,
                 CameraMetadata.HOT_PIXEL_MODE_HIGH_QUALITY);
@@ -683,13 +685,16 @@ public class StaticMetadata {
                     modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
         }
 
-        // FAST and HIGH_QUALITY mode must be both present or both not present
-        List<Integer> coupledModes = Arrays.asList(new Integer[] {
-                CameraMetadata.TONEMAP_MODE_FAST,
-                CameraMetadata.TONEMAP_MODE_HIGH_QUALITY
-        });
-        checkTrueForKey(key, " FAST and HIGH_QUALITY mode must both present or both not present",
-                containsAllOrNone(modeList, coupledModes));
+        if (isHardwareLevelLimitedOrBetter()) {
+            // FAST and HIGH_QUALITY mode must be both present or both not present
+            List<Integer> coupledModes = Arrays.asList(new Integer[] {
+                    CameraMetadata.TONEMAP_MODE_FAST,
+                    CameraMetadata.TONEMAP_MODE_HIGH_QUALITY
+            });
+            checkTrueForKey(
+                    key, " FAST and HIGH_QUALITY mode must both present or both not present",
+                    containsAllOrNone(modeList, coupledModes));
+        }
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes, CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE,
                 CameraMetadata.TONEMAP_MODE_HIGH_QUALITY);
@@ -1263,13 +1268,17 @@ public class StaticMetadata {
                     modeList.contains(CameraMetadata.EDGE_MODE_OFF) &&
                     modeList.contains(CameraMetadata.EDGE_MODE_FAST));
         }
-        // FAST and HIGH_QUALITY mode must be both present or both not present
-        List<Integer> coupledModes = Arrays.asList(new Integer[] {
-                CameraMetadata.EDGE_MODE_FAST,
-                CameraMetadata.EDGE_MODE_HIGH_QUALITY
-        });
-        checkTrueForKey(key, " FAST and HIGH_QUALITY mode must both present or both not present",
-                containsAllOrNone(modeList, coupledModes));
+
+        if (isHardwareLevelLimitedOrBetter()) {
+            // FAST and HIGH_QUALITY mode must be both present or both not present
+            List<Integer> coupledModes = Arrays.asList(new Integer[] {
+                    CameraMetadata.EDGE_MODE_FAST,
+                    CameraMetadata.EDGE_MODE_HIGH_QUALITY
+            });
+            checkTrueForKey(
+                    key, " FAST and HIGH_QUALITY mode must both present or both not present",
+                    containsAllOrNone(modeList, coupledModes));
+        }
 
         return edgeModes;
     }
@@ -1292,13 +1301,16 @@ public class StaticMetadata {
                     modeList.contains(CameraMetadata.NOISE_REDUCTION_MODE_FAST));
         }
 
-        // FAST and HIGH_QUALITY mode must be both present or both not present
-        List<Integer> coupledModes = Arrays.asList(new Integer[] {
-                CameraMetadata.NOISE_REDUCTION_MODE_FAST,
-                CameraMetadata.NOISE_REDUCTION_MODE_HIGH_QUALITY
-        });
-        checkTrueForKey(key, " FAST and HIGH_QUALITY mode must both present or both not present",
-                containsAllOrNone(modeList, coupledModes));
+        if (isHardwareLevelLimitedOrBetter()) {
+            // FAST and HIGH_QUALITY mode must be both present or both not present
+            List<Integer> coupledModes = Arrays.asList(new Integer[] {
+                    CameraMetadata.NOISE_REDUCTION_MODE_FAST,
+                    CameraMetadata.NOISE_REDUCTION_MODE_HIGH_QUALITY
+            });
+            checkTrueForKey(
+                    key, " FAST and HIGH_QUALITY mode must both present or both not present",
+                    containsAllOrNone(modeList, coupledModes));
+        }
         return noiseReductionModes;
     }
 
@@ -1476,13 +1488,17 @@ public class StaticMetadata {
         checkTrueForKey(key, " Camera devices must always support either OFF or FAST mode",
                 modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF) ||
                 modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_FAST));
-        // FAST and HIGH_QUALITY mode must be both present or both not present
-        List<Integer> coupledModes = Arrays.asList(new Integer[] {
-                CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_FAST,
-                CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY
-        });
-        checkTrueForKey(key, " FAST and HIGH_QUALITY mode must both present or both not present",
-                containsAllOrNone(modeList, coupledModes));
+
+        if (isHardwareLevelLimitedOrBetter()) {
+            // FAST and HIGH_QUALITY mode must be both present or both not present
+            List<Integer> coupledModes = Arrays.asList(new Integer[] {
+                    CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_FAST,
+                    CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY
+            });
+            checkTrueForKey(
+                    key, " FAST and HIGH_QUALITY mode must both present or both not present",
+                    containsAllOrNone(modeList, coupledModes));
+        }
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes,
                 CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF,
