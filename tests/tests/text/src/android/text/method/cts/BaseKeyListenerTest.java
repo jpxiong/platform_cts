@@ -86,6 +86,365 @@ public class BaseKeyListenerTest extends KeyListenerTestCase {
         assertEquals(TEST_STRING, mTextView.getText().toString());
     }
 
+    private void executeCtrlBackspace(Editable content, MockBaseKeyListener listener) {
+        long currentTime = System.currentTimeMillis();
+        final KeyEvent delKeyEvent = new KeyEvent(
+                currentTime,
+                currentTime,
+                KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_DEL,
+                0 /* repeat */,
+                KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_LEFT_ON);
+        listener.backspace(mTextView, content, KeyEvent.KEYCODE_DEL, delKeyEvent);
+    }
+
+    private void assertCursorPosition(Editable content, int offset) {
+        assertEquals(offset, Selection.getSelectionStart(content));
+        assertEquals(offset, Selection.getSelectionEnd(content));
+    }
+
+    public void testBackspace_withCtrl() {
+        final MockBaseKeyListener mockBaseKeyListener = new MockBaseKeyListener();
+
+        // If the contents only having symbolic characters, delete all characters.
+        String testText = "!#$%&'()`{*}_?+";
+        Editable content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, testText.length(), testText.length());
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Latin ASCII text
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+
+        // If the cursor is head of the text, should do nothing.
+        prepTextViewSync(content, mockBaseKeyListener, false, 0, 0);
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World. This is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        prepTextViewSync(content, mockBaseKeyListener, false, testText.length(), testText.length());
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World. This is ", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World. This ", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World. ", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, ", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Latin ASCII, cursor is middle of the text.
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        int charsFromTail = 12;  // Cursor location is 12 chars from the tail.(before "is").
+        prepTextViewSync(content, mockBaseKeyListener, false,
+                         testText.length() - charsFromTail, testText.length() - charsFromTail);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World.  is Android.", content.toString());
+        assertCursorPosition(content, content.toString().length() - charsFromTail);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello,  is Android.", content.toString());
+        assertCursorPosition(content, content.toString().length() - charsFromTail);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals(" is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals(" is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Latin ASCII, cursor is inside word.
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        charsFromTail = 14;  // Cursor location is 12 chars from the tail. (inside "This")
+        prepTextViewSync(content, mockBaseKeyListener, false,
+                         testText.length() - charsFromTail, testText.length() - charsFromTail);
+
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, World. is is Android.", content.toString());
+        assertCursorPosition(content, content.toString().length() - charsFromTail);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("Hello, is is Android.", content.toString());
+        assertCursorPosition(content, content.toString().length() - charsFromTail);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("is is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("is is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Hebrew Text
+        // The deletion works on a Logical direction basis.
+        testText = "\u05E9\u05DC\u05D5\u05DD\u0020\u05D4\u05E2\u05D5\u05DC\u05DD\u002E\u0020" +
+                   "\u05D6\u05D4\u0020\u05D0\u05E0\u05D3\u05E8\u05D5\u05D0\u05D9\u05D3\u002E";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, testText.length(), testText.length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05E9\u05DC\u05D5\u05DD\u0020\u05D4\u05E2\u05D5\u05DC\u05DD\u002E\u0020" +
+                     "\u05D6\u05D4\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05E9\u05DC\u05D5\u05DD\u0020\u05D4\u05E2\u05D5\u05DC\u05DD\u002E\u0020",
+                     content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05E9\u05DC\u05D5\u05DD\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // BiDi Text
+        // The deletion works on a Logical direction basis.
+        testText = "\u05D6\u05D4\u0020\u05DC\u002D\u0020\u0041Android\u0020\u05E2\u05D5\u05D1" +
+                   "\u05D3\u0020\u05D4\u05D9\u05D8\u05D1\u002E";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, testText.length(), testText.length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05D6\u05D4\u0020\u05DC\u002D\u0020\u0041Android\u0020\u05E2\u05D5\u05D1" +
+                     "\u05D3\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05D6\u05D4\u0020\u05DC\u002D\u0020\u0041Android\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05D6\u05D4\u0020\u05DC\u002D\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("\u05D6\u05D4\u0020", content.toString());
+        assertCursorPosition(content, content.toString().length());
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlBackspace(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+    }
+
+    private void executeCtrlForwardDelete(Editable content, MockBaseKeyListener listener) {
+        long currentTime = System.currentTimeMillis();
+        final KeyEvent delKeyEvent = new KeyEvent(
+                currentTime,
+                currentTime,
+                KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_FORWARD_DEL,
+                0 /* repeat */,
+                KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_LEFT_ON);
+        listener.forwardDelete(mTextView, content, KeyEvent.KEYCODE_FORWARD_DEL, delKeyEvent);
+    }
+
+    public void testForwardDelete_withCtrl() {
+        final MockBaseKeyListener mockBaseKeyListener = new MockBaseKeyListener();
+
+        // If the contents only having symbolic characters, delete all characters.
+        String testText = "!#$%&'()`{*}_?+";
+        Editable content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, 0, 0);
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Latin ASCII text
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+
+        // If the cursor is tail of the text, should do nothing.
+        prepTextViewSync(content, mockBaseKeyListener, false, testText.length(), testText.length());
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. This is Android.", content.toString());
+        assertCursorPosition(content, testText.length());
+
+        prepTextViewSync(content, mockBaseKeyListener, false, 0, 0);
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals(", World. This is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals(". This is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals(" is Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals(" Android.", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals(".", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // Latin ASCII, cursor is middle of the text.
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        int charsFromHead = 14;  // Cursor location is 14 chars from the head.(before "This").
+        prepTextViewSync(content, mockBaseKeyListener, false, charsFromHead, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World.  is Android.", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World.  Android.", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. .", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. ", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. ", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        // Latin ASCII, cursor is inside word.
+        testText = "Hello, World. This is Android.";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        charsFromHead = 16;  // Cursor location is 16 chars from the head. (inside "This")
+        prepTextViewSync(content, mockBaseKeyListener, false, charsFromHead, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. Th is Android.", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. Th Android.", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. Th.", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. Th", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("Hello, World. Th", content.toString());
+        assertCursorPosition(content, charsFromHead);
+
+        // Hebrew Text
+        // The deletion works on a Logical direction basis.
+        testText = "\u05E9\u05DC\u05D5\u05DD\u0020\u05D4\u05E2\u05D5\u05DC\u05DD\u002E\u0020" +
+                   "\u05D6\u05D4\u0020\u05D0\u05E0\u05D3\u05E8\u05D5\u05D0\u05D9\u05D3\u002E";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, 0, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u0020\u05D4\u05E2\u05D5\u05DC\u05DD\u002E\u0020\u05D6\u05D4\u0020\u05D0" +
+                     "\u05E0\u05D3\u05E8\u05D5\u05D0\u05D9\u05D3\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u002E\u0020\u05D6\u05D4\u0020\u05D0\u05E0\u05D3\u05E8\u05D5\u05D0\u05D9\u05D3" +
+                     "\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u0020\u05D0\u05E0\u05D3\u05E8\u05D5\u05D0\u05D9\u05D3\u002E",
+                     content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        // BiDi Text
+        // The deletion works on a Logical direction basis.
+        testText = "\u05D6\u05D4\u0020\u05DC\u002D\u0020\u0041Android\u0020\u05E2\u05D5\u05D1" +
+                   "\u05D3\u0020\u05D4\u05D9\u05D8\u05D1\u002E";
+        content = Editable.Factory.getInstance().newEditable(testText);
+        prepTextViewSync(content, mockBaseKeyListener, false, 0, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u0020\u05DC\u002D\u0020\u0041Android\u0020\u05E2\u05D5\u05D1\u05D3\u0020" +
+                     "\u05D4\u05D9\u05D8\u05D1\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u002D\u0020\u0041Android\u0020\u05E2\u05D5\u05D1\u05D3\u0020\u05D4\u05D9" +
+                     "\u05D8\u05D1\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u0020\u05E2\u05D5\u05D1\u05D3\u0020\u05D4\u05D9\u05D8\u05D1\u002E",
+                     content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u0020\u05D4\u05D9\u05D8\u05D1\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("\u002E", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+
+        executeCtrlForwardDelete(content, mockBaseKeyListener);
+        assertEquals("", content.toString());
+        assertCursorPosition(content, 0);
+    }
+
     /*
      * Check point:
      * 1. Press 0 key, the content of TextView does not changed.
