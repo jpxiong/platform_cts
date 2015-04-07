@@ -85,8 +85,10 @@ public class IntrinsicResize extends IntrinsicBase {
         }
 
 
+        mVerify.set_gAllowedIntError(1);
         mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
         if (outW == w && outH == h) {
+            mVerify.set_gAllowedIntError(0);
             //when scale = 1, check with the original.
             mVerify.invoke_verify(mAllocRef, mAllocSrc, mAllocSrc);
             mVerify.invoke_verify(mAllocDst, mAllocSrc, mAllocSrc);
@@ -230,7 +232,7 @@ public class IntrinsicResize extends IntrinsicBase {
         testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 0.5f, 2.f);
         checkError();
     }
-    
+
     public void test_U8_4_SCALE20_05_inRectangle() {
         testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 2.f, 0.5f);
         checkError();
@@ -247,7 +249,7 @@ public class IntrinsicResize extends IntrinsicBase {
         testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 2.f, 0.5f);
         checkError();
     }
-    
+
     public void test_U8_4_SCALE05_05_inRectangle() {
         testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 0.5f, 0.5f);
         checkError();
