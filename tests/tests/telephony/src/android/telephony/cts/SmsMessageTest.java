@@ -62,6 +62,10 @@ public class SmsMessageTest extends AndroidTestCase{
     private static final long TIMESTAMP_MILLIS = 1149631383000l;
     private static final int SEPTETS_SKT = 80;
     private static final int SEPTETS_KT = 90;
+    private static final String LONG_TEXT_WITH_32BIT_CHARS =
+        "Long dkkshsh jdjsusj kbsksbdf jfkhcu hhdiwoqiwyrygrvn?*?*!\";:'/,."
+        + "__?9#9292736&4;\"$+$+((]\\[\\℅©℅™^®°¥°¥=¢£}}£∆~¶~÷|√×."
+        + " 😯😆😉😇😂😀👕🎓😀👙🐕🐀🐶🐰🐩⛪⛲ ";
 
     @Override
     protected void setUp() throws Exception {
@@ -88,7 +92,7 @@ public class SmsMessageTest extends AndroidTestCase{
         int[] result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER1, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertRemaining(sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2], SmsMessage.MAX_USER_DATA_SEPTETS);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
         assertEquals(pdu, toHexString(sms.getPdu()));
 
@@ -120,7 +124,7 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(msgBody, false);
         assertEquals(SMS_NUMBER2, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertRemaining(sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2], SmsMessage.MAX_USER_DATA_SEPTETS);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
 
         // Test createFromPdu Ucs to Sms
@@ -131,19 +135,19 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER3, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertRemaining(sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2], SmsMessage.MAX_USER_DATA_SEPTETS);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
     }
 
-    private void assertRemaining(int messageLength, int remaining) {
+    private void assertRemaining(int messageLength, int remaining, int maxChars) {
         if (TelephonyUtils.isSkt(mTelephonyManager)) {
             assertTrue(checkRemaining(SEPTETS_SKT, messageLength, remaining)
-                    || checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
+                    || checkRemaining(maxChars, messageLength, remaining));
         } else if (TelephonyUtils.isKt(mTelephonyManager)) {
             assertTrue(checkRemaining(SEPTETS_KT, messageLength, remaining)
-                    || checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
+                    || checkRemaining(maxChars, messageLength, remaining));
         } else {
-            assertTrue(checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
+            assertTrue(checkRemaining(maxChars, messageLength, remaining));
         }
     }
 
@@ -287,6 +291,22 @@ public class SmsMessageTest extends AndroidTestCase{
         assertEquals(EMAIL_FROM, sms.getEmailFrom());
         assertEquals(DMB, sms.getDisplayMessageBody());
         assertEquals(MB, sms.getEmailBody());
+    }
+
+    public void testCalculateLength() throws Exception {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
+
+        int[] result = SmsMessage.calculateLength(LONG_TEXT_WITH_32BIT_CHARS, false);
+        assertEquals(3, result[0]);
+        assertEquals(LONG_TEXT_WITH_32BIT_CHARS.length(), result[1]);
+        assertRemaining(LONG_TEXT_WITH_32BIT_CHARS.length(), result[2],
+                // 3 parts, each with (SmsMessage.MAX_USER_DATA_BYTES_WITH_HEADER / 2) 16-bit
+                // characters. We need to subtract one because a 32-bit character crosses the
+                // boundary of 2 parts.
+                3 * SmsMessage.MAX_USER_DATA_BYTES_WITH_HEADER / 2 - 1);
+        assertEquals(SmsMessage.ENCODING_16BIT, result[3]);
     }
 
     private final static char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

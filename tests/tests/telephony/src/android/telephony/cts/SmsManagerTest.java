@@ -49,6 +49,10 @@ public class SmsManagerTest extends AndroidTestCase {
         "three separate messages.This is a very long text. This text should be broken " +
         "into three separate messages.This is a very long text. This text should be " +
         "broken into three separate messages.";;
+    private static final String LONG_TEXT_WITH_32BIT_CHARS =
+        "Long dkkshsh jdjsusj kbsksbdf jfkhcu hhdiwoqiwyrygrvn?*?*!\";:'/,."
+        + "__?9#9292736&4;\"$+$+((]\\[\\℅©℅™^®°¥°¥=¢£}}£∆~¶~÷|√×."
+        + " 😯😆😉😇😂😀👕🎓😀👙🐕🐀🐶🐰🐩⛪⛲ ";
 
     private static final String SMS_SEND_ACTION = "CTS_SMS_SEND_ACTION";
     private static final String SMS_DELIVERY_ACTION = "CTS_SMS_DELIVERY_ACTION";
@@ -209,17 +213,28 @@ public class SmsManagerTest extends AndroidTestCase {
     public void testDivideMessage() {
         ArrayList<String> dividedMessages = divideMessage(LONG_TEXT);
         assertNotNull(dividedMessages);
-        int numParts;
         if (TelephonyUtils.isSkt(mTelephonyManager)) {
-            assertTrue(isComplete(dividedMessages, 5) || isComplete(dividedMessages, 3));
+            assertTrue(isComplete(dividedMessages, 5, LONG_TEXT)
+                    || isComplete(dividedMessages, 3, LONG_TEXT));
         } else if (TelephonyUtils.isKt(mTelephonyManager)) {
-            assertTrue(isComplete(dividedMessages, 4) || isComplete(dividedMessages, 3));
+            assertTrue(isComplete(dividedMessages, 4, LONG_TEXT)
+                    || isComplete(dividedMessages, 3, LONG_TEXT));
         } else {
-            assertTrue(isComplete(dividedMessages, 3));
+            assertTrue(isComplete(dividedMessages, 3, LONG_TEXT));
         }
     }
 
-    private boolean isComplete(List<String> dividedMessages, int numParts) {
+    public void testDivideUnicodeMessage() {
+        ArrayList<String> dividedMessages = divideMessage(LONG_TEXT_WITH_32BIT_CHARS);
+        assertNotNull(dividedMessages);
+        assertTrue(isComplete(dividedMessages, 3, LONG_TEXT_WITH_32BIT_CHARS));
+        for (String messagePiece : dividedMessages) {
+            assertFalse(Character.isHighSurrogate(
+                    messagePiece.charAt(messagePiece.length() - 1)));
+        }
+    }
+
+    private boolean isComplete(List<String> dividedMessages, int numParts, String longText) {
         if (dividedMessages.size() != numParts) {
             return false;
         }
@@ -228,7 +243,7 @@ public class SmsManagerTest extends AndroidTestCase {
         for (int i = 0; i < numParts; i++) {
             actualMessage += dividedMessages.get(i);
         }
-        return LONG_TEXT.equals(actualMessage);
+        return longText.equals(actualMessage);
     }
 
     public void testSendMessages() throws InterruptedException {
