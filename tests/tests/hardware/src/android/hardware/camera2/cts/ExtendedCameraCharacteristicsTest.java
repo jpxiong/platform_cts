@@ -18,6 +18,7 @@ package android.hardware.camera2.cts;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
@@ -350,6 +351,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
      */
     public void testStaticBurstCharacteristics() {
         int counter = 0;
+        final float SIZE_ERROR_MARGIN = 0.03f;
         for (CameraCharacteristics c : mCharacteristics) {
             int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
             assertNotNull("android.request.availableCapabilities must never be null",
@@ -363,6 +365,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assertNotNull(String.format("No stream configuration map found for: ID %s",
                     mIds[counter]), config);
+            Rect activeRect = c.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            Size sensorSize = new Size(activeRect.width(), activeRect.height());
 
             // Ensure that max YUV size matches max JPEG size
             Size maxYuvSize = CameraTestUtils.getMaxSize(
@@ -372,6 +376,12 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             boolean haveMaxYuv = maxYuvSize != null ?
                 (maxJpegSize.getWidth() <= maxYuvSize.getWidth() &&
                         maxJpegSize.getHeight() <= maxYuvSize.getHeight()) : false;
+
+            boolean maxYuvMatchSensor =
+                    (maxYuvSize.getWidth() <= sensorSize.getWidth() * (1.0 + SIZE_ERROR_MARGIN) &&
+                     maxYuvSize.getWidth() >= sensorSize.getWidth() * (1.0 - SIZE_ERROR_MARGIN) &&
+                     maxYuvSize.getHeight() <= sensorSize.getHeight() * (1.0 + SIZE_ERROR_MARGIN) &&
+                     maxYuvSize.getHeight() >= sensorSize.getHeight() * (1.0 - SIZE_ERROR_MARGIN));
 
             // Ensure that YUV output is fast enough - needs to be at least 20 fps
 
@@ -427,12 +437,15 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 "(%d frames reported, [0, %d] frames expected)",
                                 mIds[counter], maxSyncLatency, MAX_LATENCY_BOUND),
                         haveFastSyncLatency);
+                assertTrue(
+                        "Active array size and max YUV size should be similar",
+                        maxYuvMatchSensor);
             } else {
                 assertTrue(
                         String.format("Camera device %s has all the requirements for BURST" +
                                 " capability but does not report it!", mIds[counter]),
-                        !(haveMaxYuv && haveMaxYuvRate &&
-                                haveFastAeTargetFps && haveFastSyncLatency));
+                        !(haveMaxYuv && haveMaxYuvRate && haveFastAeTargetFps &&
+                                haveFastSyncLatency && maxYuvMatchSensor));
             }
 
             counter++;
