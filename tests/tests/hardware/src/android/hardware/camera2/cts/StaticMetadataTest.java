@@ -33,8 +33,6 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
 
-import junit.framework.Assert;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,13 +85,6 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING));
                 mCollector.expectTrue("Full device must contain BURST_CAPTURE capability",
                         availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE));
-
-                // Max yuv resolution must be very close to  sensor resolution
-                Size[] yuvSizes = configs.getOutputSizes(ImageFormat.YUV_420_888);
-                Size maxYuvSize = CameraTestUtils.getMaxSize(yuvSizes);
-                mCollector.expectSizesAreSimilar(
-                        "Active array size and max YUV size should be similar",
-                        sensorSize, maxYuvSize, SIZE_ERROR_MARGIN);
 
                 // Max resolution fps must be >= 20.
                 mCollector.expectTrue("Full device must support at least 20fps for max resolution",
