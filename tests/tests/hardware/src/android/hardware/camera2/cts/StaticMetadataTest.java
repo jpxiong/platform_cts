@@ -374,6 +374,11 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                     resultKeys.add(CaptureResult.LENS_FILTER_DENSITY);
                 }
                 break;
+
+            case REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING:
+            case REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING:
+                // Tested in ExtendedCameraCharacteristicsTest
+                return;
             default:
                 capabilityName = "Unknown";
                 assertTrue(String.format("Unknown capability set: %d", capability),
