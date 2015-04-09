@@ -248,10 +248,19 @@ public class TestSensorEnvironment {
     }
 
     /**
-     * @return The actual sampling period at which a sensor can sample data. This value is a
-     *         fraction of {@link #getExpectedSamplingPeriodUs()}.
+     * @return The maximum acceptable actual sampling period of this sensor.
+     *         For continuous sensors, this is higher than {@link #getExpectedSamplingPeriodUs()}
+     *         because sensors are allowed to run up to 10% slower than requested.
+     *         For sensors with other reporting modes, this is the maximum integer
+     *         {@link Integer#MAX_VALUE} as they can report no events for long
+     *         periods of time.
      */
     public int getMaximumExpectedSamplingPeriodUs() {
+        int sensorReportingMode = mSensor.getReportingMode();
+        if (sensorReportingMode != Sensor.REPORTING_MODE_CONTINUOUS) {
+            return Integer.MAX_VALUE;
+        }
+
         int expectedSamplingPeriodUs = getExpectedSamplingPeriodUs();
         return (int) (expectedSamplingPeriodUs / MAXIMUM_EXPECTED_SAMPLING_FREQUENCY_MULTIPLIER);
     }
