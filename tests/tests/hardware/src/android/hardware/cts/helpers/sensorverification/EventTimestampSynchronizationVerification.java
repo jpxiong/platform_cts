@@ -67,10 +67,10 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
      */
     public static EventTimestampSynchronizationVerification getDefault(
             TestSensorEnvironment environment) {
-        int reportLatencyUs = environment.getMaxReportLatencyUs();
-        int fifoMaxEventCount = environment.getSensor().getFifoMaxEventCount();
+        long reportLatencyUs = environment.getMaxReportLatencyUs();
+        long fifoMaxEventCount = environment.getSensor().getFifoMaxEventCount();
         if (fifoMaxEventCount > 0) {
-            int fifoBasedReportLatencyUs =
+            long fifoBasedReportLatencyUs =
                     fifoMaxEventCount * environment.getMaximumExpectedSamplingPeriodUs();
             reportLatencyUs = Math.min(reportLatencyUs, fifoBasedReportLatencyUs);
 
