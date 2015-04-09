@@ -72,6 +72,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private boolean mLogData = false;
     private ITestDevice mDevice;
     private Set<String> mDeviceFeatures;
+    private Map<String, Boolean> mConfigQuerySupportCache = new HashMap<>();
 
     private IRecovery mDeviceRecovery = new Recovery();
     {
@@ -1361,13 +1362,26 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         configCommandLine.append(" --deqp-gl-minor-version=");
         configCommandLine.append(getGlesMinorVersion());
 
+        final String commandLine = configCommandLine.toString();
+
+        // check for cached result first
+        if (mConfigQuerySupportCache.containsKey(commandLine)) {
+            return mConfigQuerySupportCache.get(commandLine);
+        }
+
+        final boolean supported = queryIsSupportedConfigCommandLine(commandLine);
+        mConfigQuerySupportCache.put(commandLine, supported);
+        return supported;
+    }
+
+    private boolean queryIsSupportedConfigCommandLine(String deqpCommandLine)
+            throws DeviceNotAvailableException, CapabilityQueryFailureException {
         final String instrumentationName =
                 "com.drawelements.deqp/com.drawelements.deqp.platformutil.DeqpPlatformCapabilityQueryInstrumentation";
         final String command = String.format(
                 "am instrument %s -w -e deqpQueryType renderConfigSupported -e deqpCmdLine \"%s\""
                     + " %s",
-                AbiUtils.createAbiFlag(mAbi.getName()), configCommandLine.toString(),
-                instrumentationName);
+                AbiUtils.createAbiFlag(mAbi.getName()), deqpCommandLine, instrumentationName);
 
         final PlatformQueryInstrumentationParser parser = new PlatformQueryInstrumentationParser();
         mDevice.executeShellCommand(command, parser);
