@@ -21,9 +21,11 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_CLANG := true
 LOCAL_MODULE := librscpptest_jni
 LOCAL_MODULE_TAGS := optional
+
 LOCAL_SRC_FILES := \
     rs_jni.cpp \
     rs_jni_allocation.cpp \
+    rs_jni_element.cpp \
     rs_jni_script.cpp \
     rs_jni_type.cpp \
     rs_jni_object.cpp
