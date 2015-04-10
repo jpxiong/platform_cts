@@ -3421,6 +3421,39 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertTrue(mTextView.didTouchFocusSelect());
     }
 
+    public void testSelectAllJustAfterTap() {
+        // Prepare an EditText with focus.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = new EditText(mActivity);
+                mActivity.setContentView(mTextView);
+
+                assertFalse(mTextView.didTouchFocusSelect());
+                mTextView.setFocusable(true);
+                mTextView.requestFocus();
+                assertTrue(mTextView.didTouchFocusSelect());
+
+                mTextView.setText("Hello, World.", BufferType.SPANNABLE);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Tap the view to show InsertPointController.
+        TouchUtils.tapView(this, mTextView);
+
+        // Execute SelectAll context menu.
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.onTextContextMenuItem(android.R.id.selectAll);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // The selection must be whole of the text contents.
+        assertEquals(0, mTextView.getSelectionStart());
+        assertEquals(mTextView.length(), mTextView.getSelectionEnd());
+    }
+
     public void testExtractText() {
         mTextView = new TextView(mActivity);
 
