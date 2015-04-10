@@ -431,7 +431,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         public TestAbstractCursor(String[] columnNames, ArrayList<ArrayList> rows) {
             int colCount = columnNames.length;
             boolean foundID = false;
-            mRowIdColumnIndex = 0;
 
             // Add an _id column if not in columnNames
             for (int i = 0; i < colCount; ++i) {
