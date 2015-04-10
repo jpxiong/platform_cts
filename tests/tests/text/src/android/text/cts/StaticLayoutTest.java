@@ -18,11 +18,20 @@ package android.text.cts;
 
 import android.test.AndroidTestCase;
 import android.text.Editable;
+import android.text.GetChars;
+import android.text.GraphicsOperations;
+import android.text.Layout.Alignment;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.SpannedString;
 import android.text.StaticLayout;
 import android.text.TextDirectionHeuristics;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.Layout.Alignment;
+
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StaticLayoutTest extends AndroidTestCase {
     private static final float SPACE_MULTI = 1.0f;
@@ -426,5 +435,410 @@ public class StaticLayoutTest extends AndroidTestCase {
         assertEquals(2, layout.getLineCount());
         assertTrue(layout.getLineContainsTab(0));
 
+    }
+
+    // String wrapper for testing not well known implementation of CharSequence.
+    private class FakeCharSequence implements CharSequence {
+        private String mStr;
+
+        public FakeCharSequence(String str) {
+            mStr = str;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return mStr.charAt(index);
+        }
+
+        @Override
+        public int length() {
+            return mStr.length();
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return mStr.subSequence(start, end);
+        }
+
+        @Override
+        public String toString() {
+            return mStr;
+        }
+    };
+
+    private List<CharSequence> buildTestCharSequences(String testString, Normalizer.Form[] forms) {
+        List<CharSequence> result = new ArrayList<CharSequence>();
+
+        List<String> normalizedStrings = new ArrayList<String>();
+        for (Normalizer.Form form: forms) {
+            normalizedStrings.add(Normalizer.normalize(testString, form));
+        }
+
+        for (String str: normalizedStrings) {
+            result.add(str);
+            result.add(new SpannedString(str));
+            result.add(new SpannableString(str));
+            result.add(new SpannableStringBuilder(str));  // as a GraphicsOperations implementation.
+            result.add(new FakeCharSequence(str));  // as a not well known implementation.
+        }
+        return result;
+    }
+
+    private String buildTestMessage(CharSequence seq) {
+        String normalized;
+        if (Normalizer.isNormalized(seq, Normalizer.Form.NFC)) {
+            normalized = "NFC";
+        } else if (Normalizer.isNormalized(seq, Normalizer.Form.NFD)) {
+            normalized = "NFD";
+        } else if (Normalizer.isNormalized(seq, Normalizer.Form.NFKC)) {
+            normalized = "NFKC";
+        } else if (Normalizer.isNormalized(seq, Normalizer.Form.NFKD)) {
+            normalized = "NFKD";
+        } else {
+            throw new IllegalStateException("Normalized form is not NFC/NFD/NFKC/NFKD");
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < seq.length(); ++i) {
+            builder.append(String.format("0x%04X ", Integer.valueOf(seq.charAt(i))));
+        }
+
+        return "testString: \"" + seq.toString() + "\"[" + builder.toString() + "]" +
+                ", class: " + seq.getClass().getName() +
+                ", Normalization: " + normalized;
+    }
+
+    public void testGetOffset_ASCII() {
+        String testStrings[] = { "abcde", "ab\ncd", "ab\tcd", "ab\n\nc", "ab\n\tc" };
+
+        for (String testString: testStrings) {
+            for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+                StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                        DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+                String testLabel = buildTestMessage(seq);
+
+                assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+                assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+                assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+                assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+                assertEquals(testLabel, 3, layout.getOffsetToLeftOf(4));
+                assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+
+                assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+                assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+                assertEquals(testLabel, 3, layout.getOffsetToRightOf(2));
+                assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+                assertEquals(testLabel, 5, layout.getOffsetToRightOf(4));
+                assertEquals(testLabel, 5, layout.getOffsetToRightOf(5));
+            }
+        }
+
+        String testString = "ab\r\nde";
+        for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(6));
+
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(6));
+        }
+    }
+
+    public void testGetOffset_UNICODE() {
+        String testStrings[] = new String[] {
+              // Cyrillic alphabets.
+              "\u0410\u0411\u0412\u0413\u0414",
+              // Japanese Hiragana Characters.
+              "\u3042\u3044\u3046\u3048\u304A",
+        };
+
+        for (String testString: testStrings) {
+            for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+                StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                        DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+                String testLabel = buildTestMessage(seq);
+
+                assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+                assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+                assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+                assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+                assertEquals(testLabel, 3, layout.getOffsetToLeftOf(4));
+                assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+
+                assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+                assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+                assertEquals(testLabel, 3, layout.getOffsetToRightOf(2));
+                assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+                assertEquals(testLabel, 5, layout.getOffsetToRightOf(4));
+                assertEquals(testLabel, 5, layout.getOffsetToRightOf(5));
+            }
+        }
+    }
+
+    public void testGetOffset_UNICODE_Normalization() {
+        // "A" with acute, circumflex, tilde, diaeresis, ring above.
+        String testString = "\u00C1\u00C2\u00C3\u00C4\u00C5";
+        Normalizer.Form[] oneUnicodeForms = { Normalizer.Form.NFC, Normalizer.Form.NFKC };
+        for (CharSequence seq: buildTestCharSequences(testString, oneUnicodeForms)) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 3, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(5));
+        }
+
+        Normalizer.Form[] twoUnicodeForms = { Normalizer.Form.NFD, Normalizer.Form.NFKD };
+        for (CharSequence seq: buildTestCharSequences(testString, twoUnicodeForms)) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(6));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(7));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(8));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(9));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(10));
+
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 8, layout.getOffsetToRightOf(6));
+            assertEquals(testLabel, 8, layout.getOffsetToRightOf(7));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(8));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(9));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(10));
+        }
+    }
+
+    public void testGetOffset_UNICODE_SurrogatePairs() {
+        // Emoticons for surrogate pairs tests.
+        String testString =
+                "\uD83D\uDE00\uD83D\uDE01\uD83D\uDE02\uD83D\uDE03\uD83D\uDE04";
+        for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(6));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(7));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(8));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(9));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(10));
+
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 8, layout.getOffsetToRightOf(6));
+            assertEquals(testLabel, 8, layout.getOffsetToRightOf(7));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(8));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(9));
+            assertEquals(testLabel, 10, layout.getOffsetToRightOf(10));
+        }
+    }
+
+    public void testGetOffset_UNICODE_Thai() {
+        // Thai Characters. The expected cursorable boundary is
+        // | \u0E02 | \u0E2D | \u0E1A | \u0E04\u0E38 | \u0E13 |
+        String testString = "\u0E02\u0E2D\u0E1A\u0E04\u0E38\u0E13";
+        for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(6));
+
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 3, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(6));
+        }
+    }
+
+    public void testGetOffset_UNICODE_Hebrew() {
+        String testString = "\u05DE\u05E1\u05E2\u05D3\u05D4"; // Hebrew Characters
+        for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN,
+                    TextDirectionHeuristics.RTL, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(5));
+
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 3, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(5));
+        }
+    }
+
+    public void testGetOffset_UNICODE_Arabic() {
+        // Arabic Characters. The expected cursorable boundary is
+        // | \u0623 \u064F | \u0633 \u0652 | \u0631 \u064E | \u0629 \u064C |";
+        String testString = "\u0623\u064F\u0633\u0652\u0631\u064E\u0629\u064C";
+
+        Normalizer.Form[] oneUnicodeForms = { Normalizer.Form.NFC, Normalizer.Form.NFKC };
+        for (CharSequence seq: buildTestCharSequences(testString, oneUnicodeForms)) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(6));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(7));
+            assertEquals(testLabel, 8, layout.getOffsetToLeftOf(8));
+
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(6));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(7));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(8));
+        }
+    }
+
+    public void testGetOffset_UNICODE_Bidi() {
+        // String having RTL characters and LTR characters
+
+        // LTR Context
+        // The first and last two characters are LTR characters.
+        String testString = "\u0061\u0062\u05DE\u05E1\u05E2\u0063\u0064";
+        // Logical order: [L1] [L2] [R1] [R2] [R3] [L3] [L4]
+        //               0    1    2    3    4    5    6    7
+        // Display order: [L1] [L2] [R3] [R2] [R1] [L3] [L4]
+        //               0    1    2    4    3    5    6    7
+        // [L?] means ?th LTR character and [R?] means ?th RTL character.
+        for (CharSequence seq: buildTestCharSequences(testString, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(6));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(7));
+
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 3, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 7, layout.getOffsetToRightOf(6));
+            assertEquals(testLabel, 7, layout.getOffsetToRightOf(7));
+        }
+
+        // RTL Context
+        // The first and last two characters are RTL characters.
+        String testString2 = "\u05DE\u05E1\u0063\u0064\u0065\u05DE\u05E1";
+        // Logical order: [R1] [R2] [L1] [L2] [L3] [R3] [R4]
+        //               0    1    2    3    4    5    6    7
+        // Display order: [R4] [R3] [L1] [L2] [L3] [R2] [R1]
+        //               7    6    5    3    4    2    1    0
+        // [L?] means ?th LTR character and [R?] means ?th RTL character.
+        for (CharSequence seq: buildTestCharSequences(testString2, Normalizer.Form.values())) {
+            StaticLayout layout = new StaticLayout(seq, mDefaultPaint,
+                    DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
+
+            String testLabel = buildTestMessage(seq);
+
+            assertEquals(testLabel, 1, layout.getOffsetToLeftOf(0));
+            assertEquals(testLabel, 2, layout.getOffsetToLeftOf(1));
+            assertEquals(testLabel, 4, layout.getOffsetToLeftOf(2));
+            assertEquals(testLabel, 5, layout.getOffsetToLeftOf(3));
+            assertEquals(testLabel, 3, layout.getOffsetToLeftOf(4));
+            assertEquals(testLabel, 6, layout.getOffsetToLeftOf(5));
+            assertEquals(testLabel, 7, layout.getOffsetToLeftOf(6));
+            assertEquals(testLabel, 7, layout.getOffsetToLeftOf(7));
+
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(0));
+            assertEquals(testLabel, 0, layout.getOffsetToRightOf(1));
+            assertEquals(testLabel, 1, layout.getOffsetToRightOf(2));
+            assertEquals(testLabel, 4, layout.getOffsetToRightOf(3));
+            assertEquals(testLabel, 2, layout.getOffsetToRightOf(4));
+            assertEquals(testLabel, 3, layout.getOffsetToRightOf(5));
+            assertEquals(testLabel, 5, layout.getOffsetToRightOf(6));
+            assertEquals(testLabel, 6, layout.getOffsetToRightOf(7));
+        }
     }
 }
