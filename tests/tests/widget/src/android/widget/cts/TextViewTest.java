@@ -96,6 +96,7 @@ import android.widget.TextView.BufferType;
 import android.widget.TextView.OnEditorActionListener;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Test {@link TextView}.
@@ -3613,6 +3614,26 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         // Reset is done when we add the view
         ll.addView(tv);
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
+    }
+
+    public void testAllCapsLocalization() {
+        String testString = "abcdefghijklmnopqrstuvwxyz";
+
+        // The capitalized characters of "i" on Turkish and Azerbaijani are different from English.
+        Locale[] testLocales = {
+            new Locale("az", "AZ"),
+            new Locale("tr", "TR"),
+            new Locale("en", "US"),
+        };
+
+        TextView tv = new TextView(mActivity);
+        tv.setAllCaps(true);
+        for (Locale locale: testLocales) {
+            tv.setTextLocale(locale);
+            assertEquals("Locale: " + locale.getDisplayName(),
+                         testString.toUpperCase(locale),
+                         tv.getTransformationMethod().getTransformation(testString, tv).toString());
+        }
     }
 
     @UiThreadTest
