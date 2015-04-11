@@ -1414,6 +1414,17 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".audio.HifiUltrasoundTestActivity"
+                android:label="@string/hifi_ultrasound_test"
+                android:screenOrientation="locked">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_audio" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.microphone" />
+        </activity>
+
         <service android:name=".tv.MockTvInputService"
             android:permission="android.permission.BIND_TV_INPUT">
             <intent-filter>

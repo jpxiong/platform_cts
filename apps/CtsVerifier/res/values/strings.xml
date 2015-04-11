@@ -286,6 +286,22 @@
 
     <string name="empty"></string>
 
+    <!-- Strings for HifiUltrasoundTestActivity -->
+    <string name="hifi_ultrasound_test">Hifi Ultrasound Test</string>
+    <string name="hifi_ultrasound_test_info">This is a test for near-ultrasound response.\n
+        This test requires two devices, one as recording device, one as playback device.\n</string>
+    <string name="hifi_ultrasound_test_play">GENERATE</string>
+    <string name="hifi_ultrasound_test_record">RECORD</string>
+    <string name="hifi_ultrasound_test_playback">PLAY</string>
+    <string name="hifi_ultrasound_test_plot">PLOT</string>
+    <string name="hifi_ultrasound_test_dismiss">DISMISS</string>
+    <string name="hifi_ultrasound_test_instruction1">
+        Set the volume of the playback device at 70% and hold it with one hand.\n
+        Hold the recording device with the other hand\n
+        Press the RECORD button on the recording device, the GENERATE button on the playback device simultaneously.\n</string>
+    <string name="hifi_ultrasound_test_pass">PASS</string>
+    <string name="hifi_ultrasound_test_fail">FAIL</string>
+
     <!-- Strings for Location tests -->
     <string name="location_gps_test">GPS Test</string>
     <string name="location_gps_test_info">This test verifies basic GPS behavior
