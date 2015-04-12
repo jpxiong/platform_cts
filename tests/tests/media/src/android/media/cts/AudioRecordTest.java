@@ -24,7 +24,6 @@ import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioRecord.OnRecordPositionUpdateListener;
-import android.media.cts.AudioHelper;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
@@ -264,7 +263,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 false /*localRecord*/, true /*customHandler*/,
                 2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
                 true /*useByteBuffer*/, true /*blocking*/,
-                true /*auditRecording*/, 17000 /*TEST_SR*/,
+                true /*auditRecording*/, 96000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
     }
 
