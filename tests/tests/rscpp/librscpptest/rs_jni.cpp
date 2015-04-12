@@ -443,4 +443,54 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSResizeTest_resize
 
 }
 
+extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSYuvTest_yuvTest(JNIEnv * env,
+                                                                               jclass obj,
+                                                                               jstring pathObj,
+                                                                               jint X,
+                                                                               jint Y,
+                                                                               jbyteArray inputByteArray,
+                                                                               jbyteArray outputByteArray,
+                                                                               jint yuvFormat
+                                                                               )
+{
+    const char * path = env->GetStringUTFChars(pathObj, NULL);
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+    sp<RS> mRS = new RS();
+    mRS->init(path);
+
+    RSYuvFormat mYuvFormat = (RSYuvFormat)yuvFormat;
+    sp<ScriptIntrinsicYuvToRGB> syuv = ScriptIntrinsicYuvToRGB::create(mRS, Element::U8_4(mRS));;
+    sp<Allocation> inputAlloc = nullptr;
+
+    if (mYuvFormat != RS_YUV_NONE) {
+        //syuv = ScriptIntrinsicYuvToRGB::create(mRS, Element::YUV(mRS));
+        Type::Builder tb(mRS, Element::YUV(mRS));
+        tb.setX(X);
+        tb.setY(Y);
+        tb.setYuvFormat(mYuvFormat);
+        inputAlloc = Allocation::createTyped(mRS, tb.create());
+        inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+    } else {
+        //syuv = ScriptIntrinsicYuvToRGB::create(mRS, Element::U8(mRS));
+        size_t arrLen = X * Y + ((X + 1) / 2) * ((Y + 1) / 2) * 2;
+        inputAlloc = Allocation::createSized(mRS, Element::U8(mRS), arrLen);
+        inputAlloc->copy1DRangeFrom(0, arrLen, input);
+    }
+
+    sp<const Type> tout = Type::create(mRS, Element::RGBA_8888(mRS), X, Y, 0);
+    sp<Allocation> outputAlloc = Allocation::createTyped(mRS, tout);
+
+    syuv->setInput(inputAlloc);
+    syuv->forEach(outputAlloc);
+
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    env->ReleaseStringUTFChars(pathObj, path);
+    return (mRS->getError() == RS_SUCCESS);
+
+}
 
