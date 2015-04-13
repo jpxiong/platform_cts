@@ -830,6 +830,36 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         assertEquals(Integer.parseInt(rotation), angle);
     }
 
+    public void testPlaybackRate() throws Exception {
+        final int toleranceMs = 1000;
+        if (!checkLoadResource(
+                R.raw.video_480x360_mp4_h264_1000kbps_30fps_aac_stereo_128kbps_44100hz)) {
+            return; // skip
+        }
+
+        mMediaPlayer.prepare();
+        float[] rates = { 0.25f, 0.5f, 1.0f, 2.0f };
+        for (float playbackRate : rates) {
+            mMediaPlayer.seekTo(0);
+            Thread.sleep(1000);
+            int playTime = 4000;  // The testing clip is about 10 second long.
+            mMediaPlayer.setPlaybackRate(playbackRate,
+                                         MediaPlayer.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+            mMediaPlayer.start();
+            Thread.sleep(playTime);
+            assertTrue("MediaPlayer should still be playing", mMediaPlayer.isPlaying());
+
+            int playedMediaDurationMs = mMediaPlayer.getCurrentPosition();
+            int diff = Math.abs((int)(playedMediaDurationMs / playbackRate) - playTime);
+            if (diff > toleranceMs) {
+                fail("Media player had error in playback rate " + playbackRate
+                     + ", play time is " + playTime + " vs expected " + playedMediaDurationMs);
+            }
+            mMediaPlayer.pause();
+        }
+        mMediaPlayer.stop();
+    }
+
     public void testLocalVideo_MP4_H264_480x360_500kbps_25fps_AAC_Stereo_128kbps_44110Hz()
             throws Exception {
         playVideoTest(
