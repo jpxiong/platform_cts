@@ -388,6 +388,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                      maxYuvSize.getHeight() <= sensorSize.getHeight() * (1.0 + SIZE_ERROR_MARGIN) &&
                      maxYuvSize.getHeight() >= sensorSize.getHeight() * (1.0 - SIZE_ERROR_MARGIN));
 
+            // No need to do null check since framework will generate the key if HAL don't supply
+            boolean haveAeLock = c.get(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
+            boolean haveAwbLock = c.get(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
+
             // Ensure that YUV output is fast enough - needs to be at least 20 fps
 
             long maxYuvRate =
@@ -443,14 +447,25 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 mIds[counter], maxSyncLatency, MAX_LATENCY_BOUND),
                         haveFastSyncLatency);
                 assertTrue(
-                        "Active array size and max YUV size should be similar",
+                        String.format("BURST-capable camera device %s max YUV size %s should be" +
+                                "close to active array size %s",
+                                mIds[counter], maxYuvSize.toString(), sensorSize.toString()),
                         maxYuvMatchSensor);
+                assertTrue(
+                        String.format("BURST-capable camera device %s does not support AE lock",
+                                mIds[counter]),
+                        haveAeLock);
+                assertTrue(
+                        String.format("BURST-capable camera device %s does not support AWB lock",
+                                mIds[counter]),
+                        haveAwbLock);
             } else {
                 assertTrue(
                         String.format("Camera device %s has all the requirements for BURST" +
                                 " capability but does not report it!", mIds[counter]),
                         !(haveMaxYuv && haveMaxYuvRate && haveFastAeTargetFps &&
-                                haveFastSyncLatency && maxYuvMatchSensor));
+                                haveFastSyncLatency && maxYuvMatchSensor &&
+                                haveAeLock && haveAwbLock));
             }
 
             counter++;

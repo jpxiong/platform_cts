@@ -1673,6 +1673,25 @@ public class StaticMetadata {
     }
 
     /*
+     * Determine if camera device support AE lock control
+     *
+     * @return {@code true} if AE lock control is supported
+     */
+    public boolean isAeLockSupported() {
+        return getValueFromKeyNonNull(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
+    }
+
+    /*
+     * Determine if camera device support AWB lock control
+     *
+     * @return {@code true} if AWB lock control is supported
+     */
+    public boolean isAwbLockSupported() {
+        return getValueFromKeyNonNull(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
+    }
+
+
+    /*
      * Determine if camera device support manual lens shading map control
      *
      * @return {@code true} if manual lens shading map control is supported

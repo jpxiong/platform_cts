@@ -1089,16 +1089,22 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
             mCollector.expectKeyValueEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
                     CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+            // if AE lock is not supported, expect the control key to be non-exist or false
+            if (mStaticInfo.isAeLockSupported() || request.get(CONTROL_AE_LOCK) != null) {
+                mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
+            }
 
             mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER,
                     CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
 
             mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
                     CaptureRequest.CONTROL_AWB_MODE_AUTO);
-            mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
+            // if AWB lock is not supported, expect the control key to be non-exist or false
+            if (mStaticInfo.isAwbLockSupported() || request.get(CONTROL_AWB_LOCK) != null) {
+                mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
+            }
 
             // Check 3A regions.
             if (VERBOSE) {

@@ -1046,7 +1046,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void aeAutoModeTestLock(int mode) throws Exception {
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+        if (mStaticInfo.isAeLockSupported()) {
+            requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+        }
         requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, mode);
         configurePreviewOutput(requestBuilder);
 
@@ -1077,9 +1079,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         SimpleCaptureCallback listener =  new SimpleCaptureCallback();
 
         CaptureResult[] resultsDuringLock = new CaptureResult[numCapturesDuringLock];
+        boolean canSetAeLock = mStaticInfo.isAeLockSupported();
 
         // Reset the AE lock to OFF, since we are reusing this builder many times
-        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+        if (canSetAeLock) {
+            requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+        }
 
         // Just send several captures with auto AE, lock off.
         CaptureRequest request = requestBuilder.build();
@@ -1087,6 +1092,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             mSession.capture(request, listener, mHandler);
         }
         waitForNumResults(listener, NUM_CAPTURES_BEFORE_LOCK);
+
+        if (!canSetAeLock) {
+            // Without AE lock, the remaining tests items won't work
+            return;
+        }
 
         // Then fire several capture to lock the AE.
         requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
@@ -1112,7 +1122,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         // Can't read manual sensor/exposure settings without manual sensor
         if (mStaticInfo.isCapabilitySupported(
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
             int sensitivityLocked =
                     getValueNotNull(resultsDuringLock[0], CaptureResult.SENSOR_SENSITIVITY);
             long expTimeLocked =
@@ -1475,6 +1485,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private void awbModeAndLockTestByCamera() throws Exception {
         int[] awbModes = mStaticInfo.getAwbAvailableModesChecked();
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        boolean canSetAwbLock = mStaticInfo.isAwbLockSupported();
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
@@ -1490,7 +1501,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, mode, listener,
                     NUM_FRAMES_VERIFIED);
 
-            if (mode == CameraMetadata.CONTROL_AWB_MODE_AUTO) {
+            if (mode == CameraMetadata.CONTROL_AWB_MODE_AUTO && canSetAwbLock) {
                 // Verify color correction transform and gains stay unchanged after a lock.
                 requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
                 listener = new SimpleCaptureCallback();
@@ -1503,7 +1514,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 }
 
             }
-            verifyAwbCaptureResultUnchanged(listener, NUM_FRAMES_VERIFIED);
+            // Don't verify auto mode result if AWB lock is not supported
+            if (mode != CameraMetadata.CONTROL_AWB_MODE_AUTO || canSetAwbLock) {
+                verifyAwbCaptureResultUnchanged(listener, NUM_FRAMES_VERIFIED);
+            }
         }
     }
 

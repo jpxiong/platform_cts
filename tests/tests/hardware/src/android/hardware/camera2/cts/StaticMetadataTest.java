@@ -268,12 +268,10 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE";
                 requestKeys.add(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION);
-                requestKeys.add(CaptureRequest.CONTROL_AE_LOCK);
                 requestKeys.add(CaptureRequest.CONTROL_AE_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE);
                 requestKeys.add(CaptureRequest.CONTROL_AF_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_AF_TRIGGER);
-                requestKeys.add(CaptureRequest.CONTROL_AWB_LOCK);
                 requestKeys.add(CaptureRequest.CONTROL_AWB_MODE);
                 requestKeys.add(CaptureRequest.CONTROL_CAPTURE_INTENT);
                 requestKeys.add(CaptureRequest.CONTROL_EFFECT_MODE);
@@ -319,6 +317,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 requestKeys.add(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE);
                 requestKeys.add(CaptureRequest.TONEMAP_CURVE);
                 requestKeys.add(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE);
+                requestKeys.add(CaptureRequest.CONTROL_AWB_LOCK);
 
                 // Legacy mode always doesn't support these requirements
                 Boolean contrastCurveModeSupported = false;
@@ -342,9 +341,12 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                         "Tonemap mode must include CONTRAST_CURVE", contrastCurveModeSupported));
                 additionalRequirements.add(new Pair<String, Boolean>(
                         "Color aberration mode must include OFF", offColorAberrationModeSupported));
+                additionalRequirements.add(new Pair<String, Boolean>(
+                        "Must support AWB lock", mStaticInfo.isAwbLockSupported()));
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR:
                 capabilityName = "REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR";
+                requestKeys.add(CaptureRequest.CONTROL_AE_LOCK);
                 requestKeys.add(CaptureRequest.SENSOR_FRAME_DURATION);
                 requestKeys.add(CaptureRequest.SENSOR_EXPOSURE_TIME);
                 requestKeys.add(CaptureRequest.SENSOR_SENSITIVITY);
@@ -355,6 +357,8 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                     requestKeys.add(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE);
                 }
                 requestKeys.add(CaptureRequest.BLACK_LEVEL_LOCK);
+                additionalRequirements.add(new Pair<String, Boolean>(
+                        "Must support AE lock", mStaticInfo.isAeLockSupported()));
                 break;
             case REQUEST_AVAILABLE_CAPABILITIES_RAW:
                 // RAW_CAPABILITY needs to check for not just capture request keys

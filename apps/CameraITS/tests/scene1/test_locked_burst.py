@@ -15,6 +15,7 @@
 import its.image
 import its.device
 import its.objects
+import its.caps
 import os.path
 import numpy
 import pylab
@@ -36,6 +37,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
+        its.caps.skip_unless(its.caps.ae_lock(props) and
+                             its.caps.awb_lock(props))
 
         # Converge 3A prior to capture.
         cam.do_3a(do_af=True, lock_ae=True, lock_awb=True)
