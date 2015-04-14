@@ -85,19 +85,16 @@ public class TestAtan2pi extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -154,19 +151,16 @@ public class TestAtan2pi extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -223,19 +217,16 @@ public class TestAtan2pi extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -292,19 +283,16 @@ public class TestAtan2pi extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }

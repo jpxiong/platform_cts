@@ -85,19 +85,16 @@ public class TestNativeDistance extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 message.append("Input inLeftVector: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInLeftVector[i], Float.floatToRawIntBits(arrayInLeftVector[i]), arrayInLeftVector[i]));
+                appendVariableToMessage(message, arrayInLeftVector[i]);
                 message.append("\n");
                 message.append("Input inRightVector: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInRightVector[i], Float.floatToRawIntBits(arrayInRightVector[i]), arrayInRightVector[i]));
+                appendVariableToMessage(message, arrayInRightVector[i]);
                 message.append("\n");
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -166,22 +163,19 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inLeftVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLeftVector[i * 2 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 2 + j]), arrayInLeftVector[i * 2 + j]));
+                    appendVariableToMessage(message, arrayInLeftVector[i * 2 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inRightVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRightVector[i * 2 + j], Float.floatToRawIntBits(arrayInRightVector[i * 2 + j]), arrayInRightVector[i * 2 + j]));
+                    appendVariableToMessage(message, arrayInRightVector[i * 2 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -244,22 +238,19 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inLeftVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inRightVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -322,22 +313,19 @@ public class TestNativeDistance extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inLeftVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inRightVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }

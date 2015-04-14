@@ -91,18 +91,16 @@ public class TestRemquo extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Output outQuotient: ");
-                    message.append(String.format("%d", args.outQuotient));
+                    appendVariableToMessage(message, args.outQuotient);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(Float.toString(args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloatFloatIntFloat" +
@@ -162,18 +160,16 @@ public class TestRemquo extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Output outQuotient: ");
-                    message.append(String.format("%d", args.outQuotient));
+                    appendVariableToMessage(message, args.outQuotient);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(Float.toString(args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat2Float2Int2Float2" +
@@ -233,18 +229,16 @@ public class TestRemquo extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Output outQuotient: ");
-                    message.append(String.format("%d", args.outQuotient));
+                    appendVariableToMessage(message, args.outQuotient);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(Float.toString(args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat3Float3Int3Float3" +
@@ -304,18 +298,16 @@ public class TestRemquo extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inNumerator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inNumerator, Float.floatToRawIntBits(args.inNumerator), args.inNumerator));
+                    appendVariableToMessage(message, args.inNumerator);
                     message.append("\n");
                     message.append("Input inDenominator: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inDenominator, Float.floatToRawIntBits(args.inDenominator), args.inDenominator));
+                    appendVariableToMessage(message, args.inDenominator);
                     message.append("\n");
                     message.append("Output outQuotient: ");
-                    message.append(String.format("%d", args.outQuotient));
+                    appendVariableToMessage(message, args.outQuotient);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(Float.toString(args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkRemquoFloat4Float4Int4Float4" +

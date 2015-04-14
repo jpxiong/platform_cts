@@ -93,23 +93,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -173,23 +169,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -253,23 +245,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -333,23 +321,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -413,23 +397,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -493,23 +473,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -573,23 +549,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -659,19 +631,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -734,19 +706,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -809,19 +781,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -884,19 +856,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -966,19 +938,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1041,19 +1013,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1116,19 +1088,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1191,19 +1163,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1273,19 +1245,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1348,19 +1320,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1423,19 +1395,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1498,19 +1470,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1580,19 +1552,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1655,19 +1627,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1730,19 +1702,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1805,19 +1777,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1887,19 +1859,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1962,19 +1934,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2037,19 +2009,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2112,19 +2084,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2194,19 +2166,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2269,19 +2241,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2344,19 +2316,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2419,19 +2391,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2501,19 +2473,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2576,19 +2548,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2651,19 +2623,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2726,19 +2698,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2808,19 +2780,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2883,19 +2855,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2958,19 +2930,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3033,19 +3005,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3108,19 +3080,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3183,19 +3155,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3258,19 +3230,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3333,19 +3305,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3408,19 +3380,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3483,19 +3455,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3558,19 +3530,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3633,19 +3605,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3708,19 +3680,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3783,19 +3755,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3858,19 +3830,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3933,19 +3905,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4008,19 +3980,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4083,19 +4055,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4158,19 +4130,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4233,19 +4205,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4308,19 +4280,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4383,19 +4355,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4458,19 +4430,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4533,19 +4505,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4608,19 +4580,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("%d", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("%d", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("%d", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4683,19 +4655,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4758,19 +4730,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4833,19 +4805,19 @@ public class TestClamp extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inValue: ");
-                    message.append(String.format("0x%x", args.inValue));
+                    appendVariableToMessage(message, args.inValue);
                     message.append("\n");
                     message.append("Input inMinValue: ");
-                    message.append(String.format("0x%x", args.inMinValue));
+                    appendVariableToMessage(message, args.inMinValue);
                     message.append("\n");
                     message.append("Input inMaxValue: ");
-                    message.append(String.format("0x%x", args.inMaxValue));
+                    appendVariableToMessage(message, args.inMaxValue);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
