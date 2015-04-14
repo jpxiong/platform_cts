@@ -26,8 +26,8 @@ def main():
     """Test 3A lock + YUV burst (using auto settings).
 
     This is a test that is designed to pass even on limited devices that
-    don't have MANUAL_SENSOR or PER_FRAME_CONTROLS. (They must be able to
-    capture bursts with full res @ full frame rate to pass, however).
+    don't have MANUAL_SENSOR or PER_FRAME_CONTROLS. The test checks
+    YUV image consistency while the frame rate check is in CTS.
     """
     NAME = os.path.basename(__file__).split(".")[0]
 
@@ -69,26 +69,6 @@ def main():
             print "Patch mean spread", spread, \
                    " (min/max: ",  min(means), "/", max(means), ")"
             assert(spread < SPREAD_THRESH)
-
-        # Also ensure that the burst was at full frame rate.
-        fmt_code = 0x23
-        configs = props['android.scaler.streamConfigurationMap']\
-                       ['availableStreamConfigurations']
-        min_duration = None
-        for cfg in configs:
-            if cfg['format'] == fmt_code and cfg['input'] == False and \
-                    cfg['width'] == caps[0]["width"] and \
-                    cfg['height'] == caps[0]["height"]:
-                min_duration = cfg["minFrameDuration"]
-        assert(min_duration is not None)
-        tstamps = [c['metadata']['android.sensor.timestamp'] for c in caps]
-        deltas = [tstamps[i]-tstamps[i-1] for i in range(1,len(tstamps))]
-        actual_fps = 1.0 / (max(deltas) / 1000000000.0)
-        actual_fps_max = 1.0 / (min(deltas) / 1000000000.0)
-        max_fps = 1.0 / (min_duration / 1000000000.0)
-        print "Measure FPS min/max", actual_fps, "/", actual_fps_max
-        print "FPS measured %.1f, max advertized %.1f" %(actual_fps, max_fps)
-        assert(max_fps - FPS_MAX_DIFF <= actual_fps <= max_fps + FPS_MAX_DIFF)
 
 if __name__ == '__main__':
     main()
