@@ -21,7 +21,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.UserManager;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
@@ -44,6 +48,8 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
     private ComponentName mComponent;
     private ComponentName mSecondComponent;
     private boolean mDeviceAdmin;
+    private boolean mManagedProfiles;
+    private PackageManager mPackageManager;
 
     private static final String TEST_CA_STRING1 =
             "-----BEGIN CERTIFICATE-----\n" +
@@ -68,9 +74,11 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         mDevicePolicyManager = (DevicePolicyManager)
                 mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         mComponent = DeviceAdminInfoTest.getReceiverComponent();
+        mPackageManager = mContext.getPackageManager();
         mSecondComponent = DeviceAdminInfoTest.getSecondReceiverComponent();
-        mDeviceAdmin =
-                mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN);
+        mDeviceAdmin = mPackageManager.hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN);
+        mManagedProfiles = mDeviceAdmin
+                && mPackageManager.hasSystemFeature(PackageManager.FEATURE_MANAGED_USERS);
         setBlankPassword();
     }
 
@@ -892,6 +900,32 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         } catch (SecurityException e) {
             assertProfileOwnerMessage(e.getMessage());
         }
+    }
+
+    /**
+     * Test whether the version of the pre-installed launcher is at least L. This is needed for
+     * managed profile support.
+     */
+    public void testLauncherVersionAtLeastL() throws Exception {
+        if (!mManagedProfiles) {
+            return;
+        }
+
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        List<ResolveInfo> resolveInfos = mPackageManager.queryIntentActivities(intent,
+                0 /* default flags */);
+        assertFalse("No launcher present", resolveInfos.isEmpty());
+
+        for (ResolveInfo resolveInfo : resolveInfos) {
+            ApplicationInfo launcherAppInfo = mPackageManager.getApplicationInfo(
+                    resolveInfo.activityInfo.packageName, 0 /* default flags */);
+            if ((launcherAppInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 &&
+                    launcherAppInfo.targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
+                return;
+            }
+        }
+        fail("No system launcher with version L+ present present on device.");
     }
 
     private void assertDeviceOwnerMessage(String message) {
