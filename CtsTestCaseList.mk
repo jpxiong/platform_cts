@@ -210,6 +210,8 @@ cts_target_junit_tests := \
     CtsJdwp
 
 cts_deqp_test_apis := \
+    egl \
+    gles2 \
     gles3 \
     gles31
 

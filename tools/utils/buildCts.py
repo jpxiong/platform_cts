@@ -373,6 +373,8 @@ def BuildCtsVettedNewPackagesList():
       'android.uiautomation' : [],
       'android.uirendering' : [],
       'android.webgl' : [],
+      'com.drawelements.deqp.egl' : [],
+      'com.drawelements.deqp.gles2' : [],
       'com.drawelements.deqp.gles3' : [],
       'com.drawelements.deqp.gles31' : []}
 
