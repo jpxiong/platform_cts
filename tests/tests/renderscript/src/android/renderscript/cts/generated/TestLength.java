@@ -78,15 +78,13 @@ public class TestLength extends RSBaseCompute {
             if (!valid) {
                 StringBuilder message = new StringBuilder();
                 message.append("Input inV: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayInV[i], Float.floatToRawIntBits(arrayInV[i]), arrayInV[i]));
+                appendVariableToMessage(message, arrayInV[i]);
                 message.append("\n");
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -145,16 +143,14 @@ public class TestLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 2 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInV[i * 2 + j], Float.floatToRawIntBits(arrayInV[i * 2 + j]), arrayInV[i * 2 + j]));
+                    appendVariableToMessage(message, arrayInV[i * 2 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -208,16 +204,14 @@ public class TestLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInV[i * 4 + j], Float.floatToRawIntBits(arrayInV[i * 4 + j]), arrayInV[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }
@@ -271,16 +265,14 @@ public class TestLength extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInV[i * 4 + j], Float.floatToRawIntBits(arrayInV[i * 4 + j]), arrayInV[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
                     message.append("\n");
                 }
                 message.append("Expected output out: ");
-                message.append(args.out.toString());
+                appendVariableToMessage(message, args.out);
                 message.append("\n");
                 message.append("Actual   output out: ");
-                message.append(String.format("%14.8g {%8x} %15a",
-                        arrayOut[i], Float.floatToRawIntBits(arrayOut[i]), arrayOut[i]));
+                appendVariableToMessage(message, arrayOut[i]);
                 if (!args.out.couldBe(arrayOut[i])) {
                     message.append(" FAIL");
                 }

@@ -78,15 +78,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -137,15 +135,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -196,15 +192,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -260,14 +254,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -318,14 +311,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -376,14 +368,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -439,14 +430,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -497,14 +487,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -555,14 +544,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -618,14 +606,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -676,14 +663,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -734,14 +720,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -797,14 +782,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -855,14 +839,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -913,14 +896,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -976,14 +958,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -1034,14 +1015,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -1092,14 +1072,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -1155,14 +1134,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -1213,14 +1191,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -1271,14 +1248,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -1333,14 +1309,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1390,14 +1365,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1447,14 +1421,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1509,13 +1482,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1565,13 +1538,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1621,13 +1594,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1682,13 +1655,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1738,13 +1711,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1794,13 +1767,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1855,13 +1828,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1911,13 +1884,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1967,13 +1940,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2028,13 +2001,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2084,13 +2057,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2140,13 +2113,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2201,13 +2174,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2257,13 +2230,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2313,13 +2286,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2374,13 +2347,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2430,13 +2403,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2486,13 +2459,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2547,14 +2520,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2604,14 +2576,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2661,14 +2632,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2723,13 +2693,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2779,13 +2749,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2835,13 +2805,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2896,13 +2866,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2952,13 +2922,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3008,13 +2978,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3069,13 +3039,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3125,13 +3095,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3181,13 +3151,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3242,13 +3212,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3298,13 +3268,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3354,13 +3324,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3415,13 +3385,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3471,13 +3441,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3527,13 +3497,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3588,13 +3558,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3644,13 +3614,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3700,13 +3670,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3761,14 +3731,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3818,14 +3787,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3875,14 +3843,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3937,13 +3904,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3993,13 +3960,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4049,13 +4016,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4110,13 +4077,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4166,13 +4133,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4222,13 +4189,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4283,13 +4250,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4339,13 +4306,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4395,13 +4362,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4456,13 +4423,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4512,13 +4479,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4568,13 +4535,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4629,13 +4596,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4685,13 +4652,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4741,13 +4708,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4802,13 +4769,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -4858,13 +4825,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4914,13 +4881,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -4975,14 +4942,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5032,14 +4998,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5089,14 +5054,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5151,13 +5115,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5207,13 +5171,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5263,13 +5227,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5324,13 +5288,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5380,13 +5344,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5436,13 +5400,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5497,13 +5461,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5553,13 +5517,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5609,13 +5573,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5670,13 +5634,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5726,13 +5690,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5782,13 +5746,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5843,13 +5807,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -5899,13 +5863,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -5955,13 +5919,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6016,13 +5980,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6072,13 +6036,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6128,13 +6092,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6189,14 +6153,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6246,14 +6209,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6303,14 +6265,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6365,13 +6326,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6421,13 +6382,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6477,13 +6438,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6538,13 +6499,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6594,13 +6555,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6650,13 +6611,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6711,13 +6672,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6767,13 +6728,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6823,13 +6784,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6884,13 +6845,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -6940,13 +6901,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -6996,13 +6957,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7057,13 +7018,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7113,13 +7074,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7169,13 +7130,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7230,13 +7191,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7286,13 +7247,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7342,13 +7303,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7403,14 +7364,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7460,14 +7420,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7517,14 +7476,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7579,13 +7537,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7635,13 +7593,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7691,13 +7649,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7752,13 +7710,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7808,13 +7766,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7864,13 +7822,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -7925,13 +7883,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -7981,13 +7939,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8037,13 +7995,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8098,13 +8056,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -8154,13 +8112,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8210,13 +8168,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8271,13 +8229,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -8327,13 +8285,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8383,13 +8341,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8444,13 +8402,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -8500,13 +8458,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8556,13 +8514,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -8618,15 +8576,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -8677,15 +8633,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -8736,15 +8690,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -8800,14 +8752,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -8858,14 +8809,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -8916,14 +8866,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -8979,14 +8928,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -9037,14 +8985,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -9095,14 +9042,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -9157,14 +9103,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -9214,14 +9159,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9271,14 +9215,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9333,13 +9276,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -9389,13 +9332,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9445,13 +9388,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9506,13 +9449,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -9562,13 +9505,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9618,13 +9561,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9679,14 +9622,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -9736,14 +9678,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9793,14 +9734,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9855,13 +9795,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -9911,13 +9851,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -9967,13 +9907,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -10028,13 +9968,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -10084,13 +10024,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -10140,13 +10080,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -10202,15 +10142,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -10261,15 +10199,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10320,15 +10256,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10384,14 +10318,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -10442,14 +10375,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10500,14 +10432,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10563,14 +10494,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -10621,14 +10551,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10679,14 +10608,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -10741,14 +10669,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -10798,14 +10725,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -10855,14 +10781,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -10917,13 +10842,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -10973,13 +10898,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11029,13 +10954,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11090,13 +11015,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -11146,13 +11071,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11202,13 +11127,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11263,14 +11188,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -11320,14 +11244,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11377,14 +11300,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11439,13 +11361,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -11495,13 +11417,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11551,13 +11473,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11612,13 +11534,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -11668,13 +11590,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11724,13 +11646,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11785,14 +11707,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -11842,14 +11763,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11899,14 +11819,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -11961,13 +11880,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12017,13 +11936,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12073,13 +11992,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12134,13 +12053,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12190,13 +12109,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12246,13 +12165,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12307,14 +12226,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12364,14 +12282,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12421,14 +12338,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12483,13 +12399,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12539,13 +12455,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12595,13 +12511,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12656,13 +12572,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12712,13 +12628,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12768,13 +12684,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12829,14 +12745,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -12886,14 +12801,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -12943,14 +12857,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13005,13 +12918,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -13061,13 +12974,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13117,13 +13030,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13178,13 +13091,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -13234,13 +13147,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13290,13 +13203,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13351,14 +13264,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -13408,14 +13320,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13465,14 +13376,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13527,13 +13437,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -13583,13 +13493,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13639,13 +13549,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13700,13 +13610,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -13756,13 +13666,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13812,13 +13722,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -13874,15 +13784,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -13933,15 +13841,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -13992,15 +13898,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14056,14 +13960,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -14114,14 +14017,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14172,14 +14074,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14235,14 +14136,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -14293,14 +14193,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14351,14 +14250,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14414,14 +14312,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -14472,14 +14369,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14530,14 +14426,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14593,14 +14488,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -14651,14 +14545,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14709,14 +14602,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14772,14 +14664,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -14830,14 +14721,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14888,14 +14778,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -14951,14 +14840,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -15009,14 +14897,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -15067,14 +14954,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%24.8g {%16x} %31a",
-                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -15129,14 +15015,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -15186,14 +15071,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15243,14 +15127,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15305,13 +15188,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -15361,13 +15244,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15417,13 +15300,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15478,13 +15361,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -15534,13 +15417,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15590,13 +15473,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15651,13 +15534,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -15707,13 +15590,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15763,13 +15646,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15824,13 +15707,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -15880,13 +15763,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15936,13 +15819,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -15997,13 +15880,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16053,13 +15936,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16109,13 +15992,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16170,13 +16053,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16226,13 +16109,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16282,13 +16165,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16343,14 +16226,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16400,14 +16282,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16457,14 +16338,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16519,13 +16399,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16575,13 +16455,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16631,13 +16511,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16692,13 +16572,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16748,13 +16628,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16804,13 +16684,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16865,13 +16745,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -16921,13 +16801,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -16977,13 +16857,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17038,13 +16918,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -17094,13 +16974,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17150,13 +17030,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17211,13 +17091,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -17267,13 +17147,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17323,13 +17203,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17384,13 +17264,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -17440,13 +17320,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -17496,13 +17376,13 @@ public class TestConvert extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("0x%x", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }

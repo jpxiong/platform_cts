@@ -92,23 +92,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -171,23 +167,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -250,23 +242,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -329,23 +317,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -408,23 +392,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -487,23 +467,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -566,23 +542,19 @@ public class TestMix extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inStart: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
+                    appendVariableToMessage(message, args.inStart);
                     message.append("\n");
                     message.append("Input inStop: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
+                    appendVariableToMessage(message, args.inStop);
                     message.append("\n");
                     message.append("Input inFraction: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inFraction, Float.floatToRawIntBits(args.inFraction), args.inFraction));
+                    appendVariableToMessage(message, args.inFraction);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }

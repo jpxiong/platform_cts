@@ -77,13 +77,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -133,13 +133,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -189,13 +189,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -245,13 +245,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -306,13 +306,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -362,13 +362,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -418,13 +418,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -474,13 +474,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -535,13 +535,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -591,13 +591,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -647,13 +647,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -703,13 +703,13 @@ public class TestAbs extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%d", args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }

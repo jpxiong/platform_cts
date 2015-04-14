@@ -75,11 +75,10 @@ public class TestIlogb extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloatInt" +
@@ -125,11 +124,10 @@ public class TestIlogb extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat2Int2" +
@@ -175,11 +173,10 @@ public class TestIlogb extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat3Int3" +
@@ -225,11 +222,10 @@ public class TestIlogb extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append(errorMessage);
                     assertTrue("Incorrect output for checkIlogbFloat4Int4" +
