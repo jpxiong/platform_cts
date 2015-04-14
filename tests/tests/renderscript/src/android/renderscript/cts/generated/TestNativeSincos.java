@@ -88,25 +88,22 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output outCos: ");
-                    message.append(args.outCos.toString());
+                    appendVariableToMessage(message, args.outCos);
                     message.append("\n");
                     message.append("Actual   output outCos: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCos[i * 1 + j], Float.floatToRawIntBits(arrayOutCos[i * 1 + j]), arrayOutCos[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOutCos[i * 1 + j]);
                     if (!args.outCos.couldBe(arrayOutCos[i * 1 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
@@ -166,25 +163,22 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output outCos: ");
-                    message.append(args.outCos.toString());
+                    appendVariableToMessage(message, args.outCos);
                     message.append("\n");
                     message.append("Actual   output outCos: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCos[i * 2 + j], Float.floatToRawIntBits(arrayOutCos[i * 2 + j]), arrayOutCos[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOutCos[i * 2 + j]);
                     if (!args.outCos.couldBe(arrayOutCos[i * 2 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
@@ -244,25 +238,22 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output outCos: ");
-                    message.append(args.outCos.toString());
+                    appendVariableToMessage(message, args.outCos);
                     message.append("\n");
                     message.append("Actual   output outCos: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCos[i * 4 + j], Float.floatToRawIntBits(arrayOutCos[i * 4 + j]), arrayOutCos[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
                     if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
@@ -322,25 +313,22 @@ public class TestNativeSincos extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Expected output outCos: ");
-                    message.append(args.outCos.toString());
+                    appendVariableToMessage(message, args.outCos);
                     message.append("\n");
                     message.append("Actual   output outCos: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOutCos[i * 4 + j], Float.floatToRawIntBits(arrayOutCos[i * 4 + j]), arrayOutCos[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
                     if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
                         message.append(" FAIL");
                     }

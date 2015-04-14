@@ -85,18 +85,16 @@ public class TestNativeRootn extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Input inN: ");
-                    message.append(String.format("%d", args.inN));
+                    appendVariableToMessage(message, args.inN);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -153,18 +151,16 @@ public class TestNativeRootn extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Input inN: ");
-                    message.append(String.format("%d", args.inN));
+                    appendVariableToMessage(message, args.inN);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -221,18 +217,16 @@ public class TestNativeRootn extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Input inN: ");
-                    message.append(String.format("%d", args.inN));
+                    appendVariableToMessage(message, args.inN);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -289,18 +283,16 @@ public class TestNativeRootn extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inV: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    appendVariableToMessage(message, args.inV);
                     message.append("\n");
                     message.append("Input inN: ");
-                    message.append(String.format("%d", args.inN));
+                    appendVariableToMessage(message, args.inN);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
