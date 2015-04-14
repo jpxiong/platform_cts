@@ -1307,6 +1307,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                         !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
                                 REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
                     // OK
+                } else if (template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG &&
+                        !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
+                                REQUEST_AVAILABLE_CAPABILITIES_ZSL)) {
+                    // OK.
                 } else if (sLegacySkipTemplates.contains(template) &&
                         mStaticInfo.isHardwareLevelLegacy()) {
                     // OK
