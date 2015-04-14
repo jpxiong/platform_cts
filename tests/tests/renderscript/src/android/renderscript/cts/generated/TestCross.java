@@ -95,23 +95,20 @@ public class TestCross extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inLeftVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Input inRightVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 3 ; j++) {
                     message.append("Expected output out: ");
-                    message.append(args.out[j].toString());
+                    appendVariableToMessage(message, args.out[j]);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -178,23 +175,20 @@ public class TestCross extends RSBaseCompute {
                 StringBuilder message = new StringBuilder();
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inLeftVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInLeftVector[i * 4 + j], Float.floatToRawIntBits(arrayInLeftVector[i * 4 + j]), arrayInLeftVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Input inRightVector: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayInRightVector[i * 4 + j], Float.floatToRawIntBits(arrayInRightVector[i * 4 + j]), arrayInRightVector[i * 4 + j]));
+                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
                     message.append("\n");
                 }
                 for (int j = 0; j < 4 ; j++) {
                     message.append("Expected output out: ");
-                    message.append(args.out[j].toString());
+                    appendVariableToMessage(message, args.out[j]);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }

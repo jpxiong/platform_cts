@@ -92,23 +92,19 @@ public class TestMad extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inMultiplicand1: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
+                    appendVariableToMessage(message, args.inMultiplicand1);
                     message.append("\n");
                     message.append("Input inMultiplicand2: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
+                    appendVariableToMessage(message, args.inMultiplicand2);
                     message.append("\n");
                     message.append("Input inOffset: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
+                    appendVariableToMessage(message, args.inOffset);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -171,23 +167,19 @@ public class TestMad extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inMultiplicand1: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
+                    appendVariableToMessage(message, args.inMultiplicand1);
                     message.append("\n");
                     message.append("Input inMultiplicand2: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
+                    appendVariableToMessage(message, args.inMultiplicand2);
                     message.append("\n");
                     message.append("Input inOffset: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
+                    appendVariableToMessage(message, args.inOffset);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -250,23 +242,19 @@ public class TestMad extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inMultiplicand1: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
+                    appendVariableToMessage(message, args.inMultiplicand1);
                     message.append("\n");
                     message.append("Input inMultiplicand2: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
+                    appendVariableToMessage(message, args.inMultiplicand2);
                     message.append("\n");
                     message.append("Input inOffset: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
+                    appendVariableToMessage(message, args.inOffset);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -329,23 +317,19 @@ public class TestMad extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inMultiplicand1: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand1, Float.floatToRawIntBits(args.inMultiplicand1), args.inMultiplicand1));
+                    appendVariableToMessage(message, args.inMultiplicand1);
                     message.append("\n");
                     message.append("Input inMultiplicand2: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inMultiplicand2, Float.floatToRawIntBits(args.inMultiplicand2), args.inMultiplicand2));
+                    appendVariableToMessage(message, args.inMultiplicand2);
                     message.append("\n");
                     message.append("Input inOffset: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inOffset, Float.floatToRawIntBits(args.inOffset), args.inOffset));
+                    appendVariableToMessage(message, args.inOffset);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }

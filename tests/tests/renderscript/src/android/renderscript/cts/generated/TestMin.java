@@ -85,19 +85,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                         message.append(" FAIL");
                     }
@@ -154,19 +151,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                         message.append(" FAIL");
                     }
@@ -223,19 +217,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -292,19 +283,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(args.out.toString());
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%14.8g {%8x} %15a",
-                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                         message.append(" FAIL");
                     }
@@ -366,16 +354,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -431,16 +419,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -496,16 +484,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -561,16 +549,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -632,16 +620,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -697,16 +685,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -762,16 +750,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -827,16 +815,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -898,16 +886,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -963,16 +951,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1028,16 +1016,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1093,16 +1081,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1164,16 +1152,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1229,16 +1217,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1294,16 +1282,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1359,16 +1347,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1430,16 +1418,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1495,16 +1483,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1560,16 +1548,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1625,16 +1613,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1696,16 +1684,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1761,16 +1749,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1826,16 +1814,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1891,16 +1879,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1962,16 +1950,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2027,16 +2015,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2092,16 +2080,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2157,16 +2145,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("%d", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("%d", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2228,16 +2216,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2293,16 +2281,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2358,16 +2346,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2423,16 +2411,16 @@ public class TestMin extends RSBaseCompute {
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
                     message.append("Input inA: ");
-                    message.append(String.format("0x%x", args.inA));
+                    appendVariableToMessage(message, args.inA);
                     message.append("\n");
                     message.append("Input inB: ");
-                    message.append(String.format("0x%x", args.inB));
+                    appendVariableToMessage(message, args.inB);
                     message.append("\n");
                     message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
                     message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
