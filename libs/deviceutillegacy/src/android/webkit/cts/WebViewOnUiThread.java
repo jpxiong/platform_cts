@@ -39,6 +39,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView.HitTestResult;
 import android.webkit.WebView.PictureListener;
+import android.webkit.WebView.VisualStateCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -624,6 +625,15 @@ public class WebViewOnUiThread {
             @Override
             public Boolean capture() {
                 return mWebView.pageDown(bottom);
+            }
+        });
+    }
+
+    public void insertVisualStateCallback(final long requestId, final VisualStateCallback callback) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.insertVisualStateCallback(requestId, callback);
             }
         });
     }
