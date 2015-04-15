@@ -248,4 +248,50 @@ public class LaunchClip extends RSBaseCompute {
 
         verifyRange(sc, mOut);
     }
+
+    public void testWrite3DAdapter1D() {
+        setup(false, true, 64, 64, 64, false, false, 0, 0, 0, 0);
+
+        Script.LaunchOptions sc = new Script.LaunchOptions();
+        sc.setX(9, 37);
+        sc.setY(17, 18);
+        sc.setZ(7, 8);
+
+        AllocationAdapter a = makeAdapter(mAout, 28, 0, 0,  9, 17, 7);
+        mScript.forEach_write1d(a);
+        mAout.copyTo(mOut);
+
+        verifyRange(sc, mOut);
+    }
+
+    public void testWrite3DAdapter2D() {
+        setup(false, true, 64, 64, 64, false, false, 0, 0, 0, 0);
+
+        Script.LaunchOptions sc = new Script.LaunchOptions();
+        sc.setX(9, 37);
+        sc.setY(17, 27);
+        sc.setZ(7, 8);
+
+        AllocationAdapter a = makeAdapter(mAout, 28, 10, 0,  9, 17, 7);
+        mScript.forEach_write2d(a);
+        mAout.copyTo(mOut);
+
+        verifyRange(sc, mOut);
+    }
+
+    public void testWrite3DAdapter3D() {
+        setup(false, true, 64, 64, 64, false, false, 0, 0, 0, 0);
+
+        Script.LaunchOptions sc = new Script.LaunchOptions();
+        sc.setX(9, 37);
+        sc.setY(17, 27);
+        sc.setZ(7, 21);
+
+        AllocationAdapter a = makeAdapter(mAout, 28, 10, 14,  9, 17, 7);
+        mScript.forEach_write3d(a);
+        mAout.copyTo(mOut);
+
+        verifyRange(sc, mOut);
+    }
+
 }
