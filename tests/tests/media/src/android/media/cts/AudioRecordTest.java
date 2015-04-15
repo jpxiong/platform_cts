@@ -226,8 +226,16 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         assertEquals(AudioRecord.STATE_UNINITIALIZED, mAudioRecord.getState());
     }
 
+    public void testAudioRecordResamplerMono8Bit() throws Exception {
+        doTest("ResamplerResamplerMono8Bit", true /*localRecord*/, false /*customHandler*/,
+                1 /*periodsPerSecond*/, 1 /*markerPeriodsPerSecond*/,
+                false /*useByteBuffer*/,  false /*blocking*/,
+                false /*auditRecording*/, 88200 /*TEST_SR*/,
+                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_8BIT);
+    }
+
     public void testAudioRecordResamplerStereo8Bit() throws Exception {
-        doTest("ResamplerStereo8Bit", false /*localRecord*/, false /*customHandler*/,
+        doTest("ResamplerStereo8Bit", true /*localRecord*/, false /*customHandler*/,
                 0 /*periodsPerSecond*/, 3 /*markerPeriodsPerSecond*/,
                 true /*useByteBuffer*/,  true /*blocking*/,
                 false /*auditRecording*/, 45000 /*TEST_SR*/,
@@ -240,6 +248,14 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 false /*useByteBuffer*/, true /*blocking*/,
                 false /*auditRecording*/, 8000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+    }
+
+    public void testAudioRecordStereo16Bit() throws Exception {
+        doTest("Stereo16Bit", false /*localRecord*/, false /*customHandler*/,
+                2 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/,
+                false /*useByteBuffer*/, false /*blocking*/,
+                false /*auditRecording*/, 17000 /*TEST_SR*/,
+                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
     }
 
     public void testAudioRecordMonoFloat() throws Exception {
@@ -262,7 +278,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("testAudioRecordByteBufferAuditResamplerStereoFloat",
                 false /*localRecord*/, true /*customHandler*/,
                 2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
-                true /*useByteBuffer*/, true /*blocking*/,
+                true /*useByteBuffer*/, false /*blocking*/,
                 true /*auditRecording*/, 96000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
     }
@@ -387,15 +403,20 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 final int lastLimit = 13;
                 byteBuffer.position(lastPosition);
                 byteBuffer.limit(lastLimit);
-                int ret = record.read(byteBuffer, amount);
+                int ret = blocking ? record.read(byteBuffer, amount) :
+                    record.read(byteBuffer, amount, AudioRecord.READ_NON_BLOCKING);
                 // so long as amount requested in bytes is a multiple of the frame size
                 // we expect the byte buffer request to be filled.  Caution: the
                 // byte buffer data will be in native endian order, not Java order.
-                assertEquals(amount, ret); // blocking
+                if (blocking) {
+                    assertEquals(amount, ret);
+                } else {
+                    assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
+                }
                 // position, limit are not changed by read().
                 assertEquals(lastPosition, byteBuffer.position());
                 assertEquals(lastLimit, byteBuffer.limit());
-                if (samplesRead == 0) {
+                if (samplesRead == 0 && ret > 0) {
                     firstSampleTime = System.currentTimeMillis();
                 }
                 samplesRead += ret / bytesPerSample;
@@ -404,16 +425,20 @@ public class AudioRecordTest extends CtsAndroidTestCase {
             switch (TEST_FORMAT) {
             case AudioFormat.ENCODING_PCM_8BIT: {
                 // For 8 bit data, use bytes
-                assertTrue(blocking); // always blocking (for now)
                 byte[] byteData = new byte[BUFFER_SAMPLES];
                 while (samplesRead < targetSamples) {
                     // the first time through, we read a single frame.
                     // this sets the recording anchor position.
                     int amount = samplesRead == 0 ? numChannels :
                         Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                    int ret = record.read(byteData, 0, amount);
-                    assertEquals(amount, ret); // blocking
-                    if (samplesRead == 0) {
+                    int ret = blocking ? record.read(byteData, 0, amount) :
+                        record.read(byteData, 0, amount, AudioRecord.READ_NON_BLOCKING);
+                    if (blocking) {
+                        assertEquals(amount, ret);
+                    } else {
+                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
+                    }
+                    if (samplesRead == 0 && ret > 0) {
                         firstSampleTime = System.currentTimeMillis();
                     }
                     samplesRead += ret;
@@ -421,16 +446,20 @@ public class AudioRecordTest extends CtsAndroidTestCase {
             } break;
             case AudioFormat.ENCODING_PCM_16BIT: {
                 // For 16 bit data, use shorts
-                assertTrue(blocking); // always blocking (for now)
                 short[] shortData = new short[BUFFER_SAMPLES];
                 while (samplesRead < targetSamples) {
                     // the first time through, we read a single frame.
                     // this sets the recording anchor position.
                     int amount = samplesRead == 0 ? numChannels :
                         Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                    int ret = record.read(shortData, 0, amount);
-                    assertEquals(amount, ret); // blocking
-                    if (samplesRead == 0) {
+                    int ret = blocking ? record.read(shortData, 0, amount) :
+                        record.read(shortData, 0, amount, AudioRecord.READ_NON_BLOCKING);
+                    if (blocking) {
+                        assertEquals(amount, ret);
+                    } else {
+                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
+                    }
+                    if (samplesRead == 0 && ret > 0) {
                         firstSampleTime = System.currentTimeMillis();
                     }
                     samplesRead += ret;
@@ -446,11 +475,11 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                     int ret = record.read(floatData, 0, amount, blocking ?
                             AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
                     if (blocking) {
-                        assertEquals(amount, ret); // blocking
+                        assertEquals(amount, ret);
                     } else {
-                        assertTrue(ret >= 0 && ret <= amount);
+                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
                     }
-                    if (samplesRead == 0) {
+                    if (samplesRead == 0 && ret > 0) {
                         firstSampleTime = System.currentTimeMillis();
                     }
                     samplesRead += ret;
@@ -514,9 +543,15 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         //        " markerPeriodsReceived " + markerList.size());
         //Log.d(TAG, "updatePeriods " + updatePeriods +
         //        " updatePeriodsReceived " + periodicList.size());
-        assertTrue(markerPeriods <= markerList.size()
+        assertTrue(TAG + ": markerPeriods " + markerPeriods +
+                " <= markerPeriodsReceived " + markerList.size() +
+                " <= markerPeriodsMax " + markerPeriodsMax,
+                markerPeriods <= markerList.size()
                 && markerList.size() <= markerPeriodsMax);
-        assertTrue(updatePeriods <= periodicList.size()
+        assertTrue(TAG + ": updatePeriods " + updatePeriods +
+               " <= updatePeriodsReceived " + periodicList.size() +
+               " <= updatePeriodsMax " + updatePeriodsMax,
+                updatePeriods <= periodicList.size()
                 && periodicList.size() <= updatePeriodsMax);
 
         // Since we don't have accurate positioning of the start time of the recorder,
