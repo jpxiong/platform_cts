@@ -28,6 +28,15 @@ import android.os.Looper;
 // Used for statistics and loopers in listener tests.
 // See AudioRecordTest.java and AudioTrack_ListenerTest.java.
 public class AudioHelper {
+    public static int frameSizeFromFormat(AudioFormat format) {
+        return format.getChannelCount()
+                * format.getBytesPerSample(format.getEncoding());
+    }
+
+    public static int frameCountFromMsec(int ms, AudioFormat format) {
+        return ms * format.getSampleRate() / 1000;
+    }
+
     public static class Statistics {
         public void add(double value) {
             final double absValue = Math.abs(value);
