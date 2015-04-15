@@ -149,4 +149,45 @@ public class MediaMetadataRetrieverTest extends AndroidTestCase {
         dataSource.returnFromReadAt(-2);
         assertTrue(mRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null);
     }
+
+    private void testThumbnail(int resId) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
+        try {
+            Resources resources = getContext().getResources();
+            AssetFileDescriptor afd = resources.openRawResourceFd(resId);
+
+            retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+
+            afd.close();
+        } catch (Exception e) {
+            fail("Unable to open file");
+        }
+
+        assertNotNull(retriever.getFrameAtTime(-1 /* timeUs (any) */));
+    }
+
+    public void testThumbnailH264() {
+        testThumbnail(R.raw.video_1280x720_mp4_h264_8192kbps_30fps_aac_stereo_128kbps_44100hz);
+    }
+
+    public void testThumbnailH263() {
+        testThumbnail(R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_mono_24kbps_11025hz);
+    }
+
+    public void testThumbnailMPEG4() {
+        testThumbnail(R.raw.video_1280x720_mp4_mpeg4_1000kbps_25fps_aac_stereo_128kbps_44100hz);
+    }
+
+    public void testThumbnailVP8() {
+        testThumbnail(R.raw.video_640x360_webm_vp8_2048kbps_30fps_vorbis_stereo_128kbps_48000hz);
+    }
+
+    public void testThumbnailVP9() {
+        testThumbnail(R.raw.video_1280x720_webm_vp9_4096kbps_30fps_vorbis_stereo_128kbps_44100hz);
+    }
+
+    public void testThumbnailHEVC() {
+        testThumbnail(R.raw.video_1280x720_mp4_hevc_1150kbps_30fps_aac_stereo_128kbps_48000hz);
+    }
 }
