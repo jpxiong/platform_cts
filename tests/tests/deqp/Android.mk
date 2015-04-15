@@ -21,6 +21,7 @@ include $(CLEAR_VARS)
 # All APIs share the same package
 LOCAL_PACKAGE_NAME := com.drawelements.deqp
 
+include $(LOCAL_PATH)/deqp_egl.mk
 include $(LOCAL_PATH)/deqp_gles2.mk
 include $(LOCAL_PATH)/deqp_gles3.mk
 include $(LOCAL_PATH)/deqp_gles31.mk
