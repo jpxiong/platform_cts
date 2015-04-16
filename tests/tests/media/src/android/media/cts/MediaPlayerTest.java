@@ -23,6 +23,7 @@ import android.content.res.AssetFileDescriptor;
 import android.cts.util.MediaUtils;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.media.MediaDataSource;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
@@ -117,10 +118,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
-    public void testPlayNullSource() throws Exception {
+    public void testPlayNullSourcePath() throws Exception {
         try {
             mMediaPlayer.setDataSource((String) null);
-            fail("Null URI was accepted");
+            fail("Null path was accepted");
         } catch (RuntimeException e) {
             // expected
         }
@@ -1491,5 +1492,95 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     private boolean hasMicrophone() {
         return getActivity().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_MICROPHONE);
+    }
+
+    // Smoke test playback from a MediaDataSource.
+    public void testPlaybackFromAMediaDataSource() throws Exception {
+        final int resid = R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
+        final int duration = 10000;
+
+        if (!MediaUtils.hasCodecsForResource(mContext, resid)) {
+            return;
+        }
+
+        TestMediaDataSource dataSource =
+                TestMediaDataSource.fromAssetFd(mResources.openRawResourceFd(resid));
+        // Test returning -1 from getSize() to indicate unknown size.
+        dataSource.returnFromGetSize(-1);
+        mMediaPlayer.setDataSource(dataSource);
+        playLoadedVideo(null, null, -1);
+        assertTrue(mMediaPlayer.isPlaying());
+
+        // Test pause and restart.
+        mMediaPlayer.pause();
+        Thread.sleep(SLEEP_TIME);
+        assertFalse(mMediaPlayer.isPlaying());
+        mMediaPlayer.start();
+        assertTrue(mMediaPlayer.isPlaying());
+
+        // Test reset.
+        mMediaPlayer.stop();
+        mMediaPlayer.reset();
+        mMediaPlayer.setDataSource(dataSource);
+        mMediaPlayer.prepare();
+        mMediaPlayer.start();
+        assertTrue(mMediaPlayer.isPlaying());
+
+        // Test seek. Note: the seek position is cached and returned as the
+        // current position so there's no point in comparing them.
+        mMediaPlayer.seekTo(duration - SLEEP_TIME);
+        while (mMediaPlayer.isPlaying()) {
+            Thread.sleep(SLEEP_TIME);
+        }
+    }
+
+    public void testNullMediaDataSourceIsRejected() throws Exception {
+        try {
+            mMediaPlayer.setDataSource((MediaDataSource) null);
+            fail("Null MediaDataSource was accepted");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    public void testMediaDataSourceIsClosedOnReset() throws Exception {
+        TestMediaDataSource dataSource = new TestMediaDataSource(new byte[0]);
+        mMediaPlayer.setDataSource(dataSource);
+        mMediaPlayer.reset();
+        assertTrue(dataSource.isClosed());
+    }
+
+    public void testPlaybackFailsIfMediaDataSourceThrows() throws Exception {
+        final int resid = R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
+        if (!MediaUtils.hasCodecsForResource(mContext, resid)) {
+            return;
+        }
+
+        setOnErrorListener();
+        TestMediaDataSource dataSource =
+                TestMediaDataSource.fromAssetFd(mResources.openRawResourceFd(resid));
+        mMediaPlayer.setDataSource(dataSource);
+        mMediaPlayer.prepare();
+
+        dataSource.throwFromReadAt();
+        mMediaPlayer.start();
+        assertTrue(mOnErrorCalled.waitForSignal());
+    }
+
+    public void testPlaybackFailsIfMediaDataSourceReturnsAnError() throws Exception {
+        final int resid = R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
+        if (!MediaUtils.hasCodecsForResource(mContext, resid)) {
+            return;
+        }
+
+        setOnErrorListener();
+        TestMediaDataSource dataSource =
+                TestMediaDataSource.fromAssetFd(mResources.openRawResourceFd(resid));
+        mMediaPlayer.setDataSource(dataSource);
+        mMediaPlayer.prepare();
+
+        dataSource.returnFromReadAt(-1);
+        mMediaPlayer.start();
+        assertTrue(mOnErrorCalled.waitForSignal());
     }
 }
