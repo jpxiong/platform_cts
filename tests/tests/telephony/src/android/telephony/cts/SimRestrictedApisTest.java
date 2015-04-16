@@ -266,4 +266,24 @@ public class SimRestrictedApisTest extends AndroidTestCase {
         } catch (SecurityException expected) {
         }
     }
+
+    /**
+     * Tests the TelephonyManager.notifyCarrierNetworkChange() API to make sure a
+     * SecurityException is thrown since the test APK is not signed by a certificate on the SIM.
+     */
+    public void testNotifyCarrierNetworkChange() {
+        try {
+            if (isSimCardPresent()) {
+                TelephonyManager.getDefault().notifyCarrierNetworkChange(true /* active */);
+                fail("Expected SecurityException for notifyCarrierNetworkChange(true)");
+            }
+        } catch (SecurityException expected) {}
+
+        try {
+            if (isSimCardPresent()) {
+                TelephonyManager.getDefault().notifyCarrierNetworkChange(false /* active */);
+                fail("Expected SecurityException for notifyCarrierNetworkChange(false)");
+            }
+        } catch (SecurityException expected) {}
+    }
 }
