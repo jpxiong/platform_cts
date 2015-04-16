@@ -23,10 +23,8 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.Image;
 import android.util.Log;
 import android.util.Range;
 import android.util.Size;
@@ -40,7 +38,7 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
     /**
-     * Test BURST_CAPTURE capability with full-AUTO capture.
+     * Test YUV burst capture with full-AUTO control.
      * Also verifies sensor settings operation if READ_SENSOR_SETTINGS is available.
      */
     public void testYuvBurst() throws Exception {
@@ -49,10 +47,9 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
                 String id = mCameraIds[i];
                 Log.i(TAG, "Testing YUV Burst for camera " + id);
                 openDevice(id);
-                if (!mStaticInfo.isCapabilitySupported(
-                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)) {
-                    Log.i(TAG, "BURST_CAPTURE capability is not supported in camera " + id +
-                            ". Skip the test");
+
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skip burst test on legacy devices.");
                     continue;
                 }
 
@@ -64,7 +61,7 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    public void yuvBurstTestByCamera(String cameraId) throws Exception {
+    private void yuvBurstTestByCamera(String cameraId) throws Exception {
         // Parameters
         final int MAX_CONVERGENCE_FRAMES = 150; // 5 sec at 30fps
         final long MAX_PREVIEW_RESULT_TIMEOUT_MS = 1000;
@@ -82,10 +79,6 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
             CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH);
         final int maxSyncLatency = mStaticInfo.getCharacteristics().get(
             CameraCharacteristics.SYNC_MAX_LATENCY);
-
-        assertTrue("Cam " + cameraId + ": maxSyncLatency is UNKNOWN;" +
-            " not allowed for BURST_CAPTURE capability",
-            maxSyncLatency >= 0);
 
         // Find minimum frame duration for full-res YUV_420_888
         StreamConfigurationMap config = mStaticInfo.getCharacteristics().get(
@@ -137,13 +130,13 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
         // Create session and start up preview
 
         SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
-        SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+        ImageDropperListener imageDropper = new ImageDropperListener();
 
         prepareCaptureAndStartPreview(
             previewBuilder, burstBuilder,
             previewSize, stillSize,
             ImageFormat.YUV_420_888, resultListener,
-            /*maxNumImages*/ 3, imageListener);
+            /*maxNumImages*/ 3, imageDropper);
 
         // Create burst
 
@@ -234,8 +227,13 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
             // Calculate how many requests we need to still send down to camera before we
             // know the settings have settled for the burst
 
-            int requestsNeededToSync = maxSyncLatency - pipelineDepth;
-            for (int i = 0; i < maxSyncLatency; i++) {
+            int numFramesWaited = maxSyncLatency;
+            if (numFramesWaited == CameraCharacteristics.SYNC_MAX_LATENCY_UNKNOWN) {
+                numFramesWaited = NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY;
+            }
+
+            int requestsNeededToSync = numFramesWaited - pipelineDepth;
+            for (int i = 0; i < numFramesWaited; i++) {
                 if (!burstSent && requestsNeededToSync <= 0) {
                     mSession.captureBurst(burst, resultListener, mHandler);
                     burstSent = true;
@@ -270,13 +268,6 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
             assertTrue(String.format("Cam %s: Sensitivity is not valid: %d",
                     cameraId, burstSensitivity),
                 burstSensitivity > 0);
-        }
-
-        // Process burst images
-        for (int i = 0; i < BURST_SIZE; i++) {
-            Image img = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-
-            img.close();
         }
 
         // Process burst results
