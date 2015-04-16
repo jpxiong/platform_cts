@@ -3471,6 +3471,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         assertEquals(mActivity.getResources().getString(R.string.text_view_hello),
                 outText.text.toString());
+
+        // Tests for invalid arguments.
+        assertFalse(mTextView.extractText(request, null));
+        assertFalse(mTextView.extractText(null, outText));
+        assertFalse(mTextView.extractText(null, null));
     }
 
     @UiThreadTest
