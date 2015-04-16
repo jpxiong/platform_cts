@@ -282,6 +282,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             try {
                 openDevice(mCameraIds[i]);
 
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skipping test on legacy devices");
+                    continue;
+                }
+
                 Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
 
                 // Update preview surface with given size for all sub-tests.
@@ -460,6 +465,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
+
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skipping test on legacy devices");
+                    continue;
+                }
 
                 awbModeAndLockTestByCamera();
             } finally {
