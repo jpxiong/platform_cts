@@ -132,6 +132,7 @@ cts_test_packages := \
     CtsJobSchedulerDeviceTestCases \
     CtsJniTestCases \
     CtsKeystoreTestCases \
+    CtsLibcoreLegacy22TestCases \
     CtsLocationTestCases \
     CtsLocation2TestCases \
     CtsMediaStressTestCases \
