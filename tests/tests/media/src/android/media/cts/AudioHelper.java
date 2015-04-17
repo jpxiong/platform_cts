@@ -174,7 +174,7 @@ public class AudioHelper {
         AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
                 int format, int bufferSize) {
             this(audioSource, sampleRate, channelMask, format, bufferSize,
-                    AudioManager.STREAM_MUSIC, 1000 /*delayMs*/);
+                    AudioManager.STREAM_MUSIC, 500 /*delayMs*/);
         }
 
         AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
@@ -189,6 +189,7 @@ public class AudioHelper {
                 final int bufferOutSize = bufferOutSamples
                         * AudioFormat.getBytesPerSample(format);
 
+                // Caution: delayMs too large results in buffer sizes that cannot be created.
                 mTrack = new AudioTrack(auditStreamType, sampleRate, channelOutMask, format,
                         bufferOutSize, AudioTrack.MODE_STREAM);
                 mPosition = 0;
