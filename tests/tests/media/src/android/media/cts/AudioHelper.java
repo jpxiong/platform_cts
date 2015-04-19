@@ -19,6 +19,7 @@ package android.media.cts;
 import java.nio.ByteBuffer;
 import org.junit.Assert;
 
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -167,22 +168,37 @@ public class AudioHelper {
     }
 
     /* AudioRecordAudit extends AudioRecord to allow concurrent playback
-     * of read content to an AudioTrack.
+     * of read content to an AudioTrack.  This is for testing only.
+     * For general applications, it is NOT recommended to extend AudioRecord.
      * This affects AudioRecord timing.
      */
     public static class AudioRecordAudit extends AudioRecord {
         AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
-                int format, int bufferSize) {
-            this(audioSource, sampleRate, channelMask, format, bufferSize,
+                int format, int bufferSize, boolean isChannelIndex) {
+            this(audioSource, sampleRate, channelMask, format, bufferSize, isChannelIndex,
                     AudioManager.STREAM_MUSIC, 500 /*delayMs*/);
         }
 
         AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
-                int format, int bufferSize, int auditStreamType, int delayMs) {
-            super(audioSource, sampleRate, channelMask, format, bufferSize);
+                int format, int bufferSize,
+                boolean isChannelIndex, int auditStreamType, int delayMs) {
+            // without channel index masks, one could call:
+            // super(audioSource, sampleRate, channelMask, format, bufferSize);
+            super(new AudioAttributes.Builder()
+                            .setInternalCapturePreset(audioSource)
+                            .build(),
+                    (isChannelIndex
+                            ? new AudioFormat.Builder().setChannelIndexMask(channelMask)
+                                    : new AudioFormat.Builder().setChannelMask(channelMask))
+                            .setEncoding(format)
+                            .setSampleRate(sampleRate)
+                            .build(),
+                    bufferSize,
+                    AudioManager.AUDIO_SESSION_ID_GENERATE);
 
             if (delayMs >= 0) { // create an AudioTrack
-                final int channelOutMask = outChannelMaskFromInChannelMask(channelMask);
+                final int channelOutMask = isChannelIndex ? channelMask :
+                    outChannelMaskFromInChannelMask(channelMask);
                 final int bufferOutFrames = sampleRate * delayMs / 1000;
                 final int bufferOutSamples = bufferOutFrames
                         * AudioFormat.channelCountFromOutChannelMask(channelOutMask);
@@ -190,8 +206,19 @@ public class AudioHelper {
                         * AudioFormat.getBytesPerSample(format);
 
                 // Caution: delayMs too large results in buffer sizes that cannot be created.
-                mTrack = new AudioTrack(auditStreamType, sampleRate, channelOutMask, format,
-                        bufferOutSize, AudioTrack.MODE_STREAM);
+                mTrack = new AudioTrack.Builder()
+                                .setAudioAttributes(new AudioAttributes.Builder()
+                                        .setLegacyStreamType(auditStreamType)
+                                        .build())
+                                .setAudioFormat((isChannelIndex ?
+                                  new AudioFormat.Builder().setChannelIndexMask(channelOutMask) :
+                                  new AudioFormat.Builder().setChannelMask(channelOutMask))
+                                        .setEncoding(format)
+                                        .setSampleRate(sampleRate)
+                                        .build())
+                                .setBufferSizeInBytes(bufferOutSize)
+                                .build();
+                Assert.assertEquals(AudioTrack.STATE_INITIALIZED, mTrack.getState());
                 mPosition = 0;
                 mFinishAtMs = 0;
             }
@@ -211,6 +238,20 @@ public class AudioHelper {
         }
 
         @Override
+        public int read(byte[] audioData, int offsetInBytes, int sizeInBytes, int readMode) {
+            // for byte array access we verify format is 8 bit PCM (typical use)
+            Assert.assertEquals(TAG + ": format mismatch",
+                    AudioFormat.ENCODING_PCM_8BIT, getAudioFormat());
+            int samples = super.read(audioData, offsetInBytes, sizeInBytes, readMode);
+            if (mTrack != null) {
+                Assert.assertEquals(samples, mTrack.write(audioData, offsetInBytes, samples,
+                        AudioTrack.WRITE_BLOCKING));
+                mPosition += samples / mTrack.getChannelCount();
+            }
+            return samples;
+        }
+
+        @Override
         public int read(short[] audioData, int offsetInShorts, int sizeInShorts) {
             // for short array access we verify format is 16 bit PCM (typical use)
             Assert.assertEquals(TAG + ": format mismatch",
@@ -218,6 +259,20 @@ public class AudioHelper {
             int samples = super.read(audioData, offsetInShorts, sizeInShorts);
             if (mTrack != null) {
                 Assert.assertEquals(samples, mTrack.write(audioData, offsetInShorts, samples));
+                mPosition += samples / mTrack.getChannelCount();
+            }
+            return samples;
+        }
+
+        @Override
+        public int read(short[] audioData, int offsetInShorts, int sizeInShorts, int readMode) {
+            // for short array access we verify format is 16 bit PCM (typical use)
+            Assert.assertEquals(TAG + ": format mismatch",
+                    AudioFormat.ENCODING_PCM_16BIT, getAudioFormat());
+            int samples = super.read(audioData, offsetInShorts, sizeInShorts, readMode);
+            if (mTrack != null) {
+                Assert.assertEquals(samples, mTrack.write(audioData, offsetInShorts, samples,
+                        AudioTrack.WRITE_BLOCKING));
                 mPosition += samples / mTrack.getChannelCount();
             }
             return samples;
@@ -240,6 +295,23 @@ public class AudioHelper {
         @Override
         public int read(ByteBuffer audioBuffer, int sizeInBytes) {
             int bytes = super.read(audioBuffer, sizeInBytes);
+            if (mTrack != null) {
+                // read does not affect position and limit of the audioBuffer.
+                // we make a duplicate to change that for writing to the output AudioTrack
+                // which does check position and limit.
+                ByteBuffer copy = audioBuffer.duplicate();
+                copy.position(0).limit(bytes);  // read places data at the start of the buffer.
+                Assert.assertEquals(bytes, mTrack.write(copy, bytes, AudioTrack.WRITE_BLOCKING));
+                mPosition += bytes /
+                        (mTrack.getChannelCount()
+                                * AudioFormat.getBytesPerSample(mTrack.getAudioFormat()));
+            }
+            return bytes;
+        }
+
+        @Override
+        public int read(ByteBuffer audioBuffer, int sizeInBytes, int readMode) {
+            int bytes = super.read(audioBuffer, sizeInBytes, readMode);
             if (mTrack != null) {
                 // read does not affect position and limit of the audioBuffer.
                 // we make a duplicate to change that for writing to the output AudioTrack
