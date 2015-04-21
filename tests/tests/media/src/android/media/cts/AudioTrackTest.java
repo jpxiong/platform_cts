@@ -1360,6 +1360,9 @@ public class AudioTrackTest extends CtsAndroidTestCase {
     }
 
     public void testPlayStaticData() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testPlayStaticData";
         final int TEST_FORMAT_ARRAY[] = {  // 6 chirps repeated (TEST_LOOPS+1) times, 3 times
