@@ -65,6 +65,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebView.HitTestResult;
 import android.webkit.WebView.PictureListener;
+import android.webkit.WebView.VisualStateCallback;
 import android.webkit.WebViewClient;
 import android.webkit.WebViewDatabase;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
@@ -2449,6 +2450,47 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
             descriptor.close();
             file.delete();
         }
+    }
+
+    public void testVisualStateCallbackCalled() throws Exception {
+        // Check that the visual state callback is called correctly.
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final CountDownLatch callbackLatch = new CountDownLatch(1);
+        final long kRequest = 100;
+
+        mOnUiThread.loadUrl("about:blank");
+
+        mOnUiThread.insertVisualStateCallback(kRequest, new VisualStateCallback() {
+            public void onComplete(long requestId) {
+                assertEquals(kRequest, requestId);
+                callbackLatch.countDown();
+            }
+        });
+
+        assertTrue(callbackLatch.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+
+    public void testOnPageCommitVisibleCalled() throws Exception {
+        // Check that the onPageCommitVisible callback is called
+        // correctly.
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+
+        final CountDownLatch callbackLatch = new CountDownLatch(1);
+
+        mOnUiThread.setWebViewClient(new WebViewClient() {
+                public void onPageCommitVisible(WebView view, String url) {
+                    assertEquals(url, "about:blank");
+                    callbackLatch.countDown();
+                }
+            });
+
+        mOnUiThread.loadUrl("about:blank");
+        assertTrue(callbackLatch.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     private void savePrintedPage(final PrintDocumentAdapter adapter,
