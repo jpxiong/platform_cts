@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 import android.content.Context;
 import android.cts.util.TestThread;
@@ -218,5 +219,85 @@ public class DebugTest extends AndroidTestCase {
         // Don't require any specific content, just that something was written
         assertTrue(file.exists());
         assertTrue(file.length() > 0);
+    }
+
+    private static void checkNumber(String s) throws Exception {
+        assertTrue(s != null);
+        long n = Long.valueOf(s);
+        assertTrue(n >= 0);
+    }
+
+    private static void checkHistogram(String s) throws Exception {
+        assertTrue(s != null);
+        assertTrue(s.length() > 0);
+        String[] buckets = s.split(",");
+        long last_key = 0;
+        for (int i = 0; i < buckets.length; ++i) {
+            String bucket = buckets[i];
+            assertTrue(bucket.length() > 0);
+            String[] kv = bucket.split(":");
+            assertTrue(kv.length == 2);
+            assertTrue(kv[0].length() > 0);
+            assertTrue(kv[1].length() > 0);
+            long key = Long.valueOf(kv[0]);
+            long value = Long.valueOf(kv[1]);
+            assertTrue(key >= 0);
+            assertTrue(value >= 0);
+            assertTrue(key >= last_key);
+            last_key = key;
+        }
+    }
+
+    public void testGetRuntimeStat() throws Exception {
+        // Invoke at least one GC and wait for 20 seconds or so so we get at
+        // least one bucket in the histograms.
+        for (int i = 0; i < 20; ++i) {
+            Runtime.getRuntime().gc();
+            Thread.sleep(1000L);
+        }
+        String gc_count = Debug.getRuntimeStat("art.gc.gc-count");
+        String gc_time = Debug.getRuntimeStat("art.gc.gc-time");
+        String bytes_allocated = Debug.getRuntimeStat("art.gc.bytes-allocated");
+        String bytes_freed = Debug.getRuntimeStat("art.gc.bytes-freed");
+        String blocking_gc_count = Debug.getRuntimeStat("art.gc.blocking-gc-count");
+        String blocking_gc_time = Debug.getRuntimeStat("art.gc.blocking-gc-time");
+        String gc_count_rate_histogram = Debug.getRuntimeStat("art.gc.gc-count-rate-histogram");
+        String blocking_gc_count_rate_histogram =
+            Debug.getRuntimeStat("art.gc.blocking-gc-count-rate-histogram");
+        checkNumber(gc_count);
+        checkNumber(gc_time);
+        checkNumber(bytes_allocated);
+        checkNumber(bytes_freed);
+        checkNumber(blocking_gc_count);
+        checkNumber(blocking_gc_time);
+        checkHistogram(gc_count_rate_histogram);
+        checkHistogram(blocking_gc_count_rate_histogram);
+    }
+
+    public void testGetRuntimeStats() throws Exception {
+        // Invoke at least one GC and wait for 20 seconds or so so we get at
+        // least one bucket in the histograms.
+        for (int i = 0; i < 20; ++i) {
+            Runtime.getRuntime().gc();
+            Thread.sleep(1000L);
+        }
+        Map<String, String> map = Debug.getRuntimeStats();
+        String gc_count = map.get("art.gc.gc-count");
+        String gc_time = map.get("art.gc.gc-time");
+        String bytes_allocated = map.get("art.gc.bytes-allocated");
+        String bytes_freed = map.get("art.gc.bytes-freed");
+        String blocking_gc_count = map.get("art.gc.blocking-gc-count");
+        String blocking_gc_time = map.get("art.gc.blocking-gc-time");
+        String gc_count_rate_histogram = map.get("art.gc.gc-count-rate-histogram");
+        String blocking_gc_count_rate_histogram =
+            map.get("art.gc.blocking-gc-count-rate-histogram");
+        checkNumber(gc_count);
+        checkNumber(gc_time);
+        checkNumber(bytes_allocated);
+        checkNumber(bytes_freed);
+        checkNumber(blocking_gc_count);
+        checkNumber(blocking_gc_time);
+        checkHistogram(gc_count_rate_histogram);
+        checkHistogram(blocking_gc_count_rate_histogram);
     }
 }
