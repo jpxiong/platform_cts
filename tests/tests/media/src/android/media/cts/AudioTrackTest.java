@@ -23,6 +23,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTimestamp;
 import android.media.AudioTrack;
+import android.media.PlaybackSettings;
 import android.util.Log;
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
@@ -1999,6 +2000,85 @@ public class AudioTrackTest extends CtsAndroidTestCase {
             //        + ")  diff(" + (expected - actual) + ")");
             assertEquals(expected, actual, tolerance60MsInFrames);
             track.stop();
+        }
+        track.release();
+    }
+
+    public void testVariableSpeedPlayback() throws Exception {
+        final String TEST_NAME = "testVariableSpeedPlayback";
+        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_FLOAT; // required for test
+        final int TEST_MODE = AudioTrack.MODE_STATIC;           // required for test
+        final int TEST_SR = 48000;
+
+        AudioFormat format = new AudioFormat.Builder()
+                //.setChannelIndexMask((1 << 0))  // output to first channel, FL
+                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                .setEncoding(TEST_FORMAT)
+                .setSampleRate(TEST_SR)
+                .build();
+
+        // create track
+        final int frameCount = AudioHelper.frameCountFromMsec(100 /*ms*/, format);
+        final int frameSize = AudioHelper.frameSizeFromFormat(format);
+        AudioTrack track = new AudioTrack.Builder()
+                .setAudioFormat(format)
+                .setBufferSizeInBytes(frameCount * frameSize)
+                .setTransferMode(TEST_MODE)
+                .build();
+
+        // create float array and write it
+        final int sampleCount = frameCount * format.getChannelCount();
+        float[] vaf = createSoundDataInFloatArray(sampleCount, TEST_SR, 600);
+        assertEquals(vaf.length, track.write(vaf, 0 /* offsetInFloats */, vaf.length,
+                AudioTrack.WRITE_NON_BLOCKING));
+
+        // sweep speed and pitch
+        final float[][][] speedAndPitch = {
+             // { {speedStart, pitchStart} {speedEnd, pitchEnd} }
+                { {0.5f, 0.5f}, {2.0f, 2.0f} },  // speed by SR conversion (chirp)
+                { {0.5f, 1.0f}, {2.0f, 1.0f} },  // speed by time stretch (constant pitch)
+                { {1.0f, 0.5f}, {1.0f, 2.0f} },  // pitch by SR conversion (chirp)
+        };
+
+        final int TEST_TIME_MS = 2000;
+        final int TEST_DELTA_MS = 100;
+        final int testSteps = TEST_TIME_MS / TEST_DELTA_MS;
+
+        for (int i = 0; i < speedAndPitch.length; ++i) {
+            final float speedStart = speedAndPitch[i][0][0];
+            final float pitchStart = speedAndPitch[i][0][1];
+            final float speedEnd = speedAndPitch[i][1][0];
+            final float pitchEnd = speedAndPitch[i][1][1];
+            final float speedInc = (speedEnd - speedStart) / testSteps;
+            final float pitchInc = (pitchEnd - pitchStart) / testSteps;
+
+            PlaybackSettings playbackSettings = new PlaybackSettings()
+                    .setPitch(pitchStart)
+                    .setSpeed(speedStart)
+                    .allowDefaults();
+
+            // set track in infinite loop to be a sine generator
+            track.setLoopPoints(0, frameCount, -1 /* loopCount */); // cleared by stop()
+            track.play();
+
+            Thread.sleep(300 /* millis */); // warm up track
+
+            int anticipatedPosition = track.getPlaybackHeadPosition();
+            for (int j = 0; j < testSteps; ++j) {
+                track.setPlaybackSettings(playbackSettings);
+                Thread.sleep(TEST_DELTA_MS);
+                // Log.d(TAG, "position[" + j + "] " + track.getPlaybackHeadPosition());
+                anticipatedPosition +=
+                        playbackSettings.getSpeed() * TEST_DELTA_MS * TEST_SR / 1000;
+                playbackSettings.setPitch(playbackSettings.getPitch() + pitchInc);
+                playbackSettings.setSpeed(playbackSettings.getSpeed() + speedInc);
+            }
+            final int endPosition = track.getPlaybackHeadPosition();
+            final int tolerance100MsInFrames = 100 * TEST_SR / 1000;
+            assertEquals(TAG, anticipatedPosition, endPosition, tolerance100MsInFrames);
+            track.stop();
+
+            Thread.sleep(100 /* millis */); // distinct pause between each test
         }
         track.release();
     }
