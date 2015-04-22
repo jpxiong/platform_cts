@@ -289,6 +289,14 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         }
     }
 
+    public void testBluetoothContactSharingDisabled() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                "testSetBluetoothContactSharingDisabled_setterAndGetter", mUserId));
+    }
+
     private void disableActivityForUser(String activityName, int userId)
             throws DeviceNotAvailableException {
         String command = "am start -W --user " + userId
