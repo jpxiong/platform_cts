@@ -29,7 +29,7 @@ public class DisplayTestRunner extends CtsInstrumentationApkTest {
     private static final String OVERLAY_DISPLAY_DEVICES_SETTING_NAME = "overlay_display_devices";
 
     // Use a non-standard pattern, must match values in tests/tests/display/.../DisplayTest.java
-    private static final String OVERLAY_DISPLAY_DEVICES_SETTING_VALUE = "1281x721/214";
+    private static final String OVERLAY_DISPLAY_DEVICES_SETTING_VALUE = "181x161/214";
 
     @Override
     public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {

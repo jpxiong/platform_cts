@@ -28,10 +28,11 @@ import android.view.WindowManager;
 public class DisplayTest extends AndroidTestCase {
     // This test is called from DisplayTestRunner which brings up an overlay display on the target
     // device. The overlay display parameters must match the ones defined there which are
-    // 1281x721/214 (wxh/dpi).
+    // 181x161/214 (wxh/dpi).  It only matters that these values are different from any real
+    // display.
 
-    private static final int SECONDARY_DISPLAY_WIDTH = 1281;
-    private static final int SECONDARY_DISPLAY_HEIGHT = 721;
+    private static final int SECONDARY_DISPLAY_WIDTH = 181;
+    private static final int SECONDARY_DISPLAY_HEIGHT = 161;
     private static final int SECONDARY_DISPLAY_DPI = 214;
     private static final float SCALE_DENSITY_LOWER_BOUND =
             (float)(SECONDARY_DISPLAY_DPI - 1) / DisplayMetrics.DENSITY_DEFAULT;
