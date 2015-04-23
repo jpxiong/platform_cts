@@ -838,6 +838,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             return; // skip
         }
 
+        mMediaPlayer.setDisplay(mActivity.getSurfaceHolder());
         mMediaPlayer.prepare();
         float[] rates = { 0.25f, 0.5f, 1.0f, 2.0f };
         for (float playbackRate : rates) {
