@@ -22,7 +22,7 @@ import android.test.AndroidTestCase;
 
 public class KeyChainTest extends AndroidTestCase {
     public void testIsKeyAlgorithmSupported_RequiredAlgorithmsSupported() throws Exception {
-        assertTrue("DSA must be supported", KeyChain.isKeyAlgorithmSupported("DSA"));
+        assertFalse("DSA must not be supported", KeyChain.isKeyAlgorithmSupported("DSA"));
         assertTrue("EC must be supported", KeyChain.isKeyAlgorithmSupported("EC"));
         assertTrue("RSA must be supported", KeyChain.isKeyAlgorithmSupported("RSA"));
     }
