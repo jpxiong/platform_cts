@@ -52,8 +52,6 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             removeTestUsers();
             mUserId = createManagedProfile();
             installApp(MANAGED_PROFILE_APK);
-            installApp(INTENT_RECEIVER_APK);
-            installApp(INTENT_SENDER_APK);
             setProfileOwner(MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId);
             startUser(mUserId);
         }
@@ -134,6 +132,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
+        installApp(INTENT_RECEIVER_APK);
+        installApp(INTENT_SENDER_APK);
 
         // Test from parent to managed
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
@@ -155,6 +155,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
+        installApp(INTENT_RECEIVER_APK);
+        installApp(INTENT_SENDER_APK);
 
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
                 "testAllowCrossProfileCopyPaste", mUserId));
