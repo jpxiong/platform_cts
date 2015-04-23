@@ -94,6 +94,25 @@ public class TextToSpeechTest extends AndroidTestCase {
         return false;
     }
 
+    private void assertContainsEngine(String engine, List<TextToSpeech.EngineInfo> engines) {
+        for (TextToSpeech.EngineInfo engineInfo : engines) {
+            if (engineInfo.name.equals(engine)) {
+                return;
+            }
+        }
+        fail("Engine " + engine + " not found");
+    }
+
+    private HashMap<String, String> createParams() {
+        HashMap<String, String> params = new HashMap<String,String>();
+        params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, UTTERANCE_ID);
+        return params;
+    }
+
+    private boolean waitForUtterance() throws InterruptedException {
+        return mTts.waitForComplete(UTTERANCE_ID);
+    }
+
     public void testSynthesizeToFile() throws Exception {
         if (mTts == null) {
             return;
@@ -123,7 +142,6 @@ public class TextToSpeechTest extends AndroidTestCase {
         assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
         assertTrue("speak() completion timeout", waitForUtterance());
     }
-
 
     public void testSpeakStop() throws Exception {
         getTts().stop();
@@ -157,24 +175,4 @@ public class TextToSpeechTest extends AndroidTestCase {
         assertNotNull("getEngines() returned null", engines);
         assertContainsEngine(TextToSpeechWrapper.MOCK_TTS_ENGINE, engines);
     }
-
-    private void assertContainsEngine(String engine, List<TextToSpeech.EngineInfo> engines) {
-        for (TextToSpeech.EngineInfo engineInfo : engines) {
-            if (engineInfo.name.equals(engine)) {
-                return;
-            }
-        }
-        fail("Engine " + engine + " not found");
-    }
-
-    private HashMap<String, String> createParams() {
-        HashMap<String, String> params = new HashMap<String,String>();
-        params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, UTTERANCE_ID);
-        return params;
-    }
-
-    private boolean waitForUtterance() throws InterruptedException {
-        return mTts.waitForComplete(UTTERANCE_ID);
-    }
-
 }

@@ -20,7 +20,11 @@ import android.speech.tts.SynthesisCallback;
 import android.speech.tts.SynthesisRequest;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeechService;
+import android.speech.tts.TtsEngines;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Stub implementation of {@link TextToSpeechService}. Used for testing the
@@ -32,6 +36,17 @@ public class StubTextToSpeechService extends TextToSpeechService {
     // Object that onSynthesizeText will #wait on, if set to non-null
     public static volatile Object sSynthesizeTextWait;
 
+    private ArrayList<Locale> supportedLanguages = new ArrayList<Locale>();
+    private ArrayList<Locale> supportedCountries = new ArrayList<Locale>();
+    private ArrayList<Locale> GBFallbacks = new ArrayList<Locale>();
+
+    public StubTextToSpeechService() {
+        supportedLanguages.add(new Locale("eng"));
+        supportedCountries.add(new Locale("eng", "USA"));
+        supportedCountries.add(new Locale("eng", "GBR"));
+        GBFallbacks.add(new Locale("eng", "NZL"));
+    }
+
     @Override
     protected String[] onGetLanguage() {
         return new String[] { "eng", "USA", "" };
@@ -39,12 +54,19 @@ public class StubTextToSpeechService extends TextToSpeechService {
 
     @Override
     protected int onIsLanguageAvailable(String lang, String country, String variant) {
-        return TextToSpeech.LANG_AVAILABLE;
+        if (supportedCountries.contains(new Locale(lang, country))) {
+            return TextToSpeech.LANG_COUNTRY_AVAILABLE;
+        }
+        if (supportedLanguages.contains(new Locale(lang))) {
+            return TextToSpeech.LANG_AVAILABLE;
+        }
+ 
+        return TextToSpeech.LANG_NOT_SUPPORTED;
     }
 
     @Override
     protected int onLoadLanguage(String lang, String country, String variant) {
-        return TextToSpeech.LANG_AVAILABLE;
+        return onIsLanguageAvailable(lang, country, variant);
     }
 
     @Override
@@ -75,6 +97,22 @@ public class StubTextToSpeechService extends TextToSpeechService {
         if (callback.done() != TextToSpeech.SUCCESS) {
             return;
         }
+    }
+
+    @Override
+    public String onGetDefaultVoiceNameFor(String lang, String country, String variant) {
+        Locale locale = new Locale(lang, country);
+        if (supportedCountries.contains(locale)) {
+          return TtsEngines.normalizeTTSLocale(locale).toLanguageTag();
+        }
+        if (lang.equals("eng")) {
+            if (GBFallbacks.contains(new Locale(lang, country))) {
+                return "en-GB";
+            } else {
+                return "en-US";
+            }
+        }
+        return super.onGetDefaultVoiceNameFor(lang, country, variant);
     }
 
 }
