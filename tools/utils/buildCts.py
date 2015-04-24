@@ -30,6 +30,12 @@ def GetSubDirectories(root):
   """Return all directories under the given root directory."""
   return [x for x in os.listdir(root) if os.path.isdir(os.path.join(root, x))]
 
+def ReadFileLines(filePath):
+  """Reads a file and returns its contents as a line list."""
+  f = open(filePath, 'r');
+  lines = [line.strip() for line in f.readlines()]
+  f.close()
+  return lines
 
 def GetMakeFileVars(makefile_path):
   """Extracts variable definitions from the given make file.
@@ -254,6 +260,8 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.drawelements\.')
+    plan.ExcludeTests('com.drawelements.deqp.gles3', ReadFileLines(os.path.join(self.test_root, 'deqp/gles3-temporary-failures.txt')))
+    plan.ExcludeTests('com.drawelements.deqp.gles31', ReadFileLines(os.path.join(self.test_root, 'deqp/gles31-temporary-failures.txt')))
     self.__WritePlan(plan, 'CTS-DEQP')
 
     # CTS - sub plan for new test packages added for staging
