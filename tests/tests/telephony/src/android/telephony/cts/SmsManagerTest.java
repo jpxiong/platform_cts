@@ -369,9 +369,10 @@ public class SmsManagerTest extends AndroidTestCase {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
                     Object[] obj = (Object[]) bundle.get("pdus");
+                    String format = bundle.getString("format");
                     SmsMessage[] message = new SmsMessage[obj.length];
                     for (int i = 0; i < obj.length; i++) {
-                        message[i] = SmsMessage.createFromPdu((byte[]) obj[i]);
+                        message[i] = SmsMessage.createFromPdu((byte[]) obj[i], format);
                     }
 
                     for (SmsMessage currentMessage : message) {
