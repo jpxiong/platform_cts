@@ -21,6 +21,7 @@ import static com.android.ex.camera2.blocking.BlockingStateCallback.*;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
 import android.hardware.camera2.CameraDevice;
@@ -32,6 +33,7 @@ import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.media.Image;
+import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.os.Environment;
 import android.os.Handler;
@@ -43,6 +45,7 @@ import android.view.Surface;
 import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.blocking.BlockingStateCallback;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -355,5 +358,145 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         }
 
         return captureBuilder;
+    }
+
+    /**
+     * Test the invalid Image access: accessing a closed image must result in
+     * {@link IllegalStateException}.
+     *
+     * @param closedImage The closed image.
+     * @param closedBuffer The ByteBuffer from a closed Image. buffer invalid
+     *            access will be skipped if it is null.
+     */
+    protected void imageInvalidAccessTestAfterClose(Image closedImage,
+            Plane closedPlane, ByteBuffer closedBuffer) {
+        if (closedImage == null) {
+            throw new IllegalArgumentException(" closedImage must be non-null");
+        }
+        if (closedBuffer != null && !closedBuffer.isDirect()) {
+            throw new IllegalArgumentException("The input ByteBuffer should be direct ByteBuffer");
+        }
+
+        if (closedPlane != null) {
+            // Plane#getBuffer test
+            try {
+                closedPlane.getBuffer(); // An ISE should be thrown here.
+                fail("Image should throw IllegalStateException when calling getBuffer"
+                        + " after the image is closed");
+            } catch (IllegalStateException e) {
+                // Expected.
+            }
+
+            // Plane#getPixelStride test
+            try {
+                closedPlane.getPixelStride(); // An ISE should be thrown here.
+                fail("Image should throw IllegalStateException when calling getPixelStride"
+                        + " after the image is closed");
+            } catch (IllegalStateException e) {
+                // Expected.
+            }
+
+            // Plane#getRowStride test
+            try {
+                closedPlane.getRowStride(); // An ISE should be thrown here.
+                fail("Image should throw IllegalStateException when calling getRowStride"
+                        + " after the image is closed");
+            } catch (IllegalStateException e) {
+                // Expected.
+            }
+        }
+
+        // ByteBuffer access test
+        if (closedBuffer != null) {
+            try {
+                closedBuffer.get(); // An ISE should be thrown here.
+                fail("Image should throw IllegalStateException when accessing a byte buffer"
+                        + " after the image is closed");
+            } catch (IllegalStateException e) {
+                // Expected.
+            }
+        }
+
+        // Image#getFormat test
+        try {
+            closedImage.getFormat();
+            fail("Image should throw IllegalStateException when calling getFormat"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getWidth test
+        try {
+            closedImage.getWidth();
+            fail("Image should throw IllegalStateException when calling getWidth"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getHeight test
+        try {
+            closedImage.getHeight();
+            fail("Image should throw IllegalStateException when calling getHeight"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getTimestamp test
+        try {
+            closedImage.getTimestamp();
+            fail("Image should throw IllegalStateException when calling getTimestamp"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getTimestamp test
+        try {
+            closedImage.getTimestamp();
+            fail("Image should throw IllegalStateException when calling getTimestamp"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#isOpaque test
+        try {
+            closedImage.isOpaque();
+            fail("Image should throw IllegalStateException when calling isOpaque"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getCropRect test
+        try {
+            closedImage.getCropRect();
+            fail("Image should throw IllegalStateException when calling getCropRect"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#setCropRect test
+        try {
+            Rect rect = new Rect();
+            closedImage.setCropRect(rect);
+            fail("Image should throw IllegalStateException when calling setCropRect"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
+
+        // Image#getPlanes test
+        try {
+            closedImage.getPlanes();
+            fail("Image should throw IllegalStateException when calling getPlanes"
+                    + " after the image is closed");
+        } catch (IllegalStateException e) {
+            // Expected.
+        }
     }
 }

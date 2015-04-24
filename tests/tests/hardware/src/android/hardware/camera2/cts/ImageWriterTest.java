@@ -25,6 +25,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
+import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.media.ImageWriter;
 import android.os.ConditionVariable;
@@ -32,6 +33,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -232,9 +234,13 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
                     "ImageWriter 1st input image should match camera 1st output image",
                     isImageStronglyEqual(inputImage, cameraImage));
 
+            // Image should be closed after queueInputImage call
+            Plane closedPlane = inputImage.getPlanes()[0];
+            ByteBuffer closedBuffer = closedPlane.getBuffer();
             mWriter.queueInputImage(inputImage);
-            outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            imageInvalidAccessTestAfterClose(inputImage, closedPlane, closedBuffer);
 
+            outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             mCollector.expectTrue("ImageWriter 1st output image should match 1st input image",
                     isImageStronglyEqual(cameraImage, outputImage));
             if (DEBUG) {
@@ -261,7 +267,13 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
                 String img2FileName = DEBUG_FILE_NAME_BASE + "/" + maxSize + "_image2.yuv";
                 dumpFile(img2FileName, img1Data);
             }
+
+            // Image should be closed after queueInputImage call
+            closedPlane = cameraImage.getPlanes()[0];
+            closedBuffer = closedPlane.getBuffer();
             mWriter.queueInputImage(cameraImage);
+            imageInvalidAccessTestAfterClose(cameraImage, closedPlane, closedBuffer);
+
             outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             byte[] outputImageData = getDataFromImage(outputImage);
 
@@ -300,6 +312,9 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             validateOpaqueImage(cameraImage, "Opaque image " + i + "from camera: ", maxSize,
                     result);
             mWriter.queueInputImage(cameraImage);
+            // Image should be closed after queueInputImage
+            imageInvalidAccessTestAfterClose(cameraImage,
+                    /*closedPlane*/null, /*closedBuffer*/null);
             outputImage = listenerForWriter.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
             validateOpaqueImage(outputImage, "First Opaque image output by ImageWriter: ",
                     maxSize, result);

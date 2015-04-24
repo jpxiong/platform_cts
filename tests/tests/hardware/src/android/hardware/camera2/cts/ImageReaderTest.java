@@ -34,6 +34,7 @@ import android.hardware.camera2.cts.rs.BitmapUtils;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
+import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.os.ConditionVariable;
 import android.util.Log;
@@ -154,8 +155,8 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     }
 
     /**
-     * Test invalid access of image byte buffers: when an image is closed, further access
-     * of the image byte buffers will get an IllegalStateException. The basic assumption of
+     * Test invalid access of image after an image is closed, further access
+     * of the image will get an IllegalStateException. The basic assumption of
      * this test is that the ImageReader always gives direct byte buffer, which is always true
      * for camera case. For if the produced image byte buffer is not direct byte buffer, there
      * is no guarantee to get an ISE for this invalid access case.
@@ -166,16 +167,12 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "Testing invalid image access for Camera " + id);
                 openDevice(id);
-                bufferAccessAfterRelease();
-                fail("ImageReader should throw IllegalStateException when accessing a byte buffer"
-                        + " after the image is closed");
-            } catch (IllegalStateException e) {
-                // Expected.
+                invalidAccessTestAfterClose();
             } finally {
                 closeDevice(id);
+                closeDefaultImageReader();
             }
         }
-
     }
 
     /**
@@ -596,34 +593,27 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         }
     }
 
-    /**
-     * Test buffer access after release, YUV420_888 single capture is tested. This method
-     * should throw ISE.
-     */
-    private void bufferAccessAfterRelease() throws Exception {
+    private void invalidAccessTestAfterClose() throws Exception {
         final int FORMAT = ImageFormat.YUV_420_888;
         Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(FORMAT,
                 StaticMetadata.StreamDirection.Output);
+        Image img = null;
+        // Create ImageReader.
+        mListener = new SimpleImageListener();
+        createDefaultImageReader(availableSizes[0], FORMAT, MAX_NUM_IMAGES, mListener);
 
-        try {
-            // Create ImageReader.
-            mListener = new SimpleImageListener();
-            createDefaultImageReader(availableSizes[0], FORMAT, MAX_NUM_IMAGES, mListener);
+        // Start capture.
+        CaptureRequest request = prepareCaptureRequest();
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
+        startCapture(request, /* repeating */false, listener, mHandler);
 
-            // Start capture.
-            CaptureRequest request = prepareCaptureRequest();
-            SimpleCaptureCallback listener = new SimpleCaptureCallback();
-            startCapture(request, /* repeating */false, listener, mHandler);
+        mListener.waitForAnyImageAvailable(CAPTURE_WAIT_TIMEOUT_MS);
+        img = mReader.acquireNextImage();
+        Plane firstPlane = img.getPlanes()[0];
+        ByteBuffer buffer = firstPlane.getBuffer();
+        img.close();
 
-            mListener.waitForAnyImageAvailable(CAPTURE_WAIT_TIMEOUT_MS);
-            Image img = mReader.acquireNextImage();
-            ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-            img.close();
-
-            byte data = buffer.get(); // An ISE should be thrown here.
-        } finally {
-            closeDefaultImageReader();
-        }
+        imageInvalidAccessTestAfterClose(img, firstPlane, buffer);
     }
 
     private void bufferFormatTestByCamera(int format, boolean repeating) throws Exception {
