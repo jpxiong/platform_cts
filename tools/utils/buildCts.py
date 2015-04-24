@@ -154,11 +154,14 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'PDK')
 
     flaky_tests = BuildCtsFlakyTestList()
+    releasekey_tests = BuildListForReleaseBuildTest()
 
     # CTS Stable plan
     plan = tools.TestPlan(packages)
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-stable')
 
@@ -183,7 +186,10 @@ class CtsBuilder(object):
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-small')
+    self.__WritePlan(plan, 'CTS-public-small')
 
     # CTS - sub plan for public, medium size tests
     plan = tools.TestPlan(packages)
@@ -193,7 +199,10 @@ class CtsBuilder(object):
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-kitkat-medium')
+    self.__WritePlan(plan, 'CTS-public-medium')
 
     # CTS - sub plan for hardware tests which is public, large
     plan = tools.TestPlan(packages)
@@ -201,6 +210,8 @@ class CtsBuilder(object):
     plan.Include(r'android\.hardware$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-hardware')
 
@@ -212,6 +223,8 @@ class CtsBuilder(object):
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-media')
 
     # CTS - sub plan for mediastress tests which is public, large
@@ -220,6 +233,8 @@ class CtsBuilder(object):
     plan.Include(r'android\.mediastress$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-mediastress')
 
@@ -231,9 +246,17 @@ class CtsBuilder(object):
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-l-tests')
 
-    #CTS - sub plan for new test packages added for staging
+    # CTS - sub plan for tests in drawelement packages
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(r'com\.drawelements\.')
+    self.__WritePlan(plan, 'CTS-DEQP')
+
+    # CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
     for package, test_list in small_tests.iteritems():
       plan.Exclude(package+'$')
@@ -241,6 +264,7 @@ class CtsBuilder(object):
       plan.Exclude(package+'$')
     for package, tests_list in new_test_packages.iteritems():
       plan.Exclude(package+'$')
+    plan.Exclude(r'com\.drawelements\.')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
     plan.Exclude(r'android\.view$')
@@ -248,12 +272,9 @@ class CtsBuilder(object):
     plan.Exclude(r'com\.android\.cts\.browserbench')
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    for package, test_list in releasekey_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
-
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    plan.Include(r'com\.drawelements\.')
-    self.__WritePlan(plan, 'CTS-DEQP')
 
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
@@ -372,23 +393,33 @@ def BuildCtsVettedNewPackagesList():
       'android.tv' : [],
       'android.uiautomation' : [],
       'android.uirendering' : [],
-      'android.webgl' : [],
-      'com.drawelements.deqp.egl' : [],
-      'com.drawelements.deqp.gles2' : [],
-      'com.drawelements.deqp.gles3' : [],
-      'com.drawelements.deqp.gles31' : []}
+      'android.webgl' : []}
 
-def BuildCtsFlakyTestList():
+def BuildListForReleaseBuildTest():
   """ Construct a defaultdict that maps package name to a list of tests
-      that are known to be flaky in the lab or not passing on userdebug builds. """
+      that are expected to pass only when running against a user/release-key build. """
   return {
       'android.app' : [
           'android.app.cts.ActivityManagerTest#testIsRunningInTestHarness',],
+      'android.dpi' : [
+          'android.dpi.cts.DefaultManifestAttributesSdkTest#testPackageHasExpectedSdkVersion',],
       'android.host.security' : [
           'android.cts.security.SELinuxHostTest#testAllEnforcing',
           'android.cts.security.SELinuxHostTest#testSuDomain',],
-      'android.dpi' : [
-          'android.dpi.cts.DefaultManifestAttributesSdkTest#testPackageHasExpectedSdkVersion',],
+      'android.os' : [
+          'android.os.cts.BuildVersionTest#testReleaseVersion',
+          'android.os.cts.BuildTest#testIsSecureUserBuild',],
+      'android.security' : [
+          'android.security.cts.BannedFilesTest#testNoSu',
+          'android.security.cts.BannedFilesTest#testNoSuInPath',
+          'android.security.cts.PackageSignatureTest#testPackageSignatures',
+          'android.security.cts.SELinuxDomainTest#testSuDomain',],
+      '' : []}
+
+def BuildCtsFlakyTestList():
+  """ Construct a defaultdict that maps package name to a list of tests
+      that flaky during dev cycle and cause other subsequent tests to fail. """
+  return {
       'android.hardware' : [
           'android.hardware.cts.CameraTest#testVideoSnapshot',
           'android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata',
@@ -406,15 +437,9 @@ def BuildCtsFlakyTestList():
           'android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping',
           'android.net.cts.TrafficStatsTest#testTrafficStatsForLocalhost',
           'android.net.wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',],
-      'android.os' : [
-          'android.os.cts.BuildVersionTest#testReleaseVersion',
-          'android.os.cts.BuildTest#testIsSecureUserBuild',],
       'android.security' : [
-          'android.security.cts.BannedFilesTest#testNoSu',
-          'android.security.cts.BannedFilesTest#testNoSuInPath',
           'android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports',
-          'android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',
-          'android.security.cts.PackageSignatureTest#testPackageSignatures',],
+          'android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',],
       'android.webkit' : [
           'android.webkit.cts.WebViewClientTest#testOnUnhandledKeyEvent',],
       'com.android.cts.filesystemperf' : [
