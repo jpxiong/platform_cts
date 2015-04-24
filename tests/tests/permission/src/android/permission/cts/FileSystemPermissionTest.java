@@ -164,18 +164,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     @MediumTest
     public void testDevMemSane() throws Exception {
         File f = new File("/dev/mem");
-        assertFalse(f.canRead());
-        assertFalse(f.canWrite());
-        assertFalse(f.canExecute());
         assertFalse(f.exists());
     }
 
     @MediumTest
     public void testDevkmemSane() throws Exception {
         File f = new File("/dev/kmem");
-        assertFalse(f.canRead());
-        assertFalse(f.canWrite());
-        assertFalse(f.canExecute());
         assertFalse(f.exists());
     }
 
