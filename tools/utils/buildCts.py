@@ -281,7 +281,7 @@ def BuildAospMediumSizeTestList():
       'com.android.cts.browserbench' : []}
 
 def BuildAospSmallSizeTestList():
-  """ Construct a defaultdict that lists packages names of small tests
+  """ Construct a default dict that lists packages names of small tests
       already published to aosp. """
   return {
       'android.aadb' : [],
@@ -383,42 +383,43 @@ def BuildCtsFlakyTestList():
       that are known to be flaky in the lab or not passing on userdebug builds. """
   return {
       'android.app' : [
-          'cts.ActivityManagerTest#testIsRunningInTestHarness',],
+          'android.app.cts.ActivityManagerTest#testIsRunningInTestHarness',],
+      'android.host.security' : [
+          'android.cts.security.SELinuxHostTest#testAllEnforcing',
+          'android.cts.security.SELinuxHostTest#testSuDomain',],
       'android.dpi' : [
-          'cts.DefaultManifestAttributesSdkTest#testPackageHasExpectedSdkVersion',],
+          'android.dpi.cts.DefaultManifestAttributesSdkTest#testPackageHasExpectedSdkVersion',],
       'android.hardware' : [
-          'cts.CameraTest#testVideoSnapshot',
-          'cts.CameraGLTest#testCameraToSurfaceTextureMetadata',
-          'cts.CameraGLTest#testSetPreviewTextureBothCallbacks',
-          'cts.CameraGLTest#testSetPreviewTexturePreviewCallback',],
+          'android.hardware.cts.CameraTest#testVideoSnapshot',
+          'android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata',
+          'android.hardware.cts.CameraGLTest#testSetPreviewTextureBothCallbacks',
+          'android.hardware.cts.CameraGLTest#testSetPreviewTexturePreviewCallback',],
       'android.media' : [
-          'cts.DecoderTest#testCodecResetsH264WithSurface',
-          'cts.StreamingMediaPlayerTest#testHLS',],
+          'android.media.cts.DecoderTest#testCodecResetsH264WithSurface',
+          'android.media.cts.StreamingMediaPlayerTest#testHLS',],
       'android.net' : [
-          'cts.ConnectivityManagerTest#testStartUsingNetworkFeature_enableHipri',
-          'cts.DnsTest#testDnsWorks',
-          'cts.SSLCertificateSocketFactoryTest#testCreateSocket',
-          'cts.SSLCertificateSocketFactoryTest#test_createSocket_bind',
-          'cts.SSLCertificateSocketFactoryTest#test_createSocket_simple',
-          'cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping',
-          'cts.TrafficStatsTest#testTrafficStatsForLocalhost',
-          'wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',],
+          'android.net.cts.ConnectivityManagerTest#testStartUsingNetworkFeature_enableHipri',
+          'android.net.cts.DnsTest#testDnsWorks',
+          'android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket',
+          'android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind',
+          'android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple',
+          'android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping',
+          'android.net.cts.TrafficStatsTest#testTrafficStatsForLocalhost',
+          'android.net.wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly',],
       'android.os' : [
-          'cts.BuildVersionTest#testReleaseVersion',
-          'cts.BuildTest#testIsSecureUserBuild',],
+          'android.os.cts.BuildVersionTest#testReleaseVersion',
+          'android.os.cts.BuildTest#testIsSecureUserBuild',],
       'android.security' : [
-          'cts.BannedFilesTest#testNoSu',
-          'cts.BannedFilesTest#testNoSuInPath',
-          'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports',
-          'cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',
-          'cts.PackageSignatureTest#testPackageSignatures',
-          'cts.SELinuxDomainTest#testSuDomain',
-          'cts.SELinuxHostTest#testAllEnforcing',],
+          'android.security.cts.BannedFilesTest#testNoSu',
+          'android.security.cts.BannedFilesTest#testNoSuInPath',
+          'android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports',
+          'android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts',
+          'android.security.cts.PackageSignatureTest#testPackageSignatures',],
       'android.webkit' : [
-          'cts.WebViewClientTest#testOnUnhandledKeyEvent',],
+          'android.webkit.cts.WebViewClientTest#testOnUnhandledKeyEvent',],
       'com.android.cts.filesystemperf' : [
-          'RandomRWTest#testRandomRead',
-          'RandomRWTest#testRandomUpdate',],
+          'com.android.cts.filesystemperf.RandomRWTest#testRandomRead',
+          'com.android.cts.filesystemperf.RandomRWTest#testRandomUpdate',],
       '' : []}
 
 def LogGenerateDescription(name):
