@@ -1227,7 +1227,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         // constant for test
         final String TEST_NAME = "testGetMinBufferSizeTooHighSR";
         // FIXME need an API to retrieve AudioTrack.SAMPLE_RATE_HZ_MAX
-        final int TEST_SR = 96001;
+        final int TEST_SR = 192001;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_8BIT;
 
@@ -1479,12 +1479,14 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                 AudioFormat.ENCODING_PCM_16BIT,
                 AudioFormat.ENCODING_PCM_FLOAT,
         };
+        // due to downmixer algorithmic latency, source channels greater than 2 may
+        // sound shorter in duration at 4kHz sampling rate.
         final int TEST_SR_ARRAY[] = {
                 4000,
-                22050,
                 44100,
                 48000,
                 96000,
+                192000,
         };
         final int TEST_CONF_ARRAY[] = {
                 AudioFormat.CHANNEL_OUT_MONO,    // 1.0
@@ -1506,72 +1508,81 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                     // -------- initialization --------------
                     final int minBufferSize = AudioTrack.getMinBufferSize(TEST_SR,
                             TEST_CONF, TEST_FORMAT); // in bytes
-                    final int bufferSamples = 12 * minBufferSize
-                            / AudioFormat.getBytesPerSample(TEST_FORMAT);
-                    final int channelCount = Integer.bitCount(TEST_CONF);
-                    final double testFrequency = frequency / channelCount;
                     AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
                             TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
                     assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
-                    boolean hasPlayed = false;
-                    int written = 0;
 
+                    // compute parameters for the source signal data.
+                    final int channelCount = Integer.bitCount(TEST_CONF);
+                    AudioFormat format = track.getFormat();
+                    assertEquals(TEST_NAME, TEST_SR, format.getSampleRate());
+                    assertEquals(TEST_NAME, TEST_CONF, format.getChannelMask());
+                    assertEquals(TEST_NAME, channelCount, format.getChannelCount());
+                    assertEquals(TEST_NAME, TEST_FORMAT, format.getEncoding());
+                    final int sourceSamples = channelCount
+                            * AudioHelper.frameCountFromMsec(500,
+                                    format); // duration of test tones
+                    final double testFrequency = frequency / channelCount;
+
+                    int written = 0;
+                    // For streaming tracks, it's ok to issue the play() command
+                    // before any audio is written.
+                    track.play();
                     // -------- test --------------
+
+                    // samplesPerWrite can be any positive value.
+                    // We prefer this to be a multiple of channelCount so write()
+                    // does not return a short count.
+                    // If samplesPerWrite is very large, it is limited to the data length
+                    // and we simply write (blocking) the entire source data and not even loop.
+                    // We choose a value here which simulates double buffer writes.
+                    final int buffers = 2; // double buffering mode
+                    final int samplesPerWrite =
+                            (track.getNativeFrameCount() / buffers) * channelCount;
                     switch (TEST_FORMAT) {
                     case AudioFormat.ENCODING_PCM_8BIT: {
                         byte data[] = createSoundDataInByteArray(
-                                bufferSamples, TEST_SR,
+                                sourceSamples, TEST_SR,
                                 testFrequency);
                         while (written < data.length) {
-                            int ret = track.write(data, written,
-                                    Math.min(data.length - written, minBufferSize));
-                            assertTrue(TEST_NAME, ret >= 0);
+                            int samples = Math.min(data.length - written, samplesPerWrite);
+                            int ret = track.write(data, written, samples);
+                            assertEquals(TEST_NAME, samples, ret);
                             written += ret;
-                            if (!hasPlayed) {
-                                track.play();
-                                hasPlayed = true;
-                            }
                         }
                         } break;
                     case AudioFormat.ENCODING_PCM_16BIT: {
                         short data[] = createSoundDataInShortArray(
-                                bufferSamples, TEST_SR,
+                                sourceSamples, TEST_SR,
                                 testFrequency);
                         while (written < data.length) {
-                            int ret = track.write(data, written,
-                                    Math.min(data.length - written, minBufferSize));
-                            assertTrue(TEST_NAME, ret >= 0);
+                            int samples = Math.min(data.length - written, samplesPerWrite);
+                            int ret = track.write(data, written, samples);
+                            assertEquals(TEST_NAME, samples, ret);
                             written += ret;
-                            if (!hasPlayed) {
-                                track.play();
-                                hasPlayed = true;
-                            }
                         }
                         } break;
                     case AudioFormat.ENCODING_PCM_FLOAT: {
                         float data[] = createSoundDataInFloatArray(
-                                bufferSamples, TEST_SR,
+                                sourceSamples, TEST_SR,
                                 testFrequency);
                         while (written < data.length) {
-                            int ret = track.write(data, written,
-                                    Math.min(data.length - written, minBufferSize),
+                            int samples = Math.min(data.length - written, samplesPerWrite);
+                            int ret = track.write(data, written, samples,
                                     AudioTrack.WRITE_BLOCKING);
-                            assertTrue(TEST_NAME, ret >= 0);
+                            assertEquals(TEST_NAME, samples, ret);
                             written += ret;
-                            if (!hasPlayed) {
-                                track.play();
-                                hasPlayed = true;
-                            }
                         }
                         } break;
                     }
 
-                    Thread.sleep(WAIT_MSEC);
+                    // For streaming tracks, AudioTrack.stop() doesn't immediately stop playback.
+                    // Rather, it allows the remaining data in the internal buffer to drain.
                     track.stop();
-                    Thread.sleep(WAIT_MSEC);
+                    Thread.sleep(WAIT_MSEC); // wait for the data to drain.
                     // -------- tear down --------------
                     track.release();
-                    frequency += 70; // increment test tone frequency
+                    frequency += 50; // increment test tone frequency
                 }
             }
         }
@@ -1614,8 +1625,6 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                     TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
                             assertTrue(TEST_NAME,
                                     track.getState() == AudioTrack.STATE_INITIALIZED);
-                            boolean hasPlayed = false;
-                            int written = 0;
                             ByteBuffer bb = (useDirect == 1)
                                     ? ByteBuffer.allocateDirect(bufferSize)
                                             : ByteBuffer.allocate(bufferSize);
@@ -1648,6 +1657,8 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                 } break;
                             }
 
+                            boolean hasPlayed = false;
+                            int written = 0;
                             while (written < bufferSize) {
                                 int ret = track.write(bb,
                                         Math.min(bufferSize - written, minBufferSize),
@@ -1660,7 +1671,6 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                 }
                             }
 
-                            Thread.sleep(WAIT_MSEC);
                             track.stop();
                             Thread.sleep(WAIT_MSEC);
                             // -------- tear down --------------
