@@ -133,6 +133,17 @@ def raw10(props):
     """
     return len(its.objects.get_available_output_sizes("raw10", props)) > 0
 
+def raw12(props):
+    """Returns whether a device supports RAW12 output.
+
+    Args:
+        props: Camera properties object.
+
+    Returns:
+        Boolean.
+    """
+    return len(its.objects.get_available_output_sizes("raw12", props)) > 0
+
 def sensor_fusion(props):
     """Returns whether the camera and motion sensor timestamps for the device
     are in the same time domain and can be compared directly.
