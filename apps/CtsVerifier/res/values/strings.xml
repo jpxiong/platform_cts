@@ -1038,7 +1038,8 @@
         Location Provider API when the device is in High Accuracy location mode.
     </string>
     <string name="location_mode_select_high_accuracy">
-        Please select the \"High accuracy\" mode at Settings > Location and return here.
+        Please select the \"High accuracy\" mode at Settings > Location
+        (hint: tap the "Mode" item) and return here.
     </string>
     <string name="location_mode_battery_saving_test">Battery Saving Mode Test</string>
     <string name="location_mode_battery_saving_info">
@@ -1046,7 +1047,8 @@
         Location Provider API when the device is in Battery Saving location mode.
     </string>
     <string name="location_mode_select_battery_saving">
-        Please select the \"Battery Saving\" mode at Settings > Location and return here.
+        Please select the \"Battery Saving\" mode at Settings > Location
+        (hint: tap the "Mode" item) and return here.
     </string>
     <string name="location_mode_device_only_test">Device Only Mode Test</string>
     <string name="location_mode_device_only_info">
@@ -1055,7 +1057,7 @@
     </string>
     <string name="location_mode_select_device_only">
         Please select the \"Device Only\" mode at
-        Settings > Location and return here.
+        Settings > Location (hint: tap the "Mode" item) and return here.
     </string>
     <string name="location_mode_off_test">Location Mode Off Test</string>
     <string name="location_mode_off_info">
