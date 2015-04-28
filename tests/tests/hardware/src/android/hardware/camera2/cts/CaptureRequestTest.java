@@ -2025,12 +2025,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         validatePipelineDepth(result);
     }
 
-    private <T> T getValueNotNull(CaptureResult result, CaptureResult.Key<T> key) {
-        T value = result.get(key);
-        assertNotNull("Value of Key " + key.getName() + " shouldn't be null", value);
-        return value;
-    }
-
     /**
      * Basic verification for the control mode capture result.
      *

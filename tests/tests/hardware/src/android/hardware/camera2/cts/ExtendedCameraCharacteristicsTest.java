@@ -358,9 +358,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
         int counter = 0;
         final float SIZE_ERROR_MARGIN = 0.03f;
         for (CameraCharacteristics c : mCharacteristics) {
-            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-            assertNotNull("android.request.availableCapabilities must never be null",
-                    actualCapabilities);
+            int[] actualCapabilities = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
 
             // Check if the burst capability is defined
             boolean haveBurstCapability = arrayContains(actualCapabilities,
@@ -370,7 +369,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assertNotNull(String.format("No stream configuration map found for: ID %s",
                     mIds[counter]), config);
-            Rect activeRect = c.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            Rect activeRect = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
             Size sensorSize = new Size(activeRect.width(), activeRect.height());
 
             // Ensure that max YUV size matches max JPEG size
@@ -389,8 +389,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                      maxYuvSize.getHeight() >= sensorSize.getHeight() * (1.0 - SIZE_ERROR_MARGIN));
 
             // No need to do null check since framework will generate the key if HAL don't supply
-            boolean haveAeLock = c.get(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
-            boolean haveAwbLock = c.get(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
+            boolean haveAeLock = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
+            boolean haveAwbLock = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
 
             // Ensure that YUV output is fast enough - needs to be at least 20 fps
 
@@ -402,7 +404,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
             // Ensure that there's an FPS range that's fast enough to capture at above
             // minFrameDuration, for full-auto bursts
-            Range[] fpsRanges = c.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            Range[] fpsRanges = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
             float minYuvFps = 1.f / maxYuvRate;
 
             boolean haveFastAeTargetFps = false;
@@ -512,6 +515,13 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                         !supportYUV || arrayContains(inputFormats, ImageFormat.YUV_420_888));
                 assertTrue("PRIVATE input must be supported for OPAQUE reprocessing",
                         !supportOpaque || arrayContains(inputFormats, ImageFormat.PRIVATE));
+
+                // max capture stall must be reported if one of the reprocessing is supported.
+                final int MAX_ALLOWED_STALL_FRAMES = 4;
+                Integer maxCaptureStall = c.get(CameraCharacteristics.REPROCESS_MAX_CAPTURE_STALL);
+                assertTrue("max capture stall must be non-null and no larger than "
+                        + MAX_ALLOWED_STALL_FRAMES,
+                        maxCaptureStall != null && maxCaptureStall <= MAX_ALLOWED_STALL_FRAMES);
 
                 for (int input : inputFormats) {
                     // Verify mandatory output formats are supported
