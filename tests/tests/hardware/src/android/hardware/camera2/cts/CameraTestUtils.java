@@ -61,10 +61,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
@@ -284,6 +286,35 @@ public class CameraTestUtils extends Assert {
         }
     }
 
+    public static class SimpleImageWriterListener implements ImageWriter.ImageListener {
+        private final Semaphore mImageReleasedSema = new Semaphore(0);
+        private final ImageWriter mWriter;
+        @Override
+        public void onInputImageReleased(ImageWriter writer) {
+            if (writer != mWriter) {
+                return;
+            }
+
+            if (VERBOSE) {
+                Log.v(TAG, "Input image is released");
+            }
+            mImageReleasedSema.release();
+        }
+
+        public SimpleImageWriterListener(ImageWriter writer) {
+            if (writer == null) {
+                throw new IllegalArgumentException("writer cannot be null");
+            }
+            mWriter = writer;
+        }
+
+        public void waitForImageReleased(long timeoutMs) throws InterruptedException {
+            if (!mImageReleasedSema.tryAcquire(timeoutMs, TimeUnit.MILLISECONDS)) {
+                fail("wait for image available timed out after " + timeoutMs + "ms");
+            }
+        }
+    }
+
     public static class SimpleCaptureCallback extends CameraCaptureSession.CaptureCallback {
         private final LinkedBlockingQueue<TotalCaptureResult> mQueue =
                 new LinkedBlockingQueue<TotalCaptureResult>();
@@ -391,16 +422,63 @@ public class CameraTestUtils extends Assert {
          */
         public TotalCaptureResult getTotalCaptureResultForRequest(CaptureRequest myRequest,
                 int numResultsWait) {
+            ArrayList<CaptureRequest> captureRequests = new ArrayList<>(1);
+            captureRequests.add(myRequest);
+            return getTotalCaptureResultsForRequests(captureRequests, numResultsWait)[0];
+        }
+
+        /**
+         * Get an array of {@link #TotalCaptureResult total capture results} for a given list of
+         * {@link #CaptureRequest capture requests}. This can be used when the order of results
+         * may not the same as the order of requests.
+         *
+         * @param captureRequests The list of {@link #CaptureRequest capture requests} whose
+         *            corresponding {@link #TotalCaptureResult capture results} are
+         *            being waited for.
+         * @param numResultsWait Number of frames to wait for the capture results
+         *            before timeout.
+         * @throws TimeoutRuntimeException If more than numResultsWait results are
+         *            seen before all the results matching captureRequests arrives.
+         */
+        public TotalCaptureResult[] getTotalCaptureResultsForRequests(
+                List<CaptureRequest> captureRequests, int numResultsWait) {
             if (numResultsWait < 0) {
                 throw new IllegalArgumentException("numResultsWait must be no less than 0");
             }
+            if (captureRequests == null || captureRequests.size() == 0) {
+                throw new IllegalArgumentException("captureRequests must have at least 1 request.");
+            }
 
-            TotalCaptureResult result;
+            // Create a request -> a list of result indices map that it will wait for.
+            HashMap<CaptureRequest, ArrayList<Integer>> remainingResultIndicesMap = new HashMap<>();
+            for (int i = 0; i < captureRequests.size(); i++) {
+                CaptureRequest request = captureRequests.get(i);
+                ArrayList<Integer> indices = remainingResultIndicesMap.get(request);
+                if (indices == null) {
+                    indices = new ArrayList<>();
+                    remainingResultIndicesMap.put(request, indices);
+                }
+                indices.add(i);
+            }
+
+            TotalCaptureResult[] results = new TotalCaptureResult[captureRequests.size()];
             int i = 0;
             do {
-                result = getTotalCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
-                if (result.getRequest().equals(myRequest)) {
-                    return result;
+                TotalCaptureResult result = getTotalCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+                CaptureRequest request = result.getRequest();
+                ArrayList<Integer> indices = remainingResultIndicesMap.get(request);
+                if (indices != null) {
+                    results[indices.get(0)] = result;
+                    indices.remove(0);
+
+                    // Remove the entry if all results for this request has been fulfilled.
+                    if (indices.isEmpty()) {
+                        remainingResultIndicesMap.remove(request);
+                    }
+                }
+
+                if (remainingResultIndicesMap.isEmpty()) {
+                    return results;
                 }
             } while (i++ < numResultsWait);
 
