@@ -274,6 +274,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
     }
 
+    // Audit modes work best with non-blocking mode
     public void testAudioRecordAuditByteBufferResamplerStereoFloat() throws Exception {
         doTest("AuditByteBufferResamplerStereoFloat",
                 false /*localRecord*/, true /*customHandler*/,
@@ -289,6 +290,17 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 false /*useByteBuffer*/, false /*blocking*/,
                 true /*auditRecording*/, true /*isChannelIndex*/, 47000 /*TEST_SR*/,
                 (1 << 0) /* 1 channel */, AudioFormat.ENCODING_PCM_FLOAT);
+    }
+
+    // Audit buffers can run out of space with high sample rate,
+    // so keep the channels and pcm encoding low
+    public void testAudioRecordAuditChannelIndex2() throws Exception {
+        doTest("AuditChannelIndex2", true /*localRecord*/, true /*customHandler*/,
+                2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
+                false /*useByteBuffer*/, false /*blocking*/,
+                true /*auditRecording*/, true /*isChannelIndex*/, 192000 /*TEST_SR*/,
+                (1 << 0) | (1 << 2) /* 2 channels, gap in middle */,
+                AudioFormat.ENCODING_PCM_8BIT);
     }
 
     // Audit buffers can run out of space with high numbers of channels,
@@ -404,7 +416,8 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int numChannels =  AudioFormat.channelCountFromInChannelMask(TEST_CONF);
         final int bytesPerSample = AudioFormat.getBytesPerSample(TEST_FORMAT);
         final int bytesPerFrame = numChannels * bytesPerSample;
-        final int targetSamples = TEST_TIME_MS * TEST_SR * numChannels / 1000;
+        // careful about integer overflow in the formula below:
+        final int targetSamples = (int)((long)TEST_TIME_MS * TEST_SR * numChannels / 1000);
         final int BUFFER_FRAMES = 512;
         final int BUFFER_SAMPLES = BUFFER_FRAMES * numChannels;
         // TODO: verify behavior when buffer size is not a multiple of frame size.
