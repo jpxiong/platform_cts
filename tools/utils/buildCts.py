@@ -260,6 +260,8 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.drawelements\.')
+    # STOPSHIP(jpoyry): Do not ship with reduced test plan to avoid confusion of having multiple
+    #                   different deqp sets in different plans.
     plan.ExcludeTests('com.drawelements.deqp.gles3', ReadFileLines(os.path.join(self.test_root, 'deqp/gles3-temporary-failures.txt')))
     plan.ExcludeTests('com.drawelements.deqp.gles31', ReadFileLines(os.path.join(self.test_root, 'deqp/gles31-temporary-failures.txt')))
     self.__WritePlan(plan, 'CTS-DEQP')
