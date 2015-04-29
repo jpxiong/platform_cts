@@ -230,7 +230,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("ResamplerResamplerMono8Bit", true /*localRecord*/, false /*customHandler*/,
                 1 /*periodsPerSecond*/, 1 /*markerPeriodsPerSecond*/,
                 false /*useByteBuffer*/,  false /*blocking*/,
-                false /*auditRecording*/, 88200 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 88200 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_8BIT);
     }
 
@@ -238,7 +238,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("ResamplerStereo8Bit", true /*localRecord*/, false /*customHandler*/,
                 0 /*periodsPerSecond*/, 3 /*markerPeriodsPerSecond*/,
                 true /*useByteBuffer*/,  true /*blocking*/,
-                false /*auditRecording*/, 45000 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 45000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_8BIT);
     }
 
@@ -246,7 +246,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("LocalMono16Bit", true /*localRecord*/, false /*customHandler*/,
                 30 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/,
                 false /*useByteBuffer*/, true /*blocking*/,
-                false /*auditRecording*/, 8000 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 8000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
     }
 
@@ -254,7 +254,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("Stereo16Bit", false /*localRecord*/, false /*customHandler*/,
                 2 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/,
                 false /*useByteBuffer*/, false /*blocking*/,
-                false /*auditRecording*/, 17000 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 17000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
     }
 
@@ -262,7 +262,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("MonoFloat", false /*localRecord*/, true /*customHandler*/,
                 30 /*periodsPerSecond*/, 2 /*markerPeriodsPerSecond*/,
                 false /*useByteBuffer*/, true /*blocking*/,
-                false /*auditRecording*/, 32000 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 32000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_FLOAT);
     }
 
@@ -270,22 +270,65 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         doTest("LocalNonblockingStereoFloat", true /*localRecord*/, true /*customHandler*/,
                 2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
                 false /*useByteBuffer*/, false /*blocking*/,
-                false /*auditRecording*/, 48000 /*TEST_SR*/,
+                false /*auditRecording*/, false /*isChannelIndex*/, 48000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
     }
 
-    public void testAudioRecordByteBufferAuditResamplerStereoFloat() throws Exception {
-        doTest("testAudioRecordByteBufferAuditResamplerStereoFloat",
+    public void testAudioRecordAuditByteBufferResamplerStereoFloat() throws Exception {
+        doTest("AuditByteBufferResamplerStereoFloat",
                 false /*localRecord*/, true /*customHandler*/,
                 2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
                 true /*useByteBuffer*/, false /*blocking*/,
-                true /*auditRecording*/, 96000 /*TEST_SR*/,
+                true /*auditRecording*/, false /*isChannelIndex*/, 96000 /*TEST_SR*/,
                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
+    }
+
+    public void testAudioRecordAuditChannelIndexMonoFloat() throws Exception {
+        doTest("AuditChannelIndexMonoFloat", true /*localRecord*/, true /*customHandler*/,
+                2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
+                false /*useByteBuffer*/, false /*blocking*/,
+                true /*auditRecording*/, true /*isChannelIndex*/, 47000 /*TEST_SR*/,
+                (1 << 0) /* 1 channel */, AudioFormat.ENCODING_PCM_FLOAT);
+    }
+
+    // Audit buffers can run out of space with high numbers of channels,
+    // so keep the sample rate low.
+    public void testAudioRecordAuditChannelIndex5() throws Exception {
+        doTest("AuditChannelIndex5", true /*localRecord*/, true /*customHandler*/,
+                2 /*periodsPerSecond*/, 0 /*markerPeriodsPerSecond*/,
+                false /*useByteBuffer*/, false /*blocking*/,
+                true /*auditRecording*/, true /*isChannelIndex*/, 16000 /*TEST_SR*/,
+                (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4)  /* 5 channels */,
+                AudioFormat.ENCODING_PCM_16BIT);
+    }
+
+    private AudioRecord createAudioRecord(
+            int audioSource, int sampleRateInHz,
+            int channelConfig, int audioFormat, int bufferSizeInBytes,
+            boolean auditRecording, boolean isChannelIndex) {
+        if (auditRecording) {
+            return new AudioHelper.AudioRecordAudit(
+                    audioSource, sampleRateInHz, channelConfig,
+                    audioFormat, bufferSizeInBytes, isChannelIndex);
+        } else if (isChannelIndex) {
+            return new AudioRecord.Builder()
+                    .setAudioFormat(new AudioFormat.Builder()
+                            .setChannelIndexMask(channelConfig)
+                            .setEncoding(audioFormat)
+                            .setSampleRate(sampleRateInHz)
+                            .build())
+                    .setBufferSizeInBytes(bufferSizeInBytes)
+                    .build();
+        } else {
+            return new AudioRecord(audioSource, sampleRateInHz, channelConfig,
+                    audioFormat, bufferSizeInBytes);
+        }
     }
 
     private void doTest(String reportName, boolean localRecord, boolean customHandler,
             int periodsPerSecond, int markerPeriodsPerSecond,
-            boolean useByteBuffer, boolean blocking, boolean auditRecording,
+            boolean useByteBuffer, boolean blocking,
+            final boolean auditRecording, final boolean isChannelIndex,
             final int TEST_SR, final int TEST_CONF, final int TEST_FORMAT) throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -295,7 +338,11 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int TEST_SOURCE = MediaRecorder.AudioSource.DEFAULT;
         mIsHandleMessageCalled = false;
 
-        final int bufferSizeInBytes =
+        // For channelIndex use one frame in bytes for buffer size.
+        // This is adjusted to the minimum buffer size by native code.
+        final int bufferSizeInBytes = isChannelIndex ?
+                (AudioFormat.getBytesPerSample(TEST_FORMAT)
+                        * AudioFormat.channelCountFromInChannelMask(TEST_CONF)) :
                 AudioRecord.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         assertTrue(bufferSizeInBytes > 0);
 
@@ -303,49 +350,26 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final AudioHelper
                 .MakeSomethingAsynchronouslyAndLoop<AudioRecord> makeSomething;
 
-        if (auditRecording) {
-            if (localRecord) {
-                makeSomething = null;
-                record = new AudioHelper.AudioRecordAudit(
-                        TEST_SOURCE,
-                        TEST_SR, TEST_CONF,
-                        TEST_FORMAT, bufferSizeInBytes);
-            } else {
-                makeSomething =
-                        new AudioHelper.MakeSomethingAsynchronouslyAndLoop<AudioRecord>(
-                                new AudioHelper.MakesSomething<AudioRecord>() {
-                                    @Override
-                                    public AudioRecord makeSomething() {
-                                        return new AudioHelper.AudioRecordAudit(
-                                                TEST_SOURCE,
-                                                TEST_SR, TEST_CONF,
-                                                TEST_FORMAT, bufferSizeInBytes);
-                                    }
-                                }
-                                );
-                // create AudioRecord on different thread's looper.
-                record = makeSomething.make();
-            }
+        if (localRecord) {
+            makeSomething = null;
+            record = createAudioRecord(TEST_SOURCE, TEST_SR, TEST_CONF,
+                    TEST_FORMAT, bufferSizeInBytes, auditRecording, isChannelIndex);
         } else {
-            if (localRecord) {
-                makeSomething = null;
-                record = new AudioRecord(TEST_SOURCE, TEST_SR, TEST_CONF,
-                        TEST_FORMAT, bufferSizeInBytes);
-            } else {
-                makeSomething =
-                        new AudioHelper.MakeSomethingAsynchronouslyAndLoop<AudioRecord>(
-                                new AudioHelper.MakesSomething<AudioRecord>() {
-                                    @Override
-                                    public AudioRecord makeSomething() {
-                                        return new AudioRecord(TEST_SOURCE, TEST_SR, TEST_CONF,
-                                                TEST_FORMAT, bufferSizeInBytes);
-                                    }
+            makeSomething =
+                    new AudioHelper.MakeSomethingAsynchronouslyAndLoop<AudioRecord>(
+                            new AudioHelper.MakesSomething<AudioRecord>() {
+                                @Override
+                                public AudioRecord makeSomething() {
+                                    return createAudioRecord(TEST_SOURCE, TEST_SR, TEST_CONF,
+                                            TEST_FORMAT, bufferSizeInBytes, auditRecording,
+                                            isChannelIndex);
                                 }
-                                );
-               // create AudioRecord on different thread's looper.
-               record = makeSomething.make();
-            }
+                            }
+                            );
+           // create AudioRecord on different thread's looper.
+           record = makeSomething.make();
         }
+
         // AudioRecord creation may have silently failed, check state now
         assertEquals(AudioRecord.STATE_INITIALIZED, record.getState());
 
