@@ -132,8 +132,8 @@ public class ActivityManagerMemoryClassTest
     }
 
     private void assertMemoryForScreenDensity(int memoryClass, int screenDensity, int screenSize) {
-        int expectedMinimumMemory = ExpectedMemorySizesClass.getExpectedMemorySize(screenDensity, 
-                                                                                   screenSize);
+        int expectedMinimumMemory = ExpectedMemorySizesClass.getExpectedMemorySize(screenSize,
+                                                                                   screenDensity);
 
         assertTrue("Expected to have at least " + expectedMinimumMemory
                 + "mb of memory for screen density " + screenDensity,
