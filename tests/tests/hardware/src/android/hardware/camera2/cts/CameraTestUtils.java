@@ -968,6 +968,17 @@ public class CameraTestUtils extends Assert {
         return value;
     }
 
+    public static <T> T getValueNotNull(CameraCharacteristics characteristics,
+            CameraCharacteristics.Key<T> key) {
+        if (characteristics == null) {
+            throw new IllegalArgumentException("Camera characteristics must not be null");
+        }
+
+        T value = characteristics.get(key);
+        assertNotNull("Value of Key " + key.getName() + "shouldn't be null", value);
+        return value;
+    }
+
     /**
      * Get a crop region for a given zoom factor and center position.
      * <p>
