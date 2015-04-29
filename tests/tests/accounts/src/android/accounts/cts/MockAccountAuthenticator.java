@@ -35,6 +35,9 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     public static String KEY_ACCOUNT_INFO = "key_account_info";
     public static String KEY_ACCOUNT_AUTHENTICATOR_RESPONSE = "key_account_authenticator_response";
     public static String ACCOUNT_NAME_FOR_NEW_REMOVE_API = "call new removeAccount api";
+    // Key for triggering return intent flow
+    public static String KEY_RETURN_INTENT = "return an intent";
+    public static String ACCOUNT_NAME_FOR_NEW_REMOVE_API1 = "call new removeAccount api";
 
     private final Context mContext;
     AccountAuthenticatorResponse mResponse;
@@ -94,6 +97,16 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         mOptionsConfirmCredentials = null;
         mAccount = null;
         mFeatures = null;
+    }
+
+    public void callAccountAuthenticated() {
+        AccountManager am = AccountManager.get(mContext);
+        am.notifyAccountAuthenticated(mAccount);
+    }
+
+    public void callSetPassword() {
+        AccountManager am = AccountManager.get(mContext);
+        am.setPassword(mAccount, "password");
     }
 
     private Bundle createResultBundle() {
@@ -163,7 +176,13 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         this.mOptionsConfirmCredentials = options;
 
         Bundle result = new Bundle();
-        result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
+        if (options.containsKey(KEY_RETURN_INTENT)) {
+            Intent intent = new Intent();
+            intent.setClassName("android.accounts.cts", "android.accounts.cts.AccountDummyActivity");
+            result.putParcelable(AccountManager.KEY_INTENT, intent);
+        } else {
+            result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
+        }
 
         return result;
     }
