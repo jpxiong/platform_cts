@@ -22,8 +22,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 
-import android.R.attr;
-import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -39,7 +37,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RotateDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Debug;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
@@ -235,6 +232,27 @@ public class LayerDrawableTest extends AndroidTestCase {
             fail("Should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetDrawableByLayerId() {
+        Drawable layer1A  = new ColorDrawable(Color.RED);
+        Drawable layer2A  = new ColorDrawable(Color.BLUE);
+        LayerDrawable layerDrawable = new LayerDrawable(new Drawable[] { layer1A, layer2A });
+        layerDrawable.setId(0, 10);
+        layerDrawable.setId(1, 20);
+
+        Drawable layer1B = new ColorDrawable(Color.GREEN);
+        layer1B.setLevel(10000);
+        Drawable layer2B = new ColorDrawable(Color.YELLOW);
+        layer2B.setLevel(5000);
+        layerDrawable.setDrawableByLayerId(10, layer1B);
+        layerDrawable.setDrawableByLayerId(20, layer2B);
+
+        assertEquals("Level is unchanged after setDrawableByLayerId()",
+                10000, layerDrawable.findDrawableByLayerId(10).getLevel());
+        assertEquals("Level is unchanged after setDrawableByLayerId()",
+                5000, layerDrawable.findDrawableByLayerId(20).getLevel());
     }
 
     @SuppressWarnings("deprecation")
