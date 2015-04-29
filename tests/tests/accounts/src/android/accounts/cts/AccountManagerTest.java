@@ -1063,6 +1063,95 @@ public class AccountManagerTest extends ActivityInstrumentationTestCase2<Account
     }
 
     /**
+     * Tests the setting of lastAuthenticatedTime on adding account
+     */
+    public void testLastAuthenticatedTimeAfterAddAccount() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+        assertTrue(addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD) > 0);
+    }
+
+    /**
+     * Test confirmCredentials() for account not on device. Just that no error
+     * should be thrown.
+     */
+    public void testConfirmCredentialsAccountNotOnDevice() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+
+        Account account = new Account("AccountNotOnThisDevice", ACCOUNT_TYPE);
+        AccountManagerFuture<Bundle> futureBundle = am.confirmCredentials(account,
+                OPTIONS_BUNDLE,
+                mActivity,
+                null /* callback */,
+                null /* handler */);
+
+        futureBundle.getResult();
+    }
+
+    /**
+     * Tests the setting of lastAuthenticatedTime on confirmCredentials being
+     * successful.
+     */
+    public void testLastAuthenticatedTimeAfterConfirmCredentialsSuccess() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+
+        long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
+
+        // Now this confirm credentials call returns true, which in turn
+        // should update the last authenticated timestamp.
+        Bundle result = am.confirmCredentials(ACCOUNT,
+                OPTIONS_BUNDLE, /* options */
+                null, /* activity */
+                null /* callback */,
+                null /* handler */).getResult();
+        long confirmedCredTime = result.getLong(
+                AccountManager.KEY_LAST_AUTHENTICATED_TIME, -1);
+        assertTrue(confirmedCredTime > accountAddTime);
+    }
+
+    /**
+     * Tests the setting of lastAuthenticatedTime on updateCredentials being
+     * successful.
+     */
+    public void testLastAuthenticatedTimeAfterUpdateCredentialsSuccess() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+
+        long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
+
+        am.updateCredentials(ACCOUNT,
+                AUTH_TOKEN_TYPE,
+                OPTIONS_BUNDLE,
+                mActivity,
+                null /* callback */,
+                null /* handler */).getResult();
+        long updateCredTime = getLastAuthenticatedTime(ACCOUNT);
+        assertTrue(updateCredTime > accountAddTime);
+    }
+
+    /**
+     * Tests the setting of lastAuthenticatedTime on accountAuthenticated being
+     * successful.
+     */
+    public void testLastAuthenticatedTimeAfterAccountAuthenticated() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+        long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
+        mockAuthenticator.callAccountAuthenticated();
+        long accountAuthenticatedTime = getLastAuthenticatedTime(ACCOUNT);
+        assertTrue(accountAuthenticatedTime > accountAddTime);
+    }
+
+    /**
+     * Tests the setting of lastAuthenticatedTime on setPassword being
+     * successful.
+     */
+    public void testLastAuthenticatedTimeAfterSetPassword() throws IOException,
+            AuthenticatorException, OperationCanceledException {
+        long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
+        mockAuthenticator.callSetPassword();
+        long setPasswordTime = getLastAuthenticatedTime(ACCOUNT);
+        assertTrue(setPasswordTime > accountAddTime);
+    }
+
+    /**
      * Test confirmCredentials() with callback
      */
     public void testConfirmCredentialsWithCallbackAndHandler() throws IOException,
@@ -1109,11 +1198,11 @@ public class AccountManagerTest extends ActivityInstrumentationTestCase2<Account
                 callback,
                 handler);
 
-        futureBundle.getResult();
+        // futureBundle.getResult();
 
         // Wait with timeout for the callback to do its work
         try {
-            latch.await(LATCH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            latch.await(3 * LATCH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             fail("should not throw an InterruptedException");
         }
@@ -1517,6 +1606,26 @@ public class AccountManagerTest extends ActivityInstrumentationTestCase2<Account
                 getAssertFalseCallback(latch),
                 handler);
         waitForLatch(latch);
+    }
+
+    private long getLastAuthenticatedTime(Account account) throws OperationCanceledException,
+            AuthenticatorException, IOException {
+        Bundle options = new Bundle();
+        options.putBoolean(MockAccountAuthenticator.KEY_RETURN_INTENT, true);
+        // Not really confirming, but a way to get last authenticated timestamp
+        Bundle result = am.confirmCredentials(ACCOUNT,
+                options,// OPTIONS_BUNDLE,
+                null, /* activity */
+                null /* callback */,
+                null /* handler */).getResult();
+        return result.getLong(
+                AccountManager.KEY_LAST_AUTHENTICATED_TIME, -1);
+    }
+
+    private long addAccountAndReturnAccountAddedTime(Account account, String password)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        addAccountExplicitly(account, password, null /* userData */);
+        return getLastAuthenticatedTime(account);
     }
 
     /**
