@@ -720,6 +720,33 @@
                        android:value="android.hardware.sensor.compass" />
         </activity>
 
+        <activity
+            android:name=".sensors.RVCVXCheckTestActivity"
+            android:keepScreenOn="true"
+            android:label="@string/snsr_rvcvxchk_test"
+            android:screenOrientation="locked" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="test_category"
+                android:value="@string/test_category_sensors" />
+            <meta-data
+                android:name="test_required_features"
+                android:value="android.hardware.sensor.accelerometer:android.hardware.sensor.gyroscope:android.hardware.sensor.compass:android.hardware.camera.any" />
+            <meta-data android:name="test_excluded_features"
+                    android:value="android.hardware.type.television" />
+        </activity>
+        <activity
+            android:name=".sensors.RVCVRecordActivity"
+            android:keepScreenOn="true"
+            android:label="@string/snsr_rvcvxchk_test_rec"
+            android:screenOrientation="locked" >
+        </activity>
+
+
         <!-- TODO: enable when a full set of verifications can be implemented -->
         <!--activity android:name=".sensors.RotationVectorTestActivity"
                   android:label="@string/snsr_rot_vec_test"

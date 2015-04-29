@@ -500,6 +500,8 @@
     <string name="snsr_test_skipped">SKIPPED</string>
     <string name="snsr_test_fail">FAIL</string>
     <string name="snsr_execution_time">Test execution time %1$s sec</string>
+    <string name="snsr_rvcvxchk_test">Rotation Vector CV XCheck</string>
+    <string name="snsr_rvcvxchk_test_rec">Rotation Vector CV XCheck Recording</string>
 
     <!-- Strings to interact with users in Sensor Tests -->
     <string name="snsr_test_play_sound">A sound will be played once the verification is complete...</string>
