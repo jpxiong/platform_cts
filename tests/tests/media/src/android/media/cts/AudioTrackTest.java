@@ -2075,7 +2075,18 @@ public class AudioTrackTest extends CtsAndroidTestCase {
 
             int anticipatedPosition = track.getPlaybackHeadPosition();
             for (int j = 0; j < testSteps; ++j) {
+                // set playback settings
+                final float pitch = playbackSettings.getPitch();
+                final float speed = playbackSettings.getSpeed();
+
                 track.setPlaybackSettings(playbackSettings);
+
+                // verify that settings have changed
+                PlaybackSettings checkSettings = track.getPlaybackSettings();
+                assertEquals(TAG, pitch, checkSettings.getPitch());
+                assertEquals(TAG, speed, checkSettings.getSpeed());
+
+                // sleep for playback
                 Thread.sleep(TEST_DELTA_MS);
                 // Log.d(TAG, "position[" + j + "] " + track.getPlaybackHeadPosition());
                 anticipatedPosition +=
