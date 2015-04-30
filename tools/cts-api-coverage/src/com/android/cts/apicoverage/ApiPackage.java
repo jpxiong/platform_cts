@@ -72,6 +72,11 @@ class ApiPackage implements HasCoverage {
         return (float) getNumCoveredMethods() / getTotalMethods() * 100;
     }
 
+    @Override
+    public int getMemberSize() {
+        return getTotalMethods();
+    }
+
     public void removeEmptyAbstractClasses() {
         Iterator<Entry<String, ApiClass>> it = mApiClassMap.entrySet().iterator();
         while (it.hasNext()) {

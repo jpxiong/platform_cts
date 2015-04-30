@@ -121,4 +121,9 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
             return (float) getNumCoveredMethods() / getTotalMethods() * 100;
         }
     }
+
+    @Override
+    public int getMemberSize() {
+        return getTotalMethods();
+    }
 }

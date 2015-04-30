@@ -21,6 +21,7 @@
     <xsl:template match="/">
         <html>
             <head>
+                <title><xsl:value-of select="api-coverage/@title" /></title>
                 <script type="text/javascript">
                     function toggleVisibility(id) {
                         element = document.getElementById(id); 
@@ -87,7 +88,7 @@
                 &nbsp;(<xsl:value-of select="api-coverage/total/@numCovered" />/<xsl:value-of select="api-coverage/total/@numTotal" />)
                 </div>
                 <div class="apks" onclick="toggleVisibility('sourceApks')">
-                    Source APKs (<xsl:value-of select="count(api-coverage/debug/sources/apk)" />)
+                    Source Modules (<xsl:value-of select="count(api-coverage/debug/sources/apk)" />)
                 </div>
                 <div id="sourceApks" style="display: none">
                     <ul>
