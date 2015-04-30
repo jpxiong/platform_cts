@@ -400,9 +400,8 @@ public class TvContractTest extends AndroidTestCase {
             String sortOrder) throws Exception {
         try {
             getContext().getContentResolver().query(uri, projection, null, null, sortOrder);
-            fail("Setting sortOrder should fail without ACCESS_ALL_EPG_DATA permission for " + uri);
         } catch (SecurityException e) {
-            // Expected exception
+            fail("Setting sort order shoud be allowed for " + uri);
         }
     }
 
