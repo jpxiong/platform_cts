@@ -334,4 +334,31 @@ public class MediaUtils {
     public static boolean checkDecoderForFormat(MediaFormat format) {
         return check(canDecode(format), "no decoder for " + format);
     }
+
+    public static MediaExtractor createMediaExtractorForMimeType(
+            Context context, int resourceId, String mimeTypePrefix)
+            throws IOException {
+        MediaExtractor extractor = new MediaExtractor();
+        AssetFileDescriptor afd = context.getResources().openRawResourceFd(resourceId);
+        try {
+            extractor.setDataSource(
+                    afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        } finally {
+            afd.close();
+        }
+        int trackIndex;
+        for (trackIndex = 0; trackIndex < extractor.getTrackCount(); trackIndex++) {
+            MediaFormat trackMediaFormat = extractor.getTrackFormat(trackIndex);
+            if (trackMediaFormat.getString(MediaFormat.KEY_MIME).startsWith(mimeTypePrefix)) {
+                extractor.selectTrack(trackIndex);
+                break;
+            }
+        }
+        if (trackIndex == extractor.getTrackCount()) {
+            extractor.release();
+            throw new IllegalStateException("couldn't get a track for " + mimeTypePrefix);
+        }
+
+        return extractor;
+    }
 }
