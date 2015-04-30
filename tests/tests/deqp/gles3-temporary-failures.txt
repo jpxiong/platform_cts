@@ -1979,6 +1979,7 @@ dEQP-GLES3.functional.shaders.random.all_features.fragment#25
 dEQP-GLES3.functional.shaders.random.all_features.fragment#30
 dEQP-GLES3.functional.shaders.random.all_features.fragment#32
 dEQP-GLES3.functional.shaders.random.all_features.fragment#34
+dEQP-GLES3.functional.shaders.random.all_features.fragment#37
 dEQP-GLES3.functional.shaders.random.all_features.fragment#38
 dEQP-GLES3.functional.shaders.random.all_features.fragment#39
 dEQP-GLES3.functional.shaders.random.all_features.fragment#40
