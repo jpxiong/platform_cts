@@ -105,7 +105,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         String myAppDirectory = getContext().getApplicationInfo().dataDir;
         for (ApplicationInfo app : apps) {
             if (!myAppDirectory.equals(app.dataDir)) {
-                writableDirs.addAll(getWritableDirectoryiesAndSubdirectoriesOf(new File(app.dataDir)));
+                writableDirs.addAll(getWritableDirectoriesAndSubdirectoriesOf(new File(app.dataDir)));
             }
         }
 
@@ -372,7 +372,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     @LargeTest
     public void testAllOtherDirectoriesNotWritable() throws Exception {
         File start = new File("/");
-        Set<File> writableDirs = getWritableDirectoryiesAndSubdirectoriesOf(start);
+        Set<File> writableDirs = getWritableDirectoriesAndSubdirectoriesOf(start);
 
         assertTrue("Found writable directories: " + writableDirs.toString(),
                 writableDirs.isEmpty());
@@ -563,7 +563,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         Set<File> writableDirs = new HashSet<File>();
         for (String dir : OTHER_RANDOM_DIRECTORIES) {
             File start = new File(dir);
-            writableDirs.addAll(getWritableDirectoryiesAndSubdirectoriesOf(start));
+            writableDirs.addAll(getWritableDirectoriesAndSubdirectoriesOf(start));
         }
 
         assertTrue("Found writable directories: " + writableDirs.toString(),
@@ -977,7 +977,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         return retval;
     }
 
-    private Set<File> getWritableDirectoryiesAndSubdirectoriesOf(File dir) throws Exception {
+    private Set<File> getWritableDirectoriesAndSubdirectoriesOf(File dir) throws Exception {
         Set<File> retval = new HashSet<File>();
         if (!dir.isDirectory()) {
             return retval;
@@ -1006,7 +1006,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
 
         for (File f : subFiles) {
-            retval.addAll(getWritableDirectoryiesAndSubdirectoriesOf(f));
+            retval.addAll(getWritableDirectoriesAndSubdirectoriesOf(f));
         }
 
         return retval;
