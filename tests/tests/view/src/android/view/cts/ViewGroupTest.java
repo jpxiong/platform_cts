@@ -36,8 +36,12 @@ import android.test.InstrumentationTestCase;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.ActionMode;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1658,6 +1662,151 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         vg.setStaticTransformationsEnabled(false);
         vg.drawChild(canvas, textView, 100);
         assertFalse(vg.isGetChildStaticTransformationCalled);
+    }
+
+    public void testStartActionModeForChildRespectsSubclassMode() {
+        MockViewGroupSubclass vgParent = new MockViewGroupSubclass(mContext);
+        MockViewGroupSubclass vg = new MockViewGroupSubclass(mContext);
+        vg.shouldReturnOwnTypelessActionMode = true;
+        vgParent.addView(vg);
+        MockTextView textView = new MockTextView(mContext);
+        vg.addView(textView);
+
+        textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK, ActionMode.TYPE_FLOATING);
+
+        assertTrue(vg.isStartActionModeForChildTypedCalled);
+        assertTrue(vg.isStartActionModeForChildTypelessCalled);
+        // Call should not bubble up as we have an intercepting implementation.
+        assertFalse(vgParent.isStartActionModeForChildTypedCalled);
+    }
+
+    public void testStartActionModeForChildTypedBubblesUpToParent() {
+        MockViewGroupSubclass vgParent = new MockViewGroupSubclass(mContext);
+        MockViewGroupSubclass vg = new MockViewGroupSubclass(mContext);
+        vgParent.addView(vg);
+        MockTextView textView = new MockTextView(mContext);
+        vg.addView(textView);
+
+        textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK, ActionMode.TYPE_FLOATING);
+
+        assertTrue(vg.isStartActionModeForChildTypedCalled);
+        assertTrue(vg.isStartActionModeForChildTypelessCalled);
+        assertTrue(vgParent.isStartActionModeForChildTypedCalled);
+    }
+
+    public void testStartActionModeForChildTypelessBubblesUpToParent() {
+        MockViewGroupSubclass vgParent = new MockViewGroupSubclass(mContext);
+        MockViewGroupSubclass vg = new MockViewGroupSubclass(mContext);
+        vgParent.addView(vg);
+        MockTextView textView = new MockTextView(mContext);
+        vg.addView(textView);
+
+        textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK);
+
+        assertTrue(vg.isStartActionModeForChildTypedCalled);
+        assertTrue(vg.isStartActionModeForChildTypelessCalled);
+        assertTrue(vgParent.isStartActionModeForChildTypedCalled);
+    }
+
+    private static final ActionMode.Callback NO_OP_ACTION_MODE_CALLBACK =
+            new ActionMode.Callback() {
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {}
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    return false;
+                }
+            };
+
+    private static final ActionMode NO_OP_ACTION_MODE =
+            new ActionMode() {
+                @Override
+                public void setTitle(CharSequence title) {}
+
+                @Override
+                public void setTitle(int resId) {}
+
+                @Override
+                public void setSubtitle(CharSequence subtitle) {}
+
+                @Override
+                public void setSubtitle(int resId) {}
+
+                @Override
+                public void setCustomView(View view) {}
+
+                @Override
+                public void invalidate() {}
+
+                @Override
+                public void finish() {}
+
+                @Override
+                public Menu getMenu() {
+                    return null;
+                }
+
+                @Override
+                public CharSequence getTitle() {
+                    return null;
+                }
+
+                @Override
+                public CharSequence getSubtitle() {
+                    return null;
+                }
+
+                @Override
+                public View getCustomView() {
+                    return null;
+                }
+
+                @Override
+                public MenuInflater getMenuInflater() {
+                    return null;
+                }
+            };
+
+    private static class MockViewGroupSubclass extends ViewGroup {
+        boolean isStartActionModeForChildTypedCalled = false;
+        boolean isStartActionModeForChildTypelessCalled = false;
+        boolean shouldReturnOwnTypelessActionMode = false;
+
+        public MockViewGroupSubclass(Context context) {
+            super(context);
+        }
+
+        @Override
+        public ActionMode startActionModeForChild(View originalView, ActionMode.Callback callback) {
+            isStartActionModeForChildTypelessCalled = true;
+            if (shouldReturnOwnTypelessActionMode) {
+                return NO_OP_ACTION_MODE;
+            }
+            return super.startActionModeForChild(originalView, callback);
+        }
+
+        @Override
+        public ActionMode startActionModeForChild(
+                View originalView, ActionMode.Callback callback, int type) {
+            isStartActionModeForChildTypedCalled = true;
+            return super.startActionModeForChild(originalView, callback, type);
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            // no-op
+        }
     }
 
     static public int resetRtlPropertiesCount;
