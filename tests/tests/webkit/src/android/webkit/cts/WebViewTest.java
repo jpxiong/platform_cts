@@ -225,6 +225,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         // full address
         assertEquals("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92826",
                 WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92826"));
+        // Zipcode is optional.
+        assertEquals("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA",
+                WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA"));
         // not an address
         assertNull(WebView.findAddress("This is not an address: no town, no state, no zip."));
     }
