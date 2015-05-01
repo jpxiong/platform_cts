@@ -1999,14 +1999,8 @@ public class IntrinsicBLAS extends IntrinsicBase {
             if (cM != cN) {
                 return false;
             }
-            if (TransA != ScriptIntrinsicBLAS.NO_TRANSPOSE) {
-                if (aN != cM) {
-                    return false;
-                }
-            } else {
-                if (aM != cM) {
-                    return false;
-                }
+            if (aM != cM) {
+                return false;
             }
         } else if (A != null && B != null) {
             // A and B only
