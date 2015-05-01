@@ -505,6 +505,16 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewCts
         assertTrue(mSettings.getPluginsEnabled());
     }
 
+    public void testOffscreenPreRaster() {
+        if (!NullWebViewUtils.isWebViewAvailable()) {
+            return;
+        }
+        assertFalse(mSettings.getOffscreenPreRaster());
+
+        mSettings.setOffscreenPreRaster(true);
+        assertTrue(mSettings.getOffscreenPreRaster());
+    }
+
     public void testAccessPluginsPath() {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
