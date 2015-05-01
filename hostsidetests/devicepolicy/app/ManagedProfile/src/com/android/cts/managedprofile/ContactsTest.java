@@ -170,6 +170,17 @@ public class ContactsTest extends AndroidTestCase {
         removeAllTestContactsInProfile();
     }
 
+    public void testSetBluetoothContactSharingDisabled_setterAndGetter() {
+        mDevicePolicyManager.setBluetoothContactSharingDisabled(
+                BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT, false);
+        assertFalse(mDevicePolicyManager.getBluetoothContactSharingDisabled(
+                BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT));
+        mDevicePolicyManager.setBluetoothContactSharingDisabled(
+                BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT, true);
+        assertTrue(mDevicePolicyManager.getBluetoothContactSharingDisabled(
+                BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT));
+    }
+
     private boolean isManagedProfile() {
         String adminPackage = BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT.getPackageName();
         return mDevicePolicyManager.isProfileOwnerApp(adminPackage);
