@@ -694,4 +694,21 @@ public class Camera2SurfaceViewTestCase extends
 
         return null;
     }
+
+    protected boolean isReprocessSupported(String cameraId, int format)
+            throws CameraAccessException {
+        if (format != ImageFormat.YUV_420_888 && format != ImageFormat.PRIVATE) {
+            throw new IllegalArgumentException(
+                    "format " + format + " is not supported for reprocessing");
+        }
+
+        StaticMetadata info =
+                new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
+                                   CheckLevel.ASSERT, /*collector*/ null);
+        int cap = CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING;
+        if (format == ImageFormat.PRIVATE) {
+            cap = CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING;
+        }
+        return info.isCapabilitySupported(cap);
+    }
 }

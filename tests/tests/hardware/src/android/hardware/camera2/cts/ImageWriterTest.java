@@ -201,6 +201,8 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         Image inputImage = null;
         // Image from the second ImageReader.
         Image outputImage = null;
+        assertTrue("ImageWriter max images should be " + MAX_NUM_IMAGES,
+                mWriter.getMaxImages() == MAX_NUM_IMAGES);
         if (format == CAMERA_OPAQUE_FORMAT) {
             assertTrue("First ImageReader should be opaque",
                     mReader.isOpaque());
