@@ -871,6 +871,19 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testSetBluetoothContactSharingDisabled_failIfNotProfileOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetBluetoothContactSharingDisabled_failIfNotProfileOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setBluetoothContactSharingDisabled(mComponent, true);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertProfileOwnerMessage(e.getMessage());
+        }
+    }
+
     public void testSetPermittedInputMethods_failIfNotProfileOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testSetPermittedInputMethods_failIfNotProfileOwner");
