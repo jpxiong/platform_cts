@@ -25,6 +25,11 @@ import java.util.Date;
 import javax.security.auth.x500.X500Principal;
 
 public class KeyPairGeneratorSpecTest extends AndroidTestCase {
+    private static final X500Principal DEFAULT_CERT_SUBJECT = new X500Principal("CN=fake");
+    private static final BigInteger DEFAULT_CERT_SERIAL_NUMBER = new BigInteger("1");
+    private static final Date DEFAULT_CERT_NOT_BEFORE = new Date(0L); // Jan 1 1980
+    private static final Date DEFAULT_CERT_NOT_AFTER = new Date(2461449600000L); // Jan 1 2048
+
     private static final String TEST_ALIAS_1 = "test1";
 
     private static final X500Principal TEST_DN_1 = new X500Principal("CN=test1");
@@ -105,56 +110,44 @@ public class KeyPairGeneratorSpecTest extends AndroidTestCase {
         }
     }
 
-    public void testBuilder_MissingSubjectDN_Failure() throws Exception {
-        try {
-            new KeyPairGeneratorSpec.Builder(getContext())
-                    .setAlias(TEST_ALIAS_1)
-                    .setSerialNumber(SERIAL_1)
-                    .setStartDate(NOW)
-                    .setEndDate(NOW_PLUS_10_YEARS)
-                    .build();
-            fail("Should throw IllegalArgumentException when subject is missing");
-        } catch (IllegalArgumentException expected) {
-        }
+    public void testBuilder_MissingSubjectDN_Success() throws Exception {
+        KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(getContext())
+                .setAlias(TEST_ALIAS_1)
+                .setSerialNumber(SERIAL_1)
+                .setStartDate(NOW)
+                .setEndDate(NOW_PLUS_10_YEARS)
+                .build();
+        assertEquals(DEFAULT_CERT_SUBJECT, spec.getSubjectDN());
     }
 
-    public void testBuilder_MissingSerialNumber_Failure() throws Exception {
-        try {
-            new KeyPairGeneratorSpec.Builder(getContext())
-                    .setAlias(TEST_ALIAS_1)
-                    .setSubject(TEST_DN_1)
-                    .setStartDate(NOW)
-                    .setEndDate(NOW_PLUS_10_YEARS)
-                    .build();
-            fail("Should throw IllegalArgumentException when serialNumber is missing");
-        } catch (IllegalArgumentException expected) {
-        }
+    public void testBuilder_MissingSerialNumber_Success() throws Exception {
+        KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(getContext())
+                .setAlias(TEST_ALIAS_1)
+                .setSubject(TEST_DN_1)
+                .setStartDate(NOW)
+                .setEndDate(NOW_PLUS_10_YEARS)
+                .build();
+        assertEquals(DEFAULT_CERT_SERIAL_NUMBER, spec.getSerialNumber());
     }
 
-    public void testBuilder_MissingStartDate_Failure() throws Exception {
-        try {
-            new KeyPairGeneratorSpec.Builder(getContext())
-                    .setAlias(TEST_ALIAS_1)
-                    .setSubject(TEST_DN_1)
-                    .setSerialNumber(SERIAL_1)
-                    .setEndDate(NOW_PLUS_10_YEARS)
-                    .build();
-            fail("Should throw IllegalArgumentException when startDate is missing");
-        } catch (IllegalArgumentException expected) {
-        }
+    public void testBuilder_MissingStartDate_Success() throws Exception {
+        KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(getContext())
+                .setAlias(TEST_ALIAS_1)
+                .setSubject(TEST_DN_1)
+                .setSerialNumber(SERIAL_1)
+                .setEndDate(NOW_PLUS_10_YEARS)
+                .build();
+        assertEquals(DEFAULT_CERT_NOT_BEFORE, spec.getStartDate());
     }
 
-    public void testBuilder_MissingEndDate_Failure() throws Exception {
-        try {
-            new KeyPairGeneratorSpec.Builder(getContext())
-                    .setAlias(TEST_ALIAS_1)
-                    .setSubject(TEST_DN_1)
-                    .setSerialNumber(SERIAL_1)
-                    .setStartDate(NOW)
-                    .build();
-            fail("Should throw IllegalArgumentException when endDate is missing");
-        } catch (IllegalArgumentException expected) {
-        }
+    public void testBuilder_MissingEndDate_Success() throws Exception {
+        KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(getContext())
+                .setAlias(TEST_ALIAS_1)
+                .setSubject(TEST_DN_1)
+                .setSerialNumber(SERIAL_1)
+                .setStartDate(NOW)
+                .build();
+        assertEquals(DEFAULT_CERT_NOT_AFTER, spec.getEndDate());
     }
 
     public void testBuilder_EndBeforeStart_Failure() throws Exception {
