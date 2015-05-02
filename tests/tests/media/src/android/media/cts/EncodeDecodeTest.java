@@ -209,15 +209,32 @@ public class EncodeDecodeTest extends AndroidTestCase {
      */
     public void testEncodeDecodeVideoFromSurfaceToSurfaceQCIF() throws Throwable {
         setParameters(176, 144, 1000000, MIME_TYPE_AVC, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
     }
     public void testEncodeDecodeVideoFromSurfaceToSurfaceQVGA() throws Throwable {
         setParameters(320, 240, 2000000, MIME_TYPE_AVC, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
     }
     public void testEncodeDecodeVideoFromSurfaceToSurface720p() throws Throwable {
         setParameters(1280, 720, 6000000, MIME_TYPE_AVC, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
+    }
+
+    /**
+     * Tests streaming of AVC video through the encoder and decoder.  Data is provided through
+     * a PersistentSurface and decoded onto a Surface.  The output is checked for validity.
+     */
+    public void testEncodeDecodeVideoFromPersistentSurfaceToSurfaceQCIF() throws Throwable {
+        setParameters(176, 144, 1000000, MIME_TYPE_AVC, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
+    }
+    public void testEncodeDecodeVideoFromPersistentSurfaceToSurfaceQVGA() throws Throwable {
+        setParameters(320, 240, 2000000, MIME_TYPE_AVC, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
+    }
+    public void testEncodeDecodeVideoFromPersistentSurfaceToSurface720p() throws Throwable {
+        setParameters(1280, 720, 6000000, MIME_TYPE_AVC, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
     }
 
     /**
@@ -226,40 +243,77 @@ public class EncodeDecodeTest extends AndroidTestCase {
      */
     public void testVP8EncodeDecodeVideoFromSurfaceToSurfaceQCIF() throws Throwable {
         setParameters(176, 144, 1000000, MIME_TYPE_VP8, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
     }
     public void testVP8EncodeDecodeVideoFromSurfaceToSurfaceQVGA() throws Throwable {
         setParameters(320, 240, 2000000, MIME_TYPE_VP8, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
     }
     public void testVP8EncodeDecodeVideoFromSurfaceToSurface720p() throws Throwable {
         setParameters(1280, 720, 6000000, MIME_TYPE_VP8, true, false);
-        SurfaceToSurfaceWrapper.runTest(this);
+        SurfaceToSurfaceWrapper.runTest(this, false);
+    }
+
+    /**
+     * Tests streaming of VP8 video through the encoder and decoder.  Data is provided through
+     * a PersistentSurface and decoded onto a Surface.  The output is checked for validity.
+     */
+    public void testVP8EncodeDecodeVideoFromPersistentSurfaceToSurfaceQCIF() throws Throwable {
+        setParameters(176, 144, 1000000, MIME_TYPE_VP8, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
+    }
+    public void testVP8EncodeDecodeVideoFromPersistentSurfaceToSurfaceQVGA() throws Throwable {
+        setParameters(320, 240, 2000000, MIME_TYPE_VP8, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
+    }
+    public void testVP8EncodeDecodeVideoFromPersistentSurfaceToSurface720p() throws Throwable {
+        setParameters(1280, 720, 6000000, MIME_TYPE_VP8, true, false);
+        SurfaceToSurfaceWrapper.runTest(this, true);
     }
 
     /** Wraps testEncodeDecodeVideoFromSurfaceToSurface() */
     private static class SurfaceToSurfaceWrapper implements Runnable {
         private Throwable mThrowable;
         private EncodeDecodeTest mTest;
+        private boolean mUsePersistentInput;
 
-        private SurfaceToSurfaceWrapper(EncodeDecodeTest test) {
+        private SurfaceToSurfaceWrapper(EncodeDecodeTest test, boolean persistent) {
             mTest = test;
+            mUsePersistentInput = persistent;
         }
 
         @Override
         public void run() {
+            InputSurface inputSurface = null;
             try {
-                mTest.encodeDecodeVideoFromSurfaceToSurface();
+                if (!mUsePersistentInput) {
+                    mTest.encodeDecodeVideoFromSurfaceToSurface(null);
+                } else {
+                    Log.d(TAG, "creating persistent surface");
+                    inputSurface = new InputSurface(
+                            MediaCodec.createPersistentInputSurface());
+
+                    for (int i = 0; i < 3; i++) {
+                        Log.d(TAG, "test persistent surface - round " + i);
+                        mTest.encodeDecodeVideoFromSurfaceToSurface(inputSurface);
+                    }
+                }
             } catch (Throwable th) {
                 mThrowable = th;
+            } finally {
+                if (inputSurface != null) {
+                    inputSurface.release();
+                }
             }
         }
 
         /**
          * Entry point.
          */
-        public static void runTest(EncodeDecodeTest obj) throws Throwable {
-            SurfaceToSurfaceWrapper wrapper = new SurfaceToSurfaceWrapper(obj);
+        public static void runTest(EncodeDecodeTest obj, boolean persisent)
+                throws Throwable {
+            SurfaceToSurfaceWrapper wrapper =
+                    new SurfaceToSurfaceWrapper(obj, persisent);
             Thread th = new Thread(wrapper, "codec test");
             th.start();
             th.join();
@@ -357,10 +411,10 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * We encode several frames of a video test pattern using MediaCodec, then decode the
      * output with MediaCodec and do some simple checks.
      */
-    private void encodeDecodeVideoFromSurfaceToSurface() throws Exception {
+    private void encodeDecodeVideoFromSurfaceToSurface(InputSurface inSurf) throws Exception {
         MediaCodec encoder = null;
         MediaCodec decoder = null;
-        InputSurface inputSurface = null;
+        InputSurface inputSurface = inSurf;
         OutputSurface outputSurface = null;
 
         mLargestColorDelta = -1;
@@ -402,13 +456,19 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // our desired properties.  Request a Surface to use for input.
             encoder = MediaCodec.createByCodecName(codec);
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            inputSurface = new InputSurface(encoder.createInputSurface());
+            if (inSurf != null) {
+                Log.d(TAG, "using persistent surface");
+                encoder.usePersistentInputSurface(inputSurface.getSurface());
+                inputSurface.updateSize(mWidth, mHeight);
+            } else {
+                inputSurface = new InputSurface(encoder.createInputSurface());
+            }
             encoder.start();
 
             doEncodeDecodeVideoFromSurfaceToSurface(encoder, inputSurface, decoder, outputSurface);
         } finally {
             if (VERBOSE) Log.d(TAG, "releasing codecs");
-            if (inputSurface != null) {
+            if (inSurf == null && inputSurface != null) {
                 inputSurface.release();
             }
             if (outputSurface != null) {
