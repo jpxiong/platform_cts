@@ -71,6 +71,43 @@ public class DeqpTestRunnerTest extends TestCase {
         DEFAULT_INSTANCE_ARGS.iterator().next().put("surfacetype", "window");
     }
 
+    private static class StubRecovery implements DeqpTestRunner.IRecovery {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setSleepProvider(DeqpTestRunner.ISleepProvider sleepProvider) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setDevice(ITestDevice device) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onExecutionProgressed() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void recoverConnectionRefused() throws DeviceNotAvailableException {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void recoverComLinkKilled() throws DeviceNotAvailableException {
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -491,6 +528,125 @@ public class DeqpTestRunnerTest extends TestCase {
             mockListener.testEnded(EasyMock.eq(testIds[i]),
                     EasyMock.<Map<String, String>>notNull());
 
+            EasyMock.expectLastCall().once();
+        }
+
+        mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
+        EasyMock.expectLastCall().once();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+
+        EasyMock.replay(mockDevice, mockIDevice);
+        EasyMock.replay(mockListener);
+
+        deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
+        deqpTest.run(mockListener);
+
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice, mockIDevice);
+    }
+
+    /**
+     * Test running a unexecutable test.
+     */
+    public void testRun_unexecutableTests() throws Exception {
+        final String instrumentationAnswerNoExecs =
+                "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+
+        final TestIdentifier[] testIds = {
+                new TestIdentifier("dEQP-GLES3.missing", "no"),
+                new TestIdentifier("dEQP-GLES3.missing", "nope"),
+                new TestIdentifier("dEQP-GLES3.missing", "donotwant"),
+        };
+
+        final String[] testPaths = {
+                "dEQP-GLES3.missing.no",
+                "dEQP-GLES3.missing.nope",
+                "dEQP-GLES3.missing.donotwant",
+        };
+
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        Map<TestIdentifier, List<Map<String, String>>> instances = new HashMap<>();
+
+        for (TestIdentifier id : testIds) {
+            tests.add(id);
+            instances.put(id, DEFAULT_INSTANCE_ARGS);
+        }
+
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instances);
+        deqpTest.setAbi(UnitTests.ABI);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+                .andReturn(Integer.toString(version)).atLeastOnce();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).andReturn("")
+                .once();
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true), EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName()))))
+                .andReturn(null).once();
+
+        expectRenderConfigQuery(mockDevice, 3, 0);
+
+        String commandLine = String.format(
+                "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable",
+                CASE_LIST_FILE_NAME);
+
+        // first try
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{missing{no,nope,donotwant}}}", commandLine, instrumentationAnswerNoExecs);
+
+        // splitting begins
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{missing{no}}}", commandLine, instrumentationAnswerNoExecs);
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{missing{nope,donotwant}}}", commandLine, instrumentationAnswerNoExecs);
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{missing{nope}}}", commandLine, instrumentationAnswerNoExecs);
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{missing{donotwant}}}", commandLine, instrumentationAnswerNoExecs);
+
+        mockListener.testRunStarted(ID, testPaths.length);
+        EasyMock.expectLastCall().once();
+
+        for (int i = 0; i < testPaths.length; i++) {
+            mockListener.testStarted(EasyMock.eq(testIds[i]));
+            EasyMock.expectLastCall().once();
+
+            mockListener.testFailed(EasyMock.eq(testIds[i]),
+                    EasyMock.eq("=== with config {glformat=rgba8888d24s8,rotation=unspecified,surfacetype=window} ===\n"
+                    + "Abort: Test cannot be executed"));
+            EasyMock.expectLastCall().once();
+
+            mockListener.testEnded(EasyMock.eq(testIds[i]),
+                    EasyMock.<Map<String, String>>notNull());
             EasyMock.expectLastCall().once();
         }
 
@@ -1011,7 +1167,7 @@ public class DeqpTestRunnerTest extends TestCase {
      * Test dEQP with multiple instances
      */
     public void testRun_multipleInstances() throws Exception {
-        final String instrumentationAnswerConfigA =
+        final String instrumentationAnswerConfigAPass1 =
                 "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
@@ -1042,10 +1198,30 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Details=Pass\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=TestCaseResult\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.crashtwo\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"; // early eof
-        final String instrumentationAnswerConfigB =
+        final String instrumentationAnswerConfigAPass2 =
+                "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.crashtwo\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"; // early eof
+        final String instrumentationAnswerConfigBPass1 =
                 "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
@@ -1070,12 +1246,6 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
-                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.crashtwo\r\n"
-                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
-                + "INSTRUMENTATION_STATUS: dEQP-TerminateTestCase-Reason=Magic\r\n"
-                + "INSTRUMENTATION_STATUS: dEQP-EventType=TerminateTestCase\r\n"
-                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
-                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.skipone\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Code=Pass\r\n"
@@ -1087,7 +1257,31 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_CODE: 0\r\n";
-        final String instrumentationAnswerConfigC =
+        final String instrumentationAnswerConfigBPass2 =
+                "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.crashtwo\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TerminateTestCase-Reason=Magic\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=TerminateTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+        final String instrumentationAnswerConfigCPass1 =
                 "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
@@ -1110,6 +1304,24 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=TestCaseResult\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+        final String instrumentationAnswerConfigCPass2 =
+                "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
                 + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=dEQP-GLES3.instances.crashtwo\r\n"
@@ -1186,10 +1398,11 @@ public class DeqpTestRunnerTest extends TestCase {
             tests.add(id);
         }
 
-        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
         ITestInvocationListener mockListener
                 = EasyMock.createStrictMock(ITestInvocationListener.class);
-        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+        IMocksControl orderedControl = EasyMock.createStrictControl();
+        ITestDevice mockDevice = orderedControl.createMock(ITestDevice.class);
+        IDevice mockIDevice = orderedControl.createMock(IDevice.class);
 
         DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instances);
         deqpTest.setAbi(UnitTests.ABI);
@@ -1199,8 +1412,6 @@ public class DeqpTestRunnerTest extends TestCase {
         int version = 3 << 16;
         EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
                 .andReturn(Integer.toString(version)).atLeastOnce();
-        EasyMock.expect(mockDevice.executeShellCommand("pm list features")).andReturn(ALL_FEATURES)
-                .anyTimes();
 
         EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
             andReturn("").once();
@@ -1218,7 +1429,7 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "--deqp-gl-major-version=3 "
                 + "--deqp-gl-minor-version=0", "Yes");
 
-        // run config A
+        // run config A - first pass
         runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
                 "{dEQP-GLES3{instances{passall,failone,crashtwo}}}",
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
@@ -1226,9 +1437,23 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "--deqp-screen-rotation=unspecified "
                 + "--deqp-surface-type=window "
                 + "--deqp-log-images=disable "
-                + "--deqp-watchdog=enable", instrumentationAnswerConfigA);
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigAPass1);
+
+        // run config A - second pass
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{instances{crashtwo}}}",
+                "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
+                + " --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigAPass2);
 
         // query for config B
+
+        EasyMock.expect(mockDevice.executeShellCommand("pm list features")).andReturn(ALL_FEATURES)
+                .once();
+
         expectRenderConfigQueryAndReturn(mockDevice,
                 "--deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
@@ -1236,15 +1461,15 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "--deqp-gl-major-version=3 "
                 + "--deqp-gl-minor-version=0", "Yes");
 
-        // run for config B
+        // run for config B - first pass
         runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
-                "{dEQP-GLES3{instances{passall,crashtwo,skipone}}}",
+                "{dEQP-GLES3{instances{passall,skipone}}}",
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=90 "
                 + "--deqp-surface-type=window "
                 + "--deqp-log-images=disable "
-                + "--deqp-watchdog=enable", instrumentationAnswerConfigB);
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigBPass1);
 
         // query for config C
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1254,15 +1479,35 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "--deqp-gl-major-version=3 "
                 + "--deqp-gl-minor-version=0", "Yes");
 
-        // run for config C
+        // run for config C - first pass
         runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
-                "{dEQP-GLES3{instances{failone,crashtwo}}}",
+                "{dEQP-GLES3{instances{failone}}}",
                 "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
                 + " --deqp-gl-config-name=rgba8888d24s8 "
                 + "--deqp-screen-rotation=180 "
                 + "--deqp-surface-type=window "
                 + "--deqp-log-images=disable "
-                + "--deqp-watchdog=enable" , instrumentationAnswerConfigC);
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigCPass1);
+
+        // run for config C - second pass
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{instances{crashtwo}}}",
+                "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
+                + " --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=180 "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigCPass2);
+
+        // run for config B - second pass (crashtwo has been deferred due to its instability)
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                "{dEQP-GLES3{instances{crashtwo}}}",
+                "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
+                + " --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=90 "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable", instrumentationAnswerConfigBPass2);
 
         // query for unsupported config
         expectRenderConfigQueryAndReturn(mockDevice,
@@ -1321,11 +1566,12 @@ public class DeqpTestRunnerTest extends TestCase {
         mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
         EasyMock.expectLastCall().once();
 
-        EasyMock.replay(mockDevice, mockIDevice);
+        orderedControl.replay();
         EasyMock.replay(mockListener);
+        deqpTest.setRecovery(new StubRecovery());
         deqpTest.run(mockListener);
         EasyMock.verify(mockListener);
-        EasyMock.verify(mockDevice, mockIDevice);
+        orderedControl.verify();
     }
 
     private void testMultipleInstancesLossOfDeviceMidInstance(final boolean recoverySuccessful)
@@ -1377,7 +1623,6 @@ public class DeqpTestRunnerTest extends TestCase {
                 + "INSTRUMENTATION_STATUS_CODE: 0\r\n"; // early <EOF>
 
         final TestIdentifier testId = new TestIdentifier("dEQP-GLES3.loss", "instance");
-        final String testPath = "dEQP-GLES3.loss.instance";
 
         Map<String,String> supportedConfigA = new HashMap<>();
         supportedConfigA.put("glconfig", "rgba8888d24s8");
@@ -1512,6 +1757,16 @@ public class DeqpTestRunnerTest extends TestCase {
             mockRecovery.recoverComLinkKilled();
             EasyMock.expectLastCall().once();
 
+            // retry running config B
+            runInstrumentationLineAndAnswer(mockDevice, mockIDevice,
+                    "{dEQP-GLES3{loss{instance}}}",
+                    "--deqp-caselist-file=" + CASE_LIST_FILE_NAME
+                    + " --deqp-gl-config-name=rgba8888d24s8 "
+                    + "--deqp-screen-rotation=90 "
+                    + "--deqp-surface-type=window "
+                    + "--deqp-log-images=disable "
+                    + "--deqp-watchdog=enable", instrumentationAnswerFine);
+
             // query config C
             expectRenderConfigQueryAndReturn(mockDevice,
                     "--deqp-gl-config-name=rgba8888d24s8 "
@@ -1534,20 +1789,14 @@ public class DeqpTestRunnerTest extends TestCase {
         mockListener.testRunStarted(ID, 1);
         EasyMock.expectLastCall().once();
 
-        mockListener.testStarted(EasyMock.eq(testId));
-        EasyMock.expectLastCall().once();
-
-        final String crashDescription = (recoverySuccessful) ? ("Incomplete test log") : ("Device lost");
-        mockListener.testFailed(testId,
-                "=== with config {glformat=rgba8888d24s8,rotation=90,surfacetype=window} ===\n"
-                + "Crash: " + crashDescription);
-        EasyMock.expectLastCall().once();
-
-        mockListener.testEnded(EasyMock.eq(testId), EasyMock.<Map<String, String>>notNull());
-        EasyMock.expectLastCall().once();
-
-        // run is ended successfully only if device is available
+        // result is reported only if device is available
         if (recoverySuccessful) {
+            mockListener.testStarted(EasyMock.eq(testId));
+            EasyMock.expectLastCall().once();
+
+            mockListener.testEnded(EasyMock.eq(testId), EasyMock.<Map<String, String>>notNull());
+            EasyMock.expectLastCall().once();
+
             mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
             EasyMock.expectLastCall().once();
         }
