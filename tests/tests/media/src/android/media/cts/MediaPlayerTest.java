@@ -1062,13 +1062,22 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         if (trackInfos == null || trackInfos.length == 0) {
             return;
         }
+
+        Vector<Integer> externalTrackIndex = new Vector<>();
         for (int i = 0; i < trackInfos.length; ++i) {
             assertTrue(trackInfos[i] != null);
-            if (trackInfos[i].getTrackType() ==
-                 MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
-                mTimedTextTrackIndex.add(i);
+            if (trackInfos[i].getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                MediaFormat format = trackInfos[i].getFormat();
+                String mime = format.getString(MediaFormat.KEY_MIME);
+                if (MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP.equals(mime)) {
+                    externalTrackIndex.add(i);
+                } else {
+                    mTimedTextTrackIndex.add(i);
+                }
             }
         }
+
+        mTimedTextTrackIndex.addAll(externalTrackIndex);
     }
 
     private int getTimedTextTrackCount() {
