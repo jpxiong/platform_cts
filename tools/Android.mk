@@ -33,4 +33,10 @@ $(cts_prebuilt_jar): $(JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(TF_JAR) $(CTS_TF_JAR
 .PHONY: cts-harness
 cts-harness : $(cts_prebuilt_jar)
 
+# Put the test coverage report in the dist dir if "cts" is among the build goals.
+ifneq ($(filter cts, $(MAKECMDGOALS)),)
+  $(call dist-for-goals,cts,$(CTS_TF_JAR))
+  $(call dist-for-goals,cts,$(HOSTTESTLIB_JAR))
+endif
+
 include $(call all-subdir-makefiles)
