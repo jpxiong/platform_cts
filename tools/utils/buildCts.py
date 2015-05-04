@@ -159,6 +159,7 @@ class CtsBuilder(object):
     plan.Include('com\.android\.cts\..*')#TODO(stuartscott): Should PDK have all these?
     self.__WritePlan(plan, 'PDK')
 
+    temporarily_known_failure_tests = BuildCtsTemporarilyKnownFailureList();
     flaky_tests = BuildCtsFlakyTestList()
     releasekey_tests = BuildListForReleaseBuildTest()
 
@@ -190,6 +191,8 @@ class CtsBuilder(object):
     for package, test_list in small_tests.iteritems():
       plan.Include(package+'$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
+    for package, test_list in temporarily_known_failure_tests.iteritems():
+      plan.ExcludeTests(package, test_list)
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     for package, test_list in releasekey_tests.iteritems():
@@ -274,6 +277,9 @@ class CtsBuilder(object):
       plan.Exclude(package+'$')
     for package, tests_list in new_test_packages.iteritems():
       plan.Exclude(package+'$')
+    for package, test_list in temporarily_known_failure_tests.iteritems():
+      plan.Include(package+'$')
+      plan.IncludeTests(package, test_list)
     plan.Exclude(r'com\.drawelements\.')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
@@ -455,6 +461,41 @@ def BuildCtsFlakyTestList():
       'com.android.cts.filesystemperf' : [
           'com.android.cts.filesystemperf.RandomRWTest#testRandomRead',
           'com.android.cts.filesystemperf.RandomRWTest#testRandomUpdate',],
+      '' : []}
+
+def BuildCtsTemporarilyKnownFailureList():
+  """ Construct a defaultdict that maps package name to a list of tests
+      that are known failures during dev cycle but expected to be fixed before launch """
+  return {
+      'android.content' : [
+          'android.content.cts.ContentResolverTest#testAndroidTestCaseSetupProperly',
+          'android.content.cts.ContentResolverTest#testBulkInsert',
+          'android.content.cts.ContentResolverTest#testCancelableQuery_WhenCanceledBeforeQuery_ThrowsImmediately',
+          'android.content.cts.ContentResolverTest#testCancelableQuery_WhenCanceledDuringLongRunningQuery_CancelsQueryAndThrows',
+          'android.content.cts.ContentResolverTest#testCancelableQuery_WhenNotCanceled_ReturnsResultSet',
+          'android.content.cts.ContentResolverTest#testConstructor',
+          'android.content.cts.ContentResolverTest#testCrashOnLaunch',
+          'android.content.cts.ContentResolverTest#testCrashingOpenAssetFileDescriptor',
+          'android.content.cts.ContentResolverTest#testCrashingOpenTypedAssetFileDescriptor',
+          'android.content.cts.ContentResolverTest#testCrashingQuery',
+          'android.content.cts.ContentResolverTest#testDelete',
+          'android.content.cts.ContentResolverTest#testGetType',
+          'android.content.cts.ContentResolverTest#testInsert',
+          'android.content.cts.ContentResolverTest#testNotifyChange1',
+          'android.content.cts.ContentResolverTest#testNotifyChange2',
+          'android.content.cts.ContentResolverTest#testOpenAssetFileDescriptor',
+          'android.content.cts.ContentResolverTest#testOpenFileDescriptor',
+          'android.content.cts.ContentResolverTest#testOpenInputStream',
+          'android.content.cts.ContentResolverTest#testOpenOutputStream',
+          'android.content.cts.ContentResolverTest#testQuery',
+          'android.content.cts.ContentResolverTest#testRegisterContentObserver',
+          'android.content.cts.ContentResolverTest#testStableToUnstableRefs',
+          'android.content.cts.ContentResolverTest#testStartCancelSync',
+          'android.content.cts.ContentResolverTest#testStartSyncFailure',
+          'android.content.cts.ContentResolverTest#testUnstableGetType',
+          'android.content.cts.ContentResolverTest#testUnstableToStableRefs',
+          'android.content.cts.ContentResolverTest#testUpdate',
+          'android.content.cts.ContentResolverTest#testValidateSyncExtrasBundle',],
       '' : []}
 
 def LogGenerateDescription(name):
