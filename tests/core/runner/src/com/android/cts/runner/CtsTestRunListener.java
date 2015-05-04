@@ -58,7 +58,7 @@ public class CtsTestRunListener extends InstrumentationRunListener {
 
     @Override
     public void testRunStarted(Description description) throws Exception {
-        mEnvironment = new TestEnvironment(getInstrumentation().getContext());
+        mEnvironment = new TestEnvironment(getInstrumentation().getTargetContext());
 
         // We might want to move this to /sdcard, if is is mounted/writable.
         File cacheDir = getInstrumentation().getTargetContext().getCacheDir();
