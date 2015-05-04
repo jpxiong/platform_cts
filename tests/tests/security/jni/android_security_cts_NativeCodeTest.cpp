@@ -201,7 +201,7 @@ static jboolean android_security_cts_NativeCodeTest_doFutexTest(JNIEnv*, jobject
 static jboolean android_security_cts_NativeCodeTest_doNvmapIocFromIdTest(JNIEnv*, jobject)
 {
     /*
-     * IOCTL code specified from the original Qualcomm notification.
+     * IOCTL code specified from the original notification.
      * Also available in:
      *     .../kernel/tegra/drivers/video/tegra/nvmap/nvmap_ioctl.h
      * #define NVMAP_IOC_MAGIC 'N'
@@ -239,7 +239,7 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_NativeCodeTest_doCVE20141710Test },
     {  "doFutexTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doFutexTest },
-    {  "doFutexTest", "()Z",
+    {  "doNvmapIocFromIdTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doNvmapIocFromIdTest },
 };
 
