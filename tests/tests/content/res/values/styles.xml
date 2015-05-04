@@ -169,4 +169,11 @@
         <item name="android:windowSwipeToDismiss">false</item>
     </style>
 
+    <style name="Theme_LayoutDirectionDependent">
+        <item name="themeInteger">999</item>
+    </style>
+
+    <style name="Theme_OrientationDependent">
+        <item name="themeDimension">999px</item>
+    </style>
 </resources>
