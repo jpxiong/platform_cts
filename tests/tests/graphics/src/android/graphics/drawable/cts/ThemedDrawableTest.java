@@ -17,6 +17,8 @@
 package android.graphics.drawable.cts;
 
 import android.annotation.TargetApi;
+import android.content.res.Resources.Theme;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
@@ -26,6 +28,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Debug;
 import android.test.AndroidTestCase;
 import android.view.Gravity;
 
@@ -38,7 +41,17 @@ public class ThemedDrawableTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        mContext.setTheme(R.style.Theme_ThemedDrawableTest);
+        // Workaround for ContextImpl.setTheme() being broken.
+        final Theme theme = mContext.getResources().newTheme();
+        theme.applyStyle(R.style.Theme_ThemedDrawableTest, true);
+        final Theme ctxTheme = mContext.getTheme();
+        ctxTheme.setTo(theme);
+    }
+
+    @Override
+    public void testAndroidTestCaseSetupProperly() {
+        final TypedArray t = mContext.obtainStyledAttributes(new int[]{R.attr.themeType});
+        assertTrue("Theme was applied correctly", t.getInt(0, -1) == 0);
     }
 
     public void testBitmapDrawable() {
