@@ -977,6 +977,62 @@ public class StaticMetadata {
     }
 
     /**
+     * get android.control.availableModes and do the sanity check.
+     *
+     * @return available control modes.
+     */
+    public int[] getAvailableControlModesChecked() {
+        Key<int[]> modesKey = CameraCharacteristics.CONTROL_AVAILABLE_MODES;
+        int[] modes = getValueFromKeyNonNull(modesKey);
+        if (modes == null) {
+            modes = new int[0];
+        }
+
+        List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        checkTrueForKey(modesKey, "value is empty", !modeList.isEmpty());
+
+        // All camera device must support AUTO
+        checkTrueForKey(modesKey, "values " + modeList.toString() + " must contain AUTO mode",
+                modeList.contains(CameraMetadata.CONTROL_MODE_AUTO));
+
+        boolean isAeOffSupported =  Arrays.asList(
+                CameraTestUtils.toObject(getAeAvailableModesChecked())).contains(
+                        CameraMetadata.CONTROL_AE_MODE_OFF);
+        boolean isAfOffSupported =  Arrays.asList(
+                CameraTestUtils.toObject(getAfAvailableModesChecked())).contains(
+                        CameraMetadata.CONTROL_AF_MODE_OFF);
+        boolean isAwbOffSupported =  Arrays.asList(
+                CameraTestUtils.toObject(getAwbAvailableModesChecked())).contains(
+                        CameraMetadata.CONTROL_AWB_MODE_OFF);
+        if (isAeOffSupported && isAfOffSupported && isAwbOffSupported) {
+            // 3A OFF controls are supported, OFF mode must be supported here.
+            checkTrueForKey(modesKey, "values " + modeList.toString() + " must contain OFF mode",
+                    modeList.contains(CameraMetadata.CONTROL_MODE_OFF));
+        }
+
+        if (isSceneModeSupported()) {
+            checkTrueForKey(modesKey, "values " + modeList.toString() + " must contain"
+                    + " USE_SCENE_MODE",
+                    modeList.contains(CameraMetadata.CONTROL_MODE_USE_SCENE_MODE));
+        }
+
+        return modes;
+    }
+
+    public boolean isSceneModeSupported() {
+        List<Integer> availableSceneModes = Arrays.asList(
+                CameraTestUtils.toObject(getAvailableSceneModesChecked()));
+
+        if (availableSceneModes.isEmpty()) {
+            return false;
+        }
+
+        // If sceneMode is not supported, camera device will contain single entry: DISABLED.
+        return availableSceneModes.size() > 1 ||
+                !availableSceneModes.contains(CameraMetadata.CONTROL_SCENE_MODE_DISABLED);
+    }
+
+    /**
      * Get aeAvailableModes and do the sanity check.
      *
      * <p>Depending on the check level this class has, for WAR or COLLECT levels,
@@ -1738,7 +1794,7 @@ public class StaticMetadata {
      *
      * @return {@code true} if manual color correction control is supported
      */
-    public boolean isManualColorCorrectionSupported() {
+    public boolean isColorCorrectionSupported() {
         return areKeysAvailable(CaptureRequest.COLOR_CORRECTION_MODE);
     }
 

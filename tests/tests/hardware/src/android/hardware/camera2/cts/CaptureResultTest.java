@@ -478,7 +478,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
          * Hardware Level = LIMITED or LEGACY
          */
         // Key not present if certain control is not supported
-        if (!mStaticInfo.isManualColorCorrectionSupported()) {
+        if (!mStaticInfo.isColorCorrectionSupported()) {
             waiverKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
             waiverKeys.add(CaptureResult.COLOR_CORRECTION_MODE);
             waiverKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);

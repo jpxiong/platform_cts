@@ -379,7 +379,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                if (!mStaticInfo.isManualColorCorrectionSupported()) {
+                if (!mStaticInfo.isColorCorrectionSupported()) {
                     Log.i(TAG, "Camera " + id +
                             " doesn't support color correction controls, skipping test");
                     continue;
@@ -546,8 +546,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
-                sceneModeTestByCamera();
+                if (mStaticInfo.isSceneModeSupported()) {
+                    sceneModeTestByCamera();
+                }
             } finally {
                 closeDevice();
             }
@@ -746,35 +747,55 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         validateColorCorrectionResult(result,
                 previewRequestBuilder.get(CaptureRequest.COLOR_CORRECTION_MODE));
-
+        int colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX;
         // TRANSFORM_MATRIX mode
         // Only test unit gain and identity transform
-        RggbChannelVector UNIT_GAIN = new RggbChannelVector(1.0f, 1.0f, 1.0f, 1.0f);
+        List<Integer> availableControlModes = Arrays.asList(
+                CameraTestUtils.toObject(mStaticInfo.getAvailableControlModesChecked()));
+        List<Integer> availableAwbModes = Arrays.asList(
+                CameraTestUtils.toObject(mStaticInfo.getAwbAvailableModesChecked()));
+        boolean isManualCCSupported =
+                availableControlModes.contains(CaptureRequest.CONTROL_MODE_OFF) ||
+                availableAwbModes.contains(CaptureRequest.CONTROL_AWB_MODE_OFF);
+        if (isManualCCSupported) {
+            if (!availableControlModes.contains(CaptureRequest.CONTROL_MODE_OFF)) {
+                // Only manual AWB mode is supported
+                manualRequestBuilder.set(CaptureRequest.CONTROL_MODE,
+                        CaptureRequest.CONTROL_MODE_AUTO);
+                manualRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
+                        CaptureRequest.CONTROL_AWB_MODE_OFF);
+            } else {
+                // All 3A manual controls are supported, it doesn't matter what we set for AWB mode.
+                manualRequestBuilder.set(CaptureRequest.CONTROL_MODE,
+                        CaptureRequest.CONTROL_MODE_OFF);
+            }
 
-        ColorSpaceTransform IDENTITY_TRANSFORM = new ColorSpaceTransform(
-            new Rational[] {
-                ONE_R, ZERO_R, ZERO_R,
-                ZERO_R, ONE_R, ZERO_R,
-                ZERO_R, ZERO_R, ONE_R
-            });
+            RggbChannelVector UNIT_GAIN = new RggbChannelVector(1.0f, 1.0f, 1.0f, 1.0f);
 
-        int colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX;
-        manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, colorCorrectionMode);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_GAINS, UNIT_GAIN);
-        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_TRANSFORM, IDENTITY_TRANSFORM);
-        request = manualRequestBuilder.build();
-        mSession.capture(request, listener, mHandler);
-        result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
-        RggbChannelVector gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
-        ColorSpaceTransform transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
-        validateColorCorrectionResult(result, colorCorrectionMode);
-        mCollector.expectEquals("control mode result/request mismatch",
-                CaptureResult.CONTROL_MODE_OFF, result.get(CaptureResult.CONTROL_MODE));
-        mCollector.expectEquals("Color correction gain result/request mismatch",
-                UNIT_GAIN, gains);
-        mCollector.expectEquals("Color correction gain result/request mismatch",
-                IDENTITY_TRANSFORM, transform);
+            ColorSpaceTransform IDENTITY_TRANSFORM = new ColorSpaceTransform(
+                new Rational[] {
+                    ONE_R, ZERO_R, ZERO_R,
+                    ZERO_R, ONE_R, ZERO_R,
+                    ZERO_R, ZERO_R, ONE_R
+                });
+
+            manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE, colorCorrectionMode);
+            manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_GAINS, UNIT_GAIN);
+            manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_TRANSFORM, IDENTITY_TRANSFORM);
+            request = manualRequestBuilder.build();
+            mSession.capture(request, listener, mHandler);
+            result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+            RggbChannelVector gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
+            ColorSpaceTransform transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
+            validateColorCorrectionResult(result, colorCorrectionMode);
+            mCollector.expectEquals("control mode result/request mismatch",
+                    CaptureResult.CONTROL_MODE_OFF, result.get(CaptureResult.CONTROL_MODE));
+            mCollector.expectEquals("Color correction gain result/request mismatch",
+                    UNIT_GAIN, gains);
+            mCollector.expectEquals("Color correction gain result/request mismatch",
+                    IDENTITY_TRANSFORM, transform);
+
+        }
 
         // FAST mode
         colorCorrectionMode = CaptureRequest.COLOR_CORRECTION_MODE_FAST;
