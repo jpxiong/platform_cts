@@ -34,7 +34,8 @@ public class SimRestrictedApisTest extends AndroidTestCase {
     }
 
     private boolean isSimCardPresent() {
-        return mTelephonyManager.getSimState() != TelephonyManager.SIM_STATE_ABSENT;
+        return mTelephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE &&
+                mTelephonyManager.getSimState() != TelephonyManager.SIM_STATE_ABSENT;
     }
 
     /**
