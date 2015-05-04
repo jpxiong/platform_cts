@@ -35,7 +35,7 @@ def main():
     THRESHOLD_MAX_OUTLIER_DIFF = 0.1
     THRESHOLD_MIN_LEVEL = 0.1
     THRESHOLD_MAX_LEVEL = 0.9
-    THRESHOLD_MAX_ABS_GRAD = 0.001
+    THRESHOLD_MAX_LEVEL_DIFF = 0.025
 
     mults = []
     r_means = []
@@ -72,15 +72,18 @@ def main():
     pylab.ylim([0,1])
     matplotlib.pyplot.savefig("%s_plot_means.png" % (NAME))
 
-    # Check for linearity. For each R,G,B channel, fit a line y=mx+b, and
-    # assert that the gradient is close to 0 (flat) and that there are no
-    # crazy outliers. Also ensure that the images aren't clamped to 0 or 1
+    # Check for linearity. Verify sample pixel mean values are close to each
+    # other. Also ensure that the images aren't clamped to 0 or 1
     # (which would make them look like flat lines).
     for chan in xrange(3):
         values = [r_means, g_means, b_means][chan]
         m, b = numpy.polyfit(mults, values, 1).tolist()
+        max_val = max(values)
+        min_val = min(values)
+        max_diff = max_val - min_val
         print "Channel %d line fit (y = mx+b): m = %f, b = %f" % (chan, m, b)
-        assert(abs(m) < THRESHOLD_MAX_ABS_GRAD)
+        print "Channel max %f min %f diff %f" % (max_val, min_val, max_diff)
+        assert(max_diff < THRESHOLD_MAX_LEVEL_DIFF)
         assert(b > THRESHOLD_MIN_LEVEL and b < THRESHOLD_MAX_LEVEL)
         for v in values:
             assert(v > THRESHOLD_MIN_LEVEL and v < THRESHOLD_MAX_LEVEL)
