@@ -18,6 +18,7 @@ package android.content.res.cts;
 
 import org.xmlpull.v1.XmlPullParser;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
@@ -76,6 +77,27 @@ public class Resources_ThemeTest extends AndroidTestCase {
         final TypedValue value = new TypedValue();
         getContext().getResources().getValue(R.raw.testmp3, value, true);
         assertFalse(mResTheme.resolveAttribute(R.raw.testmp3, value, false));
+    }
+
+    public void testGetChangingConfigurations() {
+        Resources.Theme theme = getContext().getResources().newTheme();
+        assertEquals("Initial changing configuration mask is empty",
+                0, theme.getChangingConfigurations());
+
+        theme.applyStyle(R.style.Theme_OrientationDependent, true);
+        assertEquals("First call to Theme.applyStyle() sets changing configuration",
+                ActivityInfo.CONFIG_ORIENTATION, theme.getChangingConfigurations());
+
+        theme.applyStyle(R.style.Theme_LayoutDirectionDependent, true);
+        assertEquals("Multiple calls to Theme.applyStyle() update changing configuration",
+                ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_LAYOUT_DIRECTION,
+                theme.getChangingConfigurations());
+
+        Resources.Theme other = getContext().getResources().newTheme();
+        other.setTo(theme);
+        assertEquals("Theme.setTheme() copies changing confguration",
+                ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_LAYOUT_DIRECTION,
+                theme.getChangingConfigurations());
     }
 
 }
