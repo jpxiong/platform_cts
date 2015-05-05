@@ -105,13 +105,18 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
      * @throws Exception
      */
     protected void doTestVideoPlayback(int mediaNumber, int repeatCounter) throws Exception {
+        Instrumentation inst = getInstrumentation();
+        String mediaName = getFullVideoClipName(mediaNumber);
+        if (!MediaUtils.checkCodecsForPath(inst.getTargetContext(), mediaName)) {
+            return;  // not supported, message is already logged
+        }
+
         File playbackOutput = new File(WorkDir.getTopDir(), "PlaybackTestResult.txt");
         Writer output = new BufferedWriter(new FileWriter(playbackOutput, true));
 
         boolean testResult = true;
         boolean onCompleteSuccess = false;
 
-        Instrumentation inst = getInstrumentation();
         Intent intent = new Intent();
 
         intent.setClass(inst.getTargetContext(), MediaFrameworkTest.class);
@@ -119,10 +124,6 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
 
         Activity act = inst.startActivitySync(intent);
 
-        String mediaName = getFullVideoClipName(mediaNumber);
-        if (!MediaUtils.checkCodecsForPath(inst.getTargetContext(), mediaName)) {
-            return;  // not supported, message is already logged
-        }
         for (int i = 0; i < repeatCounter; i++) {
             Log.v(TAG, "start playing " + mediaName);
             onCompleteSuccess =
