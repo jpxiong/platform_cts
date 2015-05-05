@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.media.CamcorderProfile;
+import android.cts.util.MediaUtils;
 import android.media.MediaRecorder.AudioEncoder;
 import android.media.MediaRecorder.VideoEncoder;
 import android.os.Environment;
@@ -42,22 +43,6 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
     protected static final int REPEAT_NUMBER_FOR_LONG_CLIPS = 1;
     protected static final int REPEAT_NUMBER_FOR_REPEATED_PLAYBACK = 20;
     private static final String TAG = "MediaPlayerStressTest";
-    // whether a video format is supported or not.
-    private final boolean mSupported;
-
-    /**
-     * construct a test case with check of whether the format is supported or not.
-     * @param quality
-     * @param videoCodec
-     * @param audioCodec
-     */
-    protected MediaPlayerStressTest(int quality, int videoCodec, int audioCodec) {
-        mSupported = VideoPlayerCapability.formatSupported(quality, videoCodec, audioCodec);
-    }
-
-    protected MediaPlayerStressTest() {
-        mSupported = true; // supported if nothing specified
-    }
 
     /**
      * provides full path name of video clip for the given media number
@@ -120,11 +105,6 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
      * @throws Exception
      */
     protected void doTestVideoPlayback(int mediaNumber, int repeatCounter) throws Exception {
-        if (!mSupported) {
-            Log.i(TAG, "Not supported!");
-            return;
-        }
-
         File playbackOutput = new File(WorkDir.getTopDir(), "PlaybackTestResult.txt");
         Writer output = new BufferedWriter(new FileWriter(playbackOutput, true));
 
@@ -140,6 +120,9 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
         Activity act = inst.startActivitySync(intent);
 
         String mediaName = getFullVideoClipName(mediaNumber);
+        if (!MediaUtils.checkCodecsForPath(inst.getTargetContext(), mediaName)) {
+            return;  // not supported, message is already logged
+        }
         for (int i = 0; i < repeatCounter; i++) {
             Log.v(TAG, "start playing " + mediaName);
             onCompleteSuccess =
