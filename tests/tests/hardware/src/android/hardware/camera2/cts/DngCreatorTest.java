@@ -19,15 +19,16 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.DngCreator;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.rs.BitmapUtils;
 import android.hardware.camera2.cts.rs.RawConverter;
@@ -37,6 +38,7 @@ import android.location.Location;
 import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.ConditionVariable;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
@@ -51,7 +53,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static android.hardware.camera2.cts.helpers.AssertHelpers.*;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests for the DngCreator API.
@@ -61,8 +62,9 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final String DEBUG_DNG_FILE = "raw16.dng";
 
-    private static final double IMAGE_DIFFERENCE_TOLERANCE = 60;
+    private static final double IMAGE_DIFFERENCE_TOLERANCE = 65;
     private static final int DEFAULT_PATCH_DIMEN = 512;
+    private static final int AE_TIMEOUT_MS = 2000;
 
     @Override
     protected void setUp() throws Exception {
@@ -131,7 +133,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 captureReader = createImageReader(activeArraySize, ImageFormat.RAW_SENSOR, 2,
                         captureListener);
                 Pair<Image, CaptureResult> resultPair = captureSingleRawShot(activeArraySize,
-                        captureReader, captureListener);
+                        /*waitForAe*/false, captureReader, captureListener);
                 CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
 
                 // Test simple writeImage, no header checks
@@ -233,7 +235,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 captureListeners.add(previewListener);
 
                 Pair<List<Image>, CaptureResult> resultPair = captureSingleRawShot(activeArraySize,
-                        captureReaders, captureListeners);
+                        captureReaders, /*waitForAe*/false, captureListeners);
                 CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
 
                 // Test simple writeImage, no header checks
@@ -356,7 +358,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 captureListeners.add(jpegListener);
 
                 Pair<List<Image>, CaptureResult> resultPair = captureSingleRawShot(activeArraySize,
-                        captureReaders, captureListeners);
+                        captureReaders, /*waitForAe*/true, captureListeners);
                 CameraCharacteristics characteristics = mStaticInfo.getCharacteristics();
                 Image raw = resultPair.first.get(0);
                 Image jpeg = resultPair.first.get(1);
@@ -495,20 +497,23 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         }
     }
 
-    private Pair<Image, CaptureResult> captureSingleRawShot(Size s, ImageReader captureReader,
+    private Pair<Image, CaptureResult> captureSingleRawShot(Size s, boolean waitForAe,
+            ImageReader captureReader,
             CameraTestUtils.SimpleImageReaderListener captureListener) throws Exception {
         List<ImageReader> readers = new ArrayList<ImageReader>();
         readers.add(captureReader);
         List<CameraTestUtils.SimpleImageReaderListener> listeners =
                 new ArrayList<CameraTestUtils.SimpleImageReaderListener>();
         listeners.add(captureListener);
-        Pair<List<Image>, CaptureResult> res = captureSingleRawShot(s, readers, listeners);
+        Pair<List<Image>, CaptureResult> res = captureSingleRawShot(s, readers, waitForAe,
+                listeners);
         return new Pair<Image, CaptureResult>(res.first.get(0), res.second);
     }
 
-    private Pair<List<Image>, CaptureResult> captureSingleRawShot(Size s, List<ImageReader> captureReaders,
+    private Pair<List<Image>, CaptureResult> captureSingleRawShot(Size s,
+            List<ImageReader> captureReaders, boolean waitForAe,
             List<CameraTestUtils.SimpleImageReaderListener> captureListeners) throws Exception {
-        return captureRawShots(s, captureReaders, captureListeners, 1).get(0);
+        return captureRawShots(s, captureReaders, waitForAe, captureListeners, 1).get(0);
     }
 
     /**
@@ -521,8 +526,10 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
      * @return a list of pairs containing a {@link Image} and {@link CaptureResult} used for
      *          each capture.
      */
-    private List<Pair<List<Image>, CaptureResult>> captureRawShots(Size s, List<ImageReader> captureReaders,
-            List<CameraTestUtils.SimpleImageReaderListener> captureListeners, int numShots) throws Exception {
+    private List<Pair<List<Image>, CaptureResult>> captureRawShots(Size s,
+            List<ImageReader> captureReaders, boolean waitForAe,
+            List<CameraTestUtils.SimpleImageReaderListener> captureListeners,
+            int numShots) throws Exception {
         if (VERBOSE) {
             Log.v(TAG, "captureSingleRawShot - Capturing raw image.");
         }
@@ -541,16 +548,74 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
         }
         assertTrue("Capture size is supported.", validSize);
 
-
         // Capture images.
-        List<Surface> outputSurfaces = new ArrayList<Surface>();
+        final List<Surface> outputSurfaces = new ArrayList<Surface>();
         for (ImageReader captureReader : captureReaders) {
             Surface captureSurface = captureReader.getSurface();
             outputSurfaces.add(captureSurface);
         }
 
-        CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces,
-                CameraDevice.TEMPLATE_STILL_CAPTURE);
+        // Set up still capture template targeting JPEG/RAW outputs
+        CaptureRequest.Builder request =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+        assertNotNull("Fail to get captureRequest", request);
+        for (Surface surface : outputSurfaces) {
+            request.addTarget(surface);
+        }
+
+        ImageReader previewReader = null;
+        if (waitForAe) {
+            // Also setup a small YUV output for AE metering if needed
+            Size yuvSize = (mOrderedPreviewSizes.size() == 0) ? null :
+                    mOrderedPreviewSizes.get(mOrderedPreviewSizes.size() - 1);
+            assertNotNull("Must support at least one small YUV size.", yuvSize);
+            previewReader = createImageReader(yuvSize, ImageFormat.YUV_420_888,
+                        /*maxNumImages*/2, new CameraTestUtils.ImageDropperListener());
+            outputSurfaces.add(previewReader.getSurface());
+        }
+
+        createSession(outputSurfaces);
+
+        if (waitForAe) {
+            CaptureRequest.Builder precaptureRequest =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            assertNotNull("Fail to get captureRequest", precaptureRequest);
+            precaptureRequest.addTarget(previewReader.getSurface());
+            precaptureRequest.set(CaptureRequest.CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_AUTO);
+            precaptureRequest.set(CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON);
+
+            final ConditionVariable waitForAeCondition = new ConditionVariable(/*isOpen*/false);
+            CameraCaptureSession.CaptureCallback captureCallback =
+                    new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureProgressed(CameraCaptureSession session,
+                        CaptureRequest request, CaptureResult partialResult) {
+                    if (partialResult.get(CaptureResult.CONTROL_AE_STATE) ==
+                            CaptureRequest.CONTROL_AE_STATE_CONVERGED) {
+                        waitForAeCondition.open();
+                    }
+                }
+
+                @Override
+                public void onCaptureCompleted(CameraCaptureSession session,
+                        CaptureRequest request, TotalCaptureResult result) {
+                    if (result.get(CaptureResult.CONTROL_AE_STATE) ==
+                            CaptureRequest.CONTROL_AE_STATE_CONVERGED) {
+                        waitForAeCondition.open();
+                    }
+                }
+            };
+            startCapture(precaptureRequest.build(), /*repeating*/true, captureCallback, mHandler);
+
+            precaptureRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            startCapture(precaptureRequest.build(), /*repeating*/false, captureCallback, mHandler);
+            assertTrue("Timeout out waiting for AE to converge",
+                    waitForAeCondition.block(AE_TIMEOUT_MS));
+        }
+
         request.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                 CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE_ON);
         CameraTestUtils.SimpleCaptureCallback resultListener =
