@@ -570,7 +570,48 @@ public class AllocationCopyToTest extends RSBaseCompute {
                    result);
     }
 
+    public void test_AllocationCopy3DRangeFrom_Alloc() {
+        Random random = new Random(0x172d8ab9);
+        int width = random.nextInt(64);
+        int height = random.nextInt(64);
+        int depth = random.nextInt(64);
 
+        int xoff = random.nextInt(width);
+        int yoff = random.nextInt(height);
+        int zoff = random.nextInt(height);
+
+        int xcount = width - xoff;
+        int ycount = height - yoff;
+        int zcount = depth - zoff;
+        int arr_len = xcount * ycount * zcount;
+
+        long[] inArray = new long[arr_len];
+        long[] outArray = new long[arr_len];
+
+        for (int i = 0; i < arr_len; i++) {
+            inArray[i] = random.nextLong();
+        }
+
+        Type.Builder typeBuilder = new Type.Builder(mRS, Element.I64(mRS));
+        typeBuilder.setX(width).setY(height).setZ(depth);
+        alloc = Allocation.createTyped(mRS, typeBuilder.create());
+        Allocation allocRef = Allocation.createTyped(mRS, typeBuilder.create());
+
+        allocRef.copy3DRangeFrom(xoff, yoff, zoff, xcount, ycount, zcount, (Object)inArray);
+        alloc.copy3DRangeFrom(xoff, yoff, zoff, xcount, ycount, zcount, allocRef, xoff, yoff, zoff);
+        alloc.copy3DRangeTo(xoff, yoff, zoff, xcount, ycount, zcount, (Object)outArray);
+
+        boolean result = true;
+        for (int i = 0; i < arr_len; i++) {
+            if (inArray[i] != outArray[i]) {
+                result = false;
+                android.util.Log.v("Allocation Copy3DRangeFrom (alloc) Test", "Failed: " + i + " " + inArray[i] + " " + outArray[i]);
+                break;
+            }
+        }
+        assertTrue("test_AllocationCopy3DRangeFrom_Alloc failed, output array does not match input",
+                   result);
+    }
 
     public void test_Allocationcopy1DRangeToUnchecked_Byte() {
         Random random = new Random(0x172d8ab9);
