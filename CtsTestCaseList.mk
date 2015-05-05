@@ -127,6 +127,7 @@ cts_test_packages := \
     CtsAppWidgetTestCases \
     CtsBluetoothTestCases \
     CtsCalendarcommon2TestCases \
+    CtsCallLogTestCases \
     CtsContentTestCases \
     CtsDatabaseTestCases \
     CtsDisplayTestCases \
