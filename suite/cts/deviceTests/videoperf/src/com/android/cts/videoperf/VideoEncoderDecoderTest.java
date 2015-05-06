@@ -28,6 +28,7 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 
 import android.cts.util.CtsAndroidTestCase;
@@ -38,6 +39,7 @@ import com.android.cts.util.Stat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.lang.System;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
 
@@ -89,12 +91,20 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private double mRmsErrorMargain = PIXEL_RMS_ERROR_MARGAIN;
     private Random mRandom;
 
+    private class TestConfig {
+        public boolean mTestPixels = true;
+        public boolean mTestResult = true;
+    }
+
+    private TestConfig mTestConfig;
+
     @Override
     protected void setUp() throws Exception {
         mEncodedOutputBuffer = new Vector<ByteBuffer>(TOTAL_FRAMES * 2);
         // Use time as a seed, hoping to prevent checking pixels in the same pattern
         long now = System.currentTimeMillis();
         mRandom = new Random(now);
+        mTestConfig = new TestConfig();
         super.setUp();
     }
 
@@ -107,22 +117,22 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         mYDirectBuffer = null;
         mUVDirectBuffer = null;
         mRandom = null;
+        mTestConfig = null;
         super.tearDown();
     }
 
-    private String getEncoderName(String mime, boolean isGoog) {
-        return getCodecName(mime, isGoog, true /* isEncoder */);
+    private String getEncoderName(String mime) {
+        return getCodecName(mime, true /* isEncoder */);
     }
 
-    private String getDecoderName(String mime, boolean isGoog) {
-        return getCodecName(mime, isGoog, false /* isEncoder */);
+    private String getDecoderName(String mime) {
+        return getCodecName(mime, false /* isEncoder */);
     }
 
-    private String getCodecName(String mime, boolean isGoog, boolean isEncoder) {
+    private String getCodecName(String mime, boolean isEncoder) {
         MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
         for (MediaCodecInfo info : mcl.getCodecInfos()) {
-            if (info.isEncoder() != isEncoder
-                    || info.getName().toLowerCase().startsWith("omx.google.") != isGoog) {
+            if (info.isEncoder() != isEncoder) {
                 continue;
             }
             CodecCapabilities caps = null;
@@ -136,29 +146,65 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         return null;
     }
 
+    private String[] getEncoderName(String mime, boolean isGoog) {
+        return getCodecName(mime, isGoog, true /* isEncoder */);
+    }
+
+    private String[] getDecoderName(String mime, boolean isGoog) {
+        return getCodecName(mime, isGoog, false /* isEncoder */);
+    }
+
+    private String[] getCodecName(String mime, boolean isGoog, boolean isEncoder) {
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        ArrayList<String> result = new ArrayList<String>();
+        for (MediaCodecInfo info : mcl.getCodecInfos()) {
+            if (info.isEncoder() != isEncoder
+                    || info.getName().toLowerCase().startsWith("omx.google.") != isGoog) {
+                continue;
+            }
+            CodecCapabilities caps = null;
+            try {
+                caps = info.getCapabilitiesForType(mime);
+            } catch (IllegalArgumentException e) {  // mime is not supported
+                continue;
+            }
+            result.add(info.getName());
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
+    public void testAvc0176x0144() throws Exception {
+        doTestDefault(VIDEO_AVC, 176, 144);
+    }
+
+    public void testAvc0352x0288() throws Exception {
+        doTestDefault(VIDEO_AVC, 352, 288);
+    }
+
+    public void testAvc0720x0480() throws Exception {
+        doTestDefault(VIDEO_AVC, 720, 480);
+    }
+
+    public void testAvc1280x0720() throws Exception {
+        doTestDefault(VIDEO_AVC, 1280, 720);
+    }
+
+    /**
+     * resolution intentionally set to 1072 not 1080
+     * as 1080 is not multiple of 16, and it requires additional setting like stride
+     * which is not specified in API documentation.
+     */
+    public void testAvc1920x1072() throws Exception {
+        doTestDefault(VIDEO_AVC, 1920, 1072);
+    }
+
     // Avc tests
-    public void testAvc0176x0144Other() throws Exception {
-        doTestOther(VIDEO_AVC, 176, 144);
-    }
-
-    public void testAvc0176x0144Goog() throws Exception {
-        doTestGoog(VIDEO_AVC, 176, 144);
-    }
-
     public void testAvc0320x0240Other() throws Exception {
         doTestOther(VIDEO_AVC, 320, 240);
     }
 
     public void testAvc0320x0240Goog() throws Exception {
         doTestGoog(VIDEO_AVC, 320, 240);
-    }
-
-    public void testAvc0352x0288Other() throws Exception {
-        doTestOther(VIDEO_AVC, 352, 288);
-    }
-
-    public void testAvc0352x0288Goog() throws Exception {
-        doTestGoog(VIDEO_AVC, 352, 288);
     }
 
     public void testAvc0720x0480Other() throws Exception {
@@ -177,17 +223,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         doTestGoog(VIDEO_AVC, 1280, 720);
     }
 
-    /**
-     * resolution intentionally set to 1072 not 1080
-     * as 1080 is not multiple of 16, and it requires additional setting like stride
-     * which is not specified in API documentation.
-     */
-    public void testAvc1920x1072Other() throws Exception {
-        doTestOther(VIDEO_AVC, 1920, 1072);
+    public void testAvc1920x1080Other() throws Exception {
+        doTestOther(VIDEO_AVC, 1920, 1080);
     }
 
-    public void testAvc1920x1072Goog() throws Exception {
-        doTestGoog(VIDEO_AVC, 1920, 1072);
+    public void testAvc1920x1080Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 1920, 1080);
     }
 
     // Vp8 tests
@@ -301,11 +342,32 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     }
 
     private void doTestGoog(String mimeType, int w, int h) throws Exception {
+        mTestConfig.mTestPixels = false;
+        mTestConfig.mTestResult = false;
         doTest(true /* isGoog */, mimeType, w, h, NUMBER_OF_REPEAT);
     }
 
     private void doTestOther(String mimeType, int w, int h) throws Exception {
+        mTestConfig.mTestPixels = false;
         doTest(false /* isGoog */, mimeType, w, h, NUMBER_OF_REPEAT);
+    }
+
+    private void doTestDefault(String mimeType, int w, int h) throws Exception {
+        mTestConfig.mTestResult = false;
+
+        String encoderName = getEncoderName(mimeType);
+        if (encoderName == null) {
+            Log.i(TAG, "Encoder for " + mimeType + " not found");
+            return;
+        }
+
+        String decoderName = getDecoderName(mimeType);
+        if (decoderName == null) {
+            Log.i(TAG, "Encoder for " + mimeType + " not found");
+            return;
+        }
+
+        doTestByName(encoderName, decoderName, mimeType, w, h, NUMBER_OF_REPEAT);
     }
 
     /**
@@ -318,20 +380,30 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      */
     private void doTest(boolean isGoog, String mimeType, int w, int h, int numberRepeat)
             throws Exception {
-        String encoderName = getEncoderName(mimeType, isGoog);
-        if (encoderName == null) {
+        String[] encoderNames = getEncoderName(mimeType, isGoog);
+        if (encoderNames.length == 0) {
             Log.i(TAG, isGoog ? "Google " : "Non-google "
                     + "encoder for " + mimeType + " not found");
             return;
         }
 
-        String decoderName = getDecoderName(mimeType, isGoog);
-        if (decoderName == null) {
+        String[] decoderNames = getDecoderName(mimeType, isGoog);
+        if (decoderNames.length == 0) {
             Log.i(TAG, isGoog ? "Google " : "Non-google "
                     + "decoder for " + mimeType + " not found");
             return;
         }
 
+        for (String encoderName: encoderNames) {
+            for (String decoderName: decoderNames) {
+                doTestByName(encoderName, decoderName, mimeType, w, h, numberRepeat);
+            }
+        }
+    }
+
+    private void doTestByName(
+            String encoderName, String decoderName, String mimeType, int w, int h, int numberRepeat)
+            throws Exception {
         CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(encoderName, mimeType, w, h);
         if (infoEnc == null) {
             Log.i(TAG, "Encoder " + mimeType + " with " + w + "," + h + " not supported");
@@ -407,6 +479,27 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             if (decoderRmsErrorResults[i] >= mRmsErrorMargain) {
                 fail("rms error is bigger than the limit "
                         + decoderRmsErrorResults[i] + " vs " + mRmsErrorMargain);
+            }
+        }
+
+        if (mTestConfig.mTestResult) {
+            Range<Double> reportedEncoderResults =
+                    CodecInfo.getAchievableFrameRatesFor(encoderName, mimeType, w, h);
+            Range<Double> reportedDecoderResults =
+                    CodecInfo.getAchievableFrameRatesFor(decoderName, mimeType, w, h);
+            if (reportedEncoderResults == null) {
+                fail("Failed to getAchievableFrameRatesFor "
+                        + encoderName + " " + mimeType + " " + w + "x" + h);
+            }
+            if (reportedDecoderResults == null) {
+                fail("Failed to getAchievableFrameRatesFor "
+                        + decoderName + " " + mimeType + " " + w + "x" + h);
+            }
+            if (!reportedEncoderResults.contains(Stat.getAverage(encoderFpsResults))) {
+                fail("Expecting achievable frame rate in the rang of " + reportedEncoderResults);
+            }
+            if (!reportedDecoderResults.contains(Stat.getAverage(decoderFpsResults))) {
+                fail("Expecting achievable frame rate in the rang of " + reportedDecoderResults);
             }
         }
     }
@@ -770,52 +863,54 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
                 // only do YUV compare on EOS frame if the buffer size is none-zero
                 if (info.size > 0) {
-                    Point origin = getOrigin(outFrameCount);
-                    int i;
+                    if (mTestConfig.mTestPixels) {
+                        Point origin = getOrigin(outFrameCount);
+                        int i;
 
-                    // if decoder supports planar or semiplanar, check output with
-                    // ByteBuffer & Image each on half of the points
-                    int pixelCheckPerFrame = PIXEL_CHECK_PER_FRAME;
-                    if (!isDstFlexYUV()) {
-                        pixelCheckPerFrame /= 2;
-                        ByteBuffer buf = codec.getOutputBuffer(outputBufIndex);
-                        if (VERBOSE && (outFrameCount == 0)) {
-                            printByteBuffer("Y ", buf, 0, 20);
-                            printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
-                            printByteBuffer("UV ", buf,
-                                    mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
+                        // if decoder supports planar or semiplanar, check output with
+                        // ByteBuffer & Image each on half of the points
+                        int pixelCheckPerFrame = PIXEL_CHECK_PER_FRAME;
+                        if (!isDstFlexYUV()) {
+                            pixelCheckPerFrame /= 2;
+                            ByteBuffer buf = codec.getOutputBuffer(outputBufIndex);
+                            if (VERBOSE && (outFrameCount == 0)) {
+                                printByteBuffer("Y ", buf, 0, 20);
+                                printByteBuffer("UV ", buf, mVideoWidth * mVideoHeight, 20);
+                                printByteBuffer("UV ", buf,
+                                        mVideoWidth * mVideoHeight + mVideoWidth * 60, 20);
+                            }
+                            for (i = 0; i < pixelCheckPerFrame; i++) {
+                                int w = mRandom.nextInt(mVideoWidth);
+                                int h = mRandom.nextInt(mVideoHeight);
+                                getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
+                                getPixelValuesFromOutputBuffer(buf, w, h, decoded);
+                                if (VERBOSE) {
+                                    Log.i(TAG, outFrameCount + "-" + i + "- th round: ByteBuffer:"
+                                            + " expected "
+                                            + expected.mY + "," + expected.mU + "," + expected.mV
+                                            + " decoded "
+                                            + decoded.mY + "," + decoded.mU + "," + decoded.mV);
+                                }
+                                totalErrorSquared += expected.calcErrorSquared(decoded);
+                            }
                         }
+
+                        Image image = codec.getOutputImage(outputBufIndex);
+                        assertTrue(image != null);
                         for (i = 0; i < pixelCheckPerFrame; i++) {
                             int w = mRandom.nextInt(mVideoWidth);
                             int h = mRandom.nextInt(mVideoHeight);
                             getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
-                            getPixelValuesFromOutputBuffer(buf, w, h, decoded);
+                            getPixelValuesFromImage(image, w, h, decoded);
                             if (VERBOSE) {
-                                Log.i(TAG, outFrameCount + "-" + i + "- th round: ByteBuffer:"
-                                        + " expected "
+                                Log.i(TAG, outFrameCount + "-" + i + "- th round: FlexYUV:"
+                                        + " expcted "
                                         + expected.mY + "," + expected.mU + "," + expected.mV
                                         + " decoded "
                                         + decoded.mY + "," + decoded.mU + "," + decoded.mV);
                             }
                             totalErrorSquared += expected.calcErrorSquared(decoded);
                         }
-                    }
-
-                    Image image = codec.getOutputImage(outputBufIndex);
-                    assertTrue(image != null);
-                    for (i = 0; i < pixelCheckPerFrame; i++) {
-                        int w = mRandom.nextInt(mVideoWidth);
-                        int h = mRandom.nextInt(mVideoHeight);
-                        getPixelValuesFromYUVBuffers(origin.x, origin.y, w, h, expected);
-                        getPixelValuesFromImage(image, w, h, decoded);
-                        if (VERBOSE) {
-                            Log.i(TAG, outFrameCount + "-" + i + "- th round: FlexYUV:"
-                                    + " expcted "
-                                    + expected.mY + "," + expected.mU + "," + expected.mV
-                                    + " decoded "
-                                    + decoded.mY + "," + decoded.mU + "," + decoded.mV);
-                        }
-                        totalErrorSquared += expected.calcErrorSquared(decoded);
                     }
                     outFrameCount++;
                 }

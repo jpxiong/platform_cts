@@ -24,6 +24,7 @@ import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.util.Log;
+import android.util.Range;
 
 import java.io.IOException;
 
@@ -63,6 +64,7 @@ public class CodecInfo {
         CodecCapabilities cap = codec.getCodecInfo().getCapabilitiesForType(mimeType);
         if (cap.colorFormats.length == 0) {
             Log.w(TAG, "no supported color format");
+            codec.release();
             return null;
         }
 
@@ -82,12 +84,29 @@ public class CodecInfo {
             info.mFps = vidCap.getSupportedFrameRatesFor(w, h).getUpper().intValue();
         } catch (IllegalArgumentException e) {
             Log.w(TAG, "unsupported size");
+            codec.release();
             return null;
         }
         info.mBitRate = vidCap.getBitrateRange().getUpper();
         Log.i(TAG, "test bit rate " + info.mBitRate + " fps " + info.mFps);
         codec.release();
         return info;
+    }
+
+    public static Range<Double> getAchievableFrameRatesFor(
+            String codecName, String mimeType, int width, int height) {
+        MediaCodec codec;
+        try {
+            codec = MediaCodec.createByCodecName(codecName);
+        } catch (IOException e) {
+            return null;
+        }
+
+        VideoCapabilities cap =
+            codec.getCodecInfo().getCapabilitiesForType(mimeType).getVideoCapabilities();
+        Range<Double> results = cap.getAchievableFrameRatesFor(width, height);
+        codec.release();
+        return results;
     }
 
     // for debugging
