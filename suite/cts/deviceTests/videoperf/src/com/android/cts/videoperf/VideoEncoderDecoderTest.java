@@ -23,10 +23,12 @@ import android.media.cts.CodecUtils;
 import android.media.Image;
 import android.media.Image.Plane;
 import android.media.MediaCodec;
-import android.media.MediaCodecList;
+import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.util.Log;
+import android.util.Size;
 
 import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.ResultType;
@@ -57,6 +59,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private static final long VIDEO_CODEC_WAIT_TIME_US = 5000;
     private static final boolean VERBOSE = false;
     private static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC;
+    private static final String VIDEO_VP8 = MediaFormat.MIMETYPE_VIDEO_VP8;
+    private static final String VIDEO_H263 = MediaFormat.MIMETYPE_VIDEO_H263;
+    private static final String VIDEO_MPEG4 = MediaFormat.MIMETYPE_VIDEO_MPEG4;
     private static final int TOTAL_FRAMES = 300;
     private static final int NUMBER_OF_REPEAT = 10;
     // i frame interval for encoder
@@ -81,6 +86,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private static final int PIXEL_CHECK_PER_FRAME = 1000;
     // RMS error in pixel values above this will be treated as error.
     private static final double PIXEL_RMS_ERROR_MARGAIN = 20.0;
+    private double mRmsErrorMargain = PIXEL_RMS_ERROR_MARGAIN;
     private Random mRandom;
 
     @Override
@@ -104,20 +110,71 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         super.tearDown();
     }
 
-    public void testAvc0176x0144() throws Exception {
-        doTest(VIDEO_AVC, 176, 144, NUMBER_OF_REPEAT);
+    private String getEncoderName(String mime, boolean isGoog) {
+        return getCodecName(mime, isGoog, true /* isEncoder */);
     }
 
-    public void testAvc0352x0288() throws Exception {
-        doTest(VIDEO_AVC, 352, 288, NUMBER_OF_REPEAT);
+    private String getDecoderName(String mime, boolean isGoog) {
+        return getCodecName(mime, isGoog, false /* isEncoder */);
     }
 
-    public void testAvc0720x0480() throws Exception {
-        doTest(VIDEO_AVC, 720, 480, NUMBER_OF_REPEAT);
+    private String getCodecName(String mime, boolean isGoog, boolean isEncoder) {
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : mcl.getCodecInfos()) {
+            if (info.isEncoder() != isEncoder
+                    || info.getName().toLowerCase().startsWith("omx.google.") != isGoog) {
+                continue;
+            }
+            CodecCapabilities caps = null;
+            try {
+                caps = info.getCapabilitiesForType(mime);
+            } catch (IllegalArgumentException e) {  // mime is not supported
+                continue;
+            }
+            return info.getName();
+        }
+        return null;
     }
 
-    public void testAvc1280x0720() throws Exception {
-        doTest(VIDEO_AVC, 1280, 720, NUMBER_OF_REPEAT);
+    // Avc tests
+    public void testAvc0176x0144Other() throws Exception {
+        doTestOther(VIDEO_AVC, 176, 144);
+    }
+
+    public void testAvc0176x0144Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 176, 144);
+    }
+
+    public void testAvc0320x0240Other() throws Exception {
+        doTestOther(VIDEO_AVC, 320, 240);
+    }
+
+    public void testAvc0320x0240Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 320, 240);
+    }
+
+    public void testAvc0352x0288Other() throws Exception {
+        doTestOther(VIDEO_AVC, 352, 288);
+    }
+
+    public void testAvc0352x0288Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 352, 288);
+    }
+
+    public void testAvc0720x0480Other() throws Exception {
+        doTestOther(VIDEO_AVC, 720, 480);
+    }
+
+    public void testAvc0720x0480Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 720, 480);
+    }
+
+    public void testAvc1280x0720Other() throws Exception {
+        doTestOther(VIDEO_AVC, 1280, 720);
+    }
+
+    public void testAvc1280x0720Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 1280, 720);
     }
 
     /**
@@ -125,8 +182,95 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
      * as 1080 is not multiple of 16, and it requires additional setting like stride
      * which is not specified in API documentation.
      */
-    public void testAvc1920x1072() throws Exception {
-        doTest(VIDEO_AVC, 1920, 1072, NUMBER_OF_REPEAT);
+    public void testAvc1920x1072Other() throws Exception {
+        doTestOther(VIDEO_AVC, 1920, 1072);
+    }
+
+    public void testAvc1920x1072Goog() throws Exception {
+        doTestGoog(VIDEO_AVC, 1920, 1072);
+    }
+
+    // Vp8 tests
+    public void testVp80320x0180Other() throws Exception {
+        doTestOther(VIDEO_VP8, 320, 180);
+    }
+
+    public void testVp80320x0180Goog() throws Exception {
+        doTestGoog(VIDEO_VP8, 320, 180);
+    }
+
+    public void testVp80640x0360Other() throws Exception {
+        doTestOther(VIDEO_VP8, 640, 360);
+    }
+
+    public void testVp80640x0360Goog() throws Exception {
+        doTestGoog(VIDEO_VP8, 640, 360);
+    }
+
+    public void testVp81280x0720Other() throws Exception {
+        doTestOther(VIDEO_VP8, 1280, 720);
+    }
+
+    public void testVp81280x0720Goog() throws Exception {
+        doTestGoog(VIDEO_VP8, 1280, 720);
+    }
+
+    public void testVp81920x1080Other() throws Exception {
+        doTestOther(VIDEO_VP8, 1920, 1080);
+    }
+
+    public void testVp81920x1080Goog() throws Exception {
+        doTestGoog(VIDEO_VP8, 1920, 1080);
+    }
+
+    // H263 tests
+    public void testH2630176x0144Other() throws Exception {
+        doTestOther(VIDEO_H263, 176, 144);
+    }
+
+    public void testH2630176x0144Goog() throws Exception {
+        doTestGoog(VIDEO_H263, 176, 144);
+    }
+
+    public void testH2630352x0288Other() throws Exception {
+        doTestOther(VIDEO_H263, 352, 288);
+    }
+
+    public void testH2630352x0288Goog() throws Exception {
+        doTestGoog(VIDEO_H263, 352, 288);
+    }
+
+    // Mpeg4 tests
+    public void testMpeg40176x0144Other() throws Exception {
+        doTestOther(VIDEO_MPEG4, 176, 144);
+    }
+
+    public void testMpeg40176x0144Goog() throws Exception {
+        doTestGoog(VIDEO_MPEG4, 176, 144);
+    }
+
+    public void testMpeg40352x0288Other() throws Exception {
+        doTestOther(VIDEO_MPEG4, 352, 288);
+    }
+
+    public void testMpeg40352x0288Goog() throws Exception {
+        doTestGoog(VIDEO_MPEG4, 352, 288);
+    }
+
+    public void testMpeg40640x0480Other() throws Exception {
+        doTestOther(VIDEO_MPEG4, 640, 480);
+    }
+
+    public void testMpeg40640x0480Goog() throws Exception {
+        doTestGoog(VIDEO_MPEG4, 640, 480);
+    }
+
+    public void testMpeg41280x0720Other() throws Exception {
+        doTestOther(VIDEO_MPEG4, 1280, 720);
+    }
+
+    public void testMpeg41280x0720Goog() throws Exception {
+        doTestGoog(VIDEO_MPEG4, 1280, 720);
     }
 
     private boolean isSrcSemiPlanar() {
@@ -156,20 +300,44 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         }
     }
 
+    private void doTestGoog(String mimeType, int w, int h) throws Exception {
+        doTest(true /* isGoog */, mimeType, w, h, NUMBER_OF_REPEAT);
+    }
+
+    private void doTestOther(String mimeType, int w, int h) throws Exception {
+        doTest(false /* isGoog */, mimeType, w, h, NUMBER_OF_REPEAT);
+    }
+
     /**
      * Run encoding / decoding test for given mimeType of codec
+     * @param isGoog test google or non-google codec.
      * @param mimeType like video/avc
      * @param w video width
      * @param h video height
      * @param numberRepeat how many times to repeat the encoding / decoding process
      */
-    private void doTest(String mimeType, int w, int h, int numberRepeat) throws Exception {
-        CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(mimeType, w, h, true /* encoder */);
+    private void doTest(boolean isGoog, String mimeType, int w, int h, int numberRepeat)
+            throws Exception {
+        String encoderName = getEncoderName(mimeType, isGoog);
+        if (encoderName == null) {
+            Log.i(TAG, isGoog ? "Google " : "Non-google "
+                    + "encoder for " + mimeType + " not found");
+            return;
+        }
+
+        String decoderName = getDecoderName(mimeType, isGoog);
+        if (decoderName == null) {
+            Log.i(TAG, isGoog ? "Google " : "Non-google "
+                    + "decoder for " + mimeType + " not found");
+            return;
+        }
+
+        CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(encoderName, mimeType, w, h);
         if (infoEnc == null) {
             Log.i(TAG, "Encoder " + mimeType + " with " + w + "," + h + " not supported");
             return;
         }
-        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false /* encoder */);
+        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(decoderName, mimeType, w, h);
         assertNotNull(infoDec);
         mVideoWidth = w;
         mVideoHeight = h;
@@ -196,14 +364,15 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             format.setInteger(MediaFormat.KEY_FRAME_RATE, infoEnc.mFps);
             mFrameRate = infoEnc.mFps;
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, KEY_I_FRAME_INTERVAL);
-            double encodingTime = runEncoder(VIDEO_AVC, format, TOTAL_FRAMES);
+
+            double encodingTime = runEncoder(encoderName, format, TOTAL_FRAMES);
             // re-initialize format for decoder
             format = new MediaFormat();
             format.setString(MediaFormat.KEY_MIME, mimeType);
             format.setInteger(MediaFormat.KEY_WIDTH, w);
             format.setInteger(MediaFormat.KEY_HEIGHT, h);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mDstColorFormat);
-            double[] decoderResult = runDecoder(VIDEO_AVC, format);
+            double[] decoderResult = runDecoder(decoderName, format);
             if (decoderResult == null) {
                 success = false;
             } else {
@@ -227,26 +396,31 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 ResultUnit.FPS);
         getReportLog().printArray("encoder decoder", totalFpsResults, ResultType.HIGHER_BETTER,
                 ResultUnit.FPS);
+        getReportLog().printValue(mimeType + " encoder average fps for " + w + "x" + h,
+                Stat.getAverage(encoderFpsResults), ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        getReportLog().printValue(mimeType + " decoder average fps for " + w + "x" + h,
+                Stat.getAverage(decoderFpsResults), ResultType.HIGHER_BETTER, ResultUnit.FPS);
         getReportLog().printSummary("encoder decoder", Stat.getAverage(totalFpsResults),
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
         // make sure that rms error is not too big.
         for (int i = 0; i < numberRepeat; i++) {
-            assertTrue(decoderRmsErrorResults[i] < PIXEL_RMS_ERROR_MARGAIN);
+            if (decoderRmsErrorResults[i] >= mRmsErrorMargain) {
+                fail("rms error is bigger than the limit "
+                        + decoderRmsErrorResults[i] + " vs " + mRmsErrorMargain);
+            }
         }
     }
 
     /**
      * run encoder benchmarking
-     * @param mimeType encoder type like video/avc
+     * @param encoderName encoder name
      * @param format format of media to encode
      * @param totalFrames total number of frames to encode
      * @return time taken in ms to encode the frames. This does not include initialization time.
      */
-    private double runEncoder(String mimeType, MediaFormat format, int totalFrames) {
+    private double runEncoder(String encoderName, MediaFormat format, int totalFrames) {
         MediaCodec codec = null;
         try {
-            MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-            String encoderName = mcl.findEncoderForFormat(format);
             codec = MediaCodec.createByCodecName(encoderName);
             codec.configure(
                     format,
@@ -254,9 +428,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     null /* crypto */,
                     MediaCodec.CONFIGURE_FLAG_ENCODE);
         } catch (IllegalStateException e) {
-            Log.e(TAG, "codec '" + mimeType + "' failed configuration.");
+            Log.e(TAG, "codec '" + encoderName + "' failed configuration.");
             codec.release();
-            assertTrue("codec '" + mimeType + "' failed configuration.", false);
+            assertTrue("codec '" + encoderName + "' failed configuration.", false);
         } catch (IOException | NullPointerException e) {
             Log.i(TAG, "could not find codec for " + format);
             return Double.NaN;
@@ -542,18 +716,16 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
     /**
      * run encoder benchmarking with encoded stream stored from encoding phase
-     * @param mimeType encoder type like video/avc
+     * @param decoderName decoder name
      * @param format format of media to decode
      * @return returns length-2 array with 0: time for decoding, 1 : rms error of pixels
      */
-    private double[] runDecoder(String mimeType, MediaFormat format) {
-        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-        String decoderName = mcl.findDecoderForFormat(format);
+    private double[] runDecoder(String decoderName, MediaFormat format) {
         MediaCodec codec = null;
         try {
             codec = MediaCodec.createByCodecName(decoderName);
         } catch (IOException | NullPointerException e) {
-            Log.i(TAG, "could not find codec for " + format);
+            Log.i(TAG, "could not find decoder for " + format);
             return null;
         }
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
@@ -580,6 +752,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     ByteBuffer src = mEncodedOutputBuffer.get(inputBufferCount);
                     int writeSize = src.capacity();
                     dstBuf.put(src.array(), 0, writeSize);
+
                     codec.queueInputBuffer(
                             inputBufIndex,
                             0 /* offset */,
@@ -669,7 +842,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         codec.stop();
         codec.release();
         codec = null;
-        assertTrue(outFrameCount >= TOTAL_FRAMES);
+        if (outFrameCount < TOTAL_FRAMES) {
+            fail("Expecting " + TOTAL_FRAMES + " frames but get " + outFrameCount + " instead.");
+        }
         // divide by 3 as sum is done for Y, U, V.
         double errorRms = Math.sqrt(totalErrorSquared / PIXEL_CHECK_PER_FRAME / outFrameCount / 3);
         double[] result = { (double) finish - start, errorRms };
