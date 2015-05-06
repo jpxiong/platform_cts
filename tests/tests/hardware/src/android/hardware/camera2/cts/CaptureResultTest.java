@@ -440,17 +440,21 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
 
         // Keys only present when corresponding control is on are being
         // verified in its own functional test
-        // Only present when tone mapping mode is CONTRAST_CURVE
+        // Only present in certain tonemap mode. Test in CaptureRequestTest.
         waiverKeys.add(CaptureResult.TONEMAP_CURVE);
+        waiverKeys.add(CaptureResult.TONEMAP_GAMMA);
+        waiverKeys.add(CaptureResult.TONEMAP_PRESET_CURVE);
         // Only present when test pattern mode is SOLID_COLOR.
         // TODO: verify this key in test pattern test later
         waiverKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
         // Only present when STATISTICS_LENS_SHADING_MAP_MODE is ON
         waiverKeys.add(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
-        //  Only present when STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES is ON
+        // Only present when STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES is ON
         waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
-        //  Only present when face detection is on
+        // Only present when face detection is on
         waiverKeys.add(CaptureResult.STATISTICS_FACES);
+        // Only present in reprocessing capture result.
+        waiverKeys.add(CaptureResult.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR);
 
         //Keys not required if RAW is not supported
         if (!mStaticInfo.isCapabilitySupported(
@@ -458,6 +462,13 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
             waiverKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
             waiverKeys.add(CaptureResult.SENSOR_NOISE_PROFILE);
+        }
+
+        //Keys for depth output capability
+        if (!mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT)) {
+            waiverKeys.add(CaptureResult.LENS_POSE_ROTATION);
+            waiverKeys.add(CaptureResult.LENS_POSE_TRANSLATION);
         }
 
         if (mStaticInfo.getAeMaxRegionsChecked() == 0) {
@@ -687,6 +698,8 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.LENS_FOCAL_LENGTH);
         resultKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
         resultKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
+        resultKeys.add(CaptureResult.LENS_POSE_ROTATION);
+        resultKeys.add(CaptureResult.LENS_POSE_TRANSLATION);
         resultKeys.add(CaptureResult.LENS_FOCUS_RANGE);
         resultKeys.add(CaptureResult.LENS_STATE);
         resultKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
@@ -712,7 +725,10 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
         resultKeys.add(CaptureResult.TONEMAP_CURVE);
         resultKeys.add(CaptureResult.TONEMAP_MODE);
+        resultKeys.add(CaptureResult.TONEMAP_GAMMA);
+        resultKeys.add(CaptureResult.TONEMAP_PRESET_CURVE);
         resultKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
+        resultKeys.add(CaptureResult.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR);
 
         return resultKeys;
     }
