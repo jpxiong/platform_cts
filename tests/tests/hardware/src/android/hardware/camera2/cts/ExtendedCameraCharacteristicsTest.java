@@ -198,6 +198,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             {
                 //                                           (Key Name)                                     (HW Level)  (Capabilities <Var-Arg>)
                 expectKeyAvailable(c, CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES     , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_MODES                         , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES          , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES                      , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES          , LEGACY   ,   BC                   );
