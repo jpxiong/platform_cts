@@ -204,11 +204,13 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES          , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE                   , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP                    , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE                       , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES                      , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS                       , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES                   , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES     , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES                     , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE                      , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AE                          , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AF                          , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AWB                         , LEGACY   ,   BC                   );

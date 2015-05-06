@@ -321,6 +321,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
 
                 // Legacy mode always doesn't support these requirements
                 Boolean contrastCurveModeSupported = false;
+                Boolean gammaAndPresetModeSupported = false;
                 Boolean offColorAberrationModeSupported = false;
                 if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
                     int[] tonemapModes = mStaticInfo.getAvailableToneMapModesChecked();
@@ -329,6 +330,10 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                             Arrays.asList(CameraTestUtils.toObject(tonemapModes));
                     contrastCurveModeSupported =
                             modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE);
+                    gammaAndPresetModeSupported =
+                            modeList.contains(CameraMetadata.TONEMAP_MODE_GAMMA_VALUE) &&
+                            modeList.contains(CameraMetadata.TONEMAP_MODE_PRESET_CURVE);
+
                     int[] colorAberrationModes =
                             mStaticInfo.getAvailableColorAberrationModesChecked();
                     modeList = (colorAberrationModes.length == 0) ?
@@ -337,8 +342,12 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                     offColorAberrationModeSupported =
                             modeList.contains(CameraMetadata.COLOR_CORRECTION_ABERRATION_MODE_OFF);
                 }
+                Boolean tonemapModeQualified =
+                        contrastCurveModeSupported || gammaAndPresetModeSupported;
                 additionalRequirements.add(new Pair<String, Boolean>(
-                        "Tonemap mode must include CONTRAST_CURVE", contrastCurveModeSupported));
+                        "Tonemap mode must include {CONTRAST_CURVE} and/or " +
+                        "{GAMMA_VALUE, PRESET_CURVE}",
+                        tonemapModeQualified));
                 additionalRequirements.add(new Pair<String, Boolean>(
                         "Color aberration mode must include OFF", offColorAberrationModeSupported));
                 additionalRequirements.add(new Pair<String, Boolean>(
