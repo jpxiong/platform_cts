@@ -491,7 +491,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
             throws Exception {
         SimpleCaptureCallback captureCallback = new SimpleCaptureCallback();
         CaptureRequest.Builder builder;
-        if (inputResult != null) {
+        boolean isReprocess = inputResult != null;
+        if (isReprocess) {
             builder = mCamera.createReprocessCaptureRequest(inputResult);
         } else {
             builder = mCamera.createCaptureRequest(CAPTURE_TEMPLATE);
@@ -499,6 +500,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
         builder.addTarget(output);
         CaptureRequest request = builder.build();
+        assertTrue("Capture request reprocess type " + request.isReprocess() + " is wrong.",
+                request.isReprocess() == isReprocess);
         mSession.capture(request, captureCallback, mHandler);
 
         // wait for regular capture result
@@ -511,18 +514,10 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     private boolean isYuvReprocessSupported(String cameraId) throws Exception {
-        StaticMetadata info =
-                new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
-                                   CheckLevel.ASSERT, /*collector*/ null);
-        return info.isCapabilitySupported(
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING);
+        return isReprocessSupported(cameraId, ImageFormat.YUV_420_888);
     }
 
     private boolean isOpaqueReprocessSupported(String cameraId) throws Exception {
-        StaticMetadata info =
-                new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
-                                   CheckLevel.ASSERT, /*collector*/ null);
-        return info.isCapabilitySupported(
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING);
+        return isReprocessSupported(cameraId, ImageFormat.PRIVATE);
     }
 }

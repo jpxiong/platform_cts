@@ -64,6 +64,7 @@ public class StaticMetadata {
     private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX = 2;
     private static final Rational CONTROL_AE_COMPENSATION_STEP_DEFAULT = new Rational(1, 2);
     private static final byte REQUEST_PIPELINE_MAX_DEPTH_MAX = 8;
+    private static final int MAX_REPROCESS_MAX_CAPTURE_STALL = 4;
 
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
@@ -1899,6 +1900,26 @@ public class StaticMetadata {
                 facing >= CameraCharacteristics.LENS_FACING_FRONT &&
                 facing <= CameraCharacteristics.LENS_FACING_BACK);
         return facing;
+    }
+
+    /**
+     * Get maxCaptureStall frames or default value (if value doesn't exist)
+     * @return maxCaptureStall frames or default value.
+     */
+    public int getMaxCaptureStallOrDefault() {
+        Key<Integer> key =
+                CameraCharacteristics.REPROCESS_MAX_CAPTURE_STALL;
+        Integer value = getValueFromKeyNonNull(key);
+
+        if (value == null) {
+            return MAX_REPROCESS_MAX_CAPTURE_STALL;
+        }
+
+        checkTrueForKey(key, " value is out of range ",
+                value >= 0 &&
+                value <= MAX_REPROCESS_MAX_CAPTURE_STALL);
+
+        return value;
     }
 
     /**
