@@ -267,6 +267,7 @@ class CtsBuilder(object):
     #                   different deqp sets in different plans.
     plan.ExcludeTests('com.drawelements.deqp.gles3', ReadFileLines(os.path.join(self.test_root, 'deqp/gles3-temporary-failures.txt')))
     plan.ExcludeTests('com.drawelements.deqp.gles31', ReadFileLines(os.path.join(self.test_root, 'deqp/gles31-temporary-failures.txt')))
+    plan.ExcludeTests('com.drawelements.deqp.egl', ReadFileLines(os.path.join(self.test_root, 'deqp/egl-temporary-failures.txt')))
     self.__WritePlan(plan, 'CTS-DEQP')
 
     # CTS - sub plan for new test packages added for staging
