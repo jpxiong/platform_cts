@@ -37,6 +37,7 @@ import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.ImageWriter;
 import android.media.Image.Plane;
 import android.os.Handler;
 import android.util.Log;
@@ -119,12 +120,39 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
+     * Create an ImageWriter and hook up the ImageListener.
+     *
+     * @param inputSurface The input surface of the ImageWriter.
+     * @param maxImages The max number of Images that can be dequeued simultaneously.
+     * @param listener The listener used by this ImageWriter to notify callbacks
+     * @param handler The handler to post listener callbacks.
+     * @return ImageWriter object created.
+     */
+    public static ImageWriter makeImageWriter(
+            Surface inputSurface, int maxImages,
+            ImageWriter.ImageListener listener, Handler handler) {
+        ImageWriter writer = ImageWriter.newInstance(inputSurface, maxImages);
+        writer.setImageListener(listener, handler);
+        return writer;
+    }
+
+    /**
      * Close pending images and clean up an {@link android.media.ImageReader} object.
      * @param reader an {@link android.media.ImageReader} to close.
      */
     public static void closeImageReader(ImageReader reader) {
         if (reader != null) {
             reader.close();
+        }
+    }
+
+    /**
+     * Close pending images and clean up an {@link android.media.ImageWriter} object.
+     * @param writer an {@link android.media.ImageWriter} to close.
+     */
+    public static void closeImageWriter(ImageWriter writer) {
+        if (writer != null) {
+            writer.close();
         }
     }
 
@@ -179,11 +207,52 @@ public class CameraTestUtils extends Assert {
             implements ImageReader.OnImageAvailableListener {
         private final LinkedBlockingQueue<Image> mQueue =
                 new LinkedBlockingQueue<Image>();
+        // Indicate whether this listener will drop images or not,
+        // when the queued images reaches the reader maxImages
+        private final boolean mAsyncMode;
+        // maxImages held by the queue in async mode.
+        private final int mMaxImages;
+
+        /**
+         * Create a synchronous SimpleImageReaderListener that queues the images
+         * automatically when they are available, no image will be dropped. If
+         * the caller doesn't call getImage(), the producer will eventually run
+         * into buffer starvation.
+         */
+        public SimpleImageReaderListener() {
+            mAsyncMode = false;
+            mMaxImages = 0;
+        }
+
+        /**
+         * Create a synchronous/asynchronous SimpleImageReaderListener that
+         * queues the images automatically when they are available. For
+         * asynchronous listener, image will be dropped if the queued images
+         * reach to maxImages queued. If the caller doesn't call getImage(), the
+         * producer will not be blocked. For synchronous listener, no image will
+         * be dropped. If the caller doesn't call getImage(), the producer will
+         * eventually run into buffer starvation.
+         *
+         * @param asyncMode If the listener is operating at asynchronous mode.
+         * @param maxImages The max number of images held by this listener.
+         */
+        /**
+         *
+         * @param asyncMode
+         */
+        public SimpleImageReaderListener(boolean asyncMode, int maxImages) {
+            mAsyncMode = asyncMode;
+            mMaxImages = maxImages;
+        }
 
         @Override
         public void onImageAvailable(ImageReader reader) {
             try {
                 mQueue.put(reader.acquireNextImage());
+                if (mAsyncMode && mQueue.size() >= mMaxImages) {
+                    Image img = mQueue.poll();
+                    img.close();
+                }
             } catch (InterruptedException e) {
                 throw new UnsupportedOperationException(
                         "Can't handle InterruptedException in onImageAvailable");
@@ -200,6 +269,18 @@ public class CameraTestUtils extends Assert {
             Image image = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
             assertNotNull("Wait for an image timed out in " + timeout + "ms", image);
             return image;
+        }
+
+        /**
+         * Drain the pending images held by this listener currently.
+         *
+         */
+        public void drain() {
+            for (int i = 0; i < mQueue.size(); i++) {
+                Image image = mQueue.poll();
+                assertNotNull("Unable to get an image", image);
+                image.close();
+            }
         }
     }
 
@@ -242,6 +323,27 @@ public class CameraTestUtils extends Assert {
 
         public CaptureResult getCaptureResult(long timeout) {
             return getTotalCaptureResult(timeout);
+        }
+
+        public TotalCaptureResult getCaptureResult(long timeout, long timestamp) {
+            try {
+                long currentTs = -1L;
+                TotalCaptureResult result;
+                while (true) {
+                    result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                    if (result == null) {
+                        throw new RuntimeException(
+                                "Wait for a capture result timed out in " + timeout + "ms");
+                    }
+                    currentTs = result.get(CaptureResult.SENSOR_TIMESTAMP);
+                    if (currentTs == timestamp) {
+                        return result;
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
         }
 
         public TotalCaptureResult getTotalCaptureResult(long timeout) {
@@ -309,6 +411,11 @@ public class CameraTestUtils extends Assert {
         public boolean hasMoreResults()
         {
             return mQueue.isEmpty();
+        }
+
+        public void drain() {
+            mQueue.clear();
+            mNumFramesArrived.getAndSet(0);
         }
     }
 
