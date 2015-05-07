@@ -369,8 +369,9 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 raw.getPlanes()[0].getBuffer().get(rawPlane);
                 raw.getPlanes()[0].getBuffer().rewind();
                 RawConverter.convertToSRGB(RenderScriptSingleton.getRS(), raw.getWidth(),
-                        raw.getHeight(), rawPlane, characteristics,
-                        resultPair.second, /*offsetX*/0, /*offsetY*/0, /*out*/rawBitmap);
+                        raw.getHeight(), raw.getPlanes()[0].getRowStride(), rawPlane,
+                        characteristics, resultPair.second, /*offsetX*/0, /*offsetY*/0,
+                        /*out*/rawBitmap);
 
                 // Decompress JPEG image to a bitmap
                 byte[] compressedJpegData = CameraTestUtils.getDataFromImage(jpeg);
