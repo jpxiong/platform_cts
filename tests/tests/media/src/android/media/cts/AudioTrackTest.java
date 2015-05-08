@@ -23,7 +23,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTimestamp;
 import android.media.AudioTrack;
-import android.media.PlaybackSettings;
+import android.media.PlaybackParams;
 import android.util.Log;
 
 import com.android.cts.util.ReportLog;
@@ -2173,7 +2173,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
             final float speedInc = (speedEnd - speedStart) / testSteps;
             final float pitchInc = (pitchEnd - pitchStart) / testSteps;
 
-            PlaybackSettings playbackSettings = new PlaybackSettings()
+            PlaybackParams playbackParams = new PlaybackParams()
                     .setPitch(pitchStart)
                     .setSpeed(speedStart)
                     .allowDefaults();
@@ -2187,23 +2187,23 @@ public class AudioTrackTest extends CtsAndroidTestCase {
             int anticipatedPosition = track.getPlaybackHeadPosition();
             for (int j = 0; j < testSteps; ++j) {
                 // set playback settings
-                final float pitch = playbackSettings.getPitch();
-                final float speed = playbackSettings.getSpeed();
+                final float pitch = playbackParams.getPitch();
+                final float speed = playbackParams.getSpeed();
 
-                track.setPlaybackSettings(playbackSettings);
+                track.setPlaybackParams(playbackParams);
 
                 // verify that settings have changed
-                PlaybackSettings checkSettings = track.getPlaybackSettings();
-                assertEquals(TAG, pitch, checkSettings.getPitch());
-                assertEquals(TAG, speed, checkSettings.getSpeed());
+                PlaybackParams checkParams = track.getPlaybackParams();
+                assertEquals(TAG, pitch, checkParams.getPitch());
+                assertEquals(TAG, speed, checkParams.getSpeed());
 
                 // sleep for playback
                 Thread.sleep(TEST_DELTA_MS);
                 // Log.d(TAG, "position[" + j + "] " + track.getPlaybackHeadPosition());
                 anticipatedPosition +=
-                        playbackSettings.getSpeed() * TEST_DELTA_MS * TEST_SR / 1000;
-                playbackSettings.setPitch(playbackSettings.getPitch() + pitchInc);
-                playbackSettings.setSpeed(playbackSettings.getSpeed() + speedInc);
+                        playbackParams.getSpeed() * TEST_DELTA_MS * TEST_SR / 1000;
+                playbackParams.setPitch(playbackParams.getPitch() + pitchInc);
+                playbackParams.setSpeed(playbackParams.getSpeed() + speedInc);
             }
             final int endPosition = track.getPlaybackHeadPosition();
             final int tolerance100MsInFrames = 100 * TEST_SR / 1000;
