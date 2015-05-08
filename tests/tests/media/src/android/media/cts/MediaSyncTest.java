@@ -629,7 +629,6 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
                         mMediaSync.queueAudio(
                                 outputByteBuffer,
                                 index,
-                                info.size,
                                 info.presentationTimeUs);
                     } else {
                         codec.releaseOutputBuffer(index, info.presentationTimeUs * 1000);
