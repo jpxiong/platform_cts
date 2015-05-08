@@ -1620,15 +1620,20 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expectLastCall().once();
     }
 
-    private void setRecoveryExpectationKillProcess(RecoverableTestDevice mockDevice)
-            throws DeviceNotAvailableException {
+    private void setRecoveryExpectationKillProcess(RecoverableTestDevice mockDevice,
+            DeqpTestRunner.ISleepProvider mockSleepProvider) throws DeviceNotAvailableException {
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
                 andReturn("root 1234 com.drawelement.deqp").once();
 
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("kill -9 1234"))).
                 andReturn("").once();
-    }
 
+        // Recovery checks if kill failed
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expectLastCall().once();
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
+                andReturn("").once();
+    }
 
     private void setRecoveryExpectationRecovery(RecoverableTestDevice mockDevice)
             throws DeviceNotAvailableException {
@@ -1664,11 +1669,11 @@ public class DeqpTestRunnerTest extends TestCase {
         switch (numConsecutiveErrors) {
             case 0:
                 setRecoveryExpectationWait(mockSleepProvider);
-                setRecoveryExpectationKillProcess(mockDevice);
+                setRecoveryExpectationKillProcess(mockDevice, mockSleepProvider);
                 return 1;
             case 1:
                 setRecoveryExpectationRecovery(mockDevice);
-                setRecoveryExpectationKillProcess(mockDevice);
+                setRecoveryExpectationKillProcess(mockDevice, mockSleepProvider);
                 return 2;
             case 2:
                 setRecoveryExpectationReboot(mockDevice);
@@ -1837,6 +1842,56 @@ public class DeqpTestRunnerTest extends TestCase {
                 RecoveryEvent.PROGRESS, RecoveryEvent.FAIL_LINK_KILLED,
                 RecoveryEvent.FAIL_CONNECTION_REFUSED, RecoveryEvent.FAIL_LINK_KILLED,
                 RecoveryEvent.PROGRESS);
+    }
+
+    /**
+     * Test recovery if process cannot be killed
+     */
+    public void testRecovery_unkillableProcess () throws Exception {
+        DeqpTestRunner.Recovery recovery = new DeqpTestRunner.Recovery();
+        IMocksControl orderedControl = EasyMock.createStrictControl();
+        RecoverableTestDevice mockDevice = orderedControl.createMock(RecoverableTestDevice.class);
+        DeqpTestRunner.ISleepProvider mockSleepProvider =
+                orderedControl.createMock(DeqpTestRunner.ISleepProvider.class);
+
+        // recovery attempts to kill the process after a timeout
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
+                andReturn("root 1234 com.drawelement.deqp").once();
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("kill -9 1234"))).
+                andReturn("").once();
+
+        // Recovery checks if kill failed
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expectLastCall().once();
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
+                andReturn("root 1234 com.drawelement.deqp").once();
+
+        // Recovery resets the connection
+        mockDevice.recoverDevice();
+        EasyMock.expectLastCall().once();
+
+        // and attempts to kill the process again
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
+                andReturn("root 1234 com.drawelement.deqp").once();
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("kill -9 1234"))).
+                andReturn("").once();
+
+        // Recovery checks if kill failed
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expectLastCall().once();
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.contains("ps"))).
+                andReturn("root 1234 com.drawelement.deqp").once();
+
+        // recovery reboots the device
+        mockDevice.reboot();
+        EasyMock.expectLastCall().once();
+
+        orderedControl.replay();
+        recovery.setDevice(mockDevice);
+        recovery.setSleepProvider(mockSleepProvider);
+        recovery.recoverComLinkKilled();
+        orderedControl.verify();
     }
 
     private void runInstrumentationLineAndAnswer(ITestDevice mockDevice, IDevice mockIDevice,

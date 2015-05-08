@@ -740,6 +740,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
      */
     public static class Recovery implements IRecovery {
         private int RETRY_COOLDOWN_MS = 6000; // 6 seconds
+        private int PROCESS_KILL_WAIT_MS = 1000; // 1 second
 
         private static enum MachineState {
             WAIT, // recover by waiting
@@ -751,6 +752,9 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         private MachineState mState = MachineState.WAIT;
         private ITestDevice mDevice;
         private ISleepProvider mSleepProvider;
+
+        private static class ProcessKillFailureException extends Exception {
+        }
 
         /**
          * {@inheritDoc}
@@ -835,6 +839,9 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                     } catch (DeviceNotAvailableException ex) {
                         // chain forward
                         recoverComLinkKilled();
+                    } catch (ProcessKillFailureException ex) {
+                        // chain forward
+                        recoverComLinkKilled();
                     }
                     break;
 
@@ -847,6 +854,9 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         recoverDevice();
                         killDeqpProcess();
                     } catch (DeviceNotAvailableException ex) {
+                        // chain forward
+                        recoverComLinkKilled();
+                    } catch (ProcessKillFailureException ex) {
                         // chain forward
                         recoverComLinkKilled();
                     }
@@ -876,7 +886,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             mSleepProvider.sleep(RETRY_COOLDOWN_MS);
         }
 
-        private void killDeqpProcess() throws DeviceNotAvailableException {
+        private Iterable<Integer> getDeqpProcessPids() throws DeviceNotAvailableException {
+            final List<Integer> pids = new ArrayList<Integer>(2);
             final String processes = mDevice.executeShellCommand("ps | grep com.drawelements");
             final String[] lines = processes.split("(\\r|\\n)+");
             for (String line : lines) {
@@ -885,14 +896,28 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                     continue;
                 }
 
-                final int processId;
                 try {
-                    processId = Integer.parseInt(fields[1], 10);
+                    final int processId = Integer.parseInt(fields[1], 10);
+                    pids.add(processId);
                 } catch (NumberFormatException ex) {
                     continue;
                 }
+            }
+            return pids;
+        }
 
+        private void killDeqpProcess() throws DeviceNotAvailableException,
+                ProcessKillFailureException {
+            for (Integer processId : getDeqpProcessPids()) {
                 mDevice.executeShellCommand(String.format("kill -9 %d", processId));
+            }
+
+            mSleepProvider.sleep(PROCESS_KILL_WAIT_MS);
+
+            // check that processes actually died
+            if (getDeqpProcessPids().iterator().hasNext()) {
+                // a process is still alive, killing failed
+                throw new ProcessKillFailureException();
             }
         }
 
