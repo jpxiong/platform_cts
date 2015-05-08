@@ -21,6 +21,7 @@ import android.cts.util.TestThread;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
@@ -36,6 +37,8 @@ import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
+import android.webkit.WebMessage;
+import android.webkit.WebMessagePort;
 import android.webkit.WebSettings;
 import android.webkit.WebView.HitTestResult;
 import android.webkit.WebView.PictureListener;
@@ -303,6 +306,24 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.removeJavascriptInterface(interfaceName);
+            }
+        });
+    }
+
+    public WebMessagePort[] createWebMessageChannel() {
+        return getValue(new ValueGetter<WebMessagePort[]>() {
+            @Override
+            public WebMessagePort[] capture() {
+                return mWebView.createWebMessageChannel();
+            }
+        });
+    }
+
+    public void postMessageToMainFrame(final WebMessage message, final Uri targetOrigin) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.postMessageToMainFrame(message, targetOrigin);
             }
         });
     }
