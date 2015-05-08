@@ -25,6 +25,7 @@ import android.media.AudioTimestamp;
 import android.media.AudioTrack;
 import android.media.PlaybackSettings;
 import android.util.Log;
+
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
@@ -260,6 +261,116 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         }
 
         assertTrue("testConstructorStreamType", localTestRes);
+    }
+
+    // -----------------------------------------------------------------
+    // AudioTrack construction with Builder
+    // ----------------------------------
+
+    // Test case 1: build AudioTrack with default parameters, test documented default params
+    public void testBuilderDefault() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testBuilderDefault";
+        final int expectedDefaultEncoding = AudioFormat.ENCODING_PCM_16BIT;
+        final int expectedDefaultRate =
+                AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC);
+        final int expectedDefaultChannels = AudioFormat.CHANNEL_OUT_STEREO;
+        // use Builder
+        final int buffSizeInBytes = AudioTrack.getMinBufferSize(
+                expectedDefaultRate, expectedDefaultChannels, expectedDefaultEncoding);
+        final AudioTrack track = new AudioTrack.Builder()
+                .setBufferSizeInBytes(buffSizeInBytes)
+                .build();
+        // save results
+        final int observedState = track.getState();
+        final int observedFormat = track.getAudioFormat();
+        final int observedChannelConf = track.getChannelConfiguration();
+        final int observedRate = track.getSampleRate();
+        // release track before the test exits (either successfully or with an exception)
+        track.release();
+        // compare results
+        assertEquals(TEST_NAME + ": Track initialized", AudioTrack.STATE_INITIALIZED,
+                observedState);
+        assertEquals(TEST_NAME + ": Default track encoding", expectedDefaultEncoding,
+                observedFormat);
+        assertEquals(TEST_NAME + ": Default track channels", expectedDefaultChannels,
+                observedChannelConf);
+        assertEquals(TEST_NAME + ": Default track sample rate", expectedDefaultRate,
+                observedRate);
+    }
+
+    // Test case 2: build AudioTrack with AudioFormat, test it's used
+    public void testBuilderFormat() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testBuilderFormat";
+        final int TEST_RATE = 32000;
+        final int TEST_CHANNELS = AudioFormat.CHANNEL_OUT_STEREO;
+        // use Builder
+        final int buffSizeInBytes = AudioTrack.getMinBufferSize(
+                TEST_RATE, TEST_CHANNELS, AudioFormat.ENCODING_PCM_16BIT);
+        final AudioTrack track = new AudioTrack.Builder()
+                .setAudioAttributes(new AudioAttributes.Builder().build())
+                .setBufferSizeInBytes(buffSizeInBytes)
+                .setAudioFormat(new AudioFormat.Builder()
+                        .setChannelMask(TEST_CHANNELS).setSampleRate(TEST_RATE).build())
+                .build();
+        // save results
+        final int observedState = track.getState();
+        final int observedChannelConf = track.getChannelConfiguration();
+        final int observedRate = track.getSampleRate();
+        // release track before the test exits (either successfully or with an exception)
+        track.release();
+        // compare results
+        assertEquals(TEST_NAME + ": Track initialized", AudioTrack.STATE_INITIALIZED,
+                observedState);
+        assertEquals(TEST_NAME + ": Track channels", TEST_CHANNELS, observedChannelConf);
+        assertEquals(TEST_NAME + ": Track sample rate", TEST_RATE, observedRate);
+    }
+
+    // Test case 3: build AudioTrack with session ID, test it's used
+    public void testBuilderSession() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testBuilderSession";
+        // generate a session ID
+        final int expectedSessionId = new AudioManager(getContext()).generateAudioSessionId();
+        // use builder
+        final AudioTrack track = new AudioTrack.Builder()
+                .setSessionId(expectedSessionId)
+                .build();
+        // save results
+        final int observedSessionId = track.getAudioSessionId();
+        // release track before the test exits (either successfully or with an exception)
+        track.release();
+        // compare results
+        assertEquals(TEST_NAME + ": Assigned track session ID", expectedSessionId,
+                observedSessionId);
+    }
+
+    // Test case 4: build AudioTrack with AudioAttributes built from stream type, test it's used
+    public void testBuilderAttributesStream() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testBuilderAttributesStream";
+        //     use a stream type documented in AudioAttributes.Builder.setLegacyStreamType(int)
+        final int expectedStreamType = AudioManager.STREAM_ALARM;
+        final int expectedContentType = AudioAttributes.CONTENT_TYPE_SPEECH;
+        final AudioAttributes aa = new AudioAttributes.Builder()
+                .setLegacyStreamType(expectedStreamType)
+                .setContentType(expectedContentType)
+                .build();
+        // use builder
+        final AudioTrack track = new AudioTrack.Builder()
+                .setAudioAttributes(aa)
+                .build();
+        // save results
+        final int observedStreamType = track.getStreamType();
+        // release track before the test exits (either successfully or with an exception)
+        track.release();
+        // compare results
+        assertEquals(TEST_NAME + ": track stream type", expectedStreamType, observedStreamType);
+        //    also test content type was preserved in the attributes even though they
+        //     were first configured with a legacy stream type
+        assertEquals(TEST_NAME + ": attributes content type", expectedContentType,
+                aa.getContentType());
     }
 
     // -----------------------------------------------------------------
