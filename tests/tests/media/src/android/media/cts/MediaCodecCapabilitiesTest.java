@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * Basic sanity test of data returned by MediaCodeCapabilities.
@@ -526,6 +527,86 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         }
         if (skipped) {
             MediaUtils.skipTest("no non-tunneled/non-secure video decoders found");
+        }
+    }
+
+    private static MediaFormat createMinFormat(String mime, VideoCapabilities vcaps, int color) {
+        int minWidth = vcaps.getSupportedWidths().getLower();
+        int minHeight = vcaps.getSupportedHeightsFor(minWidth).getLower();
+        int minBitrate = vcaps.getBitrateRange().getLower();
+
+        MediaFormat format = MediaFormat.createVideoFormat(mime, minWidth, minHeight);
+        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, color);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, minBitrate);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, 10);
+        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10);
+        return format;
+    }
+
+    private static int getActualMax(
+            boolean isEncoder, String name, String mime, CodecCapabilities caps, int max) {
+        int flag = isEncoder ? MediaCodec.CONFIGURE_FLAG_ENCODE : 0;
+        MediaFormat format =
+                createMinFormat(mime, caps.getVideoCapabilities(), caps.colorFormats[0]);
+        Vector<MediaCodec> codecs = new Vector<MediaCodec>();
+        for (int i = 0; i < max; ++i) {
+            try {
+                Log.d(TAG, "Create codec " + name + " #" + i);
+                MediaCodec codec = MediaCodec.createByCodecName(name);
+                codec.configure(format, null, null, flag);
+                codec.start();
+                codecs.add(codec);
+            } catch (IllegalArgumentException e) {
+                fail("Got unexpected IllegalArgumentException " + e.getMessage());
+            } catch (IOException e) {
+                fail("Got unexpected IOException " + e.getMessage());
+            } catch (MediaCodec.CodecException e) {
+                // ERROR_INSUFFICIENT_RESOURCE is expected as the test keep creating codecs.
+                // But other exception should be treated as failure.
+                if (e.getErrorCode() == MediaCodec.CodecException.ERROR_INSUFFICIENT_RESOURCE) {
+                    Log.d(TAG, "Got CodecException with ERROR_INSUFFICIENT_RESOURCE.");
+                    break;
+                } else {
+                    fail("Unexpected CodecException " + e.getDiagnosticInfo());
+                }
+            }
+        }
+        int actualMax = codecs.size();
+        for (int i = 0; i < codecs.size(); ++i) {
+            codecs.get(i).release();
+        }
+        return actualMax;
+    }
+
+    private static boolean shouldTestActual(CodecCapabilities caps) {
+        if (caps.getVideoCapabilities() == null) {
+            // TODO: test audio codecs.
+            return false;
+        }
+        return true;
+    }
+
+    public void testGetMaxSupportedInstances() {
+        MediaCodecList allCodecs = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : allCodecs.getCodecInfos()) {
+            Log.d(TAG, "codec: " + info.getName());
+            Log.d(TAG, "  isEncoder = " + info.isEncoder());
+
+            String[] types = info.getSupportedTypes();
+            for (int j = 0; j < types.length; ++j) {
+                Log.d(TAG, "calling getCapabilitiesForType " + types[j]);
+                CodecCapabilities caps = info.getCapabilitiesForType(types[j]);
+                int max = caps.getMaxSupportedInstances();
+                Log.d(TAG, "getMaxSupportedInstances returns " + max);
+                assertTrue(max > 0);
+
+                if (shouldTestActual(caps)) {
+                    int actualMax = getActualMax(
+                            info.isEncoder(), info.getName(), types[j], caps, max + 1);
+                    Log.d(TAG, "actualMax " + actualMax + " vs reported max " + max);
+                    assertTrue(actualMax >= (int)(max * 0.9));
+                }
+            }
         }
     }
 }
