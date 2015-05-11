@@ -20,6 +20,8 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.log.LogUtil.CLog;
 
+import java.io.File;
+
 /**
  * Set of tests for Device Owner use cases.
  */
@@ -27,6 +29,10 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
 
     private static final String DEVICE_OWNER_PKG = "com.android.cts.deviceowner";
     private static final String DEVICE_OWNER_APK = "CtsDeviceOwnerApp.apk";
+
+    private static final String TEST_APP_APK = "CtsSimpleApp.apk";
+    private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
+    private static final String TEST_APP_LOCATION = "/data/local/tmp/";
 
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             DEVICE_OWNER_PKG + ".BaseDeviceOwnerTest$BasicAdminReceiver";
@@ -79,6 +85,19 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
 
     public void testScreenCaptureDisabled() throws Exception {
         executeDeviceOwnerTest("ScreenCaptureDisabledTest");
+    }
+
+    public void testSilentPackageInstaller() throws Exception {
+        final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
+        try {
+            getDevice().uninstallPackage(TEST_APP_PKG);
+            assertTrue(getDevice().pushFile(apk, TEST_APP_LOCATION + apk.getName()));
+            executeDeviceOwnerTest("SilentPackageInstallerTest");
+        } finally {
+            String command = "rm " + TEST_APP_LOCATION + apk.getName();
+            String commandOutput = getDevice().executeShellCommand(command);
+            getDevice().uninstallPackage(TEST_APP_PKG);
+        }
     }
 
     private void executeDeviceOwnerTest(String testClassName) throws Exception {
