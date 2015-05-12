@@ -1333,7 +1333,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     // OK
                 } else if (template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG &&
                         !mStaticInfo.isCapabilitySupported(CameraCharacteristics.
-                                REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING)) {
+                                REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING)) {
                     // OK.
                 } else if (sLegacySkipTemplates.contains(template) &&
                         mStaticInfo.isHardwareLevelLegacy()) {

@@ -626,7 +626,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         InputConfiguration inputConfig = new InputConfiguration(maxInputSize.getWidth(),
                 maxInputSize.getHeight(), inputFormat);
         mSessionListener = new BlockingSessionCallback();
-        mSession = CameraTestUtils.configureReprocessibleCameraSession(
+        mSession = CameraTestUtils.configureReprocessableCameraSession(
                 mCamera, inputConfig, outSurfaces, mSessionListener, mHandler);
 
         // 3. Create ImageWriter for input

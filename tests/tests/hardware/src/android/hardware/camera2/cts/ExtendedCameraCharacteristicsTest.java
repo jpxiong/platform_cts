@@ -87,7 +87,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private static final int YUV_REPROCESS =
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING;
     private static final int OPAQUE_REPROCESS =
-            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING;
+            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING;
 
     @Override
     public void setContext(Context context) {
@@ -491,7 +491,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             boolean supportYUV = arrayContains(capabilities,
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING);
             boolean supportOpaque = arrayContains(capabilities,
-                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING);
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING);
             StreamConfigurationMap configs =
                     c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Integer maxNumInputStreams =
