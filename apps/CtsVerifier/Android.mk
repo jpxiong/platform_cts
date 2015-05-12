@@ -31,6 +31,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
                                ctstestrunner \
                                apache-commons-math \
                                androidplot \
+                               ctsverifier-opencv \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
@@ -43,6 +44,16 @@ LOCAL_SDK_VERSION := current
 LOCAL_DEX_PREOPT := false
 
 include $(BUILD_PACKAGE)
+
+
+# opencv library
+include $(CLEAR_VARS)
+
+LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
+        ctsverifier-opencv:libs/opencv-android.jar
+
+include $(BUILD_MULTI_PREBUILT)
+
 
 notification-bot := $(call intermediates-dir-for,APPS,NotificationBot)/package.apk
 
