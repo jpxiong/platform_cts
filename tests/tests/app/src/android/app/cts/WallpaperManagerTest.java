@@ -44,25 +44,25 @@ public class WallpaperManagerTest extends AndroidTestCase {
         final Point min = getScreenSize();
         final int w = min.x * 3;
         final int h = min.y * 2;
-
         assertDesiredMinimum(new Point(min.x / 2, min.y / 2), min);
 
-        assertDesiredMinimum(new Point(w, h),
-                             new Point(w, h));
+        assertDesiredMinimum(new Point(w, h), min);
 
-        assertDesiredMinimum(new Point(min.x / 2, h),
-                             new Point(min.x, h));
+        assertDesiredMinimum(new Point(min.x / 2, h), min);
 
-        assertDesiredMinimum(new Point(w, min.y / 2),
-                             new Point(w, min.y));
+        assertDesiredMinimum(new Point(w, min.y / 2), min);
     }
 
-    private void assertDesiredMinimum(Point suggestedSize, Point expectedSize) {
+    private void assertDesiredMinimum(Point suggestedSize, Point minSize) {
         mWallpaperManager.suggestDesiredDimensions(suggestedSize.x, suggestedSize.y);
         Point actualSize = new Point(mWallpaperManager.getDesiredMinimumWidth(),
                 mWallpaperManager.getDesiredMinimumHeight());
         if (actualSize.x > 0 || actualSize.y > 0) {
-            assertEquals(expectedSize, actualSize);
+            if((actualSize.x < minSize.x || actualSize.y < minSize.y)){
+                throw new AssertionError("Expected at least x: " + minSize.x + " y: "
+                                         + minSize.y + ", got x: " + actualSize.x +
+                                         " y: " + actualSize.y );
+            }
         }
     }
 
