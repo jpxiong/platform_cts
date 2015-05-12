@@ -63,6 +63,9 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     private ImageReader mFirstImageReader;
     // The image reader for the reprocess capture
     private ImageReader mSecondImageReader;
+    // A flag indicating whether the regular capture and the reprocess capture share the same image
+    // reader. If it's true, mFirstImageReader should be used for regular and reprocess outputs.
+    private boolean mShareOneImageReader;
     private SimpleImageReaderListener mFirstImageReaderListener;
     private SimpleImageReaderListener mSecondImageReaderListener;
     private Surface mInputSurface;
@@ -257,9 +260,15 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 closeReprossibleSession();
                 setupReprocessibleSession(/*previewSurface*/null, /*numImageWriterImages*/1);
                 try {
+                    TotalCaptureResult reprocessResult;
                     // issue and wait on reprocess capture request
-                    TotalCaptureResult reprocessResult =
-                            submitCaptureRequest(mSecondImageReader.getSurface(), result);
+                    if (mShareOneImageReader) {
+                        reprocessResult =
+                                submitCaptureRequest(mFirstImageReader.getSurface(), result);
+                    } else {
+                        reprocessResult =
+                                submitCaptureRequest(mSecondImageReader.getSurface(), result);
+                    }
                     fail("Camera " + id + ": should get IllegalArgumentException for cross " +
                             "session reprocess captrue.");
                 } catch (IllegalArgumentException e) {
@@ -594,15 +603,25 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     private void setupImageReaders(Size inputSize, int inputFormat, Size reprocessOutputSize,
             int reprocessOutputFormat, int maxImages) {
 
+        mShareOneImageReader = false;
+        // If the regular output and reprocess output have the same size and format,
+        // they can share one image reader.
+        if (inputFormat == reprocessOutputFormat &&
+                inputSize.equals(reprocessOutputSize)) {
+            maxImages *= 2;
+            mShareOneImageReader = true;
+        }
         // create an ImageReader for the regular capture
         mFirstImageReaderListener = new SimpleImageReaderListener();
         mFirstImageReader = makeImageReader(inputSize, inputFormat, maxImages,
                 mFirstImageReaderListener, mHandler);
 
-        // create an ImageReader for the reprocess capture
-        mSecondImageReaderListener = new SimpleImageReaderListener();
-        mSecondImageReader = makeImageReader(reprocessOutputSize, reprocessOutputFormat, maxImages,
-                mSecondImageReaderListener, mHandler);
+        if (!mShareOneImageReader) {
+            // create an ImageReader for the reprocess capture
+            mSecondImageReaderListener = new SimpleImageReaderListener();
+            mSecondImageReader = makeImageReader(reprocessOutputSize, reprocessOutputFormat,
+                    maxImages, mSecondImageReaderListener, mHandler);
+        }
     }
 
     /**
@@ -623,7 +642,9 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         // create a reprocessible capture session
         List<Surface> outSurfaces = new ArrayList<Surface>();
         outSurfaces.add(mFirstImageReader.getSurface());
-        outSurfaces.add(mSecondImageReader.getSurface());
+        if (!mShareOneImageReader) {
+            outSurfaces.add(mSecondImageReader.getSurface());
+        }
         if (previewSurface != null) {
             outSurfaces.add(previewSurface);
         }
@@ -715,14 +736,23 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
         Surface[] outputSurfaces = new Surface[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
-            outputSurfaces[i] = mSecondImageReader.getSurface();
+            if (mShareOneImageReader) {
+                outputSurfaces[i] = mFirstImageReader.getSurface();
+            } else {
+                outputSurfaces[i] = mSecondImageReader.getSurface();
+            }
         }
 
         TotalCaptureResult[] finalResults = submitMixedCaptureBurstRequest(outputSurfaces, results);
 
         ImageResultHolder[] holders = new ImageResultHolder[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
-            Image image = mSecondImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
+            Image image;
+            if (mShareOneImageReader) {
+                image = mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
+            } else {
+                image = mSecondImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
+            }
             holders[i] = new ImageResultHolder(image, finalResults[i]);
         }
 
