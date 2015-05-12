@@ -132,27 +132,6 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         }
     }
 
-    private final class SimpleImageWriterListener implements ImageWriter.ImageListener {
-        private final ConditionVariable imageReleased = new ConditionVariable();
-        @Override
-        public void onInputImageReleased(ImageWriter writer) {
-            if (writer != mWriter) {
-                return;
-            }
-
-            if (VERBOSE) Log.v(TAG, "Input image is released");
-            imageReleased.open();
-        }
-
-        public void waitForImageReleassed(long timeoutMs) {
-            if (imageReleased.block(timeoutMs)) {
-                imageReleased.close();
-            } else {
-                fail("wait for image available timed out after " + timeoutMs + "ms");
-            }
-        }
-    }
-
     private void readerWriterFormatTestByCamera(int format)  throws Exception {
         List<Size> sizes = getSortedSizesForFormat(mCamera.getId(), mCameraManager, format, null);
         Size maxSize = sizes.get(0);
@@ -178,7 +157,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         Surface surface = mReaderForWriter.getSurface();
         assertNotNull("Surface from ImageReader shouldn't be null", surface);
         mWriter = ImageWriter.newInstance(surface, MAX_NUM_IMAGES);
-        SimpleImageWriterListener writerImageListener = new SimpleImageWriterListener();
+        SimpleImageWriterListener writerImageListener = new SimpleImageWriterListener(mWriter);
         mWriter.setImageListener(writerImageListener, mHandler);
 
         // Start capture: capture 2 images.
@@ -257,7 +236,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             outputImage.close();
 
             // Make sure ImageWriter listener callback is fired.
-            writerImageListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
+            writerImageListener.waitForImageReleased(CAPTURE_IMAGE_TIMEOUT_MS);
 
             // Test case 2: Directly inject the image into ImageWriter: works for all formats.
 
@@ -291,7 +270,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             outputImage.close();
 
             // Make sure ImageWriter listener callback is fired.
-            writerImageListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
+            writerImageListener.waitForImageReleased(CAPTURE_IMAGE_TIMEOUT_MS);
         }
 
         stopCapture(/*fast*/false);
@@ -321,24 +300,16 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             validateOpaqueImage(outputImage, "First Opaque image output by ImageWriter: ",
                     maxSize, result);
             outputImage.close();
-            writerListener.waitForImageReleassed(CAPTURE_IMAGE_TIMEOUT_MS);
+            writerListener.waitForImageReleased(CAPTURE_IMAGE_TIMEOUT_MS);
         }
     }
 
     private void validateOpaqueImage(Image image, String msg, Size imageSize,
             CaptureResult result) {
         assertNotNull("Opaque image Capture result should not be null", result != null);
-        mCollector.expectTrue(msg + "Opaque image format should be: " + CAMERA_OPAQUE_FORMAT,
-                image.getFormat() == CAMERA_OPAQUE_FORMAT);
-        mCollector.expectTrue(msg + "Opaque image format should be: " + CAMERA_OPAQUE_FORMAT,
-                image.getFormat() == CAMERA_OPAQUE_FORMAT);
+        mCollector.expectImageProperties(msg + "Opaque ", image, CAMERA_OPAQUE_FORMAT,
+                imageSize, result.get(CaptureResult.SENSOR_TIMESTAMP));
         mCollector.expectTrue(msg + "Opaque image number planes should be zero",
                 image.getPlanes().length == 0);
-        mCollector.expectTrue(msg + "Opaque image size should be " + imageSize,
-                image.getWidth() == imageSize.getWidth() &&
-                image.getHeight() == imageSize.getHeight());
-        long timestampNs = result.get(CaptureResult.SENSOR_TIMESTAMP);
-        mCollector.expectTrue(msg + "Opaque image timestamp should be " + timestampNs,
-                image.getTimestamp() == timestampNs);
     }
 }

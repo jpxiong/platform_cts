@@ -22,6 +22,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.params.MeteringRectangle;
+import android.media.Image;
 import android.util.Log;
 import android.util.Size;
 
@@ -1049,4 +1050,13 @@ public class CameraErrorCollector extends ErrorCollector {
         Set<T> sizeSet = new HashSet<T>(list);
         expectTrue(msg + " each element must be distinct", sizeSet.size() == list.size());
     }
+
+    public void expectImageProperties(String msg, Image image, int format, Size size,
+            long timestampNs) {
+        expectEquals(msg + "Image format is wrong.", image.getFormat(), format);
+        expectEquals(msg + "Image width is wrong.", image.getWidth(), size.getWidth());
+        expectEquals(msg + "Image height is wrong.", image.getHeight(), size.getHeight());
+        expectEquals(msg + "Image timestamp is wrong.", image.getTimestamp(), timestampNs);
+    }
+
 }
