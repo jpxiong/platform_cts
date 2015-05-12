@@ -2434,7 +2434,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertFalse(view.hasCalledDrawableStateChanged());
         view.setPressed(true);
         assertTrue(view.hasCalledDrawableStateChanged());
-        assertFalse(view.hasCalledOnCreateDrawableState());
         assertTrue(Arrays.equals(MockView.getPressedEnabledStateSet(), view.getDrawableState()));
         assertTrue(view.hasCalledOnCreateDrawableState());
 
@@ -2445,7 +2444,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         view.refreshDrawableState();
         assertTrue(view.hasCalledDrawableStateChanged());
         assertTrue(mMockParent.hasChildDrawableStateChanged());
-        assertFalse(view.hasCalledOnCreateDrawableState());
         assertTrue(Arrays.equals(MockView.getPressedEnabledStateSet(), view.getDrawableState()));
         assertTrue(view.hasCalledOnCreateDrawableState());
     }
