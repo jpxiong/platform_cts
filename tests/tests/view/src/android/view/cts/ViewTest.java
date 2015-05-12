@@ -3111,6 +3111,24 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertEquals(fadingEdgeLength, view.getVerticalFadingEdgeLength());
     }
 
+    @UiThreadTest
+    public void testScrollIndicators() {
+        MockView view = (MockView) mActivity.findViewById(R.id.scroll_view);
+
+        assertEquals("Set indicators match those specified in XML",
+                View.SCROLL_INDICATOR_TOP | View.SCROLL_INDICATOR_BOTTOM,
+                view.getScrollIndicators());
+
+        view.setScrollIndicators(0);
+        assertEquals("Cleared indicators", 0, view.getScrollIndicators());
+
+        view.setScrollIndicators(View.SCROLL_INDICATOR_START | View.SCROLL_INDICATOR_RIGHT);
+        assertEquals("Set start and right indicators",
+                View.SCROLL_INDICATOR_START | View.SCROLL_INDICATOR_RIGHT,
+                view.getScrollIndicators());
+
+    }
+
     public void testOnStartAndFinishTemporaryDetach() throws Throwable {
         final MockListView listView = new MockListView(mActivity);
         List<String> items = Lists.newArrayList("1", "2", "3");
