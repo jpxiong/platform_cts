@@ -34,6 +34,7 @@
         android:layout_height="200px"
         android:scrollbars="horizontal|vertical"
         android:fadingEdge="horizontal|vertical"
+        android:scrollIndicators="top|bottom"
         android:fadingEdgeLength="20px"/>
 
     <android.view.cts.MockView
