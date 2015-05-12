@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import android.content.pm.PackageManager;
 import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioRecord.OnRecordPositionUpdateListener;
 import android.media.MediaRecorder;
@@ -29,6 +30,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
@@ -312,6 +314,59 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                 true /*auditRecording*/, true /*isChannelIndex*/, 16000 /*TEST_SR*/,
                 (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4)  /* 5 channels */,
                 AudioFormat.ENCODING_PCM_16BIT);
+    }
+
+    // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord built with
+    // an empty Builder matches the documentation / expected values
+    public void testAudioRecordBuilderDefault() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testAudioRecordBuilderDefault";
+        // expected values below match the AudioRecord.Builder documentation
+        final int expectedCapturePreset = MediaRecorder.AudioSource.DEFAULT;
+        final String rateStr = new AudioManager(getContext())
+                .getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+        final int expectedRate = Integer.valueOf(rateStr).intValue();
+        final int expectedChannel = AudioFormat.CHANNEL_IN_MONO;
+        final int expectedEncoding = AudioFormat.ENCODING_PCM_16BIT;
+        // use builder with default values
+        final AudioRecord rec = new AudioRecord.Builder().build();
+        // save results
+        final int observedRate = rec.getSampleRate();
+        final int observedSource = rec.getAudioSource();
+        final int observedChannel = rec.getChannelConfiguration();
+        final int observedEncoding = rec.getAudioFormat();
+        // release recorder before the test exits (either successfully or with an exception)
+        rec.release();
+        // compare results
+        assertEquals(TEST_NAME + ": default capture preset", expectedCapturePreset, observedSource);
+        assertEquals(TEST_NAME + ": default rate", expectedRate, observedRate);
+        assertEquals(TEST_NAME + ": default channel config", expectedChannel, observedChannel);
+        assertEquals(TEST_NAME + ": default encoding", expectedEncoding, observedEncoding);
+    }
+
+    // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord built with
+    // an incomplete AudioFormat matches the documentation / expected values
+    public void testAudioRecordBuilderPartialFormat() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testAudioRecordBuilderPartialFormat";
+        final int expectedRate = 16000;
+        // expected values below match the AudioRecord.Builder documentation
+        final int expectedChannel = AudioFormat.CHANNEL_IN_MONO;
+        final int expectedEncoding = AudioFormat.ENCODING_PCM_16BIT;
+        // use builder with a partial audio format
+        final AudioRecord rec = new AudioRecord.Builder()
+                .setAudioFormat(new AudioFormat.Builder().setSampleRate(expectedRate).build())
+                .build();
+        // save results
+        final int observedRate = rec.getSampleRate();
+        final int observedChannel = rec.getChannelConfiguration();
+        final int observedEncoding = rec.getAudioFormat();
+        // release recorder before the test exits (either successfully or with an exception)
+        rec.release();
+        // compare results
+        assertEquals(TEST_NAME + ": configured rate", expectedRate, observedRate);
+        assertEquals(TEST_NAME + ": default channel config", expectedChannel, observedChannel);
+        assertEquals(TEST_NAME + ": default encoding", expectedEncoding, observedEncoding);
     }
 
     private AudioRecord createAudioRecord(
