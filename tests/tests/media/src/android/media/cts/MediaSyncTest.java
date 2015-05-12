@@ -247,6 +247,75 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
     }
 
     /**
+     * Tests flush.
+     */
+    public void testFlush() throws InterruptedException {
+        final int timeOutMs = 5000;
+        boolean completed = runFlush(INPUT_RESOURCE_ID, timeOutMs);
+        if (!completed) {
+            throw new RuntimeException("timed out waiting for flush");
+        }
+    }
+
+    private boolean runFlush(int inputResourceId, int timeOutMs) {
+        final int INDEX_BEFORE_FLUSH = 1;
+        final int INDEX_AFTER_FLUSH = 2;
+        final int BUFFER_SIZE = 1024;
+        final int[] returnedIndex = new int[1];
+        final Object condition = new Object();
+
+        returnedIndex[0] = -1;
+
+        mHasAudio = true;
+        if (mDecoderAudio.setup(inputResourceId, null, Long.MAX_VALUE) == false) {
+            return true;
+        }
+
+        // get audio track.
+        mAudioTrack = mDecoderAudio.getAudioTrack();
+
+        mMediaSync.setAudioTrack(mAudioTrack);
+
+        mMediaSync.setCallback(new MediaSync.Callback() {
+            @Override
+            public void onAudioBufferConsumed(
+                    MediaSync sync, ByteBuffer byteBuffer, int bufferIndex) {
+                synchronized (condition) {
+                    if (returnedIndex[0] == -1) {
+                        returnedIndex[0] = bufferIndex;
+                        condition.notify();
+                    }
+                }
+            }
+        }, null);
+
+        mMediaSync.setOnErrorListener(new MediaSync.OnErrorListener() {
+            @Override
+            public void onError(MediaSync sync, int what, int extra) {
+                fail("got error from media sync (" + what + ", " + extra + ")");
+            }
+        }, null);
+
+        mMediaSync.setPlaybackRate(0.0f, MediaSync.PLAYBACK_RATE_AUDIO_MODE_DEFAULT);
+
+        ByteBuffer buffer1 = ByteBuffer.allocate(BUFFER_SIZE);
+        ByteBuffer buffer2 = ByteBuffer.allocate(BUFFER_SIZE);
+        mMediaSync.queueAudio(buffer1, INDEX_BEFORE_FLUSH, 0 /* presentationTimeUs */);
+        mMediaSync.flush();
+        mMediaSync.queueAudio(buffer2, INDEX_AFTER_FLUSH, 0 /* presentationTimeUs */);
+
+        synchronized (condition) {
+            mMediaSync.setPlaybackRate(1.0f, MediaSync.PLAYBACK_RATE_AUDIO_MODE_DEFAULT);
+
+            try {
+                condition.wait(timeOutMs);
+            } catch (InterruptedException e) {
+            }
+            return (returnedIndex[0] == INDEX_AFTER_FLUSH);
+        }
+    }
+
+    /**
      * Tests playing back audio successfully.
      */
     public void testPlayVideo() throws InterruptedException {
