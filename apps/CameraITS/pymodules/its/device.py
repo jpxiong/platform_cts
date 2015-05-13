@@ -368,7 +368,7 @@ class ItsSession(object):
 
         The out_surfaces field can specify the width(s), height(s), and
         format(s) of the captured image. The formats may be "yuv", "jpeg",
-        "dng", "raw", or "raw10". The default is a YUV420 frame ("yuv")
+        "dng", "raw", "raw10", or "raw12". The default is a YUV420 frame ("yuv")
         corresponding to a full sensor frame.
 
         Note that one or more surfaces can be specified, allowing a capture to

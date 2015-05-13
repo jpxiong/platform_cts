@@ -91,9 +91,19 @@ public class ItsUtils {
         }
     }
 
-    public static Size[] getRawOutputSizes(CameraCharacteristics ccs)
+    public static Size[] getRaw16OutputSizes(CameraCharacteristics ccs)
             throws ItsException {
         return getOutputSizes(ccs, ImageFormat.RAW_SENSOR);
+    }
+
+    public static Size[] getRaw10OutputSizes(CameraCharacteristics ccs)
+            throws ItsException {
+        return getOutputSizes(ccs, ImageFormat.RAW10);
+    }
+
+    public static Size[] getRaw12OutputSizes(CameraCharacteristics ccs)
+            throws ItsException {
+        return getOutputSizes(ccs, ImageFormat.RAW12);
     }
 
     public static Size[] getJpegOutputSizes(CameraCharacteristics ccs)
@@ -139,7 +149,7 @@ public class ItsUtils {
             buffer.get(data);
             return data;
         } else if (format == ImageFormat.YUV_420_888 || format == ImageFormat.RAW_SENSOR
-                || format == ImageFormat.RAW10) {
+                || format == ImageFormat.RAW10 || format == ImageFormat.RAW12) {
             int offset = 0;
             data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
             int maxRowSize = planes[0].getRowStride();
@@ -213,6 +223,7 @@ public class ItsUtils {
                 return 3 == planes.length;
             case ImageFormat.RAW_SENSOR:
             case ImageFormat.RAW10:
+            case ImageFormat.RAW12:
             case ImageFormat.JPEG:
                 return 1 == planes.length;
             default:

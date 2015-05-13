@@ -64,6 +64,9 @@ def convert_capture_to_rgb_image(cap,
     if cap["format"] == "raw10":
         assert(props is not None)
         cap = unpack_raw10_capture(cap, props)
+    if cap["format"] == "raw12":
+        assert(props is not None)
+        cap = unpack_raw12_capture(cap, props)
     if cap["format"] == "yuv":
         y = cap["data"][0:w*h]
         u = cap["data"][w*h:w*h*5/4]
@@ -114,15 +117,65 @@ def unpack_raw10_image(img):
         raise its.error.Error('Invalid raw-10 buffer width')
     w = img.shape[1]*4/5
     h = img.shape[0]
-    # Cut out the 4x8b MSBs and shift to bits [10:2] in 16b words.
+    # Cut out the 4x8b MSBs and shift to bits [9:2] in 16b words.
     msbs = numpy.delete(img, numpy.s_[4::5], 1)
     msbs = msbs.astype(numpy.uint16)
     msbs = numpy.left_shift(msbs, 2)
     msbs = msbs.reshape(h,w)
-    # Cut out the 4x2b LSBs and put each in bits [2:0] of their own 8b words.
+    # Cut out the 4x2b LSBs and put each in bits [1:0] of their own 8b words.
     lsbs = img[::, 4::5].reshape(h,w/4)
     lsbs = numpy.right_shift(
             numpy.packbits(numpy.unpackbits(lsbs).reshape(h,w/4,4,2),3), 6)
+    lsbs = lsbs.reshape(h,w)
+    # Fuse the MSBs and LSBs back together
+    img16 = numpy.bitwise_or(msbs, lsbs).reshape(h,w)
+    return img16
+
+def unpack_raw12_capture(cap, props):
+    """Unpack a raw-12 capture to a raw-16 capture.
+
+    Args:
+        cap: A raw-12 capture object.
+        props: Camera properties object.
+
+    Returns:
+        New capture object with raw-16 data.
+    """
+    # Data is packed as 4x10b pixels in 5 bytes, with the first 4 bytes holding
+    # the MSBs of the pixels, and the 5th byte holding 4x2b LSBs.
+    w,h = cap["width"], cap["height"]
+    if w % 2 != 0:
+        raise its.error.Error('Invalid raw-12 buffer width')
+    cap = copy.deepcopy(cap)
+    cap["data"] = unpack_raw12_image(cap["data"].reshape(h,w*3/2))
+    cap["format"] = "raw"
+    return cap
+
+def unpack_raw12_image(img):
+    """Unpack a raw-12 image to a raw-16 image.
+
+    Output image will have the 12 LSBs filled in each 16b word, and the 4 MSBs
+    will be set to zero.
+
+    Args:
+        img: A raw-12 image, as a uint8 numpy array.
+
+    Returns:
+        Image as a uint16 numpy array, with all row padding stripped.
+    """
+    if img.shape[1] % 3 != 0:
+        raise its.error.Error('Invalid raw-12 buffer width')
+    w = img.shape[1]*2/3
+    h = img.shape[0]
+    # Cut out the 2x8b MSBs and shift to bits [11:4] in 16b words.
+    msbs = numpy.delete(img, numpy.s_[2::3], 1)
+    msbs = msbs.astype(numpy.uint16)
+    msbs = numpy.left_shift(msbs, 4)
+    msbs = msbs.reshape(h,w)
+    # Cut out the 2x4b LSBs and put each in bits [3:0] of their own 8b words.
+    lsbs = img[::, 2::3].reshape(h,w/2)
+    lsbs = numpy.right_shift(
+            numpy.packbits(numpy.unpackbits(lsbs).reshape(h,w/2,2,4),3), 4)
     lsbs = lsbs.reshape(h,w)
     # Fuse the MSBs and LSBs back together
     img16 = numpy.bitwise_or(msbs, lsbs).reshape(h,w)
