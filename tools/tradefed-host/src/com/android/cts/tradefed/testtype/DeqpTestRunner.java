@@ -19,6 +19,9 @@ import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
+import com.android.tradefed.util.IRunUtil;
+import com.android.tradefed.util.RunInterruptedException;
+import com.android.tradefed.util.RunUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,6 +77,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private ITestDevice mDevice;
     private Set<String> mDeviceFeatures;
     private Map<String, Boolean> mConfigQuerySupportCache = new HashMap<>();
+    private IRunUtil mRunUtil = RunUtil.getDefault();
 
     private IRecovery mDeviceRecovery = new Recovery();
     {
@@ -145,6 +149,15 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
      */
     public void setRecovery(IRecovery deviceRecovery) {
         mDeviceRecovery = deviceRecovery;
+    }
+
+    /**
+     * Set IRunUtil.
+     *
+     * Exposed for unit testing.
+     */
+    public void setRunUtil(IRunUtil runUtil) {
+        mRunUtil = runUtil;
     }
 
     private static final class CapabilityQueryFailureException extends Exception {
@@ -1395,6 +1408,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             throw new AssertionError("executeTestRunBatchRun precondition failed");
         }
 
+        checkInterrupted(); // throws if interrupted
+
         final String testCases = generateTestCaseTrie(batch.tests);
 
         mDevice.executeShellCommand("rm " + CASE_LIST_FILE_NAME);
@@ -1448,6 +1463,9 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                 mDeviceRecovery.recoverConnectionRefused();
             } else if (interruptingError instanceof AdbComLinkKilledError) {
                 mDeviceRecovery.recoverComLinkKilled();
+            } else if (interruptingError instanceof RunInterruptedException) {
+                // external run interruption request. Terminate immediately.
+                throw (RunInterruptedException)interruptingError;
             } else {
                 CLog.e(interruptingError);
                 throw new RuntimeException(interruptingError);
@@ -1552,6 +1570,15 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             }
         }
         return retVal;
+    }
+
+    /**
+     * Checks if this execution has been marked as interrupted and throws if it has.
+     */
+    private void checkInterrupted() throws RunInterruptedException {
+        // Work around the API. RunUtil::checkInterrupted is private but we can call it indirectly
+        // by sleeping a value <= 0.
+        mRunUtil.sleep(0);
     }
 
     /**
