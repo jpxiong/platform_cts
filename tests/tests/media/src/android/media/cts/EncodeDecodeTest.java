@@ -458,7 +458,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             if (inSurf != null) {
                 Log.d(TAG, "using persistent surface");
-                encoder.usePersistentInputSurface(inputSurface.getSurface());
+                encoder.setInputSurface(inputSurface.getSurface());
                 inputSurface.updateSize(mWidth, mHeight);
             } else {
                 inputSurface = new InputSurface(encoder.createInputSurface());
