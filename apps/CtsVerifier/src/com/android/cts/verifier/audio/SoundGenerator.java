@@ -13,25 +13,25 @@ public class SoundGenerator {
   private SoundGenerator() {
     // Initialize sample.
     int pipNum = Common.PIP_NUM;
-    int prefixTotalLength = Common.PREFIX.length
-        + Util.toLength(Common.PAUSE_BEFORE_PREFIX_DURATION_S, Common.getSampleRate())
-        + Util.toLength(Common.PAUSE_AFTER_PREFIX_DURATION_S, Common.getSampleRate());
+    int prefixTotalLength = Util.toLength(Common.PREFIX_LENGTH_S, Common.PLAYING_SAMPLE_RATE_HZ)
+        + Util.toLength(Common.PAUSE_BEFORE_PREFIX_DURATION_S, Common.PLAYING_SAMPLE_RATE_HZ)
+        + Util.toLength(Common.PAUSE_AFTER_PREFIX_DURATION_S, Common.PLAYING_SAMPLE_RATE_HZ);
     int repetitionLength = pipNum * Util.toLength(
-        Common.PIP_DURATION_S + Common.PAUSE_DURATION_S, Common.getSampleRate());
+        Common.PIP_DURATION_S + Common.PAUSE_DURATION_S, Common.PLAYING_SAMPLE_RATE_HZ);
     int sampleLength = prefixTotalLength + Common.REPETITIONS * repetitionLength;
     sample = new double[sampleLength];
 
     // Fill sample with prefix.
-    System.arraycopy(Common.PREFIX, 0, sample,
-        Util.toLength(Common.PAUSE_BEFORE_PREFIX_DURATION_S, Common.getSampleRate()),
-        Common.PREFIX.length);
+    System.arraycopy(Common.PREFIX_FOR_PLAYER, 0, sample,
+        Util.toLength(Common.PAUSE_BEFORE_PREFIX_DURATION_S, Common.PLAYING_SAMPLE_RATE_HZ),
+        Common.PREFIX_FOR_PLAYER.length);
 
     // Fill the sample.
     for (int i = 0; i < pipNum * Common.REPETITIONS; i++) {
-      double[] pip = getPip(Common.generateWindow(), Common.FREQUENCIES[i]);
+      double[] pip = getPip(Common.WINDOW_FOR_PLAYER, Common.FREQUENCIES[i]);
       System.arraycopy(pip, 0, sample,
           prefixTotalLength + i * Util.toLength(
-              Common.PIP_DURATION_S + Common.PAUSE_DURATION_S, Common.getSampleRate()),
+              Common.PIP_DURATION_S + Common.PAUSE_DURATION_S, Common.PLAYING_SAMPLE_RATE_HZ),
           pip.length);
     }
 
@@ -58,7 +58,7 @@ public class SoundGenerator {
   private static double[] getPip(double[] window, double frequency) {
     int pipArrayLength = window.length;
     double[] pipArray = new double[pipArrayLength];
-    double radPerSample = 2 * Math.PI / (Common.getSampleRate() / frequency);
+    double radPerSample = 2 * Math.PI / (Common.PLAYING_SAMPLE_RATE_HZ / frequency);
     for (int i = 0; i < pipArrayLength; i++) {
       pipArray[i] = window[i] * Math.sin(i * radPerSample);
     }

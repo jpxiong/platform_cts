@@ -41,7 +41,7 @@ import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYSeries;
 import com.androidplot.xy.*;
 
-public class HifiUltrasoundTestActivity extends PassFailButtons.Activity {
+public class HifiUltrasoundSpeakerTestActivity extends PassFailButtons.Activity {
 
     public enum Status {
         START, RECORDING, DONE, PLAYER
@@ -76,13 +76,14 @@ public class HifiUltrasoundTestActivity extends PassFailButtons.Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.hifi_ultrasound);
-        setInfoResources(R.string.hifi_ultrasound_test, R.string.hifi_ultrasound_test_info, -1);
+        setInfoResources(R.string.hifi_ultrasound_speaker_test,
+            R.string.hifi_ultrasound_speaker_test_info, -1);
         setPassFailButtonClickListeners();
         getPassButton().setEnabled(false);
 
         info = (TextView) findViewById(R.id.info_text);
         info.setMovementMethod(new ScrollingMovementMethod());
-        info.setText(R.string.hifi_ultrasound_test_instruction1);
+        info.setText(R.string.hifi_ultrasound_speaker_test_instruction1);
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         String micSupportString = audioManager.getProperty(
@@ -100,12 +101,12 @@ public class HifiUltrasoundTestActivity extends PassFailButtons.Activity {
             R.string.hifi_ultrasound_test_default_false_string))) {
           micSupport = false;
           getPassButton().setEnabled(true);
-          info.append(getResources().getString(R.string.hifi_ultrasound_test_mic_no_support));
+          info.append(getResources().getString(R.string.hifi_ultrasound_speaker_test_mic_no_support));
         }
         if (spkrSupportString.equalsIgnoreCase(getResources().getString(
             R.string.hifi_ultrasound_test_default_false_string))) {
           spkrSupport = false;
-          info.append(getResources().getString(R.string.hifi_ultrasound_test_spkr_no_support));
+          info.append(getResources().getString(R.string.hifi_ultrasound_speaker_test_spkr_no_support));
         }
 
         layoutInflater = (LayoutInflater) getBaseContext().getSystemService(
@@ -194,6 +195,7 @@ public class HifiUltrasoundTestActivity extends PassFailButtons.Activity {
               recorderButton.setEnabled(false);
               status = Status.PLAYER;
               play();
+              getPassButton().setEnabled(true);
           }
         });
     }
@@ -351,9 +353,6 @@ public class HifiUltrasoundTestActivity extends PassFailButtons.Activity {
     protected void onPostExecute(String result) {
       info.append(result);
       recorderButton.setEnabled(true);
-      if (wavAnalyzer.getResult()) {
-        getPassButton().setEnabled(true);
-      }
       recorderButton.setText(R.string.hifi_ultrasound_test_plot);
     }
 
