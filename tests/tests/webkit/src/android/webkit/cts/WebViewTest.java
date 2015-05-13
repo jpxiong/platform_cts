@@ -2466,7 +2466,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
 
         mOnUiThread.loadUrl("about:blank");
 
-        mOnUiThread.insertVisualStateCallback(kRequest, new VisualStateCallback() {
+        mOnUiThread.postVisualStateCallback(kRequest, new VisualStateCallback() {
             public void onComplete(long requestId) {
                 assertEquals(kRequest, requestId);
                 callbackLatch.countDown();

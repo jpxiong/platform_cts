@@ -650,11 +650,11 @@ public class WebViewOnUiThread {
         });
     }
 
-    public void insertVisualStateCallback(final long requestId, final VisualStateCallback callback) {
+    public void postVisualStateCallback(final long requestId, final VisualStateCallback callback) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.insertVisualStateCallback(requestId, callback);
+                mWebView.postVisualStateCallback(requestId, callback);
             }
         });
     }
