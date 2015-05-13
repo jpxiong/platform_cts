@@ -2077,24 +2077,24 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertEquals(viewId, container.keyAt(0));
 
         container.clear();
-        container.put(viewId, new BaseSavedState(BaseSavedState.EMPTY_STATE));
+        container.put(viewId, new android.graphics.Rect());
         try {
             view.restoreHierarchyState(container);
-            fail("should throw IllegalArgumentException");
+            fail("Parcelable state must be an AbsSaveState, should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // expected
         }
 
         try {
             view.restoreHierarchyState(null);
-            fail("should throw NullPointerException");
+            fail("Cannot pass null to restoreHierarchyState(), should throw NullPointerException");
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
             view.saveHierarchyState(null);
-            fail("should throw NullPointerException");
+            fail("Cannot pass null to saveHierarchyState(), should throw NullPointerException");
         } catch (NullPointerException e) {
             // expected
         }
