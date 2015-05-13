@@ -26,8 +26,8 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class DisplayTest extends AndroidTestCase {
-    // This test is called from DisplayTestRunner which brings up an overlay display on the target
-    // device. The overlay display parameters must match the ones defined there which are
+    // The CTS package brings up an overlay display on the target device (see AndroidTest.xml).
+    // The overlay display parameters must match the ones defined there which are
     // 181x161/214 (wxh/dpi).  It only matters that these values are different from any real
     // display.
 
@@ -176,5 +176,18 @@ public class DisplayTest extends AndroidTestCase {
         Display display = getSecondaryDisplay(mDisplayManager.getDisplays());
 
         assertEquals(Display.FLAG_PRESENTATION, display.getFlags());
+    }
+
+    /**
+     * Tests that the mode-related attributes and methods work as expected.
+     */
+    public void testMode() {
+        Display display = getSecondaryDisplay(mDisplayManager.getDisplays());
+        assertEquals(1, display.getSupportedModes().length);
+        Display.Mode mode = display.getMode();
+        assertEquals(display.getSupportedModes()[0], mode);
+        assertEquals(SECONDARY_DISPLAY_WIDTH, mode.getPhysicalWidth());
+        assertEquals(SECONDARY_DISPLAY_HEIGHT, mode.getPhysicalHeight());
+        assertEquals(display.getRefreshRate(), mode.getRefreshRate());
     }
 }
