@@ -328,6 +328,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int expectedRate = Integer.valueOf(rateStr).intValue();
         final int expectedChannel = AudioFormat.CHANNEL_IN_MONO;
         final int expectedEncoding = AudioFormat.ENCODING_PCM_16BIT;
+        final int expectedState = AudioRecord.STATE_INITIALIZED;
         // use builder with default values
         final AudioRecord rec = new AudioRecord.Builder().build();
         // save results
@@ -335,6 +336,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int observedSource = rec.getAudioSource();
         final int observedChannel = rec.getChannelConfiguration();
         final int observedEncoding = rec.getAudioFormat();
+        final int observedState = rec.getState();
         // release recorder before the test exits (either successfully or with an exception)
         rec.release();
         // compare results
@@ -342,6 +344,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         assertEquals(TEST_NAME + ": default rate", expectedRate, observedRate);
         assertEquals(TEST_NAME + ": default channel config", expectedChannel, observedChannel);
         assertEquals(TEST_NAME + ": default encoding", expectedEncoding, observedEncoding);
+        assertEquals(TEST_NAME + ": state", expectedState, observedState);
     }
 
     // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord built with
@@ -350,6 +353,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         // constants for test
         final String TEST_NAME = "testAudioRecordBuilderPartialFormat";
         final int expectedRate = 16000;
+        final int expectedState = AudioRecord.STATE_INITIALIZED;
         // expected values below match the AudioRecord.Builder documentation
         final int expectedChannel = AudioFormat.CHANNEL_IN_MONO;
         final int expectedEncoding = AudioFormat.ENCODING_PCM_16BIT;
@@ -361,12 +365,53 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int observedRate = rec.getSampleRate();
         final int observedChannel = rec.getChannelConfiguration();
         final int observedEncoding = rec.getAudioFormat();
+        final int observedState = rec.getState();
         // release recorder before the test exits (either successfully or with an exception)
         rec.release();
         // compare results
         assertEquals(TEST_NAME + ": configured rate", expectedRate, observedRate);
         assertEquals(TEST_NAME + ": default channel config", expectedChannel, observedChannel);
         assertEquals(TEST_NAME + ": default encoding", expectedEncoding, observedEncoding);
+        assertEquals(TEST_NAME + ": state", expectedState, observedState);
+    }
+
+    // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord matches
+    // the parameters used in the builder
+    public void testAudioRecordBuilderParams() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testAudioRecordBuilderParams";
+        final int expectedRate = 8000;
+        final int expectedChannel = AudioFormat.CHANNEL_IN_MONO;
+        final int expectedChannelCount = 1;
+        final int expectedEncoding = AudioFormat.ENCODING_PCM_16BIT;
+        final int expectedSource = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
+        final int expectedState = AudioRecord.STATE_INITIALIZED;
+        // use builder with expected parameters
+        final AudioRecord rec = new AudioRecord.Builder()
+                .setAudioFormat(new AudioFormat.Builder()
+                        .setSampleRate(expectedRate)
+                        .setChannelMask(expectedChannel)
+                        .setEncoding(expectedEncoding)
+                        .build())
+                .setAudioSource(expectedSource)
+                .build();
+        // save results
+        final int observedRate = rec.getSampleRate();
+        final int observedChannel = rec.getChannelConfiguration();
+        final int observedChannelCount = rec.getChannelCount();
+        final int observedEncoding = rec.getAudioFormat();
+        final int observedSource = rec.getAudioSource();
+        final int observedState = rec.getState();
+        // release recorder before the test exits (either successfully or with an exception)
+        rec.release();
+        // compare results
+        assertEquals(TEST_NAME + ": configured rate", expectedRate, observedRate);
+        assertEquals(TEST_NAME + ": configured channel config", expectedChannel, observedChannel);
+        assertEquals(TEST_NAME + ": configured encoding", expectedEncoding, observedEncoding);
+        assertEquals(TEST_NAME + ": implicit channel count", expectedChannelCount,
+                observedChannelCount);
+        assertEquals(TEST_NAME + ": configured source", expectedSource, observedSource);
+        assertEquals(TEST_NAME + ": state", expectedState, observedState);
     }
 
     private AudioRecord createAudioRecord(
