@@ -27,6 +27,8 @@ import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IAbi;
+import com.android.tradefed.util.IRunUtil;
+import com.android.tradefed.util.RunInterruptedException;
 
 import junit.framework.TestCase;
 
@@ -2141,6 +2143,173 @@ public class DeqpTestRunnerTest extends TestCase {
         recovery.setSleepProvider(mockSleepProvider);
         recovery.recoverComLinkKilled();
         orderedControl.verify();
+    }
+
+    /**
+     * Test external interruption before batch run.
+     */
+    public void testInterrupt_killBeforeBatch() throws Exception {
+        final TestIdentifier testId = new TestIdentifier("dEQP-GLES3.interrupt", "test");
+
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        tests.add(testId);
+
+        Map<TestIdentifier, List<Map<String, String>>> instance = new HashMap<>();
+        instance.put(testId, DEFAULT_INSTANCE_ARGS);
+
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+        IRunUtil mockRunUtil = EasyMock.createMock(IRunUtil.class);
+
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instance);
+        deqpTest.setAbi(UnitTests.ABI);
+        deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
+        deqpTest.setRunUtil(mockRunUtil);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+                .andReturn(Integer.toString(version)).atLeastOnce();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
+            andReturn("").once();
+
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true),
+                EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName())))).andReturn(null)
+                .once();
+
+        expectRenderConfigQuery(mockDevice,
+                "--deqp-gl-config-name=rgba8888d24s8 --deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window --deqp-gl-major-version=3 "
+                + "--deqp-gl-minor-version=0");
+
+        mockRunUtil.sleep(0);
+        EasyMock.expectLastCall().andThrow(new RunInterruptedException());
+
+        mockListener.testRunStarted(ID, 1);
+        EasyMock.expectLastCall().once();
+
+        EasyMock.replay(mockDevice, mockIDevice);
+        EasyMock.replay(mockListener);
+        EasyMock.replay(mockRunUtil);
+        try {
+            deqpTest.run(mockListener);
+            fail("expected RunInterruptedException");
+        } catch (RunInterruptedException ex) {
+            // expected
+        }
+        EasyMock.verify(mockRunUtil);
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice, mockIDevice);
+    }
+
+    /**
+     * Test external interruption in testFailed().
+     */
+    public void testInterrupt_killReportTestFailed() throws Exception {
+        final TestIdentifier testId = new TestIdentifier("dEQP-GLES3.interrupt", "test");
+        final String testPath = "dEQP-GLES3.interrupt.test";
+        final String testTrie = "{dEQP-GLES3{interrupt{test}}}";
+        final String output = "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=" + testPath + "\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Code=Fail\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Details=Fail\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=TestCaseResult\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        tests.add(testId);
+
+        Map<TestIdentifier, List<Map<String, String>>> instance = new HashMap<>();
+        instance.put(testId, DEFAULT_INSTANCE_ARGS);
+
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+        IRunUtil mockRunUtil = EasyMock.createMock(IRunUtil.class);
+
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instance);
+        deqpTest.setAbi(UnitTests.ABI);
+        deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
+        deqpTest.setRunUtil(mockRunUtil);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+                .andReturn(Integer.toString(version)).atLeastOnce();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
+            andReturn("").once();
+
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true),
+                EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName())))).andReturn(null)
+                .once();
+
+        expectRenderConfigQuery(mockDevice,
+                "--deqp-gl-config-name=rgba8888d24s8 --deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window --deqp-gl-major-version=3 "
+                + "--deqp-gl-minor-version=0");
+
+        mockRunUtil.sleep(0);
+        EasyMock.expectLastCall().once();
+
+        String commandLine = String.format(
+                "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable",
+                CASE_LIST_FILE_NAME);
+
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine,
+                output);
+
+        mockListener.testRunStarted(ID, 1);
+        EasyMock.expectLastCall().once();
+
+        mockListener.testStarted(EasyMock.eq(testId));
+        EasyMock.expectLastCall().once();
+
+        mockListener.testFailed(EasyMock.eq(testId), EasyMock.<String>notNull());
+        EasyMock.expectLastCall().andThrow(new RunInterruptedException());
+
+        EasyMock.replay(mockDevice, mockIDevice);
+        EasyMock.replay(mockListener);
+        EasyMock.replay(mockRunUtil);
+        try {
+            deqpTest.run(mockListener);
+            fail("expected RunInterruptedException");
+        } catch (RunInterruptedException ex) {
+            // expected
+        }
+        EasyMock.verify(mockRunUtil);
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice, mockIDevice);
     }
 
     private void runInstrumentationLineAndAnswer(ITestDevice mockDevice, IDevice mockIDevice,
