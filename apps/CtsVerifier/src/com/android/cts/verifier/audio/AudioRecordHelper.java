@@ -1,14 +1,13 @@
 package com.android.cts.verifier.audio;
 
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -16,15 +15,10 @@ import java.io.IOException;
  */
 public class AudioRecordHelper {
 
-  // order of preference
-  // MIC 48000Hz
-  // MIC 44100Hz
-  // VOICE_RECOGNITION 48000Hz
-  // VOICE_RECOGNITION 44100Hz
-  // if all these 4 settings failed, it logs an error
   private static final int[] SOURCE = {
       MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.VOICE_RECOGNITION};
-  private static final int[] SAMPLE_RATES_HZ = {48000, 44100};
+  private static final int[] SAMPLE_RATES_HZ = {
+    AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC), 48000, 44100};
 
   private static final int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
   private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -146,19 +140,5 @@ public class AudioRecordHelper {
    */
   public byte[] getByte() {
     return os.toByteArray();
-  }
-
-  /**
-   * Writes data to file
-   */
-  public void writeToFile() {
-    try {
-      FileOutputStream fos = new FileOutputStream(new File(Common.PCM_FILE));
-      fos.write(os.toByteArray());
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }
