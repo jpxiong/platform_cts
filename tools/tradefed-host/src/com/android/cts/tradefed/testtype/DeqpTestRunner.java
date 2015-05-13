@@ -49,8 +49,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private static final String DEQP_ONDEVICE_APK = "com.drawelements.deqp.apk";
     private static final String DEQP_ONDEVICE_PKG = "com.drawelements.deqp";
     private static final String INCOMPLETE_LOG_MESSAGE = "Crash: Incomplete test log";
-    private static final String DEVICE_LOST_MESSAGE = "Crash: Device lost";
     private static final String SKIPPED_INSTANCE_LOG_MESSAGE = "Configuration skipped";
+    private static final String NOT_EXECUTABLE_LOG_MESSAGE = "Abort: Test cannot be executed";
     private static final String CASE_LIST_FILE_NAME = "/sdcard/dEQP-TestCaseList.txt";
     private static final String LOG_FILE_NAME = "/sdcard/TestLog.qpa";
     public static final String FEATURE_LANDSCAPE = "android.hardware.screen.landscape";
@@ -67,6 +67,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private final Collection<TestIdentifier> mRemainingTests;
     private final Map<TestIdentifier, Set<BatchRunConfiguration>> mTestInstances;
     private final TestInstanceResultListener mInstanceListerner = new TestInstanceResultListener();
+    private final Map<TestIdentifier, Integer> mTestInstabilityRatings;
     private IAbi mAbi;
     private CtsBuildHelper mCtsBuild;
     private boolean mLogData = false;
@@ -85,6 +86,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         mName = name;
         mRemainingTests = new LinkedList<>(tests); // avoid modifying arguments
         mTestInstances = parseTestInstances(tests, testInstances);
+        mTestInstabilityRatings = new HashMap<>();
     }
 
     /**
@@ -253,15 +255,15 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         /**
          * Forward result to sink
          */
-        private void forwardFinalizedPendingResult() {
-            if (mRemainingTests.contains(mCurrentTestId)) {
-                final PendingResult result = mPendingResults.get(mCurrentTestId);
+        private void forwardFinalizedPendingResult(TestIdentifier testId) {
+            if (mRemainingTests.contains(testId)) {
+                final PendingResult result = mPendingResults.get(testId);
 
-                mPendingResults.remove(mCurrentTestId);
-                mRemainingTests.remove(mCurrentTestId);
+                mPendingResults.remove(testId);
+                mRemainingTests.remove(testId);
 
                 // Forward results to the sink
-                mSink.testStarted(mCurrentTestId);
+                mSink.testStarted(testId);
 
                 // Test Log
                 if (mLogData) {
@@ -270,9 +272,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         final ByteArrayInputStreamSource source
                                 = new ByteArrayInputStreamSource(entry.getValue().getBytes());
 
-                        mSink.testLog(mCurrentTestId.getClassName() + "."
-                                + mCurrentTestId.getTestName() + "@" + entry.getKey().getId(),
-                                LogDataType.XML, source);
+                        mSink.testLog(testId.getClassName() + "." + testId.getTestName() + "@"
+                                + entry.getKey().getId(), LogDataType.XML, source);
 
                         source.cancel();
                     }
@@ -292,11 +293,11 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         errorLog.append(entry.getValue());
                     }
 
-                    mSink.testFailed(mCurrentTestId, errorLog.toString());
+                    mSink.testFailed(testId, errorLog.toString());
                 }
 
                 final Map<String, String> emptyMap = Collections.emptyMap();
-                mSink.testEnded(mCurrentTestId, emptyMap);
+                mSink.testEnded(testId, emptyMap);
             }
         }
 
@@ -346,10 +347,29 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             result.errorMessages.put(mRunConfig, SKIPPED_INSTANCE_LOG_MESSAGE);
             result.remainingConfigs.remove(mRunConfig);
 
+            // Pending result finished, report result
             if (result.remainingConfigs.isEmpty()) {
-                // fake as if we actually run the test
-                mCurrentTestId = testId;
-                forwardFinalizedPendingResult();
+                forwardFinalizedPendingResult(testId);
+            }
+        }
+
+        /**
+         * Fake failure of an instance with current config
+         */
+        public void abortTest(TestIdentifier testId, String errorMessage) {
+            final PendingResult result = mPendingResults.get(testId);
+
+            // Mark as executed
+            result.allInstancesPassed = false;
+            result.errorMessages.put(mRunConfig, errorMessage);
+            result.remainingConfigs.remove(mRunConfig);
+
+            // Pending result finished, report result
+            if (result.remainingConfigs.isEmpty()) {
+                forwardFinalizedPendingResult(testId);
+            }
+
+            if (testId.equals(mCurrentTestId)) {
                 mCurrentTestId = null;
             }
         }
@@ -402,7 +422,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
                 // Pending result finished, report result
                 if (result.remainingConfigs.isEmpty()) {
-                    forwardFinalizedPendingResult();
+                    forwardFinalizedPendingResult(mCurrentTestId);
                 }
             } else {
                 CLog.w("Got unexpected end of %s", mCurrentTestId);
@@ -461,7 +481,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
                 // Pending result finished, report result
                 if (result.remainingConfigs.isEmpty()) {
-                    forwardFinalizedPendingResult();
+                    forwardFinalizedPendingResult(mCurrentTestId);
                 }
             } else {
                 CLog.w("Got unexpected termination of %s", mCurrentTestId);
@@ -506,41 +526,20 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         }
 
         /**
-         * Signal listener that batch ended to flush incomplete results.
+         * Signal listener that batch ended and forget incomplete results.
          */
         public void endBatch() {
             // end open test if when stream ends
             if (mCurrentTestId != null) {
-                final Map<String, String> emptyMap = Collections.emptyMap();
-                handleEndTestCase(emptyMap);
-            }
-        }
-
-        /**
-         * Signal listener that device just died.
-         */
-        public void onDeviceLost() {
-            if (mCurrentTestId != null) {
-                final PendingResult result = mPendingResults.get(mCurrentTestId);
-
-                if (result == null) {
-                    CLog.e("Device lost in invalid state: %s", mCurrentTestId);
-                    return;
+                // Current instance was removed from remainingConfigs when case
+                // started. Mark current instance as pending.
+                if (mPendingResults.get(mCurrentTestId) != null) {
+                    mPendingResults.get(mCurrentTestId).remainingConfigs.add(mRunConfig);
+                } else {
+                    CLog.w("Got unexpected internal state of %s", mCurrentTestId);
                 }
-
-                // kill current test
-                result.allInstancesPassed = false;
-                result.errorMessages.put(mRunConfig, DEVICE_LOST_MESSAGE);
-
-                if (mLogData && mCurrentTestLog != null && mCurrentTestLog.length() > 0) {
-                    result.testLogs.put(mRunConfig, mCurrentTestLog);
-                }
-
-                // finish all pending instances
-                result.remainingConfigs.clear();
-                forwardFinalizedPendingResult();
-                mCurrentTestId = null;
             }
+            mCurrentTestId = null;
         }
     }
 
@@ -553,6 +552,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         private Map<String, String> mValues;
         private String mCurrentName;
         private String mCurrentValue;
+        private int mResultCode;
+        private boolean mGotExitValue = false;
 
 
         public InstrumentationParser(TestInstanceResultListener listener) {
@@ -592,6 +593,13 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
                     mCurrentName = line.substring(nameBegin, nameEnd);
                     mCurrentValue = line.substring(valueBegin);
+                } else if (line.startsWith("INSTRUMENTATION_CODE: ")) {
+                    try {
+                        mResultCode = Integer.parseInt(line.substring(22));
+                        mGotExitValue = true;
+                    } catch (NumberFormatException ex) {
+                        CLog.w("Instrumentation code format unexpected");
+                    }
                 } else if (mCurrentValue != null) {
                     mCurrentValue = mCurrentValue + line;
                 }
@@ -622,6 +630,20 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         @Override
         public boolean isCancelled() {
             return false;
+        }
+
+        /**
+         * Returns whether target instrumentation exited normally.
+         */
+        public boolean wasSuccessful() {
+            return mGotExitValue;
+        }
+
+        /**
+         * Returns Instrumentation return code
+         */
+        public int getResultCode() {
+            return mResultCode;
         }
     }
 
@@ -665,10 +687,16 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             return false;
         }
 
+        /**
+         * Returns whether target instrumentation exited normally.
+         */
         public boolean wasSuccessful() {
             return mGotExitValue;
         }
 
+        /**
+         * Returns Instrumentation return code
+         */
         public int getResultCode() {
             return mResultCode;
         }
@@ -1093,83 +1121,180 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         return generateTestCaseTrieFromPaths(testPaths);
     }
 
-    /**
-     * Executes tests on the device.
-     */
-    private void runTests() throws DeviceNotAvailableException, CapabilityQueryFailureException {
-        mDeviceRecovery.setDevice(mDevice);
+    private static class TestBatch {
+        public BatchRunConfiguration config;
+        public List<TestIdentifier> tests;
+    }
 
-        while (!mRemainingTests.isEmpty()) {
-            // select tests for the batch
-            final ArrayList<TestIdentifier> batchTests = new ArrayList<>(TESTCASE_BATCH_LIMIT);
-            for (TestIdentifier test : mRemainingTests) {
-                batchTests.add(test);
-                if (batchTests.size() >= TESTCASE_BATCH_LIMIT) {
+    private TestBatch selectRunBatch() {
+        return selectRunBatch(mRemainingTests, null);
+    }
+
+    /**
+     * Creates a TestBatch from the given tests or null if not tests remaining.
+     *
+     *  @param pool List of tests to select from
+     *  @param requiredConfig Select only instances with pending requiredConfig, or null to select
+     *         any run configuration.
+     */
+    private TestBatch selectRunBatch(Collection<TestIdentifier> pool,
+            BatchRunConfiguration requiredConfig) {
+        // select one test (leading test) that is going to be executed and then pack along as many
+        // other compatible instances as possible.
+
+        TestIdentifier leadingTest = null;
+        for (TestIdentifier test : pool) {
+            if (!mRemainingTests.contains(test)) {
+                continue;
+            }
+            if (requiredConfig != null &&
+                    !mInstanceListerner.isPendingTestInstance(test, requiredConfig)) {
+                continue;
+            }
+            leadingTest = test;
+            break;
+        }
+
+        // no remaining tests?
+        if (leadingTest == null) {
+            return null;
+        }
+
+        BatchRunConfiguration leadingTestConfig = null;
+        if (requiredConfig != null) {
+            leadingTestConfig = requiredConfig;
+        } else {
+            for (BatchRunConfiguration runConfig : getTestRunConfigs(leadingTest)) {
+                if (mInstanceListerner.isPendingTestInstance(leadingTest, runConfig)) {
+                    leadingTestConfig = runConfig;
                     break;
                 }
             }
+        }
 
-            // find union of all run configurations
-            final Set<BatchRunConfiguration> allConfigs = new LinkedHashSet<>();
-            for (TestIdentifier test : batchTests) {
-                allConfigs.addAll(getTestRunConfigs(test));
+        // test pending <=> test has a pending config
+        if (leadingTestConfig == null) {
+            throw new AssertionError("search postcondition failed");
+        }
+
+        final int leadingInstability = getTestInstabilityRating(leadingTest);
+
+        final TestBatch runBatch = new TestBatch();
+        runBatch.config = leadingTestConfig;
+        runBatch.tests = new ArrayList<>();
+        runBatch.tests.add(leadingTest);
+
+        for (TestIdentifier test : pool) {
+            if (test == leadingTest) {
+                // do not re-select the leading tests
+                continue;
             }
-
-            // prepare instance listener
-            for (TestIdentifier test : batchTests) {
-                mInstanceListerner.setTestInstances(test, getTestRunConfigs(test));
+            if (!mInstanceListerner.isPendingTestInstance(test, leadingTestConfig)) {
+                // select only compatible
+                continue;
             }
-
-            // run batch for all configurations
-            for (BatchRunConfiguration runConfig : allConfigs) {
-                final ArrayList<TestIdentifier> relevantTests =
-                        new ArrayList<>(TESTCASE_BATCH_LIMIT);
-
-                // run only for declared run configs and only if test has not already
-                // been attempted to run
-                for (TestIdentifier test : batchTests) {
-                    if (mInstanceListerner.isPendingTestInstance(test, runConfig)) {
-                        relevantTests.add(test);
-                    }
-                }
-
-                if (!relevantTests.isEmpty()) {
-                    runTestRunBatch(relevantTests, runConfig);
-                }
+            if (getTestInstabilityRating(test) != leadingInstability) {
+                // pack along only cases in the same stability category. Packing more dangerous
+                // tests along jeopardizes the stability of this run. Packing more stable tests
+                // along jeopardizes their stability rating.
+                continue;
             }
+            if (runBatch.tests.size() >= getBatchSizeLimitForInstability(leadingInstability)) {
+                // batch size is limited.
+                break;
+            }
+            runBatch.tests.add(test);
+        }
+
+        return runBatch;
+    }
+
+    private int getBatchNumPendingCases(TestBatch batch) {
+        int numPending = 0;
+        for (TestIdentifier test : batch.tests) {
+            if (mInstanceListerner.isPendingTestInstance(test, batch.config)) {
+                ++numPending;
+            }
+        }
+        return numPending;
+    }
+
+    private int getBatchSizeLimitForInstability(int batchInstabilityRating) {
+        // reduce group size exponentially down to one
+        return Math.max(1, TESTCASE_BATCH_LIMIT / (1 << batchInstabilityRating));
+    }
+
+    private int getTestInstabilityRating(TestIdentifier testId) {
+        if (mTestInstabilityRatings.containsKey(testId)) {
+            return mTestInstabilityRatings.get(testId);
+        } else {
+            return 0;
         }
     }
 
-    private void runTestRunBatch(Collection<TestIdentifier> tests, BatchRunConfiguration runConfig)
-            throws DeviceNotAvailableException, CapabilityQueryFailureException {
-        boolean isSupportedConfig = true;
+    private void recordTestInstability(TestIdentifier testId) {
+        mTestInstabilityRatings.put(testId, getTestInstabilityRating(testId) + 1);
+    }
 
+    private void clearTestInstability(TestIdentifier testId) {
+        mTestInstabilityRatings.put(testId, 0);
+    }
+
+    /**
+     * Executes all tests on the device.
+     */
+    private void runTests() throws DeviceNotAvailableException, CapabilityQueryFailureException {
+        for (;;) {
+            TestBatch batch = selectRunBatch();
+
+            if (batch == null) {
+                break;
+            }
+
+            runTestRunBatch(batch);
+        }
+    }
+
+    /**
+     * Runs a TestBatch by either faking it or executing it on a device.
+     */
+    private void runTestRunBatch(TestBatch batch) throws DeviceNotAvailableException,
+            CapabilityQueryFailureException {
+        // prepare instance listener
+        mInstanceListerner.setCurrentConfig(batch.config);
+        for (TestIdentifier test : batch.tests) {
+            mInstanceListerner.setTestInstances(test, getTestRunConfigs(test));
+        }
+
+        // execute only if config is executable, else fake results
+        if (isSupportedRunConfiguration(batch.config)) {
+            executeTestRunBatch(batch);
+        } else {
+            fakePassTestRunBatch(batch);
+        }
+    }
+
+    private boolean isSupportedRunConfiguration(BatchRunConfiguration runConfig)
+            throws DeviceNotAvailableException, CapabilityQueryFailureException {
         // orientation support
         if (!BatchRunConfiguration.ROTATION_UNSPECIFIED.equals(runConfig.getRotation())) {
             final Set<String> features = getDeviceFeatures(mDevice);
 
             if (isPortraitClassRotation(runConfig.getRotation()) &&
                     !features.contains(FEATURE_PORTRAIT)) {
-                isSupportedConfig = false;
+                return false;
             }
             if (isLandscapeClassRotation(runConfig.getRotation()) &&
                     !features.contains(FEATURE_LANDSCAPE)) {
-                isSupportedConfig = false;
+                return false;
             }
         }
 
-        // renderability support for OpenGL ES tests
-        if (isSupportedConfig && isOpenGlEsPackage()) {
-            isSupportedConfig = isSupportedGlesRenderConfig(runConfig);
-        }
-
-        mInstanceListerner.setCurrentConfig(runConfig);
-
-        // execute only if config is executable, else fake results
-        if (isSupportedConfig) {
-            executeTestRunBatch(tests, runConfig);
+        if (isOpenGlEsPackage()) {
+            // renderability support for OpenGL ES tests
+            return isSupportedGlesRenderConfig(runConfig);
         } else {
-            fakePassTestRunBatch(tests, runConfig);
+            return true;
         }
     }
 
@@ -1211,9 +1336,66 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         }
     }
 
-    private void executeTestRunBatch(Collection<TestIdentifier> tests,
-            BatchRunConfiguration runConfig) throws DeviceNotAvailableException {
-        final String testCases = generateTestCaseTrie(tests);
+    /**
+     * Executes given test batch on a device
+     */
+    private void executeTestRunBatch(TestBatch batch) throws DeviceNotAvailableException {
+        // attempt full run once
+        executeTestRunBatchRun(batch);
+
+        // split remaining tests to two sub batches and execute both. This will terminate
+        // since executeTestRunBatchRun will always progress for a batch of size 1.
+        final ArrayList<TestIdentifier> pendingTests = new ArrayList<>();
+
+        for (TestIdentifier test : batch.tests) {
+            if (mInstanceListerner.isPendingTestInstance(test, batch.config)) {
+                pendingTests.add(test);
+            }
+        }
+
+        final int divisorNdx = pendingTests.size() / 2;
+        final List<TestIdentifier> headList = pendingTests.subList(0, divisorNdx);
+        final List<TestIdentifier> tailList = pendingTests.subList(divisorNdx, pendingTests.size());
+
+        // head
+        for (;;) {
+            TestBatch subBatch = selectRunBatch(headList, batch.config);
+
+            if (subBatch == null) {
+                break;
+            }
+
+            executeTestRunBatch(subBatch);
+        }
+
+        // tail
+        for (;;) {
+            TestBatch subBatch = selectRunBatch(tailList, batch.config);
+
+            if (subBatch == null) {
+                break;
+            }
+
+            executeTestRunBatch(subBatch);
+        }
+
+        if (getBatchNumPendingCases(batch) != 0) {
+            throw new AssertionError("executeTestRunBatch postcondition failed");
+        }
+    }
+
+    /**
+     * Runs one execution pass over the given batch.
+     *
+     * Tries to run the batch. Always makes progress (executes instances or modifies stability
+     * scores).
+     */
+    private void executeTestRunBatchRun(TestBatch batch) throws DeviceNotAvailableException {
+        if (getBatchNumPendingCases(batch) != batch.tests.size()) {
+            throw new AssertionError("executeTestRunBatchRun precondition failed");
+        }
+
+        final String testCases = generateTestCaseTrie(batch.tests);
 
         mDevice.executeShellCommand("rm " + CASE_LIST_FILE_NAME);
         mDevice.executeShellCommand("rm " + LOG_FILE_NAME);
@@ -1226,7 +1408,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         deqpCmdLine.append("--deqp-caselist-file=");
         deqpCmdLine.append(CASE_LIST_FILE_NAME);
         deqpCmdLine.append(" ");
-        deqpCmdLine.append(getRunConfigDisplayCmdLine(runConfig));
+        deqpCmdLine.append(getRunConfigDisplayCmdLine(batch.config));
 
         // If we are not logging data, do not bother outputting the images from the test exe.
         if (!mLogData) {
@@ -1253,18 +1435,16 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             parser.flush();
         }
 
-        try {
-            final boolean progressedSinceLastCall =
-                    mInstanceListerner.getCurrentTestId() != null ||
-                    getNumRemainingInstances() < numRemainingInstancesBefore;
+        final boolean progressedSinceLastCall = mInstanceListerner.getCurrentTestId() != null ||
+                getNumRemainingInstances() < numRemainingInstancesBefore;
 
-            if (progressedSinceLastCall) {
-                mDeviceRecovery.onExecutionProgressed();
-            }
+        if (progressedSinceLastCall) {
+            mDeviceRecovery.onExecutionProgressed();
+        }
 
-            if (interruptingError == null) {
-                // execution finished successfully, do nothing
-            } else if (interruptingError instanceof AdbComLinkOpenError) {
+        // interrupted, try to recover
+        if (interruptingError != null) {
+            if (interruptingError instanceof AdbComLinkOpenError) {
                 mDeviceRecovery.recoverConnectionRefused();
             } else if (interruptingError instanceof AdbComLinkKilledError) {
                 mDeviceRecovery.recoverComLinkKilled();
@@ -1272,21 +1452,68 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                 CLog.e(interruptingError);
                 throw new RuntimeException(interruptingError);
             }
-        } catch (DeviceNotAvailableException ex) {
-            // Device lost. We must signal the tradedef by rethrowing this execption. However,
-            // there is a possiblity that the device loss was caused by the currently run test
-            // instance. Since CtsTest is unaware of tests with only some instances executed,
-            // continuing the session after device has recovered will create a new DeqpTestRunner
-            // with current test in its run queue and this will cause the re-execution of this same
-            // instance. If the instance reliably can kill the device, the CTS cannot recover.
-            //
-            // Prevent this by terminating ALL instances of a tests if any of them causes a device
-            // loss.
-            mInstanceListerner.onDeviceLost();
-            throw ex;
-        } finally {
-            mInstanceListerner.endBatch();
+
+            // recoverXXX did not throw => recovery succeeded
+        } else if (!parser.wasSuccessful()) {
+            mDeviceRecovery.recoverComLinkKilled();
+            // recoverXXX did not throw => recovery succeeded
         }
+
+        // Progress guarantees.
+        if (batch.tests.size() == 1) {
+            final TestIdentifier onlyTest = batch.tests.iterator().next();
+            final boolean wasTestExecuted =
+                    !mInstanceListerner.isPendingTestInstance(onlyTest, batch.config) &&
+                    mInstanceListerner.getCurrentTestId() == null;
+            final boolean wasLinkFailure = !parser.wasSuccessful() || interruptingError != null;
+
+            // Link failures can be caused by external events, require at least two observations
+            // until bailing.
+            if (!wasTestExecuted && (!wasLinkFailure || getTestInstabilityRating(onlyTest) > 0)) {
+                recordTestInstability(onlyTest);
+                // If we cannot finish the test, mark the case as a crash.
+                //
+                // If we couldn't even start the test, fail the test instance as non-executable.
+                // This is required so that a consistently crashing or non-existent tests will
+                // not cause futile (non-terminating) re-execution attempts.
+                if (mInstanceListerner.getCurrentTestId() != null) {
+                    mInstanceListerner.abortTest(onlyTest, INCOMPLETE_LOG_MESSAGE);
+                } else {
+                    mInstanceListerner.abortTest(onlyTest, NOT_EXECUTABLE_LOG_MESSAGE);
+                }
+            } else if (wasTestExecuted) {
+                clearTestInstability(onlyTest);
+            }
+        }
+        else
+        {
+            // Analyze results to update test stability ratings. If there is no interrupting test
+            // logged, increase instability rating of all remaining tests. If there is a
+            // interrupting test logged, increase only its instability rating.
+            //
+            // A successful run of tests clears instability rating.
+            if (mInstanceListerner.getCurrentTestId() == null) {
+                for (TestIdentifier test : batch.tests) {
+                    if (mInstanceListerner.isPendingTestInstance(test, batch.config)) {
+                        recordTestInstability(test);
+                    } else {
+                        clearTestInstability(test);
+                    }
+                }
+            } else {
+                recordTestInstability(mInstanceListerner.getCurrentTestId());
+                for (TestIdentifier test : batch.tests) {
+                    // \note: isPendingTestInstance is false for getCurrentTestId. Current ID is
+                    // considered 'running' and will be restored to 'pending' in endBatch().
+                    if (!test.equals(mInstanceListerner.getCurrentTestId()) &&
+                            !mInstanceListerner.isPendingTestInstance(test, batch.config)) {
+                        clearTestInstability(test);
+                    }
+                }
+            }
+        }
+
+        mInstanceListerner.endBatch();
     }
 
     private static String getRunConfigDisplayCmdLine(BatchRunConfiguration runConfig) {
@@ -1330,11 +1557,10 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     /**
      * Pass given batch tests without running it
      */
-    private void fakePassTestRunBatch(Collection<TestIdentifier> tests,
-            BatchRunConfiguration runConfig) {
-        for (TestIdentifier test : tests) {
+    private void fakePassTestRunBatch(TestBatch batch) {
+        for (TestIdentifier test : batch.tests) {
             CLog.d("Skipping test '%s' invocation in config '%s'", test.toString(),
-                    runConfig.getId());
+                    batch.config.getId());
             mInstanceListerner.skipTest(test);
         }
     }
@@ -1568,6 +1794,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                 installTestApk();
 
                 mInstanceListerner.setSink(listener);
+                mDeviceRecovery.setDevice(mDevice);
                 runTests();
 
                 uninstallTestApk();
