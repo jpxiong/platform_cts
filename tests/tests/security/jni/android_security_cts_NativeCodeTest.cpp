@@ -296,7 +296,7 @@ static jboolean android_security_cts_NativeCodeTest_doNvmapIocFromIdTest(JNIEnv*
     bool      vulnerable = false;
 
     if (nvmap >= 0) {
-        if (0 >= ioctl(nvmap, NVMAP_IOC_FROM_ID)) {
+        if (0 == ioctl(nvmap, NVMAP_IOC_FROM_ID)) {
             /* IOCTL succeeded */
             vulnerable = true;
         }
