@@ -3505,6 +3505,36 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
                 }
             };
 
+    public void testTranslationSetter() {
+        View view = new View(mActivity);
+        float offset = 10.0f;
+        view.setTranslationX(offset);
+        view.setTranslationY(offset);
+        view.setTranslationZ(offset);
+        view.setElevation(offset);
+
+        assertEquals("Incorrect translationX", offset, view.getTranslationX());
+        assertEquals("Incorrect translationY", offset, view.getTranslationY());
+        assertEquals("Incorrect translationZ", offset, view.getTranslationZ());
+        assertEquals("Incorrect elevation", offset, view.getElevation());
+    }
+
+    public void testXYZ() {
+        View view = new View(mActivity);
+        float offset = 10.0f;
+        float start = 15.0f;
+        view.setTranslationX(offset);
+        view.setLeft((int) start);
+        view.setTranslationY(offset);
+        view.setTop((int) start);
+        view.setTranslationZ(offset);
+        view.setElevation(start);
+
+        assertEquals("Incorrect X value", offset + start, view.getX());
+        assertEquals("Incorrect Y value", offset + start, view.getY());
+        assertEquals("Incorrect Z value", offset + start, view.getZ());
+    }
+
     private static class MockDrawable extends Drawable {
         private boolean mCalledSetTint = false;
 
