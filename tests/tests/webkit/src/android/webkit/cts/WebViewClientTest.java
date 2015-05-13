@@ -30,7 +30,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebResourceResponseBase;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -538,7 +537,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewC
         private boolean mOnLoadResourceCalled;
         private int mOnReceivedErrorCode;
         private WebResourceError mOnReceivedResourceError;
-        private WebResourceResponseBase mOnReceivedHttpError;
+        private WebResourceResponse mOnReceivedHttpError;
         private boolean mOnFormResubmissionCalled;
         private boolean mDoUpdateVisitedHistoryCalled;
         private boolean mOnReceivedHttpAuthRequestCalled;
@@ -571,7 +570,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewC
             return mOnReceivedResourceError;
         }
 
-        public WebResourceResponseBase hasOnReceivedHttpError() {
+        public WebResourceResponse hasOnReceivedHttpError() {
             return mOnReceivedHttpError;
         }
 
@@ -640,7 +639,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewC
 
         @Override
         public void onReceivedHttpError(WebView view,  WebResourceRequest request,
-                WebResourceResponseBase errorResponse) {
+                WebResourceResponse errorResponse) {
             super.onReceivedHttpError(view, request, errorResponse);
             mOnReceivedHttpError = errorResponse;
         }
