@@ -89,24 +89,13 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
                 config.getOutputMinFrameDuration(ImageFormat.YUV_420_888, stillSize);
 
         // Find suitable target FPS range - as high as possible
-        Range<Integer>[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        Range<Integer> targetRange = mStaticInfo.getAeMaxTargetFpsRange();
         int minBurstFps = (int) Math.floor(1e9 / minStillFrameDuration);
-        Range<Integer> targetRange = null;
-        for (Range<Integer> candidateRange : fpsRanges) {
-            if (candidateRange.getLower() >= minBurstFps) {
-                if (targetRange == null) {
-                    targetRange = candidateRange;
-                } else if (candidateRange.getLower() > targetRange.getLower()) {
-                    targetRange = candidateRange;
-                } else if (candidateRange.getUpper() > targetRange.getUpper()) {
-                    targetRange = candidateRange;
-                }
-            }
-        }
+
         assertTrue(String.format("Cam %s: No target FPS range found with minimum FPS above " +
                         " 1/minFrameDuration (%d fps, duration %d ns) for full-resolution YUV",
-                cameraId, minBurstFps, minStillFrameDuration),
-            targetRange != null);
+                        cameraId, minBurstFps, minStillFrameDuration),
+                targetRange.getLower() >= minBurstFps);
 
         Log.i(TAG, String.format("Selected frame rate range %d - %d for YUV burst",
                         targetRange.getLower(), targetRange.getUpper()));
