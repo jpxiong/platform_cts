@@ -669,7 +669,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 numImageWriterImages);
 
         mImageWriterListener = new SimpleImageWriterListener(mImageWriter);
-        mImageWriter.setImageListener(mImageWriterListener, mHandler);
+        mImageWriter.setOnImageReleasedListener(mImageWriterListener, mHandler);
     }
 
     /**

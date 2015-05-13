@@ -109,13 +109,8 @@ public class CameraTestUtils extends Assert {
     public static ImageReader makeImageReader(Size size, int format, int maxNumImages,
             ImageReader.OnImageAvailableListener listener, Handler handler) {
         ImageReader reader;
-        if (format == ImageFormat.PRIVATE) {
-            reader = ImageReader.newOpaqueInstance(size.getWidth(), size.getHeight(),
-                    maxNumImages);
-        } else {
-            reader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
-                    maxNumImages);
-        }
+        reader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format,
+                maxNumImages);
         reader.setOnImageAvailableListener(listener, handler);
         if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size);
         return reader;
@@ -132,9 +127,9 @@ public class CameraTestUtils extends Assert {
      */
     public static ImageWriter makeImageWriter(
             Surface inputSurface, int maxImages,
-            ImageWriter.ImageListener listener, Handler handler) {
+            ImageWriter.OnImageReleasedListener listener, Handler handler) {
         ImageWriter writer = ImageWriter.newInstance(inputSurface, maxImages);
-        writer.setImageListener(listener, handler);
+        writer.setOnImageReleasedListener(listener, handler);
         return writer;
     }
 
@@ -286,11 +281,11 @@ public class CameraTestUtils extends Assert {
         }
     }
 
-    public static class SimpleImageWriterListener implements ImageWriter.ImageListener {
+    public static class SimpleImageWriterListener implements ImageWriter.OnImageReleasedListener {
         private final Semaphore mImageReleasedSema = new Semaphore(0);
         private final ImageWriter mWriter;
         @Override
-        public void onInputImageReleased(ImageWriter writer) {
+        public void onImageReleased(ImageWriter writer) {
             if (writer != mWriter) {
                 return;
             }
@@ -1270,8 +1265,9 @@ public class CameraTestUtils extends Assert {
         if (src.getFormat() != dst.getFormat()) {
             throw new IllegalArgumentException("Src and dst images should have the same format");
         }
-        if (src.isOpaque() || dst.isOpaque()) {
-            throw new IllegalArgumentException("Opaque image is not copyable");
+        if (src.getFormat() == ImageFormat.PRIVATE ||
+                dst.getFormat() == ImageFormat.PRIVATE) {
+            throw new IllegalArgumentException("PRIVATE format images are not copyable");
         }
 
         // TODO: check the owner of the dst image, it must be from ImageWriter, other source may
@@ -1298,9 +1294,9 @@ public class CameraTestUtils extends Assert {
      * Checks whether the two images are strongly equal.
      * </p>
      * <p>
-     * Two images are strongly equal if and only if the data, formats, sizes, and
-     * timestamps are same. For opaque images ({@link Image#isOpaque()} returns
-     * true), the image data is not not accessible thus the data comparison is
+     * Two images are strongly equal if and only if the data, formats, sizes,
+     * and timestamps are same. For {@link ImageFormat#PRIVATE PRIVATE} format
+     * images, the image data is not not accessible thus the data comparison is
      * effectively skipped as the number of planes is zero.
      * </p>
      * <p>
