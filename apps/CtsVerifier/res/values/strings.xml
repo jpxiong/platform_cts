@@ -287,20 +287,46 @@
     <string name="empty"></string>
 
     <!-- Strings for HifiUltrasoundTestActivity -->
-    <string name="hifi_ultrasound_test">Hifi Ultrasound Test</string>
-    <string name="hifi_ultrasound_test_info">This is a test for near-ultrasound response.\n
-        This test requires two devices, one as recording device, one as playback device.\n</string>
-    <string name="hifi_ultrasound_test_play">GENERATE</string>
+    <string name="hifi_ultrasound_test">Hifi Ultrasound Test (microphone)</string>
+    <string name="hifi_ultrasound_test_info">
+        This is a test for microphone near-ultrasound (18500Hz - 20000Hz) response.\n
+        This test requires two devices.\n</string>
+    <string name="hifi_ultrasound_test_play">PLAY</string>
     <string name="hifi_ultrasound_test_record">RECORD</string>
-    <string name="hifi_ultrasound_test_playback">PLAY</string>
     <string name="hifi_ultrasound_test_plot">PLOT</string>
     <string name="hifi_ultrasound_test_dismiss">DISMISS</string>
     <string name="hifi_ultrasound_test_instruction1">
-        Set the volume of the playback device at 70% and hold it with one hand.\n
-        Hold the recording device with the other hand\n
-        Press the RECORD button on the recording device, the GENERATE button on the playback device simultaneously.\n</string>
+        Set the volume of the reference device at 70% and hold it with one hand.\n
+        Hold the testing device with the other hand\n
+        Press the RECORD button on the testing device, then the PLAY button on the reference device within one second.\n
+        After the test, report result on the testing device.\n</string>
     <string name="hifi_ultrasound_test_pass">PASS</string>
     <string name="hifi_ultrasound_test_fail">FAIL</string>
+    <string name="hifi_ultrasound_test_default_false_string">false</string>
+    <string name="hifi_ultrasound_test_mic_prop">persist.audio.mic.ultrasound</string>
+    <string name="hifi_ultrasound_test_spkr_prop">persist.audio.spkr.ultrasound</string>
+    <string name="hifi_ultrasound_test_mic_no_support">
+        Device does not support near-ultrasound recording.\n
+        Please click pass if this is the testing device.\n</string>
+    <string name="hifi_ultrasound_test_spkr_no_support">
+        Device does not support near-ultrasound playback.\n
+        If this is your reference device, please use a different reference device.\n</string>
+
+    <string name="hifi_ultrasound_speaker_test">Hifi Ultrasound Test (speaker)</string>
+    <string name="hifi_ultrasound_speaker_test_info">
+        This is a test for speaker near-ultrasound (18500Hz - 20000Hz) response.\n
+        This test requires two devices.\n</string>
+    <string name="hifi_ultrasound_speaker_test_instruction1">
+        Set the volume of the testing device at 70% and hold it with one hand.\n
+        Hold the reference device with the other hand\n
+        Press the RECORD button on the reference device, then the PLAY button on the testing device within one second.\n
+        After the test, report result on the testing device.\n</string>
+    <string name="hifi_ultrasound_speaker_test_mic_no_support">
+        Device does not support near-ultrasound recording.\n
+        If this is your reference device, please use a different reference device.\n</string>
+    <string name="hifi_ultrasound_speaker_test_spkr_no_support">
+        Device does not support near-ultrasound playback.\n
+        Please click pass if this is the testing device.\n</string>
 
     <!-- Strings for Location tests -->
     <string name="location_gps_test">GPS Test</string>
