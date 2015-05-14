@@ -247,7 +247,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
                 setupImageReaders(inputSize, inputFormat, reprocessOutputSize,
                         reprocessOutputFormat, /*maxImages*/1);
-                setupReprocessibleSession(/*previewSurface*/null, /*numImageWriterImages*/1);
+                setupReprocessableSession(/*previewSurface*/null, /*numImageWriterImages*/1);
 
                 TotalCaptureResult result = submitCaptureRequest(mFirstImageReader.getSurface(),
                         /*inputResult*/null);
@@ -258,7 +258,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
                 // recreate the session
                 closeReprossibleSession();
-                setupReprocessibleSession(/*previewSurface*/null, /*numImageWriterImages*/1);
+                setupReprocessableSession(/*previewSurface*/null, /*numImageWriterImages*/1);
                 try {
                     TotalCaptureResult reprocessResult;
                     // issue and wait on reprocess capture request
@@ -429,7 +429,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
             setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
                 totalNumBurst);
-            setupReprocessibleSession(mPreviewSurface, /*numImageWriterImages*/numBurst);
+            setupReprocessableSession(mPreviewSurface, /*numImageWriterImages*/numBurst);
 
             if (enablePreview) {
                 startPreview(mPreviewSurface);
@@ -498,7 +498,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
             setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
                 numBurst);
-            setupReprocessibleSession(mPreviewSurface, numBurst);
+            setupReprocessableSession(mPreviewSurface, numBurst);
 
             if (enablePreview) {
                 startPreview(mPreviewSurface);
@@ -556,7 +556,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
             setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
                     /*maxImages*/1);
-            setupReprocessibleSession(mPreviewSurface, /*numImageWriterImages*/1);
+            setupReprocessableSession(mPreviewSurface, /*numImageWriterImages*/1);
 
             if (enablePreview) {
                 startPreview(mPreviewSurface);
@@ -635,11 +635,11 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     /**
-     * Set up a reprocessible session and create an ImageWriter with the sessoin's input surface.
+     * Set up a reprocessable session and create an ImageWriter with the sessoin's input surface.
      */
-    private void setupReprocessibleSession(Surface previewSurface, int numImageWriterImages)
+    private void setupReprocessableSession(Surface previewSurface, int numImageWriterImages)
             throws Exception {
-        // create a reprocessible capture session
+        // create a reprocessable capture session
         List<Surface> outSurfaces = new ArrayList<Surface>();
         outSurfaces.add(mFirstImageReader.getSurface());
         if (!mShareOneImageReader) {
@@ -660,7 +660,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 inputConfig.getFormat() == mFirstImageReader.getImageFormat());
 
         mSessionListener = new BlockingSessionCallback();
-        mSession = configureReprocessibleCameraSession(mCamera, inputConfig, outSurfaces,
+        mSession = configureReprocessableCameraSession(mCamera, inputConfig, outSurfaces,
                 mSessionListener, mHandler);
 
         // create an ImageWriter
@@ -673,7 +673,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     /**
-     * Close the reprocessible session and ImageWriter.
+     * Close the reprocessable session and ImageWriter.
      */
     private void closeReprossibleSession() {
         mInputSurface = null;
