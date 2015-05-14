@@ -30,7 +30,7 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
     private static final String TAG = "TvInputDiscoveryTestActivity";
 
     private static final Intent TV_APP_INTENT = new Intent(Intent.ACTION_VIEW,
-            TvContract.buildChannelUri(0));
+            TvContract.Channels.CONTENT_URI);
 
     private static final long TIMEOUT_MS = 5l * 60l * 1000l;  // 5 mins.
 
