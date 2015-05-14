@@ -294,13 +294,8 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
             ImageReader.OnImageAvailableListener listener) throws Exception {
 
         ImageReader reader = null;
-        if (format == ImageFormat.PRIVATE) {
-            // Create opaque ImageReader
-            reader = ImageReader.newOpaqueInstance(size.getWidth(), size.getHeight(), maxNumImages);
-        } else {
-            reader = ImageReader.newInstance(size.getWidth(), size.getHeight(),
-                    format, maxNumImages);
-        }
+        reader = ImageReader.newInstance(size.getWidth(), size.getHeight(),
+                format, maxNumImages);
 
         reader.setOnImageAvailableListener(listener, mHandler);
         if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
@@ -457,15 +452,6 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         try {
             closedImage.getTimestamp();
             fail("Image should throw IllegalStateException when calling getTimestamp"
-                    + " after the image is closed");
-        } catch (IllegalStateException e) {
-            // Expected.
-        }
-
-        // Image#isOpaque test
-        try {
-            closedImage.isOpaque();
-            fail("Image should throw IllegalStateException when calling isOpaque"
                     + " after the image is closed");
         } catch (IllegalStateException e) {
             // Expected.

@@ -28,7 +28,6 @@ import android.media.Image;
 import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.media.ImageWriter;
-import android.os.ConditionVariable;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
@@ -51,7 +50,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
     // Max number of images can be accessed simultaneously from ImageReader.
     private static final int MAX_NUM_IMAGES = 3;
-    private static final int CAMERA_OPAQUE_FORMAT = ImageFormat.PRIVATE;
+    private static final int CAMERA_PRIVATE_FORMAT = ImageFormat.PRIVATE;
     private ImageReader mReaderForWriter;
     private ImageWriter mWriter;
 
@@ -125,7 +124,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             try {
                 Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
-                readerWriterFormatTestByCamera(CAMERA_OPAQUE_FORMAT);
+                readerWriterFormatTestByCamera(CAMERA_PRIVATE_FORMAT);
             } finally {
                 closeDevice(id);
             }
@@ -158,7 +157,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         assertNotNull("Surface from ImageReader shouldn't be null", surface);
         mWriter = ImageWriter.newInstance(surface, MAX_NUM_IMAGES);
         SimpleImageWriterListener writerImageListener = new SimpleImageWriterListener(mWriter);
-        mWriter.setImageListener(writerImageListener, mHandler);
+        mWriter.setOnImageReleasedListener(writerImageListener, mHandler);
 
         // Start capture: capture 2 images.
         List<Surface> outputSurfaces = new ArrayList<Surface>();
@@ -182,17 +181,17 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         Image outputImage = null;
         assertTrue("ImageWriter max images should be " + MAX_NUM_IMAGES,
                 mWriter.getMaxImages() == MAX_NUM_IMAGES);
-        if (format == CAMERA_OPAQUE_FORMAT) {
-            assertTrue("First ImageReader should be opaque",
-                    mReader.isOpaque());
-            assertTrue("Second ImageReader should be opaque",
-                    mReaderForWriter.isOpaque());
-            assertTrue("Format of first ImageReader should be opaque",
-                    mReader.getImageFormat() == CAMERA_OPAQUE_FORMAT);
-            assertTrue(" Format of second ImageReader should be opaque",
-                    mReaderForWriter.getImageFormat() == CAMERA_OPAQUE_FORMAT);
-            assertTrue(" Format of ImageWriter should be opaque",
-                    mWriter.getFormat() == CAMERA_OPAQUE_FORMAT);
+        if (format == CAMERA_PRIVATE_FORMAT) {
+            assertTrue("First ImageReader format should be PRIVATE",
+                    mReader.getImageFormat() == CAMERA_PRIVATE_FORMAT);
+            assertTrue("Second ImageReader should be PRIVATE",
+                    mReaderForWriter.getImageFormat() == CAMERA_PRIVATE_FORMAT);
+            assertTrue("Format of first ImageReader should be PRIVATE",
+                    mReader.getImageFormat() == CAMERA_PRIVATE_FORMAT);
+            assertTrue(" Format of second ImageReader should be PRIVATE",
+                    mReaderForWriter.getImageFormat() == CAMERA_PRIVATE_FORMAT);
+            assertTrue(" Format of ImageWriter should be PRIVATE",
+                    mWriter.getFormat() == CAMERA_PRIVATE_FORMAT);
 
             // Validate 2 images
             validateOpaqueImages(maxSize, listenerForCamera, listenerForWriter, captureListener,
@@ -307,7 +306,7 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
     private void validateOpaqueImage(Image image, String msg, Size imageSize,
             CaptureResult result) {
         assertNotNull("Opaque image Capture result should not be null", result != null);
-        mCollector.expectImageProperties(msg + "Opaque ", image, CAMERA_OPAQUE_FORMAT,
+        mCollector.expectImageProperties(msg + "Opaque ", image, CAMERA_PRIVATE_FORMAT,
                 imageSize, result.get(CaptureResult.SENSOR_TIMESTAMP));
         mCollector.expectTrue(msg + "Opaque image number planes should be zero",
                 image.getPlanes().length == 0);
