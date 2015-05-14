@@ -146,7 +146,7 @@ public class MediaMetadataRetrieverTest extends AndroidTestCase {
 
     public void testRetrieveFailsIfMediaDataSourceReturnsAnError() throws Exception {
         TestMediaDataSource dataSource = setDataSourceCallback(R.raw.testvideo);
-        dataSource.returnFromReadAt(-1);
+        dataSource.returnFromReadAt(-2);
         assertTrue(mRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null);
     }
 }
