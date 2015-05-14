@@ -106,32 +106,27 @@ public class SELinuxHostTest extends DeviceTestCase {
         /* obtain sepolicy file from running device */
         devicePolicyFile = File.createTempFile("sepolicy", ".tmp");
         devicePolicyFile.deleteOnExit();
-        mDevice.executeAdbCommand("pull", "/sys/fs/selinux/policy",
-                devicePolicyFile.getAbsolutePath());
+        mDevice.pullFile("/sys/fs/selinux/policy", devicePolicyFile);
 
         /* obtain seapp_contexts file from running device */
         deviceSeappFile = File.createTempFile("seapp_contexts", ".tmp");
         deviceSeappFile.deleteOnExit();
-        mDevice.executeAdbCommand("pull", "/seapp_contexts",
-                deviceSeappFile.getAbsolutePath());
+        mDevice.pullFile("/seapp_contexts", deviceSeappFile);
 
         /* obtain file_contexts file from running device */
         deviceFcFile = File.createTempFile("file_contexts", ".tmp");
         deviceFcFile.deleteOnExit();
-        mDevice.executeAdbCommand("pull", "/file_contexts",
-                deviceFcFile.getAbsolutePath());
+        mDevice.pullFile("/file_contexts", deviceFcFile);
 
         /* obtain property_contexts file from running device */
         devicePcFile = File.createTempFile("property_contexts", ".tmp");
         devicePcFile.deleteOnExit();
-        mDevice.executeAdbCommand("pull", "/property_contexts",
-                devicePcFile.getAbsolutePath());
+        mDevice.pullFile("/property_contexts", devicePcFile);
 
         /* obtain service_contexts file from running device */
         deviceSvcFile = File.createTempFile("service_contexts", ".tmp");
         deviceSvcFile.deleteOnExit();
-        mDevice.executeAdbCommand("pull", "/service_contexts",
-                deviceSvcFile.getAbsolutePath());
+        mDevice.pullFile("/service_contexts", deviceSvcFile);
 
         /* retrieve the AOSP *_contexts files from jar */
         aospSeappFile = copyResourceToTempFile("/general_seapp_contexts");
