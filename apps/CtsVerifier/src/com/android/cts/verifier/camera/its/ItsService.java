@@ -146,6 +146,7 @@ public class ItsService extends Service implements SensorEventListener {
     private AtomicInteger mCountCallbacksRemaining = new AtomicInteger();
     private AtomicInteger mCountRawOrDng = new AtomicInteger();
     private AtomicInteger mCountRaw10 = new AtomicInteger();
+    private AtomicInteger mCountRaw12 = new AtomicInteger();
     private AtomicInteger mCountJpg = new AtomicInteger();
     private AtomicInteger mCountYuv = new AtomicInteger();
     private AtomicInteger mCountCapRes = new AtomicInteger();
@@ -658,6 +659,8 @@ public class ItsService extends Service implements SensorEventListener {
                         jsonSurface.put("format", "raw");
                     } else if (format == ImageFormat.RAW10) {
                         jsonSurface.put("format", "raw10");
+                    } else if (format == ImageFormat.RAW12) {
+                        jsonSurface.put("format", "raw12");
                     } else if (format == ImageFormat.JPEG) {
                         jsonSurface.put("format", "jpeg");
                     } else if (format == ImageFormat.YUV_420_888) {
@@ -1004,6 +1007,7 @@ public class ItsService extends Service implements SensorEventListener {
                 mCountJpg.set(0);
                 mCountYuv.set(0);
                 mCountRaw10.set(0);
+                mCountRaw12.set(0);
                 mCountCapRes.set(0);
                 mCaptureRawIsDng = false;
                 mCaptureResults = new CaptureResult[requests.size()];
@@ -1028,10 +1032,13 @@ public class ItsService extends Service implements SensorEventListener {
                             sizes = ItsUtils.getJpegOutputSizes(mCameraCharacteristics);
                         } else if ("raw".equals(sformat)) {
                             formats[i] = ImageFormat.RAW_SENSOR;
-                            sizes = ItsUtils.getRawOutputSizes(mCameraCharacteristics);
+                            sizes = ItsUtils.getRaw16OutputSizes(mCameraCharacteristics);
                         } else if ("raw10".equals(sformat)) {
                             formats[i] = ImageFormat.RAW10;
-                            sizes = ItsUtils.getRawOutputSizes(mCameraCharacteristics);
+                            sizes = ItsUtils.getRaw10OutputSizes(mCameraCharacteristics);
+                        } else if ("raw12".equals(sformat)) {
+                            formats[i] = ImageFormat.RAW12;
+                            sizes = ItsUtils.getRaw12OutputSizes(mCameraCharacteristics);
                         } else if ("dng".equals(sformat)) {
                             formats[i] = ImageFormat.RAW_SENSOR;
                             sizes = ItsUtils.getRawOutputSizes(mCameraCharacteristics);
@@ -1170,6 +1177,12 @@ public class ItsService extends Service implements SensorEventListener {
                     ByteBuffer buf = ByteBuffer.wrap(img);
                     int count = mCountRaw10.getAndIncrement();
                     mSocketRunnableObj.sendResponseCaptureBuffer("raw10Image", buf);
+                } else if (format == ImageFormat.RAW12) {
+                    Logt.i(TAG, "Received RAW12 capture");
+                    byte[] img = ItsUtils.getDataFromImage(capture);
+                    ByteBuffer buf = ByteBuffer.wrap(img);
+                    int count = mCountRaw12.getAndIncrement();
+                    mSocketRunnableObj.sendResponseCaptureBuffer("raw12Image", buf);
                 } else if (format == ImageFormat.RAW_SENSOR) {
                     Logt.i(TAG, "Received RAW16 capture");
                     int count = mCountRawOrDng.getAndIncrement();

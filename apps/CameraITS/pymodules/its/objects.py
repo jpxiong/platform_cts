@@ -142,13 +142,15 @@ def get_available_output_sizes(fmt, props):
     """Return a sorted list of available output sizes for a given format.
 
     Args:
-        fmt: the output format, as a string in ["jpg", "yuv", "raw"].
+        fmt: the output format, as a string in
+            ["jpg", "yuv", "raw", "raw10", "raw12"].
         props: the object returned from its.device.get_camera_properties().
 
     Returns:
         A sorted list of (w,h) tuples (sorted large-to-small).
     """
-    fmt_codes = {"raw":0x20, "raw10":0x25, "yuv":0x23, "jpg":0x100, "jpeg":0x100}
+    fmt_codes = {"raw":0x20, "raw10":0x25, "raw12":0x26, "yuv":0x23,
+                 "jpg":0x100, "jpeg":0x100}
     configs = props['android.scaler.streamConfigurationMap']\
                    ['availableStreamConfigurations']
     fmt_configs = [cfg for cfg in configs if cfg['format'] == fmt_codes[fmt]]
