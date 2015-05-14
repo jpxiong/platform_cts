@@ -30,6 +30,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
 import android.media.MediaMetadataRetriever;
+import android.media.PlaybackParams;
 import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
@@ -845,8 +846,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mMediaPlayer.seekTo(0);
             Thread.sleep(1000);
             int playTime = 4000;  // The testing clip is about 10 second long.
-            mMediaPlayer.setPlaybackRate(playbackRate,
-                                         MediaPlayer.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+            mMediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(playbackRate));
             mMediaPlayer.start();
             Thread.sleep(playTime);
             assertTrue("MediaPlayer should still be playing", mMediaPlayer.isPlaying());

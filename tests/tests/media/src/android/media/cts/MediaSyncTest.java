@@ -31,6 +31,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaSync;
 import android.media.MediaTimestamp;
+import android.media.PlaybackParams;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.Surface;
@@ -151,12 +152,12 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
     }
 
     /**
-     * Tests setPlaybackRate is handled correctly for wrong rate.
+     * Tests setPlaybackParams is handled correctly for wrong rate.
      */
-    public void testSetPlaybackRateFail() throws InterruptedException {
+    public void testSetPlaybackParamsFail() throws InterruptedException {
         final float rate = -1.0f;
         try {
-            mMediaSync.setPlaybackRate(rate, MediaSync.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+            mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(rate));
             fail("playback rate " + rate + " is not handled correctly");
         } catch (IllegalArgumentException e) {
         }
@@ -170,7 +171,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
         mMediaSync.setAudioTrack(mAudioTrack);
 
         try {
-            mMediaSync.setPlaybackRate(rate, MediaSync.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+            mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(rate));
             fail("With audio track set, playback rate " + rate
                     + " is not handled correctly");
         } catch (IllegalArgumentException e) {
@@ -178,13 +179,13 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
     }
 
     /**
-     * Tests setPlaybackRate is handled correctly for good rate without audio track set.
+     * Tests setPlaybackParams is handled correctly for good rate without audio track set.
      * The case for good rate with audio track set is tested in testPlaybackRate*.
      */
-    public void testSetPlaybackRateSucceed() throws InterruptedException {
+    public void testSetPlaybackParamsSucceed() throws InterruptedException {
         final float rate = (float)TEST_MAX_SPEED;
         try {
-            mMediaSync.setPlaybackRate(rate, MediaSync.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+            mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(rate));
         } catch (IllegalArgumentException e) {
             fail("playback rate " + rate + " is not handled correctly");
         }
@@ -200,6 +201,9 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             throw new RuntimeException("timed out waiting for audio buffer return");
         }
     }
+
+    private PlaybackParams PAUSED_RATE = new PlaybackParams().setSpeed(0.f);
+    private PlaybackParams NORMAL_RATE = new PlaybackParams().setSpeed(1.f);
 
     private boolean runCheckAudioBuffer(int inputResourceId, int timeOutMs) {
         final int NUM_LOOPS = 10;
@@ -233,7 +237,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             }
         }, null);
 
-        mMediaSync.setPlaybackRate(1.0f, MediaSync.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+        mMediaSync.setPlaybackParams(PAUSED_RATE);
 
         synchronized (condition) {
             mDecoderAudio.start();
@@ -296,7 +300,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             }
         }, null);
 
-        mMediaSync.setPlaybackRate(0.0f, MediaSync.PLAYBACK_RATE_AUDIO_MODE_DEFAULT);
+        mMediaSync.setPlaybackParams(PAUSED_RATE);
 
         ByteBuffer buffer1 = ByteBuffer.allocate(BUFFER_SIZE);
         ByteBuffer buffer2 = ByteBuffer.allocate(BUFFER_SIZE);
@@ -305,7 +309,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
         mMediaSync.queueAudio(buffer2, INDEX_AFTER_FLUSH, 0 /* presentationTimeUs */);
 
         synchronized (condition) {
-            mMediaSync.setPlaybackRate(1.0f, MediaSync.PLAYBACK_RATE_AUDIO_MODE_DEFAULT);
+            mMediaSync.setPlaybackParams(NORMAL_RATE);
 
             try {
                 condition.wait(timeOutMs);
@@ -438,7 +442,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             mHasAudio = true;
         }
 
-        mMediaSync.setPlaybackRate(playbackRate, MediaSync.PLAYBACK_RATE_AUDIO_MODE_RESAMPLE);
+        mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(playbackRate));
 
         synchronized (conditionFirstAudioBuffer) {
             if (video) {
