@@ -16,14 +16,25 @@
 
 package android.display.cts;
 
+import android.app.Presentation;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
+import android.hardware.display.DisplayManager.DisplayListener;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class DisplayTest extends AndroidTestCase {
     // The CTS package brings up an overlay display on the target device (see AndroidTest.xml).
@@ -43,6 +54,9 @@ public class DisplayTest extends AndroidTestCase {
 
     private DisplayManager mDisplayManager;
     private WindowManager mWindowManager;
+
+    // To test display mode switches.
+    private TestPresentation mPresentation;
 
     @Override
     protected void setUp() throws Exception {
@@ -183,11 +197,99 @@ public class DisplayTest extends AndroidTestCase {
      */
     public void testMode() {
         Display display = getSecondaryDisplay(mDisplayManager.getDisplays());
-        assertEquals(1, display.getSupportedModes().length);
+        assertEquals(2, display.getSupportedModes().length);
         Display.Mode mode = display.getMode();
         assertEquals(display.getSupportedModes()[0], mode);
         assertEquals(SECONDARY_DISPLAY_WIDTH, mode.getPhysicalWidth());
         assertEquals(SECONDARY_DISPLAY_HEIGHT, mode.getPhysicalHeight());
         assertEquals(display.getRefreshRate(), mode.getRefreshRate());
+    }
+
+    /**
+     * Tests that mode switch requests are correctly executed.
+     */
+    public void testModeSwitch() throws Exception {
+        final Display display = getSecondaryDisplay(mDisplayManager.getDisplays());
+        Display.Mode[] modes = display.getSupportedModes();
+        assertEquals(2, modes.length);
+        Display.Mode mode = display.getMode();
+        assertEquals(modes[0], mode);
+        final Display.Mode newMode = modes[1];
+
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        // Register for display events.
+        final CountDownLatch changeSignal = new CountDownLatch(1);
+        mDisplayManager.registerDisplayListener(new DisplayListener() {
+            @Override
+            public void onDisplayAdded(int displayId) {}
+
+            @Override
+            public void onDisplayChanged(int displayId) {
+                if (displayId == display.getDisplayId()) {
+                    changeSignal.countDown();
+                }
+            }
+
+            @Override
+            public void onDisplayRemoved(int displayId) {}
+        }, handler);
+
+        // Show the presentation.
+        final CountDownLatch presentationSignal = new CountDownLatch(1);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mPresentation = new TestPresentation(
+                        getContext(), display, newMode.getModeId());
+                mPresentation.show();
+                presentationSignal.countDown();
+            }
+        });
+        assertTrue(presentationSignal.await(5, TimeUnit.SECONDS));
+
+        // Wait until the display change is effective.
+        assertTrue(changeSignal.await(5, TimeUnit.SECONDS));
+
+        assertEquals(newMode, display.getMode());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mPresentation.dismiss();
+            }
+        });
+    }
+
+    /**
+     * Used to force mode changes on a display.
+     * <p>
+     * Note that due to limitations of the Presentation class, the modes must have the same size
+     * otherwise the presentation will be automatically dismissed.
+     */
+    private static final class TestPresentation extends Presentation {
+
+        private final int mModeId;
+
+        public TestPresentation(Context context, Display display, int modeId) {
+            super(context, display);
+            mModeId = modeId;
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            View content = new View(getContext());
+            content.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            content.setBackgroundColor(Color.RED);
+            setContentView(content);
+
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.preferredDisplayModeId = mModeId;
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            params.setTitle("CtsTestPresentation");
+            getWindow().setAttributes(params);
+        }
     }
 }
