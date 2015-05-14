@@ -569,12 +569,12 @@ public class CameraTestUtils extends Assert {
         return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
     }
 
-    public static CameraCaptureSession configureReprocessibleCameraSession(CameraDevice camera,
+    public static CameraCaptureSession configureReprocessableCameraSession(CameraDevice camera,
             InputConfiguration inputConfiguration, List<Surface> outputSurfaces,
             CameraCaptureSession.StateCallback listener, Handler handler)
             throws CameraAccessException {
         BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
-        camera.createReprocessibleCaptureSession(inputConfiguration, outputSurfaces,
+        camera.createReprocessableCaptureSession(inputConfiguration, outputSurfaces,
                 sessionListener, handler);
 
         return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);

@@ -380,7 +380,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 break;
 
             case REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING:
-            case REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING:
+            case REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING:
                 // Tested in ExtendedCameraCharacteristicsTest
                 return;
             default:

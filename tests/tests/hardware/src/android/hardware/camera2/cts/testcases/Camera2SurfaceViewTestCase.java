@@ -707,7 +707,7 @@ public class Camera2SurfaceViewTestCase extends
                                    CheckLevel.ASSERT, /*collector*/ null);
         int cap = CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING;
         if (format == ImageFormat.PRIVATE) {
-            cap = CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_OPAQUE_REPROCESSING;
+            cap = CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING;
         }
         return info.isCapabilitySupported(cap);
     }
