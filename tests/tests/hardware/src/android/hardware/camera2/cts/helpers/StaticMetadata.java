@@ -1297,6 +1297,30 @@ public class StaticMetadata {
     }
 
     /**
+     * Get the highest supported target FPS range.
+     * Prioritizes maximizing the min FPS, then the max FPS without lowering min FPS.
+     */
+    public Range<Integer> getAeMaxTargetFpsRange() {
+        Range<Integer>[] fpsRanges = getAeAvailableTargetFpsRangesChecked();
+
+        Range<Integer> targetRange = fpsRanges[0];
+        // Assume unsorted list of target FPS ranges, so use two passes, first maximize min FPS
+        for (Range<Integer> candidateRange : fpsRanges) {
+            if (candidateRange.getLower() > targetRange.getLower()) {
+                targetRange = candidateRange;
+            }
+        }
+        // Then maximize max FPS while not lowering min FPS
+        for (Range<Integer> candidateRange : fpsRanges) {
+            if (candidateRange.getLower() >= targetRange.getLower() &&
+                    candidateRange.getUpper() > targetRange.getUpper()) {
+                targetRange = candidateRange;
+            }
+        }
+        return targetRange;
+    }
+
+    /**
      * Get max frame duration.
      *
      * @return 0 if maxFrameDuration is null

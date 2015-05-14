@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import static android.hardware.camera2.CaptureRequest.*;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -380,11 +381,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 closeSession();
             }
             finally {
-                try {
-
-                } finally {
-                    closeDevice(mCameraIds[i], mCameraMockListener);
-                }
+                closeDevice(mCameraIds[i], mCameraMockListener);
             }
         }
     }
@@ -580,6 +577,146 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
         }
     }
+
+    /**
+     * Verify basic semantics and error conditions of the prepare call.
+     *
+     */
+    public void testPrepare() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i], mCameraMockListener);
+                waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
+
+                prepareTestByCamera();
+            }
+            finally {
+                closeDevice(mCameraIds[i], mCameraMockListener);
+            }
+        }
+    }
+
+    private void prepareTestByCamera() throws Exception {
+        final int PREPARE_TIMEOUT_MS = 10000;
+
+        mSessionMockListener = spy(new BlockingSessionCallback());
+
+        SurfaceTexture output1 = new SurfaceTexture(1);
+        Surface output1Surface = new Surface(output1);
+        SurfaceTexture output2 = new SurfaceTexture(2);
+        Surface output2Surface = new Surface(output2);
+
+        List<Surface> outputSurfaces = new ArrayList<>(
+            Arrays.asList(output1Surface, output2Surface));
+        mCamera.createCaptureSession(outputSurfaces, mSessionMockListener, mHandler);
+
+        mSession = mSessionMockListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+
+        // Try basic prepare
+
+        mSession.prepare(output1Surface);
+
+        verify(mSessionMockListener, timeout(PREPARE_TIMEOUT_MS).times(1))
+                .onSurfacePrepared(eq(mSession), eq(output1Surface));
+
+        // Should not complain if preparing already prepared stream
+
+        mSession.prepare(output1Surface);
+
+        verify(mSessionMockListener, timeout(PREPARE_TIMEOUT_MS).times(2))
+                .onSurfacePrepared(eq(mSession), eq(output1Surface));
+
+        // Check surface not included in session
+
+        SurfaceTexture output3 = new SurfaceTexture(3);
+        Surface output3Surface = new Surface(output3);
+        try {
+            mSession.prepare(output3Surface);
+            fail("Preparing surface not part of session must throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // Ensure second prepare also works
+
+        mSession.prepare(output2Surface);
+
+        verify(mSessionMockListener, timeout(PREPARE_TIMEOUT_MS).times(1))
+                .onSurfacePrepared(eq(mSession), eq(output2Surface));
+
+        // Use output1
+
+        CaptureRequest.Builder r = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        r.addTarget(output1Surface);
+
+        mSession.capture(r.build(), null, null);
+
+        try {
+            mSession.prepare(output1Surface);
+            fail("Preparing already-used surface must throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // Create new session with outputs 1 and 3, ensure output1Surface still can't be prepared
+        // again
+
+        mSessionMockListener = spy(new BlockingSessionCallback());
+
+        outputSurfaces = new ArrayList<>(
+            Arrays.asList(output1Surface, output3Surface));
+        mCamera.createCaptureSession(outputSurfaces, mSessionMockListener, mHandler);
+
+        mSession = mSessionMockListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+
+        try {
+            mSession.prepare(output1Surface);
+            fail("Preparing surface used in previous session must throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // Use output3, wait for result, then make sure prepare still doesn't work
+
+        r = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        r.addTarget(output3Surface);
+
+        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+        mSession.capture(r.build(), resultListener, mHandler);
+
+        resultListener.getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+
+        try {
+            mSession.prepare(output3Surface);
+            fail("Preparing already-used surface must throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // Create new session with outputs 1 and 2, ensure output2Surface can be prepared again
+
+        mSessionMockListener = spy(new BlockingSessionCallback());
+
+        outputSurfaces = new ArrayList<>(
+            Arrays.asList(output1Surface, output2Surface));
+        mCamera.createCaptureSession(outputSurfaces, mSessionMockListener, mHandler);
+
+        mSession = mSessionMockListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+
+        mSession.prepare(output2Surface);
+
+        verify(mSessionMockListener, timeout(PREPARE_TIMEOUT_MS).times(1))
+                .onSurfacePrepared(eq(mSession), eq(output2Surface));
+
+        try {
+            mSession.prepare(output1Surface);
+            fail("Preparing surface used in previous session must throw IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+    }
+
 
     private void invalidRequestCaptureTestByCamera() throws Exception {
         if (VERBOSE) Log.v(TAG, "invalidRequestCaptureTestByCamera");
@@ -888,7 +1025,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         mSession = mSessionMockListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
         waitForSessionState(SESSION_CONFIGURED, SESSION_CONFIGURE_TIMEOUT_MS);
         waitForSessionState(SESSION_READY, SESSION_READY_TIMEOUT_MS);
-}
+    }
 
     private void waitForDeviceState(int state, long timeoutMs) {
         mCameraMockListener.waitForState(state, timeoutMs);
