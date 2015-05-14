@@ -1041,7 +1041,7 @@ public class ItsService extends Service implements SensorEventListener {
                             sizes = ItsUtils.getRaw12OutputSizes(mCameraCharacteristics);
                         } else if ("dng".equals(sformat)) {
                             formats[i] = ImageFormat.RAW_SENSOR;
-                            sizes = ItsUtils.getRawOutputSizes(mCameraCharacteristics);
+                            sizes = ItsUtils.getRaw16OutputSizes(mCameraCharacteristics);
                             mCaptureRawIsDng = true;
                         } else {
                             throw new ItsException("Unsupported format: " + sformat);
