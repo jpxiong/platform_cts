@@ -322,13 +322,13 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
             mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
             mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
-            mMediaPlayer.setOnTimedMetaDataListener(new MediaPlayer.OnTimedMetaDataListener() {
+            mMediaPlayer.setOnTimedMetaDataAvailableListener(new MediaPlayer.OnTimedMetaDataAvailableListener() {
                 @Override
-                public void onTimedMetaData(MediaPlayer mp, TimedMetaData md) {
+                public void onTimedMetaDataAvailable(MediaPlayer mp, TimedMetaData md) {
                     counter.incrementAndGet();
                     int pos = mp.getCurrentPosition();
-                    long timeUs = md.getTimeUs();
-                    byte[] rawData = md.getRawData();
+                    long timeUs = md.getTimestamp();
+                    byte[] rawData = md.getMetaData();
                     // Raw data contains an id3 tag holding the decimal string representation of
                     // the associated time stamp rounded to the closest half second.
 
