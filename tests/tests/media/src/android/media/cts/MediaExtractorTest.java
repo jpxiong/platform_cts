@@ -83,7 +83,7 @@ public class MediaExtractorTest extends AndroidTestCase {
 
     public void testExtractorFailsIfMediaDataSourceReturnsAnError() throws Exception {
         TestMediaDataSource dataSource = getDataSourceFor(R.raw.testvideo);
-        dataSource.returnFromReadAt(-1);
+        dataSource.returnFromReadAt(-2);
         try {
             mExtractor.setDataSource(dataSource);
             fail("Expected IOException.");
