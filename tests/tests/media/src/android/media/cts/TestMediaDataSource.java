@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * A MediaDataSource that reads from a byte array for use in tests.
  */
-public class TestMediaDataSource implements MediaDataSource {
+public class TestMediaDataSource extends MediaDataSource {
     private static final String TAG = "TestMediaDataSource";
 
     private byte[] mData;
@@ -62,29 +62,30 @@ public class TestMediaDataSource implements MediaDataSource {
     }
 
     @Override
-    public synchronized int readAt(long offset, byte[] buffer, int size) {
+    public synchronized int readAt(long position, byte[] buffer, int offset, int size)
+            throws IOException {
         if (mThrowFromReadAt) {
-            throw new RuntimeException("Test exception from readAt()");
+            throw new IOException("Test exception from readAt()");
         }
         if (mReturnFromReadAt != null) {
             return mReturnFromReadAt;
         }
 
         // Clamp reads past the end of the source.
-        if (offset >= mData.length) {
-            return 0;
+        if (position >= mData.length) {
+            return -1; // -1 indicates EOF
         }
-        if (offset + size > mData.length) {
-            size -= (offset + size) - mData.length;
+        if (position + size > mData.length) {
+            size -= (position + size) - mData.length;
         }
-        System.arraycopy(mData, (int)offset, buffer, 0, size);
+        System.arraycopy(mData, (int)position, buffer, offset, size);
         return size;
     }
 
     @Override
-    public synchronized long getSize() {
+    public synchronized long getSize() throws IOException {
         if (mThrowFromGetSize) {
-            throw new RuntimeException("Test exception from getSize()");
+            throw new IOException("Test exception from getSize()");
         }
         if (mReturnFromGetSize != null) {
             return mReturnFromGetSize;

@@ -1589,7 +1589,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.setDataSource(dataSource);
         mMediaPlayer.prepare();
 
-        dataSource.returnFromReadAt(-1);
+        dataSource.returnFromReadAt(-2);
         mMediaPlayer.start();
         assertTrue(mOnErrorCalled.waitForSignal());
     }
