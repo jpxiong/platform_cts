@@ -17,6 +17,7 @@
 package android.media.cts;
 
 import java.nio.ByteBuffer;
+
 import org.junit.Assert;
 
 import android.media.AudioAttributes;
@@ -29,6 +30,43 @@ import android.os.Looper;
 // Used for statistics and loopers in listener tests.
 // See AudioRecordTest.java and AudioTrack_ListenerTest.java.
 public class AudioHelper {
+
+    // create sine waves or chirps for data arrays
+    public static byte[] createSoundDataInByteArray(int bufferSamples, final int sampleRate,
+            final double frequency, double sweep) {
+        final double rad = 2 * Math.PI * frequency / sampleRate;
+        byte[] vai = new byte[bufferSamples];
+        sweep = Math.PI * sweep / ((double)sampleRate * vai.length);
+        for (int j = 0; j < vai.length; j++) {
+            int unsigned =  (int)(Math.sin(j * (rad + j * sweep)) * Byte.MAX_VALUE)
+                    + Byte.MAX_VALUE & 0xFF;
+            vai[j] = (byte) unsigned;
+        }
+        return vai;
+    }
+
+    public static short[] createSoundDataInShortArray(int bufferSamples, final int sampleRate,
+            final double frequency, double sweep) {
+        final double rad = 2 * Math.PI * frequency / sampleRate;
+        short[] vai = new short[bufferSamples];
+        sweep = Math.PI * sweep / ((double)sampleRate * vai.length);
+        for (int j = 0; j < vai.length; j++) {
+            vai[j] = (short)(Math.sin(j * (rad + j * sweep)) * Short.MAX_VALUE);
+        }
+        return vai;
+    }
+
+    public static float[] createSoundDataInFloatArray(int bufferSamples, final int sampleRate,
+            final double frequency, double sweep) {
+        final double rad = 2 * Math.PI * frequency / sampleRate;
+        float[] vaf = new float[bufferSamples];
+        sweep = Math.PI * sweep / ((double)sampleRate * vaf.length);
+        for (int j = 0; j < vaf.length; j++) {
+            vaf[j] = (float)(Math.sin(j * (rad + j * sweep)));
+        }
+        return vaf;
+    }
+
     public static int frameSizeFromFormat(AudioFormat format) {
         return format.getChannelCount()
                 * format.getBytesPerSample(format.getEncoding());
