@@ -560,8 +560,12 @@ public class CameraTestUtils extends Assert {
             throws CameraAccessException {
         BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
         camera.createCaptureSession(outputSurfaces, sessionListener, handler);
+        CameraCaptureSession session =
+                sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        assertFalse("Camera session should not be a reprocessable session",
+                session.isReprocessable());
 
-        return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        return session;
     }
 
     public static CameraCaptureSession configureReprocessableCameraSession(CameraDevice camera,
@@ -571,8 +575,11 @@ public class CameraTestUtils extends Assert {
         BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
         camera.createReprocessableCaptureSession(inputConfiguration, outputSurfaces,
                 sessionListener, handler);
+        CameraCaptureSession session =
+                sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        assertTrue("Camera session should be a reprocessable session", session.isReprocessable());
 
-        return sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        return session;
     }
 
     public static <T> void assertArrayNotEmpty(T arr, String message) {
