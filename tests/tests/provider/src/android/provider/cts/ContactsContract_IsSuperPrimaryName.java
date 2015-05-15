@@ -112,10 +112,10 @@ public class ContactsContract_IsSuperPrimaryName extends AndroidTestCase {
         //
 
         // Execute: make the non primary name IS_SUPER_PRIMARY
-        TestData nonPrimaryName = isFirstNamePrimary ? name1 : name2;
+        TestData nonPrimaryName = !isFirstNamePrimary ? name1 : name2;
         ContentValues values = new ContentValues();
         values.put(StructuredName.IS_SUPER_PRIMARY, 1);
-        mResolver.update(nonPrimaryName.getContentUri(), values, null, null);
+        mResolver.update(nonPrimaryName.getUri(), values, null, null);
 
         // Verify: the IS_SUPER_PRIMARY values swap
         name1.load();
