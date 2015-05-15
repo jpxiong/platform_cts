@@ -114,10 +114,12 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         private int mTimeShiftStartPositionChanged;
         private int mTimeShiftCurrentPositionChanged;
 
+        @Override
         public void onTimeShiftStartPositionChanged(String inputId, long timeMs) {
             mTimeShiftStartPositionChanged++;
         }
 
+        @Override
         public void onTimeShiftCurrentPositionChanged(String inputId, long timeMs) {
             mTimeShiftCurrentPositionChanged++;
         }
