@@ -1732,10 +1732,19 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                             int bufferSize = 12 * minBufferSize;
                             int bufferSamples = bufferSize
                                     / AudioFormat.getBytesPerSample(TEST_FORMAT);
+
+                            // create audio track and confirm settings
                             AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR,
                                     TEST_CONF, TEST_FORMAT, minBufferSize, TEST_MODE);
-                            assertTrue(TEST_NAME,
-                                    track.getState() == AudioTrack.STATE_INITIALIZED);
+                            assertEquals(TEST_NAME + ": state",
+                                    AudioTrack.STATE_INITIALIZED, track.getState());
+                            assertEquals(TEST_NAME + ": sample rate",
+                                    TEST_SR, track.getSampleRate());
+                            assertEquals(TEST_NAME + ": channel mask",
+                                    TEST_CONF, track.getChannelConfiguration());
+                            assertEquals(TEST_NAME + ": encoding",
+                                    TEST_FORMAT, track.getAudioFormat());
+
                             ByteBuffer bb = (useDirect == 1)
                                     ? ByteBuffer.allocateDirect(bufferSize)
                                             : ByteBuffer.allocate(bufferSize);
@@ -2161,6 +2170,39 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                 { {1.0f, 0.5f}, {1.0f, 2.0f} },  // pitch by SR conversion (chirp)
         };
 
+        // sanity test that playback params works as expected
+        PlaybackParams params = new PlaybackParams().allowDefaults();
+        assertEquals(TEST_NAME, 1.0f, params.getSpeed());
+        assertEquals(TEST_NAME, 1.0f, params.getPitch());
+        assertEquals(TEST_NAME,
+                params.AUDIO_FALLBACK_MODE_DEFAULT,
+                params.getAudioFallbackMode());
+        track.setPlaybackParams(params); // OK
+        params.setAudioFallbackMode(params.AUDIO_FALLBACK_MODE_FAIL);
+        assertEquals(TEST_NAME,
+                params.AUDIO_FALLBACK_MODE_FAIL, params.getAudioFallbackMode());
+        params.setPitch(0.0f);
+        try {
+            track.setPlaybackParams(params);
+            fail("IllegalArgumentException should be thrown on out of range data");
+        } catch (IllegalArgumentException e) {
+            ; // expect this is invalid
+        }
+        // on failure, the AudioTrack params should not change.
+        PlaybackParams paramCheck = track.getPlaybackParams();
+        assertEquals(TEST_NAME,
+                paramCheck.AUDIO_FALLBACK_MODE_DEFAULT, paramCheck.getAudioFallbackMode());
+        assertEquals(TEST_NAME,
+                1.0f, paramCheck.getPitch());
+
+        // now try to see if we can do extreme pitch correction that should probably be muted.
+        params.setAudioFallbackMode(params.AUDIO_FALLBACK_MODE_MUTE);
+        assertEquals(TEST_NAME,
+                params.AUDIO_FALLBACK_MODE_MUTE, params.getAudioFallbackMode());
+        params.setPitch(0.1f);
+        track.setPlaybackParams(params); // OK
+
+        // now do our actual playback
         final int TEST_TIME_MS = 2000;
         final int TEST_DELTA_MS = 100;
         final int testSteps = TEST_TIME_MS / TEST_DELTA_MS;
