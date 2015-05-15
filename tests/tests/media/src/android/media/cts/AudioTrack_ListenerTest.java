@@ -124,14 +124,23 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
         mMarkerPeriodInFrames = mFrameCount / markerPeriods;
         markerPeriods = mFrameCount / mMarkerPeriodInFrames; // recalculate due to round-down
         mMarkerPosition = mMarkerPeriodInFrames;
+
+        // check that we can get and set notification marker position
+        assertEquals(0, track.getNotificationMarkerPosition());
         assertEquals(AudioTrack.SUCCESS,
                 track.setNotificationMarkerPosition(mMarkerPosition));
+        assertEquals(mMarkerPosition, track.getNotificationMarkerPosition());
+
         int updatePeriods = Math.max(3, mFrameCount * periodsPerSecond / TEST_SR);
         final int updatePeriodInFrames = mFrameCount / updatePeriods;
         updatePeriods = mFrameCount / updatePeriodInFrames; // recalculate due to round-down
+
+        // we set the notification period before running for better period positional accuracy.
+        // check that we can get and set notification periods
+        assertEquals(0, track.getPositionNotificationPeriod());
         assertEquals(AudioTrack.SUCCESS,
                 track.setPositionNotificationPeriod(updatePeriodInFrames));
-        // set NotificationPeriod before running to ensure better period positional accuracy.
+        assertEquals(updatePeriodInFrames, track.getPositionNotificationPeriod());
 
         if (mode == AudioTrack.MODE_STATIC && TEST_LOOP_FACTOR > 1) {
             track.setLoopPoints(0, vai.length, TEST_LOOP_FACTOR - 1);

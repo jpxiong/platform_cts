@@ -418,12 +418,13 @@ public class AudioRecordTest extends CtsAndroidTestCase {
             int audioSource, int sampleRateInHz,
             int channelConfig, int audioFormat, int bufferSizeInBytes,
             boolean auditRecording, boolean isChannelIndex) {
+        final AudioRecord record;
         if (auditRecording) {
-            return new AudioHelper.AudioRecordAudit(
+            record = new AudioHelper.AudioRecordAudit(
                     audioSource, sampleRateInHz, channelConfig,
                     audioFormat, bufferSizeInBytes, isChannelIndex);
         } else if (isChannelIndex) {
-            return new AudioRecord.Builder()
+            record = new AudioRecord.Builder()
                     .setAudioFormat(new AudioFormat.Builder()
                             .setChannelIndexMask(channelConfig)
                             .setEncoding(audioFormat)
@@ -432,9 +433,23 @@ public class AudioRecordTest extends CtsAndroidTestCase {
                     .setBufferSizeInBytes(bufferSizeInBytes)
                     .build();
         } else {
-            return new AudioRecord(audioSource, sampleRateInHz, channelConfig,
+            record = new AudioRecord(audioSource, sampleRateInHz, channelConfig,
                     audioFormat, bufferSizeInBytes);
         }
+
+        // did we get the AudioRecord we expected?
+        final AudioFormat format = record.getFormat();
+        assertEquals(isChannelIndex ? channelConfig : AudioFormat.CHANNEL_INVALID,
+                format.getChannelIndexMask());
+        assertEquals(isChannelIndex ? AudioFormat.CHANNEL_INVALID : channelConfig,
+                format.getChannelMask());
+        assertEquals(audioFormat, format.getEncoding());
+        assertEquals(sampleRateInHz, format.getSampleRate());
+        final int frameSize =
+                format.getChannelCount() * AudioFormat.getBytesPerSample(audioFormat);
+        // our native frame count cannot be smaller than our minimum buffer size request.
+        assertTrue(record.getNativeFrameCount() * frameSize >= bufferSizeInBytes);
+        return record;
     }
 
     private void doTest(String reportName, boolean localRecord, boolean customHandler,
