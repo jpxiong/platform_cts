@@ -26,10 +26,11 @@ import android.media.MediaCodec;
 import android.media.MediaDataSource;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
-import android.media.MediaMetadataRetriever;
+import android.media.MediaTimestamp;
 import android.media.PlaybackParams;
 import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
@@ -859,6 +860,52 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
             mMediaPlayer.pause();
         }
+        mMediaPlayer.stop();
+    }
+
+    public void testGetTimestamp() throws Exception {
+        final int toleranceUs = 100000;
+        final float playbackRate = 1.0f;
+        if (!checkLoadResource(
+                R.raw.video_480x360_mp4_h264_1000kbps_30fps_aac_stereo_128kbps_44100hz)) {
+            return; // skip
+        }
+
+        mMediaPlayer.setDisplay(mActivity.getSurfaceHolder());
+        mMediaPlayer.prepare();
+        mMediaPlayer.start();
+        mMediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(playbackRate));
+        Thread.sleep(SLEEP_TIME);  // let player get into stable state.
+        long nt1 = System.nanoTime();
+        MediaTimestamp ts1 = mMediaPlayer.getTimestamp();
+        long nt2 = System.nanoTime();
+        assertTrue("Media player should return a valid time stamp", ts1 != null);
+        assertEquals("MediaPlayer had error in clockRate " + ts1.getMediaClockRate(),
+                playbackRate, ts1.getMediaClockRate(), 0.001f);
+        assertTrue("The nanoTime of Media timestamp should be taken when getTimestamp is called.",
+                nt1 <= ts1.nanoTime && ts1.nanoTime <= nt2);
+
+        mMediaPlayer.pause();
+        ts1 = mMediaPlayer.getTimestamp();
+        assertTrue("Media player should return a valid time stamp", ts1 != null);
+        assertTrue("Media player should have play rate of 0.0f when paused",
+                ts1.getMediaClockRate() == 0.0f);
+
+        mMediaPlayer.seekTo(0);
+        mMediaPlayer.start();
+        Thread.sleep(SLEEP_TIME);  // let player get into stable state.
+        int playTime = 4000;  // The testing clip is about 10 second long.
+        ts1 = mMediaPlayer.getTimestamp();
+        assertTrue("Media player should return a valid time stamp", ts1 != null);
+        Thread.sleep(playTime);
+        MediaTimestamp ts2 = mMediaPlayer.getTimestamp();
+        assertTrue("Media player should return a valid time stamp", ts2 != null);
+        assertTrue("The clockRate should not be changed.",
+                ts1.getMediaClockRate() == ts2.getMediaClockRate());
+        assertEquals("MediaPlayer had error in timestamp.",
+                ts1.getAnchorMediaTimeUs() + (long)(playTime * ts1.getMediaClockRate() * 1000),
+                ts2.getAnchorMediaTimeUs(), toleranceUs);
+
         mMediaPlayer.stop();
     }
 
