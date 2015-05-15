@@ -105,7 +105,7 @@ public class PostMessageTest extends ActivityInstrumentationTestCase2<WebViewCts
         }
         loadPage(TITLE_FROM_POST_MESSAGE);
         WebMessage message = new WebMessage(WEBVIEW_MESSAGE);
-        mOnUiThread.postMessageToMainFrame(message, Uri.parse(BASE_URI));
+        mOnUiThread.postWebMessage(message, Uri.parse(BASE_URI));
         waitForTitle(WEBVIEW_MESSAGE);
     }
 
@@ -117,7 +117,7 @@ public class PostMessageTest extends ActivityInstrumentationTestCase2<WebViewCts
         }
         loadPage(TITLE_FROM_POST_MESSAGE);
         for (int i = 0; i < 10; i++) {
-            mOnUiThread.postMessageToMainFrame(new WebMessage(Integer.toString(i)),
+            mOnUiThread.postWebMessage(new WebMessage(Integer.toString(i)),
                     Uri.parse(BASE_URI));
         }
         waitForTitle("0123456789");
@@ -131,7 +131,7 @@ public class PostMessageTest extends ActivityInstrumentationTestCase2<WebViewCts
         loadPage(CHANNEL_MESSAGE);
         final WebMessagePort[] channel = mOnUiThread.createWebMessageChannel();
         WebMessage message = new WebMessage(WEBVIEW_MESSAGE, new WebMessagePort[]{channel[1]});
-        mOnUiThread.postMessageToMainFrame(message, Uri.parse(BASE_URI));
+        mOnUiThread.postWebMessage(message, Uri.parse(BASE_URI));
         final int messageCount = 3;
         final CountDownLatch latch = new CountDownLatch(messageCount);
         runTestOnUiThread(new Runnable() {
@@ -162,7 +162,7 @@ public class PostMessageTest extends ActivityInstrumentationTestCase2<WebViewCts
         loadPage(CHANNEL_MESSAGE);
         final WebMessagePort[] channel = mOnUiThread.createWebMessageChannel();
         WebMessage message = new WebMessage(WEBVIEW_MESSAGE, new WebMessagePort[]{channel[1]});
-        mOnUiThread.postMessageToMainFrame(message, Uri.parse(BASE_URI));
+        mOnUiThread.postWebMessage(message, Uri.parse(BASE_URI));
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -205,7 +205,7 @@ public class PostMessageTest extends ActivityInstrumentationTestCase2<WebViewCts
         loadPage(CHANNEL_FROM_JS);
         final WebMessagePort[] channel = mOnUiThread.createWebMessageChannel();
         WebMessage message = new WebMessage(WEBVIEW_MESSAGE, new WebMessagePort[]{channel[1]});
-        mOnUiThread.postMessageToMainFrame(message, Uri.parse(BASE_URI));
+        mOnUiThread.postWebMessage(message, Uri.parse(BASE_URI));
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {

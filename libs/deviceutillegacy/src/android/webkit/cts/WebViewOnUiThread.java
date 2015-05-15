@@ -319,11 +319,11 @@ public class WebViewOnUiThread {
         });
     }
 
-    public void postMessageToMainFrame(final WebMessage message, final Uri targetOrigin) {
+    public void postWebMessage(final WebMessage message, final Uri targetOrigin) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.postMessageToMainFrame(message, targetOrigin);
+                mWebView.postWebMessage(message, targetOrigin);
             }
         });
     }
