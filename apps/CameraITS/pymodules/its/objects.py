@@ -70,7 +70,8 @@ def rational_to_float(r):
     else:
         return float(r["numerator"]) / float(r["denominator"])
 
-def manual_capture_request(sensitivity, exp_time, linear_tonemap=False):
+def manual_capture_request(
+        sensitivity, exp_time, linear_tonemap=False, props=None):
     """Return a capture request with everything set to manual.
 
     Uses identity/unit color correction, and the default tonemap curve.
@@ -82,6 +83,9 @@ def manual_capture_request(sensitivity, exp_time, linear_tonemap=False):
             with.
         linear_tonemap: [Optional] whether a linear tonemap should be used
             in this request.
+        props: [Optional] the object returned from
+            its.device.get_camera_properties(). Must present when
+            linear_tonemap is True.
 
     Returns:
         The default manual capture request, ready to be passed to the
@@ -105,10 +109,20 @@ def manual_capture_request(sensitivity, exp_time, linear_tonemap=False):
         "android.shading.mode": 1
         }
     if linear_tonemap:
-        req["android.tonemap.mode"] = 0
-        req["android.tonemap.curveRed"] = [0.0,0.0, 1.0,1.0]
-        req["android.tonemap.curveGreen"] = [0.0,0.0, 1.0,1.0]
-        req["android.tonemap.curveBlue"] = [0.0,0.0, 1.0,1.0]
+        assert(props is not None)
+        #CONTRAST_CURVE mode
+        if 0 in props["android.tonemap.availableToneMapModes"]:
+            req["android.tonemap.mode"] = 0
+            req["android.tonemap.curveRed"] = [0.0,0.0, 1.0,1.0]
+            req["android.tonemap.curveGreen"] = [0.0,0.0, 1.0,1.0]
+            req["android.tonemap.curveBlue"] = [0.0,0.0, 1.0,1.0]
+        #GAMMA_VALUE mode
+        elif 3 in props["android.tonemap.availableToneMapModes"]:
+            req["android.tonemap.mode"] = 3
+            req["android.tonemap.gamma"] = 1.0
+        else:
+            print "Linear tonemap is not supported"
+            assert(False)
     return req
 
 def auto_capture_request():
