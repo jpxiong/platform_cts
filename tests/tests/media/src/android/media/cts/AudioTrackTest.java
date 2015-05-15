@@ -1404,7 +1404,8 @@ public class AudioTrackTest extends CtsAndroidTestCase {
 
         // -------- initialization --------------
         int bufferSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        byte data[] = createSoundDataInByteArray(bufferSize, TEST_SR, 1024);
+        byte data[] = AudioHelper.createSoundDataInByteArray(
+                bufferSize, TEST_SR, 1024 /* frequency */, 0 /* sweep */);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
                 bufferSize, TEST_MODE);
         // -------- test --------------
@@ -1420,56 +1421,6 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         track.stop();
         // -------- tear down --------------
         track.release();
-    }
-
-    public static byte[] createSoundDataInByteArray(int bufferSamples, final int sampleRate,
-            final double frequency, double sweep) {
-        final double rad = 2 * Math.PI * frequency / sampleRate;
-        byte[] vai = new byte[bufferSamples];
-        sweep = Math.PI * sweep / ((double)sampleRate * vai.length);
-        for (int j = 0; j < vai.length; j++) {
-            int unsigned =  (int)(Math.sin(j * (rad + j * sweep)) * Byte.MAX_VALUE)
-                    + Byte.MAX_VALUE & 0xFF;
-            vai[j] = (byte) unsigned;
-        }
-        return vai;
-    }
-
-    public static short[] createSoundDataInShortArray(int bufferSamples, final int sampleRate,
-            final double frequency, double sweep) {
-        final double rad = 2 * Math.PI * frequency / sampleRate;
-        short[] vai = new short[bufferSamples];
-        sweep = Math.PI * sweep / ((double)sampleRate * vai.length);
-        for (int j = 0; j < vai.length; j++) {
-            vai[j] = (short)(Math.sin(j * (rad + j * sweep)) * Short.MAX_VALUE);
-        }
-        return vai;
-    }
-
-    public static float[] createSoundDataInFloatArray(int bufferSamples, final int sampleRate,
-            final double frequency, double sweep) {
-        final double rad = 2 * Math.PI * frequency / sampleRate;
-        float[] vaf = new float[bufferSamples];
-        sweep = Math.PI * sweep / ((double)sampleRate * vaf.length);
-        for (int j = 0; j < vaf.length; j++) {
-            vaf[j] = (float)(Math.sin(j * (rad + j * sweep)));
-        }
-        return vaf;
-    }
-
-    public static byte[] createSoundDataInByteArray(int bufferSamples, final int sampleRate,
-            final double frequency) {
-        return createSoundDataInByteArray(bufferSamples, sampleRate, frequency, 0 /*sweep*/);
-    }
-
-    public static short[] createSoundDataInShortArray(int bufferSamples, final int sampleRate,
-            final double frequency) {
-        return createSoundDataInShortArray(bufferSamples, sampleRate, frequency, 0 /*sweep*/);
-    }
-
-    public static float[] createSoundDataInFloatArray(int bufferSamples, final int sampleRate,
-            final double frequency) {
-        return createSoundDataInFloatArray(bufferSamples, sampleRate, frequency, 0 /*sweep*/);
     }
 
     public void testPlayStaticData() throws Exception {
@@ -1529,7 +1480,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                     // only need to write once to the static track
                     switch (TEST_FORMAT) {
                     case AudioFormat.ENCODING_PCM_8BIT: {
-                        byte data[] = createSoundDataInByteArray(
+                        byte data[] = AudioHelper.createSoundDataInByteArray(
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
@@ -1537,7 +1488,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                 track.write(data, 0 /*offsetInBytes*/, data.length));
                         } break;
                     case AudioFormat.ENCODING_PCM_16BIT: {
-                        short data[] = createSoundDataInShortArray(
+                        short data[] = AudioHelper.createSoundDataInShortArray(
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
@@ -1545,7 +1496,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                                 track.write(data, 0 /*offsetInBytes*/, data.length));
                         } break;
                     case AudioFormat.ENCODING_PCM_FLOAT: {
-                        float data[] = createSoundDataInFloatArray(
+                        float data[] = AudioHelper.createSoundDataInFloatArray(
                                 bufferSamples, TEST_SR,
                                 testFrequency, TEST_SWEEP);
                         assertEquals(TEST_NAME,
@@ -1611,6 +1562,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         };
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+        final float TEST_SWEEP = 0; // sine wave only
 
         for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
             double frequency = 400; // frequency changes for each test
@@ -1652,9 +1604,9 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                             (track.getNativeFrameCount() / buffers) * channelCount;
                     switch (TEST_FORMAT) {
                     case AudioFormat.ENCODING_PCM_8BIT: {
-                        byte data[] = createSoundDataInByteArray(
+                        byte data[] = AudioHelper.createSoundDataInByteArray(
                                 sourceSamples, TEST_SR,
-                                testFrequency);
+                                testFrequency, TEST_SWEEP);
                         while (written < data.length) {
                             int samples = Math.min(data.length - written, samplesPerWrite);
                             int ret = track.write(data, written, samples);
@@ -1663,9 +1615,9 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                         }
                         } break;
                     case AudioFormat.ENCODING_PCM_16BIT: {
-                        short data[] = createSoundDataInShortArray(
+                        short data[] = AudioHelper.createSoundDataInShortArray(
                                 sourceSamples, TEST_SR,
-                                testFrequency);
+                                testFrequency, TEST_SWEEP);
                         while (written < data.length) {
                             int samples = Math.min(data.length - written, samplesPerWrite);
                             int ret = track.write(data, written, samples);
@@ -1674,9 +1626,9 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                         }
                         } break;
                     case AudioFormat.ENCODING_PCM_FLOAT: {
-                        float data[] = createSoundDataInFloatArray(
+                        float data[] = AudioHelper.createSoundDataInFloatArray(
                                 sourceSamples, TEST_SR,
-                                testFrequency);
+                                testFrequency, TEST_SWEEP);
                         while (written < data.length) {
                             int samples = Math.min(data.length - written, samplesPerWrite);
                             int ret = track.write(data, written, samples,
@@ -1719,6 +1671,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         };
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+        final float TEST_SWEEP = 0; // sine wave only
 
         for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
             double frequency = 800; // frequency changes for each test
@@ -1753,24 +1706,24 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                             // -------- test --------------
                             switch (TEST_FORMAT) {
                                 case AudioFormat.ENCODING_PCM_8BIT: {
-                                    byte data[] = createSoundDataInByteArray(
+                                    byte data[] = AudioHelper.createSoundDataInByteArray(
                                             bufferSamples, TEST_SR,
-                                            frequency);
+                                            frequency, TEST_SWEEP);
                                     bb.put(data);
                                     bb.flip();
                                 } break;
                                 case AudioFormat.ENCODING_PCM_16BIT: {
-                                    short data[] = createSoundDataInShortArray(
+                                    short data[] = AudioHelper.createSoundDataInShortArray(
                                             bufferSamples, TEST_SR,
-                                            frequency);
+                                            frequency, TEST_SWEEP);
                                     ShortBuffer sb = bb.asShortBuffer();
                                     sb.put(data);
                                     bb.limit(sb.limit() * 2);
                                 } break;
                                 case AudioFormat.ENCODING_PCM_FLOAT: {
-                                    float data[] = createSoundDataInFloatArray(
+                                    float data[] = AudioHelper.createSoundDataInFloatArray(
                                             bufferSamples, TEST_SR,
-                                            frequency);
+                                            frequency, TEST_SWEEP);
                                     FloatBuffer fb = bb.asFloatBuffer();
                                     fb.put(data);
                                     bb.limit(fb.limit() * 4);
@@ -1832,6 +1785,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                 AudioTrack.WRITE_BLOCKING,
                 AudioTrack.WRITE_NON_BLOCKING,
         };
+        final float TEST_SWEEP = 0;
 
         for (int TEST_FORMAT : TEST_FORMAT_ARRAY) {
             for (int TEST_CONF : TEST_CONF_ARRAY) {
@@ -1863,24 +1817,24 @@ public class AudioTrackTest extends CtsAndroidTestCase {
 
                             switch (TEST_FORMAT) {
                             case AudioFormat.ENCODING_PCM_8BIT: {
-                                byte data[] = createSoundDataInByteArray(
+                                byte data[] = AudioHelper.createSoundDataInByteArray(
                                         bufferSamples, TEST_SR,
-                                        frequency);
+                                        frequency, TEST_SWEEP);
                                 bb.put(data);
                                 bb.flip();
                             } break;
                             case AudioFormat.ENCODING_PCM_16BIT: {
-                                short data[] = createSoundDataInShortArray(
+                                short data[] = AudioHelper.createSoundDataInShortArray(
                                         bufferSamples, TEST_SR,
-                                        frequency);
+                                        frequency, TEST_SWEEP);
                                 ShortBuffer sb = bb.asShortBuffer();
                                 sb.put(data);
                                 bb.limit(sb.limit() * 2);
                             } break;
                             case AudioFormat.ENCODING_PCM_FLOAT: {
-                                float data[] = createSoundDataInFloatArray(
+                                float data[] = AudioHelper.createSoundDataInFloatArray(
                                         bufferSamples, TEST_SR,
-                                        frequency);
+                                        frequency, TEST_SWEEP);
                                 FloatBuffer fb = bb.asFloatBuffer();
                                 fb.put(data);
                                 bb.limit(fb.limit() * 4);
@@ -2090,7 +2044,8 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                 TEST_FORMAT, bufferSizeInBytes, TEST_MODE);
 
         // create byte array and write it
-        byte[] vai = createSoundDataInByteArray(bufferSizeInBytes, TEST_SR, 600);
+        byte[] vai = AudioHelper.createSoundDataInByteArray(bufferSizeInBytes, TEST_SR,
+                600 /* frequency */, 0 /* sweep */);
         assertEquals(vai.length, track.write(vai, 0 /* offsetInBytes */, vai.length));
 
         // sweep up test and sweep down test
@@ -2158,7 +2113,8 @@ public class AudioTrackTest extends CtsAndroidTestCase {
 
         // create float array and write it
         final int sampleCount = frameCount * format.getChannelCount();
-        float[] vaf = createSoundDataInFloatArray(sampleCount, TEST_SR, 600);
+        float[] vaf = AudioHelper.createSoundDataInFloatArray(
+                sampleCount, TEST_SR, 600 /* frequency */, 0 /* sweep */);
         assertEquals(vaf.length, track.write(vaf, 0 /* offsetInFloats */, vaf.length,
                 AudioTrack.WRITE_NON_BLOCKING));
 

@@ -119,7 +119,8 @@ public class AudioTrack_ListenerTest extends CtsAndroidTestCase {
             listener = new MockOnPlaybackPositionUpdateListener(track);
         }
 
-        byte[] vai = AudioTrackTest.createSoundDataInByteArray(bufferSizeInBytes, TEST_SR, 1024);
+        byte[] vai = AudioHelper.createSoundDataInByteArray(
+                bufferSizeInBytes, TEST_SR, 1024 /* frequency */, 0 /* sweep */);
         int markerPeriods = Math.max(3, mFrameCount * markerPeriodsPerSecond / TEST_SR);
         mMarkerPeriodInFrames = mFrameCount / markerPeriods;
         markerPeriods = mFrameCount / mMarkerPeriodInFrames; // recalculate due to round-down
