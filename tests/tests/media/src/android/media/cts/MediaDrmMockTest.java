@@ -17,10 +17,10 @@
 package android.media.cts;
 
 import android.media.MediaDrm;
-import android.media.MediaDrm.ProvisionRequest;
+import android.media.MediaDrm.CryptoSession;
 import android.media.MediaDrm.KeyRequest;
 import android.media.MediaDrm.KeyStatus;
-import android.media.MediaDrm.CryptoSession;
+import android.media.MediaDrm.ProvisionRequest;
 import android.media.MediaDrmException;
 import android.media.NotProvisionedException;
 import android.media.ResourceBusyException;
@@ -245,7 +245,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
                                                       optionalParameters);
         assertTrue(Arrays.equals(request.getData(), testRequest));
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
-        assertEquals(request.getRequestType(), MediaDrm.REQUEST_TYPE_INITIAL);
+        assertEquals(request.getRequestType(), MediaDrm.KeyRequest.REQUEST_TYPE_INITIAL);
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -278,7 +278,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
                                                       null);
         assertTrue(Arrays.equals(request.getData(), testRequest));
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
-        assertEquals(request.getRequestType(), MediaDrm.REQUEST_TYPE_INITIAL);
+        assertEquals(request.getRequestType(), MediaDrm.KeyRequest.REQUEST_TYPE_INITIAL);
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -310,7 +310,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
                                               null);
         assertTrue(Arrays.equals(request.getData(), testRequest));
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
-        assertEquals(request.getRequestType(), MediaDrm.REQUEST_TYPE_RENEWAL);
+        assertEquals(request.getRequestType(), MediaDrm.KeyRequest.REQUEST_TYPE_RENEWAL);
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -340,7 +340,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
                                               null);
         assertTrue(Arrays.equals(request.getData(), testRequest));
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
-        assertEquals(request.getRequestType(), MediaDrm.REQUEST_TYPE_RELEASE);
+        assertEquals(request.getRequestType(), MediaDrm.KeyRequest.REQUEST_TYPE_RELEASE);
 
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
         assertTrue(md.getPropertyString("mock-keytype").equals("2"));
@@ -862,7 +862,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         assertTrue(mGotEvent);
     }
 
-    public void testKeysChange() throws Exception {
+    public void testKeyStatusChange() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
@@ -893,30 +893,30 @@ public class MediaDrmMockTest extends AndroidTestCase {
                 synchronized(mLock) {
                     mLock.notify();
 
-                    mMediaDrm.setOnKeysChangeListener(new MediaDrm.OnKeysChangeListener() {
+                    mMediaDrm.setOnKeyStatusChangeListener(new MediaDrm.OnKeyStatusChangeListener() {
                             @Override
-                            public void onKeysChange(MediaDrm md, byte[] sessionId,
+                            public void onKeyStatusChange(MediaDrm md, byte[] sessionId,
                                     List<KeyStatus> keyInformation, boolean hasNewUsableKey) {
                                 synchronized(mLock) {
-                                    Log.d(TAG,"testKeysChange.onKeysChange");
+                                    Log.d(TAG,"testKeyStatusChange.onKeyStatusChange");
                                     assertTrue(md == mMediaDrm);
                                     assertTrue(Arrays.equals(sessionId, expected_sessionId));
                                     try {
                                         KeyStatus keyStatus = keyInformation.get(0);
                                         assertTrue(Arrays.equals(keyStatus.getKeyId(), "key1".getBytes()));
-                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KEY_STATUS_USABLE);
+                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KeyStatus.STATUS_USABLE);
                                         keyStatus = keyInformation.get(1);
                                         assertTrue(Arrays.equals(keyStatus.getKeyId(), "key2".getBytes()));
-                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KEY_STATUS_EXPIRED);
+                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KeyStatus.STATUS_EXPIRED);
                                         keyStatus = keyInformation.get(2);
                                         assertTrue(Arrays.equals(keyStatus.getKeyId(), "key3".getBytes()));
-                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KEY_STATUS_OUTPUT_NOT_ALLOWED);
+                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KeyStatus.STATUS_OUTPUT_NOT_ALLOWED);
                                         keyStatus = keyInformation.get(3);
                                         assertTrue(Arrays.equals(keyStatus.getKeyId(), "key4".getBytes()));
-                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KEY_STATUS_PENDING);
+                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KeyStatus.STATUS_PENDING);
                                         keyStatus = keyInformation.get(4);
                                         assertTrue(Arrays.equals(keyStatus.getKeyId(), "key5".getBytes()));
-                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KEY_STATUS_INTERNAL_ERROR);
+                                        assertTrue(keyStatus.getStatusCode() == MediaDrm.KeyStatus.STATUS_INTERNAL_ERROR);
                                         assertTrue(hasNewUsableKey);
                                         mGotEvent = true;
                                     } catch (IndexOutOfBoundsException e) {
