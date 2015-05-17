@@ -511,7 +511,6 @@ public class TvContractTest extends AndroidTestCase {
         values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
         Uri channelUri = mContentResolver.insert(mChannelsUri, values);
         assertNotNull(channelUri);
-        long channelId = ContentUris.parseId(channelUri);
         try (Cursor cursor = mContentResolver.query(
                 channelUri, CHANNELS_PROJECTION, null, null, null)) {
             cursor.moveToNext();
