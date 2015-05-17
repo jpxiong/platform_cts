@@ -58,6 +58,17 @@ public class BannedFilesTest extends TestCase {
         assertFalse("/dev/socket/fotabinder", new File("/dev/socket/fotabinder").exists());
     }
 
+    /**
+     * Detect devices allowing shell commands to be executed as system
+     * through sockets.
+     *
+     * ANDROID-19679287
+     * CVE-2015-2231
+     */
+    public void testNoSystemCmdSocket() {
+        assertFalse("/dev/socket/fota", new File("/dev/socket/fota").exists());
+    }
+
     public void testNoSu() {
         assertFalse("/sbin/su",        new File("/sbin/su").exists());
         assertFalse("/system/bin/su",  new File("/system/bin/su").exists());
