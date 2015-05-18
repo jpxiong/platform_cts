@@ -32,6 +32,7 @@ import android.media.MediaFormat;
 import android.media.MediaSync;
 import android.media.MediaTimestamp;
 import android.media.PlaybackParams;
+import android.media.SyncParams;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.Surface;
@@ -61,6 +62,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
     private final int APPLICATION_AUDIO_PERIOD_MS = 200;
     private final int TEST_MAX_SPEED = 2;
+    private static final float FLOAT_TOLERANCE = .00001f;
 
     private Context mContext;
     private Resources mResources;
@@ -186,6 +188,8 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
         final float rate = (float)TEST_MAX_SPEED;
         try {
             mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(rate));
+            PlaybackParams pbp = mMediaSync.getPlaybackParams();
+            assertEquals(rate, pbp.getSpeed(), FLOAT_TOLERANCE);
         } catch (IllegalArgumentException e) {
             fail("playback rate " + rate + " is not handled correctly");
         }
@@ -442,6 +446,10 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             mHasAudio = true;
         }
 
+        SyncParams sync = new SyncParams().allowDefaults();
+        mMediaSync.setSyncParams(sync);
+        sync = mMediaSync.getSyncParams();
+
         mMediaSync.setPlaybackParams(new PlaybackParams().setSpeed(playbackRate));
 
         synchronized (conditionFirstAudioBuffer) {
@@ -492,7 +500,10 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
                     + ", play time is " + playTimeUs + " vs expected " + mediaDurationUs,
                     mediaDurationUs,
                     playTimeUs * playbackRate,
-                    mediaDurationUs * PLAYBACK_RATE_TOLERANCE_PERCENT / 100
+                    // sync.getTolerance() is MediaSync's tolerance of the playback rate, whereas
+                    // PLAYBACK_RATE_TOLERANCE_PERCENT / 100 is our test's tolerance.
+                    // We need to add both to get an upperbound for allowable error.
+                    mediaDurationUs * (sync.getTolerance() + PLAYBACK_RATE_TOLERANCE_PERCENT / 100)
                             + TIME_MEASUREMENT_TOLERANCE_US);
         }
 
