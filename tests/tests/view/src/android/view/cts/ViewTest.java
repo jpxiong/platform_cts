@@ -56,6 +56,8 @@ import android.view.Display;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
@@ -3382,6 +3384,126 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertTrue("Background tint applied when setBackgroundTints() called before setBackground()",
                 bg.hasCalledSetTint());
     }
+
+    public void testStartActionModeWithParent() {
+        View view = new View(mActivity);
+        MockViewGroup parent = new MockViewGroup(mActivity);
+        parent.addView(view);
+
+        ActionMode mode = view.startActionMode(null);
+
+        assertNotNull(mode);
+        assertEquals(NO_OP_ACTION_MODE, mode);
+        assertTrue(parent.isStartActionModeForChildCalled);
+        assertEquals(ActionMode.TYPE_PRIMARY, parent.startActionModeForChildType);
+    }
+
+    public void testStartActionModeWithoutParent() {
+        View view = new View(mActivity);
+
+        ActionMode mode = view.startActionMode(null);
+
+        assertNull(mode);
+    }
+
+    public void testStartActionModeTypedWithParent() {
+        View view = new View(mActivity);
+        MockViewGroup parent = new MockViewGroup(mActivity);
+        parent.addView(view);
+
+        ActionMode mode = view.startActionMode(null, ActionMode.TYPE_FLOATING);
+
+        assertNotNull(mode);
+        assertEquals(NO_OP_ACTION_MODE, mode);
+        assertTrue(parent.isStartActionModeForChildCalled);
+        assertEquals(ActionMode.TYPE_FLOATING, parent.startActionModeForChildType);
+    }
+
+    public void testStartActionModeTypedWithoutParent() {
+        View view = new View(mActivity);
+
+        ActionMode mode = view.startActionMode(null, ActionMode.TYPE_FLOATING);
+
+        assertNull(mode);
+    }
+
+    private static class MockViewGroup extends ViewGroup {
+        boolean isStartActionModeForChildCalled = false;
+        int startActionModeForChildType = ActionMode.TYPE_PRIMARY;
+
+        public MockViewGroup(Context context) {
+            super(context);
+        }
+
+        @Override
+        public ActionMode startActionModeForChild(View originalView, ActionMode.Callback callback) {
+            isStartActionModeForChildCalled = true;
+            startActionModeForChildType = ActionMode.TYPE_PRIMARY;
+            return NO_OP_ACTION_MODE;
+        }
+
+        @Override
+        public ActionMode startActionModeForChild(
+                View originalView, ActionMode.Callback callback, int type) {
+            isStartActionModeForChildCalled = true;
+            startActionModeForChildType = type;
+            return NO_OP_ACTION_MODE;
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            // no-op
+        }
+    }
+
+    private static final ActionMode NO_OP_ACTION_MODE =
+            new ActionMode() {
+                @Override
+                public void setTitle(CharSequence title) {}
+
+                @Override
+                public void setTitle(int resId) {}
+
+                @Override
+                public void setSubtitle(CharSequence subtitle) {}
+
+                @Override
+                public void setSubtitle(int resId) {}
+
+                @Override
+                public void setCustomView(View view) {}
+
+                @Override
+                public void invalidate() {}
+
+                @Override
+                public void finish() {}
+
+                @Override
+                public Menu getMenu() {
+                    return null;
+                }
+
+                @Override
+                public CharSequence getTitle() {
+                    return null;
+                }
+
+                @Override
+                public CharSequence getSubtitle() {
+                    return null;
+                }
+
+                @Override
+                public View getCustomView() {
+                    return null;
+                }
+
+                @Override
+                public MenuInflater getMenuInflater() {
+                    return null;
+                }
+            };
 
     private static class MockDrawable extends Drawable {
         private boolean mCalledSetTint = false;
