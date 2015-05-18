@@ -862,6 +862,15 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             mCodec.configure(format, mSurface.getSurface(), null /* crypto */, 0 /* flags */);
             Log.i(TAG, "start");
             mCodec.start();
+
+            // inject some minimal setOutputSurface test
+            // TODO: change this test to also change the surface midstream
+            try {
+                mCodec.setOutputSurface(null);
+                fail("should not be able to set surface to NULL");
+            } catch (IllegalArgumentException e) {}
+            mCodec.setOutputSurface(mSurface.getSurface());
+
             mInputBuffers = mCodec.getInputBuffers();
             mOutputBuffers = mCodec.getOutputBuffers();
             Log.i(TAG, "configured " + mInputBuffers.length + " input[" +
