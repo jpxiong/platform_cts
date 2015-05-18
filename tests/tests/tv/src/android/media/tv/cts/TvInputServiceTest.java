@@ -34,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.android.cts.tv.R;
 
@@ -167,6 +168,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         verifyCommandTimeShiftSeekTo();
         verifyCommandTimeShiftSetPlaybackParams();
         verifyCommandSetTimeShiftPositionCallback();
+        verifyCommandOverlayViewSizeChanged();
         verifyCallbackChannelRetuned();
         verifyCallbackVideoAvailable();
         verifyCallbackVideoUnavailable();
@@ -304,6 +306,22 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             protected boolean check() {
                 return mTimeShiftPositionCallback.mTimeShiftCurrentPositionChanged > 0
                         && mTimeShiftPositionCallback.mTimeShiftStartPositionChanged > 0;
+            }
+        }.run();
+    }
+
+    public void verifyCommandOverlayViewSizeChanged() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTvView.setLayoutParams(new LinearLayout.LayoutParams(10, 20));
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        new PollingCheck(TIME_OUT) {
+            @Override
+            protected boolean check() {
+                CountingSession session = CountingTvInputService.sSession;
+                return session != null && session.mOverlayViewSizeChangedCount > 0;
             }
         }.run();
     }
@@ -449,6 +467,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             public volatile int mSetCaptionEnabledCount;
             public volatile int mSelectTrackCount;
             public volatile int mKeyDownCount;
+            public volatile int mOverlayViewSizeChangedCount;
             public volatile int mTimeShiftPause;
             public volatile int mTimeShiftResume;
             public volatile int mTimeShiftSeekTo;
@@ -526,6 +545,12 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             public long onTimeShiftGetStartPosition() {
                 return ++mTimeShiftGetStartPosition;
             }
+
+            @Override
+            public void onOverlayViewSizeChanged(int width, int height) {
+                mOverlayViewSizeChangedCount++;
+            }
+
         }
     }
 }
