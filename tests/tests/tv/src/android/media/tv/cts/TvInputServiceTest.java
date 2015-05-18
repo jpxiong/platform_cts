@@ -32,6 +32,8 @@ import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.Surface;
+import android.view.SurfaceView;
+import android.view.View;
 
 import com.android.cts.tv.R;
 
@@ -173,6 +175,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         verifyCallbackContentAllowed();
         verifyCallbackContentBlocked();
         verifyCallbackTimeShiftStatusChanged();
+        verifyCallbackLayoutSurface();
 
         runTestOnUiThread(new Runnable() {
             @Override
@@ -402,6 +405,30 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             @Override
             protected boolean check() {
                 return mCallback.mTimeShiftStatusChanged > 0;
+            }
+        }.run();
+    }
+
+    public void verifyCallbackLayoutSurface() {
+        final int left = 10;
+        final int top = 20;
+        final int right = 30;
+        final int bottom = 40;
+        CountingSession session = CountingTvInputService.sSession;
+        assertNotNull(session);
+        session.layoutSurface(left, top, right, bottom);
+        new PollingCheck(TIME_OUT) {
+            @Override
+            protected boolean check() {
+                int childCount = mTvView.getChildCount();
+                for (int i = 0; i < childCount; ++i) {
+                    View v = mTvView.getChildAt(i);
+                    if (v instanceof SurfaceView) {
+                        return v.getLeft() == left && v.getTop() == top && v.getRight() == right
+                                && v.getBottom() == bottom;
+                    }
+                }
+                return false;
             }
         }.run();
     }
