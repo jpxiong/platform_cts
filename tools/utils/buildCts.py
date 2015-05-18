@@ -295,7 +295,6 @@ class CtsBuilder(object):
 
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
-    plan.Include(r'android\.webgl')
     self.__WritePlan(plan, 'CTS-webview')
 
 
@@ -409,8 +408,7 @@ def BuildCtsVettedNewPackagesList():
       'android.signature' : [],
       'android.tv' : [],
       'android.uiautomation' : [],
-      'android.uirendering' : [],
-      'android.webgl' : []}
+      'android.uirendering' : []}
 
 def BuildListForReleaseBuildTest():
   """ Construct a defaultdict that maps package name to a list of tests
