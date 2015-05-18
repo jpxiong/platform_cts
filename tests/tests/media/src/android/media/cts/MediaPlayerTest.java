@@ -32,6 +32,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
 import android.media.MediaTimestamp;
 import android.media.PlaybackParams;
+import android.media.SyncParams;
 import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
@@ -70,6 +71,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     private static final int  RECORDED_VIDEO_WIDTH  = 176;
     private static final int  RECORDED_VIDEO_HEIGHT = 144;
     private static final long RECORDED_DURATION_MS  = 3000;
+    private static final float FLOAT_TOLERANCE = .0001f;
+
     private Vector<Integer> mTimedTextTrackIndex = new Vector<Integer>();
     private int mSelectedTimedTextIndex;
     private Monitor mOnTimedTextCalled = new Monitor();
@@ -842,6 +845,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         mMediaPlayer.setDisplay(mActivity.getSurfaceHolder());
         mMediaPlayer.prepare();
+        SyncParams sync = new SyncParams().allowDefaults();
+        mMediaPlayer.setSyncParams(sync);
+        sync = mMediaPlayer.getSyncParams();
+
         float[] rates = { 0.25f, 0.5f, 1.0f, 2.0f };
         for (float playbackRate : rates) {
             mMediaPlayer.seekTo(0);
@@ -850,6 +857,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mMediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(playbackRate));
             mMediaPlayer.start();
             Thread.sleep(playTime);
+            PlaybackParams pbp = mMediaPlayer.getPlaybackParams();
+            assertEquals(
+                    playbackRate, pbp.getSpeed(),
+                    FLOAT_TOLERANCE + playbackRate * sync.getTolerance());
             assertTrue("MediaPlayer should still be playing", mMediaPlayer.isPlaying());
 
             int playedMediaDurationMs = mMediaPlayer.getCurrentPosition();
@@ -859,6 +870,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
                      + ", play time is " + playTime + " vs expected " + playedMediaDurationMs);
             }
             mMediaPlayer.pause();
+            pbp = mMediaPlayer.getPlaybackParams();
+            assertEquals(0.f, pbp.getSpeed(), FLOAT_TOLERANCE);
         }
         mMediaPlayer.stop();
     }
