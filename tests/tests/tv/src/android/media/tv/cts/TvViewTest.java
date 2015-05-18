@@ -258,6 +258,8 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 case TvTrackInfo.TYPE_VIDEO:
                     assertEquals(track.getVideoHeight(), selectedTrack.getVideoHeight());
                     assertEquals(track.getVideoWidth(), selectedTrack.getVideoWidth());
+                    assertEquals(track.getVideoPixelAspectRatio(),
+                            selectedTrack.getVideoPixelAspectRatio(), 0.001f);
                     break;
                 case TvTrackInfo.TYPE_AUDIO:
                     assertEquals(track.getAudioChannelCount(),
@@ -267,6 +269,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                     break;
                 case TvTrackInfo.TYPE_SUBTITLE:
                     assertEquals(track.getLanguage(), selectedTrack.getLanguage());
+                    assertEquals(track.getDescription(), selectedTrack.getDescription());
                     break;
                 default:
                     fail("Unrecognized type: " + track.getType());
@@ -281,7 +284,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         TvTrackInfo videoTrack1 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-HD")
                 .setVideoHeight(1920).setVideoWidth(1080).build();
         TvTrackInfo videoTrack2 = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, "video-SD")
-                .setVideoHeight(640).setVideoWidth(360).build();
+                .setVideoHeight(640).setVideoWidth(360).setVideoPixelAspectRatio(1.09f).build();
         TvTrackInfo audioTrack1 =
                 new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, "audio-stereo-eng")
                 .setLanguage("eng").setAudioChannelCount(2).setAudioSampleRate(48000).build();
@@ -293,13 +296,16 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         TvTrackInfo subtitleTrack2 =
                 new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-esp")
                 .setLanguage("esp").build();
+        TvTrackInfo subtitleTrack3 =
+                new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle-eng2")
+                .setLanguage("eng").setDescription("audio commentary").build();
 
         StubTunerTvInputService.injectTrack(videoTrack1, videoTrack2, audioTrack1, audioTrack2,
                 subtitleTrack1, subtitleTrack2);
 
         final List<TvTrackInfo> tracks = new ArrayList<TvTrackInfo>();
         Collections.addAll(tracks, videoTrack1, videoTrack2, audioTrack1, audioTrack2,
-                subtitleTrack1, subtitleTrack2);
+                subtitleTrack1, subtitleTrack2, subtitleTrack3);
         tryTuneAllChannels(new Runnable() {
             @Override
             public void run() {
