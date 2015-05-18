@@ -21,7 +21,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.MessageQueue;
-import android.os.MessageQueue.FileDescriptorCallback;
+import android.os.MessageQueue.OnFileDescriptorEventListener;
 import android.os.ParcelFileDescriptor;
 import android.os.ParcelFileDescriptor.AutoCloseInputStream;
 import android.os.ParcelFileDescriptor.AutoCloseOutputStream;
@@ -214,8 +214,8 @@ public class MessageQueueTest extends AndroidTestCase {
     public void testRegisterFileDescriptorCallbackThrowsWhenFdIsNull() {
         MessageQueue queue = Looper.getMainLooper().getQueue();
         try {
-            queue.registerFileDescriptorCallback(null, 0,
-                    new FileDescriptorCallback() { });
+            queue.addOnFileDescriptorEventListener(null, 0,
+                    new OnFileDescriptorEventListener() { });
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -228,7 +228,7 @@ public class MessageQueueTest extends AndroidTestCase {
         try (ParcelFileDescriptor reader = pipe[0];
                 ParcelFileDescriptor writer = pipe[1]) {
             try {
-                queue.registerFileDescriptorCallback(reader.getFileDescriptor(), 0, null);
+                queue.addOnFileDescriptorEventListener(reader.getFileDescriptor(), 0, null);
                 fail("Expected IllegalArgumentException");
             } catch (IllegalArgumentException ex) {
                 // expected
@@ -239,7 +239,7 @@ public class MessageQueueTest extends AndroidTestCase {
     public void testUnregisterFileDescriptorCallbackThrowsWhenFdIsNull() throws Exception {
         MessageQueue queue = Looper.getMainLooper().getQueue();
         try {
-            queue.unregisterFileDescriptorCallback(null);
+            queue.removeOnFileDescriptorEventListener(null);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -252,7 +252,7 @@ public class MessageQueueTest extends AndroidTestCase {
         ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
         try (ParcelFileDescriptor reader = pipe[0];
                 ParcelFileDescriptor writer = pipe[1]) {
-            queue.unregisterFileDescriptorCallback(reader.getFileDescriptor());
+            queue.removeOnFileDescriptorEventListener(reader.getFileDescriptor());
         }
     }
 
@@ -272,7 +272,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 // Prepare to write a lot of data to the pipe asynchronously.
                 // We don't actually care about the content (assume pipes work correctly)
                 // so we just write lots of zeros.
-                FileDescriptorCallback writerCallback = new FileDescriptorCallback() {
+                OnFileDescriptorEventListener writerCallback = new OnFileDescriptorEventListener() {
                     private byte[] mBuffer = new byte[4096];
                     private int mRemaining = size;
                     private boolean mDone;
@@ -283,14 +283,14 @@ public class MessageQueueTest extends AndroidTestCase {
                         if (!mDone) {
                             // When an error happens because the reader closed its end,
                             // signal the test, and remove the callback.
-                            if ((events & FileDescriptorCallback.EVENT_ERROR) != 0) {
+                            if ((events & OnFileDescriptorEventListener.EVENT_ERROR) != 0) {
                                 writerSawError.countDown();
                                 mDone = true;
                                 return 0;
                             }
 
                             // Write all output until an error is observed.
-                            if ((events & FileDescriptorCallback.EVENT_OUTPUT) != 0) {
+                            if ((events & OnFileDescriptorEventListener.EVENT_OUTPUT) != 0) {
                                 int count = Math.min(mBuffer.length, mRemaining);
                                 try {
                                     writer.write(mBuffer, 0, count);
@@ -309,7 +309,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 };
 
                 // Prepare to read all of that data.
-                FileDescriptorCallback readerCallback = new FileDescriptorCallback() {
+                OnFileDescriptorEventListener readerCallback = new OnFileDescriptorEventListener() {
                     private byte[] mBuffer = new byte[4096];
                     private int mRemaining = size;
                     private boolean mDone;
@@ -319,14 +319,14 @@ public class MessageQueueTest extends AndroidTestCase {
                         assertEquals(pipe[0].getFileDescriptor(), fd);
                         if (!mDone) {
                             // Errors should not happen.
-                            if ((events & FileDescriptorCallback.EVENT_ERROR) != 0) {
+                            if ((events & OnFileDescriptorEventListener.EVENT_ERROR) != 0) {
                                 fail("Saw unexpected error.");
                                 return 0;
                             }
 
                             // Read until everything is read, signal the test,
                             // and remove the callback.
-                            if ((events & FileDescriptorCallback.EVENT_INPUT) != 0) {
+                            if ((events & OnFileDescriptorEventListener.EVENT_INPUT) != 0) {
                                 try {
                                     int count = reader.read(mBuffer, 0, mBuffer.length);
                                     mRemaining -= count;
@@ -349,10 +349,10 @@ public class MessageQueueTest extends AndroidTestCase {
                 };
 
                 // Register the callbacks.
-                queue.registerFileDescriptorCallback(reader.getFD(),
-                        FileDescriptorCallback.EVENT_INPUT, readerCallback);
-                queue.registerFileDescriptorCallback(writer.getFD(),
-                        FileDescriptorCallback.EVENT_OUTPUT, writerCallback);
+                queue.addOnFileDescriptorEventListener(reader.getFD(),
+                        OnFileDescriptorEventListener.EVENT_INPUT, readerCallback);
+                queue.addOnFileDescriptorEventListener(writer.getFD(),
+                        OnFileDescriptorEventListener.EVENT_OUTPUT, writerCallback);
 
                 // Wait for the reader to see all of the data that the writer
                 // is prepared to send.
@@ -368,8 +368,8 @@ public class MessageQueueTest extends AndroidTestCase {
 
                 // The reader and writer should already be unregistered.
                 // Try to unregistered them again to ensure nothing bad happens.
-                queue.unregisterFileDescriptorCallback(reader.getFD());
-                queue.unregisterFileDescriptorCallback(writer.getFD());
+                queue.removeOnFileDescriptorEventListener(reader.getFD());
+                queue.removeOnFileDescriptorEventListener(writer.getFD());
             }
         } finally {
             thread.quitAndRethrow();
@@ -401,8 +401,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                 // Register the callback.
                 final boolean[] awoke = new boolean[1];
-                queue.registerFileDescriptorCallback(reader.getFD(),
-                        FileDescriptorCallback.EVENT_ERROR, new FileDescriptorCallback() {
+                queue.addOnFileDescriptorEventListener(reader.getFD(),
+                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                         awoke[0] = true;
@@ -438,8 +438,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     final FileOutputStream writer2 = new AutoCloseOutputStream(pipe2[1])) {
                 // Register the callback.
                 final boolean[] awoke = new boolean[1];
-                queue.registerFileDescriptorCallback(reader2.getFD(),
-                        FileDescriptorCallback.EVENT_INPUT, new FileDescriptorCallback() {
+                queue.addOnFileDescriptorEventListener(reader2.getFD(),
+                        OnFileDescriptorEventListener.EVENT_INPUT, new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                         awoke[0] = true;
@@ -487,8 +487,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                 // Register the callback.
                 final boolean[] awoke = new boolean[1];
-                queue.registerFileDescriptorCallback(reader.getFD(),
-                        FileDescriptorCallback.EVENT_ERROR, new FileDescriptorCallback() {
+                queue.addOnFileDescriptorEventListener(reader.getFD(),
+                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                         awoke[0] = true;
@@ -528,8 +528,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     final FileOutputStream writer2 = new AutoCloseOutputStream(pipe[1])) {
                 // Register the callback.
                 final boolean[] awoke = new boolean[1];
-                queue.registerFileDescriptorCallback(reader2.getFD(),
-                        FileDescriptorCallback.EVENT_INPUT, new FileDescriptorCallback() {
+                queue.addOnFileDescriptorEventListener(reader2.getFD(),
+                        OnFileDescriptorEventListener.EVENT_INPUT, new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                         awoke[0] = true;
@@ -580,8 +580,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                 // Register the callback.
                 final boolean[] awoke = new boolean[1];
-                queue.registerFileDescriptorCallback(reader.getFD(),
-                        FileDescriptorCallback.EVENT_ERROR, new FileDescriptorCallback() {
+                queue.addOnFileDescriptorEventListener(reader.getFD(),
+                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                         awoke[0] = true;
@@ -605,9 +605,9 @@ public class MessageQueueTest extends AndroidTestCase {
                         }
 
                         // Now we have a new pipe, make sure we can register it successfully.
-                        queue.registerFileDescriptorCallback(pipe[0].getFileDescriptor(),
-                                FileDescriptorCallback.EVENT_INPUT,
-                                new FileDescriptorCallback() {
+                        queue.addOnFileDescriptorEventListener(pipe[0].getFileDescriptor(),
+                                OnFileDescriptorEventListener.EVENT_INPUT,
+                                new OnFileDescriptorEventListener() {
                             @Override
                             public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                                 awoke2[0] = true;
@@ -672,8 +672,8 @@ public class MessageQueueTest extends AndroidTestCase {
                         final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                     // Register the callback.
                     final boolean[] awoke = new boolean[1];
-                    queue.registerFileDescriptorCallback(reader.getFD(),
-                            FileDescriptorCallback.EVENT_ERROR, new FileDescriptorCallback() {
+                    queue.addOnFileDescriptorEventListener(reader.getFD(),
+                            OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
                         @Override
                         public int onFileDescriptorEvents(FileDescriptor fd, int events) {
                             awoke[0] = true;
