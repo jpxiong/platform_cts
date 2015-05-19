@@ -18,6 +18,7 @@
 #
 
 include $(BUILD_HOST_JAVA_LIBRARY)
+include $(BUILD_CTS_MODULE_TEST_CONFIG)
 
 cts_library_jar := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).jar
 $(cts_library_jar): $(LOCAL_BUILT_MODULE)
@@ -33,6 +34,7 @@ $(cts_library_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_library_xml): PRIVATE_LIBRARY := $(LOCAL_MODULE)
 $(cts_library_xml): PRIVATE_JAR_PATH := $(LOCAL_MODULE).jar
 $(cts_library_xml): $(cts_library_jar)
+$(cts_library_xml): $(cts_module_test_config)
 $(cts_library_xml): $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for host library $(PRIVATE_LIBRARY)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
@@ -48,4 +50,4 @@ $(cts_library_xml): $(CTS_EXPECTATIONS) $(CTS_UNSUPPORTED_ABIS) $(CTS_JAVA_TEST_
 						-o $@
 
 # Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
-$(my_register_name) : $(cts_library_jar) $(cts_library_xml)
+$(my_register_name) : $(cts_library_jar) $(cts_library_xml) $(cts_module_test_config)
