@@ -32,10 +32,7 @@ public class LauncherAppsProfileTest extends BaseLauncherAppsTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        // We need multi user to be supported in order to create a profile of the user owner.
-        mHasFeature = mHasFeature && (getMaxNumberOfUsersSupported() > 1);
-
+        mHasFeature = mHasFeature && hasDeviceFeature("android.software.managed_users");
         if (mHasFeature) {
             removeTestUsers();
             installTestApps();
