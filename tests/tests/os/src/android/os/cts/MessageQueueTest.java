@@ -215,7 +215,12 @@ public class MessageQueueTest extends AndroidTestCase {
         MessageQueue queue = Looper.getMainLooper().getQueue();
         try {
             queue.addOnFileDescriptorEventListener(null, 0,
-                    new OnFileDescriptorEventListener() { });
+                    new OnFileDescriptorEventListener() {
+                @Override
+                public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                    return 0;
+                }
+            });
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
