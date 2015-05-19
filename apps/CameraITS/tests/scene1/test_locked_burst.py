@@ -32,7 +32,8 @@ def main():
     NAME = os.path.basename(__file__).split(".")[0]
 
     BURST_LEN = 8
-    SPREAD_THRESH = 0.005
+    SPREAD_THRESH_MANUAL_SENSOR = 0.005
+    SPREAD_THRESH = 0.03
     FPS_MAX_DIFF = 2.0
 
     with its.device.ItsSession() as cam:
@@ -67,8 +68,10 @@ def main():
         for means in [r_means, g_means, b_means]:
             spread = max(means) - min(means)
             print "Patch mean spread", spread, \
-                   " (min/max: ",  min(means), "/", max(means), ")"
-            assert(spread < SPREAD_THRESH)
+                    " (min/max: ",  min(means), "/", max(means), ")"
+            threshold = SPREAD_THRESH_MANUAL_SENSOR \
+                    if its.caps.manual_sensor(props) else SPREAD_THRESH
+            assert(spread < threshold)
 
 if __name__ == '__main__':
     main()
