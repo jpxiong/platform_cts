@@ -24,6 +24,7 @@ LOCAL_DEX_PREOPT := false
 LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_CTS_SUPPORT_PACKAGE)
+include $(BUILD_CTS_MODULE_TEST_CONFIG)
 
 cts_package_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_PACKAGE_NAME).xml
 $(cts_package_xml): PRIVATE_PATH := $(LOCAL_PATH)
@@ -33,6 +34,7 @@ $(cts_package_xml): PRIVATE_MANIFEST := $(LOCAL_PATH)/AndroidManifest.xml
 $(cts_package_xml): PRIVATE_TEST_LIST := $(LOCAL_PATH)/$(LOCAL_MODULE)_list.txt
 $(cts_package_xml): $(LOCAL_PATH)/$(LOCAL_MODULE)_list.txt
 $(cts_package_xml): $(cts_support_apks)
+$(cts_package_xml): $(cts_module_test_config)
 $(cts_package_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES))  $(CTS_NATIVE_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for wrapped native package $(PRIVATE_EXECUTABLE)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
@@ -48,4 +50,4 @@ $(cts_package_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES))  $(CTS_NATIVE
 						-o $@
 
 # Have the module name depend on the cts files; so the cts files get generated when you run mm/mmm/mma/mmma.
-$(my_register_name) : $(cts_package_xml)
+$(my_register_name) : $(cts_package_xml) $(cts_module_test_config)
