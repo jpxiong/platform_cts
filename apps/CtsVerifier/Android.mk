@@ -29,6 +29,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
                                android-support-v4 \
                                compatibility-common-util-devicesidelib_v2 \
                                cts-sensors-tests \
+                               cts-verifier-facilities \
                                ctstestrunner \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
@@ -102,3 +103,18 @@ ifneq ($(filter cts, $(MAKECMDGOALS)),)
 endif
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
+
+# Build CTS verifier facilities as a libary.
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_MODULE := cts-verifier-facilities
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-Iaidl-files-under, src)
+
+LOCAL_STATIC_JAVA_LIBRARIES := compatibility-common-util-devicesidelib_v2
+
+include $(BUILD_STATIC_JAVA_LIBRARY)
+
