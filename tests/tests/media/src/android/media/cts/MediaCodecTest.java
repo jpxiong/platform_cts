@@ -21,6 +21,8 @@ import com.android.cts.media.R;
 import android.content.res.AssetFileDescriptor;
 import android.cts.util.MediaUtils;
 import android.media.MediaCodec;
+import android.media.MediaCodec.BufferInfo;
+import android.media.MediaCodec.CodecException;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
@@ -28,13 +30,20 @@ import android.media.MediaFormat;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.opengl.GLES20;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * General MediaCodec tests.
@@ -453,6 +462,241 @@ public class MediaCodecTest extends AndroidTestCase {
             }
             if (inputSurface != null) {
                 inputSurface.release();
+            }
+        }
+    }
+
+    public void testReleaseAfterFlush() throws IOException, InterruptedException {
+        CountDownLatch buffersExhausted = null;
+        CountDownLatch codecFlushed = null;
+        AtomicInteger numBuffers = null;
+
+        // sync flush from same thread
+        MediaCodec encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+        runReleaseAfterFlush(encoder, buffersExhausted, codecFlushed, numBuffers);
+
+        // sync flush from different thread
+        encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+        buffersExhausted = new CountDownLatch(1);
+        codecFlushed = new CountDownLatch(1);
+        numBuffers = new AtomicInteger();
+        Thread flushThread = new FlushThread(encoder, buffersExhausted, codecFlushed);
+        flushThread.start();
+        runReleaseAfterFlush(encoder, buffersExhausted, codecFlushed, numBuffers);
+        flushThread.join();
+
+        // async
+        // This value is calculated in getOutputBufferIndices by calling dequeueOutputBuffer
+        // with a fixed timeout until buffers are exhausted; it is possible that random timing
+        // in dequeueOutputBuffer can result in a smaller `nBuffs` than the max possible value.
+        int nBuffs = numBuffers.get();
+        HandlerThread callbackThread = new HandlerThread("ReleaseAfterFlushCallbackThread");
+        callbackThread.start();
+        Handler handler = new Handler(callbackThread.getLooper());
+
+        // async flush from same thread
+        encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+        buffersExhausted = null;
+        codecFlushed = null;
+        ReleaseAfterFlushCallback callback =
+                new ReleaseAfterFlushCallback(encoder, buffersExhausted, codecFlushed, nBuffs);
+        encoder.setCallback(callback, handler); // setCallback before configure, which is called in run
+        callback.run(); // drive input on main thread
+
+        // async flush from different thread
+        encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+        buffersExhausted = new CountDownLatch(1);
+        codecFlushed = new CountDownLatch(1);
+        callback = new ReleaseAfterFlushCallback(encoder, buffersExhausted, codecFlushed, nBuffs);
+        encoder.setCallback(callback, handler);
+        flushThread = new FlushThread(encoder, buffersExhausted, codecFlushed);
+        flushThread.start();
+        callback.run();
+        flushThread.join();
+
+        callbackThread.quitSafely();
+        callbackThread.join();
+    }
+
+    private static class FlushThread extends Thread {
+        final MediaCodec mEncoder;
+        final CountDownLatch mBuffersExhausted;
+        final CountDownLatch mCodecFlushed;
+
+        FlushThread(MediaCodec encoder, CountDownLatch buffersExhausted,
+                CountDownLatch codecFlushed) {
+            mEncoder = encoder;
+            mBuffersExhausted = buffersExhausted;
+            mCodecFlushed = codecFlushed;
+        }
+
+        @Override
+        public void run() {
+            try {
+                mBuffersExhausted.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.w(TAG, "buffersExhausted wait interrupted; flushing immediately.", e);
+            }
+            mEncoder.flush();
+            mCodecFlushed.countDown();
+        }
+    }
+
+    private static class ReleaseAfterFlushCallback extends MediaCodec.Callback implements Runnable {
+        final MediaCodec mEncoder;
+        final CountDownLatch mBuffersExhausted, mCodecFlushed;
+        final int mNumBuffersBeforeFlush;
+
+        CountDownLatch mStopInput = new CountDownLatch(1);
+        List<Integer> mOutputBufferIndices = new ArrayList<>();
+
+        ReleaseAfterFlushCallback(MediaCodec encoder,
+                CountDownLatch buffersExhausted,
+                CountDownLatch codecFlushed,
+                int numBuffersBeforeFlush) {
+            mEncoder = encoder;
+            mBuffersExhausted = buffersExhausted;
+            mCodecFlushed = codecFlushed;
+            mNumBuffersBeforeFlush = numBuffersBeforeFlush;
+        }
+
+        @Override
+        public void onInputBufferAvailable(MediaCodec codec, int index) {
+            fail(codec + " onInputBufferAvailable " + index);
+        }
+
+        @Override
+        public void onOutputBufferAvailable(MediaCodec codec, int index, BufferInfo info) {
+            mOutputBufferIndices.add(index);
+            if (mOutputBufferIndices.size() == mNumBuffersBeforeFlush) {
+                releaseAfterFlush(codec, mOutputBufferIndices, mBuffersExhausted, mCodecFlushed);
+                mStopInput.countDown();
+            }
+        }
+
+        @Override
+        public void onError(MediaCodec codec, CodecException e) {
+            Log.e(TAG, codec + " onError", e);
+            fail(codec + " onError " + e.getMessage());
+        }
+
+        @Override
+        public void onOutputFormatChanged(MediaCodec codec, MediaFormat format) {
+            Log.v(TAG, codec + " onOutputFormatChanged " + format);
+        }
+
+        @Override
+        public void run() {
+            InputSurface inputSurface = null;
+            try {
+                inputSurface = initCodecAndSurface(mEncoder);
+                do {
+                    GLES20.glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
+                    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+                    inputSurface.swapBuffers();
+                } while (!mStopInput.await(TIMEOUT_USEC, TimeUnit.MICROSECONDS));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.w(TAG, "mEncoder input frames interrupted/stopped", e);
+            } finally {
+                cleanupCodecAndSurface(mEncoder, inputSurface);
+            }
+        }
+    }
+
+    private static void runReleaseAfterFlush(
+            MediaCodec encoder,
+            CountDownLatch buffersExhausted,
+            CountDownLatch codecFlushed,
+            AtomicInteger numBuffers) {
+        InputSurface inputSurface = null;
+        try {
+            inputSurface = initCodecAndSurface(encoder);
+            List<Integer> outputBufferIndices = getOutputBufferIndices(encoder, inputSurface);
+            if (numBuffers != null) {
+                numBuffers.set(outputBufferIndices.size());
+            }
+            releaseAfterFlush(encoder, outputBufferIndices, buffersExhausted, codecFlushed);
+        } finally {
+            cleanupCodecAndSurface(encoder, inputSurface);
+        }
+    }
+
+    private static InputSurface initCodecAndSurface(MediaCodec encoder) {
+        InputSurface inputSurface;
+        CodecInfo info = getAvcSupportedFormatInfo();
+        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, info.mMaxW, info.mMaxH);
+        format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, info.mBitRate);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, info.mFps);
+        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+        OutputSurface outputSurface = new OutputSurface(1, 1);
+        encoder.configure(format, outputSurface.getSurface(), null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        inputSurface = new InputSurface(encoder.createInputSurface());
+        inputSurface.makeCurrent();
+        encoder.start();
+        return inputSurface;
+    }
+
+    private static void cleanupCodecAndSurface(MediaCodec encoder, InputSurface inputSurface) {
+        if (encoder != null) {
+            encoder.stop();
+            encoder.release();
+        }
+
+        if (inputSurface != null) {
+            inputSurface.release();
+        }
+    }
+
+    private static List<Integer> getOutputBufferIndices(MediaCodec encoder, InputSurface inputSurface) {
+        boolean feedMoreFrames;
+        MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+        List<Integer> indices = new ArrayList<>();
+        do {
+            feedMoreFrames = indices.isEmpty();
+            GLES20.glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            inputSurface.swapBuffers();
+            // dequeue buffers until not available
+            int index = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
+            while (index >= 0) {
+                feedMoreFrames = true;
+                indices.add(index);
+                index = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC_SHORT);
+            }
+        } while (feedMoreFrames);
+        assertFalse(indices.isEmpty());
+        return indices;
+    }
+
+    private static void releaseAfterFlush(
+            MediaCodec encoder,
+            List<Integer> outputBufferIndices,
+            CountDownLatch buffersExhausted,
+            CountDownLatch codecFlushed) {
+        if (buffersExhausted == null) {
+            // flush from same thread
+            encoder.flush();
+        } else {
+            assertNotNull(codecFlushed);
+            buffersExhausted.countDown();
+            try {
+                codecFlushed.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.w(TAG, "codecFlushed wait interrupted; releasing buffers immediately.", e);
+            }
+        }
+
+        for (int index : outputBufferIndices) {
+            try {
+                encoder.releaseOutputBuffer(index, true);
+                fail("MediaCodec releaseOutputBuffer after flush() does not throw exception");
+            } catch (MediaCodec.CodecException e) {
+                // Expected
             }
         }
     }
