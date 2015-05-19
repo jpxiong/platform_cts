@@ -241,7 +241,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             }
         }, null);
 
-        mMediaSync.setPlaybackParams(PAUSED_RATE);
+        mMediaSync.setPlaybackParams(NORMAL_RATE);
 
         synchronized (condition) {
             mDecoderAudio.start();
