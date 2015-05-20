@@ -17,25 +17,30 @@
 package android.media.tv.cts;
 
 import android.content.Context;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
-import android.test.AndroidTestCase;
+import android.os.Handler;
+import android.test.ActivityInstrumentationTestCase2;
 
 import java.util.List;
 
 /**
  * Test for {@link android.media.tv.TvInputManager}.
  */
-public class TvInputManagerTest extends AndroidTestCase {
+public class TvInputManagerTest extends ActivityInstrumentationTestCase2<TvViewStubActivity> {
     private static final String[] VALID_TV_INPUT_SERVICES = {
         StubTunerTvInputService.class.getName()
     };
     private static final String[] INVALID_TV_INPUT_SERVICES = {
         NoMetadataTvInputService.class.getName(), NoPermissionTvInputService.class.getName()
     };
+    private static final TvContentRating DUMMY_RATING = TvContentRating.createRating(
+            "com.android.tv", "US_TV", "US_TV_PG", "US_TV_D", "US_TV_L");
 
     private String mStubId;
     private TvInputManager mManager;
+    private TvInputManager.TvInputCallback mCallabck = new TvInputManager.TvInputCallback() {};
 
     private static TvInputInfo getInfoForClassName(List<TvInputInfo> list, String name) {
         for (TvInputInfo info : list) {
@@ -46,25 +51,29 @@ public class TvInputManagerTest extends AndroidTestCase {
         return null;
     }
 
+    public TvInputManagerTest() {
+        super(TvViewStubActivity.class);
+    }
+
     @Override
     public void setUp() throws Exception {
-        if (!Utils.hasTvInputFramework(getContext())) {
+        if (!Utils.hasTvInputFramework(getActivity())) {
             return;
         }
-        mManager = (TvInputManager) mContext.getSystemService(Context.TV_INPUT_SERVICE);
+        mManager = (TvInputManager) getActivity().getSystemService(Context.TV_INPUT_SERVICE);
         mStubId = getInfoForClassName(
                 mManager.getTvInputList(), StubTunerTvInputService.class.getName()).getId();
     }
 
     public void testGetInputState() throws Exception {
-        if (!Utils.hasTvInputFramework(getContext())) {
+        if (!Utils.hasTvInputFramework(getActivity())) {
             return;
         }
         assertEquals(mManager.getInputState(mStubId), TvInputManager.INPUT_STATE_CONNECTED);
     }
 
     public void testGetTvInputInfo() throws Exception {
-        if (!Utils.hasTvInputFramework(getContext())) {
+        if (!Utils.hasTvInputFramework(getActivity())) {
             return;
         }
         assertEquals(mManager.getTvInputInfo(mStubId), getInfoForClassName(
@@ -72,7 +81,7 @@ public class TvInputManagerTest extends AndroidTestCase {
     }
 
     public void testGetTvInputList() throws Exception {
-        if (!Utils.hasTvInputFramework(getContext())) {
+        if (!Utils.hasTvInputFramework(getActivity())) {
             return;
         }
         List<TvInputInfo> list = mManager.getTvInputList();
@@ -84,5 +93,45 @@ public class TvInputManagerTest extends AndroidTestCase {
             assertNull("getTvInputList() contains invalind input: " + name,
                     getInfoForClassName(list, name));
         }
+    }
+
+    public void testIsParentalControlsEnabled() {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
+        try {
+            mManager.isParentalControlsEnabled();
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    public void testIsRatingBlocked() {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
+        try {
+            mManager.isRatingBlocked(DUMMY_RATING);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    public void testRegisterUnregisterCallback() {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mManager.registerCallback(mCallabck, new Handler());
+                    mManager.unregisterCallback(mCallabck);
+                } catch (Exception e) {
+                    fail();
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
     }
 }
