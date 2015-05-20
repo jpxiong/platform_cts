@@ -50,8 +50,8 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     private static final long TIME_OUT = 15000L;
     private static final String mDummyTrackId = "dummyTrackId";
     private static final TvTrackInfo mDummyTrack =
-            new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, mDummyTrackId)
-            .setLanguage("und").build();
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, mDummyTrackId)
+            .setVideoWidth(1920).setVideoHeight(1080).setLanguage("und").build();
 
     private TvView mTvView;
     private Activity mActivity;
@@ -66,6 +66,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         private int mVideoUnavailableCount;
         private int mTrackSelectedCount;
         private int mTrackChangedCount;
+        private int mVideoSizeChanged;
         private int mContentAllowedCount;
         private int mContentBlockedCount;
 
@@ -92,6 +93,11 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         @Override
         public void onTracksChanged(String inputId, List<TvTrackInfo> trackList) {
             mTrackChangedCount++;
+        }
+
+        @Override
+        public void onVideoSizeChanged(String inputId, int width, int height) {
+            mVideoSizeChanged++;
         }
 
         @Override
@@ -365,6 +371,21 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             @Override
             protected boolean check() {
                 return mCallback.mTrackChangedCount > 0;
+            }
+        }.run();
+    }
+
+    public void verifyCallbackVideoSizeChanged() {
+        resetCounts();
+        CountingSession session = CountingTvInputService.sSession;
+        assertNotNull(session);
+        ArrayList<TvTrackInfo> tracks = new ArrayList<>();
+        tracks.add(mDummyTrack);
+        session.notifyTracksChanged(tracks);
+        new PollingCheck(TIME_OUT) {
+            @Override
+            protected boolean check() {
+                return mCallback.mVideoSizeChanged > 0;
             }
         }.run();
     }
