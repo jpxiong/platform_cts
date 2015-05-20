@@ -73,7 +73,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         private int mTrackChangedCount;
         private int mContentAllowedCount;
         private int mContentBlockedCount;
-        private int mTimeShiftStatusChanged;
+        private int mTimeShiftStatusChangedCount;
 
         @Override
         public void onChannelRetuned(String inputId, Uri channelUri) {
@@ -112,7 +112,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
 
         @Override
         public void onTimeShiftStatusChanged(String inputId, int status) {
-            mTimeShiftStatusChanged++;
+            mTimeShiftStatusChangedCount++;
         }
 
         public void resetCounts() {
@@ -123,6 +123,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             mTrackChangedCount = 0;
             mContentAllowedCount = 0;
             mContentBlockedCount = 0;
+            mTimeShiftStatusChangedCount = 0;
         }
     }
 
@@ -138,6 +139,11 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
         @Override
         public void onTimeShiftCurrentPositionChanged(String inputId, long timeMs) {
             mTimeShiftCurrentPositionChanged++;
+        }
+
+        public void resetCounts() {
+            mTimeShiftStartPositionChanged = 0;
+            mTimeShiftCurrentPositionChanged = 0;
         }
     }
 
@@ -349,42 +355,46 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     }
 
     public void verifyCommandTimeShiftPause() {
+        resetCounts();
         mTvView.timeShiftPause();
         mInstrumentation.waitForIdleSync();
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 CountingSession session = CountingTvInputService.sSession;
-                return session != null && session.mTimeShiftPause > 0;
+                return session != null && session.mTimeShiftPauseCount > 0;
             }
         }.run();
     }
 
     public void verifyCommandTimeShiftResume() {
+        resetCounts();
         mTvView.timeShiftResume();
         mInstrumentation.waitForIdleSync();
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 CountingSession session = CountingTvInputService.sSession;
-                return session != null && session.mTimeShiftResume > 0;
+                return session != null && session.mTimeShiftResumeCount > 0;
             }
         }.run();
     }
 
     public void verifyCommandTimeShiftSeekTo() {
+        resetCounts();
         mTvView.timeShiftSeekTo(0);
         mInstrumentation.waitForIdleSync();
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 CountingSession session = CountingTvInputService.sSession;
-                return session != null && session.mTimeShiftSeekTo > 0;
+                return session != null && session.mTimeShiftSeekToCount > 0;
             }
         }.run();
     }
 
     public void verifyCommandTimeShiftSetPlaybackParams() {
+        resetCounts();
         mTvView.timeShiftSetPlaybackParams(new PlaybackParams().setSpeed(2.0f)
                 .setAudioFallbackMode(PlaybackParams.AUDIO_FALLBACK_MODE_DEFAULT));
         mInstrumentation.waitForIdleSync();
@@ -392,12 +402,13 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             @Override
             protected boolean check() {
                 CountingSession session = CountingTvInputService.sSession;
-                return session != null && session.mTimeShiftSetPlaybackParams > 0;
+                return session != null && session.mTimeShiftSetPlaybackParamsCount > 0;
             }
         }.run();
     }
 
     public void verifyCommandSetTimeShiftPositionCallback() {
+        resetCounts();
         mTvView.setTimeShiftPositionCallback(mTimeShiftPositionCallback);
         mInstrumentation.waitForIdleSync();
         new PollingCheck(TIME_OUT) {
@@ -410,6 +421,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     }
 
     public void verifyCommandOverlayViewSizeChanged() {
+        resetCounts();
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTvView.setLayoutParams(new LinearLayout.LayoutParams(10, 20));
@@ -522,18 +534,20 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
     }
 
     public void verifyCallbackTimeShiftStatusChanged() {
+        resetCounts();
         CountingSession session = CountingTvInputService.sSession;
         assertNotNull(session);
         session.notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
         new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return mCallback.mTimeShiftStatusChanged > 0;
+                return mCallback.mTimeShiftStatusChangedCount > 0;
             }
         }.run();
     }
 
     public void verifyCallbackLayoutSurface() {
+        resetCounts();
         final int left = 10;
         final int top = 20;
         final int right = 30;
@@ -562,6 +576,7 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             CountingTvInputService.sSession.resetCounts();
         }
         mCallback.resetCounts();
+        mTimeShiftPositionCallback.resetCounts();
     }
 
     public static class CountingTvInputService extends StubTvInputService {
@@ -588,12 +603,12 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
             public volatile int mTrackballEventCount;
             public volatile int mGenricMotionEventCount;
             public volatile int mOverlayViewSizeChangedCount;
-            public volatile int mTimeShiftPause;
-            public volatile int mTimeShiftResume;
-            public volatile int mTimeShiftSeekTo;
-            public volatile int mTimeShiftSetPlaybackParams;
-            public volatile long mTimeShiftGetCurrentPosition;
-            public volatile long mTimeShiftGetStartPosition;
+            public volatile int mTimeShiftPauseCount;
+            public volatile int mTimeShiftResumeCount;
+            public volatile int mTimeShiftSeekToCount;
+            public volatile int mTimeShiftSetPlaybackParamsCount;
+            public volatile long mTimeShiftGetCurrentPositionCount;
+            public volatile long mTimeShiftGetStartPositionCount;
 
             CountingSession(Context context) {
                 super(context);
@@ -612,6 +627,13 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
                 mTouchEventCount = 0;
                 mTrackballEventCount = 0;
                 mGenricMotionEventCount = 0;
+                mOverlayViewSizeChangedCount = 0;
+                mTimeShiftPauseCount = 0;
+                mTimeShiftResumeCount = 0;
+                mTimeShiftSeekToCount = 0;
+                mTimeShiftSetPlaybackParamsCount = 0;
+                mTimeShiftGetCurrentPositionCount = 0;
+                mTimeShiftGetStartPositionCount = 0;
             }
 
             @Override
@@ -695,32 +717,32 @@ public class TvInputServiceTest extends ActivityInstrumentationTestCase2<TvViewS
 
             @Override
             public void onTimeShiftPause() {
-                mTimeShiftPause++;
+                mTimeShiftPauseCount++;
             }
 
             @Override
             public void onTimeShiftResume() {
-                mTimeShiftResume++;
+                mTimeShiftResumeCount++;
             }
 
             @Override
             public void onTimeShiftSeekTo(long timeMs) {
-                mTimeShiftSeekTo++;
+                mTimeShiftSeekToCount++;
             }
 
             @Override
             public void onTimeShiftSetPlaybackParams(PlaybackParams param) {
-                mTimeShiftSetPlaybackParams++;
+                mTimeShiftSetPlaybackParamsCount++;
             }
 
             @Override
             public long onTimeShiftGetCurrentPosition() {
-                return ++mTimeShiftGetCurrentPosition;
+                return ++mTimeShiftGetCurrentPositionCount;
             }
 
             @Override
             public long onTimeShiftGetStartPosition() {
-                return ++mTimeShiftGetStartPosition;
+                return ++mTimeShiftGetStartPositionCount;
             }
 
             @Override
