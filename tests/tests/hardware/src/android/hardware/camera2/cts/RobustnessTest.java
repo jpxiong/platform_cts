@@ -49,6 +49,7 @@ import static org.mockito.Mockito.*;
  */
 public class RobustnessTest extends Camera2AndroidTestCase {
     private static final String TAG = "RobustnessTest";
+    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     private static final int CONFIGURE_TIMEOUT = 5000; //ms
     private static final int CAPTURE_TIMEOUT = 1000; //ms
@@ -223,6 +224,11 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             MaxOutputSizes maxSizes = new MaxOutputSizes(cc, id);
 
             final StaticMetadata staticInfo = new StaticMetadata(cc);
+            String streamConfigurationMapString =
+                    cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).toString();
+            if (VERBOSE) {
+                Log.v(TAG, "StreamConfigurationMap: " + streamConfigurationMapString);
+            }
 
             openDevice(id);
 

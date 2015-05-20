@@ -651,6 +651,10 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
         InputConfiguration inputConfig = new InputConfiguration(mFirstImageReader.getWidth(),
                 mFirstImageReader.getHeight(), mFirstImageReader.getImageFormat());
+        String inputConfigString = inputConfig.toString();
+        if (VERBOSE) {
+            Log.v(TAG, "InputConfiguration: " + inputConfigString);
+        }
         assertTrue(String.format("inputConfig is wrong: %dx%d format %d. Expect %dx%d format %d",
                 inputConfig.getWidth(), inputConfig.getHeight(), inputConfig.getFormat(),
                 mFirstImageReader.getWidth(), mFirstImageReader.getHeight(),
