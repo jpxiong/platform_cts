@@ -67,6 +67,15 @@
                        android:resource="@xml/stub_tv_input_service" />
         </service>
 
+        <service android:name="android.media.tv.cts.TvInputManagerTest$StubTvInputService2"
+                 android:permission="android.permission.BIND_TV_INPUT">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data android:name="android.media.tv.input"
+                       android:resource="@xml/stub_tv_input_service" />
+        </service>
+
         <service android:name="android.media.tv.cts.TvInputServiceTest$CountingTvInputService"
                  android:permission="android.permission.BIND_TV_INPUT">
             <intent-filter>
