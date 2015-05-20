@@ -1391,6 +1391,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
             frameCount /= 2;
         }
         assertTrue(TEST_NAME, track.getNativeFrameCount() >= frameCount);
+        assertEquals(TEST_NAME, track.getNativeFrameCount(), track.getBufferSizeInFrames());
     }
 
     public void testReloadStaticData() throws Exception {
@@ -1601,7 +1602,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
                     // We choose a value here which simulates double buffer writes.
                     final int buffers = 2; // double buffering mode
                     final int samplesPerWrite =
-                            (track.getNativeFrameCount() / buffers) * channelCount;
+                            (track.getBufferSizeInFrames() / buffers) * channelCount;
                     switch (TEST_FORMAT) {
                     case AudioFormat.ENCODING_PCM_8BIT: {
                         byte data[] = AudioHelper.createSoundDataInByteArray(
@@ -2236,6 +2237,7 @@ public class AudioTrackTest extends CtsAndroidTestCase {
     }
 */
 
+    /* MockAudioTrack allows testing of protected getNativeFrameCount() and setState(). */
     private class MockAudioTrack extends AudioTrack {
 
         public MockAudioTrack(int streamType, int sampleRateInHz, int channelConfig,
