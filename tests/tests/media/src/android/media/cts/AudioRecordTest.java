@@ -586,7 +586,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         final int frameSize =
                 format.getChannelCount() * AudioFormat.getBytesPerSample(audioFormat);
         // our native frame count cannot be smaller than our minimum buffer size request.
-        assertTrue(record.getNativeFrameCount() * frameSize >= bufferSizeInBytes);
+        assertTrue(record.getBufferSizeInFrames() * frameSize >= bufferSizeInBytes);
         return record;
     }
 
