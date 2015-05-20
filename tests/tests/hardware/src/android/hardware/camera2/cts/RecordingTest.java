@@ -24,6 +24,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Size;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.media.CamcorderProfile;
+import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
@@ -82,6 +83,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_NUM_FRAME_DROP_INTERVAL_ALLOWED = 4;
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
+    private Surface mPersistentSurface;
     private MediaRecorder mMediaRecorder;
     private String mOutMediaFileName;
     private int mVideoFrameRate;
@@ -98,19 +100,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         super.tearDown();
     }
 
-    /**
-     * <p>
-     * Test basic camera recording.
-     * </p>
-     * <p>
-     * This test covers the typical basic use case of camera recording.
-     * MediaRecorder is used to record the audio and video, CamcorderProfile is
-     * used to configure the MediaRecorder. It goes through the pre-defined
-     * CamcorderProfile list, test each profile configuration and validate the
-     * recorded video. Preview is set to the video size.
-     * </p>
-     */
-    public void testBasicRecording() throws Exception {
+    private void doBasicRecording() throws Exception {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 Log.i(TAG, "Testing basic recording for camera " + mCameraIds[i]);
@@ -125,6 +115,43 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 closeDevice();
                 releaseRecorder();
             }
+        }
+    }
+
+    /**
+     * <p>
+     * Test basic camera recording.
+     * </p>
+     * <p>
+     * This test covers the typical basic use case of camera recording.
+     * MediaRecorder is used to record the audio and video, CamcorderProfile is
+     * used to configure the MediaRecorder. It goes through the pre-defined
+     * CamcorderProfile list, test each profile configuration and validate the
+     * recorded video. Preview is set to the video size.
+     * </p>
+     */
+    public void testBasicRecording() throws Exception {
+        doBasicRecording();
+    }
+
+    /**
+     * <p>
+     * Test basic camera recording from a persistent input surface.
+     * </p>
+     * <p>
+     * This test is similar to testBasicRecording except that MediaRecorder records
+     * from a persistent input surface that's used across multiple recording sessions.
+     * </p>
+     */
+    public void testRecordingFromPersistentSurface() throws Exception {
+        mPersistentSurface = MediaCodec.createPersistentInputSurface();
+        assertNotNull("Failed to create persistent input surface!", mPersistentSurface);
+
+        try {
+            doBasicRecording();
+        } finally {
+            mPersistentSurface.release();
+            mPersistentSurface = null;
         }
     }
 
@@ -819,8 +846,14 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOutputFile(mOutMediaFileName);
+        if (mPersistentSurface != null) {
+            mMediaRecorder.setInputSurface(mPersistentSurface);
+            mRecordingSurface = mPersistentSurface;
+        }
         mMediaRecorder.prepare();
-        mRecordingSurface = mMediaRecorder.getSurface();
+        if (mPersistentSurface == null) {
+            mRecordingSurface = mMediaRecorder.getSurface();
+        }
         assertNotNull("Recording surface must be non-null!", mRecordingSurface);
         mVideoFrameRate = profile.videoFrameRate;
         mVideoSize = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
@@ -844,8 +877,14 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         mMediaRecorder.setVideoSize(sz.getWidth(), sz.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        if (mPersistentSurface != null) {
+            mMediaRecorder.setInputSurface(mPersistentSurface);
+            mRecordingSurface = mPersistentSurface;
+        }
         mMediaRecorder.prepare();
-        mRecordingSurface = mMediaRecorder.getSurface();
+        if (mPersistentSurface == null) {
+            mRecordingSurface = mMediaRecorder.getSurface();
+        }
         assertNotNull("Recording surface must be non-null!", mRecordingSurface);
         mVideoFrameRate = videoFrameRate;
         mVideoSize = sz;
@@ -908,7 +947,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         } else {
             // TODO: need implement MediaCodec path.
         }
-        if (mRecordingSurface != null) {
+        if (mPersistentSurface == null && mRecordingSurface != null) {
             mRecordingSurface.release();
             mRecordingSurface = null;
         }
