@@ -47,6 +47,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -353,6 +354,40 @@ public class SensorTest extends SensorTestCase {
         listener.assertEventsReceivedInHandler();
     }
 
+    /**
+     *  Explicit testing the SensorManager.registerListener(SensorEventListener, Sensor, int, int).
+     */
+    @TimeoutReq(minutes=10)
+    public void testBatchAndFlushUseDefaultHandler() throws Exception {
+        Sensor sensor = null;
+        for (Sensor s : mSensorList) {
+            if (s.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
+                sensor = s;
+                break;
+            }
+        }
+        if (sensor == null) {
+            throw new SensorTestStateNotSupportedException(
+                    "There are no Continuous sensors in the device.");
+        }
+
+        TestSensorEnvironment environment = new TestSensorEnvironment(
+                getContext(),
+                sensor,
+                SensorManager.SENSOR_DELAY_FASTEST,
+                (int) TimeUnit.SECONDS.toMicros(5));
+        mTestSensorManager = new TestSensorManager(environment);
+
+        TestSensorEventListener listener = new TestSensorEventListener(environment, null);
+
+        // specifyHandler <= false, use the SensorManager API without Handler parameter
+        CountDownLatch eventLatch = mTestSensorManager.registerListener(listener, 1, false);
+        listener.waitForEvents(eventLatch, 1);
+        CountDownLatch flushLatch = mTestSensorManager.requestFlush();
+        listener.waitForFlushComplete(flushLatch);
+        listener.assertEventsReceivedInHandler();
+    }
+
     // TODO: after L release move to SensorBatchingTests and run in all sensors with default
     //       verifications enabled
     public void testBatchAndFlushWithMutipleSensors() throws Exception {
@@ -568,4 +603,5 @@ public class SensorTest extends SensorTestCase {
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     }
+
 }
