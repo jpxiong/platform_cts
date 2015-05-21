@@ -1389,72 +1389,69 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             return;
         }
 
-        SimpleCaptureCallback listener;
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
-        Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
-
         int[] toneMapModes = mStaticInfo.getAvailableToneMapModesChecked();
         for (int mode : toneMapModes) {
-            requestBuilder.set(CaptureRequest.TONEMAP_MODE, mode);
             if (VERBOSE) {
                 Log.v(TAG, "Testing tonemap mode " + mode);
             }
 
-            if (mode == CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE) {
-                TonemapCurve tcLinear = new TonemapCurve(
-                        TONEMAP_CURVE_LINEAR, TONEMAP_CURVE_LINEAR, TONEMAP_CURVE_LINEAR);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcLinear);
-                // Create a new listener for each run to avoid the results from one run spill
-                // into another run.
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, maxPreviewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
-                        TONEMAP_CURVE_LINEAR);
+            requestBuilder.set(CaptureRequest.TONEMAP_MODE, mode);
+            switch (mode) {
+                case CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE:
+                    TonemapCurve toneCurve = new TonemapCurve(TONEMAP_CURVE_LINEAR,
+                            TONEMAP_CURVE_LINEAR, TONEMAP_CURVE_LINEAR);
+                    requestBuilder.set(CaptureRequest.TONEMAP_CURVE, toneCurve);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
 
-                TonemapCurve tcSrgb = new TonemapCurve(
-                        TONEMAP_CURVE_SRGB, TONEMAP_CURVE_SRGB, TONEMAP_CURVE_SRGB);
-                requestBuilder.set(CaptureRequest.TONEMAP_CURVE, tcSrgb);
-                // Create a new listener for each run to avoid the results from one run spill
-                // into another run.
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, maxPreviewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
-                        TONEMAP_CURVE_SRGB);
-            } else {
-                // Create a new listener for each run to avoid the results from one run spill
-                // into another run.
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, maxPreviewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
-                        /*inputToneCurve*/null);
+                    toneCurve = new TonemapCurve(TONEMAP_CURVE_SRGB,
+                            TONEMAP_CURVE_SRGB, TONEMAP_CURVE_SRGB);
+                    requestBuilder.set(CaptureRequest.TONEMAP_CURVE, toneCurve);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    break;
+                case CaptureRequest.TONEMAP_MODE_GAMMA_VALUE:
+                    requestBuilder.set(CaptureRequest.TONEMAP_GAMMA, 1.0f);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    requestBuilder.set(CaptureRequest.TONEMAP_GAMMA, 2.2f);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    requestBuilder.set(CaptureRequest.TONEMAP_GAMMA, 5.0f);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    break;
+                case CaptureRequest.TONEMAP_MODE_PRESET_CURVE:
+                    requestBuilder.set(CaptureRequest.TONEMAP_PRESET_CURVE,
+                            CaptureRequest.TONEMAP_PRESET_CURVE_REC709);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    requestBuilder.set(CaptureRequest.TONEMAP_PRESET_CURVE,
+                            CaptureRequest.TONEMAP_PRESET_CURVE_SRGB);
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    break;
+                default:
+                    testToneMapMode(NUM_FRAMES_VERIFIED, requestBuilder);
+                    break;
             }
         }
 
-        stopPreview();
+
     }
 
     /**
-     * Verify tonemap results.
-     * <p>
-     * Assumes R,G,B channels use the same tone curve
-     * </p>
+     * Test tonemap mode with speficied request settings
      *
-     * @param listener The capture listener used to get the capture results
      * @param numFramesVerified Number of results to be verified
-     * @param tonemapMode Tonemap mode to verify
-     * @param inputToneCurve Tonemap curve used by all 3 channels, ignored when
-     * map mode is not CONTRAST_CURVE.
+     * @param requestBuilder the request builder of settings to be tested
      */
-    private void verifyToneMapModeResults(SimpleCaptureCallback listener, int numFramesVerified,
-            int tonemapMode, float[] inputToneCurve) {
+    private void testToneMapMode (int numFramesVerified,
+            CaptureRequest.Builder requestBuilder)  throws Exception  {
         final int MIN_TONEMAP_CURVE_POINTS = 2;
         final Float ZERO = new Float(0);
         final Float ONE = new Float(1.0f);
+
+        SimpleCaptureCallback listener = new SimpleCaptureCallback();
+        int tonemapMode = requestBuilder.get(CaptureRequest.TONEMAP_MODE);
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+        startPreview(requestBuilder, maxPreviewSz, listener);
+        waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
         int maxCurvePoints = mStaticInfo.getMaxTonemapCurvePointChecked();
         for (int i = 0; i < numFramesVerified; i++) {
@@ -1477,6 +1474,14 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                  * between request and result, as they may have different array
                  * size.
                  */
+            } else if (tonemapMode == CaptureResult.TONEMAP_MODE_GAMMA_VALUE) {
+                mCollector.expectEquals("Capture result gamma value should match request",
+                        requestBuilder.get(CaptureRequest.TONEMAP_GAMMA),
+                        result.get(CaptureResult.TONEMAP_GAMMA));
+            } else if (tonemapMode == CaptureResult.TONEMAP_MODE_PRESET_CURVE) {
+                mCollector.expectEquals("Capture result preset curve should match request",
+                        requestBuilder.get(CaptureRequest.TONEMAP_PRESET_CURVE),
+                        result.get(CaptureResult.TONEMAP_PRESET_CURVE));
             }
 
             // Tonemap curve result availability and basic sanity check for all modes.
@@ -1493,6 +1498,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             mCollector.expectInRange("Tonemap curve blue length is out of range",
                     mapBlue.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
         }
+        stopPreview();
     }
 
     /**
