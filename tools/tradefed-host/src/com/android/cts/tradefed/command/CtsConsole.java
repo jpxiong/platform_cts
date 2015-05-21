@@ -56,7 +56,9 @@ public class CtsConsole extends Console {
 
     @Override
     public void run() {
-        printLine(String.format("Android CTS %s", CtsBuildProvider.CTS_BUILD_VERSION));
+        printLine(String.format("Android CTS %s build:%s",
+                CtsBuildProvider.CTS_BUILD_VERSION,
+                Package.getPackage("com.android.cts.tradefed.command").getImplementationVersion()));
         super.run();
     }
 
