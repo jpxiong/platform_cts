@@ -46,6 +46,7 @@ import junit.framework.AssertionFailedError;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -439,8 +440,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      */
     private void basicRecordingTestByCamera(int[] camcorderProfileList) throws Exception {
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        List<Range<Integer> > fpsRanges = Arrays.asList(
+                mStaticInfo.getAeAvailableTargetFpsRangesChecked());
+        int cameraId = Integer.valueOf(mCamera.getId());
         for (int profileId : camcorderProfileList) {
-            int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
                     allowedUnsupported(cameraId, profileId)) {
                 continue;
@@ -448,6 +451,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
             Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+            Range<Integer> fpsRange = new Range(profile.videoFrameRate, profile.videoFrameRate);
             if (mStaticInfo.isHardwareLevelLegacy() &&
                     (videoSz.getWidth() > maxPreviewSize.getWidth() ||
                      videoSz.getHeight() > maxPreviewSize.getHeight())) {
@@ -457,6 +461,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
                             " must be one of the camera device supported video size!",
                             mSupportedVideoSizes.contains(videoSz));
+            assertTrue("Frame rate range " + fpsRange + " (for profile ID " + profileId +
+                    ") must be one of the camera device available FPS range!",
+                    fpsRanges.contains(fpsRange));
 
             if (VERBOSE) {
                 Log.v(TAG, "Testing camera recording with video size " + videoSz.toString());
