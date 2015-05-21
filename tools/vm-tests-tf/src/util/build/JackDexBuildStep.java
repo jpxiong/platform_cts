@@ -16,14 +16,19 @@
 
 package util.build;
 
-import com.android.dx.command.dexer.Main;
-import java.io.IOException;
+import com.android.jack.Jack;
+import com.android.jack.Main;
+import com.android.jack.Options;
 
-public class DexBuildStep extends BuildStep {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JackDexBuildStep extends BuildStep {
 
     private final boolean deleteInputFileAfterBuild;
 
-    DexBuildStep(BuildFile inputFile, BuildFile outputFile,
+    JackDexBuildStep(BuildFile inputFile, BuildFile outputFile,
             boolean deleteInputFileAfterBuild) {
         super(inputFile, outputFile);
         this.deleteInputFileAfterBuild = deleteInputFileAfterBuild;
@@ -33,31 +38,39 @@ public class DexBuildStep extends BuildStep {
     boolean build() {
 
         if (super.build()) {
-            Main.Arguments args = new Main.Arguments();
+            String outputFilePath = outputFile.fileName.getAbsolutePath();
+            if (outputFilePath.endsWith(".dex")) {
+              throw new AssertionError(
+                  "DexBuildStep does not support dex output outside of an archive");
+            }
 
-            args.jarOutput = true;
-            args.fileNames = new String[] {inputFile.fileName.getAbsolutePath()};
-
-            args.outName = outputFile.fileName.getAbsolutePath();
-
-            int result = 0;
-            try {
-                result = Main.run(args);
-            } catch (IOException e) {
-                e.printStackTrace();
+            File outDir = outputFile.fileName.getParentFile();
+            if (!outDir.exists() && !outDir.mkdirs()) {
+                System.err.println("failed to create output dir: "
+                        + outDir.getAbsolutePath());
                 return false;
             }
 
-            if (result == 0) {
+            List<String> commandLine = new ArrayList<String>(4);
+            commandLine.add("--verbose");
+            commandLine.add("error");
+            commandLine.add("--output-dex-zip");
+            commandLine.add(outputFilePath);
+            commandLine.add("--import");
+            commandLine.add(inputFile.fileName.getAbsolutePath());
+
+            try {
+               Options options = Main.parseCommandLine(commandLine);
+               Jack.checkAndRun(options);
                 if (deleteInputFileAfterBuild) {
                     inputFile.fileName.delete();
                 }
                 return true;
-            } else {
+            } catch (Throwable ex) {
                 System.err.println("exception while dexing "
                         + inputFile.fileName.getAbsolutePath() + " to "
-                        + args.outName);
-                return false;
+                        + outputFile.fileName.getAbsolutePath());
+                ex.printStackTrace();
             }
         }
         return false;
@@ -71,7 +84,7 @@ public class DexBuildStep extends BuildStep {
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj)) {
-            DexBuildStep other = (DexBuildStep) obj;
+            JackDexBuildStep other = (JackDexBuildStep) obj;
 
             return inputFile.equals(other.inputFile)
                     && outputFile.equals(other.outputFile);
