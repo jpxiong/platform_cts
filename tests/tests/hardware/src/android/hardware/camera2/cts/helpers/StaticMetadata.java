@@ -678,13 +678,8 @@ public class StaticMetadata {
         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
         checkTrueForKey(key, " Camera devices must always support FAST mode",
                 modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
-        if (isCapabilitySupported(
-                CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING)) {
-            checkTrueForKey(key, "MANUAL_POST_PROCESSING supported camera devices must support"
-                    + "CONTRAST_CURVE mode",
-                    modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
-                    modeList.contains(CameraMetadata.TONEMAP_MODE_FAST));
-        }
+        // Qualification check for MANUAL_POSTPROCESSING capability is in
+        // StaticMetadataTest#testCapabilities
 
         if (isHardwareLevelLimitedOrBetter()) {
             // FAST and HIGH_QUALITY mode must be both present or both not present
@@ -698,7 +693,7 @@ public class StaticMetadata {
         }
         checkElementDistinct(key, modeList);
         checkArrayValuesInRange(key, modes, CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE,
-                CameraMetadata.TONEMAP_MODE_HIGH_QUALITY);
+                CameraMetadata.TONEMAP_MODE_PRESET_CURVE);
 
         return modes;
     }
@@ -711,16 +706,23 @@ public class StaticMetadata {
     public int getMaxTonemapCurvePointChecked() {
         Key<Integer> key = CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS;
         Integer count = getValueFromKeyNonNull(key);
+        List<Integer> modeList =
+                Arrays.asList(CameraTestUtils.toObject(getAvailableToneMapModesChecked()));
+        boolean tonemapCurveOutputSupported =
+                modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) ||
+                modeList.contains(CameraMetadata.TONEMAP_MODE_GAMMA_VALUE) ||
+                modeList.contains(CameraMetadata.TONEMAP_MODE_PRESET_CURVE);
 
         if (count == null) {
+            if (tonemapCurveOutputSupported) {
+                Assert.fail("Tonemap curve output is supported but MAX_CURVE_POINTS is null");
+            }
             return 0;
         }
 
-        List<Integer> modeList =
-                Arrays.asList(CameraTestUtils.toObject(getAvailableToneMapModesChecked()));
-        if (modeList.contains(CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE)) {
-            checkTrueForKey(key, "Full-capability camera device must support maxCurvePoints "
-                    + ">= " + TONEMAP_MAX_CURVE_POINTS_AT_LEAST,
+        if (tonemapCurveOutputSupported) {
+            checkTrueForKey(key, "Tonemap curve output supported camera device must support "
+                    + "maxCurvePoints >= " + TONEMAP_MAX_CURVE_POINTS_AT_LEAST,
                     count >= TONEMAP_MAX_CURVE_POINTS_AT_LEAST);
         }
 

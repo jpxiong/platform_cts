@@ -1435,6 +1435,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             if (mStaticInfo.areKeysAvailable(TONEMAP_MODE)) {
                 mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
                         CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
+                mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_GAMMA_VALUE);
+                mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_PRESET_CURVE);
             }
             if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE)) {
                 mCollector.expectKeyValueNotNull(request, STATISTICS_LENS_SHADING_MAP_MODE);
