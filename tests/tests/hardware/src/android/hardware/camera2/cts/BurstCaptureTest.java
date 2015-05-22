@@ -32,6 +32,7 @@ import android.util.Size;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "BurstCaptureTest";
@@ -74,7 +75,8 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
         final Size previewSize = mOrderedPreviewSizes.get(0);
 
         // Get maximum YUV_420_888 size
-        final Size stillSize = getMaxPreviewSize(cameraId, mCameraManager);
+        final Size stillSize = getSortedSizesForFormat(
+                cameraId, mCameraManager, ImageFormat.YUV_420_888, /*bound*/null).get(0);
 
         // Find max pipeline depth and sync latency
         final int maxPipelineDepth = mStaticInfo.getCharacteristics().get(
@@ -89,9 +91,30 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
                 config.getOutputMinFrameDuration(ImageFormat.YUV_420_888, stillSize);
 
         // Find suitable target FPS range - as high as possible
+        List<Range<Integer> > fpsRanges = Arrays.asList(
+                mStaticInfo.getAeAvailableTargetFpsRangesChecked());
         Range<Integer> targetRange = mStaticInfo.getAeMaxTargetFpsRange();
-        int minBurstFps = (int) Math.floor(1e9 / minStillFrameDuration);
+        // Add 0.05 here so Fps like 29.99 evaluated to 30
+        int minBurstFps = (int) Math.floor(1e9 / minStillFrameDuration + 0.05f);
+        boolean foundConstantMaxYUVRange = false;
+        boolean foundYUVStreamingRange = false;
 
+        for (Range<Integer> fpsRange : fpsRanges) {
+            if (fpsRange.getLower() == minBurstFps && fpsRange.getUpper() == minBurstFps) {
+                foundConstantMaxYUVRange = true;
+            }
+            if (fpsRange.getLower() <= 15 && fpsRange.getUpper() == minBurstFps) {
+                foundYUVStreamingRange = true;
+            }
+        }
+
+        if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+            assertTrue(String.format("Cam %s: Target FPS range of (%d, %d) must be supported",
+                    cameraId, minBurstFps, minBurstFps), foundConstantMaxYUVRange);
+            assertTrue(String.format(
+                    "Cam %s: Target FPS range of (x, %d) where x <= 15 must be supported",
+                    cameraId, minBurstFps), foundYUVStreamingRange);
+        }
         assertTrue(String.format("Cam %s: No target FPS range found with minimum FPS above " +
                         " 1/minFrameDuration (%d fps, duration %d ns) for full-resolution YUV",
                         cameraId, minBurstFps, minStillFrameDuration),

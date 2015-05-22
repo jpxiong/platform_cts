@@ -1284,9 +1284,17 @@ public class StaticMetadata {
         int fpsRangeLength = fpsRanges.length;
         int minFps, maxFps;
         long maxFrameDuration = getMaxFrameDurationChecked();
+        boolean foundConstant30Range = false;
+        boolean foundPreviewStreamingRange = false;
         for (int i = 0; i < fpsRangeLength; i += 1) {
             minFps = fpsRanges[i].getLower();
             maxFps = fpsRanges[i].getUpper();
+            if (minFps == 30 && maxFps == 30) {
+                foundConstant30Range = true;
+            }
+            if (minFps <= 15 && maxFps >= 30) {
+                foundPreviewStreamingRange = true;
+            }
             checkTrueForKey(key, " min fps must be no larger than max fps!",
                     minFps > 0 && maxFps >= minFps);
             long maxDuration = (long) (1e9 / minFps);
@@ -1294,7 +1302,10 @@ public class StaticMetadata {
                     " the frame duration %d for min fps %d must smaller than maxFrameDuration %d",
                     maxDuration, minFps, maxFrameDuration), maxDuration <= maxFrameDuration);
         }
-
+        checkTrueForKey(key, String.format(" (30, 30) must be included"), foundConstant30Range);
+        checkTrueForKey(key, String.format(
+                " (min, max) where min <= 15 and max >= 30 must be included"),
+                foundPreviewStreamingRange);
         return fpsRanges;
     }
 
