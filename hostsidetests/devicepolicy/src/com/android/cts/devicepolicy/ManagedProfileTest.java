@@ -20,6 +20,8 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.log.LogUtil.CLog;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * Set of tests for Managed Profile use cases.
  */
@@ -89,6 +91,19 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         // Note: the managed profile is removed by this test, which will make removeUserCommand in
         // tearDown() to complain, but that should be OK since its result is not asserted.
         assertFalse(listUsers().contains(mUserId));
+    }
+
+    public void testMaxOneManagedProfile() throws Exception {
+        int newUserId = -1;
+        try {
+            newUserId = createManagedProfile();
+        } catch (AssertionFailedError expected) {
+        }
+        if (newUserId > 0) {
+            removeUser(newUserId);
+            fail(mHasFeature ? "Device must allow creating only one managed profile"
+                    : "Device must not allow creating a managed profile");
+        }
     }
 
     public void testCrossProfileIntentFilters() throws Exception {
