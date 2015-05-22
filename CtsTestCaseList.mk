@@ -57,7 +57,12 @@ cts_security_keysets_list := \
     CtsKeySetSigningBUpgradeB \
     CtsKeySetSigningAAndBUpgradeA \
     CtsKeySetSigningAAndCUpgradeB \
-    CtsKeySetSigningAUpgradeNone
+    CtsKeySetSigningAUpgradeNone \
+    CtsKeySetSharedUserSigningAUpgradeB \
+    CtsKeySetSharedUserSigningBUpgradeB \
+    CtsKeySetSigningABadUpgradeB \
+    CtsKeySetSigningCBadAUpgradeAB \
+    CtsKeySetSigningANoDefUpgradeB
 
 cts_support_packages := \
     CtsAccelerationTestStubs \
