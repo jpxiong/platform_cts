@@ -337,6 +337,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             BlackLevelPattern blackLevel = mCollector.expectKeyValueNotNull(c,
                     CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
             if (blackLevel != null) {
+                String blackLevelPatternString = blackLevel.toString();
+                if (VERBOSE) {
+                    Log.v(TAG, "Black level pattern: " + blackLevelPatternString);
+                }
                 int[] blackLevelPattern = new int[BlackLevelPattern.COUNT];
                 blackLevel.copyTo(blackLevelPattern, /*offset*/0);
                 Integer whitelevel = c.get(CameraCharacteristics.SENSOR_INFO_WHITE_LEVEL);
