@@ -143,6 +143,7 @@ class TestResults extends AbstractXmlPullParser {
 
         serializer.startTag(ns, "Cts");
         serializer.attribute(ns, "version", CtsBuildProvider.CTS_BUILD_VERSION);
+        serializer.attribute(ns, "build", CtsBuildProvider.getBuildNumber());
         // TODO: consider outputting other tradefed options here
         serializer.startTag(ns, "IntValue");
         serializer.attribute(ns, "name", "testStatusTimeoutMs");
