@@ -294,6 +294,10 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                     "testPrimaryProfileEnterprisePhoneLookupDuplicated_canAccessPrimaryContact",
                     0));
 
+            // Make sure SIP enterprise lookup works too.
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
+                    "testPrimaryProfileEnterpriseSipLookup_canAccessEnterpriseContact", 0));
+
             // Managed user cannot use ordinary phone/email lookup api to access primary contacts
             assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
                     "testManagedProfilePhoneLookup_canNotAccessPrimaryContact", mUserId));
