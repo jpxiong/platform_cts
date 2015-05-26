@@ -31,11 +31,13 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 import android.test.AndroidTestCase;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,20 +51,26 @@ public class ContactsTest extends AndroidTestCase {
     private static final String PRIMARY_CONTACT_DISPLAY_NAME = "Primary";
     private static final String PRIMARY_CONTACT_PHONE = "00000001";
     private static final String PRIMARY_CONTACT_EMAIL = "one@primary.com";
+    private static final String PRIMARY_CONTACT_SIP = "foo@sip";
+
     // details of a sample managed contact
     private static final String MANAGED_CONTACT_DISPLAY_NAME = "Managed";
     private static final String MANAGED_CONTACT_PHONE = "6891999";
     private static final String MANAGED_CONTACT_EMAIL = "one@managed.com";
+    private static final String MANAGED_CONTACT_SIP = "bar@sip";
+
     // details of a sample primary and a sample managed contact, with the same phone & email
     private static final String PRIMARY_CONTACT_DISPLAY_NAME_2 = "PrimaryShared";
     private static final String MANAGED_CONTACT_DISPLAY_NAME_2 = "ManagedShared";
     private static final String SHARED_CONTACT_PHONE = "00000002";
     private static final String SHARED_CONTACT_EMAIL = "shared@shared.com";
+    private static final String SHARED_CONTACT_SIP = "baz@sip";
 
     private DevicePolicyManager mDevicePolicyManager;
     private ContentResolver mResolver;
 
-    private static class ContactInfo {
+    private class ContactInfo { // Not static to access outer world.
+
         String contactId;
         String displayName;
         String photoUri;
@@ -78,8 +86,14 @@ public class ContactsTest extends AndroidTestCase {
             this.photoId = photoId;
         }
 
-        private boolean hasPhotoUri() {
-            return photoUri != null && photoThumbnailUri != null;
+        private void assertNoPhotoUri() {
+            assertNull(photoUri);
+            assertNull(photoThumbnailUri);
+        }
+
+        private void assertPhotoUrisReadable() throws IOException {
+            assertPhotoUriReadable(photoUri);
+            assertPhotoUriReadable(photoThumbnailUri);
         }
 
         private boolean hasPhotoId() {
@@ -100,19 +114,19 @@ public class ContactsTest extends AndroidTestCase {
         assertFalse(isManagedProfile());
         // Do not insert to primary contact
         insertContact(PRIMARY_CONTACT_DISPLAY_NAME, PRIMARY_CONTACT_PHONE,
-                PRIMARY_CONTACT_EMAIL, 0);
+                PRIMARY_CONTACT_EMAIL, PRIMARY_CONTACT_SIP, 0);
 
         ContactInfo contactInfo = getContactInfo(PRIMARY_CONTACT_PHONE);
         assertNotNull(contactInfo);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
 
         contactInfo = getContactInfoFromEmail(PRIMARY_CONTACT_EMAIL);
         assertNotNull(contactInfo);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
 
@@ -125,19 +139,20 @@ public class ContactsTest extends AndroidTestCase {
         insertContact(MANAGED_CONTACT_DISPLAY_NAME,
                 MANAGED_CONTACT_PHONE,
                 MANAGED_CONTACT_EMAIL,
+                MANAGED_CONTACT_SIP,
                 com.android.cts.managedprofile.R.raw.ic_contact_picture);
 
         ContactInfo contactInfo = getContactInfo(MANAGED_CONTACT_PHONE);
         assertNotNull(contactInfo);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
 
         contactInfo = getContactInfoFromEmail(MANAGED_CONTACT_EMAIL);
         assertNotNull(contactInfo);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -145,21 +160,23 @@ public class ContactsTest extends AndroidTestCase {
     public void testPrimaryProfileDuplicatedPhoneEmailContact_insertedAndfound() throws
             RemoteException, OperationApplicationException, NotFoundException, IOException {
         assertFalse(isManagedProfile());
-        insertContact(PRIMARY_CONTACT_DISPLAY_NAME_2, SHARED_CONTACT_PHONE,
+        insertContact(PRIMARY_CONTACT_DISPLAY_NAME_2,
+                SHARED_CONTACT_PHONE,
                 SHARED_CONTACT_EMAIL,
+                SHARED_CONTACT_SIP,
                 com.android.cts.managedprofile.R.raw.ic_contact_picture);
 
         ContactInfo contactInfo = getContactInfo(SHARED_CONTACT_PHONE);
         assertNotNull(contactInfo);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
 
         contactInfo = getContactInfoFromEmail(SHARED_CONTACT_EMAIL);
         assertNotNull(contactInfo);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -168,57 +185,73 @@ public class ContactsTest extends AndroidTestCase {
             RemoteException, OperationApplicationException, NotFoundException, IOException {
         assertTrue(isManagedProfile());
         insertContact(MANAGED_CONTACT_DISPLAY_NAME_2, SHARED_CONTACT_PHONE,
-                SHARED_CONTACT_EMAIL, 0);
+                SHARED_CONTACT_EMAIL, SHARED_CONTACT_SIP , 0);
 
         ContactInfo contactInfo = getContactInfo(SHARED_CONTACT_PHONE);
         assertNotNull(contactInfo);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
 
         contactInfo = getContactInfoFromEmail(SHARED_CONTACT_EMAIL);
         assertNotNull(contactInfo);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testPrimaryProfileEnterprisePhoneLookup_canAccessEnterpriseContact() {
+    public void testPrimaryProfileEnterprisePhoneLookup_canAccessEnterpriseContact()
+            throws IOException {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfo(MANAGED_CONTACT_PHONE);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         // Cannot get photo id in ENTERPRISE_CONTENT_FILTER_URI
         assertFalse(contactInfo.hasPhotoId());
         assertTrue(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testPrimaryProfileEnterpriseEmailLookup_canAccessEnterpriseContact() {
+    public void testPrimaryProfileEnterpriseSipLookup_canAccessEnterpriseContact()
+            throws IOException {
+        assertFalse(isManagedProfile());
+        ContactInfo contactInfo = getEnterpriseContactInfoFromSipAddress(MANAGED_CONTACT_SIP);
+        assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
+        contactInfo.assertPhotoUrisReadable();
+        assertFalse(contactInfo.hasPhotoId());
+
+        // Quirk: the _id column from the SIP lookup is actually of the data id, not the contact id.
+        // assertTrue(isEnterpriseContactId(contactInfo.contactId));
+    }
+
+    public void testPrimaryProfileEnterpriseEmailLookup_canAccessEnterpriseContact()
+            throws IOException {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfoFromEmail(MANAGED_CONTACT_EMAIL);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         // Cannot get photo id in ENTERPRISE_CONTENT_FILTER_URI
         assertFalse(contactInfo.hasPhotoId());
         assertTrue(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testPrimaryProfileEnterprisePhoneLookupDuplicated_canAccessPrimaryContact() {
+    public void testPrimaryProfileEnterprisePhoneLookupDuplicated_canAccessPrimaryContact()
+            throws IOException {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfo(SHARED_CONTACT_PHONE);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testPrimaryProfileEnterpriseEmailLookupDuplicated_canAccessPrimaryContact() {
+    public void testPrimaryProfileEnterpriseEmailLookupDuplicated_canAccessPrimaryContact()
+            throws IOException {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfoFromEmail(SHARED_CONTACT_EMAIL);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -227,7 +260,7 @@ public class ContactsTest extends AndroidTestCase {
         assertTrue(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfo(SHARED_CONTACT_PHONE);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -236,11 +269,10 @@ public class ContactsTest extends AndroidTestCase {
         assertTrue(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfoFromEmail(SHARED_CONTACT_EMAIL);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME_2, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
-
 
     public void testPrimaryProfilePhoneLookup_canNotAccessEnterpriseContact() {
         assertFalse(isManagedProfile());
@@ -258,7 +290,7 @@ public class ContactsTest extends AndroidTestCase {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfo(PRIMARY_CONTACT_PHONE);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -267,25 +299,27 @@ public class ContactsTest extends AndroidTestCase {
         assertFalse(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfoFromEmail(PRIMARY_CONTACT_EMAIL);
         assertEquals(PRIMARY_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertFalse(contactInfo.hasPhotoUri());
+        contactInfo.assertNoPhotoUri();
         assertFalse(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testManagedProfileEnterprisePhoneLookup_canAccessEnterpriseContact() {
+    public void testManagedProfileEnterprisePhoneLookup_canAccessEnterpriseContact()
+            throws IOException {
         assertTrue(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfo(MANAGED_CONTACT_PHONE);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
 
-    public void testManagedProfileEnterpriseEmailLookup_canAccessEnterpriseContact() {
+    public void testManagedProfileEnterpriseEmailLookup_canAccessEnterpriseContact()
+            throws IOException {
         assertTrue(isManagedProfile());
         ContactInfo contactInfo = getEnterpriseContactInfoFromEmail(MANAGED_CONTACT_EMAIL);
         assertEquals(MANAGED_CONTACT_DISPLAY_NAME, contactInfo.displayName);
-        assertTrue(contactInfo.hasPhotoUri());
+        contactInfo.assertPhotoUrisReadable();
         assertTrue(contactInfo.hasPhotoId());
         assertFalse(isEnterpriseContactId(contactInfo.contactId));
     }
@@ -358,12 +392,8 @@ public class ContactsTest extends AndroidTestCase {
         return mDevicePolicyManager.isProfileOwnerApp(adminPackage);
     }
 
-    private void insertContact(String displayName, String phoneNumber, int photoResId) throws
-            RemoteException, OperationApplicationException, NotFoundException, IOException {
-        insertContact(displayName, phoneNumber, null, photoResId);
-    }
-
-    private void insertContact(String displayName, String phoneNumber, String email, int photoResId)
+    private void insertContact(String displayName, String phoneNumber, String email,
+            String sipAddress, int photoResId)
             throws RemoteException, OperationApplicationException, NotFoundException, IOException {
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         ops.add(ContentProviderOperation
@@ -403,26 +433,50 @@ public class ContactsTest extends AndroidTestCase {
                 .withValue(ContactsContract.CommonDataKinds.Email.TYPE,
                         Email.TYPE_WORK)
                 .build());
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.SipAddress.SIP_ADDRESS,
+                        sipAddress)
+                .withValue(ContactsContract.CommonDataKinds.SipAddress.TYPE,
+                        ContactsContract.CommonDataKinds.SipAddress.TYPE_WORK)
+                .build());
 
         if (photoResId != 0) {
             InputStream phoneInputStream = mContext.getResources().openRawResource(photoResId);
-            byte[] rawPhoto = getByteFromStream(phoneInputStream);
-            ops.add(ContentProviderOperation
-                    .newInsert(ContactsContract.Data.CONTENT_URI)
-                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                    .withValue(
-                            ContactsContract.Data.MIMETYPE,
-                            ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
-                    .withValue(Photo.PHOTO, rawPhoto)
-                    .build());
+            try {
+                byte[] rawPhoto = getByteFromStream(phoneInputStream);
+                ops.add(ContentProviderOperation
+                        .newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(
+                                ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+                        .withValue(Photo.PHOTO, rawPhoto)
+                        .build());
+            } finally {
+                phoneInputStream.close();
+            }
         }
 
         mResolver.applyBatch(ContactsContract.AUTHORITY, ops);
     }
 
     private ContactInfo getContactInfoFromUri(Uri phoneLookupUri, String phoneNumber) {
-        Uri uri = Uri.withAppendedPath(phoneLookupUri,
-                Uri.encode(phoneNumber));
+        return getContactInfoFromPhoneLookup(Uri.withAppendedPath(phoneLookupUri,
+                        Uri.encode(phoneNumber)), /* forSip =*/ false);
+    }
+
+    private ContactInfo getContactInfoFromSipUri(Uri phoneLookupUri, String sipAddress) {
+        return getContactInfoFromPhoneLookup(
+                phoneLookupUri.buildUpon().appendEncodedPath(sipAddress).appendQueryParameter(
+                        PhoneLookup.QUERY_PARAMETER_SIP_ADDRESS, "1").build(), /* forSip =*/ true);
+    }
+
+    private ContactInfo getContactInfoFromPhoneLookup(Uri uri, boolean isForSip) {
         Cursor cursor = mResolver.query(uri,
                 new String[] {
                         PhoneLookup._ID, PhoneLookup.DISPLAY_NAME, PhoneLookup.PHOTO_URI,
@@ -490,6 +544,11 @@ public class ContactsTest extends AndroidTestCase {
                 phoneNumber);
     }
 
+    private ContactInfo getEnterpriseContactInfoFromSipAddress(String phoneNumber) {
+        return getContactInfoFromSipUri(PhoneLookup.ENTERPRISE_CONTENT_FILTER_URI,
+                phoneNumber);
+    }
+
     private ContactInfo getEnterpriseContactInfoFromEmail(String email) {
         return getContactInfoFromEmailUri(Email.ENTERPRISE_CONTENT_LOOKUP_URI, email);
     }
@@ -519,5 +578,19 @@ public class ContactsTest extends AndroidTestCase {
 
     private boolean isEnterpriseContactId(String contactId) {
         return ContactsContract.Contacts.isEnterpriseContactId(Long.valueOf(contactId));
+    }
+
+    private void assertPhotoUriReadable(String uri) throws IOException {
+        assertNotNull(uri);
+        final InputStream is = mResolver.openInputStream(Uri.parse(uri));
+        try {
+            // Make sure it's readabe.  Don't have to read all content.
+            is.read();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 }
