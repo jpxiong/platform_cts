@@ -32,6 +32,7 @@ public class CtsBuildProvider implements IBuildProvider {
     private String mCtsRootDirPath = System.getProperty("CTS_ROOT");
 
     public static final String CTS_BUILD_VERSION = "5.0_r1.91";
+    public static final String CTS_PACKAGE = "com.android.cts.tradefed.testtype";
 
     /**
      * {@inheritDoc}
@@ -44,6 +45,10 @@ public class CtsBuildProvider implements IBuildProvider {
         IFolderBuildInfo ctsBuild = new FolderBuildInfo(CTS_BUILD_VERSION, "cts", "cts");
         ctsBuild.setRootDir(new File(mCtsRootDirPath));
         return ctsBuild;
+    }
+
+    public static String getBuildNumber() {
+        return Package.getPackage(CTS_PACKAGE).getImplementationVersion();
     }
 
     /**
