@@ -101,7 +101,8 @@ public class VectorDrawableTest extends AndroidTestCase {
     // exactly with the golden image.
     // We can increase the threshold if the Skia is drawing with some variance
     // on different devices. So far, the tests show they are matching correctly.
-    private static final float PIXEL_ERROR_THRESHOLD = 0.00001f;
+    private static final float PIXEL_ERROR_THRESHOLD = 0.02f;
+    private static final float PIXEL_ERROR_COUNT_THRESHOLD = 0.005f;
 
     private static final boolean DBG_DUMP_PNG = false;
 
@@ -220,7 +221,7 @@ public class VectorDrawableTest extends AndroidTestCase {
                 totalDiffPixelCount++;
             }
         }
-        if ((totalDiffPixelCount / totalPixelCount) >= PIXEL_ERROR_THRESHOLD) {
+        if ((totalDiffPixelCount / totalPixelCount) >= PIXEL_ERROR_COUNT_THRESHOLD) {
             fail((filename +": totalDiffPixelCount is " + totalDiffPixelCount));
         }
 
