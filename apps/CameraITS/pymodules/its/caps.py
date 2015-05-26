@@ -257,6 +257,32 @@ def awb_lock(props):
     return props.has_key("android.control.awbLockAvailable") and \
            props["android.control.awbLockAvailable"] == 1
 
+def lsc_map(props):
+    """Returns whether a device supports lens shading map output
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key(
+            "android.statistics.info.availableLensShadingMapModes") and \
+        1 in props["android.statistics.info.availableLensShadingMapModes"]
+
+def lsc_off(props):
+    """Returns whether a device supports disabling lens shading correction
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key(
+            "android.shading.availableModes") and \
+        0 in props["android.shading.availableModes"]
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
