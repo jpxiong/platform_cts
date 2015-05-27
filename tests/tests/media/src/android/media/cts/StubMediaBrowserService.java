@@ -16,11 +16,13 @@
 
 package android.media.cts;
 
+import android.media.MediaDescription;
 import android.media.browse.MediaBrowser.MediaItem;
 import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +32,10 @@ public class StubMediaBrowserService extends MediaBrowserService {
     static final String MEDIA_ID_ROOT = "test_media_id_root";
     static final String EXTRAS_KEY = "test_extras_key";
     static final String EXTRAS_VALUE = "test_extras_value";
+    static final String[] MEDIA_ID_CHILDREN = new String[] {
+        "test_media_id_children_0", "test_media_id_children_1",
+        "test_media_id_children_2", "test_media_id_children_3"
+    };
 
     /* package private */ static MediaSession sSession;
     private Bundle mExtras;
@@ -50,5 +56,13 @@ public class StubMediaBrowserService extends MediaBrowserService {
 
     @Override
     public void onLoadChildren(final String parentMediaId, final Result<List<MediaItem>> result) {
+        List<MediaItem> mediaItems = new ArrayList<>();
+        if (MEDIA_ID_ROOT.equals(parentMediaId)) {
+            for (String id : MEDIA_ID_CHILDREN) {
+                mediaItems.add(new MediaItem(new MediaDescription.Builder()
+                        .setMediaId(id).build(), MediaItem.FLAG_BROWSABLE));
+            }
+        }
+        result.sendResult(mediaItems);
     }
 }
