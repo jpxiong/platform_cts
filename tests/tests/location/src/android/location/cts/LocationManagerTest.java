@@ -16,7 +16,6 @@
 
 package android.location.cts;
 
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -37,7 +36,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.test.InstrumentationTestCase;
 import android.test.UiThreadTest;
 
 import java.util.List;
@@ -49,7 +47,7 @@ import java.util.List;
  * android.permission.ACCESS_FINE_LOCATION to access GPS provider
  * android.permission.ACCESS_LOCATION_EXTRA_COMMANDS to send extra commands to GPS provider
  */
-public class LocationManagerTest extends InstrumentationTestCase {
+public class LocationManagerTest extends BaseMockLocationTest {
     private static final long TEST_TIME_OUT = 5000;
 
     private static final String TEST_MOCK_PROVIDER_NAME = "test_provider";
@@ -72,13 +70,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getTargetContext();
 
         mManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-
-        // test that mock locations are allowed so a more descriptive error message can be logged
-        if (Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.ALLOW_MOCK_LOCATION, 0) == 0) {
-            fail("Mock locations are currently disabled in Settings - this test requires "
-                    + "mock locations");
-        }
 
         // remove test provider if left over from an aborted run
         LocationProvider lp = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
