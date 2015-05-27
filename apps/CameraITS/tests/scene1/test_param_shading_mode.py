@@ -35,10 +35,16 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
 
-        its.caps.skip_unless(its.caps.per_frame_control(props))
+        its.caps.skip_unless(its.caps.per_frame_control(props) and
+                             its.caps.lsc_map(props) and
+                             its.caps.lsc_off(props))
 
         assert(props.has_key("android.lens.info.shadingMapSize") and
                props["android.lens.info.shadingMapSize"] != None)
+
+        # lsc_off devices should always support OFF(0), FAST(1), and HQ(2)
+        assert(props.has_key("android.shading.availableModes") and
+               set(props["android.shading.availableModes"]) == set([0, 1, 2]))
 
         num_map_gains = props["android.lens.info.shadingMapSize"]["width"] * \
                         props["android.lens.info.shadingMapSize"]["height"] * 4
