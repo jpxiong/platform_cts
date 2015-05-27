@@ -29,6 +29,7 @@ import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.test.AndroidTestCase;
 
 import java.util.ArrayList;
@@ -57,6 +58,26 @@ public class MediaSessionTest extends AndroidTestCase {
         MediaController controller = session.getController();
         assertNotNull(controller);
         verifyNewSession(controller, tag);
+    }
+
+    /**
+     * Tests MediaSession.Token created in the constructor of MediaSession.
+     */
+    public void testSessionToken() throws Exception {
+        String tag = "test session";
+        MediaSession session = new MediaSession(getContext(), tag);
+        MediaSession.Token sessionToken = session.getSessionToken();
+
+        assertNotNull(sessionToken);
+        assertEquals(0, sessionToken.describeContents());
+
+        // Test writeToParcel
+        Parcel p = Parcel.obtain();
+        sessionToken.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        MediaSession.Token token = MediaSession.Token.CREATOR.createFromParcel(p);
+        assertEquals(token, sessionToken);
+        p.recycle();
     }
 
     /**
