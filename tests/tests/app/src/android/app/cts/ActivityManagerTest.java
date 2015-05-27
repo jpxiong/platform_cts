@@ -29,8 +29,10 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Instrumentation.ActivityMonitor;
 import android.app.Instrumentation.ActivityResult;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ConfigurationInfo;
 import android.test.InstrumentationTestCase;
 
@@ -39,6 +41,17 @@ public class ActivityManagerTest extends InstrumentationTestCase {
     private static final int WAITFOR_MSEC = 5000;
     private static final String SERVICE_NAME = "android.app.cts.MockService";
     private static final int WAIT_TIME = 2000;
+    // A secondary test activity from another APK.
+    private static final String SIMPLE_PACKAGE_NAME = "com.android.cts.launcherapps.simpleapp";
+    private static final String SIMPLE_ACTIVITY = ".SimpleActivity";
+    // The action sent back by the SIMPLE_APP after a restart.
+    private static final String ACTIVITY_LAUNCHED_ACTION =
+            "com.android.cts.launchertests.LauncherAppsTests.LAUNCHED_ACTION";
+
+    public static final int RESULT_PASS = 1;
+    public static final int RESULT_FAIL = 2;
+    public static final int RESULT_TIMEOUT = 3;
+
     private Context mContext;
     private ActivityManager mActivityManager;
     private Intent mIntent;
@@ -116,6 +129,57 @@ public class ActivityManagerTest extends InstrumentationTestCase {
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // expected exception
+        }
+    }
+
+    public void testGetRecentTasksLimitedToCurrentAPK() throws Exception {
+        int maxNum = 0;
+        int flags = 0;
+
+        // Check the number of tasks at this time.
+        List<RecentTaskInfo>  recentTaskList;
+        recentTaskList = mActivityManager.getRecentTasks(maxNum, flags);
+        int numberOfEntriesFirstRun = recentTaskList.size();
+
+        // Start another activity from another APK.
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName(SIMPLE_PACKAGE_NAME, SIMPLE_PACKAGE_NAME + SIMPLE_ACTIVITY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ActivityLaunchedReceiver receiver = new ActivityLaunchedReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTIVITY_LAUNCHED_ACTION);
+        mInstrumentation.getTargetContext().registerReceiver(receiver, filter);
+        mContext.startActivity(intent);
+
+        // Make sure the activity has really started.
+        assertEquals(RESULT_PASS, receiver.waitForActivity());
+        mInstrumentation.getTargetContext().unregisterReceiver(receiver);
+
+        // There shouldn't be any more tasks in this list at this time.
+        recentTaskList = mActivityManager.getRecentTasks(maxNum, flags);
+        int numberOfEntriesSecondRun = recentTaskList.size();
+        assertTrue(numberOfEntriesSecondRun == numberOfEntriesFirstRun);
+    }
+
+    private static class ActivityLaunchedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ACTIVITY_LAUNCHED_ACTION)) {
+                synchronized(this) {
+                   notifyAll();
+                }
+            }
+        }
+
+        public int waitForActivity() {
+            synchronized(this) {
+                try {
+                    wait(5000);
+                    return RESULT_PASS;
+                } catch (InterruptedException e) {
+                }
+            }
+            return RESULT_TIMEOUT;
         }
     }
 
