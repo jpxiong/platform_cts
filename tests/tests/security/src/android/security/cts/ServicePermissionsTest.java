@@ -99,7 +99,8 @@ public class ServicePermissionsTest extends AndroidTestCase {
             try {
                 serviceBinder.dump(out.getFD(), new String[0]);
             } catch (SecurityException e) {
-                if (e.getMessage().contains("android.permission.DUMP")) {
+                String msg = e.getMessage();
+                if ((msg == null) || msg.contains("android.permission.DUMP")) {
                     // Service correctly checked for DUMP permission, yay
                 } else {
                     // Service is throwing about something else; they're
