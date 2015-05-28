@@ -345,7 +345,7 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // exercising the underlying PhoneNumberUtil or constraining localization changes.
         Spannable spannable = new SpannableString("Hello 6502223333");
         // Execute
-        PhoneNumberUtils.addPhoneTtsSpan(spannable, 5, spannable.length() - 1);
+        PhoneNumberUtils.addPhoneTtsSpan(spannable, 5, spannable.length());
         // Verify: the Spannable is annotated with a TtsSpan in the correct location.
         TtsSpan[] ttsSpans = spannable.getSpans(5, spannable.length() - 1, TtsSpan.class);
         assertEquals(1, ttsSpans.length);
