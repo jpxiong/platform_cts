@@ -21,6 +21,7 @@ import com.android.cts.graphics.R;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
@@ -28,6 +29,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.graphics.drawable.ScaleDrawable;
@@ -275,19 +277,23 @@ public class ScaleDrawableTest extends AndroidTestCase {
     }
 
     public void testOnStateChange() {
-        MockDrawable mockDrawable = new MockDrawable();
-        MockScaleDrawable mockScaleDrawable = new MockScaleDrawable(
-                mockDrawable, Gravity.CENTER, 100, 200);
+        Drawable d = new MockDrawable();
+        MockScaleDrawable scaleDrawable = new MockScaleDrawable(d, Gravity.CENTER, 100, 200);
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
 
-        assertFalse(mockScaleDrawable.onStateChange(StateSet.WILD_CARD));
-        assertTrue(mockDrawable.hasCalledSetState());
-        assertTrue(mockScaleDrawable.hasCalledOnBoundsChange());
+        int[] state = new int[] {1, 2, 3};
+        assertFalse("child did not change", scaleDrawable.onStateChange(state));
+        assertEquals("child state did not change", d.getState(), StateSet.WILD_CARD);
 
-        mockDrawable.reset();
-        mockScaleDrawable.reset();
-        assertFalse(mockScaleDrawable.onStateChange(null));
-        assertTrue(mockDrawable.hasCalledSetState());
-        assertTrue(mockScaleDrawable.hasCalledOnBoundsChange());
+        d = mContext.getDrawable(R.drawable.statelistdrawable);
+        scaleDrawable = new MockScaleDrawable(d, Gravity.CENTER, 100, 200);
+        assertEquals("initial child state is empty", d.getState(), StateSet.WILD_CARD);
+        scaleDrawable.onStateChange(state);
+        assertTrue("child state changed", Arrays.equals(state, d.getState()));
+
+        // input null as param
+        scaleDrawable.onStateChange(null);
+        // expected, no Exception thrown out, test success
     }
 
     public void testOnLevelChange() {
@@ -413,25 +419,25 @@ public class ScaleDrawableTest extends AndroidTestCase {
         parser = res.getXml(R.xml.scaledrawable);
         attrs = DrawableTestUtils.getAttributeSet(parser, "scale_nodrawable");
         try {
-            scaleDrawable.inflate(res, parser, attrs);
-            fail("Should throw XmlPullParserException");
+            Drawable.createFromXmlInner(res, parser, attrs);
+            fail("Should throw XmlPullParserException if missing drawable");
         } catch (XmlPullParserException e) {
         }
 
         try {
-            scaleDrawable.inflate(null, parser, attrs);
+            Drawable.createFromXmlInner(null, parser, attrs);
             fail("Should throw NullPointerException if resource is null");
         } catch (NullPointerException e) {
         }
 
         try {
-            scaleDrawable.inflate(res, null, attrs);
+            Drawable.createFromXmlInner(res, null, attrs);
             fail("Should throw NullPointerException if parser is null");
         } catch (NullPointerException e) {
         }
 
         try {
-            scaleDrawable.inflate(res, parser, null);
+            Drawable.createFromXmlInner(res, parser, null);
             fail("Should throw NullPointerException if attribute set is null");
         } catch (NullPointerException e) {
         }

@@ -189,8 +189,7 @@ public class PopupWindowTest extends
 
     public void testAccessHeight() {
         mPopupWindow = new PopupWindow(mActivity);
-        // default is 0
-        assertEquals(0, mPopupWindow.getHeight());
+        assertEquals(WindowManager.LayoutParams.WRAP_CONTENT, mPopupWindow.getHeight());
 
         int height = getDisplay().getHeight() / 2;
         mPopupWindow.setHeight(height);
@@ -224,7 +223,7 @@ public class PopupWindowTest extends
 
     public void testAccessWidth() {
         mPopupWindow = new PopupWindow(mActivity);
-        assertEquals(0, mPopupWindow.getWidth());
+        assertEquals(WindowManager.LayoutParams.WRAP_CONTENT, mPopupWindow.getWidth());
 
         int width = getDisplay().getWidth() / 2;
         mPopupWindow.setWidth(width);
@@ -418,7 +417,7 @@ public class PopupWindowTest extends
         mPopupWindow.setOutsideTouchable(true);
 
         WindowManager.LayoutParams p = (WindowManager.LayoutParams)
-                mPopupWindow.getContentView().getLayoutParams();
+                mPopupWindow.getContentView().getRootView().getLayoutParams();
 
         assertEquals(0, WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES & p.flags);
         assertEquals(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -748,7 +747,7 @@ public class PopupWindowTest extends
         mPopupWindow = new PopupWindow(new TextView(mActivity));
         showPopup();
 
-        ViewGroup.LayoutParams p = mPopupWindow.getContentView().getLayoutParams();
+        ViewGroup.LayoutParams p = mPopupWindow.getContentView().getRootView().getLayoutParams();
         assertEquals(0, p.width);
         assertEquals(0, p.height);
 
