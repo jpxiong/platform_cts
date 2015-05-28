@@ -29,6 +29,9 @@ import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
@@ -36,12 +39,20 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class MediaSessionTest extends AndroidTestCase {
+    // The maximum time to wait for an operation.
+    private static final long TIME_OUT_MS = 5000L;
+    private static final String SESSION_TAG = "test-session";
+    private static final String EXTRAS_KEY = "test-key";
+    private static final String EXTRAS_VALUE = "test-val";
+    private static final String SESSION_EVENT = "test-session-event";
+
     private AudioManager mAudioManager;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
     }
 
     /**
@@ -49,23 +60,21 @@ public class MediaSessionTest extends AndroidTestCase {
      * initialized correctly.
      */
     public void testCreateSession() throws Exception {
-        String tag = "test session";
-        MediaSession session = new MediaSession(getContext(), tag);
+        MediaSession session = new MediaSession(getContext(), SESSION_TAG);
         assertNotNull(session.getSessionToken());
         assertFalse("New session should not be active", session.isActive());
 
         // Verify by getting the controller and checking all its fields
         MediaController controller = session.getController();
         assertNotNull(controller);
-        verifyNewSession(controller, tag);
+        verifyNewSession(controller, SESSION_TAG);
     }
 
     /**
      * Tests MediaSession.Token created in the constructor of MediaSession.
      */
     public void testSessionToken() throws Exception {
-        String tag = "test session";
-        MediaSession session = new MediaSession(getContext(), tag);
+        MediaSession session = new MediaSession(getContext(), SESSION_TAG);
         MediaSession.Token sessionToken = session.getSessionToken();
 
         assertNotNull(sessionToken);
@@ -85,30 +94,28 @@ public class MediaSessionTest extends AndroidTestCase {
      * controller.
      */
     public void testConfigureSession() throws Exception {
-        String tag = "test session";
-        String key = "test-key";
-        String val = "test-val";
-        MediaSession session = new MediaSession(getContext(), tag);
+        MediaSession session = new MediaSession(getContext(), SESSION_TAG);
         MediaController controller = session.getController();
 
         // test setExtras
         Bundle extras = new Bundle();
-        extras.putString(key, val);
+        extras.putString(EXTRAS_KEY, EXTRAS_VALUE);
         session.setExtras(extras);
         Bundle extrasOut = controller.getExtras();
         assertNotNull(extrasOut);
-        assertEquals(val, extrasOut.get(key));
+        assertEquals(EXTRAS_VALUE, extrasOut.get(EXTRAS_KEY));
 
         // test setFlags
         session.setFlags(5);
         assertEquals(5, controller.getFlags());
 
         // test setMetadata
-        MediaMetadata metadata = new MediaMetadata.Builder().putString(key, val).build();
+        MediaMetadata metadata =
+                new MediaMetadata.Builder().putString(EXTRAS_KEY, EXTRAS_VALUE).build();
         session.setMetadata(metadata);
         MediaMetadata metadataOut = controller.getMetadata();
         assertNotNull(metadataOut);
-        assertEquals(val, metadataOut.getString(key));
+        assertEquals(EXTRAS_VALUE, metadataOut.getString(EXTRAS_KEY));
 
         // test setPlaybackState
         PlaybackState state = new PlaybackState.Builder().setActions(55).build();
@@ -135,27 +142,27 @@ public class MediaSessionTest extends AndroidTestCase {
         assertEquals(VolumeProvider.VOLUME_CONTROL_FIXED, info.getVolumeControl());
 
         // test setPlaybackToLocal
-        AudioAttributes attrs = new AudioAttributes.Builder().addTag(val).build();
+        AudioAttributes attrs = new AudioAttributes.Builder().addTag(EXTRAS_VALUE).build();
         session.setPlaybackToLocal(attrs);
         info = controller.getPlaybackInfo();
         assertNotNull(info);
         assertEquals(MediaController.PlaybackInfo.PLAYBACK_TYPE_LOCAL, info.getPlaybackType());
         Set<String> tags = info.getAudioAttributes().getTags();
         assertNotNull(tags);
-        assertTrue(tags.contains(val));
+        assertTrue(tags.contains(EXTRAS_VALUE));
 
         // test setQueue and setQueueTitle
         ArrayList<MediaSession.QueueItem> queue = new ArrayList<MediaSession.QueueItem>();
         MediaSession.QueueItem item = new MediaSession.QueueItem(new MediaDescription.Builder()
-                .setMediaId(val).setTitle("title").build(), 11);
+                .setMediaId(EXTRAS_VALUE).setTitle("title").build(), 11);
         queue.add(item);
         session.setQueue(queue);
-        session.setQueueTitle(val);
+        session.setQueueTitle(EXTRAS_VALUE);
 
-        assertEquals(val, controller.getQueueTitle());
+        assertEquals(EXTRAS_VALUE, controller.getQueueTitle());
         assertEquals(1, controller.getQueue().size());
         assertEquals(11, controller.getQueue().get(0).getQueueId());
-        assertEquals(val, controller.getQueue().get(0).getDescription().getMediaId());
+        assertEquals(EXTRAS_VALUE, controller.getQueue().get(0).getDescription().getMediaId());
 
         session.setQueue(null);
         session.setQueueTitle(null);
@@ -168,6 +175,24 @@ public class MediaSessionTest extends AndroidTestCase {
         PendingIntent pi = PendingIntent.getActivity(getContext(), 555, intent, 0);
         session.setSessionActivity(pi);
         assertEquals(pi, controller.getSessionActivity());
+    }
+
+    public void testSendSessionEvent() throws Exception {
+        MediaSession session = new MediaSession(getContext(), SESSION_TAG);
+        MediaController controller = new MediaController(getContext(), session.getSessionToken());
+        Object lock = new Object();
+        MediaControllerCallback callback = new MediaControllerCallback(lock);
+        controller.registerCallback(callback, mHandler);
+
+        Bundle extras = new Bundle();
+        extras.putString(EXTRAS_KEY, EXTRAS_VALUE);
+
+        synchronized (lock) {
+            session.sendSessionEvent(SESSION_EVENT, extras);
+            lock.wait(TIME_OUT_MS);
+            assertEquals(SESSION_EVENT, callback.mEvent);
+            assertEquals(EXTRAS_VALUE, callback.mExtras.getString(EXTRAS_KEY));
+        }
     }
 
     /**
@@ -200,5 +225,24 @@ public class MediaSessionTest extends AndroidTestCase {
         assertEquals(AudioAttributes.USAGE_MEDIA, attrs.getUsage());
         assertEquals(mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
                 info.getCurrentVolume());
+    }
+
+    private class MediaControllerCallback extends MediaController.Callback {
+        private Object mLock;
+        private String mEvent;
+        private Bundle mExtras;
+
+        MediaControllerCallback(Object lock) {
+            mLock = lock;
+        }
+
+        @Override
+        public void onSessionEvent(String event, Bundle extras) {
+            synchronized (mLock) {
+                mEvent = event;
+                mExtras = (Bundle) extras.clone();
+                mLock.notify();
+            }
+        }
     }
 }
