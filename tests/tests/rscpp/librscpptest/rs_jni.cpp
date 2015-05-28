@@ -51,6 +51,18 @@ void aligned_free(void * memblk) {
     }
 }
 
+sp<const Element> makeElement(sp<RS> rs, RsDataType dt, int vecSize) {
+    if (vecSize > 1) {
+        return Element::createVector(rs, dt, vecSize);
+    } else {
+        if (dt == RS_TYPE_UNSIGNED_8) {
+            return Element::U8(rs);
+        } else {
+            return Element::F32(rs);
+        }
+    }
+}
+
 extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSInitTest_initTest(JNIEnv * env,
                                                                                  jclass obj,
                                                                                  jstring pathObj)
@@ -366,6 +378,66 @@ Java_android_cts_rscpp_RSBlendTest_blendTest(JNIEnv * env, jclass obj, jstring p
 
     env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
     env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    env->ReleaseStringUTFChars(pathObj, path);
+    return (rs->getError() == RS_SUCCESS);
+
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSResizeTest_resizeTest(JNIEnv * env,
+                                                                                     jclass obj,
+                                                                                     jstring pathObj,
+                                                                                     jint X,
+                                                                                     jint Y,
+                                                                                     jfloat scaleX,
+                                                                                     jfloat scaleY,
+                                                                                     jboolean useByte,
+                                                                                     jint vecSize,
+                                                                                     jbyteArray inputByteArray,
+                                                                                     jbyteArray outputByteArray,
+                                                                                     jfloatArray inputFloatArray,
+                                                                                     jfloatArray outputFloatArray
+                                                                                     )
+{
+    const char * path = env->GetStringUTFChars(pathObj, NULL);
+
+    sp<RS> rs = new RS();
+    rs->init(path);
+
+    RsDataType dt = RS_TYPE_UNSIGNED_8;
+    if (!useByte) {
+        dt = RS_TYPE_FLOAT_32;
+    }
+    sp<const Element> e = makeElement(rs, dt, vecSize);
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+
+    int outX = (int) (X * scaleX);
+    int outY = (int) (Y * scaleY);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, outX, outY);
+    sp<ScriptIntrinsicResize> resize = ScriptIntrinsicResize::create(rs);
+
+    if (useByte) {
+        jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+        inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+        env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    } else {
+        jfloat * input = (jfloat *) env->GetPrimitiveArrayCritical(inputFloatArray, 0);
+        inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+        env->ReleasePrimitiveArrayCritical(inputFloatArray, input, 0);
+    }
+
+    resize->setInput(inputAlloc);
+    resize->forEach_bicubic(outputAlloc);
+
+    if (useByte) {
+        jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+        outputAlloc->copy2DRangeTo(0, 0, outX, outY, output);
+        env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    } else {
+        jfloat * output = (jfloat *) env->GetPrimitiveArrayCritical(outputFloatArray, 0);
+        outputAlloc->copy2DRangeTo(0, 0, outX, outY, output);
+        env->ReleasePrimitiveArrayCritical(outputFloatArray, output, 0);
+    }
+
     env->ReleaseStringUTFChars(pathObj, path);
     return (rs->getError() == RS_SUCCESS);
 
