@@ -20,6 +20,7 @@ import com.android.cts.media.R;
 
 import android.media.PlaybackParams;
 import android.media.SyncParams;
+import android.os.Parcel;
 import android.test.AndroidTestCase;
 
 /**
@@ -346,6 +347,28 @@ public class ParamsTest extends AndroidTestCase {
         }
     }
 
+    public void testPlaybackParamsDescribeContents() {
+        PlaybackParams p = new PlaybackParams();
+        assertEquals(0, p.describeContents());
+    }
 
+    public void testPlaybackParamsWriteToParcel() {
+        PlaybackParams p = new PlaybackParams();
+        p.setAudioFallbackMode(PlaybackParams.AUDIO_FALLBACK_MODE_FAIL);
+        p.setAudioStretchMode(PlaybackParams.AUDIO_STRETCH_MODE_VOICE);
+        p.setPitch(.5f);
+        p.setSpeed(.0001f);
+
+        Parcel parcel = Parcel.obtain();
+        p.writeToParcel(parcel, 0 /* flags */);
+        parcel.setDataPosition(0);
+        PlaybackParams q = PlaybackParams.CREATOR.createFromParcel(parcel);
+
+        assertEquals(p.getAudioFallbackMode(), q.getAudioFallbackMode());
+        assertEquals(p.getAudioStretchMode(), q.getAudioStretchMode());
+        assertEquals(p.getPitch(), q.getPitch());
+        assertEquals(p.getSpeed(), q.getSpeed());
+        parcel.recycle();
+    }
 
 }
