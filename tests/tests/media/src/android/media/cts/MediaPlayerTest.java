@@ -171,6 +171,60 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testPlayMidi() throws Exception {
+        final int resid = R.raw.midi8sec;
+        final int midiDuration = 8000;
+        final int tolerance = 70;
+        final int seekDuration = 1000;
+
+        MediaPlayer mp = MediaPlayer.create(mContext, resid);
+        try {
+            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            assertFalse(mp.isLooping());
+            mp.setLooping(true);
+            assertTrue(mp.isLooping());
+
+            assertEquals(midiDuration, mp.getDuration(), tolerance);
+            int pos = mp.getCurrentPosition();
+            assertTrue(pos >= 0);
+            assertTrue(pos < midiDuration - seekDuration);
+
+            mp.seekTo(pos + seekDuration);
+            assertEquals(pos + seekDuration, mp.getCurrentPosition(), tolerance);
+
+            // test pause and restart
+            mp.pause();
+            Thread.sleep(SLEEP_TIME);
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            // test stop and restart
+            mp.stop();
+            mp.reset();
+            AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
+            mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mp.prepare();
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            // waiting to complete
+            while(mp.isPlaying()) {
+                Thread.sleep(SLEEP_TIME);
+            }
+        } finally {
+            mp.release();
+        }
+    }
+
     public void testPlayVideo() throws Exception {
         playVideoTest(R.raw.testvideo, 352, 288);
     }
