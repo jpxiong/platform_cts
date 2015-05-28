@@ -21,9 +21,12 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_CLANG := true
 LOCAL_MODULE := librscpptest_jni
 LOCAL_MODULE_TAGS := optional
+
 LOCAL_SRC_FILES := \
     rs_jni.cpp \
     rs_jni_allocation.cpp \
+    rs_jni_element.cpp \
+    rs_jni_foreach.cpp \
     rs_jni_script.cpp \
     rs_jni_type.cpp \
     rs_jni_object.cpp
@@ -32,7 +35,10 @@ LOCAL_SRC_FILES += \
     setelementat.rs \
     primitives.rs \
     instance.rs \
-    clear_object.rs
+    clear_object.rs \
+    foreach.rs \
+    fe_all.rs \
+    noroot.rs
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 LOCAL_C_INCLUDES += frameworks/rs/cpp
