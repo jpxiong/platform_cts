@@ -493,4 +493,3 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSYuvTest_yuvTest(J
     return (mRS->getError() == RS_SUCCESS);
 
 }
-
