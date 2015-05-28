@@ -34,7 +34,7 @@ public class RSResizeTest extends RSCppTest {
     native boolean resizeTest(String path, int w, int h, float scaleX, float scaleY,
                               boolean useByte, int vecSize, byte[] inB, byte[] outB,
                               float[] inF, float[] outF);
-    private void testReszie(int w, int h, Element.DataType dt, int vecSize, float scaleX, float scaleY) {
+    private void testResize(int w, int h, Element.DataType dt, int vecSize, float scaleX, float scaleY) {
 
         boolean useByte = false;
         if (dt == Element.DataType.UNSIGNED_8) {
@@ -91,263 +91,263 @@ public class RSResizeTest extends RSCppTest {
     }
 
     public void test_U8_4_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 4, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 4, 1.f, 1.f);
     }
     public void test_U8_3_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 3, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 3, 1.f, 1.f);
     }
     public void test_U8_2_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 2, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 2, 1.f, 1.f);
     }
     public void test_U8_1_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 1, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 1, 1.f, 1.f);
     }
 
     public void test_U8_4_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 4, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 4, 2.f, 2.f);
     }
     public void test_U8_3_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 3, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 3, 2.f, 2.f);
     }
     public void test_U8_2_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 2, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 2, 2.f, 2.f);
     }
     public void test_U8_1_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 1, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 1, 2.f, 2.f);
     }
 
     public void test_U8_4_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 4, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 4, 0.5f, 2.f);
     }
     public void test_U8_3_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 3, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 3, 0.5f, 2.f);
     }
     public void test_U8_2_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 2, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 2, 0.5f, 2.f);
     }
     public void test_U8_1_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 1, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 1, 0.5f, 2.f);
     }
 
     public void test_U8_4_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 4, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 4, 2.f, 0.5f);
     }
     public void test_U8_3_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 3, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 3, 2.f, 0.5f);
     }
     public void test_U8_2_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 2, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 2, 2.f, 0.5f);
     }
     public void test_U8_1_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 1, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 1, 2.f, 0.5f);
     }
 
     public void test_U8_4_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 4, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 4, 0.5f, 0.5f);
     }
     public void test_U8_3_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 3, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 3, 0.5f, 0.5f);
     }
     public void test_U8_2_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 2, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 2, 0.5f, 0.5f);
     }
     public void test_U8_1_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.UNSIGNED_8, 1, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.UNSIGNED_8, 1, 0.5f, 0.5f);
     }
 
     public void test_U8_4_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 4, 1.f, 1.f);
     }
     public void test_U8_3_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 3, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 3, 1.f, 1.f);
     }
     public void test_U8_2_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 2, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 2, 1.f, 1.f);
     }
     public void test_U8_1_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 1, 1.f, 1.f);
     }
 
     public void test_U8_4_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 4, 2.f, 2.f);
     }
     public void test_U8_3_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 3, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 3, 2.f, 2.f);
     }
     public void test_U8_2_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 2, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 2, 2.f, 2.f);
     }
     public void test_U8_1_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 1, 2.f, 2.f);
     }
 
     public void test_U8_4_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 4, 0.5f, 2.f);
     }
     public void test_U8_3_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 3, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 3, 0.5f, 2.f);
     }
     public void test_U8_2_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 2, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 2, 0.5f, 2.f);
     }
     public void test_U8_1_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 1, 0.5f, 2.f);
     }
 
     public void test_U8_4_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 4, 2.f, 0.5f);
     }
     public void test_U8_3_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 3, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 3, 2.f, 0.5f);
     }
     public void test_U8_2_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 2, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 2, 2.f, 0.5f);
     }
     public void test_U8_1_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 1, 2.f, 0.5f);
     }
 
     public void test_U8_4_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 4, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 4, 0.5f, 0.5f);
     }
     public void test_U8_3_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 3, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 3, 0.5f, 0.5f);
     }
     public void test_U8_2_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 2, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 2, 0.5f, 0.5f);
     }
     public void test_U8_1_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.UNSIGNED_8, 1, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.UNSIGNED_8, 1, 0.5f, 0.5f);
     }
 
 
     public void test_F32_4_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 4, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 4, 1.f, 1.f);
     }
     public void test_F32_3_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 3, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 3, 1.f, 1.f);
     }
     public void test_F32_2_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 2, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 2, 1.f, 1.f);
     }
     public void test_F32_1_SCALE10_10_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 1, 1.f, 1.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 1, 1.f, 1.f);
     }
 
     public void test_F32_4_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 4, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 4, 2.f, 2.f);
     }
     public void test_F32_3_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 3, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 3, 2.f, 2.f);
     }
     public void test_F32_2_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 2, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 2, 2.f, 2.f);
     }
     public void test_F32_1_SCALE20_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 1, 2.f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 1, 2.f, 2.f);
     }
 
     public void test_F32_4_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 4, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 4, 0.5f, 2.f);
     }
     public void test_F32_3_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 3, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 3, 0.5f, 2.f);
     }
     public void test_F32_2_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 2, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 2, 0.5f, 2.f);
     }
     public void test_F32_1_SCALE05_20_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 1, 0.5f, 2.f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 1, 0.5f, 2.f);
     }
 
     public void test_F32_4_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 4, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 4, 2.f, 0.5f);
     }
     public void test_F32_3_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 3, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 3, 2.f, 0.5f);
     }
     public void test_F32_2_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 2, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 2, 2.f, 0.5f);
     }
     public void test_F32_1_SCALE20_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 1, 2.f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 1, 2.f, 0.5f);
     }
 
     public void test_F32_4_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 4, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 4, 0.5f, 0.5f);
     }
     public void test_F32_3_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 3, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 3, 0.5f, 0.5f);
     }
     public void test_F32_2_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 2, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 2, 0.5f, 0.5f);
     }
     public void test_F32_1_SCALE05_05_inSqure() {
-        testReszie(inX, inX, Element.DataType.FLOAT_32, 1, 0.5f, 0.5f);
+        testResize(inX, inX, Element.DataType.FLOAT_32, 1, 0.5f, 0.5f);
     }
 
     public void test_F32_4_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 4, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 4, 1.f, 1.f);
     }
     public void test_F32_3_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 3, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 3, 1.f, 1.f);
     }
     public void test_F32_2_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 2, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 2, 1.f, 1.f);
     }
     public void test_F32_1_SCALE10_10_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 1, 1.f, 1.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 1, 1.f, 1.f);
     }
 
     public void test_F32_4_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 4, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 4, 2.f, 2.f);
     }
     public void test_F32_3_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 3, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 3, 2.f, 2.f);
     }
     public void test_F32_2_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 2, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 2, 2.f, 2.f);
     }
     public void test_F32_1_SCALE20_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 1, 2.f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 1, 2.f, 2.f);
     }
 
     public void test_F32_4_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 4, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 4, 0.5f, 2.f);
     }
     public void test_F32_3_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 3, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 3, 0.5f, 2.f);
     }
     public void test_F32_2_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 2, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 2, 0.5f, 2.f);
     }
     public void test_F32_1_SCALE05_20_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 1, 0.5f, 2.f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 1, 0.5f, 2.f);
     }
 
     public void test_F32_4_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 4, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 4, 2.f, 0.5f);
     }
     public void test_F32_3_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 3, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 3, 2.f, 0.5f);
     }
     public void test_F32_2_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 2, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 2, 2.f, 0.5f);
     }
     public void test_F32_1_SCALE20_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 1, 2.f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 1, 2.f, 0.5f);
     }
 
     public void test_F32_4_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 4, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 4, 0.5f, 0.5f);
     }
     public void test_F32_3_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 3, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 3, 0.5f, 0.5f);
     }
     public void test_F32_2_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 2, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 2, 0.5f, 0.5f);
     }
     public void test_F32_1_SCALE05_05_inRectangle() {
-        testReszie(inX, inY, Element.DataType.FLOAT_32, 1, 0.5f, 0.5f);
+        testResize(inX, inY, Element.DataType.FLOAT_32, 1, 0.5f, 0.5f);
     }
 }
