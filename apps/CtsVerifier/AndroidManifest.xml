@@ -1337,6 +1337,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".managedprovisioning.WorkStatusTestActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.managedprovisioning.WORK_STATUS_ICON" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.WORK_STATUS_TOAST" />
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
+
         <activity android:name=".managedprovisioning.WorkNotificationTestActivity">
             <intent-filter>
                 <action android:name="com.android.cts.verifier.managedprovisioning.WORK_NOTIFICATION" />

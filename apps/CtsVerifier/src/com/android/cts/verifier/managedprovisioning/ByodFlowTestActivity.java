@@ -77,6 +77,8 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mDisableNonMarketTest;
     private TestItem mEnableNonMarketTest;
     private TestItem mWorkNotificationBadgedTest;
+    private TestItem mWorkStatusBarIconTest;
+    private TestItem mWorkStatusBarToastTest;
     private TestItem mAppSettingsVisibleTest;
     private TestItem mLocationSettingsVisibleTest;
     private TestItem mCredSettingsVisibleTest;
@@ -189,6 +191,21 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 new Intent(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION),
                 R.drawable.ic_corp_icon);
 
+        Intent workStatusIcon = new Intent(WorkStatusTestActivity.ACTION_WORK_STATUS_ICON);
+        workStatusIcon.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mWorkStatusBarIconTest = new TestItemWithIcon(this,
+                R.string.provisioning_byod_work_status_icon,
+                R.string.provisioning_byod_work_status_icon_instruction,
+                workStatusIcon,
+                R.drawable.stat_sys_managed_profile_status);
+
+        Intent workStatusToast = new Intent(WorkStatusTestActivity.ACTION_WORK_STATUS_TOAST);
+        workStatusToast.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mWorkStatusBarToastTest = new TestItem(this,
+                R.string.provisioning_byod_work_status_toast,
+                R.string.provisioning_byod_work_status_toast_instruction,
+                workStatusToast);
+
         mDisableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_deny,
                 R.string.provisioning_byod_nonmarket_deny_info,
                 new Intent(ByodHelperActivity.ACTION_INSTALL_APK)
@@ -246,6 +263,8 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         // Badge related tests
         mTests.add(mWorkAppVisibleTest);
         mTests.add(mWorkNotificationBadgedTest);
+        mTests.add(mWorkStatusBarIconTest);
+        mTests.add(mWorkStatusBarToastTest);
 
         // Settings related tests.
         mTests.add(mProfileAccountVisibleTest);
@@ -463,6 +482,10 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 PackageManager.DONT_KILL_APP);
         getPackageManager().setComponentEnabledSetting(new ComponentName(
                 this, WorkNotificationTestActivity.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        getPackageManager().setComponentEnabledSetting(new ComponentName(
+                this, WorkStatusTestActivity.class),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
     }
