@@ -160,6 +160,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
                 .setMinMargins(Margins.NO_MARGINS)
                 .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
@@ -588,6 +589,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("PDF resolution", "PDF resolution", 300, 300))
                 .setMinMargins(new Margins(0, 0, 0, 0))
                 .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
@@ -598,6 +600,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
                 .setResolution(new Resolution("PDF resolution", "PDF resolution", 300, 300))
                 .setMinMargins(new Margins(0, 0, 0, 0))
                 .setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, thirdOldAttributes, thirdNewAttributes, true);
 
@@ -729,7 +732,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         PrintAttributes secondNewAttributes = new PrintAttributes.Builder()
                 .setMediaSize(MediaSize.ISO_A3)
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
-                .setMinMargins(Margins.NO_MARGINS).setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setMinMargins(Margins.NO_MARGINS)
+                .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
@@ -960,7 +965,9 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         PrintAttributes secondNewAttributes = new PrintAttributes.Builder()
                 .setMediaSize(MediaSize.ISO_A3)
                 .setResolution(new Resolution("300x300", "300x300", 300, 300))
-                .setMinMargins(Margins.NO_MARGINS).setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setMinMargins(Margins.NO_MARGINS)
+                .setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setDuplexMode(PrintAttributes.DUPLEX_MODE_LONG_EDGE)
                 .build();
         verifyLayoutCall(inOrder, adapter, secondOldAttributes, secondNewAttributes, true);
 
