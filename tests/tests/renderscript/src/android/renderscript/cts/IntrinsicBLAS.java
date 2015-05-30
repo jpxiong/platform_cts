@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 public class IntrinsicBLAS extends IntrinsicBase {
     private ScriptIntrinsicBLAS mBLAS;
+    private boolean mInitialized = false;
 
     private ArrayList<Allocation> mMatrixS;
     private final float alphaS = 1.0f;
@@ -63,35 +64,34 @@ public class IntrinsicBLAS extends IntrinsicBase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mBLAS = ScriptIntrinsicBLAS.create(mRS);
 
         //now populate the test Matrixes and Vectors.
-        mMatrixS = new ArrayList<Allocation>();
-        mMatrixD = new ArrayList<Allocation>();
-        mMatrixC = new ArrayList<Allocation>();
-        mMatrixZ = new ArrayList<Allocation>();
-        for (int x : mDim) {
-            for (int y : mDim) {
-                mMatrixS.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), x, y)));
-                mMatrixD.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), x, y)));
-                mMatrixC.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), x, y)));
-                mMatrixZ.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), x, y)));
+        if (!mInitialized) {
+            mBLAS = ScriptIntrinsicBLAS.create(mRS);
+            mMatrixS = new ArrayList<Allocation>();
+            mMatrixD = new ArrayList<Allocation>();
+            mMatrixC = new ArrayList<Allocation>();
+            mMatrixZ = new ArrayList<Allocation>();
+            for (int x : mDim) {
+                for (int y : mDim) {
+                    mMatrixS.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), x, y)));
+                    mMatrixD.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), x, y)));
+                    mMatrixC.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), x, y)));
+                    mMatrixZ.add(Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), x, y)));
+                }
             }
+            //also need Allocation with mismatch Element.
+            Allocation misAlloc = Allocation.createTyped(mRS, Type.createXY(mRS, Element.U8(mRS), 1, 1));
+            mMatrixS.add(misAlloc);
+            mMatrixD.add(misAlloc);
+            mMatrixC.add(misAlloc);
+            mMatrixZ.add(misAlloc);
+            mInitialized = true;
         }
-        //also need Allocation with mismatch Element.
-        Allocation misAlloc = Allocation.createTyped(mRS, Type.createXY(mRS, Element.U8(mRS), 1, 1));
-        mMatrixS.add(misAlloc);
-        mMatrixD.add(misAlloc);
-        mMatrixC.add(misAlloc);
-        mMatrixZ.add(misAlloc);
     }
 
     @Override
     protected void tearDown() throws Exception {
-        if (mBLAS != null) {
-            mBLAS.destroy();
-            mBLAS = null;
-        }
         super.tearDown();
     }
 
@@ -135,6 +135,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
         return true;
     }
 
+    private boolean validateVecInput(Allocation X) {
+        if (X.getType().getY() > 2) {
+            //for testing vector, need a mismatch Y for complete test coverage.
+            return false;
+        }
+        return true;
+    }
 
     private boolean validateGEMV(Element e, int TransA, Allocation A, Allocation X, int incX, Allocation Y, int incY) {
         if (!validateTranspose(TransA)) {
@@ -172,7 +179,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xGEMV_API_test(int trans, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateGEMV(elemA, trans, matA, vecX, incX, vecY, incY)) {
                         try {
@@ -218,9 +231,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xGEMV_API(ArrayList<Allocation> mMatrix) {
         for (int trans : mTranspose) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xGEMV_API_test(trans, incX, incY, mMatrix);
-                }
+                xGEMV_API_test(trans, incX, incX, mMatrix);
             }
         }
     }
@@ -245,7 +256,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xGBMV_API_test(int trans, int KL, int KU, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateGEMV(elemA, trans, matA, vecX, incX, vecY, incY) && KU >= 0 && KL >= 0) {
                         try {
@@ -291,10 +308,8 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xGBMV_API(ArrayList<Allocation> mMatrix) {
         for (int trans : mTranspose) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    for (int K : mK) {
-                        xGBMV_API_test(trans, K, K, incX, incY, mMatrix);
-                    }
+                for (int K : mK) {
+                    xGBMV_API_test(trans, K, K, incX, incX, mMatrix);
                 }
             }
         }
@@ -320,7 +335,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHEMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -352,9 +373,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xHEMV_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xHEMV_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xHEMV_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -371,7 +390,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHBMV_API_test(int Uplo, int K, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYR2(elemA, Uplo, vecX, incX, vecY, incY, matA) && K >= 0) {
                         try {
@@ -404,9 +429,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
         for (int Uplo : mUplo) {
             for (int K : mK) {
                 for (int incX : mInc) {
-                    for (int incY : mInc) {
-                        xHBMV_API_test(Uplo, K, incX, incY, mMatrix);
-                    }
+                        xHBMV_API_test(Uplo, K, incX, incX, mMatrix);
                 }
             }
         }
@@ -424,7 +447,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHPMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSPR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -456,9 +485,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xHPMV_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xHPMV_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xHPMV_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -507,7 +534,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSYMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYMV(elemA, Uplo, matA, vecX, incX, vecY, incY)) {
                         try {
@@ -539,9 +572,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xSYMV_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xSYMV_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xSYMV_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -559,7 +590,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSBMV_API_test(int Uplo, int K, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYMV(elemA, Uplo, matA, vecX, incX, vecY, incY) && K >= 0) {
                         try {
@@ -592,9 +629,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
         for (int Uplo : mUplo) {
             for (int K : mK) {
                 for (int incX : mInc) {
-                    for (int incY : mInc) {
-                        xSBMV_API_test(Uplo, K, incX, incY, mMatrix);
-                    }
+                    xSBMV_API_test(Uplo, K, incX, incX, mMatrix);
                 }
             }
         }
@@ -649,7 +684,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSPMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSPMV(elemA, Uplo, matA, vecX, incX, vecY, incY)) {
                         try {
@@ -681,9 +722,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xSPMV_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xSPMV_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xSPMV_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -733,6 +772,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTRMV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTRMV(elemA, Uplo, TransA, Diag, matA, vecX, incX)) {
                     try {
@@ -807,6 +849,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTBMV_API_test(int Uplo, int TransA, int Diag, int K, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTRMV(elemA, Uplo, TransA, Diag, matA, vecX, incX) && K >= 0) {
                     try {
@@ -919,6 +964,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTPMV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTPMV(elemA, Uplo, TransA, Diag, matA, vecX, incX)) {
                     try {
@@ -992,6 +1040,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTRSV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTRMV(elemA, Uplo, TransA, Diag, matA, vecX, incX)) {
                     try {
@@ -1065,6 +1116,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTBSV_API_test(int Uplo, int TransA, int Diag, int K, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTRMV(elemA, Uplo, TransA, Diag, matA, vecX, incX) && K >= 0) {
                     try {
@@ -1140,6 +1194,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xTPSV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateTPMV(elemA, Uplo, TransA, Diag, matA, vecX, incX)) {
                     try {
@@ -1245,7 +1302,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xGER_API_test(int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateGER(elemA, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1321,7 +1384,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xGERU_API_test(int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateGERU(elemA, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1370,7 +1439,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xGERC_API_test(int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateGERU(elemA, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1420,6 +1495,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHER_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateSYR(elemA, Uplo, vecX, incX, matA)) {
                     try {
@@ -1467,6 +1545,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHPR_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateSPR(elemA, Uplo, vecX, incX, matA)) {
                     try {
@@ -1514,7 +1595,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHER2_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1546,9 +1633,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xHER2_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xHER2_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xHER2_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -1566,7 +1651,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xHPR2_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSPR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1598,9 +1689,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xHPR2_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xHPR2_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xHPR2_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -1645,6 +1734,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSYR_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateSYR(elemA, Uplo, vecX, incX, matA)) {
                     try {
@@ -1726,6 +1818,9 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSPR_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 Element elemA = matA.getType().getElement();
                 if (validateSPR(elemA, Uplo, vecX, incX, matA)) {
                     try {
@@ -1805,7 +1900,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSYR2_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSYR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1837,9 +1938,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xSYR2_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xSYR2_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xSYR2_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
@@ -1891,7 +1990,13 @@ public class IntrinsicBLAS extends IntrinsicBase {
     private void xSPR2_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
+                if (!validateVecInput(vecX)) {
+                    continue;
+                }
                 for (Allocation vecY : mMatrix) {
+                    if (!validateVecInput(vecY)) {
+                        continue;
+                    }
                     Element elemA = matA.getType().getElement();
                     if (validateSPR2(elemA, Uplo, vecX, incX, vecY, incY, matA)) {
                         try {
@@ -1923,9 +2028,7 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void L2_xSPR2_API(ArrayList<Allocation> mMatrix) {
         for (int Uplo : mUplo) {
             for (int incX : mInc) {
-                for (int incY : mInc) {
-                    xSPR2_API_test(Uplo, incX, incY, mMatrix);
-                }
+                xSPR2_API_test(Uplo, incX, incX, mMatrix);
             }
         }
     }
