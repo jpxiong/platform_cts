@@ -37,6 +37,18 @@ LOCAL_DEX_PREOPT := false
 
 include $(BUILD_CTS_SUPPORT_PACKAGE)
 
+#apks signed by cts-keyset-test-ec-a
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := tests
+LOCAL_SDK_VERSION := current
+LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
+LOCAL_PACKAGE_NAME := CtsKeySetSigningEcAUpgradeA
+LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/keysets/cts-keyset-test-ec-a
+LOCAL_DEX_PREOPT := false
+
+include $(BUILD_CTS_SUPPORT_PACKAGE)
+
 #apks signed by cts-keyset-test-a and cts-keyset-test-b
 include $(CLEAR_VARS)
 
