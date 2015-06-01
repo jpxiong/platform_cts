@@ -1461,6 +1461,10 @@
     Overlay view must be shown. Verify that there is a text view displaying \"Overlay View Dummy Text\"
     when you tune to the \"Dummy\" channel.
     </string>
+    <string name="tv_input_discover_test_verify_global_search">
+    Live Channels app should provide query results for 3rd-party input\'s channels and programs on
+    global search requests.
+    </string>
     <string name="tv_input_discover_test_go_to_epg">
     Press the \"Launch EPG\" button, and locate the channel named \"Dummy\".
     </string>
