@@ -24,6 +24,7 @@ import android.media.ImageReader;
 import android.media.ImageWriter;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
@@ -75,7 +76,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     private enum CaptureTestCase {
         SINGLE_SHOT,
         BURST,
-        MIXED_BURST
+        MIXED_BURST,
+        ABORT_CAPTURE
     }
 
     /**
@@ -334,22 +336,72 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     /**
+     * Test aborting reprocess capture requests of the largest input and output sizes for each
+     * supported format.
+     */
+    public void testReprocessAbort() throws Exception {
+        for (String id : mCameraIds) {
+            if (!isYuvReprocessSupported(id) && !isOpaqueReprocessSupported(id)) {
+                continue;
+            }
+
+            try {
+                // open Camera device
+                openDevice(id);
+
+                int[] supportedInputFormats =
+                    mStaticInfo.getAvailableFormats(StaticMetadata.StreamDirection.Input);
+                for (int inputFormat : supportedInputFormats) {
+                    int[] supportedReprocessOutputFormats =
+                            mStaticInfo.getValidOutputFormatsForInput(inputFormat);
+                    for (int reprocessOutputFormat : supportedReprocessOutputFormats) {
+                        testReprocessingMaxSizes(id, inputFormat, reprocessOutputFormat,
+                                /*previewSize*/null, CaptureTestCase.ABORT_CAPTURE);
+                    }
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
      * Test the input format and output format with the largest input and output sizes.
      */
-    private void testBasicReprocessing(String cameraId, int inputFormat, int reprocessOutputFormat)
-            throws Exception {
+    private void testBasicReprocessing(String cameraId, int inputFormat,
+            int reprocessOutputFormat) throws Exception {
         try {
             openDevice(cameraId);
 
-            Size maxInputSize =
-                    getMaxSize(inputFormat, StaticMetadata.StreamDirection.Input);
-            Size maxReprocessOutputSize =
-                    getMaxSize(reprocessOutputFormat, StaticMetadata.StreamDirection.Output);
-
-            testReprocess(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
-                    reprocessOutputFormat, /* previewSize */null, /*numReprocessCaptures*/1);
+            testReprocessingMaxSizes(cameraId, inputFormat, reprocessOutputFormat,
+                    /* previewSize */null, CaptureTestCase.SINGLE_SHOT);
         } finally {
             closeDevice();
+        }
+    }
+
+    /**
+     * Test the input format and output format with the largest input and output sizes for a
+     * certain test case.
+     */
+    private void testReprocessingMaxSizes(String cameraId, int inputFormat,
+            int reprocessOutputFormat, Size previewSize, CaptureTestCase captureTestCase)
+            throws Exception {
+        Size maxInputSize = getMaxSize(inputFormat, StaticMetadata.StreamDirection.Input);
+        Size maxReprocessOutputSize =
+                getMaxSize(reprocessOutputFormat, StaticMetadata.StreamDirection.Output);
+
+        switch (captureTestCase) {
+            case SINGLE_SHOT:
+                testReprocess(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
+                        reprocessOutputFormat, previewSize, NUM_REPROCESS_CAPTURES);
+                break;
+            case ABORT_CAPTURE:
+                testReprocessAbort(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
+                        reprocessOutputFormat);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid test case");
         }
     }
 
@@ -393,7 +445,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                                         NUM_REPROCESS_BURST);
                                 break;
                             default:
-                                throw new IllegalArgumentException("Invalid capture type");
+                                throw new IllegalArgumentException("Invalid test case");
                         }
                     }
                 }
@@ -588,6 +640,99 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                     if (imageResultHolder != null) {
                         imageResultHolder.getImage().close();
                     }
+                }
+            }
+        } finally {
+            closeReprossibleSession();
+            closeImageReaders();
+        }
+    }
+
+    /**
+     * Test aborting a burst reprocess capture and multiple single reprocess captures.
+     */
+    private void testReprocessAbort(String cameraId, Size inputSize, int inputFormat,
+            Size reprocessOutputSize, int reprocessOutputFormat) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, "testReprocessAbort: cameraId: " + cameraId + " inputSize: " +
+                    inputSize + " inputFormat: " + inputFormat + " reprocessOutputSize: " +
+                    reprocessOutputSize + " reprocessOutputFormat: " + reprocessOutputFormat);
+        }
+
+        try {
+            setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
+                    NUM_REPROCESS_CAPTURES);
+            setupReprocessableSession(/*previewSurface*/null, NUM_REPROCESS_CAPTURES);
+
+            // Test two cases: submitting reprocess requests one by one and in a burst.
+            boolean submitInBursts[] = {false, true};
+            for (boolean submitInBurst : submitInBursts) {
+                // Prepare reprocess capture requests.
+                ArrayList<CaptureRequest> reprocessRequests =
+                        new ArrayList<>(NUM_REPROCESS_CAPTURES);
+
+                for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
+                    TotalCaptureResult result = submitCaptureRequest(mFirstImageReader.getSurface(),
+                            /*inputResult*/null);
+
+                    mImageWriter.queueInputImage(
+                            mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
+                    CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
+                    if (mShareOneImageReader) {
+                        builder.addTarget(mFirstImageReader.getSurface());
+                    } else {
+                        builder.addTarget(mSecondImageReader.getSurface());
+                    }
+                    reprocessRequests.add(builder.build());
+                }
+
+                SimpleCaptureCallback captureCallback = new SimpleCaptureCallback();
+
+                // Submit reprocess capture requests.
+                if (submitInBurst) {
+                    mSession.captureBurst(reprocessRequests, captureCallback, mHandler);
+                } else {
+                    for (CaptureRequest request : reprocessRequests) {
+                        mSession.capture(request, captureCallback, mHandler);
+                    }
+                }
+
+                // Abort after getting the first result
+                TotalCaptureResult reprocessResult =
+                        captureCallback.getTotalCaptureResultForRequest(reprocessRequests.get(0),
+                        CAPTURE_TIMEOUT_FRAMES);
+                mSession.abortCaptures();
+
+                // Wait until the session is ready again.
+                mSessionListener.getStateWaiter().waitForState(
+                        BlockingSessionCallback.SESSION_READY, SESSION_CLOSE_TIMEOUT_MS);
+
+                // Gather all failed requests.
+                ArrayList<CaptureFailure> failures =
+                        captureCallback.getCaptureFailures(NUM_REPROCESS_CAPTURES - 1);
+                ArrayList<CaptureRequest> failedRequests = new ArrayList<>();
+                for (CaptureFailure failure : failures) {
+                    failedRequests.add(failure.getRequest());
+                }
+
+                // For each request that didn't fail must have a valid result.
+                for (int i = 1; i < reprocessRequests.size(); i++) {
+                    CaptureRequest request = reprocessRequests.get(i);
+                    if (!failedRequests.contains(request)) {
+                        captureCallback.getTotalCaptureResultForRequest(request,
+                                CAPTURE_TIMEOUT_FRAMES);
+                    }
+                }
+
+                // Drain the image reader listeners.
+                mFirstImageReaderListener.drain();
+                if (!mShareOneImageReader) {
+                    mSecondImageReaderListener.drain();
+                }
+
+                // Make sure all input surfaces are released.
+                for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
+                    mImageWriterListener.waitForImageReleased(CAPTURE_TIMEOUT_MS);
                 }
             }
         } finally {
