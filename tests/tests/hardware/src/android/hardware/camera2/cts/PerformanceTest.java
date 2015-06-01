@@ -216,8 +216,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                             new SimpleTimingResultListener();
                     SimpleImageListener imageListener = new SimpleImageListener();
 
-                    Size maxYuvSize = CameraTestUtils.getSupportedPreviewSizes(id, mCameraManager,
-                            /*bound*/null).get(0);
+                    Size maxYuvSize = CameraTestUtils.getSortedSizesForFormat(
+                        id, mCameraManager, ImageFormat.YUV_420_888, /*bound*/null).get(0);
 
                     prepareCaptureAndStartPreview(previewBuilder, captureBuilder,
                             mOrderedPreviewSizes.get(0), maxYuvSize,
