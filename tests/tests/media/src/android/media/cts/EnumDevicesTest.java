@@ -153,15 +153,33 @@ public class EnumDevicesTest extends AndroidTestCase {
     }
 
     public void test_deviceCallback() {
+        // null callback?
         mAudioManager.registerAudioDeviceCallback(null,null);
-        assertTrue(true);
 
         AudioDeviceCallback callback =  new EmptyDeviceCallback();
+        AudioDeviceCallback someOtherCallback =  new EmptyDeviceCallback();
+        // null Handler
         mAudioManager.registerAudioDeviceCallback(callback, null);
-        assertTrue(true);
 
+        // unregister null callback
+        mAudioManager.unregisterAudioDeviceCallback(null);
+        // unregister callback not registered
+        mAudioManager.unregisterAudioDeviceCallback(someOtherCallback);
+        // nominal case
+        mAudioManager.unregisterAudioDeviceCallback(callback);
+        // remove twice
+        mAudioManager.unregisterAudioDeviceCallback(callback);
+
+        // non-null Handler
         mAudioManager.registerAudioDeviceCallback(callback, new Handler());
-        assertTrue(true);
+        // unregister null callback
+        mAudioManager.unregisterAudioDeviceCallback(null);
+        // unregister callback not registered
+        mAudioManager.unregisterAudioDeviceCallback(someOtherCallback);
+        // nominal case
+        mAudioManager.unregisterAudioDeviceCallback(callback);
+        // remove twice
+        mAudioManager.unregisterAudioDeviceCallback(callback);
     }
 
     //TODO - Need tests for device connect/disconnect callbacks
