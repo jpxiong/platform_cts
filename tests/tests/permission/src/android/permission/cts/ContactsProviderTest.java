@@ -117,4 +117,41 @@ public class ContactsProviderTest extends AndroidTestCase {
             // Expected Exception
         }
     }
+
+    /**
+    * Verifies that query(ContactsContract.CommonDataKinds.Phone.ENTERPRISE_CONTENT_URI) requires
+    * Permission.
+    * <p>
+    * Requires Permission: {@link android.Manifest.permission#INTERACT_ACROSS_USERS}.
+    */
+    @SmallTest
+    public void testQueryPhoneEnterprise() {
+        try {
+            getContext().getContentResolver().query(
+                    ContactsContract.CommonDataKinds.Phone.ENTERPRISE_CONTENT_URI,
+                    null, null, null, null);
+            fail("query(ContactsContract.CommonDataKinds.Phone.ENTERPRISE_CONTENT_URI) did not"
+                    + " throw SecurityException as expected");
+        } catch (SecurityException se) {
+            // Expected Exception
+        }
+    }
+
+    /**
+    * Verifies that query(ContactsContract.RawContactsEntity.CORP_CONTENT_URI) requires
+    * Permission.
+    * <p>
+    * Requires Permission: {@link android.Manifest.permission#INTERACT_ACROSS_USERS}.
+    */
+    @SmallTest
+    public void testRawContactsEntityCorp() {
+        try {
+            getContext().getContentResolver().query(
+                    ContactsContract.RawContactsEntity.CORP_CONTENT_URI, null, null, null, null);
+            fail("query(ContactsContract.RawContactsEntity.CORP_CONTENT_URI) did not throw"
+                    + " SecurityException as expected");
+        } catch (SecurityException se) {
+            // Expected Exception
+        }
+    }
 }
