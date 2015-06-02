@@ -23,11 +23,13 @@ import android.media.cts.CodecUtils;
 import android.media.Image;
 import android.media.Image.Plane;
 import android.media.MediaCodec;
+import android.media.MediaCodec.BufferInfo;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.util.Log;
+import android.util.Pair;
 import android.util.Range;
 import android.util.Size;
 
@@ -40,6 +42,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.lang.System;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
 
@@ -82,7 +85,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private int mVideoHeight;
     private int mFrameRate;
 
-    private Vector<ByteBuffer> mEncodedOutputBuffer;
+    private LinkedList<Pair<ByteBuffer, BufferInfo>> mEncodedOutputBuffer;
     // check this many pixels per each decoded frame
     // checking too many points decreases decoder frame rates a lot.
     private static final int PIXEL_CHECK_PER_FRAME = 1000;
@@ -100,7 +103,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
-        mEncodedOutputBuffer = new Vector<ByteBuffer>(TOTAL_FRAMES * 2);
+        mEncodedOutputBuffer = new LinkedList<Pair<ByteBuffer, BufferInfo>>();
         // Use time as a seed, hoping to prevent checking pixels in the same pattern
         long now = System.currentTimeMillis();
         mRandom = new Random(now);
@@ -803,7 +806,9 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         int l = info.size;
         ByteBuffer copied = ByteBuffer.allocate(l);
         output.get(copied.array(), 0, l);
-        mEncodedOutputBuffer.add(copied);
+        BufferInfo savedInfo = new BufferInfo();
+        savedInfo.set(0, l, info.presentationTimeUs, info.flags);
+        mEncodedOutputBuffer.addLast(Pair.create(copied, savedInfo));
         codec.releaseOutputBuffer(index, false /* render */);
     }
 
@@ -842,7 +847,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 if (inputBufIndex >= 0) {
                     ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
                     dstBuf.clear();
-                    ByteBuffer src = mEncodedOutputBuffer.get(inputBufferCount);
+                    ByteBuffer src = mEncodedOutputBuffer.get(inputBufferCount).first;
+                    BufferInfo srcInfo = mEncodedOutputBuffer.get(inputBufferCount).second;
                     int writeSize = src.capacity();
                     dstBuf.put(src.array(), 0, writeSize);
 
@@ -850,8 +856,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                             inputBufIndex,
                             0 /* offset */,
                             writeSize,
-                            0,
-                            (inputLeft == 1) ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                            srcInfo.presentationTimeUs,
+                            srcInfo.flags);
                     inputLeft --;
                     inputBufferCount ++;
                 }
