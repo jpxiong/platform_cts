@@ -188,45 +188,61 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 openDevice(mCameraIds[i]);
 
                 if (!mStaticInfo.isManualLensShadingMapSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " doesn't support lens shading controls, skipping test");
+                    continue;
+                }
+
+                List<Integer> lensShadingMapModes = Arrays.asList(CameraTestUtils.toObject(
+                        mStaticInfo.getAvailableLensShadingMapModesChecked()));
+
+                if (!lensShadingMapModes.contains(STATISTICS_LENS_SHADING_MAP_MODE_ON)) {
                     continue;
                 }
 
                 SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 CaptureRequest.Builder requestBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
-                // Shading map mode OFF, lensShadingMapMode ON, camera device
-                // should output unity maps.
-                requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_OFF);
                 requestBuilder.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                         STATISTICS_LENS_SHADING_MAP_MODE_ON);
 
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
+                List<Integer> lensShadingModes = Arrays.asList(CameraTestUtils.toObject(
+                        mStaticInfo.getAvailableLensShadingModesChecked()));
 
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, previewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_OFF);
+                // Shading map mode OFF, lensShadingMapMode ON, camera device
+                // should output unity maps.
+                if (lensShadingModes.contains(SHADING_MODE_OFF)) {
+                    requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_OFF);
+                    listener = new SimpleCaptureCallback();
+                    startPreview(requestBuilder, previewSz, listener);
+                    waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+                    verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_OFF);
+                }
 
                 // Shading map mode FAST, lensShadingMapMode ON, camera device
                 // should output valid maps.
-                requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_FAST);
+                if (lensShadingModes.contains(SHADING_MODE_FAST)) {
+                    requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_FAST);
 
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, previewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                // Allow at most one lock OFF state as the exposure is changed once.
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_FAST);
+                    listener = new SimpleCaptureCallback();
+                    startPreview(requestBuilder, previewSz, listener);
+                    waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+                    // Allow at most one lock OFF state as the exposure is changed once.
+                    verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_FAST);
+                }
 
                 // Shading map mode HIGH_QUALITY, lensShadingMapMode ON, camera device
                 // should output valid maps.
-                requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_HIGH_QUALITY);
+                if (lensShadingModes.contains(SHADING_MODE_HIGH_QUALITY)) {
+                    requestBuilder.set(CaptureRequest.SHADING_MODE, SHADING_MODE_HIGH_QUALITY);
 
-                listener = new SimpleCaptureCallback();
-                startPreview(requestBuilder, previewSz, listener);
-                waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
-                verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_HIGH_QUALITY);
+                    listener = new SimpleCaptureCallback();
+                    startPreview(requestBuilder, previewSz, listener);
+                    waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+                    verifyShadingMap(listener, NUM_FRAMES_VERIFIED, SHADING_MODE_HIGH_QUALITY);
+                }
 
                 stopPreview();
             } finally {
