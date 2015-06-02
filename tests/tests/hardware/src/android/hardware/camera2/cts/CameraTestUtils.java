@@ -32,7 +32,6 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.params.InputConfiguration;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.cts.helpers.CameraUtils;
-import android.util.Size;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
@@ -41,6 +40,8 @@ import android.media.ImageWriter;
 import android.media.Image.Plane;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
+import android.util.Size;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
@@ -315,13 +316,21 @@ public class CameraTestUtils extends Assert {
                 new LinkedBlockingQueue<TotalCaptureResult>();
         private final LinkedBlockingQueue<CaptureFailure> mFailureQueue =
                 new LinkedBlockingQueue<>();
+        // Pair<CaptureRequest, Long> is a pair of capture request and timestamp.
+        private final LinkedBlockingQueue<Pair<CaptureRequest, Long>> mCaptureStartQueue =
+                new LinkedBlockingQueue<>();
 
         private AtomicLong mNumFramesArrived = new AtomicLong(0);
 
         @Override
         public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request,
-                long timestamp, long frameNumber)
-        {
+                long timestamp, long frameNumber) {
+            try {
+                mCaptureStartQueue.put(new Pair(request, timestamp));
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureStarted");
+            }
         }
 
         @Override
@@ -519,6 +528,37 @@ public class CameraTestUtils extends Assert {
             return failures;
         }
 
+        /**
+         * Wait until the capture start of a request and expected timestamp arrives or it times
+         * out after a number of capture starts.
+         *
+         * @param request The request for the capture start to wait for.
+         * @param timestamp The timestamp for the capture start to wait for.
+         * @param numCaptureStartsWait The number of capture start events to wait for before timing
+         *                             out.
+         */
+        public void waitForCaptureStart(CaptureRequest request, Long timestamp,
+                int numCaptureStartsWait) throws Exception {
+            Pair<CaptureRequest, Long> expectedShutter = new Pair<>(request, timestamp);
+
+            int i = 0;
+            do {
+                Pair<CaptureRequest, Long> shutter = mCaptureStartQueue.poll(
+                        CAPTURE_RESULT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+                if (shutter == null) {
+                    throw new TimeoutRuntimeException("Unable to get any more capture start " +
+                            "event after waiting for " + CAPTURE_RESULT_TIMEOUT_MS + " ms.");
+                } else if (expectedShutter.equals(shutter)) {
+                    return;
+                }
+
+            } while (i++ < numCaptureStartsWait);
+
+            throw new TimeoutRuntimeException("Unable to get the expected capture start " +
+                    "event after waiting for " + numCaptureStartsWait + " capture starts");
+        }
+
         public boolean hasMoreResults()
         {
             return mQueue.isEmpty();
@@ -528,6 +568,7 @@ public class CameraTestUtils extends Assert {
             mQueue.clear();
             mNumFramesArrived.getAndSet(0);
             mFailureQueue.clear();
+            mCaptureStartQueue.clear();
         }
     }
 
