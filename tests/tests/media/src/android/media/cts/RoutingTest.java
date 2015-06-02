@@ -26,6 +26,9 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import android.test.AndroidTestCase;
 
 import android.util.Log;
@@ -38,6 +41,11 @@ public class RoutingTest extends AndroidTestCase {
 
     private AudioManager mAudioManager;
 
+    static {
+        // We're going to use a Handler
+        Looper.prepare();
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -47,17 +55,12 @@ public class RoutingTest extends AndroidTestCase {
         assertNotNull(mAudioManager);
     }
 
-    public void test_audioTrack_preferredDevice() {
-        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)) {
-            // Can't do it so skip this test
-            return;
-        }
-
+    private AudioTrack allocAudioTrack() {
         int bufferSize =
-            AudioTrack.getMinBufferSize(
-                41000,
-                AudioFormat.CHANNEL_OUT_STEREO,
-                AudioFormat.ENCODING_PCM_16BIT);
+                AudioTrack.getMinBufferSize(
+                    41000,
+                    AudioFormat.CHANNEL_OUT_STEREO,
+                    AudioFormat.ENCODING_PCM_16BIT);
         AudioTrack audioTrack =
             new AudioTrack(
                 AudioManager.STREAM_MUSIC,
@@ -66,6 +69,16 @@ public class RoutingTest extends AndroidTestCase {
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize,
                 AudioTrack.MODE_STREAM);
+        return audioTrack;
+    }
+
+    public void test_audioTrack_preferredDevice() {
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)) {
+            // Can't do it so skip this test
+            return;
+        }
+
+        AudioTrack audioTrack = allocAudioTrack();
         assertNotNull(audioTrack);
 
         // None selected (new AudioTrack), so check for default
@@ -76,7 +89,7 @@ public class RoutingTest extends AndroidTestCase {
 
         // test each device
         AudioDeviceInfo[] deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-        for(int index = 0; index < deviceList.length; index++) {
+        for (int index = 0; index < deviceList.length; index++) {
             assertTrue(audioTrack.setPreferredDevice(deviceList[index]));
             assertTrue(audioTrack.getPreferredDevice() == deviceList[index]);
         }
@@ -84,6 +97,80 @@ public class RoutingTest extends AndroidTestCase {
         // Check defaults again
         assertTrue(audioTrack.setPreferredDevice(null));
         assertNull(audioTrack.getPreferredDevice());
+
+        audioTrack.release();
+    }
+
+    private class AudioTrackRoutingListener implements AudioTrack.OnRoutingChangedListener {
+        public void onRoutingChanged(AudioTrack audioTrack) {}
+    }
+
+    public void test_audioTrack_RoutingListener() {
+        AudioTrack audioTrack = allocAudioTrack();
+
+        audioTrack.addOnRoutingChangedListener(null, null);
+
+        AudioTrackRoutingListener listener = new AudioTrackRoutingListener();
+        AudioTrackRoutingListener someOtherListener = new AudioTrackRoutingListener();
+
+        audioTrack.addOnRoutingChangedListener(listener, null);
+
+        // remove a listener we didn't add
+        audioTrack.removeOnRoutingChangedListener(someOtherListener);
+
+        audioTrack.removeOnRoutingChangedListener(listener);
+
+        audioTrack.addOnRoutingChangedListener(listener, new Handler());
+
+        audioTrack.removeOnRoutingChangedListener(listener);
+
+        audioTrack.release();
+   }
+
+    private AudioRecord allocAudioRecord() {
+        int bufferSize =
+                AudioRecord.getMinBufferSize(
+                    41000,
+                    AudioFormat.CHANNEL_OUT_DEFAULT,
+                    AudioFormat.ENCODING_PCM_16BIT);
+        AudioRecord audioRecord =
+            new AudioRecord(
+                MediaRecorder.AudioSource.DEFAULT,
+                41000, AudioFormat.CHANNEL_OUT_DEFAULT,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize);
+        return audioRecord;
+    }
+
+    private class AudioRecordRoutingListener implements AudioRecord.OnRoutingChangedListener {
+        public void onRoutingChanged(AudioRecord audioRecord) {}
+    }
+
+    public void test_audioRecord_RoutingListener() {
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
+            // Can't do it so skip this test
+            return;
+        }
+
+        AudioRecord audioRecord = allocAudioRecord();
+
+        audioRecord.addOnRoutingChangedListener(null, null);
+
+        AudioRecordRoutingListener listener = new AudioRecordRoutingListener();
+        AudioRecordRoutingListener someOtherListener = new AudioRecordRoutingListener();
+
+        audioRecord.addOnRoutingChangedListener(listener, null);
+
+        // remove a listener we didn't add
+        audioRecord.removeOnRoutingChangedListener(someOtherListener);
+
+        audioRecord.removeOnRoutingChangedListener(listener);
+
+        audioRecord.addOnRoutingChangedListener(listener, new Handler());
+
+        audioRecord.removeOnRoutingChangedListener(listener);
+
+        audioRecord.release();
     }
 
     public void test_audioRecord_preferredDevice() {
@@ -92,17 +179,7 @@ public class RoutingTest extends AndroidTestCase {
             return;
         }
 
-        int bufferSize =
-            AudioRecord.getMinBufferSize(
-                41000,
-                AudioFormat.CHANNEL_OUT_DEFAULT,
-                AudioFormat.ENCODING_PCM_16BIT);
-        AudioRecord audioRecord =
-            new AudioRecord(
-                MediaRecorder.AudioSource.DEFAULT,
-                41000, AudioFormat.CHANNEL_OUT_DEFAULT,
-                AudioFormat.ENCODING_PCM_16BIT,
-                bufferSize);
+        AudioRecord audioRecord = allocAudioRecord();
         assertNotNull(audioRecord);
 
         // None selected (new AudioRecord), so check for default
@@ -113,7 +190,7 @@ public class RoutingTest extends AndroidTestCase {
 
         // test each device
         AudioDeviceInfo[] deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_INPUTS);
-        for(int index = 0; index < deviceList.length; index++) {
+        for (int index = 0; index < deviceList.length; index++) {
             assertTrue(audioRecord.setPreferredDevice(deviceList[index]));
             assertTrue(audioRecord.getPreferredDevice() == deviceList[index]);
         }
@@ -121,5 +198,7 @@ public class RoutingTest extends AndroidTestCase {
         // Check defaults again
         assertTrue(audioRecord.setPreferredDevice(null));
         assertNull(audioRecord.getPreferredDevice());
+
+        audioRecord.release();
     }
 }
