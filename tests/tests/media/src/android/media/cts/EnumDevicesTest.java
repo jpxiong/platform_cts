@@ -95,6 +95,53 @@ public class EnumDevicesTest extends AndroidTestCase {
         }
     }
 
+    public void test_devicesInfoFields() {
+        AudioDeviceInfo[] deviceList;
+        deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_ALL);
+        for (int index = 0; index < deviceList.length; index++) {
+            AudioDeviceInfo deviceInfo = deviceList[index];
+            // Product Name
+            CharSequence productName = deviceInfo.getProductName();
+            assertNotNull(productName);
+            assertTrue(productName.length() != 0);
+
+            // Address
+            String address = deviceInfo.getAddress();
+            assertNotNull(address);
+            // address may be empty
+
+            // isSource() XOR isSink()
+            assertTrue(deviceInfo.isSource() != deviceInfo.isSink());
+
+            // Sample Rates
+            int[] sampleRates = deviceInfo.getSampleRates();
+            assertNotNull(sampleRates);
+            // "analog" devices won't list any sample rates
+
+            // Channel Masks
+            int[] channelMasks = deviceInfo.getChannelMasks();
+            assertNotNull(channelMasks);
+            // "analog" devices won't list any channel masks
+
+            // Channel Index Masks
+            int[] indexMasks = deviceInfo.getChannelIndexMasks();
+            assertNotNull(channelMasks);
+
+            // Channel Counts
+            int[] channelCounts = deviceInfo.getChannelCounts();
+            assertNotNull(channelCounts);
+            // "analog" devices won't list any channel Counts
+
+            // Encodings
+            int[] encodings = deviceInfo.getEncodings();
+            assertNotNull(encodings);
+            // "analog" devices won't list any encodings
+
+            int type = deviceInfo.getType();
+            assert(type > AudioDeviceInfo.TYPE_UNKNOWN);
+        }
+    }
+
     private class EmptyDeviceCallback extends AudioDeviceCallback {
         public void onAudioDevicesAdded(AudioDeviceInfo[] addedDevices) {
             mAddCallbackCalled = true;
