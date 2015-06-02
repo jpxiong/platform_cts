@@ -25,6 +25,8 @@ import android.os.MessageQueue.OnFileDescriptorEventListener;
 import android.os.ParcelFileDescriptor;
 import android.os.ParcelFileDescriptor.AutoCloseInputStream;
 import android.os.ParcelFileDescriptor.AutoCloseOutputStream;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.os.SystemClock;
 import android.os.MessageQueue.IdleHandler;
 import android.test.AndroidTestCase;
@@ -66,7 +68,7 @@ public class MessageQueueTest extends AndroidTestCase {
         }
     }
 
-    private enum Test {ADD_IDLE_HANDLER, REMOVE_IDLE_HANDLER};
+    private enum Test {ADD_IDLE_HANDLER, REMOVE_IDLE_HANDLER}
 
     /**
      * {@link HandlerThread} that adds or removes an idle handler depending on the {@link Test}
@@ -91,6 +93,7 @@ public class MessageQueueTest extends AndroidTestCase {
             super.onLooperPrepared();
 
             IdleHandler idleHandler = new IdleHandler() {
+                @Override
                 public boolean queueIdle() {
                     mIdleLatch.countDown();
                     return false;
@@ -168,6 +171,7 @@ public class MessageQueueTest extends AndroidTestCase {
     public void testMessageOrder() throws Exception {
 
         OrderTestHelper tester = new OrderTestHelper() {
+            @Override
             public void init() {
                 super.init();
                 long now = SystemClock.uptimeMillis() + 200;
@@ -191,6 +195,7 @@ public class MessageQueueTest extends AndroidTestCase {
 
         OrderTestHelper tester = new OrderTestHelper() {
 
+            @Override
             public void init() {
                 super.init();
                 long now = SystemClock.uptimeMillis() + 200;
@@ -200,6 +205,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(0));
             }
 
+            @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 if (msg.what == 0) {
@@ -386,9 +392,9 @@ public class MessageQueueTest extends AndroidTestCase {
      * edge cases around closing file descriptors within the callback and adding
      * new ones with the same number.
      *
-     * Register a file descriptor, close it from within the callback before
-     * returning, return.  Then create a new file descriptor (with the same number),
-     * register it.  Ensure that we start getting events for the new file descriptor.
+     * Register a file descriptor, close it from within the callback, then return.
+     * Later, create a new file descriptor register it.  Ensure that we start getting
+     * events for the new file descriptor.
      *
      * This test exercises special logic in Looper.cpp for EPOLL_CTL_DEL handling EBADF.
      */
@@ -401,23 +407,19 @@ public class MessageQueueTest extends AndroidTestCase {
             final Handler handler = new Handler(thread.getLooper());
 
             final ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
-            final int oldReaderFd = pipe[0].getFd();
             try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
                     final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                 // Register the callback.
-                final boolean[] awoke = new boolean[1];
+                final CountDownLatch awoke = new CountDownLatch(1);
                 queue.addOnFileDescriptorEventListener(reader.getFD(),
-                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
+                        OnFileDescriptorEventListener.EVENT_ERROR,
+                        new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                        awoke[0] = true;
+                        awoke.countDown();
 
-                        // Close the file descriptor before we return.
-                        try {
-                            reader.close();
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                        // Close the reader before we return.
+                        closeQuietly(reader);
 
                         // Return 0 to unregister the callback.
                         return 0;
@@ -428,26 +430,23 @@ public class MessageQueueTest extends AndroidTestCase {
                 writer.close();
 
                 // Wait for the looper to catch up and run the callback.
+                assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
                 syncWait(handler);
-                assertTrue(awoke[0]);
             }
 
             // At this point, the reader and writer are both closed.
-            // If we're lucky, we can create a new pipe with the same file
-            // descriptor numbers as before.
+            // Make a new pipe and ensure that things still work as expected.
             final ParcelFileDescriptor[] pipe2 = ParcelFileDescriptor.createPipe();
-            assertEquals("Expected new pipe to be created with same fd number as "
-                    + "previous pipe we just closed for the purpose of this test.",
-                    oldReaderFd, pipe2[0].getFd());
             try (final FileInputStream reader2 = new AutoCloseInputStream(pipe2[0]);
                     final FileOutputStream writer2 = new AutoCloseOutputStream(pipe2[1])) {
                 // Register the callback.
-                final boolean[] awoke = new boolean[1];
+                final CountDownLatch awoke = new CountDownLatch(1);
                 queue.addOnFileDescriptorEventListener(reader2.getFD(),
-                        OnFileDescriptorEventListener.EVENT_INPUT, new OnFileDescriptorEventListener() {
+                        OnFileDescriptorEventListener.EVENT_INPUT,
+                        new OnFileDescriptorEventListener() {
                     @Override
                     public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                        awoke[0] = true;
+                        awoke.countDown();
 
                         // Return 0 to unregister the callback.
                         return 0;
@@ -458,8 +457,8 @@ public class MessageQueueTest extends AndroidTestCase {
                 writer2.close();
 
                 // Wait for the looper to catch up and run the callback.
+                assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
                 syncWait(handler);
-                assertTrue(awoke[0]);
             }
         } finally {
             thread.quitAndRethrow();
@@ -471,10 +470,10 @@ public class MessageQueueTest extends AndroidTestCase {
      * edge cases around closing file descriptors within the callback and adding
      * new ones with the same number.
      *
-     * Register a file descriptor, close it from within the callback before
-     * returning, create a new file descriptor (with the same number) and return.
-     * Then register the same file descriptor.  Ensure that we start getting events for
-     * the new file descriptor.
+     * Register a file descriptor, close it from within the callback, reassign its
+     * number to a different pipe, then return.  Later, register the same file descriptor
+     * again (now referring to a new pipe).  Ensure that we start getting
+     * events for the new file descriptor.
      *
      * This test exercises special logic in Looper.cpp for EPOLL_CTL_DEL handling ENOENT.
      */
@@ -487,69 +486,67 @@ public class MessageQueueTest extends AndroidTestCase {
             final Handler handler = new Handler(thread.getLooper());
 
             final ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
-            final int oldReaderFd = pipe[0].getFd();
-            try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
-                    final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
-                // Register the callback.
-                final boolean[] awoke = new boolean[1];
-                queue.addOnFileDescriptorEventListener(reader.getFD(),
-                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
-                    @Override
-                    public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                        awoke[0] = true;
+            final ParcelFileDescriptor[] pipe2 = ParcelFileDescriptor.createPipe();
+            try {
+                final int oldReaderFd = pipe[0].getFd();
+                try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
+                        final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
+                    // Register the callback.
+                    final CountDownLatch awoke = new CountDownLatch(1);
+                    queue.addOnFileDescriptorEventListener(reader.getFD(),
+                            OnFileDescriptorEventListener.EVENT_ERROR,
+                            new OnFileDescriptorEventListener() {
+                        @Override
+                        public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                            awoke.countDown();
 
-                        try {
-                            // Close the file descriptor before we return.
-                            reader.close();
+                            // Close the reader before we return and hijack its fd.
+                            hijackFd(pipe2, pipe);
 
-                            // At this point, the reader and writer are both closed.
-                            // Assuming no one else has created a file descriptor in the meantime,
-                            // when we recreate the pipe we will get the same number as before.
-                            final ParcelFileDescriptor[] pipe2 = ParcelFileDescriptor.createPipe();
-                            assertEquals("Expected new pipe to be created with same fd number as "
-                                    + "previous pipe we just closed for the purpose of this test.",
-                                    oldReaderFd, pipe2[0].getFd());
-                            pipe[0] = pipe2[0];
-                            pipe[1] = pipe2[1];
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
+                            // Return 0 to unregister the callback.
+                            return 0;
                         }
+                    });
 
-                        // Return 0 to unregister the callback.
-                        return 0;
-                    }
-                });
+                    // Close the writer to wake up the callback (due to hangup).
+                    writer.close();
 
-                // Close the writer to wake up the callback (due to hangup).
-                writer.close();
+                    // Wait for the looper to catch up and run the callback.
+                    assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
+                    syncWait(handler);
+                }
 
-                // Wait for the looper to catch up and run the callback.
-                syncWait(handler);
-                assertTrue(awoke[0]);
-            }
+                // Now we have a new pipe with the same file descriptor, make sure we can
+                // register it successfully.
+                assertEquals(oldReaderFd, pipe2[0].getFd());
+                try (final FileInputStream reader2 = new AutoCloseInputStream(pipe2[0]);
+                        final FileOutputStream writer2 = new AutoCloseOutputStream(pipe2[1])) {
+                    // Register the callback.
+                    final CountDownLatch awoke = new CountDownLatch(1);
+                    queue.addOnFileDescriptorEventListener(reader2.getFD(),
+                            OnFileDescriptorEventListener.EVENT_INPUT,
+                            new OnFileDescriptorEventListener() {
+                        @Override
+                        public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                            awoke.countDown();
 
-            // Now we have a new pipe, make sure we can register it successfully.
-            try (final FileInputStream reader2 = new AutoCloseInputStream(pipe[0]);
-                    final FileOutputStream writer2 = new AutoCloseOutputStream(pipe[1])) {
-                // Register the callback.
-                final boolean[] awoke = new boolean[1];
-                queue.addOnFileDescriptorEventListener(reader2.getFD(),
-                        OnFileDescriptorEventListener.EVENT_INPUT, new OnFileDescriptorEventListener() {
-                    @Override
-                    public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                        awoke[0] = true;
+                            // Return 0 to unregister the callback.
+                            return 0;
+                        }
+                    });
 
-                        // Return 0 to unregister the callback.
-                        return 0;
-                    }
-                });
+                    // Close the writer to wake up the callback (due to hangup).
+                    writer2.close();
 
-                // Close the writer to wake up the callback (due to hangup).
-                writer2.close();
-
-                // Wait for the looper to catch up and run the callback.
-                syncWait(handler);
-                assertTrue(awoke[0]);
+                    // Wait for the looper to catch up and run the callback.
+                    assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
+                    syncWait(handler);
+                }
+            } finally {
+                closeQuietly(pipe[0]);
+                closeQuietly(pipe[1]);
+                closeQuietly(pipe2[0]);
+                closeQuietly(pipe2[1]);
             }
         } finally {
             thread.quitAndRethrow();
@@ -561,10 +558,9 @@ public class MessageQueueTest extends AndroidTestCase {
      * edge cases around closing file descriptors within the callback and adding
      * new ones with the same number.
      *
-     * Register a file descriptor, close it from within the callback before
-     * returning, create a new file descriptor (with the same number),
-     * register it, and return.  Ensure that we start getting events for the
-     * new file descriptor.
+     * Register a file descriptor, close it from within the callback, reassign its
+     * number to a different pipe, register it, then return.
+     * Ensure that we start getting events for the new file descriptor.
      *
      * This test exercises special logic in Looper.cpp for EPOLL_CTL_MOD handling
      * ENOENT and fallback to EPOLL_CTL_ADD as well as sequence number checks when removing
@@ -579,71 +575,66 @@ public class MessageQueueTest extends AndroidTestCase {
             final Handler handler = new Handler(thread.getLooper());
 
             final ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
-            final boolean[] awoke2 = new boolean[1];
-            final int oldReaderFd = pipe[0].getFd();
-            try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
-                    final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
-                // Register the callback.
-                final boolean[] awoke = new boolean[1];
-                queue.addOnFileDescriptorEventListener(reader.getFD(),
-                        OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
-                    @Override
-                    public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                        awoke[0] = true;
+            final ParcelFileDescriptor[] pipe2 = ParcelFileDescriptor.createPipe();
+            try {
+                final CountDownLatch awoke2 = new CountDownLatch(1);
+                final int oldReaderFd = pipe[0].getFd();
+                try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
+                        final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
+                    // Register the callback.
+                    final CountDownLatch awoke = new CountDownLatch(1);
+                    queue.addOnFileDescriptorEventListener(reader.getFD(),
+                            OnFileDescriptorEventListener.EVENT_ERROR,
+                            new OnFileDescriptorEventListener() {
+                        @Override
+                        public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                            awoke.countDown();
 
-                        final ParcelFileDescriptor[] pipe2;
-                        try {
-                            // Close the file descriptor before we return.
-                            reader.close();
+                            // Close the reader before we return and hijack its fd.
+                            hijackFd(pipe2, pipe);
 
-                            // At this point, the reader and writer are both closed.
-                            // Assuming no one else has created a file descriptor in the meantime,
-                            // when we recreate the pipe we will get the same number as before.
-                            pipe2 = ParcelFileDescriptor.createPipe();
-                            assertEquals("Expected new pipe to be created with same fd number as "
-                                    + "previous pipe we just closed for the purpose of this test.",
-                                    oldReaderFd, pipe2[0].getFd());
-                            pipe[0] = pipe2[0];
-                            pipe[1] = pipe2[1];
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
+                            // Now we have a new pipe, make sure we can register it successfully.
+                            queue.addOnFileDescriptorEventListener(pipe2[0].getFileDescriptor(),
+                                    OnFileDescriptorEventListener.EVENT_INPUT,
+                                    new OnFileDescriptorEventListener() {
+                                @Override
+                                public int onFileDescriptorEvents(FileDescriptor fd, int events) {
+                                    awoke2.countDown();
+
+                                    // Return 0 to unregister the callback.
+                                    return 0;
+                                }
+                            });
+
+                            // Return 0 to unregister the callback.
+                            return 0;
                         }
+                    });
 
-                        // Now we have a new pipe, make sure we can register it successfully.
-                        queue.addOnFileDescriptorEventListener(pipe[0].getFileDescriptor(),
-                                OnFileDescriptorEventListener.EVENT_INPUT,
-                                new OnFileDescriptorEventListener() {
-                            @Override
-                            public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                                awoke2[0] = true;
+                    // Close the writer to wake up the callback (due to hangup).
+                    writer.close();
 
-                                // Return 0 to unregister the callback.
-                                return 0;
-                            }
-                        });
+                    // Wait for the looper to catch up and run the callback.
+                    assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
+                    syncWait(handler);
+                }
 
-                        // Return 0 to unregister the callback.
-                        return 0;
-                    }
-                });
-
-                // Close the writer to wake up the callback (due to hangup).
-                writer.close();
+                // Close the second writer to wake up the second callback (due to hangup).
+                pipe2[1].close();
 
                 // Wait for the looper to catch up and run the callback.
+                assertTrue("awoke2", awoke2.await(TIMEOUT, TimeUnit.MILLISECONDS));
                 syncWait(handler);
-                assertTrue(awoke[0]);
+
+                // Close the second reader now that we're done with the test.
+                assertEquals(oldReaderFd, pipe2[0].getFd());
+                pipe2[0].close();
+            } finally {
+                closeQuietly(pipe[0]);
+                closeQuietly(pipe[1]);
+                closeQuietly(pipe2[0]);
+                closeQuietly(pipe2[1]);
             }
-
-            // Close the second writer to wake up the second callback (due to hangup).
-            pipe[1].close();
-
-            // Wait for the looper to catch up and run the callback.
-            syncWait(handler);
-            assertTrue(awoke2[0]);
-
-            // Close the second reader now that we're done with the test.
-            pipe[0].close();
         } finally {
             thread.quitAndRethrow();
         }
@@ -655,7 +646,7 @@ public class MessageQueueTest extends AndroidTestCase {
      * new ones with the same number.
      *
      * Register a file descriptor, make a duplicate of it, close it from within the
-     * callback before returning, return.  Look for signs that the Looper is spinning
+     * callback, then return.  Look for signs that the Looper is spinning
      * and never getting a chance to block.
      *
      * This test exercises special logic in Looper.cpp for rebuilding the epoll set
@@ -676,12 +667,12 @@ public class MessageQueueTest extends AndroidTestCase {
                 try (final FileInputStream reader = new AutoCloseInputStream(pipe[0]);
                         final FileOutputStream writer = new AutoCloseOutputStream(pipe[1])) {
                     // Register the callback.
-                    final boolean[] awoke = new boolean[1];
+                    final CountDownLatch awoke = new CountDownLatch(1);
                     queue.addOnFileDescriptorEventListener(reader.getFD(),
                             OnFileDescriptorEventListener.EVENT_ERROR, new OnFileDescriptorEventListener() {
                         @Override
                         public int onFileDescriptorEvents(FileDescriptor fd, int events) {
-                            awoke[0] = true;
+                            awoke.countDown();
 
                             // Close the file descriptor before we return.
                             try {
@@ -699,8 +690,8 @@ public class MessageQueueTest extends AndroidTestCase {
                     writer.close();
 
                     // Wait for the looper to catch up and run the callback.
+                    assertTrue("awoke", awoke.await(TIMEOUT, TimeUnit.MILLISECONDS));
                     syncWait(handler);
-                    assertTrue(awoke[0]);
                 }
 
                 // Wait a little bit before we stop the thread.
@@ -729,6 +720,7 @@ public class MessageQueueTest extends AndroidTestCase {
             private int mBarrierToken1;
             private int mBarrierToken2;
 
+            @Override
             public void init() {
                 super.init();
                 mLastMessage = 10;
@@ -741,6 +733,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 mHandler.sendEmptyMessage(6);
             }
 
+            @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 if (msg.what == 3) {
@@ -797,7 +790,35 @@ public class MessageQueueTest extends AndroidTestCase {
                 latch.countDown();
             }
         });
-        latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
+        assertTrue("Handler got stuck.", latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+
+    private static void closeQuietly(AutoCloseable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    private static void hijackFd(ParcelFileDescriptor[] newPipe, ParcelFileDescriptor[] oldPipe) {
+        // Detach the old pipe's first fd and get its number.
+        int fd = oldPipe[0].detachFd();
+
+        // Assign the new pipe's first fd to the same number as the old pipe's first fd.
+        // This causes the old pipe's first fd to be closed and reassigned.
+        try {
+            Os.dup2(newPipe[0].getFileDescriptor(), fd);
+        } catch (ErrnoException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        // Fix up the new pipe's first fd object.
+        closeQuietly(newPipe[0]);
+        newPipe[0] = ParcelFileDescriptor.adoptFd(fd);
     }
 
     /**
@@ -814,6 +835,7 @@ public class MessageQueueTest extends AndroidTestCase {
 
         public void init() {
             mHandler = new Handler() {
+                @Override
                 public void handleMessage(Message msg) {
                     OrderTestHelper.this.handleMessage(msg);
                 }
@@ -863,6 +885,7 @@ public class MessageQueueTest extends AndroidTestCase {
                 super("MessengerLooperThread");
             }
 
+            @Override
             public void onLooperPrepared() {
                 init();
                 mLooper = getLooper();
@@ -908,7 +931,7 @@ public class MessageQueueTest extends AndroidTestCase {
      * A HandlerThread that propagates exceptions out of the event loop
      * instead of crashing the process.
      */
-    private class AssertableHandlerThread extends HandlerThread {
+    private static class AssertableHandlerThread extends HandlerThread {
         private Throwable mThrowable;
         private long mRuntime;
 
