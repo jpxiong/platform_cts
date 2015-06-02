@@ -183,6 +183,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
+    CtsAtraceTestCases \
     CtsDevicePolicyManagerTestCases \
     CtsDumpsysHostTestCases \
     CtsHostJank \
