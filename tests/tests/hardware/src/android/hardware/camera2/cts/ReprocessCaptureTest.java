@@ -77,7 +77,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         SINGLE_SHOT,
         BURST,
         MIXED_BURST,
-        ABORT_CAPTURE
+        ABORT_CAPTURE,
+        TIMESTAMPS
     }
 
     /**
@@ -366,6 +367,35 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     /**
+     * Test reprocess timestamps for the largest input and output sizes for each supported format.
+     */
+    public void testReprocessTimestamps() throws Exception {
+        for (String id : mCameraIds) {
+            if (!isYuvReprocessSupported(id) && !isOpaqueReprocessSupported(id)) {
+                continue;
+            }
+
+            try {
+                // open Camera device
+                openDevice(id);
+
+                int[] supportedInputFormats =
+                    mStaticInfo.getAvailableFormats(StaticMetadata.StreamDirection.Input);
+                for (int inputFormat : supportedInputFormats) {
+                    int[] supportedReprocessOutputFormats =
+                            mStaticInfo.getValidOutputFormatsForInput(inputFormat);
+                    for (int reprocessOutputFormat : supportedReprocessOutputFormats) {
+                        testReprocessingMaxSizes(id, inputFormat, reprocessOutputFormat,
+                                /*previewSize*/null, CaptureTestCase.TIMESTAMPS);
+                    }
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
      * Test the input format and output format with the largest input and output sizes.
      */
     private void testBasicReprocessing(String cameraId, int inputFormat,
@@ -398,6 +428,10 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 break;
             case ABORT_CAPTURE:
                 testReprocessAbort(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
+                        reprocessOutputFormat);
+                break;
+            case TIMESTAMPS:
+                testReprocessTimestamps(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
                         reprocessOutputFormat);
                 break;
             default:
@@ -734,6 +768,89 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
                     mImageWriterListener.waitForImageReleased(CAPTURE_TIMEOUT_MS);
                 }
+            }
+        } finally {
+            closeReprossibleSession();
+            closeImageReaders();
+        }
+    }
+
+    /**
+     * Test timestamps for reprocess requests. Reprocess request's shutter timestamp, result's
+     * sensor timestamp, and output image's timestamp should match the reprocess input's timestamp.
+     */
+    private void testReprocessTimestamps(String cameraId, Size inputSize, int inputFormat,
+            Size reprocessOutputSize, int reprocessOutputFormat) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, "testReprocessTimestamps: cameraId: " + cameraId + " inputSize: " +
+                    inputSize + " inputFormat: " + inputFormat + " reprocessOutputSize: " +
+                    reprocessOutputSize + " reprocessOutputFormat: " + reprocessOutputFormat);
+        }
+
+        try {
+            setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
+                    NUM_REPROCESS_CAPTURES);
+            setupReprocessableSession(/*previewSurface*/null, NUM_REPROCESS_CAPTURES);
+
+            // Prepare reprocess capture requests.
+            ArrayList<CaptureRequest> reprocessRequests = new ArrayList<>(NUM_REPROCESS_CAPTURES);
+            ArrayList<Long> expectedTimestamps = new ArrayList<>(NUM_REPROCESS_CAPTURES);
+
+            for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
+                TotalCaptureResult result = submitCaptureRequest(mFirstImageReader.getSurface(),
+                        /*inputResult*/null);
+
+                mImageWriter.queueInputImage(
+                        mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
+                CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
+                if (mShareOneImageReader) {
+                    builder.addTarget(mFirstImageReader.getSurface());
+                } else {
+                    builder.addTarget(mSecondImageReader.getSurface());
+                }
+                reprocessRequests.add(builder.build());
+                // Reprocess result's timestamp should match input image's timestamp.
+                expectedTimestamps.add(result.get(CaptureResult.SENSOR_TIMESTAMP));
+            }
+
+            // Submit reprocess requests.
+            SimpleCaptureCallback captureCallback = new SimpleCaptureCallback();
+            mSession.captureBurst(reprocessRequests, captureCallback, mHandler);
+
+            // Verify we get the expected timestamps.
+            for (int i = 0; i < reprocessRequests.size(); i++) {
+                captureCallback.waitForCaptureStart(reprocessRequests.get(i),
+                        expectedTimestamps.get(i), CAPTURE_TIMEOUT_FRAMES);
+            }
+
+            TotalCaptureResult[] reprocessResults =
+                    captureCallback.getTotalCaptureResultsForRequests(reprocessRequests,
+                    CAPTURE_TIMEOUT_FRAMES);
+
+            for (int i = 0; i < expectedTimestamps.size(); i++) {
+                // Verify the result timestamps match the input image's timestamps.
+                long expected = expectedTimestamps.get(i);
+                long timestamp = reprocessResults[i].get(CaptureResult.SENSOR_TIMESTAMP);
+                assertEquals("Reprocess result timestamp (" + timestamp + ") doesn't match input " +
+                        "image's timestamp (" + expected + ")", expected, timestamp);
+
+                // Verify the reprocess output image timestamps match the input image's timestamps.
+                Image image;
+                if (mShareOneImageReader) {
+                    image = mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
+                } else {
+                    image = mSecondImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
+                }
+                timestamp = image.getTimestamp();
+                image.close();
+
+                assertEquals("Reprocess output timestamp (" + timestamp + ") doesn't match input " +
+                        "image's timestamp (" + expected + ")", expected, timestamp);
+            }
+
+            // Make sure all input surfaces are released.
+            for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
+                mImageWriterListener.waitForImageReleased(CAPTURE_TIMEOUT_MS);
             }
         } finally {
             closeReprossibleSession();
