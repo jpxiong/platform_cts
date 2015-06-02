@@ -313,6 +313,9 @@ public class CameraTestUtils extends Assert {
     public static class SimpleCaptureCallback extends CameraCaptureSession.CaptureCallback {
         private final LinkedBlockingQueue<TotalCaptureResult> mQueue =
                 new LinkedBlockingQueue<TotalCaptureResult>();
+        private final LinkedBlockingQueue<CaptureFailure> mFailureQueue =
+                new LinkedBlockingQueue<>();
+
         private AtomicLong mNumFramesArrived = new AtomicLong(0);
 
         @Override
@@ -336,6 +339,12 @@ public class CameraTestUtils extends Assert {
         @Override
         public void onCaptureFailed(CameraCaptureSession session, CaptureRequest request,
                 CaptureFailure failure) {
+            try {
+                mFailureQueue.put(failure);
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureFailed");
+            }
         }
 
         @Override
@@ -481,6 +490,35 @@ public class CameraTestUtils extends Assert {
                     + "waiting for " + numResultsWait + " results");
         }
 
+        /**
+         * Get an array list of {@link #CaptureFailure capture failure} with maxNumFailures entries
+         * at most. If it times out before maxNumFailures failures are received, return the failures
+         * received so far.
+         *
+         * @param maxNumFailures The maximal number of failures to return. If it times out before
+         *                       the maximal number of failures are received, return the received
+         *                       failures so far.
+         * @throws UnsupportedOperationException If an error happens while waiting on the failure.
+         */
+        public ArrayList<CaptureFailure> getCaptureFailures(long maxNumFailures) {
+            ArrayList<CaptureFailure> failures = new ArrayList<>();
+            try {
+                for (int i = 0; i < maxNumFailures; i++) {
+                    CaptureFailure failure = mFailureQueue.poll(CAPTURE_RESULT_TIMEOUT_MS,
+                            TimeUnit.MILLISECONDS);
+                    if (failure == null) {
+                        // If waiting on a failure times out, return the failures so far.
+                        break;
+                    }
+                    failures.add(failure);
+                }
+            }  catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
+
+            return failures;
+        }
+
         public boolean hasMoreResults()
         {
             return mQueue.isEmpty();
@@ -489,6 +527,7 @@ public class CameraTestUtils extends Assert {
         public void drain() {
             mQueue.clear();
             mNumFramesArrived.getAndSet(0);
+            mFailureQueue.clear();
         }
     }
 
