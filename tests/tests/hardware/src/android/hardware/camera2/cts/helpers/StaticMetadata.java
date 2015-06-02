@@ -1655,6 +1655,52 @@ public class StaticMetadata {
     }
 
     /**
+     * Get available lens shading modes.
+     */
+     public int[] getAvailableLensShadingModesChecked() {
+         Key<int[]> key =
+                 CameraCharacteristics.SHADING_AVAILABLE_MODES;
+         int[] modes = getValueFromKeyNonNull(key);
+         if (modes == null) {
+             return new int[0];
+         }
+
+         List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+         // FAST must be included.
+         checkTrueForKey(key, " FAST must be included",
+                 modeList.contains(CameraMetadata.SHADING_MODE_FAST));
+
+         if (isCapabilitySupported(
+                 CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING)) {
+             checkTrueForKey(key, " OFF must be included for MANUAL_POST_PROCESSING devices",
+                     modeList.contains(CameraMetadata.SHADING_MODE_OFF));
+         }
+         return modes;
+     }
+
+     /**
+      * Get available lens shading map modes.
+      */
+      public int[] getAvailableLensShadingMapModesChecked() {
+          Key<int[]> key =
+                  CameraCharacteristics.STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES;
+          int[] modes = getValueFromKeyNonNull(key);
+          if (modes == null) {
+              return new int[0];
+          }
+
+          List<Integer> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+
+          if (isCapabilitySupported(
+                  CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
+              checkTrueForKey(key, " ON must be included for RAW capability devices",
+                      modeList.contains(CameraMetadata.STATISTICS_LENS_SHADING_MAP_MODE_ON));
+          }
+          return modes;
+      }
+
+
+    /**
      * Get available capabilities and do the sanity check.
      *
      * @return reported available capabilities list, empty list if the value is unavailable.
