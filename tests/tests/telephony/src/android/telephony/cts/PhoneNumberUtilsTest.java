@@ -335,7 +335,7 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // exercising the underlying PhoneNumberUtil or constraining localization changes.
         String phoneNumber = "6512223333";
         // Execute
-        TtsSpan ttsSpan = PhoneNumberUtils.getPhoneTtsSpan(phoneNumber);
+        TtsSpan ttsSpan = PhoneNumberUtils.createTtsSpan(phoneNumber);
         // Verify: the created TtsSpan contains the phone number.
         assertEquals("6512223333", ttsSpan.getArgs().get(TtsSpan.ARG_NUMBER_PARTS));
     }
@@ -345,7 +345,7 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // exercising the underlying PhoneNumberUtil or constraining localization changes.
         Spannable spannable = new SpannableString("Hello 6502223333");
         // Execute
-        PhoneNumberUtils.addPhoneTtsSpan(spannable, 5, spannable.length());
+        PhoneNumberUtils.addTtsSpan(spannable, 5, spannable.length());
         // Verify: the Spannable is annotated with a TtsSpan in the correct location.
         TtsSpan[] ttsSpans = spannable.getSpans(5, spannable.length() - 1, TtsSpan.class);
         assertEquals(1, ttsSpans.length);
@@ -357,7 +357,7 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // exercising the underlying PhoneNumberUtil or constraining localization changes.
         CharSequence phoneNumber = "6512223333";
         // Execute
-        Spannable spannable = (Spannable) PhoneNumberUtils.getPhoneTtsSpannable(phoneNumber);
+        Spannable spannable = (Spannable) PhoneNumberUtils.createTtsSpannable(phoneNumber);
         // Verify: returned char sequence contains a TtsSpan with the phone number in it
         TtsSpan[] ttsSpans = spannable.getSpans(0, spannable.length() - 1, TtsSpan.class);
         assertEquals(1, ttsSpans.length);
