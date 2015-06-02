@@ -813,11 +813,76 @@ public class DumpsysHostTest extends DeviceTestCase {
         assertInteger(parts[4]); // chargeTimeRemaining
     }
 
-    private static void assertInteger(String input) {
+    /**
+     * Tests the output of "dumpsys gfxinfo framestats".
+     *
+     * @throws Exception
+     */
+    public void testGfxinfoFramestats() throws Exception {
+        final String MARKER = "---PROFILEDATA---";
+
+        String frameinfo = mDevice.executeShellCommand("dumpsys gfxinfo com.android.systemui framestats");
+        assertNotNull(frameinfo);
+        assertTrue(frameinfo.length() > 0);
+        int profileStart = frameinfo.indexOf(MARKER);
+        int profileEnd = frameinfo.indexOf(MARKER, profileStart + 1);
+        assertTrue(profileStart >= 0);
+        assertTrue(profileEnd > profileStart);
+        String profileData = frameinfo.substring(profileStart + MARKER.length(), profileEnd);
+        assertTrue(profileData.length() > 0);
+        boolean foundAtLeastOneRow = false;
+        try (BufferedReader reader = new BufferedReader(
+                new StringReader(profileData))) {
+            String line;
+            // First line needs to be the headers
+            while ((line = reader.readLine()) != null && line.isEmpty()) {}
+
+            assertNotNull(line);
+            assertTrue("First line was not the expected header",
+                    line.startsWith("Flags,IntendedVsync,Vsync,OldestInputEvent" +
+                            ",NewestInputEvent,HandleInputStart,AnimationStart" +
+                            ",PerformTraversalsStart,DrawStart,SyncStart" +
+                            ",IssueDrawCommandsStart,SwapBuffers,FrameCompleted"));
+
+            long[] numparts = new long[13];
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+
+                String[] parts = line.split(",");
+                assertTrue(parts.length >= 13);
+                for (int i = 0; i < 13; i++) {
+                    numparts[i] = assertInteger(parts[i]);
+                }
+                if (numparts[0] != 0) {
+                    continue;
+                }
+                // assert VSYNC >= INTENDED_VSYNC
+                assertTrue(numparts[2] >= numparts[1]);
+                // assert time is flowing forwards, skipping index 3 & 4
+                // as those are input timestamps that may or may not be present
+                assertTrue(numparts[5] >= numparts[2]);
+                for (int i = 6; i < 13; i++) {
+                    assertTrue("Index " + i + " did not flow forward, " +
+                            numparts[i] + " not larger than " + numparts[i - 1],
+                            numparts[i] >= numparts[i-1]);
+                }
+                long totalDuration = numparts[12] - numparts[1];
+                assertTrue("Frame did not take a positive amount of time to process",
+                        totalDuration > 0);
+                assertTrue("Bogus frame duration, exceeds 100 seconds",
+                        totalDuration < 100000000000L);
+                foundAtLeastOneRow = true;
+            }
+        }
+        assertTrue(foundAtLeastOneRow);
+    }
+
+    private static long assertInteger(String input) {
         try {
-            Long.parseLong(input);
+            return Long.parseLong(input);
         } catch (NumberFormatException e) {
             fail("Expected an integer but found \"" + input + "\"");
+            // Won't be hit, above throws AssertException
+            return -1;
         }
     }
 
