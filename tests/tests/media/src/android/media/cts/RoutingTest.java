@@ -43,11 +43,6 @@ public class RoutingTest extends AndroidTestCase {
 
     private AudioManager mAudioManager;
 
-    static {
-        // We're going to use a Handler
-        Looper.prepare();
-    }
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -103,6 +98,23 @@ public class RoutingTest extends AndroidTestCase {
         audioTrack.release();
     }
 
+    /*
+     * tests if the Looper for the current thread has been prepared,
+     * If not, it makes one, prepares it and returns it.
+     * If this returns non-null, the caller is reponsible for calling quit()
+     * on the returned Looper.
+     */
+    private Looper prepareIfNeededLooper() {
+        // non-null Handler
+        Looper myLooper = null;
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+            myLooper = Looper.myLooper();
+            assertNotNull(myLooper);
+        }
+        return myLooper;
+    }
+
     private class AudioTrackRoutingListener implements AudioTrack.OnRoutingChangedListener {
         public void onRoutingChanged(AudioTrack audioTrack) {}
     }
@@ -122,11 +134,15 @@ public class RoutingTest extends AndroidTestCase {
 
         audioTrack.removeOnRoutingChangedListener(listener);
 
+        Looper myLooper = prepareIfNeededLooper();
         audioTrack.addOnRoutingChangedListener(listener, new Handler());
 
         audioTrack.removeOnRoutingChangedListener(listener);
 
         audioTrack.release();
+        if (myLooper != null) {
+            myLooper.quit();
+        }
    }
 
     private AudioRecord allocAudioRecord() {
@@ -153,7 +169,6 @@ public class RoutingTest extends AndroidTestCase {
             // Can't do it so skip this test
             return;
         }
-
         AudioRecord audioRecord = allocAudioRecord();
 
         audioRecord.addOnRoutingChangedListener(null, null);
@@ -168,11 +183,15 @@ public class RoutingTest extends AndroidTestCase {
 
         audioRecord.removeOnRoutingChangedListener(listener);
 
+        Looper myLooper = prepareIfNeededLooper();
         audioRecord.addOnRoutingChangedListener(listener, new Handler());
 
         audioRecord.removeOnRoutingChangedListener(listener);
 
         audioRecord.release();
+        if (myLooper != null) {
+            myLooper.quit();
+        }
     }
 
     public void test_audioRecord_preferredDevice() {
