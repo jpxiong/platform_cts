@@ -1375,7 +1375,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     }
                 }
             }
-            mCollector.expectValuesInRange("Face scores are invalid", faceIds,
+            mCollector.expectValuesInRange("Face scores are invalid", faceScores,
                     Face.SCORE_MIN, Face.SCORE_MAX);
             mCollector.expectValuesUnique("Face ids are invalid", faceIds);
         }

@@ -41,12 +41,18 @@ def main():
             "test_ev_compensation_advanced",
             "test_ev_compensation_basic",
             "test_yuv_plus_jpeg"
-        ]
+        ],
+        "scene2":[]
     }
 
     # Get all the scene0 and scene1 tests, which can be run using the same
     # physical setup.
-    scenes = ["scene0", "scene1"]
+    scenes = ["scene0", "scene1", "scene2"]
+    scene_req = {
+        "scene0" : None,
+        "scene1" : "A grey card covering at least the middle 30% of the scene",
+        "scene2" : "A picture containing human faces"
+    }
     tests = []
     for d in scenes:
         tests += [(d,s[:-3],os.path.join("tests", d, s))
@@ -86,14 +92,6 @@ def main():
         for d in scenes:
             os.mkdir(os.path.join(topdir, camera_id, d))
 
-        out_path = os.path.join(topdir, camera_id, "scene.jpg")
-        out_arg = "out=" + out_path
-        cmd = ['python',
-               os.path.join(os.getcwd(),"tools/validate_scene.py"),
-               camera_id_arg, out_arg]
-        retcode = subprocess.call(cmd,cwd=topdir)
-        assert(retcode == 0)
-
         print "Start running ITS on camera: ", camera_id
         # Run each test, capturing stdout and stderr.
         summary = "ITS test result summary for camera " + camera_id + "\n"
@@ -102,7 +100,19 @@ def main():
         numnotmandatedfail = 0
         numfail = 0
 
+        prev_scene = ""
         for (scene,testname,testpath) in tests:
+            if scene != prev_scene and scene_req[scene] != None:
+                out_path = os.path.join(topdir, camera_id, scene+".jpg")
+                out_arg = "out=" + out_path
+                scene_arg = "scene=" + scene_req[scene]
+                cmd = ['python',
+                        os.path.join(os.getcwd(),"tools/validate_scene.py"),
+                        camera_id_arg, out_arg, scene_arg]
+                retcode = subprocess.call(cmd,cwd=topdir)
+                assert(retcode == 0)
+                print "Start running tests for", scene
+            prev_scene = scene
             cmd = ['python', os.path.join(os.getcwd(),testpath)] + \
                   sys.argv[1:] + [camera_id_arg]
             outdir = os.path.join(topdir,camera_id,scene)
