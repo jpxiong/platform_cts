@@ -17,8 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.android.cts.verifier"
-      android:versionCode="5"
-      android:versionName="5.0_r1.91">
+      android:versionCode="5">
 
     <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="21"/>
 
