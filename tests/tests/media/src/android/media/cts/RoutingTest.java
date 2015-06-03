@@ -236,8 +236,6 @@ public class RoutingTest extends AndroidTestCase {
     }
 
     public void test_audioTrack_getRoutedDevice() {
-        AudioDeviceInfo[] deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-
         int bufferSize =
                 AudioTrack.getMinBufferSize(
                     41000,
@@ -252,7 +250,6 @@ public class RoutingTest extends AndroidTestCase {
                 bufferSize,
                 AudioTrack.MODE_STREAM);
 
-        // audioTrack_.setPreferredDevice(mRoutingDevice);
         AudioTrackFiller filler = new AudioTrackFiller(audioTrack, bufferSize);
         filler.start();
 
@@ -268,6 +265,68 @@ public class RoutingTest extends AndroidTestCase {
         assertNotNull(routedDevice); // we probably can't say anything more than this
 
         filler.stop();
+        audioTrack.stop();
         audioTrack.release();
+    }
+
+    private class AudioRecordPuller implements Runnable {
+        AudioRecord mAudioRecord;
+        int mBufferSize;
+
+        boolean mRecording;
+
+        short[] mAudioData;
+
+        public AudioRecordPuller(AudioRecord audioRecord, int bufferSize) {
+            mAudioRecord = audioRecord;
+            mBufferSize = bufferSize;
+            mRecording = false;
+        }
+
+        public void start() { mRecording = true; }
+        public void stop() { mRecording = false; }
+
+        @Override
+        public void run() {
+            while (mAudioRecord != null && mRecording) {
+                mAudioRecord.read(mAudioData, 0, mBufferSize);
+           }
+        }
+    }
+
+    public void test_audioRecord_getRoutedDevice() {
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
+            return;
+        }
+
+        int bufferSize =
+                AudioRecord.getMinBufferSize(
+                    41000,
+                    AudioFormat.CHANNEL_OUT_DEFAULT,
+                    AudioFormat.ENCODING_PCM_16BIT);
+        AudioRecord audioRecord =
+            new AudioRecord(
+                MediaRecorder.AudioSource.DEFAULT,
+                41000, AudioFormat.CHANNEL_OUT_DEFAULT,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize);
+
+        AudioRecordPuller puller = new AudioRecordPuller(audioRecord, bufferSize);
+        puller.start();
+
+        audioRecord.startRecording();
+
+        Thread pullerThread = new Thread(puller);
+        pullerThread.start();
+
+        try { Thread.sleep(1000); } catch (InterruptedException ex) {}
+
+        // No explicit route
+        AudioDeviceInfo routedDevice = audioRecord.getRoutedDevice();
+        assertNotNull(routedDevice); // we probably can't say anything more than this
+
+        puller.stop();
+        audioRecord.stop();
+        audioRecord.release();
     }
 }
