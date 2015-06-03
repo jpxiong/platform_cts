@@ -335,4 +335,12 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         assertTrue(commandOutput + " expected to start with \"Success:\"",
                 commandOutput.startsWith("Success:"));
     }
+
+    protected void setDeviceAdmin(String componentName) throws DeviceNotAvailableException {
+        String command = "dpm set-active-admin '" + componentName + "'";
+        String commandOutput = getDevice().executeShellCommand(command);
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
+        assertTrue(commandOutput + " expected to start with \"Success:\"",
+                commandOutput.startsWith("Success:"));
+    }
 }
