@@ -100,6 +100,10 @@ public class EnumDevicesTest extends AndroidTestCase {
         deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_ALL);
         for (int index = 0; index < deviceList.length; index++) {
             AudioDeviceInfo deviceInfo = deviceList[index];
+
+            // we don't say anything about the returned value.
+            int id = deviceInfo.getId();
+
             // Product Name
             CharSequence productName = deviceInfo.getProductName();
             assertNotNull(productName);
