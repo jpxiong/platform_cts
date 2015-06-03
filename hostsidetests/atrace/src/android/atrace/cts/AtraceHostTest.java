@@ -39,8 +39,9 @@ public class AtraceHostTest extends DeviceTestCase {
         mDevice = getDevice();
     }
 
-    // Collection of all userspace tags
+    // Collection of all userspace tags, and 'sched'
     private static final List<String> sRequiredCategoriesList = Arrays.asList(
+            "sched",
             "gfx",
             "input",
             "view",
