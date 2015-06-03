@@ -112,6 +112,7 @@ public class LocalSocketTest extends AndroidTestCase{
     }
 
     public void testAccessors() throws IOException{
+        final int INITIAL_SEND_BUFFER_SIZE = 1998;
         LocalSocket socket = new LocalSocket();
         LocalSocketAddress addr = new LocalSocketAddress("secondary");
 
@@ -126,8 +127,14 @@ public class LocalSocketTest extends AndroidTestCase{
         socket.setReceiveBufferSize(1999);
         assertEquals(1999 << 1, socket.getReceiveBufferSize());
 
-        socket.setSendBufferSize(1998);
-        assertEquals(1998 << 1, socket.getSendBufferSize());
+        socket.setSendBufferSize(INITIAL_SEND_BUFFER_SIZE);
+        int sendBufferSize = socket.getSendBufferSize();
+        if ((INITIAL_SEND_BUFFER_SIZE << 1) < sendBufferSize) {
+            socket.setSendBufferSize(sendBufferSize / 2);
+            assertEquals(sendBufferSize, socket.getSendBufferSize());
+        } else {
+            assertEquals(INITIAL_SEND_BUFFER_SIZE << 1, sendBufferSize);
+        }
 
         // Timeout is not support at present, so set is ignored
         socket.setSoTimeout(1996);
