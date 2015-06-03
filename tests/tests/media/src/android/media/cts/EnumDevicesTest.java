@@ -37,11 +37,6 @@ public class EnumDevicesTest extends AndroidTestCase {
     boolean mAddCallbackCalled = false;
     boolean mRemoveCallbackCalled = false;
 
-    static {
-        // We're going to use a Handler
-        Looper.prepare();
-    }
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -152,6 +147,23 @@ public class EnumDevicesTest extends AndroidTestCase {
         }
     }
 
+    /*
+     * tests if the Looper for the current thread has been prepared,
+     * If not, it makes one, prepares it and returns it.
+     * If this returns non-null, the caller is reponsible for calling quit()
+     * on the returned Looper.
+     */
+    private Looper prepareIfNeededLooper() {
+        // non-null Handler
+        Looper myLooper = null;
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+            myLooper = Looper.myLooper();
+            assertNotNull(myLooper);
+        }
+        return myLooper;
+    }
+    
     public void test_deviceCallback() {
         // null callback?
         mAudioManager.registerAudioDeviceCallback(null,null);
@@ -170,7 +182,8 @@ public class EnumDevicesTest extends AndroidTestCase {
         // remove twice
         mAudioManager.unregisterAudioDeviceCallback(callback);
 
-        // non-null Handler
+        Looper myLooper = prepareIfNeededLooper();
+        
         mAudioManager.registerAudioDeviceCallback(callback, new Handler());
         // unregister null callback
         mAudioManager.unregisterAudioDeviceCallback(null);
@@ -180,6 +193,10 @@ public class EnumDevicesTest extends AndroidTestCase {
         mAudioManager.unregisterAudioDeviceCallback(callback);
         // remove twice
         mAudioManager.unregisterAudioDeviceCallback(callback);
+
+        if (myLooper != null) {
+            myLooper.quit();
+        }
     }
 
     //TODO - Need tests for device connect/disconnect callbacks
