@@ -877,7 +877,27 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedPreviewSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
-        return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.YUV_420_888, bound);
+        CameraCharacteristics props = cameraManager.getCameraCharacteristics(cameraId);
+        StreamConfigurationMap config =
+                props.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] rawSizes = config.getOutputSizes(android.view.SurfaceHolder.class);
+        assertArrayNotEmpty(rawSizes,
+                "Available sizes for SurfaceHolder class should not be empty");
+        if (VERBOSE) {
+            Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(rawSizes));
+        }
+
+        if (bound == null) {
+            return getAscendingOrderSizes(Arrays.asList(rawSizes), /*ascending*/false);
+        }
+
+        List<Size> sizes = new ArrayList<Size>();
+        for (Size sz: rawSizes) {
+            if (sz.getWidth() <= bound.getWidth() && sz.getHeight() <= bound.getHeight()) {
+                sizes.add(sz);
+            }
+        }
+        return getAscendingOrderSizes(sizes, /*ascending*/false);
     }
 
     /**
@@ -946,7 +966,27 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedVideoSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
-        return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.YUV_420_888, bound);
+        CameraCharacteristics props = cameraManager.getCameraCharacteristics(cameraId);
+        StreamConfigurationMap config =
+                props.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] rawSizes = config.getOutputSizes(android.media.MediaRecorder.class);
+        assertArrayNotEmpty(rawSizes,
+                "Available sizes for MediaRecorder class should not be empty");
+        if (VERBOSE) {
+            Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(rawSizes));
+        }
+
+        if (bound == null) {
+            return getAscendingOrderSizes(Arrays.asList(rawSizes), /*ascending*/false);
+        }
+
+        List<Size> sizes = new ArrayList<Size>();
+        for (Size sz: rawSizes) {
+            if (sz.getWidth() <= bound.getWidth() && sz.getHeight() <= bound.getHeight()) {
+                sizes.add(sz);
+            }
+        }
+        return getAscendingOrderSizes(sizes, /*ascending*/false);
     }
 
     /**
