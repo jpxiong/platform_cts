@@ -339,7 +339,7 @@ public class SensorTest extends SensorTestCase {
 
     // TODO: after L release move to SensorBatchingTests and run in all sensors with default
     //       verifications enabled
-    public void testBatchAndFlushWithMutipleSensors() throws Exception {
+    public void testBatchAndFlushWithMultipleSensors() throws Exception {
         final int maxSensors = 3;
         final int maxReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(10);
         List<Sensor> sensorsToTest = new ArrayList<Sensor>();
