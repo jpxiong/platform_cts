@@ -28,6 +28,7 @@
                 <action android:name="com.android.cts.action.READ_FROM_URI" />
                 <action android:name="com.android.cts.action.TAKE_PERSISTABLE_URI_PERMISSION" />
                 <action android:name="com.android.cts.action.WRITE_TO_URI" />
+                <action android:name="com.android.cts.action.TEST_LOCK_TASK" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

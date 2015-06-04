@@ -34,6 +34,9 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
     private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
     private static final String TEST_APP_LOCATION = "/data/local/tmp/";
 
+    private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
+    private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
+
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             DEVICE_OWNER_PKG + ".BaseDeviceOwnerTest$BasicAdminReceiver";
     private static final String CLEAR_DEVICE_OWNER_TEST_CLASS =
@@ -76,7 +79,12 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
     }
 
     public void testLockTask() throws Exception {
-        executeDeviceOwnerTest("LockTaskTest");
+        try {
+            installApp(INTENT_RECEIVER_APK);
+            executeDeviceOwnerTest("LockTaskTest");
+        } finally {
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+        }
     }
 
     public void testPersistentIntentResolving() throws Exception {
