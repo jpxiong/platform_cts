@@ -78,7 +78,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         BURST,
         MIXED_BURST,
         ABORT_CAPTURE,
-        TIMESTAMPS
+        TIMESTAMPS,
+        JPEG_EXIF
     }
 
     /**
@@ -265,13 +266,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 try {
                     TotalCaptureResult reprocessResult;
                     // issue and wait on reprocess capture request
-                    if (mShareOneImageReader) {
-                        reprocessResult =
-                                submitCaptureRequest(mFirstImageReader.getSurface(), result);
-                    } else {
-                        reprocessResult =
-                                submitCaptureRequest(mSecondImageReader.getSurface(), result);
-                    }
+                    reprocessResult = submitCaptureRequest(
+                            getReprocessOutputImageReader().getSurface(), result);
                     fail("Camera " + id + ": should get IllegalArgumentException for cross " +
                             "session reprocess captrue.");
                 } catch (IllegalArgumentException e) {
@@ -396,6 +392,40 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     }
 
     /**
+     * Test reprocess jpeg output's exif data for the largest input and output sizes for each
+     * supported format.
+     */
+    public void testReprocessJpegExif() throws Exception {
+        for (String id : mCameraIds) {
+            if (!isYuvReprocessSupported(id) && !isOpaqueReprocessSupported(id)) {
+                continue;
+            }
+
+            try {
+                // open Camera device
+                openDevice(id);
+
+                int[] supportedInputFormats =
+                    mStaticInfo.getAvailableFormats(StaticMetadata.StreamDirection.Input);
+
+                for (int inputFormat : supportedInputFormats) {
+                    int[] supportedReprocessOutputFormats =
+                            mStaticInfo.getValidOutputFormatsForInput(inputFormat);
+
+                    for (int reprocessOutputFormat : supportedReprocessOutputFormats) {
+                        if (reprocessOutputFormat == ImageFormat.JPEG) {
+                            testReprocessingMaxSizes(id, inputFormat, ImageFormat.JPEG,
+                                    /*previewSize*/null, CaptureTestCase.JPEG_EXIF);
+                        }
+                    }
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
      * Test the input format and output format with the largest input and output sizes.
      */
     private void testBasicReprocessing(String cameraId, int inputFormat,
@@ -433,6 +463,9 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
             case TIMESTAMPS:
                 testReprocessTimestamps(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize,
                         reprocessOutputFormat);
+                break;
+            case JPEG_EXIF:
+                testReprocessJpegExif(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid test case");
@@ -712,11 +745,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                     mImageWriter.queueInputImage(
                             mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
                     CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
-                    if (mShareOneImageReader) {
-                        builder.addTarget(mFirstImageReader.getSurface());
-                    } else {
-                        builder.addTarget(mSecondImageReader.getSurface());
-                    }
+                    builder.addTarget(getReprocessOutputImageReader().getSurface());
                     reprocessRequests.add(builder.build());
                 }
 
@@ -803,11 +832,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 mImageWriter.queueInputImage(
                         mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
                 CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
-                if (mShareOneImageReader) {
-                    builder.addTarget(mFirstImageReader.getSurface());
-                } else {
-                    builder.addTarget(mSecondImageReader.getSurface());
-                }
+                builder.addTarget(getReprocessOutputImageReader().getSurface());
                 reprocessRequests.add(builder.build());
                 // Reprocess result's timestamp should match input image's timestamp.
                 expectedTimestamps.add(result.get(CaptureResult.SENSOR_TIMESTAMP));
@@ -835,12 +860,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                         "image's timestamp (" + expected + ")", expected, timestamp);
 
                 // Verify the reprocess output image timestamps match the input image's timestamps.
-                Image image;
-                if (mShareOneImageReader) {
-                    image = mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
-                } else {
-                    image = mSecondImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
-                }
+                Image image = getReprocessOutputImageReaderListener().getImage(CAPTURE_TIMEOUT_MS);
                 timestamp = image.getTimestamp();
                 image.close();
 
@@ -851,6 +871,64 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
             // Make sure all input surfaces are released.
             for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
                 mImageWriterListener.waitForImageReleased(CAPTURE_TIMEOUT_MS);
+            }
+        } finally {
+            closeReprossibleSession();
+            closeImageReaders();
+        }
+    }
+
+    private void testReprocessJpegExif(String cameraId, Size inputSize, int inputFormat,
+            Size reprocessOutputSize) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, "testReprocessJpegExif: cameraId: " + cameraId + " inputSize: " +
+                    inputSize + " inputFormat: " + inputFormat + " reprocessOutputSize: " +
+                    reprocessOutputSize);
+        }
+
+        Size[] thumbnailSizes = mStaticInfo.getAvailableThumbnailSizesChecked();
+        Size[] testThumbnailSizes = new Size[EXIF_TEST_DATA.length];
+        Arrays.fill(testThumbnailSizes, thumbnailSizes[thumbnailSizes.length - 1]);
+        // Make sure thumbnail size (0, 0) is covered.
+        testThumbnailSizes[0] = new Size(0, 0);
+
+        try {
+            setupImageReaders(inputSize, inputFormat, reprocessOutputSize, ImageFormat.JPEG,
+                    EXIF_TEST_DATA.length);
+            setupReprocessableSession(/*previewSurface*/null, EXIF_TEST_DATA.length);
+
+            // Prepare reprocess capture requests.
+            ArrayList<CaptureRequest> reprocessRequests = new ArrayList<>(EXIF_TEST_DATA.length);
+
+            for (int i = 0; i < EXIF_TEST_DATA.length; i++) {
+                TotalCaptureResult result = submitCaptureRequest(mFirstImageReader.getSurface(),
+                        /*inputResult*/null);
+                mImageWriter.queueInputImage(
+                        mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
+
+                CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
+                builder.addTarget(getReprocessOutputImageReader().getSurface());
+
+                // set jpeg keys
+                setJpegKeys(builder, EXIF_TEST_DATA[i], testThumbnailSizes[i], mCollector);
+                reprocessRequests.add(builder.build());
+            }
+
+            // Submit reprocess requests.
+            SimpleCaptureCallback captureCallback = new SimpleCaptureCallback();
+            mSession.captureBurst(reprocessRequests, captureCallback, mHandler);
+
+            TotalCaptureResult[] reprocessResults =
+                    captureCallback.getTotalCaptureResultsForRequests(reprocessRequests,
+                    CAPTURE_TIMEOUT_FRAMES);
+
+            for (int i = 0; i < EXIF_TEST_DATA.length; i++) {
+                // Verify output image's and result's JPEG EXIF data.
+                Image image = getReprocessOutputImageReaderListener().getImage(CAPTURE_TIMEOUT_MS);
+                verifyJpegKeys(image, reprocessResults[i], reprocessOutputSize,
+                        testThumbnailSizes[i], EXIF_TEST_DATA[i], mStaticInfo, mCollector);
+                image.close();
+
             }
         } finally {
             closeReprossibleSession();
@@ -894,6 +972,25 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         mFirstImageReader = null;
         CameraTestUtils.closeImageReader(mSecondImageReader);
         mSecondImageReader = null;
+    }
+
+    /**
+     * Get the ImageReader for reprocess output.
+     */
+    private ImageReader getReprocessOutputImageReader() {
+        if (mShareOneImageReader) {
+            return mFirstImageReader;
+        } else {
+            return mSecondImageReader;
+        }
+    }
+
+    private SimpleImageReaderListener getReprocessOutputImageReaderListener() {
+        if (mShareOneImageReader) {
+            return mFirstImageReaderListener;
+        } else {
+            return mSecondImageReaderListener;
+        }
     }
 
     /**
@@ -1002,23 +1099,14 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
 
         Surface[] outputSurfaces = new Surface[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
-            if (mShareOneImageReader) {
-                outputSurfaces[i] = mFirstImageReader.getSurface();
-            } else {
-                outputSurfaces[i] = mSecondImageReader.getSurface();
-            }
+            outputSurfaces[i] = getReprocessOutputImageReader().getSurface();
         }
 
         TotalCaptureResult[] finalResults = submitMixedCaptureBurstRequest(outputSurfaces, results);
 
         ImageResultHolder[] holders = new ImageResultHolder[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
-            Image image;
-            if (mShareOneImageReader) {
-                image = mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
-            } else {
-                image = mSecondImageReaderListener.getImage(CAPTURE_TIMEOUT_MS);
-            }
+            Image image = getReprocessOutputImageReaderListener().getImage(CAPTURE_TIMEOUT_MS);
             holders[i] = new ImageResultHolder(image, finalResults[i]);
         }
 
