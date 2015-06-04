@@ -29,15 +29,22 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.cts.helpers.CameraErrorCollector;
+import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.params.InputConfiguration;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.cts.helpers.CameraUtils;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.location.Location;
+import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.ImageWriter;
 import android.media.Image.Plane;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
@@ -62,12 +69,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
@@ -97,6 +107,62 @@ public class CameraTestUtils extends Assert {
     public static final int SESSION_ACTIVE_TIMEOUT_MS = 1000;
 
     public static final int MAX_READER_IMAGES = 5;
+
+    private static final int EXIF_DATETIME_LENGTH = 19;
+    private static final int EXIF_DATETIME_ERROR_MARGIN_SEC = 60;
+    private static final float EXIF_FOCAL_LENGTH_ERROR_MARGIN = 0.001f;
+    private static final float EXIF_EXPOSURE_TIME_ERROR_MARGIN_RATIO = 0.05f;
+    private static final float EXIF_EXPOSURE_TIME_MIN_ERROR_MARGIN_SEC = 0.002f;
+    private static final float EXIF_APERTURE_ERROR_MARGIN = 0.001f;
+
+    // Some exif tags that are not defined by ExifInterface but supported.
+    private static final String TAG_DATETIME_DIGITIZED = "DateTimeDigitized";
+    private static final String TAG_SUBSEC_TIME = "SubSecTime";
+    private static final String TAG_SUBSEC_TIME_ORIG = "SubSecTimeOriginal";
+    private static final String TAG_SUBSEC_TIME_DIG = "SubSecTimeDigitized";
+
+    private static final Location sTestLocation0 = new Location(LocationManager.GPS_PROVIDER);
+    private static final Location sTestLocation1 = new Location(LocationManager.GPS_PROVIDER);
+    private static final Location sTestLocation2 = new Location(LocationManager.NETWORK_PROVIDER);
+
+    protected static final String DEBUG_FILE_NAME_BASE =
+            Environment.getExternalStorageDirectory().getPath();
+
+    static {
+        sTestLocation0.setTime(1199145600L);
+        sTestLocation0.setLatitude(37.736071);
+        sTestLocation0.setLongitude(-122.441983);
+        sTestLocation0.setAltitude(21.0);
+
+        sTestLocation1.setTime(1199145601L);
+        sTestLocation1.setLatitude(0.736071);
+        sTestLocation1.setLongitude(0.441983);
+        sTestLocation1.setAltitude(1.0);
+
+        sTestLocation2.setTime(1199145602L);
+        sTestLocation2.setLatitude(-89.736071);
+        sTestLocation2.setLongitude(-179.441983);
+        sTestLocation2.setAltitude(100000.0);
+    }
+
+    // Exif test data vectors.
+    public static final ExifTestData[] EXIF_TEST_DATA = {
+            new ExifTestData(
+                    /*gpsLocation*/ sTestLocation0,
+                    /* orientation */90,
+                    /* jpgQuality */(byte) 80,
+                    /* thumbQuality */(byte) 75),
+            new ExifTestData(
+                    /*gpsLocation*/ sTestLocation1,
+                    /* orientation */180,
+                    /* jpgQuality */(byte) 90,
+                    /* thumbQuality */(byte) 85),
+            new ExifTestData(
+                    /*gpsLocation*/ sTestLocation2,
+                    /* orientation */270,
+                    /* jpgQuality */(byte) 100,
+                    /* thumbQuality */(byte) 100)
+    };
 
     /**
      * Create an {@link android.media.ImageReader} object and get the surface.
@@ -1446,5 +1512,437 @@ public class CameraTestUtils extends Assert {
         }
 
         return true;
+    }
+
+    /**
+     * Set jpeg related keys in a capture request builder.
+     *
+     * @param builder The capture request builder to set the keys inl
+     * @param exifData The exif data to set.
+     * @param thumbnailSize The thumbnail size to set.
+     * @param collector The camera error collector to collect errors.
+     */
+    public static void setJpegKeys(CaptureRequest.Builder builder, ExifTestData exifData,
+            Size thumbnailSize, CameraErrorCollector collector) {
+        builder.set(CaptureRequest.JPEG_THUMBNAIL_SIZE, thumbnailSize);
+        builder.set(CaptureRequest.JPEG_GPS_LOCATION, exifData.gpsLocation);
+        builder.set(CaptureRequest.JPEG_ORIENTATION, exifData.jpegOrientation);
+        builder.set(CaptureRequest.JPEG_QUALITY, exifData.jpegQuality);
+        builder.set(CaptureRequest.JPEG_THUMBNAIL_QUALITY,
+                exifData.thumbnailQuality);
+
+        // Validate request set and get.
+        collector.expectEquals("JPEG thumbnail size request set and get should match",
+                thumbnailSize, builder.get(CaptureRequest.JPEG_THUMBNAIL_SIZE));
+        collector.expectTrue("GPS locations request set and get should match.",
+                areGpsFieldsEqual(exifData.gpsLocation,
+                builder.get(CaptureRequest.JPEG_GPS_LOCATION)));
+        collector.expectEquals("JPEG orientation request set and get should match",
+                exifData.jpegOrientation,
+                builder.get(CaptureRequest.JPEG_ORIENTATION));
+        collector.expectEquals("JPEG quality request set and get should match",
+                exifData.jpegQuality, builder.get(CaptureRequest.JPEG_QUALITY));
+        collector.expectEquals("JPEG thumbnail quality request set and get should match",
+                exifData.thumbnailQuality,
+                builder.get(CaptureRequest.JPEG_THUMBNAIL_QUALITY));
+    }
+
+    /**
+     * Simple validation of JPEG image size and format.
+     * <p>
+     * Only validate the image object sanity. It is fast, but doesn't actually
+     * check the buffer data. Assert is used here as it make no sense to
+     * continue the test if the jpeg image captured has some serious failures.
+     * </p>
+     *
+     * @param image The captured jpeg image
+     * @param expectedSize Expected capture jpeg size
+     */
+    public static void basicValidateJpegImage(Image image, Size expectedSize) {
+        Size imageSz = new Size(image.getWidth(), image.getHeight());
+        assertTrue(
+                String.format("Image size doesn't match (expected %s, actual %s) ",
+                        expectedSize.toString(), imageSz.toString()), expectedSize.equals(imageSz));
+        assertEquals("Image format should be JPEG", ImageFormat.JPEG, image.getFormat());
+        assertNotNull("Image plane shouldn't be null", image.getPlanes());
+        assertEquals("Image plane number should be 1", 1, image.getPlanes().length);
+
+        // Jpeg decoding validate was done in ImageReaderTest, no need to duplicate the test here.
+    }
+
+    /**
+     * Verify the JPEG EXIF and JPEG related keys in a capture result are expected.
+     * - Capture request get values are same as were set.
+     * - capture result's exif data is the same as was set by
+     *   the capture request.
+     * - new tags in the result set by the camera service are
+     *   present and semantically correct.
+     *
+     * @param image The output JPEG image to verify.
+     * @param captureResult The capture result to verify.
+     * @param expectedSize The expected JPEG size.
+     * @param expectedThumbnailSize The expected thumbnail size.
+     * @param expectedExifData The expected EXIF data
+     * @param staticInfo The static metadata for the camera device.
+     * @param jpegFilename The filename to dump the jpeg to.
+     * @param collector The camera error collector to collect errors.
+     */
+    public static void verifyJpegKeys(Image image, CaptureResult captureResult, Size expectedSize,
+            Size expectedThumbnailSize, ExifTestData expectedExifData, StaticMetadata staticInfo,
+            CameraErrorCollector collector) throws Exception {
+
+        basicValidateJpegImage(image, expectedSize);
+
+        byte[] jpegBuffer = getDataFromImage(image);
+        // Have to dump into a file to be able to use ExifInterface
+        String jpegFilename = DEBUG_FILE_NAME_BASE + "/verifyJpegKeys.jpeg";
+        dumpFile(jpegFilename, jpegBuffer);
+        ExifInterface exif = new ExifInterface(jpegFilename);
+
+        if (expectedThumbnailSize.equals(new Size(0,0))) {
+            collector.expectTrue("Jpeg shouldn't have thumbnail when thumbnail size is (0, 0)",
+                    !exif.hasThumbnail());
+        } else {
+            collector.expectTrue("Jpeg must have thumbnail for thumbnail size " +
+                    expectedThumbnailSize, exif.hasThumbnail());
+        }
+
+        // Validate capture result vs. request
+        Size resultThumbnailSize = captureResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE);
+        int orientationTested = expectedExifData.jpegOrientation;
+        if ((orientationTested == 90 || orientationTested == 270)) {
+            int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    /*defaultValue*/-1);
+            if (exifOrientation == ExifInterface.ORIENTATION_UNDEFINED) {
+                // Device physically rotated image+thumbnail data
+                // Expect thumbnail size to be also rotated
+                resultThumbnailSize = new Size(resultThumbnailSize.getHeight(),
+                        resultThumbnailSize.getWidth());
+            }
+        }
+
+        collector.expectEquals("JPEG thumbnail size result and request should match",
+                expectedThumbnailSize, resultThumbnailSize);
+        if (collector.expectKeyValueNotNull(captureResult, CaptureResult.JPEG_GPS_LOCATION) !=
+                null) {
+            collector.expectTrue("GPS location result and request should match.",
+                    areGpsFieldsEqual(expectedExifData.gpsLocation,
+                    captureResult.get(CaptureResult.JPEG_GPS_LOCATION)));
+        }
+        collector.expectEquals("JPEG orientation result and request should match",
+                expectedExifData.jpegOrientation,
+                captureResult.get(CaptureResult.JPEG_ORIENTATION));
+        collector.expectEquals("JPEG quality result and request should match",
+                expectedExifData.jpegQuality, captureResult.get(CaptureResult.JPEG_QUALITY));
+        collector.expectEquals("JPEG thumbnail quality result and request should match",
+                expectedExifData.thumbnailQuality,
+                captureResult.get(CaptureResult.JPEG_THUMBNAIL_QUALITY));
+
+        // Validate other exif tags for all non-legacy devices
+        if (!staticInfo.isHardwareLevelLegacy()) {
+            verifyJpegExifExtraTags(exif, expectedSize, captureResult, staticInfo, collector);
+        }
+    }
+
+    /**
+     * Get the degree of an EXIF orientation.
+     */
+    private static int getExifOrientationInDegree(int exifOrientation,
+            CameraErrorCollector collector) {
+        switch (exifOrientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return 0;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return 90;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return 180;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return 270;
+            default:
+                collector.addMessage("It is impossible to get non 0, 90, 180, 270 degress exif" +
+                        "info based on the request orientation range");
+                return 0;
+        }
+    }
+
+    /**
+     * Validate and return the focal length.
+     *
+     * @param result Capture result to get the focal length
+     * @return Focal length from capture result or -1 if focal length is not available.
+     */
+    private static float validateFocalLength(CaptureResult result, StaticMetadata staticInfo,
+            CameraErrorCollector collector) {
+        float[] focalLengths = staticInfo.getAvailableFocalLengthsChecked();
+        Float resultFocalLength = result.get(CaptureResult.LENS_FOCAL_LENGTH);
+        if (collector.expectTrue("Focal length is invalid",
+                resultFocalLength != null && resultFocalLength > 0)) {
+            List<Float> focalLengthList =
+                    Arrays.asList(CameraTestUtils.toObject(focalLengths));
+            collector.expectTrue("Focal length should be one of the available focal length",
+                    focalLengthList.contains(resultFocalLength));
+            return resultFocalLength;
+        }
+        return -1;
+    }
+
+    /**
+     * Validate and return the aperture.
+     *
+     * @param result Capture result to get the aperture
+     * @return Aperture from capture result or -1 if aperture is not available.
+     */
+    private static float validateAperture(CaptureResult result, StaticMetadata staticInfo,
+            CameraErrorCollector collector) {
+        float[] apertures = staticInfo.getAvailableAperturesChecked();
+        Float resultAperture = result.get(CaptureResult.LENS_APERTURE);
+        if (collector.expectTrue("Capture result aperture is invalid",
+                resultAperture != null && resultAperture > 0)) {
+            List<Float> apertureList =
+                    Arrays.asList(CameraTestUtils.toObject(apertures));
+            collector.expectTrue("Aperture should be one of the available apertures",
+                    apertureList.contains(resultAperture));
+            return resultAperture;
+        }
+        return -1;
+    }
+
+    /**
+     * Return the closest value in an array of floats.
+     */
+    private static float getClosestValueInArray(float[] values, float target) {
+        int minIdx = 0;
+        float minDistance = Math.abs(values[0] - target);
+        for(int i = 0; i < values.length; i++) {
+            float distance = Math.abs(values[i] - target);
+            if (minDistance > distance) {
+                minDistance = distance;
+                minIdx = i;
+            }
+        }
+
+        return values[minIdx];
+    }
+
+    /**
+     * Return if two Location's GPS field are the same.
+     */
+    private static boolean areGpsFieldsEqual(Location a, Location b) {
+        if (a == null || b == null) {
+            return false;
+        }
+
+        return a.getTime() == b.getTime() && a.getLatitude() == b.getLatitude() &&
+                a.getLongitude() == b.getLongitude() && a.getAltitude() == b.getAltitude() &&
+                a.getProvider() == b.getProvider();
+    }
+
+    /**
+     * Verify extra tags in JPEG EXIF
+     */
+    private static void verifyJpegExifExtraTags(ExifInterface exif, Size jpegSize,
+            CaptureResult result, StaticMetadata staticInfo, CameraErrorCollector collector)
+            throws ParseException {
+        /**
+         * TAG_IMAGE_WIDTH and TAG_IMAGE_LENGTH and TAG_ORIENTATION.
+         * Orientation and exif width/height need to be tested carefully, two cases:
+         *
+         * 1. Device rotate the image buffer physically, then exif width/height may not match
+         * the requested still capture size, we need swap them to check.
+         *
+         * 2. Device use the exif tag to record the image orientation, it doesn't rotate
+         * the jpeg image buffer itself. In this case, the exif width/height should always match
+         * the requested still capture size, and the exif orientation should always match the
+         * requested orientation.
+         *
+         */
+        int exifWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, /*defaultValue*/0);
+        int exifHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, /*defaultValue*/0);
+        Size exifSize = new Size(exifWidth, exifHeight);
+        // Orientation could be missing, which is ok, default to 0.
+        int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                /*defaultValue*/-1);
+        // Get requested orientation from result, because they should be same.
+        if (collector.expectKeyValueNotNull(result, CaptureResult.JPEG_ORIENTATION) != null) {
+            int requestedOrientation = result.get(CaptureResult.JPEG_ORIENTATION);
+            final int ORIENTATION_MIN = ExifInterface.ORIENTATION_UNDEFINED;
+            final int ORIENTATION_MAX = ExifInterface.ORIENTATION_ROTATE_270;
+            boolean orientationValid = collector.expectTrue(String.format(
+                    "Exif orientation must be in range of [%d, %d]",
+                    ORIENTATION_MIN, ORIENTATION_MAX),
+                    exifOrientation >= ORIENTATION_MIN && exifOrientation <= ORIENTATION_MAX);
+            if (orientationValid) {
+                /**
+                 * Device captured image doesn't respect the requested orientation,
+                 * which means it rotates the image buffer physically. Then we
+                 * should swap the exif width/height accordingly to compare.
+                 */
+                boolean deviceRotatedImage = exifOrientation == ExifInterface.ORIENTATION_UNDEFINED;
+
+                if (deviceRotatedImage) {
+                    // Case 1.
+                    boolean needSwap = (requestedOrientation % 180 == 90);
+                    if (needSwap) {
+                        exifSize = new Size(exifHeight, exifWidth);
+                    }
+                } else {
+                    // Case 2.
+                    collector.expectEquals("Exif orientaiton should match requested orientation",
+                            requestedOrientation, getExifOrientationInDegree(exifOrientation,
+                            collector));
+                }
+            }
+        }
+
+        /**
+         * Ideally, need check exifSize == jpegSize == actual buffer size. But
+         * jpegSize == jpeg decode bounds size(from jpeg jpeg frame
+         * header, not exif) was validated in ImageReaderTest, no need to
+         * validate again here.
+         */
+        collector.expectEquals("Exif size should match jpeg capture size", jpegSize, exifSize);
+
+        // TAG_DATETIME, it should be local time
+        long currentTimeInMs = System.currentTimeMillis();
+        long currentTimeInSecond = currentTimeInMs / 1000;
+        Date date = new Date(currentTimeInMs);
+        String localDatetime = new SimpleDateFormat("yyyy:MM:dd HH:").format(date);
+        String dateTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+        if (collector.expectTrue("Exif TAG_DATETIME shouldn't be null", dateTime != null)) {
+            collector.expectTrue("Exif TAG_DATETIME is wrong",
+                    dateTime.length() == EXIF_DATETIME_LENGTH);
+            long exifTimeInSecond =
+                    new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(dateTime).getTime() / 1000;
+            long delta = currentTimeInSecond - exifTimeInSecond;
+            collector.expectTrue("Capture time deviates too much from the current time",
+                    Math.abs(delta) < EXIF_DATETIME_ERROR_MARGIN_SEC);
+            // It should be local time.
+            collector.expectTrue("Exif date time should be local time",
+                    dateTime.startsWith(localDatetime));
+        }
+
+        // TAG_FOCAL_LENGTH.
+        float[] focalLengths = staticInfo.getAvailableFocalLengthsChecked();
+        float exifFocalLength = (float)exif.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, -1);
+        collector.expectEquals("Focal length should match",
+                getClosestValueInArray(focalLengths, exifFocalLength),
+                exifFocalLength, EXIF_FOCAL_LENGTH_ERROR_MARGIN);
+        // More checks for focal length.
+        collector.expectEquals("Exif focal length should match capture result",
+                validateFocalLength(result, staticInfo, collector), exifFocalLength);
+
+        // TAG_EXPOSURE_TIME
+        // ExifInterface API gives exposure time value in the form of float instead of rational
+        String exposureTime = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+        collector.expectNotNull("Exif TAG_EXPOSURE_TIME shouldn't be null", exposureTime);
+        if (staticInfo.areKeysAvailable(CaptureResult.SENSOR_EXPOSURE_TIME)) {
+            if (exposureTime != null) {
+                double exposureTimeValue = Double.parseDouble(exposureTime);
+                long expTimeResult = result.get(CaptureResult.SENSOR_EXPOSURE_TIME);
+                double expected = expTimeResult / 1e9;
+                double tolerance = expected * EXIF_EXPOSURE_TIME_ERROR_MARGIN_RATIO;
+                tolerance = Math.max(tolerance, EXIF_EXPOSURE_TIME_MIN_ERROR_MARGIN_SEC);
+                collector.expectEquals("Exif exposure time doesn't match", expected,
+                        exposureTimeValue, tolerance);
+            }
+        }
+
+        // TAG_APERTURE
+        // ExifInterface API gives aperture value in the form of float instead of rational
+        String exifAperture = exif.getAttribute(ExifInterface.TAG_APERTURE);
+        collector.expectNotNull("Exif TAG_APERTURE shouldn't be null", exifAperture);
+        if (staticInfo.areKeysAvailable(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES)) {
+            float[] apertures = staticInfo.getAvailableAperturesChecked();
+            if (exifAperture != null) {
+                float apertureValue = Float.parseFloat(exifAperture);
+                collector.expectEquals("Aperture value should match",
+                        getClosestValueInArray(apertures, apertureValue),
+                        apertureValue, EXIF_APERTURE_ERROR_MARGIN);
+                // More checks for aperture.
+                collector.expectEquals("Exif aperture length should match capture result",
+                        validateAperture(result, staticInfo, collector), apertureValue);
+            }
+        }
+
+        /**
+         * TAG_FLASH. TODO: For full devices, can check a lot more info
+         * (http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html#Flash)
+         */
+        String flash = exif.getAttribute(ExifInterface.TAG_FLASH);
+        collector.expectNotNull("Exif TAG_FLASH shouldn't be null", flash);
+
+        /**
+         * TAG_WHITE_BALANCE. TODO: For full devices, with the DNG tags, we
+         * should be able to cross-check android.sensor.referenceIlluminant.
+         */
+        String whiteBalance = exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
+        collector.expectNotNull("Exif TAG_WHITE_BALANCE shouldn't be null", whiteBalance);
+
+        // TAG_MAKE
+        String make = exif.getAttribute(ExifInterface.TAG_MAKE);
+        collector.expectEquals("Exif TAG_MAKE is incorrect", Build.MANUFACTURER, make);
+
+        // TAG_MODEL
+        String model = exif.getAttribute(ExifInterface.TAG_MODEL);
+        collector.expectEquals("Exif TAG_MODEL is incorrect", Build.MODEL, model);
+
+
+        // TAG_ISO
+        int iso = exif.getAttributeInt(ExifInterface.TAG_ISO, /*defaultValue*/-1);
+        if (staticInfo.areKeysAvailable(CaptureResult.SENSOR_SENSITIVITY)) {
+            int expectedIso = result.get(CaptureResult.SENSOR_SENSITIVITY);
+            collector.expectEquals("Exif TAG_ISO is incorrect", expectedIso, iso);
+        }
+
+        // TAG_DATETIME_DIGITIZED (a.k.a Create time for digital cameras).
+        String digitizedTime = exif.getAttribute(TAG_DATETIME_DIGITIZED);
+        collector.expectNotNull("Exif TAG_DATETIME_DIGITIZED shouldn't be null", digitizedTime);
+        if (digitizedTime != null) {
+            String expectedDateTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            collector.expectNotNull("Exif TAG_DATETIME shouldn't be null", expectedDateTime);
+            if (expectedDateTime != null) {
+                collector.expectEquals("dataTime should match digitizedTime",
+                        expectedDateTime, digitizedTime);
+            }
+        }
+
+        /**
+         * TAG_SUBSEC_TIME. Since the sub second tag strings are truncated to at
+         * most 9 digits in ExifInterface implementation, use getAttributeInt to
+         * sanitize it. When the default value -1 is returned, it means that
+         * this exif tag either doesn't exist or is a non-numerical invalid
+         * string. Same rule applies to the rest of sub second tags.
+         */
+        int subSecTime = exif.getAttributeInt(TAG_SUBSEC_TIME, /*defaultValue*/-1);
+        collector.expectTrue("Exif TAG_SUBSEC_TIME value is null or invalid!", subSecTime > 0);
+
+        // TAG_SUBSEC_TIME_ORIG
+        int subSecTimeOrig = exif.getAttributeInt(TAG_SUBSEC_TIME_ORIG, /*defaultValue*/-1);
+        collector.expectTrue("Exif TAG_SUBSEC_TIME_ORIG value is null or invalid!",
+                subSecTimeOrig > 0);
+
+        // TAG_SUBSEC_TIME_DIG
+        int subSecTimeDig = exif.getAttributeInt(TAG_SUBSEC_TIME_DIG, /*defaultValue*/-1);
+        collector.expectTrue(
+                "Exif TAG_SUBSEC_TIME_DIG value is null or invalid!", subSecTimeDig > 0);
+    }
+
+
+    /**
+     * Immutable class wrapping the exif test data.
+     */
+    public static class ExifTestData {
+        public final Location gpsLocation;
+        public final int jpegOrientation;
+        public final byte jpegQuality;
+        public final byte thumbnailQuality;
+
+        public ExifTestData(Location location, int orientation,
+                byte jpgQuality, byte thumbQuality) {
+            gpsLocation = location;
+            jpegOrientation = orientation;
+            jpegQuality = jpgQuality;
+            thumbnailQuality = thumbQuality;
+        }
     }
 }
