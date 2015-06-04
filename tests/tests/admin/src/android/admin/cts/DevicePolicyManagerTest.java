@@ -133,26 +133,29 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
                 mDevicePolicyManager.getPasswordQuality(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertTrue(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
-        assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
+        String caseDescription = "initial";
+        assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
 
         mDevicePolicyManager.setPasswordMinimumLength(mComponent, 10);
+        caseDescription = "minimum password length = 10";
         assertEquals(10, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordFails("abcd1234", caseDescription);
 
-        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 3);
-        assertEquals(3, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
+        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 4);
+        caseDescription = "minimum password length = 4";
+        assertEquals(4, mDevicePolicyManager.getPasswordMinimumLength(
+                mComponent));
         assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertTrue(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
     }
 
     public void testPasswordQuality_numeric() {
@@ -166,26 +169,29 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
                 mDevicePolicyManager.getPasswordQuality(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertTrue(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
-        assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
+        String caseDescription = "initial";
+        assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
 
         mDevicePolicyManager.setPasswordMinimumLength(mComponent, 10);
+        caseDescription = "minimum password length = 10";
         assertEquals(10, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordFails("abcd1234", caseDescription);
 
-        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 3);
-        assertEquals(3, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
+        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 4);
+        caseDescription = "minimum password length = 4";
+        assertEquals(4, mDevicePolicyManager.getPasswordMinimumLength(
+                mComponent));
         assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertTrue(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
     }
 
     public void testPasswordQuality_alphabetic() {
@@ -199,26 +205,29 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
                 mDevicePolicyManager.getPasswordQuality(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
-        assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
+        String caseDescription = "initial";
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
 
         mDevicePolicyManager.setPasswordMinimumLength(mComponent, 10);
+        caseDescription = "minimum password length = 10";
         assertEquals(10, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordFails("abcd1234", caseDescription);
 
-        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 3);
-        assertEquals(3, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
+        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 4);
+        caseDescription = "minimum password length = 4";
+        assertEquals(4, mDevicePolicyManager.getPasswordMinimumLength(
+                mComponent));
         assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
     }
 
     public void testPasswordQuality_alphanumeric() {
@@ -232,26 +241,29 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
                 mDevicePolicyManager.getPasswordQuality(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
-        assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
+        String caseDescription = "initial";
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
 
         mDevicePolicyManager.setPasswordMinimumLength(mComponent, 10);
+        caseDescription = "minimum password length = 10";
         assertEquals(10, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
         assertFalse(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordFails("abcd1234", caseDescription);
 
-        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 3);
-        assertEquals(3, mDevicePolicyManager.getPasswordMinimumLength(mComponent));
+        mDevicePolicyManager.setPasswordMinimumLength(mComponent, 4);
+        caseDescription = "minimum password length = 4";
+        assertEquals(4, mDevicePolicyManager.getPasswordMinimumLength(
+                mComponent));
         assertTrue(mDevicePolicyManager.isActivePasswordSufficient());
 
-        assertFalse(mDevicePolicyManager.resetPassword("123", 0));
-        assertFalse(mDevicePolicyManager.resetPassword("abcd", 0));
-        assertTrue(mDevicePolicyManager.resetPassword("abcd123", 0));
+        assertPasswordFails("1234", caseDescription);
+        assertPasswordFails("abcd", caseDescription);
+        assertPasswordSucceeds("abcd1234", caseDescription);
     }
 
     public void testPasswordQuality_complexUpperCase() {
@@ -265,26 +277,29 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         resetComplexPasswordRestrictions();
 
         String caseDescription = "minimum UpperCase=0";
-        assertPasswordSucceeds("abc", caseDescription);
-        assertPasswordSucceeds("aBc", caseDescription);
-        assertPasswordSucceeds("ABC", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
+        assertPasswordSucceeds("aBc1", caseDescription);
+        assertPasswordSucceeds("ABC1", caseDescription);
         assertPasswordSucceeds("ABCD", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumUpperCase(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumUpperCase(mComponent));
         caseDescription = "minimum UpperCase=1";
-        assertPasswordFails("abc", caseDescription);
-        assertPasswordSucceeds("aBc", caseDescription);
-        assertPasswordSucceeds("ABC", caseDescription);
+        assertPasswordFails("abc1", caseDescription);
+        assertPasswordSucceeds("aBc1", caseDescription);
+        assertPasswordSucceeds("ABC1", caseDescription);
         assertPasswordSucceeds("ABCD", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumUpperCase(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumUpperCase(mComponent));
         caseDescription = "minimum UpperCase=3";
-        assertPasswordFails("abc", caseDescription);
-        assertPasswordFails("aBC", caseDescription);
-        assertPasswordSucceeds("ABC", caseDescription);
+        assertPasswordFails("abc1", caseDescription);
+        assertPasswordFails("aBC1", caseDescription);
+        assertPasswordSucceeds("ABC1", caseDescription);
         assertPasswordSucceeds("ABCD", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordQuality_complexLowerCase() {
@@ -299,25 +314,28 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
 
         String caseDescription = "minimum LowerCase=0";
         assertPasswordSucceeds("ABCD", caseDescription);
-        assertPasswordSucceeds("aBC", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordSucceeds("aBC1", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumLowerCase(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumLowerCase(mComponent));
         caseDescription = "minimum LowerCase=1";
         assertPasswordFails("ABCD", caseDescription);
-        assertPasswordSucceeds("aBC", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordSucceeds("aBC1", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumLowerCase(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumLowerCase(mComponent));
         caseDescription = "minimum LowerCase=3";
         assertPasswordFails("ABCD", caseDescription);
-        assertPasswordFails("aBC", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordFails("aBC1", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordQuality_complexLetters() {
@@ -332,25 +350,28 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
 
         String caseDescription = "minimum Letters=0";
         assertPasswordSucceeds("1234", caseDescription);
-        assertPasswordSucceeds("a23", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordSucceeds("a123", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumLetters(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumLetters(mComponent));
         caseDescription = "minimum Letters=1";
         assertPasswordFails("1234", caseDescription);
-        assertPasswordSucceeds("a23", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordSucceeds("a123", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumLetters(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumLetters(mComponent));
         caseDescription = "minimum Letters=3";
         assertPasswordFails("1234", caseDescription);
-        assertPasswordFails("a23", caseDescription);
-        assertPasswordSucceeds("abc", caseDescription);
+        assertPasswordFails("a123", caseDescription);
+        assertPasswordSucceeds("abc1", caseDescription);
         assertPasswordSucceeds("abcd", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordQuality_complexNumeric() {
@@ -365,25 +386,28 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
 
         String caseDescription = "minimum Numeric=0";
         assertPasswordSucceeds("abcd", caseDescription);
-        assertPasswordSucceeds("1bc", caseDescription);
-        assertPasswordSucceeds("123", caseDescription);
+        assertPasswordSucceeds("1abc", caseDescription);
+        assertPasswordSucceeds("123a", caseDescription);
         assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumNumeric(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumNumeric(mComponent));
         caseDescription = "minimum Numeric=1";
         assertPasswordFails("abcd", caseDescription);
-        assertPasswordSucceeds("1bc", caseDescription);
-        assertPasswordSucceeds("123", caseDescription);
+        assertPasswordSucceeds("1abc", caseDescription);
+        assertPasswordSucceeds("123a", caseDescription);
         assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumNumeric(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumNumeric(mComponent));
         caseDescription = "minimum Numeric=3";
         assertPasswordFails("abcd", caseDescription);
-        assertPasswordFails("1bc", caseDescription);
-        assertPasswordSucceeds("123", caseDescription);
+        assertPasswordFails("1abc", caseDescription);
+        assertPasswordSucceeds("123a", caseDescription);
         assertPasswordSucceeds("1234", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordQuality_complexSymbols() {
@@ -398,25 +422,28 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
 
         String caseDescription = "minimum Symbols=0";
         assertPasswordSucceeds("abcd", caseDescription);
-        assertPasswordSucceeds("_bc", caseDescription);
-        assertPasswordSucceeds("@#!", caseDescription);
+        assertPasswordSucceeds("_bc1", caseDescription);
+        assertPasswordSucceeds("@#!1", caseDescription);
         assertPasswordSucceeds("_@#!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumSymbols(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumSymbols(mComponent));
         caseDescription = "minimum Symbols=1";
         assertPasswordFails("abcd", caseDescription);
-        assertPasswordSucceeds("_bc", caseDescription);
-        assertPasswordSucceeds("@#!", caseDescription);
+        assertPasswordSucceeds("_bc1", caseDescription);
+        assertPasswordSucceeds("@#!1", caseDescription);
         assertPasswordSucceeds("_@#!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumSymbols(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumSymbols(mComponent));
         caseDescription = "minimum Symbols=3";
         assertPasswordFails("abcd", caseDescription);
-        assertPasswordFails("_bc", caseDescription);
-        assertPasswordSucceeds("@#!", caseDescription);
+        assertPasswordFails("_bc1", caseDescription);
+        assertPasswordSucceeds("@#!1", caseDescription);
         assertPasswordSucceeds("_@#!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordQuality_complexNonLetter() {
@@ -435,6 +462,7 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         assertPasswordSucceeds("3bcd", caseDescription);
         assertPasswordSucceeds("_@3c", caseDescription);
         assertPasswordSucceeds("_25!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumNonLetter(mComponent, 1);
         assertEquals(1, mDevicePolicyManager.getPasswordMinimumNonLetter(mComponent));
@@ -444,6 +472,7 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         assertPasswordSucceeds("3bcd", caseDescription);
         assertPasswordSucceeds("_@3c", caseDescription);
         assertPasswordSucceeds("_25!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
 
         mDevicePolicyManager.setPasswordMinimumNonLetter(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getPasswordMinimumNonLetter(mComponent));
@@ -451,8 +480,9 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         assertPasswordFails("Abcd", caseDescription);
         assertPasswordFails("_bcd", caseDescription);
         assertPasswordFails("3bcd", caseDescription);
-        assertPasswordSucceeds("c_@3c", caseDescription);
+        assertPasswordSucceeds("_@3c", caseDescription);
         assertPasswordSucceeds("_25!", caseDescription);
+        assertPasswordFails("123", caseDescription); // too short
     }
 
     public void testPasswordHistoryLength() {
@@ -1016,9 +1046,13 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
     }
 
     private void assertPasswordFails(String password, String restriction) {
-        boolean passwordResetResult = mDevicePolicyManager.resetPassword(password, /* flags= */0);
-        assertFalse("Password '" + password + "' should have failed on " + restriction,
-                passwordResetResult);
+        try {
+            boolean passwordResetResult = mDevicePolicyManager.resetPassword(password, /* flags= */0);
+            assertFalse("Password '" + password + "' should have failed on " + restriction,
+                    passwordResetResult);
+        } catch (IllegalArgumentException e) {
+            // yesss, we have failed!
+        }
     }
 
     private void assertPasswordSucceeds(String password, String restriction) {
