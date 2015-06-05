@@ -512,17 +512,13 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
 
         Size recordSize = null;
-        CamcorderProfile Profile = CamcorderProfile.get(mCurrentCameraId, mCurrentVideoSizeId);
-        recordSize = mCamera.new Size(profile.videoFrameWidth,profile.videoFrameHeight);
-
-        /*Size recordSize = null;
         for (int i = 0; i < qualityList.size(); i++) {
             if (mCurrentVideoSizeId == qualityList.get(i).videoSizeId) {
                 recordSize = mCamera.new Size(qualityList.get(i).width,
                         qualityList.get(i).height);
                 break;
             }
-        }*/
+        }
 
         if (recordSize == null) {
             Log.e(TAG, "findRecordSize: did not find a match");
