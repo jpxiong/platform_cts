@@ -1605,4 +1605,14 @@
     <string name="error_screen_pinning_did_not_start">Screen was not pinned.</string>
     <string name="error_screen_pinning_did_not_exit">Screen was not unpinned.</string>
     <string name="error_screen_pinning_couldnt_exit">Could not exit screen pinning through API.</string>
+
+    <!--  Audio Devices Notifcations Test -->
+    <string name="audio_devices_notifications_test">Audio Devices Notifications Test</string>
+    <string name="audio_devices_notification_instructions">
+          Click the "Clear Messages" button then connect and disconnect a wired headset.
+          Note if the appropriate notification messages appear below.
+    </string>
+    <string name="audio_dev_notification_clearmsgs">Clear Messages</string>
+    <string name="audio_dev_notification_connectMsg">CONNECT DETECTED</string>
+    <string name="audio_dev_notification_disconnectMsg">DISCONNECT DETECTED</string>
 </resources>
