@@ -95,6 +95,7 @@ public class Camera2SurfaceViewTestCase extends
     protected CameraCaptureSession mSession;
     protected ImageReader mReader;
     protected Surface mReaderSurface;
+    protected Surface mOldReaderSurface;
     protected Surface mPreviewSurface;
     protected Size mPreviewSize;
     protected List<Size> mOrderedPreviewSizes; // In descending order.
@@ -545,6 +546,8 @@ public class Camera2SurfaceViewTestCase extends
     protected void closeImageReader() {
         CameraTestUtils.closeImageReader(mReader);
         mReader = null;
+        Log.i(TAG,"mReaderSurface = " + mReaderSurface);
+        mOldReaderSurface = mReaderSurface;
         mReaderSurface = null;
     }
 
@@ -649,7 +652,11 @@ public class Camera2SurfaceViewTestCase extends
         outputSurfaces.add(mReaderSurface);
         mSessionListener = new BlockingSessionCallback();
         mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
-
+        if (mOldReaderSurface != null) {
+            Log.i(TAG,"release mOldReaderSurface = " + mOldReaderSurface);
+            mOldReaderSurface.release();
+            mOldReaderSurface = null;
+        }
         // Configure the requests.
         previewRequest.addTarget(mPreviewSurface);
         stillRequest.addTarget(mPreviewSurface);
