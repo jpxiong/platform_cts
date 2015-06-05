@@ -143,6 +143,7 @@ cts_test_packages := \
     CtsLocation2TestCases \
     CtsMediaStressTestCases \
     CtsMediaTestCases \
+    CtsMidiTestCases \
     CtsNativeOpenGLTestCases \
     CtsNdefTestCases \
     CtsNetTestCases \
