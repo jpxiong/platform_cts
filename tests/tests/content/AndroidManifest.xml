@@ -43,6 +43,12 @@
             android:label="@string/permlab_costMoney"
             android:description="@string/permdesc_costMoney"/>
 
+    <permission android:name="com.android.cts.content.CALL_ABROAD_PERMISSION"
+                android:label="@string/permlab_callAbroad"
+                android:description="@string/permdesc_callAbroad"
+                android:protectionLevel="normal"
+                android:permissionGroup="android.permission-group.COST_MONEY" />
+
     <!-- Used for PackageManager test, don't delete! -->
     <uses-configuration/>
     <uses-feature android:name="android.hardware.camera" />
