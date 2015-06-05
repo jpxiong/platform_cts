@@ -16,12 +16,10 @@
 package android.app.cts;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ActivityManager.ProcessErrorStateInfo;
 import android.app.ActivityManager.RecentTaskInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -36,7 +34,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ConfigurationInfo;
-import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 
 public class ActivityManagerTest extends InstrumentationTestCase {
@@ -200,7 +197,7 @@ public class ActivityManagerTest extends InstrumentationTestCase {
                    result = RESULT_PASS;
                    if (mActivityToFilter.equals(ACTIVITY_TIME_TRACK_INFO)) {
                        mTimeUsed = intent.getExtras().getLong(
-                               ActivityOptions.EXTRA_USAGE_REPORT_TIME);
+                               ActivityOptions.EXTRA_USAGE_TIME_REPORT);
                    }
                    notifyAll();
                 }
