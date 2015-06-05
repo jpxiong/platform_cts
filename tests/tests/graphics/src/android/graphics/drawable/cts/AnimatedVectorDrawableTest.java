@@ -190,6 +190,19 @@ public class AnimatedVectorDrawableTest extends ActivityInstrumentationTestCase2
         assertEquals(originalAlpha, d3.getAlpha());
     }
 
+    public void testReset() {
+        final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+        // The AVD has a duration as 100ms.
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                d1.reset();
+                assertFalse(d1.isRunning());
+            }
+        });
+
+    }
+
     public void testAddCallback() throws InterruptedException {
         MyCallback callback = new MyCallback();
         final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
