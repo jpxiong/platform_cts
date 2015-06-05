@@ -16,12 +16,12 @@
 
 package android.graphics.drawable.cts;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
@@ -190,31 +190,14 @@ public class AnimatedVectorDrawableTest extends ActivityInstrumentationTestCase2
         assertEquals(originalAlpha, d3.getAlpha());
     }
 
-    public void testAddRemoveListener() {
-        AnimatorListenerAdapter listener1 = new AnimatorListenerAdapter() {};
-        AnimatorListenerAdapter listener2 = new AnimatorListenerAdapter() {};
-        AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
-
-        d1.addListener(listener1);
-        d1.addListener(listener2);
-
-        assertTrue(d1.getListeners().contains(listener1));
-        assertTrue(d1.getListeners().contains(listener2));
-
-        d1.removeListener(listener1);
-        assertFalse(d1.getListeners().contains(listener1));
-
-        d1.removeListener(listener2);
-        assertTrue(d1.getListeners() == null);
-    }
-
-    public void testListener() throws InterruptedException {
-        MyListener listener = new MyListener();
+    public void testAddCallback() throws InterruptedException {
+        MyCallback callback = new MyCallback();
         final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
 
-        d1.addListener(listener);
+        d1.registerAnimationCallback(callback);
         // The AVD has a duration as 100ms.
         mActivity.runOnUiThread(new Runnable() {
+            @Override
             public void run() {
                 d1.start();
             }
@@ -222,31 +205,62 @@ public class AnimatedVectorDrawableTest extends ActivityInstrumentationTestCase2
 
         Thread.sleep(200);
 
-        assertTrue(listener.mStart);
-        assertTrue(listener.mEnd);
-        assertFalse(listener.mCancel);
+        assertTrue(callback.mStart);
+        assertTrue(callback.mEnd);
     }
 
-    class MyListener implements Animator.AnimatorListener{
+    public void testRemoveCallback() throws InterruptedException {
+        MyCallback callback = new MyCallback();
+        final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+
+        d1.registerAnimationCallback(callback);
+        assertTrue(d1.unregisterAnimationCallback(callback));
+        // The AVD has a duration as 100ms.
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                d1.start();
+            }
+        });
+
+        Thread.sleep(200);
+
+        assertFalse(callback.mStart);
+        assertFalse(callback.mEnd);
+    }
+
+    public void testClearCallback() throws InterruptedException {
+        MyCallback callback = new MyCallback();
+        final AnimatedVectorDrawable d1 = (AnimatedVectorDrawable) mResources.getDrawable(mResId);
+
+        d1.registerAnimationCallback(callback);
+        d1.clearAnimationCallbacks();
+        // The AVD has a duration as 100ms.
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                d1.start();
+            }
+        });
+
+        Thread.sleep(200);
+
+        assertFalse(callback.mStart);
+        assertFalse(callback.mEnd);
+    }
+
+    class MyCallback extends Animatable2.AnimationCallback {
         boolean mStart = false;
         boolean mEnd = false;
-        boolean mCancel = false;
-        int mRepeat = 0;
 
-        public void onAnimationCancel(Animator animation) {
-            mCancel = true;
-        }
-
-        public void onAnimationEnd(Animator animation) {
-            mEnd = true;
-        }
-
-        public void onAnimationRepeat(Animator animation) {
-            mRepeat++;
-        }
-
-        public void onAnimationStart(Animator animation) {
+        @Override
+        public void onAnimationStart(Drawable drawable) {
             mStart = true;
+        }
+
+        @Override
+        public void onAnimationEnd(Drawable drawable) {
+            mEnd = true;
         }
     }
 }
