@@ -67,6 +67,7 @@ cts_security_keysets_list := \
 cts_support_packages := \
     CtsAccelerationTestStubs \
     CtsAppTestStubs \
+    CtsAtraceTestApp \
     CtsCertInstallerApp \
     CtsDeviceAdmin \
     CtsDeviceOpenGl \
