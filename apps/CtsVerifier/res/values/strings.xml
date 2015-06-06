@@ -1615,4 +1615,23 @@
     <string name="audio_dev_notification_clearmsgs">Clear Messages</string>
     <string name="audio_dev_notification_connectMsg">CONNECT DETECTED</string>
     <string name="audio_dev_notification_disconnectMsg">DISCONNECT DETECTED</string>
+
+    <!--  Audio Routing Notifcations Test -->
+    <string name="audio_routingnotifications_test">Audio Routing Notifications Test</string>
+    <string name="audio_dev_routingnotification_instructions">
+          Click on the "Play" button in the AudioTrack Routing Notifictions section below to
+          start (silent) playback. Insert a wired headset. Observe a message acknowledging the
+          rerouting event below. Remove the wired headset and observe the new routing message.
+          Click on the "Stop" button to stop playback.\n
+          Repeat the process with "Record" and "Stop" button in the AudioRecord Routing
+          Notifications section below.
+    </string>
+    <string name="audio_routingnotification_playBtn">Play</string>
+    <string name="audio_routingnotification_playStopBtn">Stop</string>
+    <string name="audio_routingnotification_recBtn">Record</string>
+    <string name="audio_routingnotification_recStopBtn">Stop</string>
+    <string name="audio_routingnotification_playHeader">AudioTrack Routing Notifications</string>
+    <string name="audio_routingnotification_recHeader">AudioRecord Routing Notifications</string>
+    <string name="audio_routingnotification_trackRoutingMsg">AudioTrack rerouting</string>
+    <string name="audio_routingnotification_recordRoutingMsg">AudioRecord rerouting</string>
 </resources>
