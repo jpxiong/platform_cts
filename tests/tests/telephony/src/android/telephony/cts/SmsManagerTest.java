@@ -70,6 +70,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "311660",   // MetroPCS
                     "310120",   // Sprint
                     "44050",    // KDDI
+                    "44051",    // KDDI
                     "44053",    // KDDI
                     "44054",    // KDDI
                     "44070",    // KDDI
@@ -129,6 +130,7 @@ public class SmsManagerTest extends AndroidTestCase {
             Arrays.asList(
                     "44010",    // NTT DOCOMO
                     "44020",    // SBM
+                    "44051",    // KDDI
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
@@ -167,6 +169,7 @@ public class SmsManagerTest extends AndroidTestCase {
             Arrays.asList(
                     "44010",    // NTT DOCOMO
                     "44020",    // SBM
+                    "44051",    // KDDI
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
