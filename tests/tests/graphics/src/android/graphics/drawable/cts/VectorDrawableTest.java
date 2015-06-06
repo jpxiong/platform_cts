@@ -21,6 +21,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.VectorDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
@@ -287,5 +290,13 @@ public class VectorDrawableTest extends AndroidTestCase {
         assertEquals(0x20, d3.getAlpha());
 
         d2.setAlpha(originalAlpha);
+    }
+
+    public void testColorFilter() {
+        PorterDuffColorFilter filter = new PorterDuffColorFilter(Color.RED, Mode.SRC_IN);
+        VectorDrawable vectorDrawable = new VectorDrawable();
+        vectorDrawable.setColorFilter(filter);
+
+        assertEquals(filter, vectorDrawable.getColorFilter());
     }
 }
