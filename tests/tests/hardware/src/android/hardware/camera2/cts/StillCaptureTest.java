@@ -116,7 +116,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_REGIONS_AE_INDEX = 0;
     private static final int MAX_REGIONS_AWB_INDEX = 1;
     private static final int MAX_REGIONS_AF_INDEX = 2;
-    private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 3000;
+    private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 6000;
     private static final double AE_COMPENSATION_ERROR_TOLERANCE = 0.2;
     private static final int NUM_FRAMES_WAITED = 30;
     // 5 percent error margin for resulting metering regions
