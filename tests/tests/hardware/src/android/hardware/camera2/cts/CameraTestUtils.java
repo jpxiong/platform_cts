@@ -694,6 +694,35 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
+     * Configure a new camera session with output surfaces and type.
+     *
+     * @param camera The CameraDevice to be configured.
+     * @param outputSurfaces The surface list that used for camera output.
+     * @param listener The callback CameraDevice will notify when capture results are available.
+     */
+    public static CameraCaptureSession configureCameraSession(CameraDevice camera,
+            List<Surface> outputSurfaces, boolean isHighSpeed,
+            CameraCaptureSession.StateCallback listener, Handler handler)
+            throws CameraAccessException {
+        BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
+        if (isHighSpeed) {
+            camera.createConstrainedHighSpeedCaptureSession(outputSurfaces,
+                    sessionListener, handler);
+        } else {
+            camera.createCaptureSession(outputSurfaces, sessionListener, handler);
+        }
+        CameraCaptureSession session =
+                sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
+        assertFalse("Camera session should not be a reprocessable session",
+                session.isReprocessable());
+        String sessionType = isHighSpeed ? "High Speed" : "Normal";
+        assertTrue("Capture session type must be " + sessionType,
+                session.isConstrainedHighSpeed() == isHighSpeed);
+
+        return session;
+    }
+
+    /**
      * Configure a new camera session with output surfaces.
      *
      * @param camera The CameraDevice to be configured.
@@ -704,14 +733,9 @@ public class CameraTestUtils extends Assert {
             List<Surface> outputSurfaces,
             CameraCaptureSession.StateCallback listener, Handler handler)
             throws CameraAccessException {
-        BlockingSessionCallback sessionListener = new BlockingSessionCallback(listener);
-        camera.createCaptureSession(outputSurfaces, sessionListener, handler);
-        CameraCaptureSession session =
-                sessionListener.waitAndGetSession(SESSION_CONFIGURE_TIMEOUT_MS);
-        assertFalse("Camera session should not be a reprocessable session",
-                session.isReprocessable());
 
-        return session;
+        return configureCameraSession(camera, outputSurfaces, /*isHighSpeed*/false,
+                listener, handler);
     }
 
     public static CameraCaptureSession configureReprocessableCameraSession(CameraDevice camera,

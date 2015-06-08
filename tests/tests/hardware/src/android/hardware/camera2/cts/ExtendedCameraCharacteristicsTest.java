@@ -27,6 +27,7 @@ import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.params.BlackLevelPattern;
 import android.hardware.camera2.params.ColorSpaceTransform;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.ImageReader;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -88,6 +89,10 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING;
     private static final int OPAQUE_REPROCESS =
             CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING;
+    private static final int CONSTRAINED_HIGH_SPEED =
+            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO;
+    private static final int HIGH_SPEED_FPS_LOWER_MIN = 30;
+    private static final int HIGH_SPEED_FPS_UPPER_MIN = 120;
 
     @Override
     public void setContext(Context context) {
@@ -230,6 +235,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 expectKeyAvailable(c, CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES                  , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS                   , OPT      ,   YUV_REPROCESS, OPAQUE_REPROCESS);
+                expectKeyAvailable(c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP                 , OPT      ,   CONSTRAINED_HIGH_SPEED);
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC                     , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING            , LEGACY   ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW                      , LEGACY   ,   BC                   );
@@ -722,6 +728,84 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             counter++;
         } // mCharacteristics
 
+    }
+
+    /**
+     * Test high speed capability and cross-check the high speed sizes and fps ranges from
+     * the StreamConfigurationMap.
+     */
+    public void testConstrainedHighSpeedCapability() {
+        for (CameraCharacteristics c : mCharacteristics) {
+            int[] capabilities = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            boolean supportHighSpeed = arrayContains(capabilities, CONSTRAINED_HIGH_SPEED);
+            if (supportHighSpeed) {
+                StreamConfigurationMap config =
+                        CameraTestUtils.getValueNotNull(
+                                c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                List<Size> highSpeedSizes = Arrays.asList(config.getHighSpeedVideoSizes());
+                assertTrue("High speed sizes shouldn't be empty", highSpeedSizes.size() > 0);
+                Size[] allSizes = config.getOutputSizes(ImageFormat.PRIVATE);
+                assertTrue("Normal size for PRIVATE format shouldn't be null or empty",
+                        allSizes != null && allSizes.length > 0);
+                for (Size size: highSpeedSizes) {
+                    // The sizes must be a subset of the normal sizes
+                    assertTrue("High speed size " + size +
+                            " must be part of normal sizes " + Arrays.toString(allSizes),
+                            Arrays.asList(allSizes).contains(size));
+
+                    // Sanitize the high speed FPS ranges for each size
+                    List<Range<Integer>> ranges =
+                            Arrays.asList(config.getHighSpeedVideoFpsRangesFor(size));
+                    for (Range<Integer> range : ranges) {
+                        assertTrue("The range " + range + " doesn't satisfy the"
+                                + " min/max boundary requirements.",
+                                range.getLower() >= HIGH_SPEED_FPS_LOWER_MIN &&
+                                range.getUpper() >= HIGH_SPEED_FPS_UPPER_MIN);
+                        assertTrue("The range " + range + " should be multiple of 30fps",
+                                range.getLower() % 30 == 0 && range.getUpper() % 30 == 0);
+                        // If the range is fixed high speed range, it should contain the
+                        // [30, fps_max] in the high speed range list; if it's variable FPS range,
+                        // the corresponding fixed FPS Range must be included in the range list.
+                        if (range.getLower() == range.getUpper()) {
+                            Range<Integer> variableRange = new Range<Integer>(30, range.getUpper());
+                            assertTrue("The variable FPS range " + variableRange +
+                                    " shoould be included in the high speed ranges for size " +
+                                    size, ranges.contains(variableRange));
+                        } else {
+                            Range<Integer> fixedRange =
+                                    new Range<Integer>(range.getUpper(), range.getUpper());
+                            assertTrue("The fixed FPS range " + fixedRange +
+                                    " shoould be included in the high speed ranges for size " +
+                                    size, ranges.contains(fixedRange));
+                        }
+                    }
+                }
+                // If the device advertise some high speed profiles, the sizes and FPS ranges
+                // should be advertise by the camera.
+                for (int quality = CamcorderProfile.QUALITY_HIGH_SPEED_480P;
+                        quality <= CamcorderProfile.QUALITY_HIGH_SPEED_2160P; quality++) {
+                    if (CamcorderProfile.hasProfile(quality)) {
+                        CamcorderProfile profile = CamcorderProfile.get(quality);
+                        Size camcorderProfileSize =
+                                new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+                        assertTrue("CamcorderPrfile size " + camcorderProfileSize +
+                                " must be included in the high speed sizes " +
+                                Arrays.toString(highSpeedSizes.toArray()),
+                                highSpeedSizes.contains(camcorderProfileSize));
+                        Range<Integer> camcorderFpsRange =
+                                new Range<Integer>(profile.videoFrameRate, profile.videoFrameRate);
+                        List<Range<Integer>> allRanges =
+                                Arrays.asList(config.getHighSpeedVideoFpsRangesFor(
+                                        camcorderProfileSize));
+                        assertTrue("Camcorder fps range " + camcorderFpsRange +
+                                " should be included by high speed fps ranges " +
+                                Arrays.toString(allRanges.toArray()),
+                                allRanges.contains(camcorderFpsRange));
+                    }
+                }
+            }
+        }
     }
 
     /**
