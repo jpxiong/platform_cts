@@ -250,6 +250,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         slowMotionRecording();
     }
 
+    public void testConstrainedHighSpeedRecording() throws Exception {
+        constrainedHighSpeedRecording();
+    }
+
     /**
      * <p>
      * Test recording framerate accuracy when switching from low FPS to high FPS.
@@ -337,18 +341,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                     int captureRate = fpsRange.getLower();
                     int videoFramerate = captureRate / SLOWMO_SLOW_FACTOR;
-                    /**
-                     * Check if encoder support this. TODO: use HIGH_SPEED_720p
-                     * CamCorderProfile to get the performance guarantee. Also
-                     * add the test in StaticMetadataTest to check: 1. Camera
-                     * high speed recording metadata is correctly reported 2.
-                     * Encoder profile/level info is correctly reported. After
-                     * that, we only need check the CamcorderProfile before
-                     * skipping the test.
-                     */
-                    if (!isSupportedByAVCEncoder(size, captureRate)) {
-                        Log.i(TAG, "high speed recording " + size + "@" + captureRate + "fps"
-                                + " is not supported by AVC encoder");
+                    // Skip the test if the highest recording FPS supported by CamcorderProfile
+                    if (fpsRange.getUpper() > getFpsFromHighSpeedProfileForSize(size)) {
+                        Log.w(TAG, "high speed recording " + size + "@" + captureRate + "fps"
+                                + " is not supported by CamcorderProfile");
                         continue;
                     }
 
@@ -366,8 +362,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     // Start recording
                     SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
                     startSlowMotionRecording(/*useMediaRecorder*/true, videoFramerate, captureRate,
-                            fpsRange, resultListener);
-                    long startTime = SystemClock.elapsedRealtime();
+                            fpsRange, resultListener, /*useHighSpeedSession*/false);
 
                     // Record certain duration.
                     SystemClock.sleep(RECORDING_DURATION_MS);
@@ -380,7 +375,6 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
                     // Validation.
                     validateRecording(size, durationMs);
-
                 }
 
             } finally {
@@ -388,6 +382,93 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 releaseRecorder();
             }
         }
+    }
+
+    private void constrainedHighSpeedRecording() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing constrained high speed recording for camera " + id);
+                // Re-use the MediaRecorder object for the same camera device.
+                mMediaRecorder = new MediaRecorder();
+                openDevice(id);
+
+                if (!mStaticInfo.isConstrainedHighSpeedVideoSupported()) {
+                    continue;
+                }
+
+                StreamConfigurationMap config =
+                        mStaticInfo.getValueFromKeyNonNull(
+                                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                Size[] highSpeedVideoSizes = config.getHighSpeedVideoSizes();
+                for (Size size : highSpeedVideoSizes) {
+                    List<Range<Integer>> fixedFpsRanges =
+                            getHighSpeedFixedFpsRangeForSize(config, size);
+                    mCollector.expectTrue("Unable to find the fixed frame rate fps range for " +
+                            "size " + size, fixedFpsRanges.size() > 0);
+                    // Test recording for each FPS range
+                    for (Range<Integer> fpsRange : fixedFpsRanges) {
+                        int captureRate = fpsRange.getLower();
+                        final int VIDEO_FRAME_RATE = 30;
+                        // Skip the test if the highest recording FPS supported by CamcorderProfile
+                        if (fpsRange.getUpper() > getFpsFromHighSpeedProfileForSize(size)) {
+                            Log.w(TAG, "high speed recording " + size + "@" + captureRate + "fps"
+                                    + " is not supported by CamcorderProfile");
+                            continue;
+                        }
+
+                        mOutMediaFileName = VIDEO_FILE_PATH + "/test_cslowMo_video_" + captureRate +
+                                "fps_" + id + "_" + size.toString() + ".mp4";
+
+                        prepareRecording(size, VIDEO_FRAME_RATE, captureRate);
+
+                        // prepare preview surface by using video size.
+                        updatePreviewSurfaceWithVideoSize(size);
+
+                        // Start recording
+                        SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
+                        startSlowMotionRecording(/*useMediaRecorder*/true, VIDEO_FRAME_RATE,
+                                captureRate, fpsRange, resultListener,
+                                /*useHighSpeedSession*/true);
+
+                        // Record certain duration.
+                        SystemClock.sleep(RECORDING_DURATION_MS);
+
+                        // Stop recording and preview
+                        stopRecording(/*useMediaRecorder*/true);
+                        // Convert number of frames camera produced into the duration in unit of ms.
+                        int durationMs = (int) (resultListener.getTotalNumFrames() * 1000.0f /
+                                        VIDEO_FRAME_RATE);
+
+                        // Validation.
+                        validateRecording(size, durationMs);
+                    }
+                }
+
+            } finally {
+                closeDevice();
+                releaseRecorder();
+            }
+        }
+    }
+
+    /**
+     * Get high speed FPS from CamcorderProfiles for a given size.
+     *
+     * @param size The size used to search the CamcorderProfiles for the FPS.
+     * @return high speed video FPS, 0 if the given size is not supported by the CamcorderProfiles.
+     */
+    private int getFpsFromHighSpeedProfileForSize(Size size) {
+        for (int quality = CamcorderProfile.QUALITY_HIGH_SPEED_480P;
+                quality <= CamcorderProfile.QUALITY_HIGH_SPEED_2160P; quality++) {
+            if (CamcorderProfile.hasProfile(quality)) {
+                CamcorderProfile profile = CamcorderProfile.get(quality);
+                if (size.equals(new Size(profile.videoFrameWidth, profile.videoFrameHeight))){
+                    return profile.videoFrameRate;
+                }
+            }
+        }
+
+        return 0;
     }
 
     private Range<Integer> getHighestHighSpeedFixedFpsRangeForSize(StreamConfigurationMap config,
@@ -408,9 +489,21 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         return maxRange;
     }
 
+    private List<Range<Integer>> getHighSpeedFixedFpsRangeForSize(StreamConfigurationMap config,
+            Size size) {
+        Range<Integer>[] availableFpsRanges = config.getHighSpeedVideoFpsRangesFor(size);
+        List<Range<Integer>> fixedRanges = new ArrayList<Range<Integer>>();
+        for (Range<Integer> range : availableFpsRanges) {
+            if (range.getLower().equals(range.getUpper())) {
+                fixedRanges.add(range);
+            }
+        }
+        return fixedRanges;
+    }
+
     private void startSlowMotionRecording(boolean useMediaRecorder, int videoFrameRate,
             int captureRate, Range<Integer> fpsRange,
-            CameraCaptureSession.CaptureCallback listener) throws Exception {
+            CameraCaptureSession.CaptureCallback listener, boolean useHighSpeedSession) throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(2);
         assertTrue("Both preview and recording surfaces should be valid",
                 mPreviewSurface.isValid() && mRecordingSurface.isValid());
@@ -421,36 +514,48 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             outputSurfaces.add(mReaderSurface);
         }
         mSessionListener = new BlockingSessionCallback();
-        mSession = configureCameraSession(mCamera, outputSurfaces, mSessionListener, mHandler);
+        mSession = configureCameraSession(mCamera, outputSurfaces, useHighSpeedSession,
+                mSessionListener, mHandler);
 
-        CaptureRequest.Builder recordingRequestBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-        recordingRequestBuilder.set(CaptureRequest.CONTROL_MODE,
-                CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
-        recordingRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
-                CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
+        // Create slow motion request list
+        List<CaptureRequest> slowMoRequests = null;
+        if (useHighSpeedSession) {
+            CaptureRequest.Builder requestBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            requestBuilder.addTarget(mPreviewSurface);
+            requestBuilder.addTarget(mRecordingSurface);
+            slowMoRequests = mCamera.createConstrainedHighSpeedRequestList(requestBuilder.build());
+        } else {
+            CaptureRequest.Builder recordingRequestBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            recordingRequestBuilder.set(CaptureRequest.CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
+            recordingRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
+                    CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
 
-        CaptureRequest.Builder recordingOnlyBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-        recordingOnlyBuilder.set(CaptureRequest.CONTROL_MODE,
-                CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
-        recordingOnlyBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
-                CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
-        int slowMotionFactor = captureRate / videoFrameRate;
+            CaptureRequest.Builder recordingOnlyBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            recordingOnlyBuilder.set(CaptureRequest.CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
+            recordingOnlyBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
+                    CaptureRequest.CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO);
+            int slowMotionFactor = captureRate / videoFrameRate;
 
-        // Make sure camera output frame rate is set to correct value.
-        recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
-        recordingRequestBuilder.addTarget(mRecordingSurface);
-        recordingRequestBuilder.addTarget(mPreviewSurface);
-        recordingOnlyBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
-        recordingOnlyBuilder.addTarget(mRecordingSurface);
+            // Make sure camera output frame rate is set to correct value.
+            recordingRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+            recordingRequestBuilder.addTarget(mRecordingSurface);
+            recordingRequestBuilder.addTarget(mPreviewSurface);
+            recordingOnlyBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+            recordingOnlyBuilder.addTarget(mRecordingSurface);
 
-        List<CaptureRequest> slowMoRequests = new ArrayList<CaptureRequest>();
-        slowMoRequests.add(recordingRequestBuilder.build());// Preview + recording.
+            slowMoRequests = new ArrayList<CaptureRequest>();
+            slowMoRequests.add(recordingRequestBuilder.build());// Preview + recording.
 
-        for (int i = 0; i < slowMotionFactor - 1; i++) {
-            slowMoRequests.add(recordingOnlyBuilder.build()); // Recording only.
+            for (int i = 0; i < slowMotionFactor - 1; i++) {
+                slowMoRequests.add(recordingOnlyBuilder.build()); // Recording only.
+            }
         }
+
         mSession.setRepeatingBurst(slowMoRequests, listener, mHandler);
 
         if (useMediaRecorder) {

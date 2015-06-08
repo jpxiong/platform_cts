@@ -2026,6 +2026,19 @@ public class StaticMetadata {
     }
 
     /**
+     * Check if the constrained high speed video is supported by the camera device.
+     * The high speed FPS ranges and sizes are sanitized in
+     * ExtendedCameraCharacteristicsTest#testConstrainedHighSpeedCapability.
+     *
+     * @return true if the constrained high speed video is supported, false otherwise.
+     */
+    public boolean isConstrainedHighSpeedVideoSupported() {
+        List<Integer> availableCapabilities = getAvailableCapabilitiesChecked();
+        return (availableCapabilities.contains(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO));
+    }
+
+    /**
      * Check if high speed video is supported (HIGH_SPEED_VIDEO scene mode is
      * supported, supported high speed fps ranges and sizes are valid).
      *
