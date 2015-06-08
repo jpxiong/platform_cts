@@ -437,7 +437,7 @@ public class LocationTest extends AndroidTestCase {
         final long timeout = 500;
 
         // should refuse binding
-        IBinder binder = service.onBind(intent);
+        IBinder binder = service.callOnBind(intent);
         assertNull("onBind should always fail.", binder);
 
         // test if result consistent with the truth
@@ -445,7 +445,7 @@ public class LocationTest extends AndroidTestCase {
         service.setEnabled(false);
         resultHandler.expectEnabled(false);
         resultHandler.expectMessage(true);
-        ret = service.onStartCommand(intent, SettingInjectorService.START_NOT_STICKY, 0);
+        ret = service.callOnStartCommand(intent, SettingInjectorService.START_NOT_STICKY, 0);
         assertEquals("onStartCommand return value invalid in (enabled == false) case.",
             ret, SettingInjectorService.START_NOT_STICKY);
         assertTrue("Message time out in (enabled == false case).",
@@ -455,7 +455,7 @@ public class LocationTest extends AndroidTestCase {
         service.setEnabled(true);
         resultHandler.expectEnabled(true);
         resultHandler.expectMessage(true);
-        ret = service.onStartCommand(intent, SettingInjectorService.START_NOT_STICKY, 0);
+        ret = service.callOnStartCommand(intent, SettingInjectorService.START_NOT_STICKY, 0);
         assertEquals("onStartCommand return value invalid in (enabled == true) case.",
             ret, SettingInjectorService.START_NOT_STICKY);
         assertTrue("Message time out in (enabled == true) case.",
@@ -463,7 +463,7 @@ public class LocationTest extends AndroidTestCase {
 
         // should not respond to the deprecated method
         resultHandler.expectMessage(false);
-        service.onStart(intent, 0);
+        service.callOnStart(intent, 0);
         resultHandler.waitForMessage(timeout);
     }
 
@@ -573,6 +573,20 @@ public class LocationTest extends AndroidTestCase {
 
         public void setEnabled(boolean enabled) {
             mEnabled = enabled;
+        }
+
+        // API coverage dashboard will not cound method call from derived class.
+        // Thus, it is necessary to make explicit call to SettingInjectorService public methods.
+        public IBinder callOnBind(Intent intent) {
+            return super.onBind(intent);
+        }
+
+        public void callOnStart(Intent intent, int startId) {
+            super.onStart(intent, startId);
+        }
+
+        public int callOnStartCommand(Intent intent, int flags, int startId) {
+            return super.onStartCommand(intent, flags, startId);
         }
     }
 
