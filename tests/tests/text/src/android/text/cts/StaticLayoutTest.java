@@ -21,6 +21,7 @@ import android.text.Editable;
 import android.text.GetChars;
 import android.text.GraphicsOperations;
 import android.text.Layout.Alignment;
+import android.text.TextUtils.TruncateAt;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
@@ -110,6 +111,104 @@ public class StaticLayoutTest extends AndroidTestCase {
             new StaticLayout(null, null, -1, null, 0, 0, true);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+        }
+    }
+
+    public void testBuilder() {
+        {
+            // Obtain.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            StaticLayout layout = builder.build();
+            // Check values passed to obtain().
+            assertEquals(LAYOUT_TEXT, layout.getText());
+            assertEquals(mDefaultPaint, layout.getPaint());
+            assertEquals(DEFAULT_OUTER_WIDTH, layout.getWidth());
+            // Check default values.
+            assertEquals(TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    layout.getTextDirectionHeuristic());
+            assertEquals(Alignment.ALIGN_NORMAL, layout.getAlignment());
+            assertEquals(0.0f, layout.getSpacingAdd());
+            assertEquals(1.0f, layout.getSpacingMultiplier());
+            assertEquals(DEFAULT_OUTER_WIDTH, layout.getEllipsizedWidth());
+        }
+        {
+            // Obtain with null objects.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(null, 0, 0, null, 0);
+            try {
+                StaticLayout layout = builder.build();
+                fail("should throw NullPointerException here");
+            } catch (NullPointerException e) {
+            }
+        }
+        {
+            // setText.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setText(LAYOUT_TEXT_SINGLE_LINE);
+            StaticLayout layout = builder.build();
+            assertEquals(LAYOUT_TEXT_SINGLE_LINE, layout.getText());
+        }
+        {
+            // setAlignment.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setAlignment(DEFAULT_ALIGN);
+            StaticLayout layout = builder.build();
+            assertEquals(DEFAULT_ALIGN, layout.getAlignment());
+        }
+        {
+            // setTextDirection.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setTextDirection(TextDirectionHeuristics.RTL);
+            StaticLayout layout = builder.build();
+            // Always returns TextDirectionHeuristics.FIRSTSTRONG_LTR.
+            assertEquals(TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    layout.getTextDirectionHeuristic());
+        }
+        {
+            // setLineSpacing.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setLineSpacing(1.0f, 2.0f);
+            StaticLayout layout = builder.build();
+            assertEquals(1.0f, layout.getSpacingAdd());
+            assertEquals(2.0f, layout.getSpacingMultiplier());
+        }
+        {
+            // setEllipsizedWidth and setEllipsize.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setEllipsize(TruncateAt.END);
+            builder.setEllipsizedWidth(ELLIPSIZE_WIDTH);
+            StaticLayout layout = builder.build();
+            assertEquals(ELLIPSIZE_WIDTH, layout.getEllipsizedWidth());
+            assertEquals(DEFAULT_OUTER_WIDTH, layout.getWidth());
+            assertTrue(layout.getEllipsisCount(0) == 0);
+            assertTrue(layout.getEllipsisCount(5) > 0);
+        }
+        {
+            // setMaxLines.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setMaxLines(1);
+            builder.setEllipsize(TruncateAt.END);
+            StaticLayout layout = builder.build();
+            assertTrue(layout.getEllipsisCount(0) > 0);
+            assertEquals(1, layout.getLineCount());
+        }
+        {
+            // Setter methods that cannot be directly tested.
+            // setBreakStrategy, setHyphenationFrequency, setIncludePad, and setIndents.
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(LAYOUT_TEXT, 0,
+                    LAYOUT_TEXT.length(), mDefaultPaint, DEFAULT_OUTER_WIDTH);
+            builder.setBreakStrategy(StaticLayout.BREAK_STRATEGY_HIGH_QUALITY);
+            builder.setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL);
+            builder.setIncludePad(true);
+            builder.setIndents(null, null);
+            StaticLayout layout = builder.build();
+            assertNotNull(layout);
         }
     }
 
