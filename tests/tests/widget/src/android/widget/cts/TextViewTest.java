@@ -42,6 +42,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.MoreAsserts;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.text.Editable;
@@ -4025,6 +4026,85 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertNull(drawables[RIGHT]);
         assertNull(drawables[TOP]);
         assertNull(drawables[BOTTOM]);
+    }
+
+    public void testSetGetBreakStrategy() {
+        TextView tv = new TextView(mActivity);
+
+        // The default value is from the theme, here the default is BREAK_STRATEGY_HIGH_QUALITY for
+        // TextView.
+        assertEquals(Layout.BREAK_STRATEGY_HIGH_QUALITY, tv.getBreakStrategy());
+
+        tv.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
+        assertEquals(Layout.BREAK_STRATEGY_SIMPLE, tv.getBreakStrategy());
+
+        tv.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
+        assertEquals(Layout.BREAK_STRATEGY_HIGH_QUALITY, tv.getBreakStrategy());
+
+        tv.setBreakStrategy(Layout.BREAK_STRATEGY_BALANCED);
+        assertEquals(Layout.BREAK_STRATEGY_BALANCED, tv.getBreakStrategy());
+
+        EditText et = new EditText(mActivity);
+
+        // The default value is from the theme, here the default is BREAK_STRATEGY_SIMPLE for
+        // EditText.
+        assertEquals(Layout.BREAK_STRATEGY_SIMPLE, et.getBreakStrategy());
+
+        et.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
+        assertEquals(Layout.BREAK_STRATEGY_SIMPLE, et.getBreakStrategy());
+
+        et.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
+        assertEquals(Layout.BREAK_STRATEGY_HIGH_QUALITY, et.getBreakStrategy());
+
+        et.setBreakStrategy(Layout.BREAK_STRATEGY_BALANCED);
+        assertEquals(Layout.BREAK_STRATEGY_BALANCED, et.getBreakStrategy());
+    }
+
+    public void testSetGetHyphenationFrequency() {
+        TextView tv = new TextView(mActivity);
+
+        assertEquals(Layout.HYPHENATION_FREQUENCY_NORMAL, tv.getHyphenationFrequency());
+
+        tv.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE);
+        assertEquals(Layout.HYPHENATION_FREQUENCY_NONE, tv.getHyphenationFrequency());
+
+        tv.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL);
+        assertEquals(Layout.HYPHENATION_FREQUENCY_NORMAL, tv.getHyphenationFrequency());
+
+        tv.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL);
+        assertEquals(Layout.HYPHENATION_FREQUENCY_FULL, tv.getHyphenationFrequency());
+    }
+
+    public void testSetGetIndents() {
+        TextView tv = new TextView(mActivity);
+        {
+            // Null.
+            tv.setIndents(null, null);
+            assertNull(tv.getLeftIndents());
+            assertNull(tv.getRightIndents());
+        }
+        {
+            // Empty arrays.
+            final int[] emptyArray = {};
+            tv.setIndents(emptyArray, emptyArray);
+            assertEquals(0, tv.getLeftIndents().length);
+            assertEquals(0, tv.getRightIndents().length);
+        }
+        {
+            final int[] leftIndents = { 10, 20, 30, 40 };
+            final int[] rightIndents = { 15, 25, 35, 45 };
+            tv.setIndents(leftIndents, rightIndents);
+            MoreAsserts.assertEquals(leftIndents, tv.getLeftIndents());
+            MoreAsserts.assertEquals(rightIndents, tv.getRightIndents());
+        }
+        {
+            // Negative values.
+            final int[] leftIndents = { -10, 20, -30, 40 };
+            final int[] rightIndents = { 15, -25, 35, -45 };
+            tv.setIndents(leftIndents, rightIndents);
+            MoreAsserts.assertEquals(leftIndents, tv.getLeftIndents());
+            MoreAsserts.assertEquals(rightIndents, tv.getRightIndents());
+        }
     }
 
     private static class MockOnEditorActionListener implements OnEditorActionListener {
