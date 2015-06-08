@@ -779,6 +779,47 @@ public class AllocationTest extends RSBaseCompute {
         assertTrue(result[0] == 2);
     }
 
+  public void testDimReturnsZero() {
+    Allocation a;
+    a = Allocation.createSized(mRS, Element.F32(mRS), 100);
+    assertTrue(a.getType().getX() == 100);
+    assertTrue(a.getType().getY() == 0);
+    assertTrue(a.getType().getZ() == 0);
+    a.destroy();
+
+    Type.Builder b;
+    b = new Type.Builder(mRS, Element.F32(mRS));
+    a = Allocation.createTyped(mRS, b.create());
+
+    assertTrue(a.getType().getX() == 1);
+    assertTrue(a.getType().getY() == 0);
+    assertTrue(a.getType().getZ() == 0);
+
+    a.destroy();
+
+    b = new Type.Builder(mRS, Element.F32(mRS)).setX(102);
+    a = Allocation.createTyped(mRS, b.create());
+
+    assertTrue(a.getType().getX() == 102);
+    assertTrue(a.getType().getY() == 0);
+    assertTrue(a.getType().getZ() == 0);
+    a.destroy();
+    b = new Type.Builder(mRS, Element.F32(mRS)).setX(102).setY(123);
+    a = Allocation.createTyped(mRS, b.create());
+
+    assertTrue(a.getType().getX() == 102);
+    assertTrue(a.getType().getY() == 123);
+    assertTrue(a.getType().getZ() == 0);
+    a.destroy();
+    b = new Type.Builder(mRS, Element.F32(mRS)).setX(2).setY(33).setZ(23);
+    a = Allocation.createTyped(mRS, b.create());
+
+    assertTrue(a.getType().getX() == 2);
+    assertTrue(a.getType().getY() == 33);
+    assertTrue(a.getType().getZ() == 23);
+
+    a.destroy();
+   }
 }
 
 
