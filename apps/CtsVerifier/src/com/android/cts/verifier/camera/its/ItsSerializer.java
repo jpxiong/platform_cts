@@ -116,9 +116,15 @@ public class ItsSerializer {
         faceObj.put("bounds", serializeRect(face.getBounds()));
         faceObj.put("score", face.getScore());
         faceObj.put("id", face.getId());
-        faceObj.put("leftEye", serializePoint(face.getLeftEyePosition()));
-        faceObj.put("rightEye", serializePoint(face.getRightEyePosition()));
-        faceObj.put("mouth", serializePoint(face.getMouthPosition()));
+        if (face.getLeftEyePosition() != null) {
+            faceObj.put("leftEye", serializePoint(face.getLeftEyePosition()));
+        }
+        if (face.getRightEyePosition() != null) {
+            faceObj.put("rightEye", serializePoint(face.getRightEyePosition()));
+        }
+        if (face.getMouthPosition() != null) {
+            faceObj.put("mouth", serializePoint(face.getMouthPosition()));
+        }
         return faceObj;
     }
 
