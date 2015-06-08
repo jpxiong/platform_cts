@@ -16,11 +16,16 @@
 
 package com.android.cts.verifier.tv;
 
+import android.app.SearchableInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.media.tv.TvContract;
+import android.os.AsyncTask;
 import android.view.View;
 
 import com.android.cts.verifier.R;
+
+import java.util.List;
 
 /**
  * Tests for verifying TV app behavior for third-party TV input apps.
@@ -41,10 +46,12 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
     private View mTuneToChannelItem;
     private View mVerifyTuneItem;
     private View mVerifyOverlayViewItem;
+    private View mVerifyGlobalSearchItem;
     private View mGoToEpgItem;
     private View mVerifyEpgItem;
     private boolean mTuneVerified;
     private boolean mOverlayViewVerified;
+    private boolean mGlobalSearchVerified;
 
     @Override
     public void onClick(View v) {
@@ -96,6 +103,7 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
                     goToNextState(postTarget, failCallback);
                 }
             });
+            verifyGlobalSearch(postTarget, failCallback);
             startActivity(TV_APP_INTENT);
         } else if (containsButton(mGoToEpgItem, v)) {
             startActivity(EPG_INTENT);
@@ -118,22 +126,52 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
         mVerifyTuneItem = createAutoItem(R.string.tv_input_discover_test_verify_tune);
         mVerifyOverlayViewItem = createAutoItem(
                 R.string.tv_input_discover_test_verify_overlay_view);
+        mVerifyGlobalSearchItem = createAutoItem(
+                R.string.tv_input_discover_test_verify_global_search);
         mGoToEpgItem = createUserItem(R.string.tv_input_discover_test_go_to_epg,
                 R.string.tv_launch_epg, this);
         mVerifyEpgItem = createUserItem(R.string.tv_input_discover_test_verify_epg,
                 R.string.tv_input_discover_test_yes, this);
     }
 
+    @Override
+    protected void setInfoResources() {
+        setInfoResources(R.string.tv_input_discover_test,
+                R.string.tv_input_discover_test_info, -1);
+    }
+
     private void goToNextState(View postTarget, Runnable failCallback) {
-        if (mTuneVerified && mOverlayViewVerified) {
+        if (mTuneVerified && mOverlayViewVerified && mGlobalSearchVerified) {
             postTarget.removeCallbacks(failCallback);
             setButtonEnabled(mGoToEpgItem, true);
         }
     }
 
-    @Override
-    protected void setInfoResources() {
-        setInfoResources(R.string.tv_input_discover_test,
-                R.string.tv_input_discover_test_info, -1);
+    private void verifyGlobalSearch(final View postTarget, final Runnable failCallback) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                Context context = TvInputDiscoveryTestActivity.this;
+                for (SearchableInfo info : SearchUtil.getSearchableInfos(context)) {
+                    if (SearchUtil.verifySearchResult(context, info,
+                            MockTvInputSetupActivity.CHANNEL_NAME,
+                            MockTvInputSetupActivity.PROGRAM_TITLE)
+                            && SearchUtil.verifySearchResult(context, info,
+                                    MockTvInputSetupActivity.PROGRAM_TITLE,
+                                    MockTvInputSetupActivity.PROGRAM_TITLE)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                setPassState(mVerifyGlobalSearchItem, result);
+                mGlobalSearchVerified = result;
+                goToNextState(postTarget, failCallback);
+            }
+        }.execute();
     }
 }

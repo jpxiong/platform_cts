@@ -33,11 +33,11 @@ import java.util.ArrayList;
 public class MockTvInputSetupActivity extends Activity {
     private static final String TAG = "MockTvInputSetupActivity";
 
-    private static final String CHANNEL_NUMBER = "999-0";
-    private static final String CHANNEL_NAME = "Dummy";
+    /* package-private */ static final String CHANNEL_NUMBER = "999-0";
+    /* package-private */ static final String CHANNEL_NAME = "Dummy";
 
-    private static final String PROGRAM_TITLE = "Dummy Program";
-    private static final String PROGRAM_DESCRIPTION = "Dummy Program Description";
+    /* package-private */ static final String PROGRAM_TITLE = "Dummy Program";
+    /* package-private */ static final String PROGRAM_DESCRIPTION = "Dummy Program Description";
     private static final long PROGRAM_LENGTH_MILLIS = 60 * 60 * 1000;
     private static final int PROGRAM_COUNT = 24;
 
