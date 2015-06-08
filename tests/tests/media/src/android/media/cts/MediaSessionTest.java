@@ -168,6 +168,10 @@ public class MediaSessionTest extends AndroidTestCase {
         PendingIntent pi = PendingIntent.getActivity(getContext(), 555, intent, 0);
         session.setSessionActivity(pi);
         assertEquals(pi, controller.getSessionActivity());
+
+        // test setActivity
+        session.setActive(true);
+        assertTrue(session.isActive());
     }
 
     /**
