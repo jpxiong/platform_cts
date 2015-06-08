@@ -23,7 +23,10 @@ import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import junit.framework.Assert;
 
 /**
  * Stub implementation of (@link android.service.media.MediaBrowserService}.
@@ -32,18 +35,24 @@ public class StubMediaBrowserService extends MediaBrowserService {
     static final String MEDIA_ID_ROOT = "test_media_id_root";
     static final String EXTRAS_KEY = "test_extras_key";
     static final String EXTRAS_VALUE = "test_extras_value";
+    static final String MEDIA_ID_CHILDREN_DELAYED = "test_media_id_children_delayed";
     static final String[] MEDIA_ID_CHILDREN = new String[] {
         "test_media_id_children_0", "test_media_id_children_1",
-        "test_media_id_children_2", "test_media_id_children_3"
+        "test_media_id_children_2", "test_media_id_children_3",
+        MEDIA_ID_CHILDREN_DELAYED
     };
+
+    static StubMediaBrowserService sInstance;
 
     /* package private */ static MediaSession sSession;
     private Bundle mExtras;
+    private Result<List<MediaItem>> mPendingResult;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        sSession = new MediaSession(this, "MediaBrowserStubService");
+        sInstance = this;
+        sSession = new MediaSession(this, "StubMediaBrowserService");
         setSessionToken(sSession.getSessionToken());
     }
 
@@ -62,7 +71,18 @@ public class StubMediaBrowserService extends MediaBrowserService {
                 mediaItems.add(new MediaItem(new MediaDescription.Builder()
                         .setMediaId(id).build(), MediaItem.FLAG_BROWSABLE));
             }
+            result.sendResult(mediaItems);
+        } else if (MEDIA_ID_CHILDREN_DELAYED.equals(parentMediaId)) {
+            Assert.assertNull(mPendingResult);
+            mPendingResult = result;
+            result.detach();
         }
-        result.sendResult(mediaItems);
+    }
+
+    public void sendDelayedNotifyChildrenChanged() {
+        if (mPendingResult != null) {
+            mPendingResult.sendResult(Collections.<MediaItem>emptyList());
+            mPendingResult = null;
+        }
     }
 }
