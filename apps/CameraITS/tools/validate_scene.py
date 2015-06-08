@@ -17,17 +17,25 @@ import its.device
 import its.objects
 import its.image
 import its.caps
+import re
 
 def main():
     """capture a yuv image and save it to argv[1]
     """
     camera_id = -1
     out_path = ""
+    scene_name = ""
+    scene_desc = "No requirement"
     for s in sys.argv[1:]:
         if s[:7] == "camera=" and len(s) > 7:
             camera_id = s[7:]
         elif s[:4] == "out=" and len(s) > 4:
             out_path = s[4:]
+        elif s[:6] == "scene=" and len(s) > 6:
+            scene_desc = s[6:]
+
+    if out_path != "":
+        scene_name = re.split("/|\.", out_path)[-2]
 
     if camera_id == -1:
         print "Error: need to specify which camera to use"
@@ -35,7 +43,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         raw_input("Press Enter after placing camera " + camera_id +
-                " to frame the test scene")
+                " to frame the test scene: " + scene_name +
+                "\nThe scene setup should be: " + scene_desc )
         # Converge 3A prior to capture.
         cam.do_3a(do_af=True, lock_ae=True, lock_awb=True)
         props = cam.get_camera_properties()
@@ -52,7 +61,8 @@ def main():
                 its.image.write_image(img, out_path)
             print "Please check scene setup in", out_path
             choice = raw_input(
-                "Is the image okay for ITS scene1? (Y/N)").lower()
+                "Is the image okay for ITS " + scene_name +\
+                "? (Y/N)").lower()
             if choice == "y":
                 break
             else:
