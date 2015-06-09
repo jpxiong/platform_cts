@@ -119,7 +119,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         double[] stopPreviewTimes = new double[NUM_TEST_LOOPS];
         double[] cameraCloseTimes = new double[NUM_TEST_LOOPS];
         double[] cameraLaunchTimes = new double[NUM_TEST_LOOPS];
+        double[] avgCameraLaunchTimes = new double[mCameraIds.length];
 
+        int counter = 0;
         for (String id : mCameraIds) {
             try {
                 initializeImageReader(id, ImageFormat.YUV_420_888);
@@ -167,6 +169,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                     }
                 }
 
+                avgCameraLaunchTimes[counter] = Stat.getAverage(cameraLaunchTimes);
                 // Finish the data collection, report the KPIs.
                 mReportLog.printArray("Camera " + id
                         + ": Camera open time", cameraOpenTimes,
@@ -186,14 +189,14 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                 mReportLog.printArray("Camera " + id
                         + ": Camera launch time", cameraLaunchTimes,
                         ResultType.LOWER_BETTER, ResultUnit.MS);
-                mReportLog.printSummary("Camera launch average time for Camera " + id,
-                        Stat.getAverage(cameraLaunchTimes),
-                        ResultType.LOWER_BETTER, ResultUnit.MS);
             }
             finally {
                 closeImageReader();
             }
+            counter++;
         }
+        mReportLog.printSummary("Camera launch average time for all cameras ",
+                Stat.getAverage(avgCameraLaunchTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
     }
 
     /**
@@ -213,7 +216,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         double[] captureTimes = new double[NUM_TEST_LOOPS];
         double[] getPartialTimes = new double[NUM_TEST_LOOPS];
         double[] getResultTimes = new double[NUM_TEST_LOOPS];
+        double[] avgResultTimes = new double[mCameraIds.length];
 
+        int counter = 0;
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
@@ -291,16 +296,18 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
                         + ": Camera capture result latency", getResultTimes,
                         ResultType.LOWER_BETTER, ResultUnit.MS);
 
-                // Result will not be reported in CTS report if no summary is printed.
-                mReportLog.printSummary("Camera capture result average latency for Camera " + id,
-                        Stat.getAverage(getResultTimes),
-                        ResultType.LOWER_BETTER, ResultUnit.MS);
+                avgResultTimes[counter] = Stat.getAverage(getResultTimes);
             }
             finally {
                 closeImageReader();
                 closeDevice();
             }
+            counter++;
         }
+
+        // Result will not be reported in CTS report if no summary is printed.
+        mReportLog.printSummary("Camera capture result average latency for all cameras ",
+                Stat.getAverage(avgResultTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
     }
 
     /**
