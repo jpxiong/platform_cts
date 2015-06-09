@@ -37,12 +37,14 @@ import android.util.Size;
 import java.util.ArrayList;
 
 /**
- * Basic tests for burst capture in RAW10/16.
+ * Basic tests for burst capture in RAW formats.
  */
 public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "BurstCaptureRawTest";
     private static final int RAW_FORMATS[] = {
-            ImageFormat.RAW10, ImageFormat.RAW_SENSOR };
+            ImageFormat.RAW10, ImageFormat.RAW12, ImageFormat.RAW_SENSOR };
+    private static final int NONSTALL_RAW_FORMATS[] = {
+        ImageFormat.RAW10, ImageFormat.RAW12 };
     private static final long EXPOSURE_MULTIPLIERS[] = {
             1, 3, 5 };
     private static final int SENSITIVITY_MLTIPLIERS[] = {
@@ -70,7 +72,7 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
                 openDevice(id);
 
                 ArrayList<Integer> supportedRawList = new ArrayList<Integer>(RAW_FORMATS.length);
-                if (!checkCapability(supportedRawList)) {
+                if (!checkCapability(supportedRawList, RAW_FORMATS)) {
                     Log.i(TAG, "Capability is not supported on camera " + id
                             + ". Skip the test.");
                     continue;
@@ -104,13 +106,13 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
     public void testMetadataRoundDown() throws Exception {
         Log.i(TAG, "Begin testMetadataRoundDown");
 
-        performTestRoutine(new TestMetaDataRoundDownRoutine());
+        performTestRoutine(new TestMetaDataRoundDownRoutine(), RAW_FORMATS);
 
         Log.i(TAG, "End testMetadataRoundDown");
     }
 
     /**
-     * Manual and Auto setting test in RAW10/16
+     * Manual and Auto setting test in RAW formats
      * <p>
      * Make sure switching between manual and auto setting would not make the capture results out of
      * sync.
@@ -119,18 +121,18 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
     public void testManualAutoSwitch() throws Exception {
         Log.i(TAG, "Begin testManualAutoSwitch");
 
-        performTestRoutine(new TestManualAutoSwitch());
+        performTestRoutine(new TestManualAutoSwitch(), RAW_FORMATS);
 
         Log.i(TAG, "End testManualAutoSwitch");
     }
 
     /**
-     * Per frame timestamp test in RAW10/16
+     * Per frame timestamp test in non-stalled RAW formats
      */
     public void testTimestamp() throws Exception {
         Log.i(TAG, "Begin testTimestamp");
 
-        performTestRoutine(new TestTimestamp());
+        performTestRoutine(new TestTimestamp(), NONSTALL_RAW_FORMATS);
 
         Log.i(TAG, "End testTimestamp");
     }
@@ -439,7 +441,7 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
      *
      * @return true if the it is has the capability to execute the test.
      */
-    private boolean checkCapability(ArrayList<Integer> supportedRawList) {
+    private boolean checkCapability(ArrayList<Integer> supportedRawList, int[] testedFormats) {
         // make sure the sensor has manual support
         if (!mStaticInfo.isCapabilitySupported(
                 CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)) {
@@ -453,7 +455,7 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
 
         // check for the RAW support
         supportedRawList.clear();
-        for (int rawFormat : RAW_FORMATS) {
+        for (int rawFormat : testedFormats) {
             if (!config.isOutputSupportedFor(rawFormat)) {
                 continue;
             }
@@ -479,6 +481,8 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
         switch (format) {
             case ImageFormat.RAW10:
                 return "RAW10";
+            case ImageFormat.RAW12:
+                return "RAW12";
             case ImageFormat.RAW_SENSOR:
                 return "RAW_SENSOR";
         }
@@ -668,14 +672,15 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
         stopPreview();
     }
 
-    private void performTestRoutine(TestRoutine routine) throws Exception
+    private void performTestRoutine(TestRoutine routine, int[] testedFormats) throws Exception
     {
+        final int PREPARE_TIMEOUT_MS = 10000;
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
 
                 ArrayList<Integer> supportedRawList = new ArrayList<Integer>(RAW_FORMATS.length);
-                if (!checkCapability(supportedRawList)) {
+                if (!checkCapability(supportedRawList, testedFormats)) {
                     Log.i(TAG, "Capability is not supported on camera " + id
                             + ". Skip the test.");
                     continue;
@@ -704,6 +709,11 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
                     prepareCaptureAndStartPreview(previewBuilder, rawBurstBuilder,
                             previewCaptureSize, rawCaptureSize, rawFormat, previewCaptureCallback,
                             MAX_FRAMES_BURST, rawReaderListener);
+
+                    // Prepare still surface to prevent large allocations slow down capture
+                    mSession.prepare(mReaderSurface);
+                    mSessionListener.waitForSurfacePrepared(
+                            mSession, mReaderSurface, PREPARE_TIMEOUT_MS);
 
                     // execute test routine
                     routine.execute(rawBurstBuilder, rawCaptureCallback, rawReaderListener,
