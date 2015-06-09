@@ -115,12 +115,6 @@ public class CameraTestUtils extends Assert {
     private static final float EXIF_EXPOSURE_TIME_MIN_ERROR_MARGIN_SEC = 0.002f;
     private static final float EXIF_APERTURE_ERROR_MARGIN = 0.001f;
 
-    // Some exif tags that are not defined by ExifInterface but supported.
-    private static final String TAG_DATETIME_DIGITIZED = "DateTimeDigitized";
-    private static final String TAG_SUBSEC_TIME = "SubSecTime";
-    private static final String TAG_SUBSEC_TIME_ORIG = "SubSecTimeOriginal";
-    private static final String TAG_SUBSEC_TIME_DIG = "SubSecTimeDigitized";
-
     private static final Location sTestLocation0 = new Location(LocationManager.GPS_PROVIDER);
     private static final Location sTestLocation1 = new Location(LocationManager.GPS_PROVIDER);
     private static final Location sTestLocation2 = new Location(LocationManager.NETWORK_PROVIDER);
@@ -1959,7 +1953,7 @@ public class CameraTestUtils extends Assert {
         }
 
         // TAG_DATETIME_DIGITIZED (a.k.a Create time for digital cameras).
-        String digitizedTime = exif.getAttribute(TAG_DATETIME_DIGITIZED);
+        String digitizedTime = exif.getAttribute(ExifInterface.TAG_DATETIME_DIGITIZED);
         collector.expectNotNull("Exif TAG_DATETIME_DIGITIZED shouldn't be null", digitizedTime);
         if (digitizedTime != null) {
             String expectedDateTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
@@ -1977,16 +1971,18 @@ public class CameraTestUtils extends Assert {
          * this exif tag either doesn't exist or is a non-numerical invalid
          * string. Same rule applies to the rest of sub second tags.
          */
-        int subSecTime = exif.getAttributeInt(TAG_SUBSEC_TIME, /*defaultValue*/-1);
+        int subSecTime = exif.getAttributeInt(ExifInterface.TAG_SUBSEC_TIME, /*defaultValue*/-1);
         collector.expectTrue("Exif TAG_SUBSEC_TIME value is null or invalid!", subSecTime > 0);
 
         // TAG_SUBSEC_TIME_ORIG
-        int subSecTimeOrig = exif.getAttributeInt(TAG_SUBSEC_TIME_ORIG, /*defaultValue*/-1);
+        int subSecTimeOrig = exif.getAttributeInt(ExifInterface.TAG_SUBSEC_TIME_ORIG,
+                /*defaultValue*/-1);
         collector.expectTrue("Exif TAG_SUBSEC_TIME_ORIG value is null or invalid!",
                 subSecTimeOrig > 0);
 
         // TAG_SUBSEC_TIME_DIG
-        int subSecTimeDig = exif.getAttributeInt(TAG_SUBSEC_TIME_DIG, /*defaultValue*/-1);
+        int subSecTimeDig = exif.getAttributeInt(ExifInterface.TAG_SUBSEC_TIME_DIG,
+                /*defaultValue*/-1);
         collector.expectTrue(
                 "Exif TAG_SUBSEC_TIME_DIG value is null or invalid!", subSecTimeDig > 0);
     }
