@@ -16,6 +16,8 @@
 
 package android.telecom.cts;
 
+import static android.telecom.cts.TestUtils.shouldTestTelecom;
+
 import android.os.Bundle;
 import android.telecom.CallAudioState;
 import android.telecom.TelecomManager;
@@ -26,15 +28,9 @@ import android.telecom.TelecomManager;
 public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
     protected void tearDown() throws Exception {
-        if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
-            mInCallCallbacks.getService().disconnectLastCall();
-            assertNumCalls(mInCallCallbacks.getService(), 0);
+        if (shouldTestTelecom(mContext)) {
+            cleanupAndVerifyUnbind();
         }
         super.tearDown();
     }
@@ -59,7 +55,7 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
         final Bundle extras = new Bundle();
         extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true);
         placeAndVerifyCall(extras);
-        verifyConnectionService();
+        verifyConnectionForOutgoingCall();
         assertAudioRoute(mInCallCallbacks.getService(), CallAudioState.ROUTE_SPEAKER);
     }
 
@@ -67,13 +63,13 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
         final Bundle extras = new Bundle();
         extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, false);
         placeAndVerifyCall(extras);
-        verifyConnectionService();
+        verifyConnectionForOutgoingCall();
         assertAudioRoute(mInCallCallbacks.getService(), CallAudioState.ROUTE_EARPIECE);
     }
 
     public void testStartCallWithSpeakerphoneNotProvided_SpeakerphoneOffByDefault() {
         placeAndVerifyCall();
-        verifyConnectionService();
+        verifyConnectionForOutgoingCall();
         assertAudioRoute(mInCallCallbacks.getService(), CallAudioState.ROUTE_EARPIECE);
     }
 }
