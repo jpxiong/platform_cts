@@ -134,7 +134,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         if (extras == null) {
             extras = new Bundle();
         }
-        extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_HANDLE, incomingHandle);
+        extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, incomingHandle);
         mTelecomManager.addNewIncomingCall(TEST_PHONE_ACCOUNT_HANDLE, extras);
 
         try {
