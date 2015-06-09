@@ -16,7 +16,6 @@
 
 package android.telecom.cts;
 
-import android.content.Intent;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
