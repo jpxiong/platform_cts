@@ -34,17 +34,14 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         super.setUp();
         if (shouldTestTelecom(mContext)) {
             placeAndVerifyCall();
-            verifyConnectionService();
+            verifyConnectionForOutgoingCall();
         }
     }
 
     @Override
     protected void tearDown() throws Exception {
         if (shouldTestTelecom(mContext)) {
-            if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
-                mInCallCallbacks.getService().disconnectLastCall();
-                assertNumCalls(mInCallCallbacks.getService(), 0);
-            }
+            cleanupAndVerifyUnbind();
         }
         super.tearDown();
     }

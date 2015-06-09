@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telecom.Call;
+import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.InCallService;
@@ -114,9 +115,38 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                     ConnectionRequest request) {
                 this.lock.release();
             }
+
+            @Override
+            public void onCreateIncomingConnection(MockConnection connection,
+                    ConnectionRequest request) {
+                this.lock.release();
+            }
         };
 
         MockConnectionService.setCallbacks(mConnectionCallbacks);
+    }
+
+    /**
+     * Puts Telecom in a state where there is an incoming call provided by the
+     * {@link MockConnectionService} which can be tested.
+     */
+    void addAndVerifyNewIncomingCall(Uri incomingHandle, Bundle extras) {
+        if (extras == null) {
+            extras = new Bundle();
+        }
+        extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_HANDLE, incomingHandle);
+        mTelecomManager.addNewIncomingCall(TEST_PHONE_ACCOUNT_HANDLE, extras);
+
+        try {
+            if (!mInCallCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
+                fail("No call added to InCallService.");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+
+        assertEquals("InCallService should contain 1 call after adding a call.", 1,
+                mInCallCallbacks.getService().getCallCount());
     }
 
     /**
@@ -144,10 +174,9 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
         assertEquals("InCallService should contain 1 call after adding a call.", 1,
                 mInCallCallbacks.getService().getCallCount());
-        assertTrue("TelecomManager should be in a call", mTelecomManager.isInCall());
     }
 
-    void verifyConnectionService() {
+    void verifyConnectionForOutgoingCall() {
         try {
             if (!mConnectionCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
                 fail("No outgoing call connection requested by Telecom");
@@ -170,6 +199,48 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals(Connection.STATE_ACTIVE, connection.getState());
     }
 
+    void verifyConnectionForIncomingCall() {
+        try {
+            if (!mConnectionCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
+                fail("No incoming call connection requested by Telecom");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+
+        assertNotNull("Telecom should bind to and create ConnectionService",
+                mConnectionCallbacks.getService());
+        assertNull("Telecom should not create outgoing connection for outgoing call",
+                mConnectionCallbacks.outgoingConnection);
+        assertNotNull("Telecom should create incoming connection for outgoing call",
+                mConnectionCallbacks.incomingConnection);
+
+        final MockConnection connection = mConnectionCallbacks.incomingConnection;
+        connection.setRinging();
+        assertEquals(Connection.STATE_RINGING, connection.getState());
+    }
+
+    /**
+     * Disconnect the created test call, verify that Telecom has cleared all calls and has
+     * unbound from the {@link ConnectionService}.
+     */
+    void cleanupAndVerifyUnbind() {
+        if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
+            mInCallCallbacks.prepareForUnbind();
+
+            mInCallCallbacks.getService().disconnectLastCall();
+            assertNumCalls(mInCallCallbacks.getService(), 0);
+
+            try {
+                if (!mInCallCallbacks.unbindLock.tryAcquire(3, TimeUnit.SECONDS)) {
+                    fail("Telecom did not unbind from InCallService after all calls removed.");
+                }
+            } catch (InterruptedException e) {
+                Log.i(TAG, "Test interrupted!");
+            }
+        }
+    }
+
     /**
      * Place a new outgoing call via the {@link MockConnectionService}
      */
@@ -186,7 +257,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      * calls if multiple calls to the same number are placed within a short period of time which
      * can cause certain tests to fail.
      */
-    private Uri getTestNumber() {
+    Uri getTestNumber() {
         return Uri.fromParts("tel", String.valueOf(sCounter++), null);
     }
 
@@ -216,7 +287,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        return incallService.getCallAudioState().isMuted();
+                        final CallAudioState state = incallService.getCallAudioState();
+                        return state == null ? null : state.isMuted();
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
@@ -234,7 +306,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        return connection.getCallAudioState().isMuted();
+                        final CallAudioState state = connection.getCallAudioState();
+                        return state == null ? null : state.isMuted();
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
@@ -252,7 +325,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        return incallService.getCallAudioState().getRoute();
+                        final CallAudioState state = incallService.getCallAudioState();
+                        return state == null ? null : state.getRoute();
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
@@ -270,11 +344,30 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        return connection.getCallAudioState().getRoute();
+                        final CallAudioState state = connection.getCallAudioState();
+                        return state == null ? null : state.getRoute();
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                 "Connection's audio route should be: " + route
+        );
+    }
+
+    void assertConnectionState(final Connection connection, final int state) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return state;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return connection.getState();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Connection should be in state " + state
         );
     }
 
