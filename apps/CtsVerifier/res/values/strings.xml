@@ -649,6 +649,14 @@
     <string name="snsr_step_counter_event">%1$d | Step Counter event. count=%2$d.</string>
     <string name="snsr_step_detector_event">%1$d | Step Detector event.</string>
 
+    <!-- Device suspend tests -->
+    <string name="snsr_device_suspend_test">Device Suspend Tests</string>
+    <string name="snsr_device_did_not_go_into_suspend">Device did not go into suspend mode during test execution </string>
+    <string name="snsr_batch_did_not_arrive_at_expected_time">Batch did not arrive at the expected time estimatedBatchArrivalMs=%1$d
+    firstEventReceivedMs=%2$d diffMs=%3$d toleranceMs=%4$d </string>
+    <string name="snsr_device_suspend_test_instr">One you begin the test, disconnect USB, turn off the display and allow
+    the device to go into suspend mode. The screen will turn on and a sound will be played once all the tests are completed.</string>
+
     <!-- Significant Motion -->
     <string name="snsr_significant_motion_test">Significant Motion Tests</string>
     <string name="snsr_significant_motion_event_arrival">Event expected to trigger. Triggered=%1$s.</string>
@@ -663,6 +671,9 @@
     <string name="snsr_significant_motion_test_deactivation">Once you begin the test, you will need to walk to ensure Significant Motion triggers only once.</string>
     <string name="snsr_significant_motion_registration">Expected to be able to register for TriggerSensor. Found=%1$b.</string>
     <string name="snsr_significant_motion_cancelation">Expected to be able to cancel TriggerSensor. Found=%b.</string>
+    <string name="snsr_significant_motion_ap_suspend">One you begin the test, disconnect USB, turn off the display and allow the device to go into suspend.
+    You will need to walk to ensure that Significant Motion triggers. The screen will turn on and a sound will be played once the test completes.</string>
+    <string name="snsr_device_did_not_wake_up_at_trigger">Device did not wakeup at tigger time. wakeTime=%1$d ms triggerTime=%2$d ms</string>
 
     <!-- Strings for Sensor CTS tests inside CtsVerifier -->
     <string name="snsr_single_sensor_tests">CTS Single Sensor Tests</string>
