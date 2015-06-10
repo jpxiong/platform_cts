@@ -22,8 +22,7 @@ import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 
 public class SimRestrictedApisTest extends AndroidTestCase {
-    private static final byte[] TEST_PDU = {
-            0, 0 };
+    private static final byte[] TEST_PDU = { 0, 0 };
     private TelephonyManager mTelephonyManager;
 
     @Override
@@ -265,25 +264,5 @@ public class SimRestrictedApisTest extends AndroidTestCase {
             }
         } catch (SecurityException expected) {
         }
-    }
-
-    /**
-     * Tests the TelephonyManager.notifyCarrierNetworkChange() API to make sure a
-     * SecurityException is thrown since the test APK is not signed by a certificate on the SIM.
-     */
-    public void testNotifyCarrierNetworkChange() {
-        try {
-            if (isSimCardPresent()) {
-                TelephonyManager.getDefault().notifyCarrierNetworkChange(true /* active */);
-                fail("Expected SecurityException for notifyCarrierNetworkChange(true)");
-            }
-        } catch (SecurityException expected) {}
-
-        try {
-            if (isSimCardPresent()) {
-                TelephonyManager.getDefault().notifyCarrierNetworkChange(false /* active */);
-                fail("Expected SecurityException for notifyCarrierNetworkChange(false)");
-            }
-        } catch (SecurityException expected) {}
     }
 }
