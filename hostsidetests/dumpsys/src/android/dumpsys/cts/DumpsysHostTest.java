@@ -49,11 +49,6 @@ public class DumpsysHostTest extends DeviceTestCase {
      * @throws Exception
      */
     public void testProcstatsOutput() throws Exception {
-        if (mDevice.getApiLevel() < 19) {
-            Log.i(TAG, "No Procstats output before KitKat, skipping test.");
-            return;
-        }
-
         String procstats = mDevice.executeShellCommand("dumpsys procstats -c");
         assertNotNull(procstats);
         assertTrue(procstats.length() > 0);
@@ -338,11 +333,6 @@ public class DumpsysHostTest extends DeviceTestCase {
      * @throws Exception
      */
     public void testBatterystatsOutput() throws Exception {
-        if (mDevice.getApiLevel() < 21) {
-            Log.i(TAG, "Batterystats output before Lollipop, skipping test.");
-            return;
-        }
-
         String batterystats = mDevice.executeShellCommand("dumpsys batterystats --checkin");
         assertNotNull(batterystats);
         assertTrue(batterystats.length() > 0);
