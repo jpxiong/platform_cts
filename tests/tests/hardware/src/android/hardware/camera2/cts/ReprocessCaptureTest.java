@@ -79,7 +79,8 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         MIXED_BURST,
         ABORT_CAPTURE,
         TIMESTAMPS,
-        JPEG_EXIF
+        JPEG_EXIF,
+        REQUEST_KEYS,
     }
 
     /**
@@ -425,6 +426,32 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         }
     }
 
+    public void testReprocessRequestKeys() throws Exception {
+        for (String id : mCameraIds) {
+            if (!isYuvReprocessSupported(id) && !isOpaqueReprocessSupported(id)) {
+                continue;
+            }
+
+            try {
+                // open Camera device
+                openDevice(id);
+
+                int[] supportedInputFormats =
+                    mStaticInfo.getAvailableFormats(StaticMetadata.StreamDirection.Input);
+                for (int inputFormat : supportedInputFormats) {
+                    int[] supportedReprocessOutputFormats =
+                            mStaticInfo.getValidOutputFormatsForInput(inputFormat);
+                    for (int reprocessOutputFormat : supportedReprocessOutputFormats) {
+                        testReprocessingMaxSizes(id, inputFormat, reprocessOutputFormat,
+                                /*previewSize*/null, CaptureTestCase.REQUEST_KEYS);
+                    }
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     /**
      * Test the input format and output format with the largest input and output sizes.
      */
@@ -466,6 +493,10 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                 break;
             case JPEG_EXIF:
                 testReprocessJpegExif(cameraId, maxInputSize, inputFormat, maxReprocessOutputSize);
+                break;
+            case REQUEST_KEYS:
+                testReprocessRequestKeys(cameraId, maxInputSize, inputFormat,
+                        maxReprocessOutputSize, reprocessOutputFormat);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid test case");
@@ -878,6 +909,10 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         }
     }
 
+    /**
+     * Test JPEG tags for reprocess requests. Reprocess result's JPEG tags and JPEG image's tags
+     * match reprocess request's JPEG tags.
+     */
     private void testReprocessJpegExif(String cameraId, Size inputSize, int inputFormat,
             Size reprocessOutputSize) throws Exception {
         if (VERBOSE) {
@@ -929,6 +964,94 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                         testThumbnailSizes[i], EXIF_TEST_DATA[i], mStaticInfo, mCollector);
                 image.close();
 
+            }
+        } finally {
+            closeReprossibleSession();
+            closeImageReaders();
+        }
+    }
+
+
+
+    /**
+     * Test the following keys in reprocess results match the keys in reprocess requests:
+     *   1. EDGE_MODE
+     *   2. NOISE_REDUCTION_MODE
+     *   3. REPROCESS_EFFECTIVE_EXPOSURE_FACTOR (only for YUV reprocess)
+     */
+
+    private void testReprocessRequestKeys(String cameraId, Size inputSize, int inputFormat,
+            Size reprocessOutputSize, int reprocessOutputFormat) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, "testReprocessRequestKeys: cameraId: " + cameraId + " inputSize: " +
+                    inputSize + " inputFormat: " + inputFormat + " reprocessOutputSize: " +
+                    reprocessOutputSize + " reprocessOutputFormat: " + reprocessOutputFormat);
+        }
+
+        final Integer[] EDGE_MODES = {CaptureRequest.EDGE_MODE_FAST,
+                CaptureRequest.EDGE_MODE_HIGH_QUALITY, CaptureRequest.EDGE_MODE_OFF};
+        final Integer[] NR_MODES = {CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY,
+                CaptureRequest.NOISE_REDUCTION_MODE_OFF, CaptureRequest.NOISE_REDUCTION_MODE_FAST};
+        final Float[] EFFECTIVE_EXP_FACTORS = {null, 1.0f, 2.5f};
+        int numFrames = EDGE_MODES.length;
+
+        try {
+            setupImageReaders(inputSize, inputFormat, reprocessOutputSize, reprocessOutputFormat,
+                    numFrames);
+            setupReprocessableSession(/*previewSurface*/null, numFrames);
+
+            // Prepare reprocess capture requests.
+            ArrayList<CaptureRequest> reprocessRequests = new ArrayList<>(numFrames);
+
+            for (int i = 0; i < numFrames; i++) {
+                TotalCaptureResult result = submitCaptureRequest(mFirstImageReader.getSurface(),
+                        /*inputResult*/null);
+                mImageWriter.queueInputImage(
+                        mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
+
+                CaptureRequest.Builder builder = mCamera.createReprocessCaptureRequest(result);
+                builder.addTarget(getReprocessOutputImageReader().getSurface());
+
+                // Set reprocess request keys
+                builder.set(CaptureRequest.EDGE_MODE, EDGE_MODES[i]);
+                builder.set(CaptureRequest.NOISE_REDUCTION_MODE, NR_MODES[i]);
+                if (inputFormat == ImageFormat.YUV_420_888) {
+                    builder.set(CaptureRequest.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR,
+                            EFFECTIVE_EXP_FACTORS[i]);
+                }
+                reprocessRequests.add(builder.build());
+            }
+
+            // Submit reprocess requests.
+            SimpleCaptureCallback captureCallback = new SimpleCaptureCallback();
+            mSession.captureBurst(reprocessRequests, captureCallback, mHandler);
+
+            TotalCaptureResult[] reprocessResults =
+                    captureCallback.getTotalCaptureResultsForRequests(reprocessRequests,
+                    CAPTURE_TIMEOUT_FRAMES);
+
+            for (int i = 0; i < numFrames; i++) {
+                // Verify result's keys
+                Integer resultEdgeMode = reprocessResults[i].get(CaptureResult.EDGE_MODE);
+                Integer resultNoiseReductionMode =
+                        reprocessResults[i].get(CaptureResult.NOISE_REDUCTION_MODE);
+
+                assertEquals("Reprocess result edge mode (" + resultEdgeMode +
+                        ") doesn't match requested edge mode (" + EDGE_MODES[i] + ")",
+                        resultEdgeMode, EDGE_MODES[i]);
+                assertEquals("Reprocess result noise reduction mode (" + resultNoiseReductionMode +
+                        ") doesn't match requested noise reduction mode (" +
+                        NR_MODES[i] + ")", resultNoiseReductionMode,
+                        NR_MODES[i]);
+
+                if (inputFormat == ImageFormat.YUV_420_888) {
+                    Float resultEffectiveExposureFactor = reprocessResults[i].get(
+                            CaptureResult.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR);
+                    assertEquals("Reprocess effective exposure factor (" +
+                            resultEffectiveExposureFactor + ") doesn't match requested " +
+                            "effective exposure factor (" + EFFECTIVE_EXP_FACTORS[i] + ")",
+                            resultEffectiveExposureFactor, EFFECTIVE_EXP_FACTORS[i]);
+                }
             }
         } finally {
             closeReprossibleSession();
