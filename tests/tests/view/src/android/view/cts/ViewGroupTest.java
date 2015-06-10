@@ -1664,7 +1664,23 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         assertFalse(vg.isGetChildStaticTransformationCalled);
     }
 
-    public void testStartActionModeForChildRespectsSubclassMode() {
+    public void testStartActionModeForChildRespectsSubclassModeOnPrimary() {
+        MockViewGroupSubclass vgParent = new MockViewGroupSubclass(mContext);
+        MockViewGroupSubclass vg = new MockViewGroupSubclass(mContext);
+        vg.shouldReturnOwnTypelessActionMode = true;
+        vgParent.addView(vg);
+        MockTextView textView = new MockTextView(mContext);
+        vg.addView(textView);
+
+        textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK, ActionMode.TYPE_PRIMARY);
+
+        assertTrue(vg.isStartActionModeForChildTypedCalled);
+        assertTrue(vg.isStartActionModeForChildTypelessCalled);
+        // Call should not bubble up as we have an intercepting implementation.
+        assertFalse(vgParent.isStartActionModeForChildTypedCalled);
+    }
+
+    public void testStartActionModeForChildIgnoresSubclassModeOnFloating() {
         MockViewGroupSubclass vgParent = new MockViewGroupSubclass(mContext);
         MockViewGroupSubclass vg = new MockViewGroupSubclass(mContext);
         vg.shouldReturnOwnTypelessActionMode = true;
@@ -1675,9 +1691,9 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK, ActionMode.TYPE_FLOATING);
 
         assertTrue(vg.isStartActionModeForChildTypedCalled);
-        assertTrue(vg.isStartActionModeForChildTypelessCalled);
-        // Call should not bubble up as we have an intercepting implementation.
-        assertFalse(vgParent.isStartActionModeForChildTypedCalled);
+        assertFalse(vg.isStartActionModeForChildTypelessCalled);
+        // Call should bubble up as we have a floating type.
+        assertTrue(vgParent.isStartActionModeForChildTypedCalled);
     }
 
     public void testStartActionModeForChildTypedBubblesUpToParent() {
@@ -1690,7 +1706,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         textView.startActionMode(NO_OP_ACTION_MODE_CALLBACK, ActionMode.TYPE_FLOATING);
 
         assertTrue(vg.isStartActionModeForChildTypedCalled);
-        assertTrue(vg.isStartActionModeForChildTypelessCalled);
         assertTrue(vgParent.isStartActionModeForChildTypedCalled);
     }
 
