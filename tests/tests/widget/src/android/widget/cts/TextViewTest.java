@@ -1668,6 +1668,96 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
     }
 
+    public void testCopyAndPaste() {
+        initTextViewForTyping();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText("abcd", BufferType.EDITABLE);
+                mTextView.setSelected(true);
+
+                // Copy "bc".
+                Selection.setSelection((Spannable) mTextView.getText(), 1, 3);
+                mTextView.onTextContextMenuItem(android.R.id.copy);
+
+                // Paste "bc" between "b" and "c".
+                Selection.setSelection((Spannable) mTextView.getText(), 2, 2);
+                mTextView.onTextContextMenuItem(android.R.id.paste);
+                assertEquals("abbccd", mTextView.getText().toString());
+
+                // Select entire text and paste "bc".
+                Selection.selectAll((Spannable) mTextView.getText());
+                mTextView.onTextContextMenuItem(android.R.id.paste);
+                assertEquals("bc", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    public void testCutAndPaste() {
+        initTextViewForTyping();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText("abcd", BufferType.EDITABLE);
+                mTextView.setSelected(true);
+
+                // Cut "bc".
+                Selection.setSelection((Spannable) mTextView.getText(), 1, 3);
+                mTextView.onTextContextMenuItem(android.R.id.cut);
+                assertEquals("ad", mTextView.getText().toString());
+
+                // Cut "ad".
+                Selection.setSelection((Spannable) mTextView.getText(), 0, 2);
+                mTextView.onTextContextMenuItem(android.R.id.cut);
+                assertEquals("", mTextView.getText().toString());
+
+                // Paste "ad".
+                mTextView.onTextContextMenuItem(android.R.id.paste);
+                assertEquals("ad", mTextView.getText().toString());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    private static boolean hasSpansAtMiddleOfText(final TextView textView, final Class<?> type) {
+        final Spannable spannable = (Spannable)textView.getText();
+        final int at = spannable.length() / 2;
+        return spannable.getSpans(at, at, type).length > 0;
+    }
+
+    public void testCutAndPaste_withAndWithoutStyle() {
+        initTextViewForTyping();
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText("example", BufferType.EDITABLE);
+                mTextView.setSelected(true);
+
+                // Set URLSpan.
+                final Spannable spannable = (Spannable) mTextView.getText();
+                spannable.setSpan(new URLSpan("http://example.com"), 0, spannable.length(), 0);
+                assertTrue(hasSpansAtMiddleOfText(mTextView, URLSpan.class));
+
+                // Cut entire text.
+                Selection.selectAll((Spannable) mTextView.getText());
+                mTextView.onTextContextMenuItem(android.R.id.cut);
+                assertEquals("", mTextView.getText().toString());
+
+                // Paste without style.
+                mTextView.onTextContextMenuItem(android.R.id.pasteAsPlainText);
+                assertEquals("example", mTextView.getText().toString());
+                // Check that the text doesn't have URLSpan.
+                assertFalse(hasSpansAtMiddleOfText(mTextView, URLSpan.class));
+
+                // Paste with style.
+                Selection.selectAll((Spannable) mTextView.getText());
+                mTextView.onTextContextMenuItem(android.R.id.paste);
+                assertEquals("example", mTextView.getText().toString());
+                // Check that the text has URLSpan.
+                assertTrue(hasSpansAtMiddleOfText(mTextView, URLSpan.class));
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
     @UiThreadTest
     public void testSetText() {
         TextView tv = findTextView(R.id.textview_text);
