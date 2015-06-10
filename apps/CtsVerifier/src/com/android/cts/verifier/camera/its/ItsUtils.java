@@ -116,6 +116,11 @@ public class ItsUtils {
         return getOutputSizes(ccs, ImageFormat.YUV_420_888);
     }
 
+    public static Size getMaxOutputSize(CameraCharacteristics ccs, int format)
+            throws ItsException {
+        return getMaxSize(getOutputSizes(ccs, format));
+    }
+
     private static Size[] getOutputSizes(CameraCharacteristics ccs, int format)
             throws ItsException {
         StreamConfigurationMap configMap = ccs.get(
@@ -124,6 +129,22 @@ public class ItsUtils {
             throw new ItsException("Failed to get stream config");
         }
         return configMap.getOutputSizes(format);
+    }
+
+    private static Size getMaxSize(Size[] sizes) {
+        if (sizes == null || sizes.length == 0) {
+            throw new IllegalArgumentException("sizes was empty");
+        }
+
+        Size maxSize = sizes[0];
+        for (int i = 1; i < sizes.length; i++) {
+            if (sizes[i].getWidth() * sizes[i].getHeight() >
+                    maxSize.getWidth() * maxSize.getHeight()) {
+                maxSize = sizes[i];
+            }
+        }
+
+        return maxSize;
     }
 
     public static byte[] getDataFromImage(Image image)

@@ -359,7 +359,7 @@ class ItsSession(object):
             raise its.error.Error('3A failed to converge')
         return ae_sens, ae_exp, awb_gains, awb_transform, af_dist
 
-    def do_capture(self, cap_request, out_surfaces=None):
+    def do_capture(self, cap_request, out_surfaces=None, reprocess_format=None):
         """Issue capture request(s), and read back the image(s) and metadata.
 
         The main top-level function for capturing one or more images using the
@@ -377,6 +377,18 @@ class ItsSession(object):
         default is the largest resolution available for the format of that
         surface. At most one output surface can be specified for a given format,
         and raw+dng, raw10+dng, and raw+raw10 are not supported as combinations.
+
+        If reprocess_format is not None, for each request, an intermediate
+        buffer of the given reprocess_format will be captured from camera and
+        the intermediate buffer will be reprocessed to the output surfaces. The
+        following settings will be turned off when capturing the intermediate
+        buffer and will be applied when reprocessing the intermediate buffer.
+            1. android.noiseReduction.mode
+            2. android.edge.mode
+            3. android.reprocess.effectiveExposureFactor
+
+        Supported reprocess format are "yuv" and "private". Supported output
+        surface formats when reprocessing is enabled are "yuv" and "jpeg".
 
         Example of a single capture request:
 
@@ -449,6 +461,8 @@ class ItsSession(object):
                 will be converted to JSON and sent to the device.
             out_surfaces: (Optional) specifications of the output image formats
                 and sizes to use for each capture.
+            reprocess_format: (Optional) The reprocessing format. If not None,
+                reprocessing will be enabled.
 
         Returns:
             An object, list of objects, or list of lists of objects, where each
@@ -460,7 +474,11 @@ class ItsSession(object):
             * metadata: the capture result object (Python dictionary).
         """
         cmd = {}
-        cmd["cmdName"] = "doCapture"
+        if reprocess_format != None:
+            cmd["cmdName"] = "doReprocessCapture"
+            cmd["reprocessFormat"] = reprocess_format
+        else:
+            cmd["cmdName"] = "doCapture"
         if not isinstance(cap_request, list):
             cmd["captureRequests"] = [cap_request]
         else:

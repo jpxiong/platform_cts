@@ -283,6 +283,30 @@ def lsc_off(props):
             "android.shading.availableModes") and \
         0 in props["android.shading.availableModes"]
 
+def yuv_reprocess(props):
+    """Returns whether a device supports YUV reprocessing.
+
+    Args:
+        props: Camera properties object.
+
+    Returns:
+        Boolean.
+    """
+    return props.has_key("android.request.availableCapabilities") and \
+           7 in props["android.request.availableCapabilities"]
+
+def private_reprocess(props):
+    """Returns whether a device supports PRIVATE reprocessing.
+
+    Args:
+        props: Camera properties object.
+
+    Returns:
+        Boolean.
+    """
+    return props.has_key("android.request.availableCapabilities") and \
+           4 in props["android.request.availableCapabilities"]
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
