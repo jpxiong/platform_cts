@@ -3505,6 +3505,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getRawTextDirection());
     }
 
     @UiThreadTest
@@ -3531,6 +3537,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3559,6 +3571,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3585,6 +3603,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3614,6 +3638,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
 
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
+
         // Force to RTL text direction on the layout
         ll.setTextDirection(View.TEXT_DIRECTION_RTL);
 
@@ -3634,6 +3664,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3652,6 +3688,106 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         // Reset is done when we add the view
         ll.addView(tv);
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
+    }
+
+    @UiThreadTest
+    public void testTextDirectionFirstStrongLtr() {
+        {
+            // The first directional character is LTR, the paragraph direction is LTR.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("this is a test");
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_LEFT_TO_RIGHT, layout.getParagraphDirection(0));
+        }
+        {
+            // The first directional character is RTL, the paragraph direction is RTL.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("\u05DD\u05DE"); // Hebrew
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_RIGHT_TO_LEFT, layout.getParagraphDirection(0));
+        }
+        {
+            // The first directional character is not a strong directional character, the paragraph
+            // direction is LTR.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("\uFFFD");  // REPLACEMENT CHARACTER. Neutral direction.
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_LTR);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_LTR, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_LEFT_TO_RIGHT, layout.getParagraphDirection(0));
+        }
+    }
+
+    @UiThreadTest
+    public void testTextDirectionFirstStrongRtl() {
+        {
+            // The first directional character is LTR, the paragraph direction is LTR.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("this is a test");
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_LEFT_TO_RIGHT, layout.getParagraphDirection(0));
+        }
+        {
+            // The first directional character is RTL, the paragraph direction is RTL.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("\u05DD\u05DE"); // Hebrew
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_RIGHT_TO_LEFT, layout.getParagraphDirection(0));
+        }
+        {
+            // The first directional character is not a strong directional character, the paragraph
+            // direction is RTL.
+            LinearLayout ll = new LinearLayout(mActivity);
+
+            TextView tv = new TextView(mActivity);
+            tv.setText("\uFFFD");  // REPLACEMENT CHARACTER. Neutral direction.
+            ll.addView(tv);
+
+            tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG_RTL);
+            assertEquals(View.TEXT_DIRECTION_FIRST_STRONG_RTL, tv.getTextDirection());
+
+            tv.onPreDraw();  // For freezing layout.
+            Layout layout = tv.getLayout();
+            assertEquals(Layout.DIR_RIGHT_TO_LEFT, layout.getParagraphDirection(0));
+        }
     }
 
     public void testAllCapsLocalization() {
