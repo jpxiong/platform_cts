@@ -16,13 +16,20 @@
 
 package android.view.cts;
 
-import android.test.AndroidTestCase;
+import android.graphics.Rect;
+import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
-public class ActionModeTest extends AndroidTestCase {
+public class ActionModeTest extends ActivityInstrumentationTestCase2<ActionModeCtsActivity> {
+
+    public ActionModeTest() {
+        super(ActionModeCtsActivity.class);
+    }
 
     public void testSetType() {
         ActionMode actionMode = new MockActionMode();
@@ -41,6 +48,51 @@ public class ActionModeTest extends AndroidTestCase {
         actionMode.invalidateContentRect();
 
         assertFalse(actionMode.mInvalidateWasCalled);
+    }
+
+    public void testInvalidateContentRectOnFloatingCallsCallback() {
+        final View view = getActivity().contentView;
+        final MockActionModeCallback2 callback = new MockActionModeCallback2();
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ActionMode mode = view.startActionMode(callback, ActionMode.TYPE_FLOATING);
+                assertNotNull(mode);
+                mode.invalidateContentRect();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertTrue(callback.mIsOnGetContentRectCalled);
+    }
+
+    private static class MockActionModeCallback2 extends ActionMode.Callback2 {
+        boolean mIsOnGetContentRectCalled = false;
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {}
+
+        @Override
+        public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
+            mIsOnGetContentRectCalled = true;
+            super.onGetContentRect(mode, view, outRect);
+        }
     }
 
     private static class MockActionMode extends ActionMode {

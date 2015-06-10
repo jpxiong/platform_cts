@@ -159,6 +159,10 @@
                 android:resource="@xml/merge" />
         </activity>
 
+        <activity android:name="android.view.cts.ActionModeCtsActivity"
+            android:label="ActionModeCtsActivity">
+        </activity>
+
         <activity android:name="android.view.cts.ViewGroupCtsActivity"
             android:label="WidgetViewGroupCtsActivity">
             <intent-filter>
