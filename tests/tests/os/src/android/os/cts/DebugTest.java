@@ -300,4 +300,53 @@ public class DebugTest extends AndroidTestCase {
         checkHistogram(gc_count_rate_histogram);
         checkHistogram(blocking_gc_count_rate_histogram);
     }
+
+    public void testGetMemoryStat() throws Exception {
+        Debug.MemoryInfo memoryInfo = new Debug.MemoryInfo();
+        Debug.getMemoryInfo(memoryInfo);
+
+        String summary_java_heap = memoryInfo.getMemoryStat("summary.java-heap");
+        String summary_native_heap = memoryInfo.getMemoryStat("summary.native-heap");
+        String summary_code = memoryInfo.getMemoryStat("summary.code");
+        String summary_stack = memoryInfo.getMemoryStat("summary.stack");
+        String summary_graphics = memoryInfo.getMemoryStat("summary.graphics");
+        String summary_private_other = memoryInfo.getMemoryStat("summary.private-other");
+        String summary_system = memoryInfo.getMemoryStat("summary.system");
+        String summary_total_pss = memoryInfo.getMemoryStat("summary.total-pss");
+        String summary_total_swap = memoryInfo.getMemoryStat("summary.total-swap");
+        checkNumber(summary_java_heap);
+        checkNumber(summary_native_heap);
+        checkNumber(summary_code);
+        checkNumber(summary_stack);
+        checkNumber(summary_graphics);
+        checkNumber(summary_private_other);
+        checkNumber(summary_system);
+        checkNumber(summary_total_pss);
+        checkNumber(summary_total_swap);
+    }
+
+    public void testGetMemoryStats() throws Exception {
+        Debug.MemoryInfo memoryInfo = new Debug.MemoryInfo();
+        Debug.getMemoryInfo(memoryInfo);
+
+        Map<String, String> map = memoryInfo.getMemoryStats();
+        String summary_java_heap = map.get("summary.java-heap");
+        String summary_native_heap = map.get("summary.native-heap");
+        String summary_code = map.get("summary.code");
+        String summary_stack = map.get("summary.stack");
+        String summary_graphics = map.get("summary.graphics");
+        String summary_private_other = map.get("summary.private-other");
+        String summary_system = map.get("summary.system");
+        String summary_total_pss = map.get("summary.total-pss");
+        String summary_total_swap = map.get("summary.total-swap");
+        checkNumber(summary_java_heap);
+        checkNumber(summary_native_heap);
+        checkNumber(summary_code);
+        checkNumber(summary_stack);
+        checkNumber(summary_graphics);
+        checkNumber(summary_private_other);
+        checkNumber(summary_system);
+        checkNumber(summary_total_pss);
+        checkNumber(summary_total_swap);
+    }
 }
