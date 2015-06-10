@@ -35,11 +35,13 @@ import android.opengl.GLES20;
 import javax.microedition.khronos.opengles.GL10;
 
 import java.io.IOException;
+import java.lang.System;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Vector;
 import java.util.zip.CRC32;
 
 public class AdaptivePlaybackTest extends MediaPlayerTestBase {
@@ -812,7 +814,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
         return items;
     }
 
-    class Decoder {
+    class Decoder implements MediaCodec.OnFrameRenderedListener {
         private final static String TAG = "AdaptiveDecoder";
         final long kTimeOutUs = 5000;
         MediaCodec mCodec;
@@ -823,6 +825,9 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
         boolean mQueuedEos;
         ArrayList<Long> mTimeStamps;
         ArrayList<String> mWarnings;
+        Vector<Long> mRenderedTimeStamps; // using Vector as it is implicitly synchronized
+        long mLastRenderNanoTime;
+        int mFramesNotifiedRendered;
 
         public Decoder(String codecName) {
             MediaCodec codec = null;
@@ -837,6 +842,23 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             mQueuedEos = false;
             mTimeStamps = new ArrayList<Long>();
             mWarnings = new ArrayList<String>();
+            mRenderedTimeStamps = new Vector<Long>();
+            mLastRenderNanoTime = System.nanoTime();
+            mFramesNotifiedRendered = 0;
+
+            codec.setOnFrameRenderedListener(this, null);
+        }
+
+        public void onFrameRendered(MediaCodec codec, long presentationTimeUs, long nanoTime) {
+            final long NSECS_IN_1SEC = 1000000000;
+            if (!mRenderedTimeStamps.remove(presentationTimeUs)) {
+                warn("invalid timestamp " + presentationTimeUs + ", queued " +
+                        collectionString(mRenderedTimeStamps));
+            }
+            assert nanoTime > mLastRenderNanoTime;
+            mLastRenderNanoTime = nanoTime;
+            ++mFramesNotifiedRendered;
+            assert nanoTime > System.nanoTime() - NSECS_IN_1SEC;
         }
 
         public String getName() {
@@ -878,11 +900,20 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                   mOutputBuffers.length + "output[" +
                   (mOutputBuffers[0] == null ? null : mOutputBuffers[0].capacity()) + "]");
             mQueuedEos = false;
+            mRenderedTimeStamps.clear();
+            mLastRenderNanoTime = System.nanoTime();
+            mFramesNotifiedRendered = 0;
         }
 
         public void stop() {
             Log.i(TAG, "stop");
             mCodec.stop();
+            // if we have queued 32 frames or more, at least one should have been notified
+            // to have rendered.
+            if (mRenderedTimeStamps.size() > 32 && mFramesNotifiedRendered == 0) {
+                fail("rendered " + mRenderedTimeStamps.size() +
+                        " frames, but none have been notified.");
+            }
         }
 
         public void flush() {
@@ -939,6 +970,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             }
 
             if (doRender) {
+                mRenderedTimeStamps.add(info.presentationTimeUs);
                 if (!mTimeStamps.remove(info.presentationTimeUs)) {
                     warn("invalid timestamp " + info.presentationTimeUs + ", queued " +
                             collectionString(mTimeStamps));
