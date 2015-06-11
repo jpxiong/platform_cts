@@ -35,31 +35,44 @@ public class MediaBrowserServiceTest extends InstrumentationTestCase {
     private static final ComponentName TEST_BROWSER_SERVICE = new ComponentName(
             "com.android.cts.media", "android.media.cts.StubMediaBrowserService");
     private final Object mWaitLock = new Object();
+
     private final MediaBrowser.ConnectionCallback mConnectionCallback =
             new MediaBrowser.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    synchronized (mWaitLock) {
-                        mMediaBrowserService = StubMediaBrowserService.sInstance;
-                        mWaitLock.notify();
-                    }
-                }
-            };
+        @Override
+        public void onConnected() {
+            synchronized (mWaitLock) {
+                mMediaBrowserService = StubMediaBrowserService.sInstance;
+                mWaitLock.notify();
+            }
+        }
+    };
 
     private final MediaBrowser.SubscriptionCallback mSubscriptionCallback  =
             new MediaBrowser.SubscriptionCallback() {
-                @Override
-                public void onChildrenLoaded(String parentId, List<MediaItem> children) {
-                    synchronized (mWaitLock) {
-                        mOnChildrenLoaded = true;
-                        mWaitLock.notify();
-                    }
+            @Override
+            public void onChildrenLoaded(String parentId, List<MediaItem> children) {
+                synchronized (mWaitLock) {
+                    mOnChildrenLoaded = true;
+                    mWaitLock.notify();
                 }
-            };
+            }
+        };
+
+    private final MediaBrowser.ItemCallback mItemCallback  =
+            new MediaBrowser.ItemCallback() {
+        @Override
+        public void onItemLoaded(MediaItem item) {
+            synchronized (mWaitLock) {
+                mOnItemLoaded = true;
+                mWaitLock.notify();
+            }
+        }
+    };
 
     private MediaBrowser mMediaBrowser;
     private StubMediaBrowserService mMediaBrowserService;
     private boolean mOnChildrenLoaded;
+    private boolean mOnItemLoaded;
 
     @Override
     protected void setUp() throws Exception {
@@ -116,6 +129,20 @@ public class MediaBrowserServiceTest extends InstrumentationTestCase {
             mMediaBrowserService.sendDelayedNotifyChildrenChanged();
             mWaitLock.wait(TIME_OUT_MS);
             assertTrue(mOnChildrenLoaded);
+        }
+    }
+
+    public void testDelayedItem() throws Exception {
+        synchronized (mWaitLock) {
+            mOnItemLoaded = false;
+            mMediaBrowser.getItem(StubMediaBrowserService.MEDIA_ID_CHILDREN_DELAYED,
+                    mItemCallback);
+            mWaitLock.wait(WAIT_TIME_FOR_NO_RESPONSE_MS);
+            assertFalse(mOnItemLoaded);
+
+            mMediaBrowserService.sendDelayedItemLoaded();
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mOnItemLoaded);
         }
     }
 
