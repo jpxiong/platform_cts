@@ -22,6 +22,7 @@ import com.android.internal.util.XmlUtils;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.content.res.Resources.NotFoundException;
@@ -171,6 +172,32 @@ public class ContextTest extends AndroidTestCase {
         assertNotNull(mContext.getSystemService(WindowManager.class));
         assertEquals(mContext.getSystemService(Context.WINDOW_SERVICE),
                 mContext.getSystemService(WindowManager.class));
+    }
+
+    public void testGetColorStateList() {
+        try {
+            mContext.getColorStateList(0);
+            fail("Failed at testGetColorStateList");
+        } catch (NotFoundException e) {
+            //expected
+        }
+
+        final ColorStateList colorStateList = mContext.getColorStateList(R.color.color2);
+        final int[] focusedState = {android.R.attr.state_focused};
+        final int focusColor = colorStateList.getColorForState(focusedState, R.color.failColor);
+        assertEquals(0xffff0000, focusColor);
+    }
+
+    public void testGetColor() {
+        try {
+            mContext.getColor(0);
+            fail("Failed at testGetColor");
+        } catch (NotFoundException e) {
+            //expected
+        }
+
+        final int color = mContext.getColor(R.color.color2);
+        assertEquals(0xffffff00, color);
     }
 
     private AttributeSet getAttributeSet(int resourceId) {
