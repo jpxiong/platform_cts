@@ -165,6 +165,7 @@ cts_test_packages := \
     CtsSignatureTestCases \
     CtsSpeechTestCases \
     CtsTelecomTestCases \
+    CtsTelecomTestCases2 \
     CtsTelephonyTestCases \
     CtsTextTestCases \
     CtsTextureViewTestCases \

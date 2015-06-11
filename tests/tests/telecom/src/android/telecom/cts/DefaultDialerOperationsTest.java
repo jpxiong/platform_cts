@@ -62,7 +62,7 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         assertEquals(TestUtils.PACKAGE, mTelecomManager.getDefaultDialerPackage());
     }
 
-    public void testVoicemailReadWrite_correctlyThrowsSecurityException() throws Exception {
+    public void testVoicemailReadWritePermissions() throws Exception {
         try {
             mContext.getContentResolver().query(Voicemails.CONTENT_URI, null, null, null, null);
             fail("Reading voicemails should throw SecurityException if not default Dialer");
@@ -93,7 +93,7 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
                 Voicemails._ID + "=999 AND 1=2", null);
     }
 
-    public void testSilenceRinger_correctlyThrowsSecurityException() throws Exception {
+    public void testSilenceRingerPermissions() throws Exception {
         try {
             mTelecomManager.silenceRinger();
             fail("TelecomManager.silenceRinger should throw SecurityException if not default "
@@ -106,7 +106,7 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         mTelecomManager.silenceRinger();
     }
 
-    public void testCancelMissedCallsNotification_correctlyThrowsSecurityException()
+    public void testCancelMissedCallsNotificationPermissions()
             throws Exception {
         try {
             mTelecomManager.cancelMissedCallsNotification();
@@ -120,7 +120,7 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         mTelecomManager.cancelMissedCallsNotification();
     }
 
-    public void testHandlePinMmi_correctlyThrowsSecurityException()
+    public void testHandlePinMmPermissions()
             throws Exception {
         try {
             mTelecomManager.handleMmi("0");
@@ -140,7 +140,7 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         mTelecomManager.handleMmi("0", mPhoneAccountHandle);
     }
 
-    public void testGetAdnForPhoneAccount_correctlyThrowsSecurityException() throws Exception {
+    public void testGetAdnForPhoneAccountPermissions() throws Exception {
         try {
             mTelecomManager.getAdnUriForPhoneAccount(mPhoneAccountHandle);
             fail("TelecomManager.getAdnUriForPhoneAccount should throw SecurityException if "
