@@ -56,6 +56,12 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
+    public void testGetDefaultDialerPackage() throws Exception {
+        assertEquals(mPreviousDefaultDialer, mTelecomManager.getDefaultDialerPackage());
+        TestUtils.setDefaultDialer(getInstrumentation(), TestUtils.PACKAGE);
+        assertEquals(TestUtils.PACKAGE, mTelecomManager.getDefaultDialerPackage());
+    }
+
     public void testVoicemailReadWrite_correctlyThrowsSecurityException() throws Exception {
         try {
             mContext.getContentResolver().query(Voicemails.CONTENT_URI, null, null, null, null);
