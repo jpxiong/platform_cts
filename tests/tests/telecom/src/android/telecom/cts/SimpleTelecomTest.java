@@ -51,6 +51,7 @@ public class SimpleTelecomTest extends InstrumentationTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        MockConnectionService.tearDown();
         super.tearDown();
     }
 
