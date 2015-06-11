@@ -176,8 +176,7 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
         stopAndFinish(UTILITY_ACTIVITY);
     }
 
-    // Verifies that updating the whitelisting during a lock task mode started with startLockTask
-    // does not kill the locked task.
+    // Verifies that updating the whitelisting during lock task mode finishes the locked task.
     public void testUpdateWhitelisting() {
         mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
         startLockTask(UTILITY_ACTIVITY);
@@ -191,10 +190,9 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
             }
         }
 
-        assertLockTaskModeActive();
-        assertTrue(mIsActivityRunning);
-
-        stopAndFinish(UTILITY_ACTIVITY);
+        assertLockTaskModeInactive();
+        assertFalse(mIsActivityRunning);
+        assertFalse(mIsActivityResumed);
     }
 
     // This launches an activity that is in the current task.
@@ -289,20 +287,22 @@ public class LockTaskTest extends BaseDeviceOwnerTest {
     }
 
     // Test the lockTaskMode flag for an activity declaring if_whitelisted.
-    // An activity locked via manifest argument can finish without calling stopLockTask.
-    public void testManifestArgument_canFinish() {
+    // An activity locked via manifest argument cannot finish without calling stopLockTask.
+    public void testManifestArgument_cannotFinish() {
         mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
         startAndWait(getLockTaskUtility(UTILITY_ACTIVITY_IF_WHITELISTED));
         waitForResume();
-        finishAndWait(UTILITY_ACTIVITY_IF_WHITELISTED);
 
-        assertFalse(mIsActivityRunning);
-        assertFalse(mIsActivityResumed);
+        // If lock task has not exited then the activity shouldn't actually receive onDestroy.
+        finishAndWait(UTILITY_ACTIVITY_IF_WHITELISTED);
+        assertLockTaskModeActive();
+        assertTrue(mIsActivityRunning);
+
+        stopAndFinish(UTILITY_ACTIVITY_IF_WHITELISTED);
     }
 
     // Test the lockTaskMode flag for an activity declaring if_whitelisted.
-    // When a whitelisting is revoked, an activity locked via manifest argument should be killed
-    // by the system.
+    // Verifies that updating the whitelisting during lock task mode finishes the locked task.
     public void testManifestArgument_updateWhitelisting() {
         mDevicePolicyManager.setLockTaskPackages(getWho(), new String[] { PACKAGE_NAME });
         startAndWait(getLockTaskUtility(UTILITY_ACTIVITY_IF_WHITELISTED));
