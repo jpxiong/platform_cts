@@ -46,7 +46,8 @@ public class StubMediaBrowserService extends MediaBrowserService {
 
     /* package private */ static MediaSession sSession;
     private Bundle mExtras;
-    private Result<List<MediaItem>> mPendingResult;
+    private Result<List<MediaItem>> mPendingLoadChildrenResult;
+    private Result<MediaItem> mPendingLoadItemResult;
 
     @Override
     public void onCreate() {
@@ -73,16 +74,43 @@ public class StubMediaBrowserService extends MediaBrowserService {
             }
             result.sendResult(mediaItems);
         } else if (MEDIA_ID_CHILDREN_DELAYED.equals(parentMediaId)) {
-            Assert.assertNull(mPendingResult);
-            mPendingResult = result;
+            Assert.assertNull(mPendingLoadChildrenResult);
+            mPendingLoadChildrenResult = result;
             result.detach();
         }
     }
 
+    @Override
+    public void onLoadItem(String itemId, Result<MediaItem> result) {
+        if (MEDIA_ID_CHILDREN_DELAYED.equals(itemId)) {
+            mPendingLoadItemResult = result;
+            result.detach();
+            return;
+        }
+
+        for (String id : MEDIA_ID_CHILDREN) {
+            if (id.equals(itemId)) {
+                result.sendResult(new MediaItem(new MediaDescription.Builder()
+                        .setMediaId(id).build(), MediaItem.FLAG_BROWSABLE));
+                return;
+            }
+        }
+
+        super.onLoadItem(itemId, result);
+    }
+
     public void sendDelayedNotifyChildrenChanged() {
-        if (mPendingResult != null) {
-            mPendingResult.sendResult(Collections.<MediaItem>emptyList());
-            mPendingResult = null;
+        if (mPendingLoadChildrenResult != null) {
+            mPendingLoadChildrenResult.sendResult(Collections.<MediaItem>emptyList());
+            mPendingLoadChildrenResult = null;
+        }
+    }
+
+    public void sendDelayedItemLoaded() {
+        if (mPendingLoadItemResult != null) {
+            mPendingLoadItemResult.sendResult(new MediaItem(new MediaDescription.Builder()
+                    .setMediaId(MEDIA_ID_CHILDREN_DELAYED).build(), MediaItem.FLAG_BROWSABLE));
+            mPendingLoadItemResult = null;
         }
     }
 }

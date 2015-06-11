@@ -18,6 +18,7 @@ package android.media.cts;
 import android.content.ComponentName;
 import android.cts.util.PollingCheck;
 import android.media.browse.MediaBrowser;
+import android.media.browse.MediaBrowser.MediaItem;
 import android.test.InstrumentationTestCase;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class MediaBrowserTest extends InstrumentationTestCase {
             "invalid.package", "invalid.ServiceClassName");
     private final StubConnectionCallback mConnectionCallback = new StubConnectionCallback();
     private final StubSubscriptionCallback mSubscriptionCallback = new StubSubscriptionCallback();
+    private final StubItemCallback mItemCallback = new StubItemCallback();
 
     private MediaBrowser mMediaBrowser;
 
@@ -115,6 +117,37 @@ public class MediaBrowserTest extends InstrumentationTestCase {
         }
     }
 
+    public void testGetItem() {
+        resetCallbacks();
+        createMediaBrowser(TEST_BROWSER_SERVICE);
+        connectMediaBrowserService();
+        mMediaBrowser.getItem(StubMediaBrowserService.MEDIA_ID_CHILDREN[0], mItemCallback);
+        new PollingCheck(TIME_OUT_MS) {
+            @Override
+            protected boolean check() {
+                return mItemCallback.mLastMediaItem != null;
+            }
+        }.run();
+
+        assertEquals(StubMediaBrowserService.MEDIA_ID_CHILDREN[0],
+                mItemCallback.mLastMediaItem.getMediaId());
+    }
+
+    public void testGetItemFailure() {
+        resetCallbacks();
+        createMediaBrowser(TEST_BROWSER_SERVICE);
+        connectMediaBrowserService();
+        mMediaBrowser.getItem("does-not-exist", mItemCallback);
+        new PollingCheck(TIME_OUT_MS) {
+            @Override
+            protected boolean check() {
+                return mItemCallback.mLastErrorId != null;
+            }
+        }.run();
+
+        assertEquals("does-not-exist", mItemCallback.mLastErrorId);
+    }
+
     private void createMediaBrowser(final ComponentName component) {
         getInstrumentation().runOnMainSync(new Runnable() {
             @Override
@@ -138,6 +171,7 @@ public class MediaBrowserTest extends InstrumentationTestCase {
     private void resetCallbacks() {
         mConnectionCallback.reset();
         mSubscriptionCallback.reset();
+        mItemCallback.reset();
     }
 
     private static class StubConnectionCallback extends MediaBrowser.ConnectionCallback {
@@ -169,14 +203,12 @@ public class MediaBrowserTest extends InstrumentationTestCase {
 
     private static class StubSubscriptionCallback extends MediaBrowser.SubscriptionCallback {
         private volatile int mChildrenLoadedCount;
-        private volatile int mErrorCount;
         private volatile String mLastErrorId;
         private volatile String mLastParentId;
         private volatile List<MediaBrowser.MediaItem> mLastChildMediaItems;
 
         public void reset() {
             mChildrenLoadedCount = 0;
-            mErrorCount = 0;
             mLastErrorId = null;
             mLastParentId = null;
             mLastChildMediaItems = null;
@@ -187,6 +219,26 @@ public class MediaBrowserTest extends InstrumentationTestCase {
             mChildrenLoadedCount++;
             mLastParentId = parentId;
             mLastChildMediaItems = children;
+        }
+
+        @Override
+        public void onError(String id) {
+            mLastErrorId = id;
+        }
+    }
+
+    private static class StubItemCallback extends MediaBrowser.ItemCallback {
+        private volatile MediaBrowser.MediaItem mLastMediaItem;
+        private volatile String mLastErrorId;
+
+        public void reset() {
+            mLastMediaItem = null;
+            mLastErrorId = null;
+        }
+
+        @Override
+        public void onItemLoaded(MediaItem item) {
+            mLastMediaItem = item;
         }
 
         @Override
