@@ -31,12 +31,18 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.EllipticCurve;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -257,6 +263,8 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
                 assertEquals((keySize + 7) & ~7, (params.getKeysize() + 7) & ~7);
                 assertEquals(params.getPublicExponent(), rsaPubKey.getPublicExponent());
             }
+        } else {
+            fail("Unsupported key algorithm: " + keyType);
         }
 
         final PrivateKey privKey = pair.getPrivate();
@@ -264,6 +272,20 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(keyType, privKey.getAlgorithm());
         assertNull("getFormat() should return null", privKey.getFormat());
         assertNull("getEncoded() should return null", privKey.getEncoded());
+
+        if ("EC".equalsIgnoreCase(keyType)) {
+            assertTrue("EC private key must be instanceof ECKey: " + privKey.getClass().getName(),
+                    privKey instanceof ECKey);
+            assertECParameterSpecEqualsIgnoreSeed(
+                    "Private and public key must have the same EC parameters",
+                    ((ECKey) pubKey).getParams(), ((ECKey) privKey).getParams());
+        } else if ("RSA".equalsIgnoreCase(keyType)) {
+            assertTrue("RSA private key must be instance of RSAKey: "
+                    + privKey.getClass().getName(),
+                    privKey instanceof RSAKey);
+            assertEquals("Private and public key must have the same RSA modulus",
+                    ((RSAKey) pubKey).getModulus(), ((RSAKey) privKey).getModulus());
+        }
 
         KeyStore.Entry entry = mKeyStore.getEntry(alias, null);
         assertNotNull("Entry should exist", entry);
@@ -275,6 +297,10 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         assertTrue("Certificate should be in X.509 format", userCert instanceof X509Certificate);
 
         final X509Certificate x509userCert = (X509Certificate) userCert;
+
+        assertEquals(
+                "Public key used to sign certificate should have the same algorithm as in KeyPair",
+                pubKey.getAlgorithm(), x509userCert.getPublicKey().getAlgorithm());
 
         assertEquals("PublicKey used to sign certificate should match one returned in KeyPair",
                 pubKey, x509userCert.getPublicKey());
@@ -294,7 +320,10 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         assertDateEquals("The notAfter date should be the one passed into the params", end,
                 x509userCert.getNotAfter());
 
+        // Assert that the cert's signature verifies using the public key from generated KeyPair
         x509userCert.verify(pubKey);
+        // Assert that the cert's signature verifies using the public key from the cert itself.
+        x509userCert.verify(x509userCert.getPublicKey());
 
         Certificate[] chain = privEntry.getCertificateChain();
         assertEquals("A list of CA certificates should not exist for the generated entry", 1,
@@ -306,47 +335,94 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
                 privEntry.getPrivateKey());
     }
 
-    private static void assertUsableInSSLConnection(final PrivateKey privKey,
-            final X509Certificate x509userCert) throws Exception {
-        // TODO this should probably be in something like:
-        // TestKeyStore.createForClientSelfSigned(...)
-        TrustManager[] clientTrustManagers = TestKeyStore.createTrustManagers(
-                TestKeyStore.getIntermediateCa().keyStore);
-        SSLContext clientContext = TestSSLContext.createSSLContext("TLS",
-                new KeyManager[] {
-                    TestKeyManager.wrap(new MyKeyManager(privKey, x509userCert))
-                }, clientTrustManagers);
+    private static void assertUsableInSSLConnection(PrivateKey privKey,
+            X509Certificate x509userCert) throws Exception {
+        // Set up both client and server to use the same private key + cert, and to trust that cert
+        // when it's presented by peer. This exercises the use of the private key both in client
+        // and server scenarios.
         TestKeyStore serverKeyStore = TestKeyStore.getServer();
         serverKeyStore.keyStore.setCertificateEntry("client-selfSigned", x509userCert);
         SSLContext serverContext = TestSSLContext.createSSLContext("TLS",
-                serverKeyStore.keyManagers,
+                new KeyManager[] {
+                    TestKeyManager.wrap(new MyKeyManager(privKey, x509userCert))
+                },
                 TestKeyStore.createTrustManagers(serverKeyStore.keyStore));
+        SSLContext clientContext = serverContext;
+
+        if ("EC".equalsIgnoreCase(privKey.getAlgorithm())) {
+            // As opposed to RSA (see below) EC keys are used in the same way in all cipher suites.
+            // Assert that the key works with the default list of cipher suites.
+            assertSSLConnectionWithClientAuth(
+                clientContext, serverContext, null, x509userCert, x509userCert);
+        } else if ("RSA".equalsIgnoreCase(privKey.getAlgorithm())) {
+            // RSA keys are used differently between Forward Secure and non-Forward Secure cipher
+            // suites. For example, RSA key exchange requires the server to decrypt using its RSA
+            // private key, whereas ECDHE_RSA key exchange requires the server to sign usnig its
+            // RSA private key. We thus assert that the key works with Forward Secure cipher suites
+            // and that it works with non-Forward Secure cipher suites.
+            List<String> fsCipherSuites = new ArrayList<String>();
+            List<String> nonFsCipherSuites = new ArrayList<String>();
+            for (String cipherSuite : clientContext.getDefaultSSLParameters().getCipherSuites()) {
+                if (cipherSuite.contains("_ECDHE_RSA_") || cipherSuite.contains("_DHE_RSA_")) {
+                    fsCipherSuites.add(cipherSuite);
+                } else if (cipherSuite.contains("_RSA_WITH_")) {
+                    nonFsCipherSuites.add(cipherSuite);
+                }
+            }
+            assertFalse("No FS RSA cipher suites enabled by default", fsCipherSuites.isEmpty());
+            assertFalse("No non-FS RSA cipher suites enabled", nonFsCipherSuites.isEmpty());
+
+            // Assert that the key works with RSA Forward Secure cipher suites.
+            assertSSLConnectionWithClientAuth(
+                    clientContext, serverContext, fsCipherSuites.toArray(new String[0]),
+                    x509userCert, x509userCert);
+            // Assert that the key works with RSA non-Forward Secure cipher suites.
+            assertSSLConnectionWithClientAuth(
+                    clientContext, serverContext, nonFsCipherSuites.toArray(new String[0]),
+                    x509userCert, x509userCert);
+        } else {
+            fail("Unsupported key algorithm: " + privKey.getAlgorithm());
+        }
+    }
+
+    private static void assertSSLConnectionWithClientAuth(
+            SSLContext clientContext, SSLContext serverContext, String[] enabledCipherSuites,
+            X509Certificate expectedClientCert, X509Certificate expectedServerCert)
+            throws Exception {
         SSLServerSocket serverSocket = (SSLServerSocket) serverContext.getServerSocketFactory()
                 .createServerSocket(0);
         InetAddress host = InetAddress.getLocalHost();
         int port = serverSocket.getLocalPort();
-
         SSLSocket client = (SSLSocket) clientContext.getSocketFactory().createSocket(host, port);
+
         final SSLSocket server = (SSLSocket) serverSocket.accept();
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Void> future = executor.submit(new Callable<Void>() {
+        Future<Certificate[]> future = executor.submit(new Callable<Certificate[]>() {
             @Override
-            public Void call() throws Exception {
+            public Certificate[] call() throws Exception {
                 server.setNeedClientAuth(true);
                 server.setWantClientAuth(true);
                 server.startHandshake();
-                return null;
+                return server.getSession().getPeerCertificates();
             }
         });
         executor.shutdown();
+        if (enabledCipherSuites != null) {
+            client.setEnabledCipherSuites(enabledCipherSuites);
+        }
         client.startHandshake();
-        Certificate[] usedClientCerts = client.getSession().getLocalCertificates();
-        assertNotNull(usedClientCerts);
-        assertEquals(1, usedClientCerts.length);
-        assertEquals(x509userCert, usedClientCerts[0]);
-        future.get();
+        Certificate[] usedServerCerts = client.getSession().getPeerCertificates();
+        Certificate[] usedClientCerts = future.get();
         client.close();
         server.close();
+
+        assertNotNull(usedServerCerts);
+        assertEquals(1, usedServerCerts.length);
+        assertEquals(expectedServerCert, usedServerCerts[0]);
+
+        assertNotNull(usedClientCerts);
+        assertEquals(1, usedClientCerts.length);
+        assertEquals(expectedClientCert, usedClientCerts[0]);
     }
 
     private static class MyKeyManager extends X509ExtendedKeyManager {
@@ -365,7 +441,7 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
 
         @Override
         public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-            throw new UnsupportedOperationException("Not implemented");
+            return "fake";
         }
 
         @Override
@@ -380,7 +456,7 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
 
         @Override
         public String[] getServerAliases(String keyType, Principal[] issuers) {
-            throw new UnsupportedOperationException("Not implemented");
+            return new String[] { "fake" };
         }
 
         @Override
@@ -396,5 +472,18 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         String result2 = formatter.format(date2);
 
         assertEquals(message, result1, result2);
+    }
+
+    private static void assertECParameterSpecEqualsIgnoreSeed(String message,
+            ECParameterSpec expected, ECParameterSpec actual) {
+        EllipticCurve expectedCurve = expected.getCurve();
+        EllipticCurve actualCurve = actual.getCurve();
+        assertEquals(message + ": curve field", expectedCurve.getField(), actualCurve.getField());
+        assertEquals(message + ": curve A", expectedCurve.getA(), actualCurve.getA());
+        assertEquals(message + ": curve B", expectedCurve.getB(), actualCurve.getB());
+        assertEquals(message + ": order mismatch", expected.getOrder(), actual.getOrder());
+        assertEquals(message + ": generator mismatch",
+                expected.getGenerator(), actual.getGenerator());
+        assertEquals(message + ": cofactor mismatch", expected.getCofactor(), actual.getCofactor());
     }
 }
