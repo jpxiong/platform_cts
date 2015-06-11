@@ -27,23 +27,28 @@ import android.uirendering.cts.testinfrastructure.ActivityTestBase;
 public class ShadowTests extends ActivityTestBase {
     @SmallTest
     public void testShadowLayout() {
+        int shadowColorValue = 0xD7;
+        // Android TV theme overrides shadow opacity to be darker.
+        if (getActivity().getOnTv()) {
+            shadowColorValue = 0xB7;
+        }
+        SamplePointVerifier verifier = new SamplePointVerifier(
+                new Point[] {
+                        // view area
+                        new Point(25, 64),
+                        new Point(64, 64),
+                        // shadow area
+                        new Point(25, 65),
+                        new Point(64, 65)
+                },
+                new int[] {
+                        Color.WHITE,
+                        Color.WHITE,
+                        Color.rgb(shadowColorValue, shadowColorValue, shadowColorValue),
+                        Color.rgb(shadowColorValue, shadowColorValue, shadowColorValue),
+                });
         createTest()
                 .addLayout(R.layout.simple_shadow_layout, null, true/* HW only */)
-                .runWithVerifier(
-                new SamplePointVerifier(
-                        new Point[] {
-                                // view area
-                                new Point(25, 64),
-                                new Point(64, 64),
-                                // shadow area
-                                new Point(25, 65),
-                                new Point(64, 65)
-                        },
-                        new int[] {
-                                Color.WHITE,
-                                Color.WHITE,
-                                Color.rgb(215, 215, 215),
-                                Color.rgb(215, 215, 215),
-                        }));
+                .runWithVerifier(verifier);
     }
 }
