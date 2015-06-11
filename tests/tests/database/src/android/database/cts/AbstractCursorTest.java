@@ -376,6 +376,12 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         }
     }
 
+    public void testSetExtras() {
+        Bundle b = new Bundle();
+        mTestAbstractCursor.setExtras(b);
+        assertSame(b, mTestAbstractCursor.getExtras());
+    }
+
     @SuppressWarnings("unchecked")
     private static ArrayList<ArrayList> createTestList(int rows, int cols) {
         ArrayList<ArrayList> list = new ArrayList<ArrayList>();
