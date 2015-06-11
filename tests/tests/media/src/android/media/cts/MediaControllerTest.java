@@ -21,6 +21,7 @@ import android.media.VolumeProvider;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState.CustomAction;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -182,6 +183,14 @@ public class MediaControllerTest extends AndroidTestCase {
             assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
 
             mCallback.reset();
+            final Uri uri = Uri.parse("content://test/popcorn.mod");
+            controls.playFromUri(uri, extras);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnPlayFromUriCalled);
+            assertEquals(uri, mCallback.mUri);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
+
+            mCallback.reset();
             final String action = "test-action";
             controls.sendCustomAction(action, extras);
             mWaitLock.wait(TIME_OUT_MS);
@@ -209,30 +218,32 @@ public class MediaControllerTest extends AndroidTestCase {
     }
 
     private class MediaSessionCallback extends MediaSession.Callback {
-        private volatile long mSeekPosition;
-        private volatile long mQueueItemId;
-        private volatile Rating mRating;
-        private volatile String mMediaId;
-        private volatile String mQuery;
-        private volatile String mAction;
-        private volatile String mCommand;
-        private volatile Bundle mExtras;
-        private volatile ResultReceiver mCommandCallback;
+        private long mSeekPosition;
+        private long mQueueItemId;
+        private Rating mRating;
+        private String mMediaId;
+        private String mQuery;
+        private Uri mUri;
+        private String mAction;
+        private String mCommand;
+        private Bundle mExtras;
+        private ResultReceiver mCommandCallback;
 
-        private volatile boolean mOnPlayCalled;
-        private volatile boolean mOnPauseCalled;
-        private volatile boolean mOnStopCalled;
-        private volatile boolean mOnFastForwardCalled;
-        private volatile boolean mOnRewindCalled;
-        private volatile boolean mOnSkipToPreviousCalled;
-        private volatile boolean mOnSkipToNextCalled;
-        private volatile boolean mOnSeekToCalled;
-        private volatile boolean mOnSkipToQueueItemCalled;
-        private volatile boolean mOnSetRatingCalled;
-        private volatile boolean mOnPlayFromMediaIdCalled;
-        private volatile boolean mOnPlayFromSearchCalled;
-        private volatile boolean mOnCustomActionCalled;
-        private volatile boolean mOnCommandCalled;
+        private boolean mOnPlayCalled;
+        private boolean mOnPauseCalled;
+        private boolean mOnStopCalled;
+        private boolean mOnFastForwardCalled;
+        private boolean mOnRewindCalled;
+        private boolean mOnSkipToPreviousCalled;
+        private boolean mOnSkipToNextCalled;
+        private boolean mOnSeekToCalled;
+        private boolean mOnSkipToQueueItemCalled;
+        private boolean mOnSetRatingCalled;
+        private boolean mOnPlayFromMediaIdCalled;
+        private boolean mOnPlayFromSearchCalled;
+        private boolean mOnPlayFromUriCalled;
+        private boolean mOnCustomActionCalled;
+        private boolean mOnCommandCalled;
 
         public void reset() {
             mSeekPosition = -1;
@@ -240,6 +251,7 @@ public class MediaControllerTest extends AndroidTestCase {
             mRating = null;
             mMediaId = null;
             mQuery = null;
+            mUri = null;
             mAction = null;
             mExtras = null;
             mCommand = null;
@@ -257,6 +269,7 @@ public class MediaControllerTest extends AndroidTestCase {
             mOnSetRatingCalled = false;
             mOnPlayFromMediaIdCalled = false;
             mOnPlayFromSearchCalled = false;
+            mOnPlayFromUriCalled = false;
             mOnCustomActionCalled = false;
             mOnCommandCalled = false;
         }
@@ -350,6 +363,16 @@ public class MediaControllerTest extends AndroidTestCase {
             synchronized (mWaitLock) {
                 mOnPlayFromSearchCalled = true;
                 mQuery = query;
+                mExtras = extras;
+                mWaitLock.notify();
+            }
+        }
+
+        @Override
+        public void onPlayFromUri(Uri uri, Bundle extras) {
+            synchronized (mWaitLock) {
+                mOnPlayFromUriCalled = true;
+                mUri = uri;
                 mExtras = extras;
                 mWaitLock.notify();
             }
