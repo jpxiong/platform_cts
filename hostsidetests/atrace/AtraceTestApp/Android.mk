@@ -23,8 +23,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_SDK_VERSION := current
 LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
 
-LOCAL_JNI_SHARED_LIBRARIES := libnativeatrace_jni
-
 LOCAL_PACKAGE_NAME := CtsAtraceTestApp
 
 # sign this app with a different cert than CtsSimpleAppInstallDiffCert
@@ -33,5 +31,3 @@ LOCAL_PACKAGE_NAME := CtsAtraceTestApp
 #LOCAL_DEX_PREOPT := false
 
 include $(BUILD_CTS_SUPPORT_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
