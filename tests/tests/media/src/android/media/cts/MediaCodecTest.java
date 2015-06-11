@@ -553,6 +553,121 @@ public class MediaCodecTest extends AndroidTestCase {
         }
     }
 
+    public void testDecodeAfterFlush() throws InterruptedException {
+        final int INPUT_RESOURCE_ID =
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
+
+        // The test should fail if the decoder never produces output frames for the input.
+        // Time out decoding, as we have no way to query whether the decoder will produce output.
+        final int DECODING_TIMEOUT_MS = 10000;
+
+        final AtomicBoolean completed = new AtomicBoolean(false);
+        Thread videoDecodingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OutputSurface outputSurface = null;
+                MediaExtractor mediaExtractor = null;
+                MediaCodec mediaCodec = null;
+                try {
+                    outputSurface = new OutputSurface(1, 1);
+                    mediaExtractor = getMediaExtractorForMimeType(INPUT_RESOURCE_ID, "video/");
+                    MediaFormat mediaFormat =
+                            mediaExtractor.getTrackFormat(mediaExtractor.getSampleTrackIndex());
+                    if (!MediaUtils.checkDecoderForFormat(mediaFormat)) {
+                        return; // skip
+                    }
+                    String mimeType = mediaFormat.getString(MediaFormat.KEY_MIME);
+                    mediaCodec = MediaCodec.createDecoderByType(mimeType);
+                    mediaCodec.configure(mediaFormat, outputSurface.getSurface(),
+                            null /* crypto */, 0 /* flags */);
+                    mediaCodec.start();
+
+                    if (!runDecodeTillFirstOutput(mediaCodec, mediaExtractor)) {
+                        throw new RuntimeException("decoder does not generate non-empty output.");
+                    }
+
+                    // simulate application flush.
+                    mediaExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+                    mediaCodec.flush();
+
+                    completed.set(runDecodeTillFirstOutput(mediaCodec, mediaExtractor));
+                } catch (IOException e) {
+                    throw new RuntimeException("error setting up decoding", e);
+                } finally {
+                    if (mediaCodec != null) {
+                        mediaCodec.stop();
+                        mediaCodec.release();
+                    }
+                    if (mediaExtractor != null) {
+                        mediaExtractor.release();
+                    }
+                    if (outputSurface != null) {
+                        outputSurface.release();
+                    }
+                }
+            }
+        });
+        videoDecodingThread.start();
+        videoDecodingThread.join(DECODING_TIMEOUT_MS);
+        // In case it's timed out, need to stop the thread and have all resources released.
+        videoDecodingThread.interrupt();
+        if (!completed.get()) {
+            throw new RuntimeException("timed out decoding to end-of-stream");
+        }
+    }
+
+    // Run the decoder till it generates an output buffer.
+    // Return true when that output buffer is not empty, false otherwise.
+    private static boolean runDecodeTillFirstOutput(
+            MediaCodec mediaCodec, MediaExtractor mediaExtractor) {
+        final int TIME_OUT_US = 10000;
+
+        assertTrue("Wrong test stream which has no data.",
+                mediaExtractor.getSampleTrackIndex() != -1);
+        boolean signaledEos = false;
+        MediaCodec.BufferInfo outputBufferInfo = new MediaCodec.BufferInfo();
+        while (!Thread.interrupted()) {
+            // Try to feed more data into the codec.
+            if (!signaledEos) {
+                int bufferIndex = mediaCodec.dequeueInputBuffer(TIME_OUT_US /* timeoutUs */);
+                if (bufferIndex != -1) {
+                    ByteBuffer buffer = mediaCodec.getInputBuffer(bufferIndex);
+                    int size = mediaExtractor.readSampleData(buffer, 0 /* offset */);
+                    long timestampUs = mediaExtractor.getSampleTime();
+                    mediaExtractor.advance();
+                    signaledEos = mediaExtractor.getSampleTrackIndex() == -1;
+                    mediaCodec.queueInputBuffer(bufferIndex,
+                            0 /* offset */,
+                            size,
+                            timestampUs,
+                            signaledEos ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                    Log.i("DEBUG", "queue with " + signaledEos);
+                }
+            }
+
+            int outputBufferIndex = mediaCodec.dequeueOutputBuffer(
+                    outputBufferInfo, TIME_OUT_US /* timeoutUs */);
+
+            if (outputBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED
+                    || outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED
+                    || outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                continue;
+            }
+            assertTrue("Wrong output buffer index", outputBufferIndex >= 0);
+
+            mediaCodec.releaseOutputBuffer(outputBufferIndex, false /* render */);
+            boolean eos = (outputBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
+            Log.i("DEBUG", "Got a frame with eos=" + eos);
+            if (eos && outputBufferInfo.size == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Tests whether decoding a short group-of-pictures succeeds. The test queues a few video frames
      * then signals end-of-stream. The test fails if the decoder doesn't output the queued frames.
