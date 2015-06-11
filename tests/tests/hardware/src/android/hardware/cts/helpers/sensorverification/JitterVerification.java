@@ -18,6 +18,10 @@ package android.hardware.cts.helpers.sensorverification;
 
 import junit.framework.Assert;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+
+import android.util.Log;
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
@@ -39,6 +43,8 @@ public class JitterVerification extends AbstractSensorVerification {
 
     // sensorType: threshold (% of expected period)
     private static final SparseIntArray DEFAULTS = new SparseIntArray(12);
+    // Max allowed jitter (in percentage).
+    private static final int THRESHOLD_PERCENT_FOR_HIFI_SENSORS = 1;
     static {
         // Use a method so that the @deprecation warning can be set for that method only
         setDefaults();
@@ -67,6 +73,11 @@ public class JitterVerification extends AbstractSensorVerification {
         int threshold = DEFAULTS.get(sensorType, -1);
         if (threshold == -1) {
             return null;
+        }
+        boolean hasHifiSensors = environment.getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_HIFI_SENSORS);
+        if (hasHifiSensors) {
+           threshold = THRESHOLD_PERCENT_FOR_HIFI_SENSORS;
         }
         return new JitterVerification(threshold);
     }
