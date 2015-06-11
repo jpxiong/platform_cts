@@ -172,12 +172,7 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
 
         // list of tags expected to be seen on app launch, in order.
         String[] requiredSectionList = {
-                // must match string in AtraceTestAppActivity#onCreate
                 "traceable-app-test-section",
-
-                // must match string in AtraceTestAppJni.c
-                "traceable-app-native-test-section",
-
                 "inflate",
                 "performTraversals",
                 "measure",
