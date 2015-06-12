@@ -54,9 +54,9 @@ public class TestUtils {
         return pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
     }
 
-    public static void setDefaultDialer(Instrumentation instrumentation, String packageName)
+    public static String setDefaultDialer(Instrumentation instrumentation, String packageName)
             throws Exception {
-        executeShellCommand(instrumentation, COMMAND_SET_DEFAULT_DIALER + packageName);
+        return executeShellCommand(instrumentation, COMMAND_SET_DEFAULT_DIALER + packageName);
     }
 
     public static String getDefaultDialer(Instrumentation instrumentation) throws Exception {
