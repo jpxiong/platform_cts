@@ -16,8 +16,10 @@
 
 package android.telecom.cts;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.provider.VoicemailContract.Voicemails;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -151,5 +153,30 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
         TestUtils.setDefaultDialer(getInstrumentation(), TestUtils.PACKAGE);
         // No exception if the calling package is the default dialer.
         mTelecomManager.getAdnUriForPhoneAccount(mPhoneAccountHandle);
+    }
+
+    public void testSetDefaultDialerNoDialIntent_notSupported() throws Exception {
+        final PackageManager pm = mContext.getPackageManager();
+        final ComponentName name = new ComponentName(mContext,
+                "android.telecom.cts.MockDialerActivity");
+        try {
+            pm.setComponentEnabledSetting(name, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+
+            final String result =
+                    TestUtils.setDefaultDialer(getInstrumentation(), TestUtils.PACKAGE);
+            assertNotSame(result, TestUtils.PACKAGE);
+            assertTrue("Expected failure indicating that this was not an installed dialer app",
+                    result.contains("is not an installed Dialer app"));
+        } finally {
+            pm.setComponentEnabledSetting(name, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
+
+        // Now that the activity is present again in the package manager, this should succeed.
+        final String result = TestUtils.setDefaultDialer(getInstrumentation(), TestUtils.PACKAGE);
+        assertTrue("Expected success message indicating that " + TestUtils.PACKAGE + " was set as "
+                + "default dialer.", result.contains("set as default dialer"));
+        assertEquals(TestUtils.PACKAGE, TestUtils.getDefaultDialer(getInstrumentation()));
     }
 }
