@@ -43,14 +43,6 @@ import static android.telecom.cts.TestUtils.shouldTestTelecom;
  * hear back via our callback.  Suboptimal, but it works.
  */
 public class VideoCallTest extends BaseTelecomTestWithMockServices {
-    @Override
-    protected void tearDown() throws Exception {
-        if (shouldTestTelecom(mContext)) {
-            cleanupAndVerifyUnbind();
-        }
-        super.tearDown();
-    }
-
     /**
      * Tests ability to start a 2-way video call and retrieve its video state.
      */
