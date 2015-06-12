@@ -75,7 +75,7 @@ public class InfrastructureTests extends ActivityTestBase {
         final Rect clipRect = new Rect(0, 0, 50, 50);
         ViewInitializer viewInitializer = new ViewInitializer() {
             @Override
-            public void intializeView(View view) {
+            public void initializeView(View view) {
                 view.setClipBounds(clipRect);
             }
         };

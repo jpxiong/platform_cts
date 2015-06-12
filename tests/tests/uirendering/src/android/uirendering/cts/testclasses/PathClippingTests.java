@@ -92,7 +92,7 @@ public class PathClippingTests extends ActivityTestBase {
         createTest()
                 .addLayout(R.layout.blue_padded_layout, new ViewInitializer() {
                     @Override
-                    public void intializeView(View view) {
+                    public void initializeView(View view) {
                         ViewGroup rootView = (ViewGroup) view;
                         rootView.setClipChildren(true);
                         View childView = rootView.getChildAt(0);
