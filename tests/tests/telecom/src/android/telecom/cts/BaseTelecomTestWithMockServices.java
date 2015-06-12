@@ -31,6 +31,7 @@ import android.telecom.InCallService;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
+import android.telecom.VideoProfile;
 import android.telecom.cts.MockConnectionService.ConnectionServiceCallbacks;
 import android.telecom.cts.MockInCallService.InCallServiceCallbacks;
 import android.test.InstrumentationTestCase;
@@ -52,7 +53,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             TEST_PHONE_ACCOUNT_HANDLE, LABEL)
             .setAddress(Uri.parse("tel:555-TEST"))
             .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
+                    PhoneAccount.CAPABILITY_VIDEO_CALLING)
             .setHighlightColor(Color.RED)
             .setShortDescription(LABEL)
             .setSupportedUriSchemes(Arrays.asList("tel"))
@@ -160,9 +162,27 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     /**
      *  Puts Telecom in a state where there is an active call provided by the
      *  {@link MockConnectionService} which can be tested.
+     *
+     *  @param videoState the video state of the call.
+     */
+    void placeAndVerifyCall(int videoState) {
+        placeAndVerifyCall(null, videoState);
+    }
+
+    /**
+     *  Puts Telecom in a state where there is an active call provided by the
+     *  {@link MockConnectionService} which can be tested.
      */
     void placeAndVerifyCall(Bundle extras) {
-        placeNewCallWithPhoneAccount(extras);
+        placeAndVerifyCall(extras, VideoProfile.STATE_AUDIO_ONLY);
+    }
+
+    /**
+     *  Puts Telecom in a state where there is an active call provided by the
+     *  {@link MockConnectionService} which can be tested.
+     */
+    void placeAndVerifyCall(Bundle extras, int videoState) {
+        placeNewCallWithPhoneAccount(extras, videoState);
 
         try {
             if (!mInCallCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
@@ -244,11 +264,16 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     /**
      * Place a new outgoing call via the {@link MockConnectionService}
      */
-    private void placeNewCallWithPhoneAccount(Bundle extras) {
+    private void placeNewCallWithPhoneAccount(Bundle extras, int videoState) {
         if (extras == null) {
             extras = new Bundle();
         }
         extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, TEST_PHONE_ACCOUNT_HANDLE);
+
+        if (!VideoProfile.isAudioOnly(videoState)) {
+            extras.putInt(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE, videoState);
+        }
+
         mTelecomManager.placeCall(getTestNumber(), extras);
     }
 
@@ -416,8 +441,33 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals(description, condition.expected(), condition.actual());
     }
 
-    private interface Condition {
+    /**
+     * Performs some work, and waits for the condition to be met.  If the condition is not met in
+     * each step of the loop, the work is performed again.
+     *
+     * @param work The work to perform.
+     * @param condition The condition.
+     * @param timeout The timeout.
+     * @param description Description of the work being performed.
+     */
+    void doWorkAndWaitUntilConditionIsTrueOrTimeout(Work work, Condition condition, long timeout,
+            String description) {
+        final long start = System.currentTimeMillis();
+        work.doWork();
+        while (!condition.expected().equals(condition.actual())
+                && System.currentTimeMillis() - start < timeout) {
+            sleep(50);
+            work.doWork();
+        }
+        assertEquals(description, condition.expected(), condition.actual());
+    }
+
+    protected interface Condition {
         Object expected();
         Object actual();
+    }
+
+    protected interface Work {
+        void doWork();
     }
 }

@@ -20,6 +20,7 @@ import static android.telecom.CallAudioState.*;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
+import android.telecom.VideoProfile;
 import android.util.Log;
 
 /**
@@ -32,6 +33,7 @@ public class MockConnection extends Connection {
             new CallAudioState(false, CallAudioState.ROUTE_EARPIECE, ROUTE_EARPIECE | ROUTE_SPEAKER);
     private int mState = STATE_NEW;
     private String mDtmfString = "";
+    private MockVideoProvider mMockVideoProvider;
 
     @Override
     public void onAnswer() {
@@ -88,5 +90,46 @@ public class MockConnection extends Connection {
 
     public String getDtmfString() {
         return mDtmfString;
+    }
+
+    /**
+     * Creates a mock video provider for this connection.
+     */
+    public void createMockVideoProvider() {
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(this);
+        mMockVideoProvider = mockVideoProvider;
+        setVideoProvider(mockVideoProvider);
+    }
+
+    public void sendMockVideoQuality(int videoQuality) {
+        if (mMockVideoProvider == null) {
+            return;
+        }
+        mMockVideoProvider.sendMockVideoQuality(videoQuality);
+    }
+
+    public void sendMockCallSessionEvent(int event) {
+        if (mMockVideoProvider == null) {
+            return;
+        }
+        mMockVideoProvider.sendMockCallSessionEvent(event);
+    }
+
+    public void sendMockPeerWidth(int width) {
+        if (mMockVideoProvider == null) {
+            return;
+        }
+        mMockVideoProvider.sendMockPeerWidth(width);
+    }
+
+    public void sendMockSessionModifyRequest(VideoProfile request) {
+        if (mMockVideoProvider == null) {
+            return;
+        }
+        mMockVideoProvider.sendMockSessionModifyRequest(request);
+    }
+
+    public MockVideoProvider getMockVideoProvider() {
+        return mMockVideoProvider;
     }
 }

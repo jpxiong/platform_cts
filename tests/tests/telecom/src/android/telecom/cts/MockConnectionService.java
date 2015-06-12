@@ -36,6 +36,13 @@ import java.util.concurrent.Semaphore;
 public class MockConnectionService extends ConnectionService {
     private static ConnectionServiceCallbacks sCallbacks;
     private static ConnectionService sConnectionService;
+
+    /**
+     * Used to control whether the {@link MockVideoProvider} will be created when connections are
+     * created.  Used by {@link VideoCallTest#testVideoCallDelayProvider()} to test scenario where
+     * the {@link MockVideoProvider} is not created immediately when the Connection is created.
+     */
+    private static boolean sCreateVideoProvider = true;
     private static Object sLock = new Object();
 
     public static abstract class ConnectionServiceCallbacks {
@@ -86,6 +93,12 @@ public class MockConnectionService extends ConnectionService {
         }
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
+        if (sCreateVideoProvider) {
+            connection.createMockVideoProvider();
+        } else {
+            sCreateVideoProvider = true;
+        }
+        connection.setVideoState(request.getVideoState());
 
         final ConnectionServiceCallbacks callbacks = getCallbacks();
         if (callbacks != null) {
@@ -108,6 +121,8 @@ public class MockConnectionService extends ConnectionService {
 
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
+        connection.createMockVideoProvider();
+        connection.setVideoState(request.getVideoState());
 
         final ConnectionServiceCallbacks callbacks = getCallbacks();
         if (callbacks != null) {
@@ -131,5 +146,9 @@ public class MockConnectionService extends ConnectionService {
             }
             return sCallbacks;
         }
+    }
+
+    public static void setCreateVideoProvider(boolean createVideoProvider) {
+        sCreateVideoProvider = createVideoProvider;
     }
 }
