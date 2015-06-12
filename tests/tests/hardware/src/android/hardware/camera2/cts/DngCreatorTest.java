@@ -19,6 +19,7 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -46,6 +47,7 @@ import android.view.Surface;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -365,38 +367,35 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
 
                 Bitmap rawBitmap = Bitmap.createBitmap(raw.getWidth(), raw.getHeight(),
                         Bitmap.Config.ARGB_8888);
+
+                Size rawBitmapSize = new Size(rawBitmap.getWidth(), rawBitmap.getHeight());
+                assertTrue("Raw bitmap size must be equal to active array size.",
+                        rawBitmapSize.equals(activeArraySize));
+
                 byte[] rawPlane = new byte[raw.getPlanes()[0].getRowStride() * raw.getHeight()];
 
                 // Render RAW image to a bitmap
                 raw.getPlanes()[0].getBuffer().get(rawPlane);
                 raw.getPlanes()[0].getBuffer().rewind();
+
                 RawConverter.convertToSRGB(RenderScriptSingleton.getRS(), raw.getWidth(),
                         raw.getHeight(), raw.getPlanes()[0].getRowStride(), rawPlane,
                         characteristics, resultPair.second, /*offsetX*/0, /*offsetY*/0,
                         /*out*/rawBitmap);
 
-                // Decompress JPEG image to a bitmap
-                byte[] compressedJpegData = CameraTestUtils.getDataFromImage(jpeg);
-
-                BitmapFactory.Options opt = new BitmapFactory.Options();
-                opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                Bitmap fullSizeJpegBmap = BitmapFactory.decodeByteArray(compressedJpegData,
-                        /*offset*/0, compressedJpegData.length, /*inout*/opt);
-                Rect jpegDimens = new Rect(0, 0, fullSizeJpegBmap.getWidth(),
-                        fullSizeJpegBmap.getHeight());
+                rawPlane = null;
+                System.gc(); // Hint to VM
 
                 if (VERBOSE) {
                     // Generate DNG file
                     DngCreator dngCreator = new DngCreator(characteristics, resultPair.second);
-                    outputStream = new ByteArrayOutputStream();
-                    dngCreator.writeImage(outputStream, raw);
 
                     // Write DNG to file
                     String dngFilePath = DEBUG_FILE_NAME_BASE + "/camera_" + deviceId + "_" +
                             DEBUG_DNG_FILE;
                     // Write out captured DNG file for the first camera device if setprop is enabled
                     fileStream = new FileOutputStream(dngFilePath);
-                    fileStream.write(outputStream.toByteArray());
+                    dngCreator.writeImage(fileStream, raw);
                     fileStream.flush();
                     fileStream.close();
                     Log.v(TAG, "Test DNG file for camera " + deviceId + " saved to " + dngFilePath);
@@ -405,8 +404,10 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                     String jpegFilePath = DEBUG_FILE_NAME_BASE + "/camera_" + deviceId + "_jpeg.jpg";
                     // Write out captured DNG file for the first camera device if setprop is enabled
                     fileChannel = new FileOutputStream(jpegFilePath).getChannel();
-                    fileChannel.write(jpeg.getPlanes()[0].getBuffer());
+                    ByteBuffer jPlane = jpeg.getPlanes()[0].getBuffer();
+                    fileChannel.write(jPlane);
                     fileChannel.close();
+                    jPlane.rewind();
                     Log.v(TAG, "Test JPEG file for camera " + deviceId + " saved to " +
                             jpegFilePath);
 
@@ -421,11 +422,21 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                             rawFilePath);
                 }
 
-                Size rawBitmapSize = new Size(rawBitmap.getWidth(), rawBitmap.getHeight());
-                assertTrue("Raw bitmap size must be equal to active array size.",
-                        rawBitmapSize.equals(activeArraySize));
+                raw.close();
 
-                // Get square center patch from JPEG and RAW bitmaps
+                // Decompress JPEG image to a bitmap
+                byte[] compressedJpegData = CameraTestUtils.getDataFromImage(jpeg);
+
+                jpeg.close();
+
+                // Get JPEG dimensions without decoding
+                BitmapFactory.Options opt0 = new BitmapFactory.Options();
+                opt0.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(compressedJpegData, /*offset*/0,
+                        compressedJpegData.length, /*inout*/opt0);
+                Rect jpegDimens = new Rect(0, 0, opt0.outWidth, opt0.outHeight);
+
+                // Find square center patch from JPEG and RAW bitmaps
                 RectF jpegRect = new RectF(jpegDimens);
                 RectF rawRect = new RectF(0, 0, rawBitmap.getWidth(), rawBitmap.getHeight());
                 int sideDimen = Math.min(Math.min(Math.min(Math.min(DEFAULT_PATCH_DIMEN,
@@ -435,6 +446,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 RectF jpegIntermediate = new RectF(0, 0, sideDimen, sideDimen);
                 jpegIntermediate.offset(jpegRect.centerX() - jpegIntermediate.centerX(),
                         jpegRect.centerY() - jpegIntermediate.centerY());
+
                 RectF rawIntermediate = new RectF(0, 0, sideDimen, sideDimen);
                 rawIntermediate.offset(rawRect.centerX() - rawIntermediate.centerX(),
                         rawRect.centerY() - rawIntermediate.centerY());
@@ -443,10 +455,18 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                 Rect rawFinal = new Rect();
                 rawIntermediate.roundOut(rawFinal);
 
-                Bitmap jpegPatch = Bitmap.createBitmap(fullSizeJpegBmap, jpegFinal.left,
-                        jpegFinal.top, jpegFinal.width(), jpegFinal.height());
+                // Get RAW center patch, and free up rest of RAW image
                 Bitmap rawPatch = Bitmap.createBitmap(rawBitmap, rawFinal.left, rawFinal.top,
                         rawFinal.width(), rawFinal.height());
+                rawBitmap.recycle();
+                rawBitmap = null;
+                System.gc(); // Hint to VM
+
+                BitmapFactory.Options opt = new BitmapFactory.Options();
+                opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap jpegPatch = BitmapRegionDecoder.newInstance(compressedJpegData,
+                        /*offset*/0, compressedJpegData.length, /*isShareable*/true).
+                        decodeRegion(jpegFinal, opt);
 
                 // Compare center patch from JPEG and rendered RAW bitmap
                 double difference = BitmapUtils.calcDifferenceMetric(jpegPatch, rawPatch);
