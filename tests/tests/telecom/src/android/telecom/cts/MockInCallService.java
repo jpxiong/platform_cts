@@ -17,15 +17,21 @@
 package android.telecom.cts;
 
 import android.content.Intent;
+import android.os.Binder;
 import android.telecom.Call;
 import android.telecom.InCallService;
+import android.util.ArrayMap;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class MockInCallService extends InCallService {
     private ArrayList<Call> mCalls = new ArrayList<>();
     private static InCallServiceCallbacks sCallbacks;
+    private Map<Call, MockVideoCallCallback> mVideoCallCallbacks =
+            new ArrayMap<Call, MockVideoCallCallback>();
 
     private static final Object sLock = new Object();
 
@@ -58,7 +64,24 @@ public class MockInCallService extends InCallService {
                 getCallbacks().onCallStateChanged(call, state);
             }
         }
+
+        @Override
+        public void onVideoCallChanged(Call call, InCallService.VideoCall videoCall) {
+            saveVideoCall(call, videoCall);
+        }
     };
+
+    private void saveVideoCall(Call call, VideoCall videoCall) {
+        if (videoCall != null) {
+            if (!mVideoCallCallbacks.containsKey(call)) {
+                MockVideoCallCallback listener = new MockVideoCallCallback(call);
+                videoCall.registerCallback(listener);
+                mVideoCallCallbacks.put(call, listener);
+            }
+        } else {
+            mVideoCallCallbacks.remove(call);
+        }
+    }
 
     @Override
     public android.os.IBinder onBind(android.content.Intent intent) {
@@ -81,6 +104,11 @@ public class MockInCallService extends InCallService {
         if (!mCalls.contains(call)) {
             mCalls.add(call);
             call.registerCallback(mCallCallback);
+
+            VideoCall videoCall = call.getVideoCall();
+            if (videoCall != null) {
+                saveVideoCall(call, videoCall);
+            }
         }
         if (getCallbacks() != null) {
             getCallbacks().onCallAdded(call, mCalls.size());
@@ -92,6 +120,7 @@ public class MockInCallService extends InCallService {
         mCalls.remove(call);
         if (getCallbacks() != null) {
             getCallbacks().onCallRemoved(call, mCalls.size());
+            saveVideoCall(call, null /* remove videoCall */);
         }
     }
 
@@ -132,5 +161,24 @@ public class MockInCallService extends InCallService {
             }
             return sCallbacks;
         }
+    }
+
+    /**
+     * Determines if a video callback has been registered for the passed in call.
+     *
+     * @param call The call.
+     * @return {@code true} if a video callback has been registered.
+     */
+    public boolean isVideoCallbackRegistered(Call call) {
+        return mVideoCallCallbacks.containsKey(call);
+    }
+
+    /**
+     * Retrieves the video callbacks associated with a call.
+     * @param call The call.
+     * @return The {@link MockVideoCallCallback} instance associated with the call.
+     */
+    public MockVideoCallCallback getVideoCallCallback(Call call) {
+        return mVideoCallCallbacks.get(call);
     }
 }
