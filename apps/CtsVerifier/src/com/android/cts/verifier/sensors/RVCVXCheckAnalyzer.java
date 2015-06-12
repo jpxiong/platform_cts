@@ -58,7 +58,7 @@ import javax.microedition.khronos.opengles.GL10;
  *  This class does analysis on the recorded RVCVCXCheck data sets.
  */
 public class RVCVXCheckAnalyzer {
-    private static final String TAG = "RVCXAnalysis";
+    private static final String TAG = "RVCVXAnalysis";
     private static final boolean LOCAL_LOGV = false;
     private static final boolean LOCAL_LOGD = true;
     private final String mPath;
@@ -202,9 +202,11 @@ public class RVCVXCheckAnalyzer {
                 return report;
             }
             if ((double) nvlog / nframe < VALID_FRAME_THRESHOLD) {
-                // to many invalid frames
+                // too many invalid frames
+                Log.w(TAG, "Too many invalid frames, n valid frame = " + nvlog +
+                        ", n total frame = " + nframe);
                 report.reason = "Too many invalid frames.";
-                return null;
+                return report;
             }
 
             fixFlippedAxis(vrecs);
@@ -852,6 +854,9 @@ public class RVCVXCheckAnalyzer {
 
             if (!foundSolution) {
                 // skip to next frame
+                if (LOCAL_LOGV) {
+                    Log.v(TAG, "cannot find pnp solution in frame " + i + ", skipped.");
+                }
                 continue;
             }
 
