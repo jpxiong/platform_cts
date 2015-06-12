@@ -1086,4 +1086,17 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             assertProfileOwnerMessage(e.getMessage());
         }
     }
+
+    public void testSetSystemUpdatePolicy_failIfNotDeviceOwner() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testSetSystemUpdatePolicy_failIfNotDeviceOwner");
+            return;
+        }
+        try {
+            mDevicePolicyManager.setSystemUpdatePolicy(mComponent, null);
+            fail("did not throw expected SecurityException");
+        } catch (SecurityException e) {
+            assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
 }
