@@ -108,6 +108,10 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         }
     }
 
+    public void testSystemUpdatePolicy() throws Exception {
+        executeDeviceOwnerTest("SystemUpdatePolicyTest");
+    }
+
     private void executeDeviceOwnerTest(String testClassName) throws Exception {
         if (!mHasFeature) {
             return;
