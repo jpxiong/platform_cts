@@ -77,7 +77,7 @@ public class RawConverter {
      * polynomial approximates the default tonemapping curve used for ACR3.
      */
     private static final float[] DEFAULT_ACR3_TONEMAP_CURVE_COEFFS = new float[] {
-            -1.087f,  1.643f,  0.443f, 0f
+            -0.7836f, 0.8469f, 0.943f, 0.0209f
     };
 
     /**
