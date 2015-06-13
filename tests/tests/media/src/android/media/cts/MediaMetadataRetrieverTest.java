@@ -20,9 +20,12 @@ import com.android.cts.media.R;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.cts.util.MediaUtils;
 import android.media.MediaDataSource;
 import android.media.MediaMetadataRetriever;
 import android.test.AndroidTestCase;
+
+import java.io.IOException;
 
 public class MediaMetadataRetrieverTest extends AndroidTestCase {
     protected Resources mResources;
@@ -151,16 +154,20 @@ public class MediaMetadataRetrieverTest extends AndroidTestCase {
     }
 
     private void testThumbnail(int resId) {
+        if (!MediaUtils.hasCodecForResourceAndDomain(getContext(), resId, "video/")) {
+            MediaUtils.skipTest("no video codecs for resource");
+            return;
+        }
+
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        Resources resources = getContext().getResources();
+        AssetFileDescriptor afd = resources.openRawResourceFd(resId);
+
+        retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
 
         try {
-            Resources resources = getContext().getResources();
-            AssetFileDescriptor afd = resources.openRawResourceFd(resId);
-
-            retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-
             afd.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             fail("Unable to open file");
         }
 
