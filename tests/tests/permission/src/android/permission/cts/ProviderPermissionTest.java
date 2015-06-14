@@ -16,7 +16,6 @@
 
 package android.permission.cts;
 
-import android.provider.Browser;
 import android.provider.CallLog;
 import android.provider.Contacts;
 import android.test.AndroidTestCase;
@@ -77,45 +76,4 @@ public class ProviderPermissionTest extends AndroidTestCase {
         assertWritingContentUriRequiresPermission(android.provider.Settings.System.CONTENT_URI,
                 android.Manifest.permission.WRITE_SETTINGS);
     }
-
-    /**
-     * Verify that read and write to browser bookmarks requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#READ_HISTORY_BOOKMARKS}
-     */
-    public void testReadBookmarks() {
-        assertReadingContentUriRequiresPermission(Browser.BOOKMARKS_URI,
-                android.Manifest.permission.READ_HISTORY_BOOKMARKS);
-    }
-
-    /**
-     * Verify that read and write to browser bookmarks requires permissions.
-     * <p>Tests Permission:
-         {@link android.Manifest.permission#WRITE_HISTORY_BOOKMARKS}
-     */
-    public void testWriteBookmarks() {
-        assertWritingContentUriRequiresPermission(Browser.BOOKMARKS_URI,
-                android.Manifest.permission.WRITE_HISTORY_BOOKMARKS);
-    }
-
-    /**
-     * Verify that read and write to browser history requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#READ_HISTORY_BOOKMARKS}
-     */
-    public void testReadBrowserHistory() {
-        assertReadingContentUriRequiresPermission(Browser.SEARCHES_URI,
-                android.Manifest.permission.READ_HISTORY_BOOKMARKS);
-    }
-
-    /**
-     * Verify that read and write to browser history requires permissions.
-     * <p>Tests Permission:
-         {@link android.Manifest.permission#WRITE_HISTORY_BOOKMARKS}
-     */
-    public void testWriteBrowserHistory() {
-        assertWritingContentUriRequiresPermission(Browser.SEARCHES_URI,
-                android.Manifest.permission.WRITE_HISTORY_BOOKMARKS);
-    }
 }
-
