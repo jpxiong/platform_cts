@@ -669,7 +669,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
 
             // TODO: Update this to use availableResultKeys once shim supports this.
             if (mStaticInfo.isCapabilitySupported(
-                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
                 Long exposureTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
                 Integer sensitivity = getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
                 mCollector.expectInRange(

@@ -931,7 +931,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         long maxExposureValuePreview = -1;
         long maxExposureValueStill = -1;
         if (mStaticInfo.isCapabilitySupported(
-                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
             // Minimum exposure settings is mostly static while maximum exposure setting depends on
             // frame rate range which in term depends on capture request.
             minExposureValue = mStaticInfo.getSensitivityMinimumOrDefault() *
