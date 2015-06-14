@@ -16,6 +16,7 @@
 
 package android.graphics.drawable.cts;
 
+import android.graphics.drawable.BitmapDrawable;
 import com.android.cts.graphics.R;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -45,6 +46,7 @@ import android.util.AttributeSet;
 import android.util.Xml;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class NinePatchDrawableTest extends InstrumentationTestCase {
     private static final int MIN_CHUNK_SIZE = 32;
@@ -198,6 +200,37 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
         mNinePatchDrawable.setDither(true);
         assertTrue(mNinePatchDrawable.getPaint().isDither());
+    }
+
+    public void testGetDither() {
+        mNinePatchDrawable.setDither(false);
+        assertFalse(mNinePatchDrawable.getDither());
+        assertEquals(mNinePatchDrawable.getDither(), mNinePatchDrawable.getPaint().isDither());
+
+        mNinePatchDrawable.setDither(true);
+        assertTrue(mNinePatchDrawable.getDither());
+        assertEquals(mNinePatchDrawable.getDither(), mNinePatchDrawable.getPaint().isDither());
+    }
+
+    public void testSetFilterBitmap() {
+        mNinePatchDrawable.setFilterBitmap(false);
+        assertFalse(mNinePatchDrawable.getPaint().isFilterBitmap());
+
+        mNinePatchDrawable.setFilterBitmap(true);
+        assertTrue(mNinePatchDrawable.getPaint().isFilterBitmap());
+    }
+
+    public void testIsFilterBitmap() {
+        mNinePatchDrawable.setFilterBitmap(false);
+        assertFalse(mNinePatchDrawable.isFilterBitmap());
+        assertEquals(mNinePatchDrawable.isFilterBitmap(),
+                mNinePatchDrawable.getPaint().isFilterBitmap());
+
+
+        mNinePatchDrawable.setFilterBitmap(true);
+        assertTrue(mNinePatchDrawable.isFilterBitmap());
+        assertEquals(mNinePatchDrawable.isFilterBitmap(),
+                mNinePatchDrawable.getPaint().isFilterBitmap());
     }
 
     public void testGetPaint() {
