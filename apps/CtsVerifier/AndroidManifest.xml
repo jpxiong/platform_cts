@@ -1300,16 +1300,32 @@
                  android:label="@string/projection_service_name"
                  android:process=":projectionservice" />
 
-        <activity android:name=".managedprovisioning.DeviceOwnerTestActivity"
+        <activity android:name=".managedprovisioning.DeviceOwnerNegativeTestActivity"
                 android:label="@string/provisioning_device_owner">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_managed_provisioning" />
-            <meta-data android:name="test_required_features" android:value="android.software.managed_users:android.software.device_admin" />
+            <meta-data android:name="test_required_features" android:value="android.software.device_admin" />
         </activity>
 
+        <activity android:name=".managedprovisioning.DeviceOwnerPositiveTestActivity"
+                android:label="@string/positive_device_owner">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_managed_provisioning" />
+            <meta-data android:name="test_required_features" android:value="android.software.device_admin" />
+        </activity>
+
+        <activity android:name=".managedprovisioning.DeviceOwnerPositiveTestActivity$CommandReceiver"
+                android:exported="false"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:noHistory="true"
+                android:autoRemoveFromRecents="true"
+                android:stateNotNeeded="true"/>
 
         <activity android:name=".managedprovisioning.ByodFlowTestActivity"
                 android:launchMode="singleTask"
@@ -1380,7 +1396,7 @@
         </activity>
 
         <receiver android:name=".managedprovisioning.DeviceAdminTestReceiver"
-                android:label="@string/provisioning_byod_device_admin"
+                android:label="@string/afw_device_admin"
                 android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data android:name="android.app.device_admin"
                        android:resource="@xml/device_admin_byod" />
