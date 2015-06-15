@@ -612,10 +612,12 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             for (int format : supportedFormats) {
                 assertTrue("Format " + format + " fails cross check",
                         config.isOutputSupportedFor(format));
-                Size[] supportedSizes = config.getOutputSizes(format);
+                List<Size> supportedSizes = CameraTestUtils.getAscendingOrderSizes(
+                        Arrays.asList(config.getOutputSizes(format)), /*ascending*/true);
                 assertTrue("Supported format " + format + " has no sizes listed",
-                        supportedSizes.length > 0);
-                for (Size size : supportedSizes) {
+                        supportedSizes.size() > 0);
+                for (int i = 0; i < supportedSizes.size(); i++) {
+                    Size size = supportedSizes.get(i);
                     if (VERBOSE) {
                         Log.v(TAG,
                                 String.format("Testing camera %s, format %d, size %s",
@@ -627,6 +629,28 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                         case ImageFormat.YUV_420_888:
                             assertTrue("YUV_420_888 may not have a non-zero stall duration",
                                     stallDuration == 0);
+                            break;
+                        case ImageFormat.JPEG:
+                        case ImageFormat.RAW_SENSOR:
+                            final float TOLERANCE_FACTOR = 2.0f;
+                            long prevDuration = 0;
+                            if (i > 0) {
+                                prevDuration = config.getOutputStallDuration(
+                                        format, supportedSizes.get(i - 1));
+                            }
+                            long nextDuration = Long.MAX_VALUE;
+                            if (i < (supportedSizes.size() - 1)) {
+                                nextDuration = config.getOutputStallDuration(
+                                        format, supportedSizes.get(i + 1));
+                            }
+                            long curStallDuration = config.getOutputStallDuration(format, size);
+                            // Stall duration should be in a reasonable range: larger size should
+                            // normally have larger stall duration.
+                            mCollector.expectInRange("Stall duration (format " + format +
+                                    " and size " + size + ") is not in the right range",
+                                    curStallDuration,
+                                    (long) (prevDuration / TOLERANCE_FACTOR),
+                                    (long) (nextDuration * TOLERANCE_FACTOR));
                             break;
                         default:
                             assertTrue("Negative stall duration for format " + format,
@@ -812,8 +836,15 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
      * Create an invalid size that's close to one of the good sizes in the list, but not one of them
      */
     private Size findInvalidSize(Size[] goodSizes) {
-        Size invalidSize = new Size(goodSizes[0].getWidth() + 1, goodSizes[0].getHeight());
-        while(arrayContains(goodSizes, invalidSize)) {
+        return findInvalidSize(Arrays.asList(goodSizes));
+    }
+
+    /**
+     * Create an invalid size that's close to one of the good sizes in the list, but not one of them
+     */
+    private Size findInvalidSize(List<Size> goodSizes) {
+        Size invalidSize = new Size(goodSizes.get(0).getWidth() + 1, goodSizes.get(0).getHeight());
+        while(goodSizes.contains(invalidSize)) {
             invalidSize = new Size(invalidSize.getWidth() + 1, invalidSize.getHeight());
         }
         return invalidSize;
