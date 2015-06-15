@@ -519,17 +519,23 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.SHADING_MODE);
         }
 
-        //Keys not required if manual sensor control is not supported
+        //Keys not required if neither MANUAL_SENSOR nor READ_SENSOR_SETTINGS is supported
+        if (!mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR) &&
+            !mStaticInfo.isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS)) {
+            waiverKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
+            waiverKeys.add(CaptureResult.SENSOR_SENSITIVITY);
+            waiverKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
+            waiverKeys.add(CaptureResult.LENS_APERTURE);
+        }
+
         if (!mStaticInfo.isCapabilitySupported(
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
-            waiverKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
             waiverKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
-            waiverKeys.add(CaptureResult.SENSOR_SENSITIVITY);
             waiverKeys.add(CaptureResult.BLACK_LEVEL_LOCK);
             waiverKeys.add(CaptureResult.LENS_FOCUS_RANGE);
-            waiverKeys.add(CaptureResult.LENS_FOCUS_DISTANCE);
             waiverKeys.add(CaptureResult.LENS_STATE);
-            waiverKeys.add(CaptureResult.LENS_APERTURE);
             waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
         }
 
