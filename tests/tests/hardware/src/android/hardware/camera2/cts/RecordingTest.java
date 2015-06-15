@@ -522,6 +522,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         if (useHighSpeedSession) {
             CaptureRequest.Builder requestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             requestBuilder.addTarget(mPreviewSurface);
             requestBuilder.addTarget(mRecordingSurface);
             slowMoRequests = mCamera.createConstrainedHighSpeedRequestList(requestBuilder.build());
