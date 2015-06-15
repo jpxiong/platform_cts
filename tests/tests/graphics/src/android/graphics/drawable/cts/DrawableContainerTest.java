@@ -16,6 +16,7 @@
 
 package android.graphics.drawable.cts;
 
+import android.graphics.drawable.GradientDrawable;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -183,6 +184,63 @@ public class DrawableContainerTest extends TestCase {
         dr.reset();
         mDrawableContainer.setDither(true);
         assertTrue(dr.hasSetDitherCalled());
+    }
+
+    public void testGetDither() {
+        assertConstantStateNotSet();
+        assertNull(mDrawableContainer.getCurrent());
+
+        mDrawableContainer.setConstantState(mDrawableContainerState);
+
+        MockDrawable dr = new MockDrawable();
+        addAndSelectDrawable(dr);
+
+
+        mDrawableContainer.setDither(true);
+        assertTrue(mDrawableContainer.getDither());
+
+        mDrawableContainer.setDither(false);
+        assertFalse(mDrawableContainer.getDither());
+
+        dr.reset();
+    }
+
+    public void testSetHotspotBounds() {
+        Rect bounds = new Rect(10, 15, 100, 150);
+        assertConstantStateNotSet();
+        assertNull(mDrawableContainer.getCurrent());
+
+        mDrawableContainer.setConstantState(mDrawableContainerState);
+
+        MockDrawable dr = new MockDrawable();
+        addAndSelectDrawable(dr);
+
+        dr.reset();
+        mDrawableContainer.setHotspotBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+        Rect outRect = new Rect();
+        mDrawableContainer.getHotspotBounds(outRect);
+        assertEquals(bounds, outRect);
+
+        dr.reset();
+    }
+
+    public void testGetHotspotBounds() {
+        Rect bounds = new Rect(10, 15, 100, 150);
+        assertConstantStateNotSet();
+        assertNull(mDrawableContainer.getCurrent());
+
+        mDrawableContainer.setConstantState(mDrawableContainerState);
+
+        MockDrawable dr = new MockDrawable();
+        addAndSelectDrawable(dr);
+
+        dr.reset();
+        mDrawableContainer.setHotspotBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+        Rect outRect = new Rect();
+        mDrawableContainer.getHotspotBounds(outRect);
+        assertEquals(bounds, outRect);
+
+        dr.reset();
     }
 
     public void testSetColorFilter() {
