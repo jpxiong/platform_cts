@@ -27,14 +27,6 @@ import android.telecom.TelecomManager;
  */
 public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
 
-    @Override
-    protected void tearDown() throws Exception {
-        if (shouldTestTelecom(mContext)) {
-            cleanupAndVerifyUnbind();
-        }
-        super.tearDown();
-    }
-
     // TODO: Need to send some commands to the UserManager via adb to do setup
     public void testDisallowOutgoingCallsForSecondaryUser() {
 

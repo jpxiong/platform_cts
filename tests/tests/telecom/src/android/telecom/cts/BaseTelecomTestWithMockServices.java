@@ -86,6 +86,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     @Override
     protected void tearDown() throws Exception {
         if (shouldTestTelecom(mContext)) {
+            cleanupCalls();
             if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
             }
@@ -241,23 +242,12 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     }
 
     /**
-     * Disconnect the created test call, verify that Telecom has cleared all calls and has
-     * unbound from the {@link ConnectionService}.
+     * Disconnect the created test call and verify that Telecom has cleared all calls.
      */
-    void cleanupAndVerifyUnbind() {
+    void cleanupCalls() {
         if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
-            mInCallCallbacks.prepareForUnbind();
-
             mInCallCallbacks.getService().disconnectLastCall();
             assertNumCalls(mInCallCallbacks.getService(), 0);
-
-            try {
-                if (!mInCallCallbacks.unbindLock.tryAcquire(3, TimeUnit.SECONDS)) {
-                    fail("Telecom did not unbind from InCallService after all calls removed.");
-                }
-            } catch (InterruptedException e) {
-                Log.i(TAG, "Test interrupted!");
-            }
         }
     }
 

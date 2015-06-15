@@ -38,7 +38,6 @@ public class MockInCallService extends InCallService {
     public static abstract class InCallServiceCallbacks {
         private MockInCallService mService;
         public Semaphore lock = new Semaphore(0);
-        public Semaphore unbindLock = null;
 
         public void onCallAdded(Call call, int numCalls) {};
         public void onCallRemoved(Call call, int numCalls) {};
@@ -50,10 +49,6 @@ public class MockInCallService extends InCallService {
 
         final public void setService(MockInCallService service) {
             mService = service;
-        }
-
-        final public void prepareForUnbind() {
-            unbindLock = new Semaphore(0);
         }
     }
 
@@ -89,14 +84,6 @@ public class MockInCallService extends InCallService {
             getCallbacks().setService(this);
         }
         return super.onBind(intent);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        if (getCallbacks() != null && getCallbacks().unbindLock != null) {
-            getCallbacks().unbindLock.release();
-        }
-        return super.onUnbind(intent);
     }
 
     @Override
