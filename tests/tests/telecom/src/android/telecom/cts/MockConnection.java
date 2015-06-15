@@ -32,11 +32,18 @@ public class MockConnection extends Connection {
     private CallAudioState mCallAudioState =
             new CallAudioState(false, CallAudioState.ROUTE_EARPIECE, ROUTE_EARPIECE | ROUTE_SPEAKER);
     private int mState = STATE_NEW;
+    public int videoState = VideoProfile.STATE_AUDIO_ONLY;
     private String mDtmfString = "";
     private MockVideoProvider mMockVideoProvider;
 
     @Override
     public void onAnswer() {
+        onAnswer(VideoProfile.STATE_AUDIO_ONLY);
+    }
+
+    @Override
+    public void onAnswer(int videoState) {
+        this.videoState = videoState;
         setActive();
     }
 
@@ -68,6 +75,11 @@ public class MockConnection extends Connection {
     @Override
     public void onPlayDtmfTone(char c) {
         mDtmfString += c;
+    }
+
+    @Override
+    public void onStopDtmfTone() {
+        mDtmfString += ".";
     }
 
     @Override
