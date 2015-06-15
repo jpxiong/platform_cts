@@ -415,43 +415,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
     }
 
     @UiThreadTest
-    public void testSetScrollBarStyle() {
-        if (!NullWebViewUtils.isWebViewAvailable()) {
-            return;
-        }
-
-        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
-        assertFalse(mWebView.overlayHorizontalScrollbar());
-        assertFalse(mWebView.overlayVerticalScrollbar());
-
-        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        assertTrue(mWebView.overlayHorizontalScrollbar());
-        assertTrue(mWebView.overlayVerticalScrollbar());
-
-        mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
-        assertFalse(mWebView.overlayHorizontalScrollbar());
-        assertFalse(mWebView.overlayVerticalScrollbar());
-
-        mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-        assertTrue(mWebView.overlayHorizontalScrollbar());
-        assertTrue(mWebView.overlayVerticalScrollbar());
-    }
-
-    @UiThreadTest
     public void testScrollBarOverlay() throws Throwable {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
         }
 
+        // These functions have no effect; just verify they don't crash
         mWebView.setHorizontalScrollbarOverlay(true);
         mWebView.setVerticalScrollbarOverlay(false);
+
         assertTrue(mWebView.overlayHorizontalScrollbar());
         assertFalse(mWebView.overlayVerticalScrollbar());
-
-        mWebView.setHorizontalScrollbarOverlay(false);
-        mWebView.setVerticalScrollbarOverlay(true);
-        assertFalse(mWebView.overlayHorizontalScrollbar());
-        assertTrue(mWebView.overlayVerticalScrollbar());
     }
 
     @UiThreadTest
