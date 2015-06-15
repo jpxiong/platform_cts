@@ -16,6 +16,7 @@
 
 package android.graphics.drawable.cts;
 
+import android.view.Gravity;
 import com.android.cts.graphics.R;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -798,6 +799,611 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertNotNull(constantState);
         assertEquals(1, constantState.getChangingConfigurations());
     }
+
+    @SuppressWarnings("deprecation")
+    public void testAddLayer() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        BitmapDrawable newDrawable = new BitmapDrawable();
+        int index = layerDrawable.addLayer(newDrawable);
+
+        final int numLayers = layerDrawable.getNumberOfLayers();
+        assertEquals(index, numLayers - 1);
+        assertEquals(newDrawable, layerDrawable.getDrawable(index));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetDrawable() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        final int numLayers = layerDrawable.getNumberOfLayers();
+        assertEquals(array[0], layerDrawable.getDrawable(0));
+        assertEquals(array[1], layerDrawable.getDrawable(1));
+        try {
+            assertEquals(null, layerDrawable.getDrawable(2));
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testFindIndexByLayerId() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setId(0, 10);
+        layerDrawable.setId(1, 20);
+
+        assertEquals(0, layerDrawable.findIndexByLayerId(10));
+        assertEquals(1, layerDrawable.findIndexByLayerId(20));
+        assertEquals(-1, layerDrawable.findIndexByLayerId(30));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetDrawable() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        BitmapDrawable newBitmapDrawable = new BitmapDrawable();
+        ColorDrawable newColorDrawable = new ColorDrawable(Color.GREEN);
+        layerDrawable.setDrawable(0, newColorDrawable);
+        layerDrawable.setDrawable(1, newBitmapDrawable);
+
+        final int numLayers = layerDrawable.getNumberOfLayers();
+        assertEquals(2, numLayers);
+        assertEquals(newColorDrawable, layerDrawable.getDrawable(0));
+        assertEquals(newBitmapDrawable, layerDrawable.getDrawable(1));
+        try {
+            assertEquals(null, layerDrawable.getDrawable(2));
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLeftPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(10, layerDrawable.getLeftPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetTopPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(11, layerDrawable.getTopPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetRightPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(20, layerDrawable.getRightPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetBottomPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(21, layerDrawable.getBottomPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetStartPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(-1, layerDrawable.getStartPadding());
+        layerDrawable.setPaddingRelative(10, 11, 20, 21);
+        assertEquals(10, layerDrawable.getStartPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetEndPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(-1, layerDrawable.getEndPadding());
+        layerDrawable.setPaddingRelative(10, 11, 20, 21);
+        assertEquals(20, layerDrawable.getEndPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetPadding() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPadding(10, 11, 20, 21);
+
+        assertEquals(10, layerDrawable.getLeftPadding());
+        assertEquals(11, layerDrawable.getTopPadding());
+        assertEquals(20, layerDrawable.getRightPadding());
+        assertEquals(21, layerDrawable.getBottomPadding());
+        assertEquals(-1, layerDrawable.getStartPadding());
+        assertEquals(-1, layerDrawable.getEndPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetPaddingRelative() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable()};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+        layerDrawable.setPaddingRelative(10, 11, 20, 21);
+
+        assertEquals(10, layerDrawable.getStartPadding());
+        assertEquals(11, layerDrawable.getTopPadding());
+        assertEquals(20, layerDrawable.getEndPadding());
+        assertEquals(21, layerDrawable.getBottomPadding());
+        assertEquals(-1, layerDrawable.getLeftPadding());
+        assertEquals(-1, layerDrawable.getRightPadding());
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerGravity() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerGravity(0, Gravity.CENTER);
+        layerDrawable.setLayerGravity(1, Gravity.NO_GRAVITY);
+
+        try {
+            layerDrawable.setLayerGravity(2, Gravity.TOP);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+        assertEquals(Gravity.CENTER, layerDrawable.getLayerGravity(0));
+        assertEquals(Gravity.NO_GRAVITY, layerDrawable.getLayerGravity(1));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerGravity() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerGravity(0, Gravity.CENTER);
+        layerDrawable.setLayerGravity(1, Gravity.NO_GRAVITY);
+
+        assertEquals(Gravity.CENTER, layerDrawable.getLayerGravity(0));
+        assertEquals(Gravity.NO_GRAVITY, layerDrawable.getLayerGravity(1));
+        try {
+            layerDrawable.getLayerGravity(2);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerWidth() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerWidth(0, 100);
+        layerDrawable.setLayerWidth(1, 200);
+
+        try {
+            layerDrawable.setLayerWidth(2, 300);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+        assertEquals(100, layerDrawable.getLayerWidth(0));
+        assertEquals(200, layerDrawable.getLayerWidth(1));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerWidth() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerWidth(0, 100);
+        layerDrawable.setLayerWidth(1, 200);
+
+        assertEquals(100, layerDrawable.getLayerWidth(0));
+        assertEquals(200, layerDrawable.getLayerWidth(1));
+        try {
+            layerDrawable.getLayerWidth(2);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerHeight() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerHeight(0, 100);
+        layerDrawable.setLayerHeight(1, 200);
+
+        try {
+            layerDrawable.setLayerHeight(2, 300);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+        assertEquals(100, layerDrawable.getLayerHeight(0));
+        assertEquals(200, layerDrawable.getLayerHeight(1));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerHeight() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerHeight(0, 100);
+        layerDrawable.setLayerHeight(1, 200);
+
+        assertEquals(100, layerDrawable.getLayerHeight(0));
+        assertEquals(200, layerDrawable.getLayerHeight(1));
+        try {
+            layerDrawable.getLayerHeight(2);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerSize() {
+        Drawable[] array = new Drawable[]{new BitmapDrawable(), new ColorDrawable(Color.BLUE)};
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        layerDrawable.setLayerSize(0, 100, 200);
+        layerDrawable.setLayerSize(1, 300, 400);
+
+        try {
+            layerDrawable.setLayerSize(2, 500, 600);
+            fail("Should throw ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+        assertEquals(100, layerDrawable.getLayerWidth(0));
+        assertEquals(200, layerDrawable.getLayerHeight(0));
+        assertEquals(300, layerDrawable.getLayerWidth(1));
+        assertEquals(400, layerDrawable.getLayerHeight(1));
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetRelative() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int start = 10;
+        int top = 20;
+        int end = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInsetRelative(0, start, top, end, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+        assertEquals(10, layerDrawable.getLayerInsetStart(0));
+        assertEquals(20, layerDrawable.getLayerInsetTop(0));
+        assertEquals(30, layerDrawable.getLayerInsetEnd(0));
+        assertEquals(40, layerDrawable.getLayerInsetBottom(0));
+        assertEquals(0, layerDrawable.getLayerInsetLeft(0));
+        assertEquals(0, layerDrawable.getLayerInsetRight(0));
+
+        // set bigger inset for layer 1
+        start += 10;
+        top += 10;
+        end += 10;
+        bottom += 10;
+        layerDrawable.setLayerInsetRelative(1, start, top, end, bottom);
+        assertEquals(layerDrawable.getDrawable(1).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(layerDrawable.getDrawable(1).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+
+
+        try {
+            layerDrawable.setLayerInsetRelative(-1, start, top, end, bottom);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetLeft() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + left + right,
+                layerDrawable.getIntrinsicWidth());
+        left += 5;
+        layerDrawable.setLayerInsetLeft(0, left);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + left + right,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(left, layerDrawable.getLayerInsetLeft(0));
+
+        try {
+            layerDrawable.setLayerInsetLeft(1, left);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetLeft() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(left, layerDrawable.getLayerInsetLeft(0));
+        left += 5;
+        layerDrawable.setLayerInsetLeft(0, left);
+        assertEquals(left, layerDrawable.getLayerInsetLeft(0));
+
+        try {
+            layerDrawable.getLayerInsetLeft(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetTop() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+        top += 5;
+        layerDrawable.setLayerInsetTop(0, top);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+        assertEquals(top, layerDrawable.getLayerInsetTop(0));
+
+        try {
+            layerDrawable.setLayerInsetTop(1, top);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetTop() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(top, layerDrawable.getLayerInsetTop(0));
+        top += 5;
+        layerDrawable.setLayerInsetTop(0, top);
+        assertEquals(top, layerDrawable.getLayerInsetTop(0));
+
+        try {
+            layerDrawable.getLayerInsetTop(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetRight() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + left + right,
+                layerDrawable.getIntrinsicWidth());
+        right += 5;
+        layerDrawable.setLayerInsetRight(0, right);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + left + right,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(right, layerDrawable.getLayerInsetRight(0));
+
+        try {
+            layerDrawable.setLayerInsetRight(1, right);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetRight() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(right, layerDrawable.getLayerInsetRight(0));
+        right += 5;
+        layerDrawable.setLayerInsetRight(0, right);
+        assertEquals(right, layerDrawable.getLayerInsetRight(0));
+
+        try {
+            layerDrawable.getLayerInsetRight(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetBottom() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+        bottom += 5;
+        layerDrawable.setLayerInsetBottom(0, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicHeight() + top + bottom,
+                layerDrawable.getIntrinsicHeight());
+        assertEquals(bottom, layerDrawable.getLayerInsetBottom(0));
+
+        try {
+            layerDrawable.setLayerInsetBottom(1, bottom);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetBottom() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int left = 10;
+        int top = 20;
+        int right = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInset(0, left, top, right, bottom);
+        assertEquals(bottom, layerDrawable.getLayerInsetBottom(0));
+        bottom += 5;
+        layerDrawable.setLayerInsetBottom(0, bottom);
+        assertEquals(bottom, layerDrawable.getLayerInsetBottom(0));
+
+        try {
+            layerDrawable.getLayerInsetBottom(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetStart() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int start = 10;
+        int top = 20;
+        int end = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInsetRelative(0, start, top, end, bottom);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        start += 5;
+        layerDrawable.setLayerInsetStart(0, start);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(start, layerDrawable.getLayerInsetStart(0));
+
+        try {
+            layerDrawable.setLayerInset(1, start, top, end, bottom);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetStart() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int start = 10;
+        int top = 20;
+        int end = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInsetRelative(0, start, top, end, bottom);
+        assertEquals(start, layerDrawable.getLayerInsetStart(0));
+        start += 5;
+        layerDrawable.setLayerInsetStart(0, start);
+        assertEquals(start, layerDrawable.getLayerInsetStart(0));
+
+        try {
+            layerDrawable.getLayerInsetStart(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testSetLayerInsetEnd() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int start = 10;
+        int top = 20;
+        int end = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInsetRelative(0, start, top, end, bottom);
+        assertEquals(end, layerDrawable.getLayerInsetEnd(0));
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        end += 5;
+        layerDrawable.setLayerInsetEnd(0, end);
+        assertEquals(layerDrawable.getDrawable(0).getIntrinsicWidth() + start + end,
+                layerDrawable.getIntrinsicWidth());
+        assertEquals(end, layerDrawable.getLayerInsetEnd(0));
+
+        try {
+            layerDrawable.setLayerInsetEnd(1, end);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testGetLayerInsetEnd() {
+        Drawable[] array = new Drawable[] { new BitmapDrawable() };
+        LayerDrawable layerDrawable = new LayerDrawable(array);
+
+        // set inset for layer 0
+        int start = 10;
+        int top = 20;
+        int end = 30;
+        int bottom = 40;
+        layerDrawable.setLayerInsetRelative(0, start, top, end, bottom);
+        assertEquals(end, layerDrawable.getLayerInsetEnd(0));
+        end += 5;
+        layerDrawable.setLayerInsetEnd(0, end);
+        assertEquals(end, layerDrawable.getLayerInsetEnd(0));
+
+        try {
+            layerDrawable.getLayerInsetEnd(1);
+            fail("Should throw IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+
 
     private static class MockDrawable extends Drawable {
         private boolean mCalledSetDither = false;
