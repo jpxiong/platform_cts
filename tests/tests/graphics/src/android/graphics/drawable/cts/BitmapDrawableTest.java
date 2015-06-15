@@ -135,6 +135,22 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertTrue(bitmapDrawable.getPaint().isFilterBitmap());
     }
 
+    public void testIsFilterBitmap() {
+        InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
+
+        assertTrue(bitmapDrawable.isFilterBitmap());
+
+        bitmapDrawable.setFilterBitmap(false);
+        assertFalse(bitmapDrawable.isFilterBitmap());
+        assertEquals(bitmapDrawable.isFilterBitmap(), bitmapDrawable.getPaint().isFilterBitmap());
+
+
+        bitmapDrawable.setFilterBitmap(true);
+        assertTrue(bitmapDrawable.isFilterBitmap());
+        assertEquals(bitmapDrawable.isFilterBitmap(), bitmapDrawable.getPaint().isFilterBitmap());
+    }
+
     public void testSetDither() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -147,6 +163,21 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         bitmapDrawable.setDither(true);
         assertTrue(bitmapDrawable.getPaint().isDither());
 
+    }
+
+    public void testGetDither() {
+        InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
+
+        assertTrue(bitmapDrawable.getPaint().isDither());
+
+        bitmapDrawable.setDither(false);
+        assertFalse(bitmapDrawable.getDither());
+        assertEquals(bitmapDrawable.getDither(), bitmapDrawable.getPaint().isDither());
+
+        bitmapDrawable.setDither(true);
+        assertTrue(bitmapDrawable.getDither());
+        assertEquals(bitmapDrawable.getDither(), bitmapDrawable.getPaint().isDither());
     }
 
     public void testAccessTileMode() {
