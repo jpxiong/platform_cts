@@ -37,12 +37,23 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
     private TelecomManager mTelecomManager;
     private PhoneAccountHandle mPhoneAccountHandle;
     private String mPreviousDefaultDialer = null;
+    private String mSystemDialer = null;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getContext();
+
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         mPreviousDefaultDialer = TestUtils.getDefaultDialer(getInstrumentation());
+        // Reset the current dialer to the system dialer, to ensure that we start each test
+        // without being the default dialer.
+        mSystemDialer = TestUtils.getSystemDialer(getInstrumentation());
+        if (!TextUtils.isEmpty(mSystemDialer)) {
+            TestUtils.setDefaultDialer(getInstrumentation(), mSystemDialer);
+        }
         mTelecomManager = (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
         final List<PhoneAccountHandle> accounts = mTelecomManager.getCallCapablePhoneAccounts();
         if (accounts != null && !accounts.isEmpty()) {
@@ -53,18 +64,26 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
     @Override
     protected void tearDown() throws Exception {
         if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
+            // Restore the default dialer to whatever the default dialer was before the tests
+            // were started. This may or may not be the system dialer.
             TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
         }
         super.tearDown();
     }
 
     public void testGetDefaultDialerPackage() throws Exception {
-        assertEquals(mPreviousDefaultDialer, mTelecomManager.getDefaultDialerPackage());
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
+        assertEquals(mSystemDialer, mTelecomManager.getDefaultDialerPackage());
         TestUtils.setDefaultDialer(getInstrumentation(), TestUtils.PACKAGE);
         assertEquals(TestUtils.PACKAGE, mTelecomManager.getDefaultDialerPackage());
     }
 
     public void testVoicemailReadWritePermissions() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         try {
             mContext.getContentResolver().query(Voicemails.CONTENT_URI, null, null, null, null);
             fail("Reading voicemails should throw SecurityException if not default Dialer");
@@ -96,6 +115,9 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
     }
 
     public void testSilenceRingerPermissions() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         try {
             mTelecomManager.silenceRinger();
             fail("TelecomManager.silenceRinger should throw SecurityException if not default "
@@ -110,6 +132,9 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
 
     public void testCancelMissedCallsNotificationPermissions()
             throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         try {
             mTelecomManager.cancelMissedCallsNotification();
             fail("TelecomManager.cancelMissedCallsNotification should throw SecurityException if "
@@ -124,6 +149,9 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
 
     public void testHandlePinMmPermissions()
             throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         try {
             mTelecomManager.handleMmi("0");
             fail("TelecomManager.handleMmi should throw SecurityException if not default dialer");
@@ -143,6 +171,9 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
     }
 
     public void testGetAdnForPhoneAccountPermissions() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         try {
             mTelecomManager.getAdnUriForPhoneAccount(mPhoneAccountHandle);
             fail("TelecomManager.getAdnUriForPhoneAccount should throw SecurityException if "
@@ -156,6 +187,9 @@ public class DefaultDialerOperationsTest extends InstrumentationTestCase {
     }
 
     public void testSetDefaultDialerNoDialIntent_notSupported() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         final PackageManager pm = mContext.getPackageManager();
         final ComponentName name = new ComponentName(mContext,
                 "android.telecom.cts.MockDialerActivity");
