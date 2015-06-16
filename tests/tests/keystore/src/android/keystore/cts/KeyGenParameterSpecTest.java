@@ -150,6 +150,34 @@ public class KeyGenParameterSpecTest extends TestCase {
         assertEquals(date, spec.getKeyValidityForConsumptionEnd());
     }
 
+    public void testSetUserAuthenticationValidityDurationSecondsValidityCheck() {
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder("alias", 0);
+        try {
+            builder.setUserAuthenticationValidityDurationSeconds(-2);
+            fail();
+        } catch (IllegalArgumentException expected) {}
+
+        try {
+            builder.setUserAuthenticationValidityDurationSeconds(-100);
+            fail();
+        } catch (IllegalArgumentException expected) {}
+
+        try {
+            builder.setUserAuthenticationValidityDurationSeconds(Integer.MIN_VALUE);
+            fail();
+        } catch (IllegalArgumentException expected) {}
+
+        builder.setUserAuthenticationValidityDurationSeconds(-1);
+        builder.setUserAuthenticationValidityDurationSeconds(0);
+        builder.setUserAuthenticationValidityDurationSeconds(1);
+        builder.setUserAuthenticationValidityDurationSeconds(Integer.MAX_VALUE);
+
+        try {
+            builder.setUserAuthenticationValidityDurationSeconds(-2);
+            fail();
+        } catch (IllegalArgumentException expected) {}
+    }
+
     public void testImmutabilityViaSetterParams() {
         // Assert that all mutable parameters provided to setters are copied to ensure that values
         // returned by getters never change.
