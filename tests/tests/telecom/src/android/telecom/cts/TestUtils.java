@@ -46,6 +46,8 @@ public class TestUtils {
 
     private static final String COMMAND_GET_DEFAULT_DIALER = "telecom get-default-dialer";
 
+    private static final String COMMAND_GET_SYSTEM_DIALER = "telecom get-system-dialer";
+
     private static final String COMMAND_ENABLE = "telecom set-phone-account-enabled ";
 
     public static boolean shouldTestTelecom(Context context) {
@@ -63,6 +65,10 @@ public class TestUtils {
 
     public static String getDefaultDialer(Instrumentation instrumentation) throws Exception {
         return executeShellCommand(instrumentation, COMMAND_GET_DEFAULT_DIALER);
+    }
+
+    public static String getSystemDialer(Instrumentation instrumentation) throws Exception {
+        return executeShellCommand(instrumentation, COMMAND_GET_SYSTEM_DIALER);
     }
 
     public static void enablePhoneAccount(Instrumentation instrumentation,
