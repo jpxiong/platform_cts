@@ -28,25 +28,40 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     private Context mContext;
     private TelecomManager mTelecomManager;
     private String mPreviousDefaultDialer = null;
+    private String mSystemDialer = null;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getContext();
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         TestUtils.PACKAGE = mContext.getPackageName();
         mPreviousDefaultDialer = TestUtils.getDefaultDialer(getInstrumentation());
+        // Reset the current dialer to the system dialer, to ensure that we start each test
+        // without being the default dialer.
+        mSystemDialer = TestUtils.getSystemDialer(getInstrumentation());
+        if (!TextUtils.isEmpty(mSystemDialer)) {
+            TestUtils.setDefaultDialer(getInstrumentation(), mSystemDialer);
+        }
         mTelecomManager = (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
     }
 
     @Override
     protected void tearDown() throws Exception {
         if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
+            // Restore the default dialer to whatever the default dialer was before the tests
+            // were started. This may or may not be the system dialer.
             TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
         }
         super.tearDown();
     }
 
     public void testShowInCallScreenPermissions() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
@@ -56,6 +71,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testGetCallCapableAccountsPermissions() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
@@ -65,6 +83,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testGetDefaultOutgoingPhoneAccount() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
@@ -74,6 +95,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testGetLine1Number() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
@@ -83,6 +107,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testGetVoicemailNumber() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
@@ -92,6 +119,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testIsInCall() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
