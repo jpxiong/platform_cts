@@ -64,6 +64,7 @@ import android.view.TouchDelegate;
 import android.view.View;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
+import android.view.View.OnContextClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
@@ -858,6 +859,18 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertFalse(view.isClickable());
     }
 
+    public void testAccessContextClickable() {
+        View view = new View(mActivity);
+
+        assertFalse(view.isContextClickable());
+
+        view.setContextClickable(true);
+        assertTrue(view.isContextClickable());
+
+        view.setContextClickable(false);
+        assertFalse(view.isContextClickable());
+    }
+
     public void testGetContextMenuInfo() {
         MockView view = new MockView(mActivity);
 
@@ -1290,6 +1303,30 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         view.setOnLongClickListener(new OnLongClickListenerImpl());
         assertTrue(view.performLongClick());
         assertTrue(view.isLongClickable());
+    }
+
+    public void testPerformContextClick() {
+        MockView view = new MockView(mActivity);
+        view.setParent(mMockParent);
+        OnContextClickListenerImpl listener = new OnContextClickListenerImpl();
+
+        view.setOnContextClickListener(listener);
+        assertFalse(listener.hasOnContextClick());
+
+        assertTrue(view.performContextClick());
+        assertTrue(listener.hasOnContextClick());
+    }
+
+    public void testSetOnContextClickListener() {
+        MockView view = new MockView(mActivity);
+        view.setParent(mMockParent);
+
+        assertFalse(view.performContextClick());
+        assertFalse(view.isContextClickable());
+
+        view.setOnContextClickListener(new OnContextClickListenerImpl());
+        assertTrue(view.performContextClick());
+        assertTrue(view.isContextClickable());
     }
 
     public void testAccessOnFocusChangeListener() {
@@ -3926,6 +3963,23 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
         public boolean onLongClick(View v) {
             mHasOnLongClick = true;
+            return true;
+        }
+    }
+
+    private static final class OnContextClickListenerImpl implements OnContextClickListener {
+        private boolean mHasContextClick = false;
+
+        public boolean hasOnContextClick() {
+            return mHasContextClick;
+        }
+
+        public void reset() {
+            mHasContextClick = false;
+        }
+
+        public boolean onContextClick(View v) {
+            mHasContextClick = true;
             return true;
         }
     }
