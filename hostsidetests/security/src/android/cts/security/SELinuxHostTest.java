@@ -667,13 +667,11 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /*
-     * There will at least be some kernel thread running and all kthreads should
-     * be in kernel context.
+     * All kthreads should be in kernel context.
      */
     public void testKernelDomain() throws DeviceNotAvailableException {
         String domain = "u:r:kernel:s0";
         List<ProcessDetails> procs = ProcessDetails.getProcMap(mDevice).get(domain);
-        assertNotNull(procs);
         for (ProcessDetails p : procs) {
             assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
         }
