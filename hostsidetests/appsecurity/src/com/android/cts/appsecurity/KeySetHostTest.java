@@ -76,6 +76,10 @@ public class KeySetHostTest extends DeviceTestCase implements IBuildReceiver {
             "CtsKeySetSigningCBadAUpgradeAB.apk";
     private static final String A_SIGNED_NO_B_B_UPGRADE =
             "CtsKeySetSigningANoDefUpgradeB.apk";
+    private static final String A_SIGNED_EC_A_UPGRADE =
+            "CtsKeySetSigningAUpgradeEcA.apk";
+    private static final String EC_A_SIGNED_A_UPGRADE =
+            "CtsKeySetSigningEcAUpgradeA.apk";
 
     /* package which defines the KEYSET_PERM_NAME signature permission */
     private static final String KEYSET_PERM_DEF_PKG =
@@ -485,5 +489,27 @@ public class KeySetHostTest extends DeviceTestCase implements IBuildReceiver {
                 false);
         assertNotNull("Installation of apk with upgrade key referring to a bad public key succeeded!",
                 installResult);
+    }
+
+    /*
+     * Check if an apk signed by RSA pub key can upgrade to apk signed by EC key.
+     */
+    public void testUpgradeKSRsaToEC() throws Exception {
+        String installResult = testPackageUpgrade(KEYSET_PKG, A_SIGNED_EC_A_UPGRADE,
+                EC_A_SIGNED_A_UPGRADE);
+        assertNull(String.format("failed to upgrade keyset app from one signed by RSA key"
+                 + "to version signed by EC upgrade-key-set, Reason: %s", installResult),
+                 installResult);
+    }
+
+    /*
+     * Check if an apk signed by EC pub key can upgrade to apk signed by RSA key.
+     */
+    public void testUpgradeKSECToRSA() throws Exception {
+        String installResult = testPackageUpgrade(KEYSET_PKG, EC_A_SIGNED_A_UPGRADE,
+                A_SIGNED_EC_A_UPGRADE);
+        assertNull(String.format("failed to upgrade keyset app from one signed by EC key"
+                 + "to version signed by RSA upgrade-key-set, Reason: %s", installResult),
+                 installResult);
     }
 }
