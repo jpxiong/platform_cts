@@ -91,6 +91,15 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
         }, "getVoiceMailNumber");
     }
 
+    public void testIsVoicemailNumber() throws Exception {
+        verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
+            @Override
+            public void run() {
+                mTelecomManager.isVoiceMailNumber(null, null);
+            }
+        }, "isVoiceMailNumber");
+    }
+
     public void testIsInCall() throws Exception {
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
