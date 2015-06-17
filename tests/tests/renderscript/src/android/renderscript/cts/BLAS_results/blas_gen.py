@@ -39,31 +39,121 @@ def herm(a):
             a[i, j] = complex(a[j, i].real, -a[j, i].imag);
     return;
 
-def sMatGen(m, n):
-    a = mat(random.randint(1, 10, size=(m, n)).astype('f4'))
+def zero(a):
+    for i in range(0, a.shape[0]):
+        for j in range(0, a.shape[1]):
+            a[i, j] = 0;
+    return;
+
+def sMatGen(m, n, scale):
+    a = mat(random.randint(1, 10, size=(m, n)).astype('f4')/scale)
     return a;
 
-def dMatGen(m, n):
-    a = mat(random.randint(1, 10, size=(m, n)).astype('f8'))
+def dMatGen(m, n, scale):
+    a = mat(random.randint(1, 10, size=(m, n)).astype('f8')/scale)
     return a;
 
-def cMatGen(m, n):
-    a_real = mat(random.randint(1, 10, size=(m, n)).astype('f4'))
-    a_img = mat(random.randint(1, 10, size=(m, n)).astype('f4'))
+def cMatGen(m, n, scale):
+    a_real = mat(random.randint(1, 10, size=(m, n)).astype('f4')/scale)
+    a_img = mat(random.randint(1, 10, size=(m, n)).astype('f4')/scale)
     a = a_real + 1j * a_img
     return a;
 
-def zMatGen(m, n):
-    a_real = mat(random.randint(1, 10, size=(m, n)).astype('f8'))
-    a_img = mat(random.randint(1, 10, size=(m, n)).astype('f8'))
+def zMatGen(m, n, scale):
+    a_real = mat(random.randint(1, 10, size=(m, n)).astype('f8')/scale)
+    a_img = mat(random.randint(1, 10, size=(m, n)).astype('f8')/scale)
     a = a_real + 1j * a_img
     return a;
 
+def matrixCreateScale(dt, m, n, scale):
+    if dt == 's':
+        return sMatGen(m, n, scale);
+    elif dt == 'd':
+        return dMatGen(m, n, scale);
+    elif dt == 'c':
+        return cMatGen(m, n, scale);
+    else:
+        return zMatGen(m, n, scale);
+    return;
 
-def sDataWriter(a, name, fo):
+def matrixCreate(dt, m, n):
+    return matrixCreateScale(dt, m, n, 10);
+
+def sDataWriter(a, name, skip, fo):
     fo.write("    static float[] " + name + " = {");
     for i in range(0, a.shape[0]):
         for j in range(0, a.shape[1]):
+            fo.write(" " + str(a[i,j]) + "f,");
+            for hh in range(0, skip):
+                fo.write(" 0.0f,");
+        fo.write("\n");
+        for k in range(0, len(name) + 23):
+            fo.write(" ");
+    fo.write(" };\n")
+    return;
+
+def dDataWriter(a, name, skip, fo):
+    fo.write("    static double[] " + name + " = {");
+    for i in range(0, a.shape[0]):
+        for j in range(0, a.shape[1]):
+            fo.write(" " + str(a[i,j]) + ",");
+            for hh in range(0, skip):
+                fo.write(" 0,");
+        fo.write("\n");
+        for k in range(0, len(name) + 24):
+            fo.write(" ");
+    fo.write(" };\n")
+    return;
+
+def cDataWriter(a, name, skip, fo):
+    fo.write("    static float[] " + name + " = {");
+    for i in range(0, a.shape[0]):
+        for j in range(0, a.shape[1]):
+            fo.write(" " + str(real(a[i,j])) + "f,");
+            fo.write(" " + str(imag(a[i,j])) + "f,");
+            for hh in range(0, skip):
+                fo.write(" 0.0f,");
+                fo.write(" 0.0f,");
+        fo.write("\n");
+        for k in range(0, len(name) + 23):
+            fo.write(" ");
+    fo.write(" };\n")
+    return;
+
+def zDataWriter(a, name, skip, fo):
+    fo.write("    static double[] " + name + " = {");
+    for i in range(0, a.shape[0]):
+        for j in range(0, a.shape[1]):
+            fo.write(" " + str(real(a[i,j])) + ",");
+            fo.write(" " + str(imag(a[i,j])) + ",");
+            for hh in range(0, skip):
+                fo.write(" 0,");
+                fo.write(" 0,");
+        fo.write("\n");
+        for k in range(0, len(name) + 24):
+            fo.write(" ");
+    fo.write(" };\n")
+    return;
+
+def dataWriterInc(dt, a, name, skip, fo):
+    if dt == 's':
+        sDataWriter(a, name, skip, fo);
+    elif dt == 'd':
+        dDataWriter(a, name, skip, fo);
+    elif dt == 'c':
+        cDataWriter(a, name, skip, fo);
+    else:
+        zDataWriter(a, name, skip, fo);
+    return;
+
+def dataWriter(dt, a, name, fo):
+    dataWriterInc(dt, a, name, 0, fo);
+    return;
+
+def sApWriter(a, name, fo):
+    fo.write("    static float[] " + name + " = {");
+    for i in range(0, a.shape[0]):
+        for j in range(i, a.shape[1]):
             fo.write(" " + str(a[i,j]) + "f,");
         fo.write("\n");
         for k in range(0, len(name) + 23):
@@ -71,10 +161,10 @@ def sDataWriter(a, name, fo):
     fo.write(" };\n")
     return;
 
-def dDataWriter(a, name, fo):
+def dApWriter(a, name, fo):
     fo.write("    static double[] " + name + " = {");
     for i in range(0, a.shape[0]):
-        for j in range(0, a.shape[1]):
+        for j in range(i, a.shape[1]):
             fo.write(" " + str(a[i,j]) + ",");
         fo.write("\n");
         for k in range(0, len(name) + 24):
@@ -82,10 +172,10 @@ def dDataWriter(a, name, fo):
     fo.write(" };\n")
     return;
 
-def cDataWriter(a, name, fo):
+def cApWriter(a, name, fo):
     fo.write("    static float[] " + name + " = {");
     for i in range(0, a.shape[0]):
-        for j in range(0, a.shape[1]):
+        for j in range(i, a.shape[1]):
             fo.write(" " + str(real(a[i,j])) + "f,");
             fo.write(" " + str(imag(a[i,j])) + "f,");
         fo.write("\n");
@@ -94,10 +184,10 @@ def cDataWriter(a, name, fo):
     fo.write(" };\n")
     return;
 
-def zDataWriter(a, name, fo):
+def zApWriter(a, name, fo):
     fo.write("    static double[] " + name + " = {");
     for i in range(0, a.shape[0]):
-        for j in range(0, a.shape[1]):
+        for j in range(i, a.shape[1]):
             fo.write(" " + str(real(a[i,j])) + ",");
             fo.write(" " + str(imag(a[i,j])) + ",");
         fo.write("\n");
@@ -106,28 +196,155 @@ def zDataWriter(a, name, fo):
     fo.write(" };\n")
     return;
 
-
-def matrixCreate(dt, m, n):
+def apWriter(dt, a, name, fo):
     if dt == 's':
-        return sMatGen(m, n);
+        sApWriter(a, name, fo);
     elif dt == 'd':
-        return dMatGen(m, n);
+        dApWriter(a, name, fo);
     elif dt == 'c':
-        return cMatGen(m, n);
+        cApWriter(a, name, fo);
     else:
-        return zMatGen(m, n);
+        zApWriter(a, name, fo);
     return;
 
-def dataWriter(dt, a, name, fo):
-    if dt == 's':
-        sDataWriter(a, name, fo);
-    elif dt == 'd':
-        dDataWriter(a, name, fo);
-    elif dt == 'c':
-        cDataWriter(a, name, fo);
-    else:
-        zDataWriter(a, name, fo);
+def sGBandWriter(a, kl, ku, name, fo):
+    m = a.shape[0];
+    n = a.shape[1];
+    b = sMatGen(m, kl + ku + 1, 1);
+    zero(b);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            b[i, j-i+kl] = a[i, j]
+    sDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            a[i, j] = b[i, j-i+kl]
     return;
+
+def dGBandWriter(a, kl, ku, name, fo):
+    m = a.shape[0];
+    n = a.shape[1];
+    b = dMatGen(m, kl + ku + 1, 1);
+    zero(b);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            b[i, j-i+kl] = a[i, j]
+    dDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            a[i, j] = b[i, j-i+kl]
+    return;
+
+def cGBandWriter(a, kl, ku, name, fo):
+    m = a.shape[0];
+    n = a.shape[1];
+    b = cMatGen(m, kl + ku + 1, 1);
+    zero(b);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            b[i, j-i+kl] = a[i, j]
+    cDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            a[i, j] = b[i, j-i+kl]
+    return;
+
+def zGBandWriter(a, kl, ku, name, fo):
+    m = a.shape[0];
+    n = a.shape[1];
+    b = zMatGen(m, kl + ku + 1, 1);
+    zero(b);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            b[i, j-i+kl] = a[i, j]
+    zDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, m):
+        for j in range(max(0, i-kl), min(i+ku+1, n)):
+            a[i, j] = b[i, j-i+kl]
+    return;
+
+def gBandWriter(dt, a, kl, ku, name, fo):
+    if dt == 's':
+        sGBandWriter(a, kl, ku, name, fo);
+    elif dt == 'd':
+        dGBandWriter(a, kl, ku, name, fo);
+    elif dt == 'c':
+        cGBandWriter(a, kl, ku, name, fo);
+    else:
+        zGBandWriter(a, kl, ku, name, fo);
+    return;
+
+def sBandWriter(a, k, name, fo):
+    n = a.shape[1];
+    b = sMatGen(n, k+1, 1);
+    zero(b);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            b[i, j-i] = a[i, j]
+    sDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            a[i, j] = b[i, j-i]
+    return;
+
+def dBandWriter(a, k, name, fo):
+    n = a.shape[1];
+    b = dMatGen(n, k+1, 1);
+    zero(b);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            b[i, j-i] = a[i, j]
+    dDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            a[i, j] = b[i, j-i]
+    return;
+
+def cBandWriter(a, k, name, fo):
+    n = a.shape[1];
+    b = cMatGen(n, k+1, 1);
+    zero(b);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            b[i, j-i] = a[i, j]
+    cDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            a[i, j] = b[i, j-i]
+    return;
+
+def zBandWriter(a, k, name, fo):
+    n = a.shape[1];
+    b = zMatGen(n, k+1, 1);
+    zero(b);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            b[i, j-i] = a[i, j]
+    zDataWriter(b, name, 0, fo);
+    zero(a);
+    for i in range(0, n):
+        for j in range(i, min(i+k+1, n)):
+            a[i, j] = b[i, j-i]
+    return;
+
+def bandWriter(dt, a, k, name, fo):
+    if dt == 's':
+        sBandWriter(a, k, name, fo);
+    elif dt == 'd':
+        dBandWriter(a, k, name, fo);
+    elif dt == 'c':
+        cBandWriter(a, k, name, fo);
+    else:
+        zBandWriter(a, k, name, fo);
+    return;
+
 
 
 #L3 Functions
@@ -306,26 +523,422 @@ def L3_xTRSM(fo, alpha, m, n):
     dataType = ['s', 'd', 'c', 'z'];
 
     for dt in dataType:
-        a = matrixCreate(dt, m, m);
+        a = matrixCreateScale(dt, m, m, 1);
         triagGen(a, 'u');
         dataWriter(dt, a, "L3_" + dt + "TRSM_A_mm", fo);
         b = matrixCreate(dt, m, n);
         dataWriter(dt, b, "L3_" + dt + "TRSM_B_mn", fo);
+
         d = alpha * (a.I * b);
         dataWriter(dt, d, "L3_" + dt + "TRSM_o_LUN", fo);
 
         a = matrixCreate(dt, n, n);
         triagGen(a, 'l');
         dataWriter(dt, a, "L3_" + dt + "TRSM_A_nn", fo);
+
         d = alpha * (b * a.I.T);
         dataWriter(dt, d, "L3_" + dt + "TRSM_o_RLT", fo);
     return
 
+#L2 Functions
+def L2_xGEMV(fo, alpha, beta, m, n):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, m, n);
+        dataWriter(dt, a, "L2_" + dt + "GEMV_A_mn", fo);
 
-def testBLASL3(fo):
-    m = random.randint(10, 20);
-    n = random.randint(10, 20);
-    k = random.randint(10, 20);
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "GEMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "GEMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, m, 1);
+        dataWriter(dt, y, "L2_" + dt + "GEMV_y_m1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "GEMV_y_m2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "GEMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "GEMV_o_N2", 1, fo);
+
+        d = alpha * a.T * y + beta * x;
+        dataWriter(dt, d, "L2_" + dt + "GEMV_o_T", fo);
+
+        d = alpha * a.H * y + beta * x;
+        dataWriter(dt, d, "L2_" + dt + "GEMV_o_H", fo);
+    return
+
+def L2_xGBMV(fo, alpha, beta, m, n, kl, ku):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, m, n);
+        gBandWriter(dt, a, kl, ku, "L2_" + dt + "GBMV_A_mn", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "GBMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "GBMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, m, 1);
+        dataWriter(dt, y, "L2_" + dt + "GBMV_y_m1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "GBMV_y_m2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "GBMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "GBMV_o_N2", 1, fo);
+
+        d = alpha * a.T * y + beta * x;
+        dataWriter(dt, d, "L2_" + dt + "GBMV_o_T", fo);
+
+        d = alpha * a.H * y + beta * x;
+        dataWriter(dt, d, "L2_" + dt + "GBMV_o_H", fo);
+    return
+
+def L2_xHEMV(fo, alpha, beta, n):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        herm(a);
+        dataWriter(dt, a, "L2_" + dt + "HEMV_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "HEMV_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "HEMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "HEMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "HEMV_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "HEMV_y_n2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "HEMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "HEMV_o_N2", 1, fo);
+    return
+
+def L2_xHBMV(fo, alpha, beta, n, k):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        herm(a);
+        bandWriter(dt, a, k, "L2_" + dt + "HBMV_A_nn", fo);
+        herm(a);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "HBMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "HBMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "HBMV_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "HBMV_y_n2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "HBMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "HBMV_o_N2", 1, fo);
+    return
+
+def L2_xHPMV(fo, alpha, beta, n):
+    dataType = ['c', 'z'];
+    # the same as HEMV, just A is in compact shape.
+    return
+
+def L2_xSYMV(fo, alpha, beta, n):
+    dataType = ['s', 'd'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        symm(a);
+        dataWriter(dt, a, "L2_" + dt + "SYMV_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "SYMV_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "SYMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "SYMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "SYMV_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "SYMV_y_n2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "SYMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "SYMV_o_N2", 1, fo);
+    return
+
+def L2_xSBMV(fo, alpha, beta, n, k):
+    dataType = ['s', 'd'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        symm(a);
+        bandWriter(dt, a, k, "L2_" + dt + "SBMV_A_nn", fo);
+        symm(a);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "SBMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "SBMV_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "SBMV_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "SBMV_y_n2", 1, fo);
+
+        d = alpha * a * x + beta * y;
+        dataWriter(dt, d, "L2_" + dt + "SBMV_o_N", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "SBMV_o_N2", 1, fo);
+    return
+
+def L2_xSPMV(fo, alpha, beta, n):
+    dataType = ['s', 'd'];
+    # the same as SYMV, just A is in compact shape.
+    return
+
+def L2_xTRMV(fo, n):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        triagGen(a, 'u');
+        dataWriter(dt, a, "L2_" + dt + "TRMV_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "TRMV_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "TRMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "TRMV_x_n2", 1, fo);
+
+        d = a * x;
+        dataWriter(dt, d, "L2_" + dt + "TRMV_o_UN", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "TRMV_o_UN2", 1, fo);
+
+        d = a.T * x;
+        dataWriter(dt, d, "L2_" + dt + "TRMV_o_UT", fo);
+
+        d = a.H * x;
+        dataWriter(dt, d, "L2_" + dt + "TRMV_o_UH", fo);
+    return
+
+def L2_xTBMV(fo, n, k):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        bandWriter(dt, a, k, "L2_" + dt + "TBMV_A_nn", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "TBMV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "TBMV_x_n2", 1, fo);
+
+        d = a * x;
+        dataWriter(dt, d, "L2_" + dt + "TBMV_o_UN", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "TBMV_o_UN2", 1, fo);
+
+        d = a.T * x;
+        dataWriter(dt, d, "L2_" + dt + "TBMV_o_UT", fo);
+
+        d = a.H * x;
+        dataWriter(dt, d, "L2_" + dt + "TBMV_o_UH", fo);
+    return
+
+def L2_xTPMV(fo, n):
+    dataType = ['s', 'd', 'c', 'z'];
+    # the same as TRMV, just A is in compact shape.
+    return
+
+def L2_xTRSV(fo, n):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreateScale(dt, n, n, 0.25);
+        triagGen(a, 'u');
+        dataWriter(dt, a, "L2_" + dt + "TRSV_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "TRSV_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "TRSV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "TRSV_x_n2", 1, fo);
+
+        d = a.I * x;
+        dataWriter(dt, d, "L2_" + dt + "TRSV_o_UN", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "TRSV_o_UN2", 1, fo);
+
+        d = a.I.T * x;
+        dataWriter(dt, d, "L2_" + dt + "TRSV_o_UT", fo);
+
+        d = a.I.H * x;
+        dataWriter(dt, d, "L2_" + dt + "TRSV_o_UH", fo);
+    return
+
+def L2_xTBSV(fo, n, k):
+    dataType = ['s', 'd', 'c', 'z'];
+    for dt in dataType:
+        a = matrixCreateScale(dt, n, n, 0.25);
+        bandWriter(dt, a, k, "L2_" + dt + "TBSV_A_nn", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "TBSV_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "TBSV_x_n2", 1, fo);
+
+        d = a.I * x;
+        dataWriter(dt, d, "L2_" + dt + "TBSV_o_UN", fo);
+        dataWriterInc(dt, d, "L2_" + dt + "TBSV_o_UN2", 1, fo);
+
+        d = a.I.T * x;
+        dataWriter(dt, d, "L2_" + dt + "TBSV_o_UT", fo);
+
+        d = a.I.H * x;
+        dataWriter(dt, d, "L2_" + dt + "TBSV_o_UH", fo);
+    return
+
+def L2_xTPSV(fo, n):
+    dataType = ['s', 'd', 'c', 'z'];
+    # the same as TRSV, just A is in compact shape.
+    return
+
+def L2_xGER(fo, alpha, m, n):
+    dataType = ['s', 'd'];
+    for dt in dataType:
+        a = matrixCreate(dt, m, n);
+        dataWriter(dt, a, "L2_" + dt + "GER_A_mn", fo);
+
+        x = matrixCreate(dt, m, 1);
+        dataWriter(dt, x, "L2_" + dt + "GER_x_m1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "GER_x_m2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "GER_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "GER_y_n2", 1, fo);
+
+        d = alpha * x * y.T + a;
+        dataWriter(dt, d, "L2_" + dt + "GER_o_N", fo);
+    return
+
+def L2_xGERU(fo, alpha, m, n):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, m, n);
+        dataWriter(dt, a, "L2_" + dt + "GERU_A_mn", fo);
+
+        x = matrixCreate(dt, m, 1);
+        dataWriter(dt, x, "L2_" + dt + "GERU_x_m1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "GERU_x_m2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "GERU_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "GERU_y_n2", 1, fo);
+
+        d = alpha * x * y.T + a;
+        dataWriter(dt, d, "L2_" + dt + "GERU_o_N", fo);
+    return
+
+def L2_xGERC(fo, alpha, m, n):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, m, n);
+        dataWriter(dt, a, "L2_" + dt + "GERC_A_mn", fo);
+
+        x = matrixCreate(dt, m, 1);
+        dataWriter(dt, x, "L2_" + dt + "GERC_x_m1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "GERC_x_m2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "GERC_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "GERC_y_n2", 1, fo);
+
+        d = alpha * x * y.H + a;
+        dataWriter(dt, d, "L2_" + dt + "GERC_o_N", fo);
+    return
+
+def L2_xHER(fo, alpha, n):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        herm(a);
+        dataWriter(dt, a, "L2_" + dt + "HER_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "HER_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "HER_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "HER_x_n2", 1, fo);
+
+        d = alpha * x * x.H + a;
+        dataWriter(dt, d, "L2_" + dt + "HER_o_N", fo);
+        apWriter(dt, d, "L2_" + dt + "HER_o_N_pu", fo);
+    return
+
+def L2_xHPR(fo, alpha, n):
+    dataType = ['c', 'z'];
+    # the same as HER, just A is in compact shape.
+    return
+
+def L2_xHER2(fo, alpha, n):
+    dataType = ['c', 'z'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        herm(a);
+        dataWriter(dt, a, "L2_" + dt + "HER2_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "HER2_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "HER2_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "HER2_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "HER2_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "HER2_y_n2", 1, fo);
+
+        d = alpha * x * y.H + y * (alpha * x.H) + a;
+        dataWriter(dt, d, "L2_" + dt + "HER2_o_N", fo);
+        apWriter(dt, d, "L2_" + dt + "HER2_o_N_pu", fo);
+    return
+
+def L2_xHPR2(fo, alpha, n):
+    dataType = ['c', 'z'];
+    # the same as HER2, just A is in compact shape.
+    return
+
+def L2_xSYR(fo, alpha, n):
+    dataType = ['s', 'd'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        dataWriter(dt, a, "L2_" + dt + "SYR_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "SYR_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "SYR_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "SYR_x_n2", 1, fo);
+
+        d = alpha * x * x.T + a;
+        dataWriter(dt, d, "L2_" + dt + "SYR_o_N", fo);
+        apWriter(dt, d, "L2_" + dt + "SYR_o_N_pu", fo);
+    return
+
+def L2_xSPR(fo, alpha, n):
+    dataType = ['s', 'd'];
+    # the same as SPR, just A is in compact shape.
+    return
+
+def L2_xSYR2(fo, alpha, n):
+    dataType = ['s', 'd'];
+    for dt in dataType:
+        a = matrixCreate(dt, n, n);
+        dataWriter(dt, a, "L2_" + dt + "SYR2_A_nn", fo);
+        apWriter(dt, a, "L2_" + dt + "SYR2_A_nn_pu", fo);
+
+        x = matrixCreate(dt, n, 1);
+        dataWriter(dt, x, "L2_" + dt + "SYR2_x_n1", fo);
+        dataWriterInc(dt, x, "L2_" + dt + "SYR2_x_n2", 1, fo);
+
+        y = matrixCreate(dt, n, 1);
+        dataWriter(dt, y, "L2_" + dt + "SYR2_y_n1", fo);
+        dataWriterInc(dt, y, "L2_" + dt + "SYR2_y_n2", 1, fo);
+
+        d = alpha * x * y.T + y * (alpha * x.T) + a;
+        dataWriter(dt, d, "L2_" + dt + "SYR2_o_N", fo);
+        apWriter(dt, d, "L2_" + dt + "SYR2_o_N_pu", fo);
+    return
+
+def L2_xSPR2(fo, alpha, n):
+    dataType = ['s', 'd'];
+    # the same as SPR2, just A is in compact shape.
+    return
+
+
+def testBLASL2L3(fo):
+    m = random.randint(15, 25);
+    n = random.randint(15, 25);
+    k = random.randint(15, 25);
+    kl = random.randint(1, 5);
+    ku = random.randint(1, 5);
+
     alpha = 1.0;
     beta = 1.0;
 
@@ -333,9 +946,39 @@ def testBLASL3(fo):
     fo.write("    static int dN = " + str(n) + ';\n');
     fo.write("    static int dK = " + str(k) + ';\n');
     fo.write('\n');
+    fo.write("    static int KL = " + str(kl) + ';\n');
+    fo.write("    static int KU = " + str(ku) + ';\n');
+    fo.write('\n');
     fo.write("    static double ALPHA = " + str(alpha) + ';\n');
     fo.write("    static double BETA = " + str(beta) + ';\n');
     fo.write('\n');
+
+
+    L2_xGEMV(fo, alpha, beta, m, n);
+    L2_xGBMV(fo, alpha, beta, m, n, kl, ku);
+    L2_xHEMV(fo, alpha, beta, n);
+    L2_xHBMV(fo, alpha, beta, n, kl);
+    L2_xHPMV(fo, alpha, beta, n);
+    L2_xSYMV(fo, alpha, beta, n);
+    L2_xSBMV(fo, alpha, beta, n, kl);
+    L2_xSPMV(fo, alpha, beta, n);
+    L2_xTRMV(fo, n);
+    L2_xTBMV(fo, n, kl);
+    L2_xTPMV(fo, n);
+    L2_xTRSV(fo, n);
+    L2_xTBSV(fo, n, kl);
+    L2_xTPSV(fo, n);
+    L2_xGER(fo, alpha, m, n);
+    L2_xGERU(fo, alpha, m, n);
+    L2_xGERC(fo, alpha, m, n);
+    L2_xHER(fo, alpha, n);
+    L2_xHPR(fo, alpha, n);
+    L2_xHER2(fo, alpha, n);
+    L2_xHPR2(fo, alpha, n);
+    L2_xSYR(fo, alpha, n);
+    L2_xSPR(fo, alpha, n);
+    L2_xSYR2(fo, alpha, n);
+    L2_xSPR2(fo, alpha, n);
 
     L3_xGEMM(fo, alpha, beta, m, n, k);
     L3_xSYMM(fo, alpha, beta, m, n);
@@ -375,7 +1018,7 @@ def javaDataGen():
 
     fo.write("public class BLASData {\n");
     #data body
-    testBLASL3(fo);
+    testBLASL2L3(fo);
     fo.write("}\n");
     fo.close()
     return;
