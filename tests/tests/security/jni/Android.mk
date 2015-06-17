@@ -28,7 +28,6 @@ LOCAL_SRC_FILES := \
 		android_security_cts_LinuxRngTest.cpp \
 		android_security_cts_LoadEffectLibraryTest.cpp \
 		android_security_cts_NativeCodeTest.cpp \
-		android_security_cts_SeccompDeathTestService.cpp \
 		android_security_cts_SELinuxTest.cpp \
 		android_security_cts_MMapExecutableTest.cpp \
 		android_security_cts_AudioPolicyBinderTest.cpp
