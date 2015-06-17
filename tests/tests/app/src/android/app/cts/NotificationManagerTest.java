@@ -100,9 +100,6 @@ public class NotificationManagerTest extends AndroidTestCase {
     }
 
     private void sendNotification(final int id, final int icon) {
-        final Notification notification = new Notification(
-                icon, "No intent", System.currentTimeMillis());
-
         final Intent intent = new Intent(Intent.ACTION_MAIN, Threads.CONTENT_URI);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -110,8 +107,13 @@ public class NotificationManagerTest extends AndroidTestCase {
         intent.setAction(Intent.ACTION_MAIN);
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
-        notification.setLatestEventInfo(mContext, "notify#" + id, "This is #" + id
-                + "notification  ", pendingIntent);
+        final Notification notification = new Notification.Builder(mContext)
+                .setSmallIcon(icon)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle("notify#" + id)
+                .setContentText("This is #" + id + "notification  ")
+                .setContentIntent(pendingIntent)
+                .build();
         mNotificationManager.notify(id, notification);
 
         StatusBarNotification[] sbns = mNotificationManager.getActiveNotifications();
