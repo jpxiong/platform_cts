@@ -191,5 +191,23 @@ public class ContactsContract_AggregationSuggestionsTest extends AndroidTestCase
         return new long[] {rawContact1.getContactId(),
                 rawContact2.getContactId(), rawContact3.getContactId()};
     }
+
+    public void testAggregationSuggestionsQueryBuilderWithContactId() throws Exception {
+        Uri uri = new AggregationSuggestions.Builder().setContactId(12).setLimit(7).build();
+        assertEquals("content://com.android.contacts/contacts/12/suggestions?limit=7",
+                uri.toString());
+    }
+
+    public void testAggregationSuggestionsQueryBuilderWithValues() throws Exception {
+        Uri uri = new AggregationSuggestions.Builder()
+                .addNameParameter("name1")
+                .addNameParameter("name2")
+                .setLimit(7)
+                .build();
+        assertEquals("content://com.android.contacts/contacts/0/suggestions?"
+                + "limit=7"
+                + "&query=name%3Aname1"
+                + "&query=name%3Aname2", uri.toString());
+    }
 }
 
