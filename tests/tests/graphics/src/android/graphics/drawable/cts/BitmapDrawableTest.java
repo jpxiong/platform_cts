@@ -21,7 +21,6 @@ import com.android.cts.graphics.R;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
@@ -172,12 +171,12 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertTrue(bitmapDrawable.getPaint().isDither());
 
         bitmapDrawable.setDither(false);
-        assertFalse(bitmapDrawable.getDither());
-        assertEquals(bitmapDrawable.getDither(), bitmapDrawable.getPaint().isDither());
+        assertFalse(bitmapDrawable.isDither());
+        assertEquals(bitmapDrawable.isDither(), bitmapDrawable.getPaint().isDither());
 
         bitmapDrawable.setDither(true);
-        assertTrue(bitmapDrawable.getDither());
-        assertEquals(bitmapDrawable.getDither(), bitmapDrawable.getPaint().isDither());
+        assertTrue(bitmapDrawable.isDither());
+        assertEquals(bitmapDrawable.isDither(), bitmapDrawable.getPaint().isDither());
     }
 
     public void testAccessTileMode() {

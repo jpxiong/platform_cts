@@ -193,10 +193,10 @@ public class GradientDrawableTest extends AndroidTestCase {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
         gradientDrawable.setDither(true);
-        assertTrue(gradientDrawable.getDither());
+        assertTrue(gradientDrawable.isDither());
 
         gradientDrawable.setDither(false);
-        assertFalse(gradientDrawable.getDither());
+        assertFalse(gradientDrawable.isDither());
     }
 
     public void testSetColorFilter() {

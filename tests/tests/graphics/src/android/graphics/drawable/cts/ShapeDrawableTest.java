@@ -16,7 +16,6 @@
 
 package android.graphics.drawable.cts;
 
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -337,12 +336,12 @@ public class ShapeDrawableTest extends AndroidTestCase {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
 
         shapeDrawable.setDither(true);
-        assertTrue(shapeDrawable.getDither());
-        assertEquals(shapeDrawable.getDither(), shapeDrawable.getPaint().isDither());
+        assertTrue(shapeDrawable.isDither());
+        assertEquals(shapeDrawable.isDither(), shapeDrawable.getPaint().isDither());
 
         shapeDrawable.setDither(false);
-        assertFalse(shapeDrawable.getDither());
-        assertEquals(shapeDrawable.getDither(), shapeDrawable.getPaint().isDither());
+        assertFalse(shapeDrawable.isDither());
+        assertEquals(shapeDrawable.isDither(), shapeDrawable.getPaint().isDither());
     }
 
     public void testMutate() {
