@@ -16,7 +16,6 @@
 
 package android.graphics.drawable.cts;
 
-import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import com.android.cts.graphics.R;
 
@@ -550,8 +549,8 @@ public class DrawableTest extends AndroidTestCase {
     public void testGetDither() {
         MockDrawable mockDrawable = new MockDrawable();
 
-        // getDither simply returns false for Drawable superclass
-        assertFalse((mockDrawable.getDither()));
+        // isDither simply returns false for Drawable superclass
+        assertFalse((mockDrawable.isDither()));
     }
 
     public void testSetHotspotBounds() {

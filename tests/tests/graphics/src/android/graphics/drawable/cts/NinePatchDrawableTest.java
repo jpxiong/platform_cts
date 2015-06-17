@@ -16,13 +16,11 @@
 
 package android.graphics.drawable.cts;
 
-import android.graphics.drawable.BitmapDrawable;
 import com.android.cts.graphics.R;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
@@ -38,15 +36,12 @@ import android.graphics.Region;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.NinePatchDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
-import android.graphics.drawable.shapes.RectShape;
 import android.test.InstrumentationTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class NinePatchDrawableTest extends InstrumentationTestCase {
     private static final int MIN_CHUNK_SIZE = 32;
@@ -204,12 +199,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     public void testGetDither() {
         mNinePatchDrawable.setDither(false);
-        assertFalse(mNinePatchDrawable.getDither());
-        assertEquals(mNinePatchDrawable.getDither(), mNinePatchDrawable.getPaint().isDither());
+        assertFalse(mNinePatchDrawable.isDither());
+        assertEquals(mNinePatchDrawable.isDither(), mNinePatchDrawable.getPaint().isDither());
 
         mNinePatchDrawable.setDither(true);
-        assertTrue(mNinePatchDrawable.getDither());
-        assertEquals(mNinePatchDrawable.getDither(), mNinePatchDrawable.getPaint().isDither());
+        assertTrue(mNinePatchDrawable.isDither());
+        assertEquals(mNinePatchDrawable.isDither(), mNinePatchDrawable.getPaint().isDither());
     }
 
     public void testSetFilterBitmap() {
