@@ -16,12 +16,10 @@
 
 package android.graphics.drawable.cts;
 
-import android.graphics.drawable.GradientDrawable;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -197,10 +195,10 @@ public class DrawableContainerTest extends TestCase {
 
 
         mDrawableContainer.setDither(true);
-        assertTrue(mDrawableContainer.getDither());
+        assertTrue(mDrawableContainer.isDither());
 
         mDrawableContainer.setDither(false);
-        assertFalse(mDrawableContainer.getDither());
+        assertFalse(mDrawableContainer.isDither());
 
         dr.reset();
     }

@@ -509,10 +509,10 @@ public class LayerDrawableTest extends AndroidTestCase {
         LayerDrawable layerDrawable = new LayerDrawable(array);
 
         layerDrawable.setDither(true);
-        assertTrue(layerDrawable.getDither());
+        assertTrue(layerDrawable.isDither());
 
         layerDrawable.setDither(false);
-        assertFalse(layerDrawable.getDither());
+        assertFalse(layerDrawable.isDither());
     }
 
     public void testSetHotspotBounds() {
@@ -1468,7 +1468,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         }
 
         @Override
-        public boolean getDither() {
+        public boolean isDither() {
             return mDither;
         }
 
