@@ -252,6 +252,223 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xGEMV_API(mMatrixZ);
     }
 
+    public void test_L2_SGEMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dM, 1));
+        matrixAS.copyFrom(BLASData.L2_sGEMV_A_mn);
+        vectorXS.copyFrom(BLASData.L2_sGEMV_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sGEMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SGEMV(trans, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYS.copyFrom(BLASData.L2_sGEMV_y_m1);
+        mBLAS.SGEMV(trans, alphaS, matrixAS, vectorYS, incX, betaS, vectorXS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGEMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXS, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sGEMV_x_n1);
+        mBLAS.SGEMV(trans, alphaS, matrixAS, vectorYS, incX, betaS, vectorXS, incY);
+        vectorYRef.copyFrom(BLASData.L2_sGEMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXS, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sGEMV_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sGEMV_y_m2);
+
+        mBLAS.SGEMV(trans, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DGEMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dM, 1));
+        matrixAD.copyFrom(BLASData.L2_dGEMV_A_mn);
+        vectorXD.copyFrom(BLASData.L2_dGEMV_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dGEMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DGEMV(trans, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYD.copyFrom(BLASData.L2_dGEMV_y_m1);
+        mBLAS.DGEMV(trans, alphaD, matrixAD, vectorYD, incX, betaD, vectorXD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGEMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXD, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dGEMV_x_n1);
+        mBLAS.DGEMV(trans, alphaD, matrixAD, vectorYD, incX, betaD, vectorXD, incY);
+        vectorYRef.copyFrom(BLASData.L2_dGEMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXD, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dGEMV_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dGEMV_y_m2);
+
+        mBLAS.DGEMV(trans, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CGEMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        matrixAC.copyFrom(BLASData.L2_cGEMV_A_mn);
+        vectorXC.copyFrom(BLASData.L2_cGEMV_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cGEMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CGEMV(trans, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYC.copyFrom(BLASData.L2_cGEMV_y_m1);
+        mBLAS.CGEMV(trans, alphaC, matrixAC, vectorYC, incX, betaC, vectorXC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGEMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXC, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cGEMV_x_n1);
+        mBLAS.CGEMV(trans, alphaC, matrixAC, vectorYC, incX, betaC, vectorXC, incY);
+        vectorYRef.copyFrom(BLASData.L2_cGEMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXC, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cGEMV_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cGEMV_y_m2);
+
+        mBLAS.CGEMV(trans, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZGEMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        matrixAZ.copyFrom(BLASData.L2_zGEMV_A_mn);
+        vectorXZ.copyFrom(BLASData.L2_zGEMV_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zGEMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZGEMV(trans, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYZ.copyFrom(BLASData.L2_zGEMV_y_m1);
+        mBLAS.ZGEMV(trans, alphaZ, matrixAZ, vectorYZ, incX, betaZ, vectorXZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGEMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXZ, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zGEMV_x_n1);
+        mBLAS.ZGEMV(trans, alphaZ, matrixAZ, vectorYZ, incX, betaZ, vectorXZ, incY);
+        vectorYRef.copyFrom(BLASData.L2_zGEMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXZ, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zGEMV_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zGEMV_y_m2);
+
+        mBLAS.ZGEMV(trans, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+
 
     private void xGBMV_API_test(int trans, int KL, int KU, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -331,6 +548,222 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xGBMV_API(mMatrixZ);
     }
 
+    public void test_L2_SGBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dM, 1));
+        matrixAS.copy2DRangeFrom(0, 0, BLASData.KL + BLASData.KU + 1, BLASData.dM, BLASData.L2_sGBMV_A_mn);
+        vectorXS.copyFrom(BLASData.L2_sGBMV_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sGBMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SGBMV(trans, BLASData.KL, BLASData.KU, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYS.copyFrom(BLASData.L2_sGBMV_y_m1);
+        mBLAS.SGBMV(trans, BLASData.KL, BLASData.KU, alphaS, matrixAS, vectorYS, incX, betaS, vectorXS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGBMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXS, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sGBMV_x_n1);
+        mBLAS.SGBMV(trans, BLASData.KL, BLASData.KU, alphaS, matrixAS, vectorYS, incX, betaS, vectorXS, incY);
+        vectorYRef.copyFrom(BLASData.L2_sGBMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXS, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sGBMV_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sGBMV_y_m2);
+
+        mBLAS.SGBMV(trans, BLASData.KL, BLASData.KU, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_sGBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DGBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dM, 1));
+        matrixAD.copy2DRangeFrom(0, 0, BLASData.KL + BLASData.KU + 1, BLASData.dM, BLASData.L2_dGBMV_A_mn);
+        vectorXD.copyFrom(BLASData.L2_dGBMV_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dGBMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DGBMV(trans, BLASData.KL, BLASData.KU, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYD.copyFrom(BLASData.L2_dGBMV_y_m1);
+        mBLAS.DGBMV(trans, BLASData.KL, BLASData.KU, alphaD, matrixAD, vectorYD, incX, betaD, vectorXD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGBMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXD, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dGBMV_x_n1);
+        mBLAS.DGBMV(trans, BLASData.KL, BLASData.KU, alphaD, matrixAD, vectorYD, incX, betaD, vectorXD, incY);
+        vectorYRef.copyFrom(BLASData.L2_dGBMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXD, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dGBMV_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dGBMV_y_m2);
+
+        mBLAS.DGBMV(trans, BLASData.KL, BLASData.KU, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_dGBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CGBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        matrixAC.copy2DRangeFrom(0, 0, BLASData.KL + BLASData.KU + 1, BLASData.dM, BLASData.L2_cGBMV_A_mn);
+        vectorXC.copyFrom(BLASData.L2_cGBMV_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cGBMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CGBMV(trans, BLASData.KL, BLASData.KU, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYC.copyFrom(BLASData.L2_cGBMV_y_m1);
+        mBLAS.CGBMV(trans, BLASData.KL, BLASData.KU, alphaC, matrixAC, vectorYC, incX, betaC, vectorXC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGBMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXC, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cGBMV_x_n1);
+        mBLAS.CGBMV(trans, BLASData.KL, BLASData.KU, alphaC, matrixAC, vectorYC, incX, betaC, vectorXC, incY);
+        vectorYRef.copyFrom(BLASData.L2_cGBMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXC, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cGBMV_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cGBMV_y_m2);
+
+        mBLAS.CGBMV(trans, BLASData.KL, BLASData.KU, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_cGBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZGBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        matrixAZ.copy2DRangeFrom(0, 0, BLASData.KL + BLASData.KU + 1, BLASData.dM, BLASData.L2_zGBMV_A_mn);
+        vectorXZ.copyFrom(BLASData.L2_zGBMV_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zGBMV_y_m1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZGBMV(trans, BLASData.KL, BLASData.KU, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector Y, since it was overwritten by BLAS.
+        vectorYZ.copyFrom(BLASData.L2_zGBMV_y_m1);
+        mBLAS.ZGBMV(trans, BLASData.KL, BLASData.KU, alphaZ, matrixAZ, vectorYZ, incX, betaZ, vectorXZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGBMV_o_T);
+        mVerify.invoke_verify(vectorYRef, vectorXZ, vectorYRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zGBMV_x_n1);
+        mBLAS.ZGBMV(trans, BLASData.KL, BLASData.KU, alphaZ, matrixAZ, vectorYZ, incX, betaZ, vectorXZ, incY);
+        vectorYRef.copyFrom(BLASData.L2_zGBMV_o_H);
+        mVerify.invoke_verify(vectorYRef, vectorXZ, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dM-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zGBMV_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zGBMV_y_m2);
+
+        mBLAS.ZGBMV(trans, BLASData.KL, BLASData.KU, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_zGBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
     private void xHEMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -385,6 +818,83 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void test_L2_ZHEMV_API() {
         L2_xHEMV_API(mMatrixZ);
     }
+
+    public void test_L2_CHEMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cHEMV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cHEMV_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cHEMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.CHEMV(uplo, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cHEMV_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cHEMV_y_n2);
+
+        mBLAS.CHEMV(uplo, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHEMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHEMV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zHEMV_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zHEMV_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHEMV(uplo, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHEMV_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zHEMV_y_n2);
+
+        mBLAS.ZHEMV(uplo, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
 
     private void xHBMV_API_test(int Uplo, int K, int incX, int incY, ArrayList<Allocation> mMatrix) {
@@ -443,6 +953,82 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xHBMV_API(mMatrixZ);
     }
 
+    public void test_L2_CHBMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_cHBMV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cHBMV_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cHBMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.CHBMV(uplo, BLASData.KL, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cHBMV_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cHBMV_y_n2);
+
+        mBLAS.CHBMV(uplo, BLASData.KL, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHBMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_zHBMV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zHBMV_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zHBMV_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHBMV(uplo, BLASData.KL, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHBMV_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zHBMV_y_n2);
+
+        mBLAS.ZHBMV(uplo, BLASData.KL, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
     private void xHPMV_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -498,6 +1084,83 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xHPMV_API(mMatrixZ);
     }
 
+    public void test_L2_CHPMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        matrixAC.copyFrom(BLASData.L2_cHEMV_A_nn_pu);
+        vectorXC.copyFrom(BLASData.L2_cHEMV_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cHEMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.CHPMV(uplo, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cHEMV_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cHEMV_y_n2);
+
+        mBLAS.CHPMV(uplo, alphaC, matrixAC, vectorXC, incX, betaC, vectorYC, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_cHEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYC, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHPMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHEMV_A_nn_pu);
+        vectorXZ.copyFrom(BLASData.L2_zHEMV_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zHEMV_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHPMV(uplo, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHEMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHEMV_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zHEMV_y_n2);
+
+        mBLAS.ZHPMV(uplo, alphaZ, matrixAZ, vectorXZ, incX, betaZ, vectorYZ, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_zHEMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYZ, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
 
 
     private boolean validateSYMV(Element e, int Uplo, Allocation A, Allocation X, int incX, Allocation Y, int incY) {
@@ -585,6 +1248,82 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xSYMV_API(mMatrixD);
     }
 
+    public void test_L2_SSYMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYMV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sSYMV_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sSYMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.SSYMV(uplo, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSYMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYMV_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sSYMV_y_n2);
+
+        mBLAS.SSYMV(uplo, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSYMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSYMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYMV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dSYMV_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dSYMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.DSYMV(uplo, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSYMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYMV_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dSYMV_y_n2);
+
+        mBLAS.DSYMV(uplo, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSYMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
 
     private void xSBMV_API_test(int Uplo, int K, int incX, int incY, ArrayList<Allocation> mMatrix) {
@@ -643,6 +1382,81 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xSBMV_API(mMatrixD);
     }
 
+    public void test_L2_SSBMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_sSBMV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sSBMV_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sSBMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.SSBMV(uplo, BLASData.KL, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sSBMV_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sSBMV_y_n2);
+
+        mBLAS.SSBMV(uplo, BLASData.KL, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSBMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_dSBMV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dSBMV_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dSBMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.DSBMV(uplo, BLASData.KL, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSBMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dSBMV_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dSBMV_y_n2);
+
+        mBLAS.DSBMV(uplo, BLASData.KL, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSBMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
 
 
     private boolean validateSPMV(Element e, int Uplo, Allocation Ap, Allocation X, int incX, Allocation Y, int incY) {
@@ -733,6 +1547,84 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_DSPMV_API() {
         L2_xSPMV_API(mMatrixD);
+    }
+
+    public void test_L2_SSPMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYMV_A_nn_pu);
+        vectorXS.copyFrom(BLASData.L2_sSYMV_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sSYMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.SSPMV(uplo, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSYMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYMV_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sSYMV_y_n2);
+
+        mBLAS.SSPMV(uplo, alphaS, matrixAS, vectorXS, incX, betaS, vectorYS, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_sSYMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYS, vectorYRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSPMV_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYMV_A_nn_pu);
+        vectorXD.copyFrom(BLASData.L2_dSYMV_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dSYMV_y_n1);
+
+        //Test for the default case:
+        mBLAS.DSPMV(uplo, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        Allocation vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSYMV_o_N);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYMV_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dSYMV_y_n2);
+
+        mBLAS.DSPMV(uplo, alphaD, matrixAD, vectorXD, incX, betaD, vectorYD, incY);
+        vectorYRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorYRef.copyFrom(BLASData.L2_dSYMV_o_N2);
+        mVerify.invoke_verify(vectorYRef, vectorYD, vectorYRef);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -844,14 +1736,207 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xTRMV_API(mMatrixZ);
     }
 
+    public void test_L2_STRMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sTRMV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STRMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+        mBLAS.STRMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+        mBLAS.STRMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n2);
+
+        mBLAS.STRMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTRMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dTRMV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTRMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+        mBLAS.DTRMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+        mBLAS.DTRMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n2);
+
+        mBLAS.DTRMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTRMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cTRMV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTRMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+        mBLAS.CTRMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+        mBLAS.CTRMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n2);
+
+        mBLAS.CTRMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTRMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zTRMV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTRMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+        mBLAS.ZTRMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+        mBLAS.ZTRMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n2);
+
+        mBLAS.ZTRMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
 
     private void xTBMV_API_test(int Uplo, int TransA, int Diag, int K, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
             for (Allocation vecX : mMatrix) {
-                if (!validateVecInput(vecX)) {
-                    continue;
-                }
                 Element elemA = matA.getType().getElement();
                 if (validateTRMV(elemA, Uplo, TransA, Diag, matA, vecX, incX) && K >= 0) {
                     try {
@@ -921,6 +2006,202 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_ZTBMV_API() {
         L2_xTBMV_API(mMatrixZ);
+    }
+
+    public void test_L2_STBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_sTBMV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sTBMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STBMV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTBMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTBMV_x_n1);
+        mBLAS.STBMV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTBMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTBMV_x_n1);
+        mBLAS.STBMV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTBMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTBMV_x_n2);
+
+        mBLAS.STBMV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTBMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_dTBMV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dTBMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTBMV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTBMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTBMV_x_n1);
+        mBLAS.DTBMV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTBMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTBMV_x_n1);
+        mBLAS.DTBMV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTBMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTBMV_x_n2);
+
+        mBLAS.DTBMV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTBMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_cTBMV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cTBMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTBMV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTBMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTBMV_x_n1);
+        mBLAS.CTBMV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTBMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTBMV_x_n1);
+        mBLAS.CTBMV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTBMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTBMV_x_n2);
+
+        mBLAS.CTBMV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTBMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTBMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_zTBMV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zTBMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTBMV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTBMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTBMV_x_n1);
+        mBLAS.ZTBMV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTBMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTBMV_x_n1);
+        mBLAS.ZTBMV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTBMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTBMV_x_n2);
+
+        mBLAS.ZTBMV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTBMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1036,6 +2317,206 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xTPMV_API(mMatrixZ);
     }
 
+    public void test_L2_STPMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        matrixAS.copyFrom(BLASData.L2_sTRMV_A_nn_pu);
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STPMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+        mBLAS.STPMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n1);
+        mBLAS.STPMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTRMV_x_n2);
+
+        mBLAS.STPMV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTPMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        matrixAD.copyFrom(BLASData.L2_dTRMV_A_nn_pu);
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTPMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+        mBLAS.DTPMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n1);
+        mBLAS.DTPMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTRMV_x_n2);
+
+        mBLAS.DTPMV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTPMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        matrixAC.copyFrom(BLASData.L2_cTRMV_A_nn_pu);
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTPMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+        mBLAS.CTPMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n1);
+        mBLAS.CTPMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTRMV_x_n2);
+
+        mBLAS.CTPMV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTPMV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        matrixAZ.copyFrom(BLASData.L2_zTRMV_A_nn_pu);
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTPMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+        mBLAS.ZTPMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n1);
+        mBLAS.ZTPMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTRMV_x_n2);
+
+        mBLAS.ZTPMV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRMV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
     private void xTRSV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -1110,6 +2591,202 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_ZTRSV_API() {
         L2_xTRSV_API(mMatrixZ);
+    }
+
+    public void test_L2_STRSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sTRSV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STRSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+        mBLAS.STRSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+        mBLAS.STRSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n2);
+
+        mBLAS.STRSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTRSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dTRSV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTRSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+        mBLAS.DTRSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+        mBLAS.DTRSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n2);
+
+        mBLAS.DTRSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTRSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cTRSV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTRSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+        mBLAS.CTRSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+        mBLAS.CTRSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n2);
+
+        mBLAS.CTRSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTRSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zTRSV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTRSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+        mBLAS.ZTRSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+        mBLAS.ZTRSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n2);
+
+        mBLAS.ZTRSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1190,6 +2867,202 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xTBSV_API(mMatrixZ);
     }
 
+    public void test_L2_STBSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_sTBSV_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sTBSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STBSV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTBSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTBSV_x_n1);
+        mBLAS.STBSV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTBSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTBSV_x_n1);
+        mBLAS.STBSV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTBSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTBSV_x_n2);
+
+        mBLAS.STBSV(uplo, trans, diag, BLASData.KL, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTBSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTBSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_dTBSV_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dTBSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTBSV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTBSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTBSV_x_n1);
+        mBLAS.DTBSV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTBSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTBSV_x_n1);
+        mBLAS.DTBSV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTBSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTBSV_x_n2);
+
+        mBLAS.DTBSV(uplo, trans, diag, BLASData.KL, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTBSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTBSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_cTBSV_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cTBSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTBSV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTBSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTBSV_x_n1);
+        mBLAS.CTBSV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTBSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTBSV_x_n1);
+        mBLAS.CTBSV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTBSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTBSV_x_n2);
+
+        mBLAS.CTBSV(uplo, trans, diag, BLASData.KL, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTBSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTBSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copy2DRangeFrom(0, 0, BLASData.KL + 1, BLASData.dN, BLASData.L2_zTBSV_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zTBSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTBSV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTBSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTBSV_x_n1);
+        mBLAS.ZTBSV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTBSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTBSV_x_n1);
+        mBLAS.ZTBSV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTBSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTBSV_x_n2);
+
+        mBLAS.ZTBSV(uplo, trans, diag, BLASData.KL, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTBSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
 
     private void xTPSV_API_test(int Uplo, int TransA, int Diag, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -1264,6 +3137,206 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_ZTPSV_API() {
         L2_xTPSV_API(mMatrixZ);
+    }
+
+    public void test_L2_STPSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        matrixAS.copyFrom(BLASData.L2_sTRSV_A_nn_pu);
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.STPSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+        mBLAS.STPSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n1);
+        mBLAS.STPSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sTRSV_x_n2);
+
+        mBLAS.STPSV(uplo, trans, diag, matrixAS, vectorXS, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_sTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXS, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DTPSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        matrixAD.copyFrom(BLASData.L2_dTRSV_A_nn_pu);
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DTPSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+        mBLAS.DTPSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n1);
+        mBLAS.DTPSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dTRSV_x_n2);
+
+        mBLAS.DTPSV(uplo, trans, diag, matrixAD, vectorXD, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_dTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXD, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_CTPSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        matrixAC.copyFrom(BLASData.L2_cTRSV_A_nn_pu);
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CTPSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+        mBLAS.CTPSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n1);
+        mBLAS.CTPSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cTRSV_x_n2);
+
+        mBLAS.CTPSV(uplo, trans, diag, matrixAC, vectorXC, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_cTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXC, vectorXRef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZTPSV_Correctness() {
+        int trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int diag = ScriptIntrinsicBLAS.NON_UNIT;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        matrixAZ.copyFrom(BLASData.L2_zTRSV_A_nn_pu);
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZTPSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        Allocation vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UN);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //test for trans cases: TRANSPOSE, CONJ_TRANSPOSE
+        trans = ScriptIntrinsicBLAS.TRANSPOSE;
+        //Reload vector X, since it was overwritten by BLAS.
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+        mBLAS.ZTPSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UT);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        trans = ScriptIntrinsicBLAS.CONJ_TRANSPOSE;
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n1);
+        mBLAS.ZTPSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UH);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        //Test for incX = 2 & incY = 2;
+        trans = ScriptIntrinsicBLAS.NO_TRANSPOSE;
+        incX = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zTRSV_x_n2);
+
+        mBLAS.ZTPSV(uplo, trans, diag, matrixAZ, vectorXZ, incX);
+        vectorXRef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXRef.copyFrom(BLASData.L2_zTRSV_o_UN2);
+        mVerify.invoke_verify(vectorXRef, vectorXZ, vectorXRef);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1353,6 +3426,77 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xGER_API(mMatrixD);
     }
 
+    public void test_L2_SGER_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dM, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sGER_A_mn);
+        vectorXS.copyFrom(BLASData.L2_sGER_x_m1);
+        vectorYS.copyFrom(BLASData.L2_sGER_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SGER(alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_sGER_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAS, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sGER_x_m2);
+        vectorYS.copyFrom(BLASData.L2_sGER_y_n2);
+        matrixAS.copyFrom(BLASData.L2_sGER_A_mn);
+
+        mBLAS.SGER(alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        mVerify.invoke_verify(matrixARef, matrixAS, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DGER_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dM, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dGER_A_mn);
+        vectorXD.copyFrom(BLASData.L2_dGER_x_m1);
+        vectorYD.copyFrom(BLASData.L2_dGER_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DGER(alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_dGER_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAD, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dGER_x_m2);
+        vectorYD.copyFrom(BLASData.L2_dGER_y_n2);
+        matrixAD.copyFrom(BLASData.L2_dGER_A_mn);
+
+        mBLAS.DGER(alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        mVerify.invoke_verify(matrixARef, matrixAD, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
 
 
     private boolean validateGERU(Element e, Allocation X, int incX, Allocation Y, int incY, Allocation A) {
@@ -1435,6 +3579,79 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xGERU_API(mMatrixZ);
     }
 
+    public void test_L2_CGERU_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cGERU_A_mn);
+        vectorXC.copyFrom(BLASData.L2_cGERU_x_m1);
+        vectorYC.copyFrom(BLASData.L2_cGERU_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CGERU(alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_cGERU_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAC, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cGERU_x_m2);
+        vectorYC.copyFrom(BLASData.L2_cGERU_y_n2);
+        matrixAC.copyFrom(BLASData.L2_cGERU_A_mn);
+
+        mBLAS.CGERU(alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        mVerify.invoke_verify(matrixARef, matrixAC, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZGERU_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zGERU_A_mn);
+        vectorXZ.copyFrom(BLASData.L2_zGERU_x_m1);
+        vectorYZ.copyFrom(BLASData.L2_zGERU_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZGERU(alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_zGERU_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAZ, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zGERU_x_m2);
+        vectorYZ.copyFrom(BLASData.L2_zGERU_y_n2);
+        matrixAZ.copyFrom(BLASData.L2_zGERU_A_mn);
+
+        mBLAS.ZGERU(alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        mVerify.invoke_verify(matrixARef, matrixAZ, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
+
+
 
     private void xGERC_API_test(int incX, int incY, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -1490,6 +3707,77 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xGERC_API(mMatrixZ);
     }
 
+    public void test_L2_CGERC_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dM, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cGERC_A_mn);
+        vectorXC.copyFrom(BLASData.L2_cGERC_x_m1);
+        vectorYC.copyFrom(BLASData.L2_cGERC_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CGERC(alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_cGERC_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAC, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cGERC_x_m2);
+        vectorYC.copyFrom(BLASData.L2_cGERC_y_n2);
+        matrixAC.copyFrom(BLASData.L2_cGERC_A_mn);
+
+        mBLAS.CGERC(alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        mVerify.invoke_verify(matrixARef, matrixAC, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZGERC_Correctness() {
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dM, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zGERC_A_mn);
+        vectorXZ.copyFrom(BLASData.L2_zGERC_x_m1);
+        vectorYZ.copyFrom(BLASData.L2_zGERC_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZGERC(alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dM));
+        matrixARef.copyFrom(BLASData.L2_zGERC_o_N);
+        mVerify.invoke_verify(matrixARef, matrixAZ, matrixARef);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dM-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zGERC_x_m2);
+        vectorYZ.copyFrom(BLASData.L2_zGERC_y_n2);
+        matrixAZ.copyFrom(BLASData.L2_zGERC_A_mn);
+
+        mBLAS.ZGERC(alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        mVerify.invoke_verify(matrixARef, matrixAZ, matrixARef);
+
+        mRS.finish();
+        checkError();
+    }
 
 
     private void xHER_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
@@ -1541,6 +3829,72 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xHER_API(mMatrixZ);
     }
 
+    public void test_L2_CHER_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cHER_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cHER_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CHER(uplo, alphaS, vectorXC, incX, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_cHER_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cHER_x_n2);
+        matrixAC.copyFrom(BLASData.L2_cHER_A_nn);
+
+        mBLAS.CHER(uplo, alphaS, vectorXC, incX, matrixAC);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHER_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHER_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zHER_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHER(uplo, alphaD, vectorXZ, incX, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_zHER_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHER_x_n2);
+        matrixAZ.copyFrom(BLASData.L2_zHER_A_nn);
+
+        mBLAS.ZHER(uplo, alphaD, vectorXZ, incX, matrixAZ);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
 
     private void xHPR_API_test(int Uplo, int incX, ArrayList<Allocation> mMatrix) {
         for (Allocation matA : mMatrix) {
@@ -1589,6 +3943,74 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_ZHPR_API() {
         L2_xHPR_API(mMatrixZ);
+    }
+
+    public void test_L2_CHPR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        matrixAC.copyFrom(BLASData.L2_cHER_A_nn_pu);
+        vectorXC.copyFrom(BLASData.L2_cHER_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CHPR(uplo, alphaS, vectorXC, incX, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_cHER_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorXC.copyFrom(BLASData.L2_cHER_x_n2);
+        matrixAC.copyFrom(BLASData.L2_cHER_A_nn_pu);
+
+        mBLAS.CHPR(uplo, alphaS, vectorXC, incX, matrixAC);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHPR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHER_A_nn_pu);
+        vectorXZ.copyFrom(BLASData.L2_zHER_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHPR(uplo, alphaD, vectorXZ, incX, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_zHER_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHER_x_n2);
+        matrixAZ.copyFrom(BLASData.L2_zHER_A_nn_pu);
+
+        mBLAS.ZHPR(uplo, alphaD, vectorXZ, incX, matrixAZ);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1646,6 +4068,80 @@ public class IntrinsicBLAS extends IntrinsicBase {
         L2_xHER2_API(mMatrixZ);
     }
 
+    public void test_L2_CHER2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, 1));
+        matrixAC.copyFrom(BLASData.L2_cHER2_A_nn);
+        vectorXC.copyFrom(BLASData.L2_cHER2_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cHER2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CHER2(uplo, alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_cHER2_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cHER2_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cHER2_y_n2);
+        matrixAC.copyFrom(BLASData.L2_cHER2_A_nn);
+
+        mBLAS.CHER2(uplo, alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHER2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHER2_A_nn);
+        vectorXZ.copyFrom(BLASData.L2_zHER2_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zHER2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHER2(uplo, alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_zHER2_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHER2_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zHER2_y_n2);
+        matrixAZ.copyFrom(BLASData.L2_zHER2_A_nn);
+
+        mBLAS.ZHER2(uplo, alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
 
 
     private void xHPR2_API_test(int Uplo, int incX, int incY, ArrayList<Allocation> mMatrix) {
@@ -1700,6 +4196,82 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_ZHPR2_API() {
         L2_xHPR2_API(mMatrixZ);
+    }
+
+    public void test_L2_CHPR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        Allocation vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N, 1));
+        matrixAC.copyFrom(BLASData.L2_cHER2_A_nn_pu);
+        vectorXC.copyFrom(BLASData.L2_cHER2_x_n1);
+        vectorYC.copyFrom(BLASData.L2_cHER2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.CHPR2(uplo, alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_cHER2_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimX, 1));
+        vectorYC = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32_2(mRS), dimY, 1));
+        vectorXC.copyFrom(BLASData.L2_cHER2_x_n2);
+        vectorYC.copyFrom(BLASData.L2_cHER2_y_n2);
+        matrixAC.copyFrom(BLASData.L2_cHER2_A_nn_pu);
+
+        mBLAS.CHPR2(uplo, alphaC, vectorXC, incX, vectorYC, incY, matrixAC);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAC, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_ZHPR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        Allocation vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N, 1));
+        matrixAZ.copyFrom(BLASData.L2_zHER2_A_nn_pu);
+        vectorXZ.copyFrom(BLASData.L2_zHER2_x_n1);
+        vectorYZ.copyFrom(BLASData.L2_zHER2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.ZHPR2(uplo, alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_zHER2_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimX, 1));
+        vectorYZ = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64_2(mRS), dimY, 1));
+        vectorXZ.copyFrom(BLASData.L2_zHER2_x_n2);
+        vectorYZ.copyFrom(BLASData.L2_zHER2_y_n2);
+        matrixAZ.copyFrom(BLASData.L2_zHER2_A_nn_pu);
+
+        mBLAS.ZHPR2(uplo, alphaZ, vectorXZ, incX, vectorYZ, incY, matrixAZ);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAZ, matrixARef, true);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1778,6 +4350,70 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_DSYR_API() {
         L2_xSYR_API(mMatrixD);
+    }
+
+    public void test_L2_SSYR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYR_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sSYR_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SSYR(uplo, alphaS, vectorXS, incX, matrixAS);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_sSYR_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYR_x_n2);
+        matrixAS.copyFrom(BLASData.L2_sSYR_A_nn);
+
+        mBLAS.SSYR(uplo, alphaS, vectorXS, incX, matrixAS);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSYR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYR_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dSYR_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DSYR(uplo, alphaD, vectorXD, incX, matrixAD);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_dSYR_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYR_x_n2);
+        matrixAD.copyFrom(BLASData.L2_dSYR_A_nn);
+
+        mBLAS.DSYR(uplo, alphaD, vectorXD, incX, matrixAD);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1859,6 +4495,72 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_DSPR_API() {
         L2_xSPR_API(mMatrixD);
+    }
+
+    public void test_L2_SSPR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYR_A_nn_pu);
+        vectorXS.copyFrom(BLASData.L2_sSYR_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SSPR(uplo, alphaS, vectorXS, incX, matrixAS);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_sSYR_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYR_x_n2);
+        matrixAS.copyFrom(BLASData.L2_sSYR_A_nn_pu);
+
+        mBLAS.SSPR(uplo, alphaS, vectorXS, incX, matrixAS);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSPR_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYR_A_nn_pu);
+        vectorXD.copyFrom(BLASData.L2_dSYR_x_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DSPR(uplo, alphaD, vectorXD, incX, matrixAD);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_dSYR_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYR_x_n2);
+        matrixAD.copyFrom(BLASData.L2_dSYR_A_nn_pu);
+
+        mBLAS.DSPR(uplo, alphaD, vectorXD, incX, matrixAD);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -1944,6 +4646,80 @@ public class IntrinsicBLAS extends IntrinsicBase {
 
     public void test_L2_DSYR2_API() {
         L2_xSYR2_API(mMatrixD);
+    }
+
+    public void test_L2_SSYR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYR2_A_nn);
+        vectorXS.copyFrom(BLASData.L2_sSYR2_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sSYR2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SSYR2(uplo, alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_sSYR2_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYR2_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sSYR2_y_n2);
+        matrixAS.copyFrom(BLASData.L2_sSYR2_A_nn);
+
+        mBLAS.SSYR2(uplo, alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSYR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYR2_A_nn);
+        vectorXD.copyFrom(BLASData.L2_dSYR2_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dSYR2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DSYR2(uplo, alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), BLASData.dN, BLASData.dN));
+        matrixARef.copyFrom(BLASData.L2_dSYR2_o_N);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (BLASData.dN-1) * incX;
+        int dimY = 1 + (BLASData.dN-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYR2_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dSYR2_y_n2);
+        matrixAD.copyFrom(BLASData.L2_dSYR2_A_nn);
+
+        mBLAS.DSYR2(uplo, alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        mRS.finish();
+        checkError();
     }
 
 
@@ -2033,6 +4809,83 @@ public class IntrinsicBLAS extends IntrinsicBase {
     public void test_L2_DSPR2_API() {
         L2_xSPR2_API(mMatrixD);
     }
+
+    public void test_L2_SSPR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        Allocation vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N, 1));
+        matrixAS.copyFrom(BLASData.L2_sSYR2_A_nn_pu);
+        vectorXS.copyFrom(BLASData.L2_sSYR2_x_n1);
+        vectorYS.copyFrom(BLASData.L2_sSYR2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.SSPR2(uplo, alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_sSYR2_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimX, 1));
+        vectorYS = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F32(mRS), dimY, 1));
+        vectorXS.copyFrom(BLASData.L2_sSYR2_x_n2);
+        vectorYS.copyFrom(BLASData.L2_sSYR2_y_n2);
+        matrixAS.copyFrom(BLASData.L2_sSYR2_A_nn_pu);
+
+        mBLAS.SSPR2(uplo, alphaS, vectorXS, incX, vectorYS, incY, matrixAS);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAS, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
+    public void test_L2_DSPR2_Correctness() {
+        int uplo = ScriptIntrinsicBLAS.UPPER;
+        int incX = 1;
+        int incY = 1;
+
+        //populate input allocations
+        int N = BLASData.dN;
+        Allocation matrixAD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        Allocation vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        Allocation vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N, 1));
+        matrixAD.copyFrom(BLASData.L2_dSYR2_A_nn_pu);
+        vectorXD.copyFrom(BLASData.L2_dSYR2_x_n1);
+        vectorYD.copyFrom(BLASData.L2_dSYR2_y_n1);
+
+        //Test for the default case: NO_TRANS
+        mBLAS.DSPR2(uplo, alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        Allocation matrixARef = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), N * (N+1) / 2, 1));
+        matrixARef.copyFrom(BLASData.L2_dSYR2_o_N_pu);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        //Test for incX = 2 & incY = 2;
+        incX = 2;
+        incY = 2;
+        int dimX = 1 + (N-1) * incX;
+        int dimY = 1 + (N-1) * incY;
+        vectorXD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimX, 1));
+        vectorYD = Allocation.createTyped(mRS, Type.createXY(mRS, Element.F64(mRS), dimY, 1));
+        vectorXD.copyFrom(BLASData.L2_dSYR2_x_n2);
+        vectorYD.copyFrom(BLASData.L2_dSYR2_y_n2);
+        matrixAD.copyFrom(BLASData.L2_dSYR2_A_nn_pu);
+
+        mBLAS.DSPR2(uplo, alphaD, vectorXD, incX, vectorYD, incY, matrixAD);
+        mVerify.invoke_verifyUpLo(matrixARef, matrixAD, matrixARef, true);
+
+        mRS.finish();
+        checkError();
+    }
+
 
 
     private boolean validateL3(Element e, int TransA, int TransB, int Side, Allocation A, Allocation B, Allocation C) {
