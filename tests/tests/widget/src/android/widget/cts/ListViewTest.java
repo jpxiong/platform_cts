@@ -32,15 +32,18 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.util.SparseBooleanArray;
 import android.util.Xml;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LayoutAnimationController;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -359,6 +362,53 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(2, mListView.getHeaderViewsCount());
+    }
+
+    public void testHeaderFooterType() throws Throwable {
+        final TextView headerView = new TextView(getActivity());
+        final List<Pair<View, View>> mismatch = new ArrayList<Pair<View, View>>();
+        final ArrayAdapter adapter = new ArrayAdapter<String>(mActivity,
+                android.R.layout.simple_list_item_1, mNameList) {
+            @Override
+            public int getItemViewType(int position) {
+                return position == 0 ? AdapterView.ITEM_VIEW_TYPE_HEADER_OR_FOOTER :
+                        super.getItemViewType(position - 1);
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (position == 0) {
+                    if (convertView != null && convertView != headerView) {
+                        mismatch.add(new Pair<View, View>(headerView, convertView));
+                    }
+                    return headerView;
+                } else {
+                    return super.getView(position - 1, convertView, parent);
+                }
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount() + 1;
+            }
+        };
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mListView.setAdapter(adapter);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertEquals(0, mismatch.size());
     }
 
     public void testAccessDivider() {
