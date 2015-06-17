@@ -4301,38 +4301,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertEquals(Layout.HYPHENATION_FREQUENCY_FULL, tv.getHyphenationFrequency());
     }
 
-    public void testSetGetIndents() {
-        TextView tv = new TextView(mActivity);
-        {
-            // Null.
-            tv.setIndents(null, null);
-            assertNull(tv.getLeftIndents());
-            assertNull(tv.getRightIndents());
-        }
-        {
-            // Empty arrays.
-            final int[] emptyArray = {};
-            tv.setIndents(emptyArray, emptyArray);
-            assertEquals(0, tv.getLeftIndents().length);
-            assertEquals(0, tv.getRightIndents().length);
-        }
-        {
-            final int[] leftIndents = { 10, 20, 30, 40 };
-            final int[] rightIndents = { 15, 25, 35, 45 };
-            tv.setIndents(leftIndents, rightIndents);
-            MoreAsserts.assertEquals(leftIndents, tv.getLeftIndents());
-            MoreAsserts.assertEquals(rightIndents, tv.getRightIndents());
-        }
-        {
-            // Negative values.
-            final int[] leftIndents = { -10, 20, -30, 40 };
-            final int[] rightIndents = { 15, -25, 35, -45 };
-            tv.setIndents(leftIndents, rightIndents);
-            MoreAsserts.assertEquals(leftIndents, tv.getLeftIndents());
-            MoreAsserts.assertEquals(rightIndents, tv.getRightIndents());
-        }
-    }
-
     private static class MockOnEditorActionListener implements OnEditorActionListener {
         private boolean isOnEditorActionCalled;
 
