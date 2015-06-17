@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -2831,7 +2832,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertEquals(40, mTextView.getPaddingBottom());
     }
 
-    public void testSetTextAppearance() {
+    public void testDeprecatedSetTextAppearance() {
         mTextView = new TextView(mActivity);
 
         mTextView.setTextAppearance(mActivity, R.style.TextAppearance_All);
@@ -2860,8 +2861,47 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertEquals(null, mTextView.getTypeface());
     }
 
+    public void testSetTextAppearance() {
+        mTextView = new TextView(mActivity);
+
+        mTextView.setTextAppearance(R.style.TextAppearance_All);
+        assertEquals(mActivity.getResources().getColor(R.drawable.black),
+                mTextView.getCurrentTextColor());
+        assertEquals(20f, mTextView.getTextSize(), 0.01f);
+        assertEquals(Typeface.BOLD, mTextView.getTypeface().getStyle());
+        assertEquals(mActivity.getResources().getColor(R.drawable.red),
+                mTextView.getCurrentHintTextColor());
+        assertEquals(mActivity.getResources().getColor(R.drawable.blue),
+                mTextView.getLinkTextColors().getDefaultColor());
+
+        mTextView.setTextAppearance(R.style.TextAppearance_Colors);
+        assertEquals(mActivity.getResources().getColor(R.drawable.black),
+                mTextView.getCurrentTextColor());
+        assertEquals(mActivity.getResources().getColor(R.drawable.blue),
+                mTextView.getCurrentHintTextColor());
+        assertEquals(mActivity.getResources().getColor(R.drawable.yellow),
+                mTextView.getLinkTextColors().getDefaultColor());
+
+        mTextView.setTextAppearance(R.style.TextAppearance_NotColors);
+        assertEquals(17f, mTextView.getTextSize(), 0.01f);
+        assertEquals(Typeface.NORMAL, mTextView.getTypeface().getStyle());
+
+        mTextView.setTextAppearance(R.style.TextAppearance_Style);
+        assertEquals(null, mTextView.getTypeface());
+    }
+
     public void testOnPreDraw() {
         // Do not test. Implementation details.
+    }
+
+    public void testAccessCompoundDrawableTint() {
+        mTextView = new TextView(mActivity);
+
+        ColorStateList colors = ColorStateList.valueOf(Color.RED);
+        mTextView.setCompoundDrawableTintList(colors);
+        mTextView.setCompoundDrawableTintMode(PorterDuff.Mode.XOR);
+        assertSame(colors, mTextView.getCompoundDrawableTintList());
+        assertEquals(PorterDuff.Mode.XOR, mTextView.getCompoundDrawableTintMode());
     }
 
     public void testSetHorizontallyScrolling() {
