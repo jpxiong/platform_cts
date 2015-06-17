@@ -313,12 +313,14 @@ public class AccessibilityEndToEndTest extends
 
         // create the notification to send
         final int notificationId = 1;
-        final Notification notification = new Notification();
-        notification.icon = android.R.drawable.stat_notify_call_mute;
-        notification.contentIntent = PendingIntent.getActivity(getActivity(), 0, new Intent(),
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        notification.tickerText = message;
-        notification.setLatestEventInfo(getActivity(), "", "", notification.contentIntent);
+        final Notification notification = new Notification.Builder(getActivity())
+                .setSmallIcon(android.R.drawable.stat_notify_call_mute)
+                .setContentIntent(PendingIntent.getActivity(getActivity(), 0, new Intent(),
+                        PendingIntent.FLAG_CANCEL_CURRENT))
+                .setTicker(message)
+                .setContentTitle("")
+                .setContentText("")
+                .build();
 
         // create and populate the expected event
         final AccessibilityEvent expected = AccessibilityEvent.obtain();
