@@ -150,6 +150,22 @@ public class NotificationTest extends AndroidTestCase {
         assertNull(result.sound);
     }
 
+    public void testBuilder() {
+        final Intent intent = new Intent();
+        final PendingIntent contentIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
+        mNotification = new Notification.Builder(mContext)
+                .setSmallIcon(1)
+                .setContentTitle(CONTENT_TITLE)
+                .setContentText(CONTENT_TEXT)
+                .setContentIntent(contentIntent)
+                .build();
+        assertEquals(CONTENT_TEXT, mNotification.extras.getString(Notification.EXTRA_TEXT));
+        assertEquals(CONTENT_TITLE, mNotification.extras.getString(Notification.EXTRA_TITLE));
+        assertEquals(1, mNotification.icon);
+        assertEquals(contentIntent, mNotification.contentIntent);
+        assertNotNull(mNotification.contentView);
+    }
+
     public void testSetLatestEventInfo() {
         mNotification = new Notification();
         mNotification.icon = 1;
