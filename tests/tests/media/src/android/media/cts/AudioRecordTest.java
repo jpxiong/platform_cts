@@ -416,6 +416,39 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         assertEquals(TEST_NAME + ": state", expectedState, observedState);
     }
 
+    // Test AudioRecord to ensure we can build after a failure.
+    public void testAudioRecordBufferSize() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testAudioRecordBufferSize";
+
+        // use builder with parameters that should fail
+        final int superBigBufferSize = 1 << 28;
+        try {
+            final AudioRecord record = new AudioRecord.Builder()
+                .setBufferSizeInBytes(superBigBufferSize)
+                .build();
+            record.release();
+            fail(TEST_NAME + ": should throw exception on failure");
+        } catch (UnsupportedOperationException e) {
+            ;
+        }
+
+        // we should be able to create again with minimum buffer size
+        final int verySmallBufferSize = 2 * 3 * 4; // frame size multiples
+        final AudioRecord record2 = new AudioRecord.Builder()
+                .setBufferSizeInBytes(verySmallBufferSize)
+                .build();
+
+        final int observedState2 = record2.getState();
+        final int observedBufferSize2 = record2.getBufferSizeInFrames();
+        record2.release();
+
+        // succeeds for minimum buffer size
+        assertEquals(TEST_NAME + ": state", AudioRecord.STATE_INITIALIZED, observedState2);
+        // should force the minimum size buffer which is > 0
+        assertTrue(TEST_NAME + ": buffer frame count", observedBufferSize2 > 0);
+    }
+
     public void testSynchronizedRecord() throws Exception {
         if (!hasMicrophone()) {
             return;
