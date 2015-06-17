@@ -1268,7 +1268,7 @@ public class PaintTest extends AndroidTestCase {
 
         try {
             // start < context start
-            p.getOffsetForAdvance(string, 1, string.length(), 0, string.length(), false, 0.0f);
+            p.getOffsetForAdvance(string, 0, string.length(), 1, string.length(), false, 0.0f);
             fail("Should throw an IndexOutOfBoundsException.");
         } catch (IndexOutOfBoundsException e) {
         } catch (Exception e) {
