@@ -2214,6 +2214,39 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         track.release();
     }
 
+    // Test AudioTrack to ensure we can build after a failure.
+    public void testAudioTrackBufferSize() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testAudioTrackBufferSize";
+
+        // use builder with parameters that should fail
+        final int superBigBufferSize = 1 << 28;
+        try {
+            final AudioTrack track = new AudioTrack.Builder()
+                .setBufferSizeInBytes(superBigBufferSize)
+                .build();
+            track.release();
+            fail(TEST_NAME + ": should throw exception on failure");
+        } catch (UnsupportedOperationException e) {
+            ;
+        }
+
+        // we should be able to create again with minimum buffer size
+        final int verySmallBufferSize = 2 * 3 * 4; // frame size multiples
+        final AudioTrack track2 = new AudioTrack.Builder()
+                .setBufferSizeInBytes(verySmallBufferSize)
+                .build();
+
+        final int observedState2 = track2.getState();
+        final int observedBufferSize2 = track2.getBufferSizeInFrames();
+        track2.release();
+
+        // succeeds for minimum buffer size
+        assertEquals(TEST_NAME + ": state", AudioTrack.STATE_INITIALIZED, observedState2);
+        // should force the minimum size buffer which is > 0
+        assertTrue(TEST_NAME + ": buffer frame count", observedBufferSize2 > 0);
+    }
+
 /* Do not run in JB-MR1. will be re-opened in the next platform release.
     public void testResourceLeakage() throws Exception {
         final int BUFFER_SIZE = 600 * 1024;
