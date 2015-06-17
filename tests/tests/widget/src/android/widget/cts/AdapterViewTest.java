@@ -383,34 +383,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertEquals(1, mAdapterView.getSelectedItemId());
         assertEquals(1, mAdapterView.getSelectedItemPosition());
         assertEquals(FRUIT[1], mAdapterView.getSelectedItem());
-
-        // Ensure getSelectedItemZzz() synchronizes after data set change.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_list_item_1);
-        adapter.add(FRUIT[0]);
-        adapter.add(FRUIT[1]);
-
-        ListAdapter previousAdapter = mAdapterView.getAdapter();
-        mAdapterView.setAdapter(adapter);
-        mAdapterView.setSelection(1);
-        assertEquals("Initial getSelectedItemId() is correct",
-                1, mAdapterView.getSelectedItemId());
-        assertEquals("Initial getSelectedItemPosition() is correct",
-                1, mAdapterView.getSelectedItemPosition());
-
-        adapter.remove(FRUIT[0]);
-        assertEquals("Synchronized getSelectedItemId() after data set invalidation",
-                0, mAdapterView.getSelectedItemId());
-        assertEquals("Synchronized getSelectedItemPosition() after data set invalidation",
-                0, mAdapterView.getSelectedItemPosition());
-
-        adapter.clear();
-        assertEquals("Synchronized getSelectedItemId() after data set cleared",
-                AdapterView.INVALID_ROW_ID, mAdapterView.getSelectedItemId());
-        assertEquals("Synchronized getSelectedItemPosition() after data set cleared",
-                AdapterView.INVALID_POSITION, mAdapterView.getSelectedItemPosition());
-
-        mAdapterView.setAdapter(previousAdapter);
     }
 
     /*
