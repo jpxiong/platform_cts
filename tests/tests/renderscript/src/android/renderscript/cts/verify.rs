@@ -20,6 +20,95 @@ int gAllowedIntError = 0;
 static bool hadError = false;
 static int2 errorLoc = {0,0};
 
+static bool compare_double(double f1, double f2) {
+    if (fabs((float)(f1-f2)) > 0.0001f) {
+        hadError = true;
+        return false;
+    }
+    return true;
+}
+
+static bool verify_double4(rs_allocation in1, rs_allocation in2)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    for (uint32_t y=0; y < h; y++) {
+        for (uint32_t x=0; x < w; x++) {
+            double4 pref = rsGetElementAt_double4(in1, x, y);
+            double4 ptst = rsGetElementAt_double4(in2, x, y);
+            bool e = !compare_double(pref.x, ptst.x);
+            e |= !compare_double(pref.y, ptst.y);
+            e |= !compare_double(pref.z, ptst.z);
+            e |= !compare_double(pref.w, ptst.w);
+            if (e) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static bool verify_double3(rs_allocation in1, rs_allocation in2)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    for (uint32_t y=0; y < h; y++) {
+        for (uint32_t x=0; x < w; x++) {
+            double3 pref = rsGetElementAt_double3(in1, x, y);
+            double3 ptst = rsGetElementAt_double3(in2, x, y);
+            bool e = !compare_double(pref.x, ptst.x);
+            e |= !compare_double(pref.y, ptst.y);
+            e |= !compare_double(pref.z, ptst.z);
+            if (e) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static bool verify_double2(rs_allocation in1, rs_allocation in2)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    for (uint32_t y=0; y < h; y++) {
+        for (uint32_t x=0; x < w; x++) {
+            double2 pref = rsGetElementAt_double2(in1, x, y);
+            double2 ptst = rsGetElementAt_double2(in2, x, y);
+            bool e = !compare_double(pref.x, ptst.x);
+            e |= !compare_double(pref.y, ptst.y);
+            if (e) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static bool verify_double(rs_allocation in1, rs_allocation in2)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    for (uint32_t y=0; y < h; y++) {
+        for (uint32_t x=0; x < w; x++) {
+            double pref = rsGetElementAt_double(in1, x, y);
+            double ptst = rsGetElementAt_double(in2, x, y);
+            bool e = !compare_double(pref, ptst);
+            if (e) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 static bool compare_float(float f1, float f2) {
     if (fabs(f1-f2) > 0.0001f) {
@@ -232,7 +321,7 @@ static bool verify_uchar(rs_allocation in1, rs_allocation in2)
             rsDebug(txt, rsGetElementAt_uchar(a, xy.x, xy.y)); \
             break; \
         } \
-    } else { \
+    } else if (dt == RS_TYPE_FLOAT_32) { \
         switch(vs) { \
         case 4: \
             rsDebug(txt, rsGetElementAt_float4(a, xy.x, xy.y)); \
@@ -245,6 +334,21 @@ static bool verify_uchar(rs_allocation in1, rs_allocation in2)
             break; \
         case 1: \
             rsDebug(txt, rsGetElementAt_float(a, xy.x, xy.y)); \
+            break; \
+        } \
+    } else if (dt == RS_TYPE_FLOAT_64) { \
+        switch(vs) { \
+        case 4: \
+            rsDebug(txt, rsGetElementAt_double4(a, xy.x, xy.y)); \
+            break; \
+        case 3: \
+            rsDebug(txt, rsGetElementAt_double3(a, xy.x, xy.y)); \
+            break; \
+        case 2: \
+            rsDebug(txt, rsGetElementAt_double2(a, xy.x, xy.y)); \
+            break; \
+        case 1: \
+            rsDebug(txt, rsGetElementAt_double(a, xy.x, xy.y)); \
             break; \
         } \
     } \
@@ -272,7 +376,7 @@ void verify(rs_allocation ref_in, rs_allocation tst_in, rs_allocation src_in)
             valid = verify_uchar(ref_in, tst_in);
             break;
         }
-    } else {
+    } else if (dt == RS_TYPE_FLOAT_32) {
         switch(vs) {
         case 4:
             valid = verify_float4(ref_in, tst_in);
@@ -287,6 +391,21 @@ void verify(rs_allocation ref_in, rs_allocation tst_in, rs_allocation src_in)
             valid = verify_float(ref_in, tst_in);
             break;
         }
+    } else if (dt == RS_TYPE_FLOAT_64) {
+        switch(vs) {
+        case 4:
+            valid = verify_double4(ref_in, tst_in);
+            break;
+        case 3:
+            valid = verify_double3(ref_in, tst_in);
+            break;
+        case 2:
+            valid = verify_double2(ref_in, tst_in);
+            break;
+        case 1:
+            valid = verify_double(ref_in, tst_in);
+            break;
+        }
     }
     if (!valid) {
         rsDebug("verify failure at xy", errorLoc);
@@ -295,6 +414,183 @@ void verify(rs_allocation ref_in, rs_allocation tst_in, rs_allocation src_in)
         printCell("test value      ", tst_in, errorLoc);
     }
 }
+
+
+static bool verifyUpLo_float2(rs_allocation in1, rs_allocation in2, bool Uplo)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    if (Uplo) { //upper
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=y; x < w; x++) {
+                float2 pref = rsGetElementAt_float2(in1, x, y);
+                float2 ptst = rsGetElementAt_float2(in2, x, y);
+                bool e = !compare_float(pref.x, ptst.x);
+                e |= !compare_float(pref.y, ptst.y);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    } else {
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=0; x <= y; x++) {
+                float2 pref = rsGetElementAt_float2(in1, x, y);
+                float2 ptst = rsGetElementAt_float2(in2, x, y);
+                bool e = !compare_float(pref.x, ptst.x);
+                e |= !compare_float(pref.y, ptst.y);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+static bool verifyUpLo_float(rs_allocation in1, rs_allocation in2, bool Uplo)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    if (Uplo) { //upper
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=y; x < w; x++) {
+                float pref = rsGetElementAt_float(in1, x, y);
+                float ptst = rsGetElementAt_float(in2, x, y);
+                bool e = !compare_float(pref, ptst);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    } else {
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=0; x <= y; x++) {
+                float pref = rsGetElementAt_float(in1, x, y);
+                float ptst = rsGetElementAt_float(in2, x, y);
+                bool e = !compare_float(pref, ptst);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+static bool verifyUpLo_double2(rs_allocation in1, rs_allocation in2, bool Uplo)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    if (Uplo) { //upper
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=y; x < w; x++) {
+                double2 pref = rsGetElementAt_double2(in1, x, y);
+                double2 ptst = rsGetElementAt_double2(in2, x, y);
+                bool e = !compare_double(pref.x, ptst.x);
+                e |= !compare_double(pref.y, ptst.y);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    } else {
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=0; x <= y; x++) {
+                double2 pref = rsGetElementAt_double2(in1, x, y);
+                double2 ptst = rsGetElementAt_double2(in2, x, y);
+                bool e = !compare_double(pref.x, ptst.x);
+                e |= !compare_double(pref.y, ptst.y);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+static bool verifyUpLo_double(rs_allocation in1, rs_allocation in2, bool Uplo)
+{
+    uint32_t w = rsAllocationGetDimX(in1);
+    uint32_t h = rsAllocationGetDimY(in1);
+    if (Uplo) { //upper
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=y; x < w; x++) {
+                double pref = rsGetElementAt_double(in1, x, y);
+                double ptst = rsGetElementAt_double(in2, x, y);
+                bool e = !compare_double(pref, ptst);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    } else {
+        for (uint32_t y=0; y < h; y++) {
+            for (uint32_t x=0; x <= y; x++) {
+                double pref = rsGetElementAt_double(in1, x, y);
+                double ptst = rsGetElementAt_double(in2, x, y);
+                bool e = !compare_double(pref, ptst);
+                if (e) {
+                    errorLoc.x = x;
+                    errorLoc.y = y;
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+void verifyUpLo(rs_allocation ref_in, rs_allocation tst_in, rs_allocation src_in, bool Uplo)
+{
+    rs_element e = rsAllocationGetElement(ref_in);
+    rs_data_type dt = rsElementGetDataType(e);
+    uint32_t vs = rsElementGetVectorSize(e);
+    bool valid = false;
+
+    if (dt == RS_TYPE_FLOAT_32) {
+        switch(vs) {
+        case 2:
+            valid = verifyUpLo_float2(ref_in, tst_in, Uplo);
+            break;
+        case 1:
+            valid = verifyUpLo_float(ref_in, tst_in, Uplo);
+            break;
+        }
+    } else if (dt == RS_TYPE_FLOAT_64) {
+        switch(vs) {
+        case 2:
+            valid = verifyUpLo_double2(ref_in, tst_in, Uplo);
+            break;
+        case 1:
+            valid = verifyUpLo_double(ref_in, tst_in, Uplo);
+            break;
+        }
+    }
+    if (!valid) {
+        rsDebug("verify failure at xy", errorLoc);
+        printCell("start value     ", src_in, errorLoc);
+        printCell("reference value ", ref_in, errorLoc);
+        printCell("test value      ", tst_in, errorLoc);
+    }
+}
+
 
 void checkError()
 {
