@@ -386,21 +386,14 @@ public class ScriptGroupTest extends RSBaseCompute {
         ScriptGroup.Input unbound = builder.addInput();
 
         ScriptGroup.Closure c = null;
-        ScriptGroup.Future f = null;
-        int stride;
-        for (stride = ARRAY_SIZE / 2; stride >= 1; stride >>= 1) {
+        ScriptGroup.Binding b2 = new ScriptGroup.Binding(s.getFieldID_a(), unbound);
+        for (int stride = ARRAY_SIZE / 2; stride >= 1; stride >>= 1) {
             ScriptGroup.Binding b1 = new ScriptGroup.Binding(s.getFieldID_reduction_stride(),
                                                              stride);
-            ScriptGroup.Binding b2;
-            if (f == null) {
-                b2 = new ScriptGroup.Binding(s.getFieldID_a_in(), unbound);
-            } else {
-                b2 = new ScriptGroup.Binding(s.getFieldID_a_in(), f);
-            }
             c = builder.addKernel(s.getKernelID_add(),
                                   Type.createX(mRS, Element.I32_4(mRS), stride),
                                   b1, b2);
-            f = c.getReturn();
+            b2 = new ScriptGroup.Binding(s.getFieldID_a(), c.getReturn());
         }
 
         if (c == null) {
@@ -419,6 +412,64 @@ public class ScriptGroupTest extends RSBaseCompute {
             if (failed == false && a[i] != ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2) {
                 Log.e(TAG,
                       "a["+i+"]="+a[i]+", should be "+ (ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2));
+                failed = true;
+            }
+        }
+
+        assertTrue(!failed);
+    }
+
+    /**
+     * Tests that the kernel output to a global can be used as a future
+     */
+    public void testBuilder2KernelOutputToGlobal() {
+        ScriptC_reduction s = new ScriptC_reduction(mRS);
+
+        int[] array = new int[ARRAY_SIZE * 4];
+
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+            array[i*4] = i;
+            array[i*4 + 1] = i;
+            array[i*4 + 2] = i;
+            array[i*4 + 3] = i;
+        }
+
+        Allocation input = Allocation.createSized(mRS, Element.I32_4(mRS), ARRAY_SIZE);
+        input.copyFrom(array);
+        Allocation input1 = Allocation.createSized(mRS, Element.I32_4(mRS), ARRAY_SIZE);
+
+        ScriptGroup.Builder2 builder = new ScriptGroup.Builder2(mRS);
+
+        ScriptGroup.Input unbound = builder.addInput();
+
+        ScriptGroup.Closure c = null;
+        ScriptGroup.Binding b2 = new ScriptGroup.Binding(s.getFieldID_a(), unbound);
+        for (int stride = ARRAY_SIZE / 2; stride >= 1; stride >>= 1) {
+            ScriptGroup.Binding b1 = new ScriptGroup.Binding(s.getFieldID_reduction_stride(),
+                                                             stride);
+            c = builder.addKernel(s.getKernelID_add2(),
+                                  Type.createX(mRS, Element.I32_4(mRS), stride),
+                                  b1, b2);
+            b2 = new ScriptGroup.Binding(s.getFieldID_a(),
+                                         c.getGlobal(s.getFieldID_a()));
+        }
+
+        if (c == null) {
+            return;
+        }
+
+        ScriptGroup group = builder.create("Summation", c.getGlobal(s.getFieldID_a()));
+
+        int[] a = new int[4 * ARRAY_SIZE];
+        ((Allocation)group.execute(input, input1)[0]).copyTo(a);
+
+        mRS.finish();
+
+        boolean failed = false;
+        for (int i = 0; i < 4; i++) {
+            if (failed == false && a[i] != ARRAY_SIZE * (ARRAY_SIZE - 1) / 2) {
+                Log.e(TAG,
+                      "a["+i+"]="+a[i]+", should be "+ (ARRAY_SIZE * (ARRAY_SIZE - 1) / 2));
                 failed = true;
             }
         }

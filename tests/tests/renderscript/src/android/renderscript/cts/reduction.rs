@@ -17,10 +17,19 @@
 #pragma version(1)
 #pragma rs java_package_name(android.renderscript.cts)
 
-rs_allocation a_in;
+rs_allocation a;
 int reduction_stride;
 
 int4 __attribute__((kernel)) add(uint x)
 {
-  return rsGetElementAt_int4(a_in, x) + rsGetElementAt_int4(a_in, x + reduction_stride);
+  return rsGetElementAt_int4(a, x) + rsGetElementAt_int4(a, x + reduction_stride);
+}
+
+int4 __attribute__((kernel)) add2(uint x)
+{
+  rsSetElementAt_int4(a,
+                      rsGetElementAt_int4(a, x) +
+                      rsGetElementAt_int4(a, x + reduction_stride),
+                      x);
+  return 0;
 }
