@@ -95,12 +95,12 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         executeDeviceOwnerTest("ScreenCaptureDisabledTest");
     }
 
-    public void testSilentPackageInstaller() throws Exception {
+    public void testPackageInstall() throws Exception {
         final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
         try {
             getDevice().uninstallPackage(TEST_APP_PKG);
             assertTrue(getDevice().pushFile(apk, TEST_APP_LOCATION + apk.getName()));
-            executeDeviceOwnerTest("SilentPackageInstallerTest");
+            executeDeviceOwnerTest("PackageInstallTest");
         } finally {
             String command = "rm " + TEST_APP_LOCATION + apk.getName();
             String commandOutput = getDevice().executeShellCommand(command);
