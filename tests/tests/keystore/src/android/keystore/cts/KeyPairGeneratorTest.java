@@ -64,7 +64,7 @@ import libcore.java.security.TestKeyStore;
 import libcore.javax.net.ssl.TestKeyManager;
 import libcore.javax.net.ssl.TestSSLContext;
 
-public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
+public class KeyPairGeneratorTest extends AndroidTestCase {
     private KeyStore mKeyStore;
 
     private CountingSecureRandom mRng;
