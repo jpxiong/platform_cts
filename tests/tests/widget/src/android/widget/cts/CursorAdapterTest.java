@@ -19,6 +19,7 @@ package android.widget.cts;
 import java.io.File;
 
 import android.content.Context;
+import android.content.res.Resources.Theme;
 import android.cts.util.PollingCheck;
 import android.cts.util.ReadElf;
 import android.cts.util.TestThread;
@@ -250,6 +251,14 @@ public class CursorAdapterTest extends InstrumentationTestCase {
         retView = (TextView) cursorAdapter.getDropDownView(1, textView, mParent);
         assertNotNull(retView);
         assertEquals(SECOND_NUMBER, retView.getText().toString());
+    }
+
+    @UiThreadTest
+    public void testAccessDropDownViewTheme() {
+        CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
+        Theme theme = mContext.getResources().newTheme();
+        cursorAdapter.setDropDownViewTheme(theme);
+        assertSame(theme, cursorAdapter.getDropDownViewTheme());
     }
 
     @UiThreadTest
