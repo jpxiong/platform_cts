@@ -18,7 +18,6 @@ package android.media.cts;
 
 import android.annotation.TargetApi;
 import android.content.res.AssetFileDescriptor;
-import android.cts.util.MediaUtils;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -274,12 +273,12 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         outputVideoFormat.setInteger(
                 MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
         outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_VIDEO_BIT_RATE);
+        outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, OUTPUT_VIDEO_FRAME_RATE);
         outputVideoFormat.setInteger(
                 MediaFormat.KEY_I_FRAME_INTERVAL, OUTPUT_VIDEO_IFRAME_INTERVAL);
+        if (VERBOSE) Log.d(TAG, "video format: " + outputVideoFormat);
 
         String videoEncoderName = mcl.findEncoderForFormat(outputVideoFormat);
-        outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, OUTPUT_VIDEO_FRAME_RATE);
-        if (VERBOSE) Log.d(TAG, "video format: " + outputVideoFormat);
         if (videoEncoderName == null) {
             // Don't fail CTS if they don't have an AVC codec (not here, anyway).
             Log.e(TAG, "Unable to find an appropriate codec for " + outputVideoFormat);

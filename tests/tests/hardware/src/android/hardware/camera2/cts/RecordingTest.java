@@ -14,7 +14,6 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
 
-import android.cts.util.MediaUtils;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCaptureSession;
@@ -1054,7 +1053,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static boolean isSupportedByAVCEncoder(Size sz, int frameRate) {
         MediaFormat format = MediaFormat.createVideoFormat(
                 MediaFormat.MIMETYPE_VIDEO_AVC, sz.getWidth(), sz.getHeight());
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
         MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
-        return MediaUtils.findEncoderForFormat(format, frameRate) != null;
+        return mcl.findEncoderForFormat(format) != null;
     }
 }
