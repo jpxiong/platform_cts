@@ -27,6 +27,14 @@ import android.telecom.TelecomManager;
  */
 public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        if (TestUtils.shouldTestTelecom(mContext)) {
+            setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
+        }
+    }
+
     // TODO: Need to send some commands to the UserManager via adb to do setup
     public void testDisallowOutgoingCallsForSecondaryUser() {
 

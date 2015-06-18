@@ -20,32 +20,34 @@ import static android.telecom.cts.TestUtils.*;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telecom.Call;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
-import android.telecom.ConnectionRequest;
 import android.telecom.InCallService;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
-import android.telecom.cts.MockConnectionService.ConnectionServiceCallbacks;
 import android.telecom.cts.MockInCallService.InCallServiceCallbacks;
 import android.test.InstrumentationTestCase;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Base class for Telecom CTS tests that require a {@link MockConnectionService} and
+ * Base class for Telecom CTS tests that require a {@link CtsConnectionService} and
  * {@link MockInCallService} to verify Telecom functionality.
  */
 public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
+
+    public static final int FLAG_REGISTER = 0x1;
+    public static final int FLAG_ENABLE = 0x2;
+
     public static final PhoneAccountHandle TEST_PHONE_ACCOUNT_HANDLE =
             new PhoneAccountHandle(new ComponentName(PACKAGE, COMPONENT), ACCOUNT_ID);
 
@@ -57,7 +59,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                     PhoneAccount.CAPABILITY_VIDEO_CALLING)
             .setHighlightColor(Color.RED)
             .setShortDescription(LABEL)
-            .setSupportedUriSchemes(Arrays.asList("tel"))
+            .addSupportedUriScheme(PhoneAccount.SCHEME_TEL)
+            .addSupportedUriScheme(PhoneAccount.SCHEME_VOICEMAIL)
             .build();
 
     private static int sCounter = 0;
@@ -65,8 +68,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     Context mContext;
     TelecomManager mTelecomManager;
     InCallServiceCallbacks mInCallCallbacks;
-    ConnectionServiceCallbacks mConnectionCallbacks;
     String mPreviousDefaultDialer = null;
+    MockConnectionService connectionService = new MockConnectionService();
 
     @Override
     protected void setUp() throws Exception {
@@ -75,8 +78,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         mTelecomManager = (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
 
         if (shouldTestTelecom(mContext)) {
-            mTelecomManager.registerPhoneAccount(TEST_PHONE_ACCOUNT);
-            TestUtils.enablePhoneAccount(getInstrumentation(), TEST_PHONE_ACCOUNT_HANDLE);
             mPreviousDefaultDialer = TestUtils.getDefaultDialer(getInstrumentation());
             TestUtils.setDefaultDialer(getInstrumentation(), PACKAGE);
             setupCallbacks();
@@ -90,9 +91,43 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
             }
-            mTelecomManager.unregisterPhoneAccount(TEST_PHONE_ACCOUNT_HANDLE);
+            tearDownConnectionService(TEST_PHONE_ACCOUNT);
         }
         super.tearDown();
+    }
+
+    protected PhoneAccount setupConnectionService(CtsConnectionService connectionService,
+            int flags)
+            throws Exception {
+        if (connectionService == null) {
+            connectionService = this.connectionService;
+        }
+        CtsConnectionService.setUp(TEST_PHONE_ACCOUNT, connectionService);
+
+        if ((flags & FLAG_REGISTER) != 0) {
+            mTelecomManager.registerPhoneAccount(TEST_PHONE_ACCOUNT);
+        }
+        if ((flags & FLAG_ENABLE) != 0) {
+            TestUtils.enablePhoneAccount(getInstrumentation(),
+                    TEST_PHONE_ACCOUNT_HANDLE);
+        }
+
+        return TEST_PHONE_ACCOUNT;
+    }
+
+    protected void tearDownConnectionService(PhoneAccount account) throws Exception {
+        mTelecomManager.unregisterPhoneAccount(account.getAccountHandle());
+        CtsConnectionService.tearDown();
+        this.connectionService = null;
+    }
+
+    protected void startCallTo(Uri address, PhoneAccountHandle accountHandle) {
+        final Intent intent = new Intent(Intent.ACTION_CALL, address);
+        if (accountHandle != null) {
+            intent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accountHandle);
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     private void sleep(long ms) {
@@ -111,27 +146,11 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         };
 
         MockInCallService.setCallbacks(mInCallCallbacks);
-
-        mConnectionCallbacks = new ConnectionServiceCallbacks() {
-            @Override
-            public void onCreateOutgoingConnection(MockConnection connection,
-                    ConnectionRequest request) {
-                this.lock.release();
-            }
-
-            @Override
-            public void onCreateIncomingConnection(MockConnection connection,
-                    ConnectionRequest request) {
-                this.lock.release();
-            }
-        };
-
-        MockConnectionService.setCallbacks(mConnectionCallbacks);
     }
 
     /**
      * Puts Telecom in a state where there is an incoming call provided by the
-     * {@link MockConnectionService} which can be tested.
+     * {@link CtsConnectionService} which can be tested.
      */
     void addAndVerifyNewIncomingCall(Uri incomingHandle, Bundle extras) {
         if (extras == null) {
@@ -154,7 +173,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     /**
      *  Puts Telecom in a state where there is an active call provided by the
-     *  {@link MockConnectionService} which can be tested.
+     *  {@link CtsConnectionService} which can be tested.
      */
     void placeAndVerifyCall() {
         placeAndVerifyCall(null);
@@ -162,7 +181,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     /**
      *  Puts Telecom in a state where there is an active call provided by the
-     *  {@link MockConnectionService} which can be tested.
+     *  {@link CtsConnectionService} which can be tested.
      *
      *  @param videoState the video state of the call.
      */
@@ -172,7 +191,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     /**
      *  Puts Telecom in a state where there is an active call provided by the
-     *  {@link MockConnectionService} which can be tested.
+     *  {@link CtsConnectionService} which can be tested.
      */
     void placeAndVerifyCall(Bundle extras) {
         placeAndVerifyCall(extras, VideoProfile.STATE_AUDIO_ONLY);
@@ -180,7 +199,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     /**
      *  Puts Telecom in a state where there is an active call provided by the
-     *  {@link MockConnectionService} which can be tested.
+     *  {@link CtsConnectionService} which can be tested.
      */
     void placeAndVerifyCall(Bundle extras, int videoState) {
         placeNewCallWithPhoneAccount(extras, videoState);
@@ -197,48 +216,47 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 mInCallCallbacks.getService().getCallCount());
     }
 
-    void verifyConnectionForOutgoingCall() {
+    MockConnection verifyConnectionForOutgoingCall() {
         try {
-            if (!mConnectionCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
+            if (!connectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
                 fail("No outgoing call connection requested by Telecom");
             }
         } catch (InterruptedException e) {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertNotNull("Telecom should bind to and create ConnectionService",
-                mConnectionCallbacks.getService());
         assertNotNull("Telecom should create outgoing connection for outgoing call",
-                mConnectionCallbacks.outgoingConnection);
+                connectionService.outgoingConnection);
         assertNull("Telecom should not create incoming connection for outgoing call",
-                mConnectionCallbacks.incomingConnection);
+                connectionService.incomingConnection);
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
-        connection.setDialing();
-        connection.setActive();
-
-        assertEquals(Connection.STATE_ACTIVE, connection.getState());
+        connectionService.outgoingConnection.setDialing();
+        connectionService.outgoingConnection.setActive();
+        assertEquals(Connection.STATE_ACTIVE,
+                connectionService.outgoingConnection.getState());
+        return connectionService.outgoingConnection;
     }
 
-    void verifyConnectionForIncomingCall() {
+    MockConnection verifyConnectionForIncomingCall() {
         try {
-            if (!mConnectionCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
-                fail("No incoming call connection requested by Telecom");
+            if (!connectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("No outgoing call connection requested by Telecom");
             }
         } catch (InterruptedException e) {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertNotNull("Telecom should bind to and create ConnectionService",
-                mConnectionCallbacks.getService());
         assertNull("Telecom should not create outgoing connection for outgoing call",
-                mConnectionCallbacks.outgoingConnection);
+                connectionService.outgoingConnection);
         assertNotNull("Telecom should create incoming connection for outgoing call",
-                mConnectionCallbacks.incomingConnection);
+                connectionService.incomingConnection);
 
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
-        connection.setRinging();
-        assertEquals(Connection.STATE_RINGING, connection.getState());
+        connectionService.incomingConnection.setRinging();
+        assertEquals(Connection.STATE_RINGING,
+                connectionService.incomingConnection.getState());
+        return connectionService.incomingConnection;
     }
 
     /**
@@ -252,7 +270,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     }
 
     /**
-     * Place a new outgoing call via the {@link MockConnectionService}
+     * Place a new outgoing call via the {@link CtsConnectionService}
      */
     private void placeNewCallWithPhoneAccount(Bundle extras, int videoState) {
         if (extras == null) {
