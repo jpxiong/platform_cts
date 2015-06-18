@@ -16,12 +16,9 @@
 
 package android.telecom.cts;
 
-import android.content.Intent;
-import android.os.Binder;
 import android.telecom.Call;
 import android.telecom.InCallService;
 import android.util.ArrayMap;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Map;

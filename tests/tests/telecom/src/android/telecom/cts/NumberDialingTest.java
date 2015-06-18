@@ -18,31 +18,21 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.shouldTestTelecom;
 
-import android.content.Context;
 import android.net.Uri;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
-import android.telecom.ConnectionService;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 
 /**
  * Tests that certain numbers make their way through to the connection service.
  */
-public class NumberDialingTest extends SimpleTelecomTest {
-
-    private Context mContext;
+public class NumberDialingTest extends BaseTelecomTestWithMockServices {
 
     /**
      * Amount of time to wait for an asynchronous method invocation to ConnectionService.
      */
     private static final int CS_WAIT_MILLIS = 2000;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mContext = getInstrumentation().getContext();
-    }
 
     public void testEndInPound() throws Exception {
         if (!shouldTestTelecom(mContext)) {
@@ -52,8 +42,8 @@ public class NumberDialingTest extends SimpleTelecomTest {
         final Object[] res = new Object[1];
         Uri address = Uri.fromParts("tel", "*1234#", null);
 
-        PhoneAccount account = setupConnectionService("testEndInPound",
-                new ConnectionService() {
+        PhoneAccount account = setupConnectionService(
+                new MockConnectionService() {
                     @Override
                     public Connection onCreateOutgoingConnection(
                             PhoneAccountHandle connectionManagerPhoneAccount,
