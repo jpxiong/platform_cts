@@ -47,7 +47,9 @@ ifeq ($(strip $(TARGET_ARCH)),x86_64)
 endif
 
 ifeq ($(ARCH_SUPPORTS_SECCOMP),1)
-	LOCAL_SRC_FILES += seccomp-tests/tests/seccomp_bpf_tests.c
+	LOCAL_SRC_FILES += seccomp-tests/tests/seccomp_bpf_tests.c \
+			seccomp_sample_program.cpp
+
 	# This define controls the behavior of OSFeatures.needsSeccompSupport().
 	LOCAL_CFLAGS += -DARCH_SUPPORTS_SECCOMP
 endif
