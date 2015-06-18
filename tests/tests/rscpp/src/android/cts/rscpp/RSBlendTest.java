@@ -117,6 +117,7 @@ public class RSBlendTest extends RSCppTest {
                 assertTrue(byteAlloc[i] == byteAlloc2[i]);
             }
 
+            mRS.destroy();
         }
 
     }
