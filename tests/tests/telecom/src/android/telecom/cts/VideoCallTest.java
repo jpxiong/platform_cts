@@ -43,6 +43,15 @@ import static android.telecom.cts.TestUtils.shouldTestTelecom;
  * hear back via our callback.  Suboptimal, but it works.
  */
 public class VideoCallTest extends BaseTelecomTestWithMockServices {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        if (TestUtils.shouldTestTelecom(mContext)) {
+            setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
+        }
+    }
+
     /**
      * Tests ability to start a 2-way video call and retrieve its video state.
      */
@@ -53,7 +62,6 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
         assertCallState(call, Call.STATE_ACTIVE);
         assertVideoState(call, VideoProfile.STATE_BIDIRECTIONAL);
@@ -99,11 +107,11 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testReceiveSessionModifyRequest() {
         placeAndVerifyCall(VideoProfile.STATE_AUDIO_ONLY);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
+
         assertVideoState(call, VideoProfile.STATE_AUDIO_ONLY);
         assertVideoCallbackRegistered(inCallService, call, true);
 
@@ -124,11 +132,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testSendSessionModifyResponse() {
         placeAndVerifyCall(VideoProfile.STATE_AUDIO_ONLY);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockVideoProvider mockVideoProvider = connection.getMockVideoProvider();
         assertVideoState(call, VideoProfile.STATE_AUDIO_ONLY);
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -148,13 +155,12 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
     public void testVideoCallDelayProvider() {
         // Don't create video provider when call is created initially; we will do this later.
         try {
-            MockConnectionService.setCreateVideoProvider(false);
+            connectionService.setCreateVideoProvider(false);
             placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-            verifyConnectionForOutgoingCall();
+            final MockConnection connection = verifyConnectionForOutgoingCall();
 
             final MockInCallService inCallService = mInCallCallbacks.getService();
             final Call call = inCallService.getLastCall();
-            final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
             assertVideoState(call, VideoProfile.STATE_BIDIRECTIONAL);
             // After initial connection creation there should not be a video provider or callbacks
@@ -168,7 +174,7 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
 
             // Ensure video providers are created in the future.
         } finally {
-            MockConnectionService.setCreateVideoProvider(true);
+            connectionService.setCreateVideoProvider(true);
         }
     }
 
@@ -241,9 +247,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testReceiveVideoQuality() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -274,9 +279,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testReceiveCallSessionEvent() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -297,9 +301,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testReceivePeerDimensionChange() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -319,9 +322,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testSetDeviceOrientation() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -338,9 +340,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testSetPreviewSurface() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -362,9 +363,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testSetDisplaySurface() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);
@@ -386,9 +386,8 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      */
     public void testSetZoom() {
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
         assertVideoCallbackRegistered(inCallService, call, true);

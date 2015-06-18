@@ -18,137 +18,59 @@ package android.telecom.cts;
 
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
-import android.telecom.ConnectionService;
-import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 
 import java.util.concurrent.Semaphore;
 
 /**
- * This is the official ConnectionService for Telecom's CTS App. Since telecom requires that a
- * CS be registered in the AndroidManifest.xml file, we have to have a single implementation
- * of a CS and this is it. To test specific CS behavior, tests will implement their own CS and
- * tell MockConnectionService to forward any method invocations to that test's implementation.
- * This is set up using {@link #setUp} and should be cleaned up before the end of the test using
- * {@link #tearDown}.
+ * Default implementation of a {@link CtsConnectionService}. This is used for the majority
+ * of Telecom CTS tests that simply require that a outgoing call is placed, or incoming call is
+ * received.
  */
-public class MockConnectionService extends ConnectionService {
-    private static ConnectionServiceCallbacks sCallbacks;
-    private static ConnectionService sConnectionService;
-
+public class MockConnectionService extends CtsConnectionService {
     /**
      * Used to control whether the {@link MockVideoProvider} will be created when connections are
      * created.  Used by {@link VideoCallTest#testVideoCallDelayProvider()} to test scenario where
      * the {@link MockVideoProvider} is not created immediately when the Connection is created.
      */
-    private static boolean sCreateVideoProvider = true;
-    private static Object sLock = new Object();
+    private boolean mCreateVideoProvider = true;
 
-    public static abstract class ConnectionServiceCallbacks {
-        private MockConnectionService mService;
-        public MockConnection outgoingConnection;
-        public MockConnection incomingConnection;
-        public Semaphore lock = new Semaphore(0);
-
-        public void onCreateOutgoingConnection(MockConnection connection,
-                ConnectionRequest request) {};
-        public void onCreateIncomingConnection(MockConnection connection,
-                ConnectionRequest request) {};
-
-        final public MockConnectionService getService() {
-            return mService;
-        }
-
-        final public void setService(MockConnectionService service) {
-            mService = service;
-        }
-    }
-
-    public static PhoneAccount setUp(PhoneAccount phoneAccount, ConnectionService connectionService)
-            throws Exception {
-        synchronized(sLock) {
-            if (sConnectionService != null) {
-                throw new Exception("Mock ConnectionService exists.  Failed to call tearDown().");
-            }
-            sConnectionService = connectionService;
-            return phoneAccount;
-        }
-    }
-
-    public static void tearDown() {
-        synchronized(sLock) {
-            sConnectionService = null;
-        }
-    }
+    public Semaphore lock = new Semaphore(0);
+    public MockConnection outgoingConnection;
+    public MockConnection incomingConnection;
 
     @Override
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
             ConnectionRequest request) {
-        synchronized(sLock) {
-            if (sConnectionService != null) {
-                return sConnectionService.onCreateOutgoingConnection(
-                        connectionManagerPhoneAccount, request);
-            }
-        }
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
-        if (sCreateVideoProvider) {
+        if (mCreateVideoProvider) {
             connection.createMockVideoProvider();
         } else {
-            sCreateVideoProvider = true;
+            mCreateVideoProvider = true;
         }
         connection.setVideoState(request.getVideoState());
 
-        final ConnectionServiceCallbacks callbacks = getCallbacks();
-        if (callbacks != null) {
-            callbacks.setService(this);
-            callbacks.outgoingConnection = connection;
-            callbacks.onCreateOutgoingConnection(connection, request);
-        }
+        outgoingConnection = connection;
+        lock.release();
         return connection;
     }
 
     @Override
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
             ConnectionRequest request) {
-        synchronized(sLock) {
-            if (sConnectionService != null) {
-                return sConnectionService.onCreateIncomingConnection(
-                        connectionManagerPhoneAccount, request);
-            }
-        }
-
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
         connection.createMockVideoProvider();
         connection.setVideoState(request.getVideoState());
 
-        final ConnectionServiceCallbacks callbacks = getCallbacks();
-        if (callbacks != null) {
-            callbacks.setService(this);
-            callbacks.incomingConnection = connection;
-            callbacks.onCreateIncomingConnection(connection, request);
-        }
+        incomingConnection = connection;
+        lock.release();
         return connection;
     }
 
-    public static void setCallbacks(ConnectionServiceCallbacks callbacks) {
-        synchronized (sLock) {
-            sCallbacks = callbacks;
-        }
-    }
-
-    private ConnectionServiceCallbacks getCallbacks() {
-        synchronized (sLock) {
-            if (sCallbacks != null) {
-                sCallbacks.setService(this);
-            }
-            return sCallbacks;
-        }
-    }
-
-    public static void setCreateVideoProvider(boolean createVideoProvider) {
-        sCreateVideoProvider = createVideoProvider;
+    public void setCreateVideoProvider(boolean createVideoProvider) {
+        mCreateVideoProvider = createVideoProvider;
     }
 }

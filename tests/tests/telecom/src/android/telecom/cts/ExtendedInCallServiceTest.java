@@ -26,10 +26,18 @@ import android.telecom.InCallService;
 import android.telecom.VideoProfile;
 
 /**
- * Extended suite of tests that use {@link MockConnectionService} and {@link MockInCallService} to
+ * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
  * verify the functionality of the Telecom service.
  */
 public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        if (TestUtils.shouldTestTelecom(mContext)) {
+            setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
+        }
+    }
 
     public void testAddNewOutgoingCallAndThenDisconnect() {
         if (!shouldTestTelecom(mContext)) {
@@ -51,18 +59,17 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         }
 
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
 
         final Call call = inCallService.getLastCall();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
         assertCallState(call, Call.STATE_ACTIVE);
 
         assertMuteState(connection, false);
 
-        inCallService.setMuted(true);;
+        inCallService.setMuted(true);
 
         assertMuteState(connection, true);
         assertMuteState(inCallService, true);
@@ -78,10 +85,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         }
 
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
         final Call call = inCallService.getLastCall();
         assertCallState(call, Call.STATE_ACTIVE);
@@ -111,10 +117,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         }
 
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
         final Call call = inCallService.getLastCall();
         assertCallState(call, Call.STATE_ACTIVE);
@@ -145,10 +150,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         }
 
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
 
         final Call call = inCallService.getLastCall();
 
@@ -165,10 +169,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
     public void testAnswerIncomingCallAudioOnly() {
         addAndVerifyNewIncomingCall(getTestNumber(), null);
-        verifyConnectionForIncomingCall();
+        final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
 
         final Call call = inCallService.getLastCall();
 
@@ -183,10 +186,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
     public void testAnswerIncomingCallAsVideo_SendsCorrectVideoState() {
         addAndVerifyNewIncomingCall(getTestNumber(), null);
-        verifyConnectionForIncomingCall();
+        final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
 
         final Call call = inCallService.getLastCall();
 
@@ -203,10 +205,9 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
     public void testRejectIncomingCall() {
         addAndVerifyNewIncomingCall(getTestNumber(), null);
-        verifyConnectionForIncomingCall();
+        final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
 
         final Call call = inCallService.getLastCall();
 

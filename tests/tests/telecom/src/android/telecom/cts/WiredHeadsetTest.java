@@ -26,6 +26,15 @@ import android.telecom.Connection;
  * media button.
  */
 public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        if (TestUtils.shouldTestTelecom(mContext)) {
+            setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
+        }
+    }
+
     @Override
     protected void tearDown() throws Exception {
         if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
@@ -37,9 +46,8 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
 
     public void testIncomingCallShortPress_acceptsCall() throws Exception {
         addAndVerifyNewIncomingCall(getTestNumber(), null);
-        verifyConnectionForIncomingCall();
+        final MockConnection connection = verifyConnectionForIncomingCall();
 
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
         final Call call = mInCallCallbacks.getService().getLastCall();
         assertCallState(call, Call.STATE_RINGING);
         assertConnectionState(connection, Connection.STATE_RINGING);
@@ -51,9 +59,8 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
 
     public void testIncomingCallLongPress_rejectsCall() throws Exception {
         addAndVerifyNewIncomingCall(getTestNumber(), null);
-        verifyConnectionForIncomingCall();
+        final MockConnection connection = verifyConnectionForIncomingCall();
 
-        final MockConnection connection = mConnectionCallbacks.incomingConnection;
         final Call call = mInCallCallbacks.getService().getLastCall();
         assertCallState(call, Call.STATE_RINGING);
         assertConnectionState(connection, Connection.STATE_RINGING);
@@ -65,8 +72,7 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
 
     public void testInCallShortPress_togglesMute() throws Exception {
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
+        final MockConnection connection = verifyConnectionForOutgoingCall();
         final MockInCallService incallService = mInCallCallbacks.getService();
 
         // Verify that sending short presses in succession toggles the mute state of the
@@ -84,9 +90,8 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
 
     public void testInCallLongPress_hangupCall() throws Exception {
         placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
-        final MockConnection connection = mConnectionCallbacks.outgoingConnection;
         final Call call = mInCallCallbacks.getService().getLastCall();
         assertCallState(call, Call.STATE_ACTIVE);
         assertConnectionState(connection, Connection.STATE_ACTIVE);
