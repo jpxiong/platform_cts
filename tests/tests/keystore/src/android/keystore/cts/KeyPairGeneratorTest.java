@@ -556,8 +556,6 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 .setCertificateSubject(certSubject)
                 .setCertificateNotBefore(certNotBefore)
                 .setCertificateNotAfter(certNotAfter)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(600)
                 .build());
         KeyPair keyPair = generator.generateKeyPair();
         assertGeneratedKeyPairAndSelfSignedCertificate(
@@ -588,8 +586,8 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512);
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(600, keyInfo.getUserAuthenticationValidityDurationSeconds());
+        assertFalse(keyInfo.isUserAuthenticationRequired());
+        assertEquals(-1, keyInfo.getUserAuthenticationValidityDurationSeconds());
     }
 
     public void testGenerate_RSA_ModernSpec_AsCustomAsPossible() throws Exception {
@@ -622,8 +620,6 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 .setCertificateSubject(certSubject)
                 .setCertificateNotBefore(certNotBefore)
                 .setCertificateNotAfter(certNotAfter)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(600)
                 .build());
         KeyPair keyPair = generator.generateKeyPair();
         assertGeneratedKeyPairAndSelfSignedCertificate(
@@ -659,8 +655,8 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getEncryptionPaddings()),
                 KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
                 KeyProperties.ENCRYPTION_PADDING_RSA_OAEP);
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(600, keyInfo.getUserAuthenticationValidityDurationSeconds());
+        assertFalse(keyInfo.isUserAuthenticationRequired());
+        assertEquals(-1, keyInfo.getUserAuthenticationValidityDurationSeconds());
     }
 
     public void testGenerate_EC_ModernSpec_UsableForTLSPeerAuth() throws Exception {
@@ -721,99 +717,9 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertKeyPairAndCertificateUsableForTLSPeerAuthentication(TEST_ALIAS_1);
     }
 
-    public void testGenerate_EC_ModernSpec_PerOpAuthRequired() throws Exception {
-        KeyPairGenerator generator = getEcGenerator();
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                TEST_ALIAS_1,
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setUserAuthenticationRequired(true)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
-        assertGeneratedKeyPairAndSelfSignedCertificate(
-                keyPair,
-                TEST_ALIAS_1,
-                "EC",
-                256,
-                DEFAULT_CERT_SUBJECT,
-                DEFAULT_CERT_SERIAL_NUMBER,
-                DEFAULT_CERT_NOT_BEFORE,
-                DEFAULT_CERT_NOT_AFTER);
-        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(-1, keyInfo.getUserAuthenticationValidityDurationSeconds());
-    }
-
-    public void testGenerate_RSA_ModernSpec_PerOpAuthRequired() throws Exception {
-        KeyPairGenerator generator = getRsaGenerator();
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                TEST_ALIAS_1,
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setUserAuthenticationRequired(true)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
-        assertGeneratedKeyPairAndSelfSignedCertificate(
-                keyPair,
-                TEST_ALIAS_1,
-                "RSA",
-                2048,
-                DEFAULT_CERT_SUBJECT,
-                DEFAULT_CERT_SERIAL_NUMBER,
-                DEFAULT_CERT_NOT_BEFORE,
-                DEFAULT_CERT_NOT_AFTER);
-        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(-1, keyInfo.getUserAuthenticationValidityDurationSeconds());
-    }
-
-    public void testGenerate_EC_ModernSpec_TimeoutBasedAuthRequired() throws Exception {
-        KeyPairGenerator generator = getEcGenerator();
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                TEST_ALIAS_1,
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(60)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
-        assertGeneratedKeyPairAndSelfSignedCertificate(
-                keyPair,
-                TEST_ALIAS_1,
-                "EC",
-                256,
-                DEFAULT_CERT_SUBJECT,
-                DEFAULT_CERT_SERIAL_NUMBER,
-                DEFAULT_CERT_NOT_BEFORE,
-                DEFAULT_CERT_NOT_AFTER);
-        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(60, keyInfo.getUserAuthenticationValidityDurationSeconds());
-    }
-
-    public void testGenerate_RSA_ModernSpec_TimeoutBasedAuthRequired() throws Exception {
-        KeyPairGenerator generator = getRsaGenerator();
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                TEST_ALIAS_1,
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(60)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
-        assertGeneratedKeyPairAndSelfSignedCertificate(
-                keyPair,
-                TEST_ALIAS_1,
-                "RSA",
-                2048,
-                DEFAULT_CERT_SUBJECT,
-                DEFAULT_CERT_SERIAL_NUMBER,
-                DEFAULT_CERT_NOT_BEFORE,
-                DEFAULT_CERT_NOT_AFTER);
-        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
-        assertTrue(keyInfo.isUserAuthenticationRequired());
-        assertEquals(60, keyInfo.getUserAuthenticationValidityDurationSeconds());
-    }
+    // TODO: Test fingerprint-authorized and secure lock screen-authorized keys. These can't
+    // currently be tested here because CTS does not require that secure lock screen is set up and
+    // that at least one fingerprint is enrolled.
 
     public void testGenerate_EC_ModernSpec_SupportedSizes() throws Exception {
         assertKeyGenUsingECSizeOnlyUsesCorrectCurve(224, ECCurves.NIST_P_224_SPEC);
