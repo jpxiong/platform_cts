@@ -672,8 +672,10 @@ public class SELinuxHostTest extends DeviceTestCase {
     public void testKernelDomain() throws DeviceNotAvailableException {
         String domain = "u:r:kernel:s0";
         List<ProcessDetails> procs = ProcessDetails.getProcMap(mDevice).get(domain);
-        for (ProcessDetails p : procs) {
-            assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
+        if (procs != null) {
+            for (ProcessDetails p : procs) {
+                assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
+            }
         }
     }
 
