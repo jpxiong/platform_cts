@@ -58,7 +58,7 @@ public class StrictModeTest extends AndroidTestCase {
                 + android.os.Process.myUid();
 
         // Insecure connection should be detected
-        ((HttpURLConnection) new URL("http://android.com/").openConnection()).getResponseCode();
+        ((HttpURLConnection) new URL("http://example.com/").openConnection()).getResponseCode();
 
         // Give system enough time to finish logging
         SystemClock.sleep(5000);
@@ -76,7 +76,7 @@ public class StrictModeTest extends AndroidTestCase {
                 + android.os.Process.myUid();
 
         // Secure connection should be ignored
-        ((HttpURLConnection) new URL("https://android.com/").openConnection()).getResponseCode();
+        ((HttpURLConnection) new URL("https://example.com/").openConnection()).getResponseCode();
 
         // Give system enough time to finish logging
         SystemClock.sleep(5000);
