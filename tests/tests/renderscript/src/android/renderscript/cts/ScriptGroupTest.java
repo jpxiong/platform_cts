@@ -458,7 +458,7 @@ public class ScriptGroupTest extends RSBaseCompute {
             return;
         }
 
-        ScriptGroup group = builder.create("Summation", c.getGlobal(s.getFieldID_a()));
+        ScriptGroup group = builder.create("SummationGlobal", c.getGlobal(s.getFieldID_a()));
 
         int[] a = new int[4 * ARRAY_SIZE];
         ((Allocation)group.execute(input, input1)[0]).copyTo(a);
