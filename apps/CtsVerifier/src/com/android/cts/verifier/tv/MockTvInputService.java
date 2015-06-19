@@ -16,8 +16,7 @@
 
 package com.android.cts.verifier.tv;
 
-import com.android.cts.verifier.R;
-
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.media.PlaybackParams;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
@@ -35,14 +35,21 @@ import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Surface;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.widget.TextView;
+
+import com.android.cts.verifier.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressLint("NewApi")
 public class MockTvInputService extends TvInputService {
     private static final String TAG = "MockTvInputService";
 
@@ -50,6 +57,7 @@ public class MockTvInputService extends TvInputService {
     private static final String SELECT_TRACK_TYPE = "type";
     private static final String SELECT_TRACK_ID = "id";
     private static final String CAPTION_ENABLED = "enabled";
+    private static final String PAUSE_CALLED = "pause_called";
 
     private static Object sLock = new Object();
     private static Callback sTuneCallback = null;
@@ -58,6 +66,14 @@ public class MockTvInputService extends TvInputService {
     private static Callback sUnblockContentCallback = null;
     private static Callback sSelectTrackCallback = null;
     private static Callback sSetCaptionEnabledCallback = null;
+    // Callbacks for time shift.
+    private static Callback sResumeAfterPauseCallback = null;
+    private static Callback sPositionTrackingCallback = null;
+    private static Callback sRewindCallback = null;
+    private static Callback sFastForwardCallback = null;
+    private static Callback sSeekToPreviousCallback = null;
+    private static Callback sSeekToNextCallback = null;
+
     private static TvContentRating sRating = null;
 
     static final TvTrackInfo sEngAudioTrack =
@@ -144,6 +160,42 @@ public class MockTvInputService extends TvInputService {
         }
     }
 
+    static void expectResumeAfterPause(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sResumeAfterPauseCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectPositionTracking(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sPositionTrackingCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectRewind(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sRewindCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectFastForward(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sFastForwardCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectSeekToPrevious(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sSeekToPreviousCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
+    static void expectSeekToNext(View postTarget, Runnable successCallback) {
+        synchronized (sLock) {
+            sSeekToNextCallback = new Callback(postTarget, successCallback);
+        }
+    }
+
     static String getInputId(Context context) {
         return TvContract.buildInputId(new ComponentName(context,
                         MockTvInputService.class.getName()));
@@ -172,9 +224,44 @@ public class MockTvInputService extends TvInputService {
     }
 
     private static class MockSessionImpl extends Session {
+        private static final int MSG_SEEK = 1000;
+        private static final int SEEK_DELAY_MS = 300;
+
         private final Context mContext;
         private Surface mSurface = null;
         private List<TvTrackInfo> mTracks = new ArrayList<>();
+
+        private long mRecordStartTimeMs;
+        private long mPausedTimeMs;
+        // The time in milliseconds when the current position is lastly updated.
+        private long mLastCurrentPositionUpdateTimeMs;
+        // The current playback position.
+        private long mCurrentPositionMs;
+        // The current playback speed rate.
+        private float mSpeed;
+
+        private final Handler mHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == MSG_SEEK) {
+                    // Actually, this input doesn't play any videos, it just shows the image.
+                    // So we should simulate the playback here by changing the current playback
+                    // position periodically in order to test the time shift.
+                    // If the playback is paused, the current playback position doesn't need to be
+                    // changed.
+                    if (mPausedTimeMs == 0) {
+                        long currentTimeMs = System.currentTimeMillis();
+                        mCurrentPositionMs += (long) ((currentTimeMs
+                                - mLastCurrentPositionUpdateTimeMs) * mSpeed);
+                        mCurrentPositionMs = Math.max(mRecordStartTimeMs,
+                                Math.min(mCurrentPositionMs, currentTimeMs));
+                        mLastCurrentPositionUpdateTimeMs = currentTimeMs;
+                    }
+                    sendEmptyMessageDelayed(MSG_SEEK, SEEK_DELAY_MS);
+                }
+                super.handleMessage(msg);
+            }
+        };
 
         private MockSessionImpl(Context context) {
             super(context);
@@ -263,6 +350,12 @@ public class MockTvInputService extends TvInputService {
             notifyTracksChanged(mTracks);
             notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, sEngAudioTrack.getId());
             notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, null);
+            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            mRecordStartTimeMs = mCurrentPositionMs = mLastCurrentPositionUpdateTimeMs
+                    = System.currentTimeMillis();
+            mPausedTimeMs = 0;
+            mHandler.sendEmptyMessageDelayed(MSG_SEEK, SEEK_DELAY_MS);
+            mSpeed = 1;
             return true;
         }
 
@@ -304,6 +397,88 @@ public class MockTvInputService extends TvInputService {
                     notifyContentAllowed();
                 }
             }
+        }
+
+        @Override
+        public long onTimeShiftGetCurrentPosition() {
+            synchronized (sLock) {
+                if (sPositionTrackingCallback != null) {
+                    sPositionTrackingCallback.post();
+                    sPositionTrackingCallback = null;
+                }
+            }
+            Log.d(TAG, "currentPositionMs=" + mCurrentPositionMs);
+            return mCurrentPositionMs;
+        }
+
+        @Override
+        public long onTimeShiftGetStartPosition() {
+            return mRecordStartTimeMs;
+        }
+
+        @Override
+        public void onTimeShiftPause() {
+            synchronized (sLock) {
+                if (sResumeAfterPauseCallback != null) {
+                    sResumeAfterPauseCallback.mBundle.putBoolean(PAUSE_CALLED, true);
+                }
+            }
+            mCurrentPositionMs = mPausedTimeMs = mLastCurrentPositionUpdateTimeMs
+                    = System.currentTimeMillis();
+        }
+
+        @Override
+        public void onTimeShiftResume() {
+            synchronized (sLock) {
+                if (sResumeAfterPauseCallback != null
+                        && sResumeAfterPauseCallback.mBundle.getBoolean(PAUSE_CALLED)) {
+                    sResumeAfterPauseCallback.post();
+                    sResumeAfterPauseCallback = null;
+                }
+            }
+            mSpeed = 1;
+            mPausedTimeMs = 0;
+            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
+        }
+
+        @Override
+        public void onTimeShiftSeekTo(long timeMs) {
+            synchronized (sLock) {
+                if (mCurrentPositionMs > timeMs) {
+                    if (sSeekToPreviousCallback != null) {
+                        sSeekToPreviousCallback.post();
+                        sSeekToPreviousCallback = null;
+                    }
+                } else if (mCurrentPositionMs < timeMs) {
+                    if (sSeekToNextCallback != null) {
+                        sSeekToNextCallback.post();
+                        sSeekToNextCallback = null;
+                    }
+                }
+            }
+            mLastCurrentPositionUpdateTimeMs = System.currentTimeMillis();
+            mCurrentPositionMs = Math.max(mRecordStartTimeMs,
+                    Math.min(timeMs, mLastCurrentPositionUpdateTimeMs));
+        }
+
+        @Override
+        public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
+            synchronized(sLock) {
+                if (params != null) {
+                    if (params.getSpeed() > 1) {
+                        if (sFastForwardCallback != null) {
+                            sFastForwardCallback.post();
+                            sFastForwardCallback = null;
+                        }
+                    } else if (params.getSpeed() < 1) {
+                        if (sRewindCallback != null) {
+                            sRewindCallback.post();
+                            sRewindCallback = null;
+                        }
+                    }
+                }
+            }
+            mSpeed = params.getSpeed();
         }
     }
 
