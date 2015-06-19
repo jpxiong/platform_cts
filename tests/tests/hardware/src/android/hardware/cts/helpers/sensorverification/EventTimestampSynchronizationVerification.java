@@ -43,7 +43,7 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
     private final ArrayList<TestSensorEvent> mCollectedEvents = new ArrayList<TestSensorEvent>();
 
     private final long mMaximumSynchronizationErrorNs;
-    private final long mReportLatencyNs;
+    private final long mExpectedSyncLatencyNs;
 
     /**
      * Constructs an instance of {@link EventTimestampSynchronizationVerification}.
@@ -53,9 +53,9 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
      */
     public EventTimestampSynchronizationVerification(
             long maximumSynchronizationErrorNs,
-            long reportLatencyNs) {
+            long expectedSyncLatencyNs) {
         mMaximumSynchronizationErrorNs = maximumSynchronizationErrorNs;
-        mReportLatencyNs = reportLatencyNs;
+        mExpectedSyncLatencyNs = expectedSyncLatencyNs;
     }
 
     /**
@@ -73,10 +73,12 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
         if (fifoMaxEventCount > 0 && maximumExpectedSamplingPeriodUs != Integer.MAX_VALUE) {
             long fifoBasedReportLatencyUs =
                     fifoMaxEventCount * maximumExpectedSamplingPeriodUs;
-            reportLatencyUs = Math.min(reportLatencyUs, fifoBasedReportLatencyUs);
+            reportLatencyUs = Math.min(reportLatencyUs, fifoBasedReportLatencyUs) +
+                (long)(2.5 * maximumExpectedSamplingPeriodUs);
         }
-        long reportLatencyNs = TimeUnit.MICROSECONDS.toNanos(reportLatencyUs);
-        return new EventTimestampSynchronizationVerification(DEFAULT_THRESHOLD_NS, reportLatencyNs);
+        long expectedSyncLatencyNs = TimeUnit.MICROSECONDS.toNanos(reportLatencyUs);
+        return new EventTimestampSynchronizationVerification(DEFAULT_THRESHOLD_NS,
+                                                              expectedSyncLatencyNs);
     }
 
     @Override
@@ -84,7 +86,6 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
         StringBuilder errorMessageBuilder =
                 new StringBuilder(" event timestamp synchronization failures: ");
         List<IndexedEvent> failures = verifyTimestampSynchronization(errorMessageBuilder);
-
         int failuresCount = failures.size();
         stats.addValue(SensorStats.EVENT_TIME_SYNCHRONIZATION_COUNT_KEY, failuresCount);
         stats.addValue(
@@ -104,7 +105,7 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
     public EventTimestampSynchronizationVerification clone() {
         return new EventTimestampSynchronizationVerification(
                 mMaximumSynchronizationErrorNs,
-                mReportLatencyNs);
+                mExpectedSyncLatencyNs);
     }
 
     /**
@@ -133,7 +134,7 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
             long receivedTimestampNs = event.receivedTimestamp;
             long upperThresholdNs = receivedTimestampNs;
             long lowerThresholdNs = receivedTimestampNs - mMaximumSynchronizationErrorNs
-                    - mReportLatencyNs;
+                    - mExpectedSyncLatencyNs;
 
             if (eventTimestampNs < lowerThresholdNs || eventTimestampNs > upperThresholdNs) {
                 if (failures.size() < TRUNCATE_MESSAGE_LENGTH) {
