@@ -18,7 +18,6 @@ package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static android.hardware.camera2.cts.helpers.AssertHelpers.assertArrayContains;
-import static junit.framework.Assert.assertNotNull;
 
 import android.graphics.ImageFormat;
 import android.graphics.Point;
@@ -106,7 +105,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     public void testTakePicture() throws Exception{
         for (String id : mCameraIds) {
             try {
-                Log.i(TAG, "Testing touch for focus for Camera " + id);
+                Log.i(TAG, "Testing basic take picture for Camera " + id);
                 openDevice(id);
 
                 takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null);
@@ -336,6 +335,21 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    public void testAePrecaptureTriggerCancelJpegCapture() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing AE precapture cancel for jpeg capture for Camera " + id);
+                openDevice(id);
+
+                takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null,
+                        /*addAeTriggerCancel*/true);
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
     /**
      * Start preview,take a picture and test preview is still running after snapshot
      */
@@ -393,6 +407,29 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private void takePictureTestByCamera(
             MeteringRectangle[] aeRegions, MeteringRectangle[] awbRegions,
             MeteringRectangle[] afRegions) throws Exception {
+        takePictureTestByCamera(aeRegions, awbRegions, afRegions,
+                /*addAeTriggerCancel*/false);
+    }
+
+    /**
+     * Take a picture for a given set of 3A regions for a particular camera.
+     * <p>
+     * Before take a still capture, it triggers an auto focus and lock it first,
+     * then wait for AWB to converge and lock it, then trigger a precapture
+     * metering sequence and wait for AE converged. After capture is received, the
+     * capture result and image are validated. If {@code addAeTriggerCancel} is true,
+     * a precapture trigger cancel will be inserted between two adjacent triggers, which
+     * should effective cancel the first trigger.
+     * </p>
+     *
+     * @param aeRegions AE regions for this capture
+     * @param awbRegions AWB regions for this capture
+     * @param afRegions AF regions for this capture
+     * @param addAeTriggerCancel If a AE precapture trigger cancel is sent after the trigger.
+     */
+    private void takePictureTestByCamera(
+            MeteringRectangle[] aeRegions, MeteringRectangle[] awbRegions,
+            MeteringRectangle[] afRegions, boolean addAeTriggerCancel) throws Exception {
 
         boolean hasFocuser = mStaticInfo.hasFocuser();
 
@@ -498,6 +535,22 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
         mSession.capture(previewRequest.build(), resultListener, mHandler);
+        if (addAeTriggerCancel) {
+            // Cancel the current precapture trigger, then send another trigger.
+            // The camera device should behave as if the first trigger is not sent.
+            // Wait one request to make the trigger start doing something before cancel.
+            waitForNumResults(resultListener, /*numResultsWait*/ 1);
+            previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL);
+            mSession.capture(previewRequest.build(), resultListener, mHandler);
+            waitForResultValue(resultListener, CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER,
+                    CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL,
+                    NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            // Issue another trigger
+            previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            mSession.capture(previewRequest.build(), resultListener, mHandler);
+        }
         waitForAeStable(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
 
         // Validate the next result immediately for region and mode.
