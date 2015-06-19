@@ -16,14 +16,21 @@
 
 package android.keystore.cts;
 
+import android.content.Context;
+import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyInfo;
+import android.security.keystore.KeyProperties;
+import android.security.keystore.KeyProtection;
 import android.test.MoreAsserts;
-
 import junit.framework.Assert;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -32,6 +39,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPrivateKey;
@@ -42,6 +50,12 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -230,5 +244,226 @@ abstract class TestUtils extends Assert {
         } else {
             throw new IllegalArgumentException("Unexpected key type: " + key.getClass());
         }
+    }
+
+    static <T> void assertContentsInAnyOrder(Iterable<T> actual, T... expected) {
+        assertContentsInAnyOrder(null, actual, expected);
+    }
+
+    static <T> void assertContentsInAnyOrder(String message, Iterable<T> actual, T... expected) {
+        Map<T, Integer> actualFreq = getFrequencyTable(actual);
+        Map<T, Integer> expectedFreq = getFrequencyTable(expected);
+        if (actualFreq.equals(expectedFreq)) {
+            return;
+        }
+
+        Map<T, Integer> extraneousFreq = new HashMap<T, Integer>();
+        for (Map.Entry<T, Integer> actualEntry : actualFreq.entrySet()) {
+            int actualCount = actualEntry.getValue();
+            Integer expectedCount = expectedFreq.get(actualEntry.getKey());
+            int diff = actualCount - ((expectedCount != null) ? expectedCount : 0);
+            if (diff > 0) {
+                extraneousFreq.put(actualEntry.getKey(), diff);
+            }
+        }
+
+        Map<T, Integer> missingFreq = new HashMap<T, Integer>();
+        for (Map.Entry<T, Integer> expectedEntry : expectedFreq.entrySet()) {
+            int expectedCount = expectedEntry.getValue();
+            Integer actualCount = actualFreq.get(expectedEntry.getKey());
+            int diff = expectedCount - ((actualCount != null) ? actualCount : 0);
+            if (diff > 0) {
+                missingFreq.put(expectedEntry.getKey(), diff);
+            }
+        }
+
+        List<T> extraneous = frequencyTableToValues(extraneousFreq);
+        List<T> missing = frequencyTableToValues(missingFreq);
+        StringBuilder result = new StringBuilder();
+        String delimiter = "";
+        if (message != null) {
+            result.append(message).append(".");
+            delimiter = " ";
+        }
+        if (!missing.isEmpty()) {
+            result.append(delimiter).append("missing: " + missing);
+            delimiter = ", ";
+        }
+        if (!extraneous.isEmpty()) {
+            result.append(delimiter).append("extraneous: " + extraneous);
+        }
+        fail(result.toString());
+    }
+
+    private static <T> Map<T, Integer> getFrequencyTable(Iterable<T> values) {
+        Map<T, Integer> result = new HashMap<T, Integer>();
+        for (T value : values) {
+            Integer count = result.get(value);
+            if (count == null) {
+                count = 1;
+            } else {
+                count++;
+            }
+            result.put(value, count);
+        }
+        return result;
+    }
+
+    private static <T> Map<T, Integer> getFrequencyTable(T... values) {
+        Map<T, Integer> result = new HashMap<T, Integer>();
+        for (T value : values) {
+            Integer count = result.get(value);
+            if (count == null) {
+                count = 1;
+            } else {
+                count++;
+            }
+            result.put(value, count);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static <T> List<T> frequencyTableToValues(Map<T, Integer> table) {
+        if (table.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<T> result = new ArrayList<T>();
+        boolean comparableValues = true;
+        for (Map.Entry<T, Integer> entry : table.entrySet()) {
+            T value = entry.getKey();
+            if (!(value instanceof Comparable)) {
+                comparableValues = false;
+            }
+            int frequency = entry.getValue();
+            for (int i = 0; i < frequency; i++) {
+                result.add(value);
+            }
+        }
+
+        if (comparableValues) {
+            sortAssumingComparable(result);
+        }
+        return result;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void sortAssumingComparable(List<?> values) {
+        Collections.sort((List<Comparable>)values);
+    }
+
+    static String[] toLowerCase(String... values) {
+        if (values == null) {
+            return null;
+        }
+        String[] result = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            String value = values[i];
+            result[i] = (value != null) ? value.toLowerCase() : null;
+        }
+        return result;
+    }
+
+    static Certificate generateSelfSignedCert(String keyAlgorithm) throws Exception {
+        KeyPairGenerator generator =
+                KeyPairGenerator.getInstance(keyAlgorithm, "AndroidKeyStore");
+        generator.initialize(new KeyGenParameterSpec.Builder(
+                "test1",
+                KeyProperties.PURPOSE_SIGN)
+                .build());
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        return keyStore.getCertificate("test1");
+    }
+
+    static PrivateKey getRawResPrivateKey(Context context, int resId) throws Exception {
+        byte[] pkcs8EncodedForm;
+        try (InputStream in = context.getResources().openRawResource(resId)) {
+            pkcs8EncodedForm = drain(in);
+        }
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(pkcs8EncodedForm);
+
+        try {
+            return KeyFactory.getInstance("EC").generatePrivate(privateKeySpec);
+        } catch (InvalidKeySpecException e) {
+            try {
+                return KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
+            } catch (InvalidKeySpecException e2) {
+                throw new InvalidKeySpecException("The key is neither EC nor RSA", e);
+            }
+        }
+    }
+
+    static X509Certificate getRawResX509Certificate(Context context, int resId) throws Exception {
+        try (InputStream in = context.getResources().openRawResource(resId)) {
+            return (X509Certificate) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(in);
+        }
+    }
+
+    static KeyPair importIntoAndroidKeyStore(
+            String alias,
+            PrivateKey privateKey,
+            Certificate certificate,
+            KeyProtection keyProtection) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        keyStore.setEntry(alias,
+                new KeyStore.PrivateKeyEntry(privateKey, new Certificate[] {certificate}),
+                keyProtection);
+        return new KeyPair(
+                keyStore.getCertificate(alias).getPublicKey(),
+                (PrivateKey) keyStore.getKey(alias, null));
+    }
+
+    static byte[] drain(InputStream in) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[16 * 1024];
+        int chunkSize;
+        while ((chunkSize = in.read(buffer)) != -1) {
+            result.write(buffer, 0, chunkSize);
+        }
+        return result.toByteArray();
+    }
+
+    static KeyProtection.Builder buildUpon(
+            KeyProtection.Builder builder) {
+        return buildUponInternal(builder, null);
+    }
+
+    static KeyProtection.Builder buildUpon(
+            KeyProtection.Builder builder, int newPurposes) {
+        return buildUponInternal(builder, newPurposes);
+    }
+
+    private static KeyProtection.Builder buildUponInternal(
+            KeyProtection.Builder builder, Integer newPurposes) {
+        KeyProtection spec = builder.build();
+        int purposes = (newPurposes == null) ? spec.getPurposes() : newPurposes;
+        KeyProtection.Builder result = new KeyProtection.Builder(purposes);
+        result.setBlockModes(spec.getBlockModes());
+        if (spec.isDigestsSpecified()) {
+            result.setDigests(spec.getDigests());
+        }
+        result.setEncryptionPaddings(spec.getEncryptionPaddings());
+        result.setSignaturePaddings(spec.getSignaturePaddings());
+        result.setKeyValidityStart(spec.getKeyValidityStart());
+        result.setKeyValidityForOriginationEnd(spec.getKeyValidityForOriginationEnd());
+        result.setKeyValidityForConsumptionEnd(spec.getKeyValidityForConsumptionEnd());
+        result.setRandomizedEncryptionRequired(spec.isRandomizedEncryptionRequired());
+        result.setUserAuthenticationRequired(spec.isUserAuthenticationRequired());
+        result.setUserAuthenticationValidityDurationSeconds(
+                spec.getUserAuthenticationValidityDurationSeconds());
+        return result;
+    }
+
+    static KeyPair getKeyPairForKeyAlgorithm(String keyAlgorithm, Iterable<KeyPair> keyPairs) {
+        for (KeyPair keyPair : keyPairs) {
+            if (keyAlgorithm.equalsIgnoreCase(keyPair.getPublic().getAlgorithm())) {
+                return keyPair;
+            }
+        }
+        throw new IllegalArgumentException("No KeyPair for key algorithm " + keyAlgorithm);
     }
 }
