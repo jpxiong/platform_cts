@@ -229,12 +229,30 @@ public class CtsTestServer {
             // request for shutdown and having the server's one thread
             // sequentially call accept() and close().
             URL url = new URL(mServerUri + SHUTDOWN_PREFIX);
-            URLConnection connection = openConnection(url);
-            connection.connect();
+            if (url.getProtocol().equalsIgnoreCase("http")) {
+                // Use Socket instead of HttpURLConnection when the server is in cleartext HTTP mode
+                // to avoid the request being blocked by NetworkSecurityPolicy.
+                Socket socket = null;
+                try {
+                    socket = new Socket(url.getHost(), url.getPort());
+                    socket.getOutputStream().write(
+                        ("GET " + SHUTDOWN_PREFIX + " HTTP/1.0\r\n\r\n").getBytes("US-ASCII"));
+                    socket.getOutputStream().flush();
+                } finally {
+                    if (socket != null) {
+                        try {
+                            socket.close();
+                        } catch (Exception ignored) {}
+                    }
+                }
+            } else {
+                URLConnection connection = openConnection(url);
+                connection.connect();
 
-            // Read the input from the stream to send the request.
-            InputStream is = connection.getInputStream();
-            is.close();
+                // Read the input from the stream to send the request.
+                InputStream is = connection.getInputStream();
+                is.close();
+            }
 
             // Block until the server thread is done shutting down.
             mServerThread.join();
