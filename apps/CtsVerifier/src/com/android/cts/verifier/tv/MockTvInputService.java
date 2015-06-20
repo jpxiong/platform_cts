@@ -19,6 +19,7 @@ package com.android.cts.verifier.tv;
 import com.android.cts.verifier.R;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -28,6 +29,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.media.tv.TvContentRating;
+import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
@@ -140,6 +142,11 @@ public class MockTvInputService extends TvInputService {
             sSetCaptionEnabledCallback = new Callback(postTarget, successCallback);
             sSetCaptionEnabledCallback.getBundle().putBoolean(CAPTION_ENABLED, enabled);
         }
+    }
+
+    static String getInputId(Context context) {
+        return TvContract.buildInputId(new ComponentName(context,
+                        MockTvInputService.class.getName()));
     }
 
     @Override
