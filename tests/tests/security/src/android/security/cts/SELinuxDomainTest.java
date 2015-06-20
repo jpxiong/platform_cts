@@ -354,23 +354,47 @@ public class SELinuxDomainTest extends TestCase {
         }
 
         private static ProcessDetails getProcessDetails(int pid, File f) throws FileNotFoundException {
-            // Get the context via attr/current
-            String context = new Scanner(new File(f, "attr/current")).next();
-            context = context.trim();
+            Scanner tmp = null;
+            String context;
+            long vSize;
+            try {
+                tmp = new Scanner(new File(f, "attr/current"));
+                // Get the context via attr/current
+                context = tmp.next();
+                context = context.trim();
+            } finally {
+                if (tmp != null) {
+                    tmp.close();
+                    tmp = null;
+                }
+            }
 
-            // Get the vSize, item #23 from the stat file
-            String x = new Scanner(new File(f, "stat")).nextLine();
-            long vSize = getVsizeFromStat(x);
+            try {
+                // Get the vSize, item #23 from the stat file
+                tmp = new Scanner(new File(f, "stat"));
+                String x = tmp.nextLine();
+                vSize = getVsizeFromStat(x);
+            } finally {
+                if (tmp != null) {
+                    tmp.close();
+                    tmp = null;
+                }
+            }
 
             StringBuilder sb = new StringBuilder();
-            Scanner tmp = new Scanner(new File(f, "cmdline"));
+            try {
+                tmp = new Scanner(new File(f, "cmdline"));
 
-            // Java's scanner tends to return oddly when handling
-            // long binary blobs. Probably some caching optimization.
-            while (tmp.hasNext()) {
-                sb.append(tmp.next().replace('\0', ' '));
+                // Java's scanner tends to return oddly when handling
+                // long binary blobs. Probably some caching optimization.
+                while (tmp.hasNext()) {
+                    sb.append(tmp.next().replace('\0', ' '));
+                }
+            } finally {
+                if (tmp != null) {
+                    tmp.close();
+                }
             }
-            tmp.close();
 
             // At this point we build up a valid proctitle, then split
             // on whitespace to get the left portion. Which is either
