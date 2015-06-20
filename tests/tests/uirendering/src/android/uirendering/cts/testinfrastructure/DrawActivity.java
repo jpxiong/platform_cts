@@ -39,6 +39,7 @@ public class DrawActivity extends Activity {
 
     private Handler mHandler;
     private View mView;
+    private View mViewWrapper;
     private boolean mOnTv;
 
     public void onCreate(Bundle bundle){
@@ -93,6 +94,7 @@ public class DrawActivity extends Activity {
             int drawCountDelay = 0;
             setContentView(R.layout.test_container);
             ViewStub stub = (ViewStub) findViewById(R.id.test_content_stub);
+            mViewWrapper = findViewById(R.id.test_content_wrapper);
             switch (message.what) {
                 case LAYOUT_MSG: {
                     stub.setLayoutResource(message.arg1);
@@ -119,9 +121,12 @@ public class DrawActivity extends Activity {
             }
 
             if (mViewInitializer != null) {
-                mViewInitializer.intializeView(mView);
+                mViewInitializer.initializeView(mView);
             }
-            mView.setLayerType(message.arg2, null);
+
+            // set layer on wrapper parent of view, so view initializer
+            // can control layer type of View under test.
+            mViewWrapper.setLayerType(message.arg2, null);
 
             DrawCounterListener onDrawListener = new DrawCounterListener(drawCountDelay);
 
@@ -147,7 +152,7 @@ public class DrawActivity extends Activity {
                 mView.postInvalidate();
             } else {
                 synchronized (mLock) {
-                    mLock.set(mView.getLeft(), mView.getTop());
+                    mLock.set(mViewWrapper.getLeft(), mViewWrapper.getTop());
                     mLock.notify();
                 }
                 mView.getViewTreeObserver().removeOnPreDrawListener(this);
