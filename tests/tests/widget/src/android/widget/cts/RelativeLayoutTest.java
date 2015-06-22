@@ -318,6 +318,18 @@ public class RelativeLayoutTest extends
         assertFalse(myRelativeLayout.checkLayoutParams(p3));
     }
 
+    public void testGetRule() {
+        RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(0, 0);
+        p.addRule(RelativeLayout.LEFT_OF, R.id.abslistview_root);
+        p.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
+        assertEquals("Get resource ID rule", R.id.abslistview_root,
+                p.getRule(RelativeLayout.LEFT_OF));
+        assertEquals("Get boolean rule", RelativeLayout.TRUE,
+                p.getRule(RelativeLayout.CENTER_IN_PARENT));
+        assertEquals("Get missing rule", 0, p.getRule(RelativeLayout.ABOVE));
+    }
+
     private class MyRelativeLayout extends RelativeLayout {
         public MyRelativeLayout(Context context) {
             super(context);
