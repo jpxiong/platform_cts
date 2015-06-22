@@ -26,6 +26,7 @@ import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.telecom.CallAudioState;
 import android.telecom.ConnectionRequest;
 import android.telecom.DisconnectCause;
 import android.telecom.GatewayInfo;
@@ -237,6 +238,33 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(gatewayAddress, parcelInfo.getGatewayAddress());
         assertEquals(originalAddress, parcelInfo.getOriginalAddress());
         assertEquals(0, parcelInfo.describeContents());
+        p.recycle();
+    }
+
+    /**
+     * Tests the CallAudioState object creation and recreation from a Parcel.
+     */
+    public void testCallAudioState() throws Exception {
+        CallAudioState audioState = new CallAudioState(
+                true,
+                CallAudioState.ROUTE_EARPIECE,
+                CallAudioState.ROUTE_WIRED_OR_EARPIECE);
+        assertEquals(true, audioState.isMuted());
+        assertEquals(CallAudioState.ROUTE_EARPIECE, audioState.getRoute());
+        assertEquals(CallAudioState.ROUTE_WIRED_OR_EARPIECE, audioState.getSupportedRouteMask());
+        assertEquals(0, audioState.describeContents());
+
+        // Create a parcel of the object and recreate the object back
+        // from the parcel.
+        Parcel p = Parcel.obtain();
+        audioState.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        CallAudioState parcelAudioState = CallAudioState.CREATOR.createFromParcel(p);
+        assertEquals(true, parcelAudioState.isMuted());
+        assertEquals(CallAudioState.ROUTE_EARPIECE, parcelAudioState.getRoute());
+        assertEquals(CallAudioState.ROUTE_WIRED_OR_EARPIECE, parcelAudioState.getSupportedRouteMask());
+        assertEquals(0, parcelAudioState.describeContents());
+        assertEquals(audioState, parcelAudioState);
         p.recycle();
     }
 }
