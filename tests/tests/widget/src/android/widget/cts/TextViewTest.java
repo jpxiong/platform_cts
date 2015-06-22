@@ -77,12 +77,16 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
@@ -4332,6 +4336,135 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
             MoreAsserts.assertEquals(rightIndents, tv.getRightIndents());
         }
     }
+
+    public void testSetAndGetCustomSelectionActionModeCallback() {
+        final String text = "abcde";
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = new EditText(mActivity);
+                mActivity.setContentView(mTextView);
+                mTextView.setText(text, BufferType.SPANNABLE);
+                mTextView.setTextIsSelectable(true);
+                mTextView.requestFocus();
+                mTextView.setSelected(true);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Check default value.
+        assertNull(mTextView.getCustomSelectionActionModeCallback());
+
+        MockActionModeCallback callbackBlockActionMode = new MockActionModeCallback(false);
+        mTextView.setCustomSelectionActionModeCallback(callbackBlockActionMode);
+        assertEquals(callbackBlockActionMode,
+                mTextView.getCustomSelectionActionModeCallback());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Set selection and try to start action mode.
+                final Bundle args = new Bundle();
+                args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
+                args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, text.length());
+                mTextView.performAccessibilityActionInternal(
+                        AccessibilityNodeInfo.ACTION_SET_SELECTION, args);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        assertEquals(1, callbackBlockActionMode.getCreateCount());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Remove selection and stop action mode.
+                mTextView.onTextContextMenuItem(android.R.id.copy);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Action mode was blocked.
+        assertEquals(0, callbackBlockActionMode.getDestroyCount());
+
+        // Overwrite callback.
+        MockActionModeCallback callbackStartActionMode = new MockActionModeCallback(true);
+        mTextView.setCustomSelectionActionModeCallback(callbackStartActionMode);
+        assertEquals(callbackStartActionMode, mTextView.getCustomSelectionActionModeCallback());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Set selection and try to start action mode.
+                final Bundle args = new Bundle();
+                args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
+                args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, text.length());
+                mTextView.performAccessibilityActionInternal(
+                        AccessibilityNodeInfo.ACTION_SET_SELECTION, args);
+
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        assertEquals(1, callbackStartActionMode.getCreateCount());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                // Remove selection and stop action mode.
+                mTextView.onTextContextMenuItem(android.R.id.copy);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Action mode was started
+        assertEquals(1, callbackStartActionMode.getDestroyCount());
+    }
+
+    public void testSetAndGetCustomInseltionActionMode() {
+        initTextViewForTyping();
+        // Check default value.
+        assertNull(mTextView.getCustomInsertionActionModeCallback());
+
+        MockActionModeCallback callback = new MockActionModeCallback(false);
+        mTextView.setCustomInsertionActionModeCallback(callback);
+        assertEquals(callback, mTextView.getCustomInsertionActionModeCallback());
+        // TODO(Bug: 22033189): Tests the set callback is actually used.
+    }
+
+    private static class MockActionModeCallback implements ActionMode.Callback {
+        private int mCreateCount = 0;
+        private int mDestroyCount = 0;
+        private final boolean mAllowToStartActionMode;
+
+        public MockActionModeCallback(boolean allowToStartActionMode) {
+            mAllowToStartActionMode = allowToStartActionMode;
+        }
+
+        public int getCreateCount() {
+            return mCreateCount;
+        }
+
+        public int getDestroyCount() {
+            return mDestroyCount;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mDestroyCount++;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mCreateCount++;
+            return mAllowToStartActionMode;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return false;
+        }
+    };
 
     private static class MockOnEditorActionListener implements OnEditorActionListener {
         private boolean isOnEditorActionCalled;
