@@ -447,6 +447,9 @@ public class CollectAllTests extends DescriptionGenerator {
                                                                     expectations,
                                                                     testClassName,
                                                                     testName);
+        int timeoutInMinutes = VogarUtils.timeoutInMinutes(expectations,
+                                                           testClassName,
+                                                           testName);
         TestClass testClass;
         if (testCases.containsKey(testClassName)) {
             testClass = testCases.get(testClassName);
@@ -456,7 +459,7 @@ public class CollectAllTests extends DescriptionGenerator {
         }
 
         testClass.mCases.add(new TestMethod(testName, "", "", supportedAbis,
-              knownFailure, false, false));
+              knownFailure, false, false, timeoutInMinutes));
     }
 
     private static boolean isJunit3Test(Class<?> klass) {
