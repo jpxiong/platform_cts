@@ -250,6 +250,31 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertSame(parent, view.getParent());
     }
 
+    public void testAccessScrollIndicators() {
+        View view = mActivity.findViewById(R.id.viewlayout_root);
+
+        assertEquals(View.SCROLL_INDICATOR_LEFT | View.SCROLL_INDICATOR_RIGHT,
+                view.getScrollIndicators());
+    }
+
+    public void testSetScrollIndicators() {
+        View view = new View(mActivity);
+
+        view.setScrollIndicators(0);
+        assertEquals(0, view.getScrollIndicators());
+
+        view.setScrollIndicators(View.SCROLL_INDICATOR_LEFT | View.SCROLL_INDICATOR_RIGHT);
+        assertEquals(View.SCROLL_INDICATOR_LEFT | View.SCROLL_INDICATOR_RIGHT,
+                view.getScrollIndicators());
+
+        view.setScrollIndicators(View.SCROLL_INDICATOR_TOP, View.SCROLL_INDICATOR_TOP);
+        assertEquals(View.SCROLL_INDICATOR_LEFT | View.SCROLL_INDICATOR_RIGHT
+                        | View.SCROLL_INDICATOR_TOP, view.getScrollIndicators());
+
+        view.setScrollIndicators(0, view.getScrollIndicators());
+        assertEquals(0, view.getScrollIndicators());
+    }
+
     public void testFindViewById() {
         View parent = mActivity.findViewById(R.id.viewlayout_root);
         assertSame(parent, parent.findViewById(R.id.viewlayout_root));
