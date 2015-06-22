@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -61,6 +62,7 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
     static final String EXTRA_SETTING = "extra-setting";
 
     private static final String CHECK_DEVICE_OWNER_TEST_ID = "CHECK_DEVICE_OWNER";
+    private static final String WIFI_LOCKDOWN_TEST_ID = WifiLockdownTestActivity.class.getName();
     private static final String REMOVE_DEVICE_OWNER_TEST_ID = "REMOVE_DEVICE_OWNER";
 
     @Override
@@ -122,6 +124,12 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
                 new Intent(this, CommandReceiver.class)
                         .putExtra(EXTRA_COMMAND, COMMAND_CHECK_DEVICE_OWNER)
                         ));
+        PackageManager packageManager = getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+            adapter.add(createTestItem(this, WIFI_LOCKDOWN_TEST_ID,
+                    R.string.device_owner_wifi_lockdown_test,
+                    new Intent(this, WifiLockdownTestActivity.class)));
+        }
         adapter.add(createInteractiveTestItem(this, REMOVE_DEVICE_OWNER_TEST_ID,
                 R.string.device_owner_remove_device_owner_test,
                 R.string.device_owner_remove_device_owner_test_info,
@@ -132,12 +140,18 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
 
     static TestListItem createInteractiveTestItem(Activity activity, String id, int titleRes,
             int infoRes, ButtonInfo buttonInfo) {
+        return createInteractiveTestItem(activity, id, titleRes, infoRes,
+                new ButtonInfo[] { buttonInfo });
+    }
+
+    static TestListItem createInteractiveTestItem(Activity activity, String id, int titleRes,
+            int infoRes, ButtonInfo[] buttonInfos) {
         return TestListItem.newTest(activity, titleRes,
                 id, new Intent(activity, IntentDrivenTestActivity.class)
                 .putExtra(IntentDrivenTestActivity.EXTRA_ID, id)
                 .putExtra(IntentDrivenTestActivity.EXTRA_TITLE, titleRes)
                 .putExtra(IntentDrivenTestActivity.EXTRA_INFO, infoRes)
-                .putExtra(IntentDrivenTestActivity.EXTRA_BUTTONS, new ButtonInfo[] { buttonInfo }),
+                .putExtra(IntentDrivenTestActivity.EXTRA_BUTTONS, buttonInfos),
                 null);
     }
 
