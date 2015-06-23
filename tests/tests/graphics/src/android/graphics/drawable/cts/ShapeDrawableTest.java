@@ -332,18 +332,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertFalse(shapeDrawable.getPaint().isDither());
     }
 
-    public void testGetDither() {
-        ShapeDrawable shapeDrawable = new ShapeDrawable();
-
-        shapeDrawable.setDither(true);
-        assertTrue(shapeDrawable.isDither());
-        assertEquals(shapeDrawable.isDither(), shapeDrawable.getPaint().isDither());
-
-        shapeDrawable.setDither(false);
-        assertFalse(shapeDrawable.isDither());
-        assertEquals(shapeDrawable.isDither(), shapeDrawable.getPaint().isDither());
-    }
-
     public void testMutate() {
         // How to load a ShapeDrawable from resources.
     }
