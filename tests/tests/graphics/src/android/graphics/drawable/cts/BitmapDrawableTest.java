@@ -164,21 +164,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
 
     }
 
-    public void testGetDither() {
-        InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
-
-        assertTrue(bitmapDrawable.getPaint().isDither());
-
-        bitmapDrawable.setDither(false);
-        assertFalse(bitmapDrawable.isDither());
-        assertEquals(bitmapDrawable.isDither(), bitmapDrawable.getPaint().isDither());
-
-        bitmapDrawable.setDither(true);
-        assertTrue(bitmapDrawable.isDither());
-        assertEquals(bitmapDrawable.isDither(), bitmapDrawable.getPaint().isDither());
-    }
-
     public void testAccessTileMode() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);

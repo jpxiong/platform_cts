@@ -197,16 +197,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertTrue(mNinePatchDrawable.getPaint().isDither());
     }
 
-    public void testGetDither() {
-        mNinePatchDrawable.setDither(false);
-        assertFalse(mNinePatchDrawable.isDither());
-        assertEquals(mNinePatchDrawable.isDither(), mNinePatchDrawable.getPaint().isDither());
-
-        mNinePatchDrawable.setDither(true);
-        assertTrue(mNinePatchDrawable.isDither());
-        assertEquals(mNinePatchDrawable.isDither(), mNinePatchDrawable.getPaint().isDither());
-    }
-
     public void testSetFilterBitmap() {
         mNinePatchDrawable.setFilterBitmap(false);
         assertFalse(mNinePatchDrawable.getPaint().isFilterBitmap());
