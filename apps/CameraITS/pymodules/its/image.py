@@ -369,6 +369,28 @@ def convert_yuv420_to_rgb_image(y_plane, u_plane, v_plane,
     rgb.reshape(w*h*3)[:] = flt.reshape(w*h*3)[:]
     return rgb.astype(numpy.float32) / 255.0
 
+def load_rgb_image(fname):
+    """Load a standard image file (JPG, PNG, etc.).
+
+    Args:
+        fname: The path of the file to load.
+
+    Returns:
+        RGB float-3 image array, with pixel values in [0.0, 1.0].
+    """
+    img = Image.open(fname)
+    w = img.size[0]
+    h = img.size[1]
+    a = numpy.array(img)
+    if len(a.shape) == 3 and a.shape[2] == 3:
+        # RGB
+        return a.reshape(h,w,3) / 255.0
+    elif len(a.shape) == 2 or len(a.shape) == 3 and a.shape[2] == 1:
+        # Greyscale; convert to RGB
+        return a.reshape(h*w).repeat(3).reshape(h,w,3) / 255.0
+    else:
+        raise its.error.Error('Unsupported image type')
+
 def load_yuv420_to_rgb_image(yuv_fname,
                              w, h,
                              ccm_yuv_to_rgb=DEFAULT_YUV_TO_RGB_CCM,
