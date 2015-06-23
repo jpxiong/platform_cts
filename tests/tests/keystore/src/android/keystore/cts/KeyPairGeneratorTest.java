@@ -91,6 +91,8 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
     @SuppressWarnings("deprecation")
     private static final Date NOW_PLUS_10_YEARS = new Date(NOW.getYear() + 10, 0, 1);
 
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+
     private static final X500Principal DEFAULT_CERT_SUBJECT = new X500Principal("CN=fake");
     private static final BigInteger DEFAULT_CERT_SERIAL_NUMBER = new BigInteger("1");
     private static final Date DEFAULT_CERT_NOT_BEFORE = new Date(0L); // Jan 1 1970
@@ -720,6 +722,55 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
     // TODO: Test fingerprint-authorized and secure lock screen-authorized keys. These can't
     // currently be tested here because CTS does not require that secure lock screen is set up and
     // that at least one fingerprint is enrolled.
+
+    public void testGenerate_EC_ModernSpec_KeyNotYetValid() throws Exception {
+        KeyPairGenerator generator = getEcGenerator();
+        Date validityStart = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
+        generator.initialize(new KeyGenParameterSpec.Builder(
+                TEST_ALIAS_1,
+                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                .setKeySize(256)
+                .setDigests(KeyProperties.DIGEST_SHA256)
+                .setKeyValidityStart(validityStart)
+                .build());
+        KeyPair keyPair = generator.generateKeyPair();
+        assertGeneratedKeyPairAndSelfSignedCertificate(
+                keyPair,
+                TEST_ALIAS_1,
+                "EC",
+                256,
+                DEFAULT_CERT_SUBJECT,
+                DEFAULT_CERT_SERIAL_NUMBER,
+                DEFAULT_CERT_NOT_BEFORE,
+                DEFAULT_CERT_NOT_AFTER);
+        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
+        assertEquals(validityStart, keyInfo.getKeyValidityStart());
+    }
+
+    public void testGenerate_RSA_ModernSpec_KeyExpiredForOrigination() throws Exception {
+        KeyPairGenerator generator = getRsaGenerator();
+        Date originationEnd = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+        generator.initialize(new KeyGenParameterSpec.Builder(
+                TEST_ALIAS_1,
+                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                .setKeySize(1024)
+                .setDigests(KeyProperties.DIGEST_SHA256)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                .setKeyValidityForOriginationEnd(originationEnd)
+                .build());
+        KeyPair keyPair = generator.generateKeyPair();
+        assertGeneratedKeyPairAndSelfSignedCertificate(
+                keyPair,
+                TEST_ALIAS_1,
+                "RSA",
+                1024,
+                DEFAULT_CERT_SUBJECT,
+                DEFAULT_CERT_SERIAL_NUMBER,
+                DEFAULT_CERT_NOT_BEFORE,
+                DEFAULT_CERT_NOT_AFTER);
+        KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
+        assertEquals(originationEnd, keyInfo.getKeyValidityForOriginationEnd());
+    }
 
     public void testGenerate_EC_ModernSpec_SupportedSizes() throws Exception {
         assertKeyGenUsingECSizeOnlyUsesCorrectCurve(224, ECCurves.NIST_P_224_SPEC);
