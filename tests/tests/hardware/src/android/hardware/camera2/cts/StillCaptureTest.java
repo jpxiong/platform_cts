@@ -663,16 +663,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      */
     private void rawCaptureTestByCamera() throws Exception {
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
-        Size[] rawSizes = mStaticInfo.getRawOutputSizesChecked();
-
-        assertTrue("No capture sizes available for RAW format!",
-                rawSizes.length != 0);
-        Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-        Size size = new Size(activeArray.width(), activeArray.height());
-        assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
-                activeArray.height() > 0);
-        assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
-                rawSizes, size);
+        Size size = mStaticInfo.getRawDimensChecked();
 
         // Prepare raw capture and start preview.
         CaptureRequest.Builder previewBuilder =
@@ -711,20 +702,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private void fullRawCaptureTestByCamera() throws Exception {
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
         Size maxStillSz = mOrderedStillSizes.get(0);
-        Size[] rawSizes = mStaticInfo.getRawOutputSizesChecked();
 
         SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
         SimpleImageReaderListener jpegListener = new SimpleImageReaderListener();
         SimpleImageReaderListener rawListener = new SimpleImageReaderListener();
 
-        assertTrue("No capture sizes available for RAW format!",
-                rawSizes.length != 0);
-        Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-        Size size = new Size(activeArray.width(), activeArray.height());
-        assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
-                activeArray.height() > 0);
-        assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
-                rawSizes, size);
+        Size size = mStaticInfo.getRawDimensChecked();
 
         if (VERBOSE) {
             Log.v(TAG, "Testing multi capture with size " + size.toString()
