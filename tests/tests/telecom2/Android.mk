@@ -29,7 +29,17 @@ LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 src_dirs := src \
     ../telecom/src
 
+res_dirs := res \
+    ../telecom/res
+
 LOCAL_SRC_FILES := $(call all-java-files-under, $(src_dirs))
+
+LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
+
+LOCAL_AAPT_FLAGS := \
+    --auto-add-overlay \
+    --extra-packages com.android.cts.telecom \
+    --rename-manifest-package com.android.cts.telecom2 \
 
 LOCAL_SDK_VERSION := current
 
