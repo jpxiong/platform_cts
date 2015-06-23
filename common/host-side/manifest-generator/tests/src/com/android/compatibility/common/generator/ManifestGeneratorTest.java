@@ -33,17 +33,24 @@ public class ManifestGeneratorTest extends TestCase {
         + "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" "
         + "package=\"test.package\">\r\n"
         + "  <uses-sdk android:minSdkVersion=\"8\" />\r\n"
+        + "%s"
         + "  <application>\r\n"
         + "%s"
         + "  </application>\r\n"
         + "  <instrumentation android:name=\"test.package.TestInstrument\" "
         + "android:targetPackage=\"test.package\" />\r\n"
         + "</manifest>";
+    private static final String PERMISSION = "  <uses-permission android:name=\"%s\" />\r\n";
+    private static final String PERMISSION_A = "android.permission.PermissionA";
+    private static final String PERMISSION_B = "android.permission.PermissionB";
     private static final String ACTIVITY = "    <activity android:name=\"%s\" />\r\n";
     private static final String ACTIVITY_A = "test.package.ActivityA";
     private static final String ACTIVITY_B = "test.package.ActivityB";
 
     public void testManifest() throws Exception {
+        List<String> permissions = new ArrayList<>();
+        permissions.add(PERMISSION_A);
+        permissions.add(PERMISSION_B);
         List<String> activities = new ArrayList<>();
         activities.add(ACTIVITY_A);
         activities.add(ACTIVITY_B);
@@ -59,10 +66,12 @@ public class ManifestGeneratorTest extends TestCase {
                 return this.string.toString();
             }
         };
-        ManifestGenerator.generate(output, PACKAGE, INSTRUMENT, activities);
+        ManifestGenerator.generate(output, PACKAGE, INSTRUMENT, permissions, activities);
+        String permissionXml = String.format(PERMISSION, PERMISSION_A)
+                + String.format(PERMISSION, PERMISSION_B);
         String activityXml = String.format(ACTIVITY, ACTIVITY_A)
                 + String.format(ACTIVITY, ACTIVITY_B);
-        String expected = String.format(MANIFEST, activityXml);
+        String expected = String.format(MANIFEST, permissionXml, activityXml);
         assertEquals("Wrong manifest output", expected, output.toString());
     }
 

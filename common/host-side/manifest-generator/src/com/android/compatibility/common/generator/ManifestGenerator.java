@@ -27,9 +27,10 @@ public class ManifestGenerator {
 
     private static final String USAGE = "Usage: "
         + "manifest-generator -n NAME -p PACKAGE_NAME -o OUTPUT_FILE -i INSTRUMENT_NAME "
-        + "[-a ACTIVITY]+";
+        + "[-r PERMISSION]+ [-a ACTIVITY]+";
     private static final String MANIFEST = "manifest";
     private static final String USES_SDK = "uses-sdk";
+    private static final String USES_PERMISSION = "uses-permission";
     private static final String APPLICATION = "application";
     private static final String INSTRUMENTATION = "instrumentation";
     private static final String ACTIVITY = "activity";
@@ -37,6 +38,7 @@ public class ManifestGenerator {
     public static void main(String[] args) {
         String pkgName = null;
         String instrumentName = null;
+        List<String> permissions = new ArrayList<>();
         List<String> activities = new ArrayList<>();
         String output = null;
 
@@ -49,6 +51,8 @@ public class ManifestGenerator {
                 output = args[++i];
             } else if (args[i].equals("-i")) {
                 instrumentName = args[++i];
+            } else if (args[i].equals("-r")) {
+                permissions.add(args[++i]);
             }
         }
 
@@ -65,7 +69,7 @@ public class ManifestGenerator {
         FileOutputStream out = null;
         try {
           out = new FileOutputStream(output);
-          generate(out, pkgName, instrumentName, activities);
+          generate(out, pkgName, instrumentName, permissions, activities);
         } catch (Exception e) {
           System.err.println("Couldn't create manifest file");
         } finally {
@@ -80,7 +84,7 @@ public class ManifestGenerator {
     }
 
     /*package*/ static void generate(OutputStream out, String pkgName, String instrumentName,
-            List<String> activities) throws Exception {
+            List<String> permissions, List<String> activities) throws Exception {
         final String ns = null;
         KXmlSerializer serializer = new KXmlSerializer();
         serializer.setOutput(out, "UTF-8");
@@ -92,6 +96,11 @@ public class ManifestGenerator {
         serializer.startTag(ns, USES_SDK);
         serializer.attribute(ns, "android:minSdkVersion", "8");
         serializer.endTag(ns, USES_SDK);
+        for (String permission : permissions) {
+            serializer.startTag(ns, USES_PERMISSION);
+            serializer.attribute(ns, "android:name", permission);
+            serializer.endTag(ns, USES_PERMISSION);
+        }
         serializer.startTag(ns, APPLICATION);
         for (String activity : activities) {
             serializer.startTag(ns, ACTIVITY);
