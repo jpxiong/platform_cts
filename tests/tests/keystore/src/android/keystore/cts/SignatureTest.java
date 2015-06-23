@@ -692,14 +692,11 @@ public class SignatureTest extends AndroidTestCase {
                 TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
 
         good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA", good.build());
         assertInitSignSucceeds("SHA224withRSA", good.build());
         assertInitSignThrowsInvalidKeyException("SHA224withRSA",
                 TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
 
         good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS", good.build());
         assertInitSignSucceeds("SHA224withRSA/PSS", good.build());
         assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS",
                 TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
@@ -715,14 +712,11 @@ public class SignatureTest extends AndroidTestCase {
                 TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
 
         good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA", good.build());
         assertInitSignSucceeds("SHA224withRSA", good.build());
         assertInitSignThrowsInvalidKeyException("SHA224withRSA",
                 TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
 
         good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS", good.build());
         assertInitSignSucceeds("SHA224withRSA/PSS", good.build());
         assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS",
                 TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
