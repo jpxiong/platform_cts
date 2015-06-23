@@ -347,6 +347,7 @@
   ],
   bug: 18030049
 },
+<<<<<<< HEAD
 {
   description: "The new recording test is not yet passing on all devices",
   names: [
@@ -360,12 +361,5 @@
     "android.hardware.camera2.cts.ImageReaderTest#testAllOutputYUVResolutions"
   ],
   bug: 18689511
-}
-{
-  description: "URLConnection fails for unknown reasons",
-  names: [
-    "libcore.java.net.URLConnectionTest#testConnectViaHttpProxyToHttpsUsingBadProxyAndHttpResponseCache fails"
-  ],
-  bug: 22033061
 }
 ]
