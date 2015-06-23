@@ -1401,7 +1401,8 @@ public class StaticMetadata {
             return minDurationMap;
         }
 
-        for (android.util.Size size : config.getOutputSizes(format)) {
+        for (android.util.Size size : getAvailableSizesForFormatChecked(format,
+                StreamDirection.Output)) {
             long minFrameDuration = config.getOutputMinFrameDuration(format, size);
 
             if (minFrameDuration != 0) {
