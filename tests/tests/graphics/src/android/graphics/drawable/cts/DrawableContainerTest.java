@@ -184,25 +184,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(dr.hasSetDitherCalled());
     }
 
-    public void testGetDither() {
-        assertConstantStateNotSet();
-        assertNull(mDrawableContainer.getCurrent());
-
-        mDrawableContainer.setConstantState(mDrawableContainerState);
-
-        MockDrawable dr = new MockDrawable();
-        addAndSelectDrawable(dr);
-
-
-        mDrawableContainer.setDither(true);
-        assertTrue(mDrawableContainer.isDither());
-
-        mDrawableContainer.setDither(false);
-        assertFalse(mDrawableContainer.isDither());
-
-        dr.reset();
-    }
-
     public void testSetHotspotBounds() {
         Rect bounds = new Rect(10, 15, 100, 150);
         assertConstantStateNotSet();
