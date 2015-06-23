@@ -172,6 +172,7 @@ cts_test_packages := \
     CtsTextTestCases \
     CtsTextureViewTestCases \
     CtsThemeTestCases \
+    CtsTransitionTestCases \
     CtsTvTestCases \
     CtsUiAutomationTestCases \
     CtsUiRenderingTestCases \
