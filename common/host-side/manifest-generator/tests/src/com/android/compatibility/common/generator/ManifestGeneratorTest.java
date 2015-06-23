@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 public class ManifestGeneratorTest extends TestCase {
 
     private static final String PACKAGE = "test.package";
+    private static final String INSTRUMENT = "test.package.TestInstrument";
     private static final String MANIFEST = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\r\n"
         + "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" "
         + "package=\"test.package\">\r\n"
@@ -35,6 +36,8 @@ public class ManifestGeneratorTest extends TestCase {
         + "  <application>\r\n"
         + "%s"
         + "  </application>\r\n"
+        + "  <instrumentation android:name=\"test.package.TestInstrument\" "
+        + "android:targetPackage=\"test.package\" />\r\n"
         + "</manifest>";
     private static final String ACTIVITY = "    <activity android:name=\"%s\" />\r\n";
     private static final String ACTIVITY_A = "test.package.ActivityA";
@@ -56,7 +59,7 @@ public class ManifestGeneratorTest extends TestCase {
                 return this.string.toString();
             }
         };
-        ManifestGenerator.generate(output, PACKAGE, activities);
+        ManifestGenerator.generate(output, PACKAGE, INSTRUMENT, activities);
         String activityXml = String.format(ACTIVITY, ACTIVITY_A)
                 + String.format(ACTIVITY, ACTIVITY_B);
         String expected = String.format(MANIFEST, activityXml);

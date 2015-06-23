@@ -26,14 +26,17 @@ import org.kxml2.io.KXmlSerializer;
 public class ManifestGenerator {
 
     private static final String USAGE = "Usage: "
-        + "manifest-generator -n NAME -p PACKAGE_NAME -o OUTPUT_FILE [-a ACTIVITY]+";
+        + "manifest-generator -n NAME -p PACKAGE_NAME -o OUTPUT_FILE -i INSTRUMENT_NAME "
+        + "[-a ACTIVITY]+";
     private static final String MANIFEST = "manifest";
     private static final String USES_SDK = "uses-sdk";
     private static final String APPLICATION = "application";
+    private static final String INSTRUMENTATION = "instrumentation";
     private static final String ACTIVITY = "activity";
 
     public static void main(String[] args) {
         String pkgName = null;
+        String instrumentName = null;
         List<String> activities = new ArrayList<>();
         String output = null;
 
@@ -44,11 +47,15 @@ public class ManifestGenerator {
                 activities.add(args[++i]);
             } else if (args[i].equals("-o")) {
                 output = args[++i];
+            } else if (args[i].equals("-i")) {
+                instrumentName = args[++i];
             }
         }
 
         if (pkgName == null) {
             error("Missing package name");
+        } else if (instrumentName == null) {
+            error("Missing instrumentation name");
         } else if (activities.isEmpty()) {
             error("No activities");
         } else if (output == null) {
@@ -58,7 +65,7 @@ public class ManifestGenerator {
         FileOutputStream out = null;
         try {
           out = new FileOutputStream(output);
-          generate(out, pkgName, activities);
+          generate(out, pkgName, instrumentName, activities);
         } catch (Exception e) {
           System.err.println("Couldn't create manifest file");
         } finally {
@@ -72,8 +79,8 @@ public class ManifestGenerator {
         }
     }
 
-    /*package*/ static void generate(OutputStream out, String pkgName, List<String> activities)
-            throws Exception {
+    /*package*/ static void generate(OutputStream out, String pkgName, String instrumentName,
+            List<String> activities) throws Exception {
         final String ns = null;
         KXmlSerializer serializer = new KXmlSerializer();
         serializer.setOutput(out, "UTF-8");
@@ -92,6 +99,10 @@ public class ManifestGenerator {
             serializer.endTag(ns, ACTIVITY);
         }
         serializer.endTag(ns, APPLICATION);
+        serializer.startTag(ns, INSTRUMENTATION);
+        serializer.attribute(ns, "android:name", instrumentName);
+        serializer.attribute(ns, "android:targetPackage", pkgName);
+        serializer.endTag(ns, INSTRUMENTATION);
         serializer.endTag(ns, MANIFEST);
         serializer.endDocument();
         out.flush();
