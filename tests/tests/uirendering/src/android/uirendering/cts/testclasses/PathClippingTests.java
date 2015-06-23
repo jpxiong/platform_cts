@@ -161,7 +161,7 @@ public class PathClippingTests extends ActivityTestBase {
                 // verify against solid color webview, clipped to its parent oval
                 .addLayout(R.layout.circle_clipped_webview, new ViewInitializer() {
                     @Override
-                    public void intializeView(View view) {
+                    public void initializeView(View view) {
                         WebView webview = (WebView)view.findViewById(R.id.webview);
                         assertNotNull(webview);
                         webview.loadData("<body style=\"background-color:blue\">", null, null);
