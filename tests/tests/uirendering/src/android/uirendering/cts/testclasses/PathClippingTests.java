@@ -14,14 +14,15 @@ import android.uirendering.cts.testinfrastructure.CanvasClient;
 import android.uirendering.cts.testinfrastructure.ViewInitializer;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import com.android.cts.uirendering.R;
 
 public class PathClippingTests extends ActivityTestBase {
     // draw circle with hole in it, with stroked circle
-    static final CanvasClient sCircleDrawCanvasClient = new CanvasClient() {
+    static final CanvasClient sTorusDrawCanvasClient = new CanvasClient() {
         @Override
         public String getDebugString() {
-            return "StrokedCircleDraw";
+            return "TorusDraw";
         }
 
         @Override
@@ -36,10 +37,10 @@ public class PathClippingTests extends ActivityTestBase {
     };
 
     // draw circle with hole in it, by path operations + path clipping
-    static final CanvasClient sCircleClipCanvasClient = new CanvasClient() {
+    static final CanvasClient sTorusClipCanvasClient = new CanvasClient() {
         @Override
         public String getDebugString() {
-            return "CircleClipDraw";
+            return "TorusClipDraw";
         }
 
         @Override
@@ -60,15 +61,15 @@ public class PathClippingTests extends ActivityTestBase {
     @SmallTest
     public void testCircleWithCircle() {
         createTest()
-                .addCanvasClient(sCircleDrawCanvasClient, false)
-                .addCanvasClient(sCircleClipCanvasClient)
+                .addCanvasClient(sTorusDrawCanvasClient, false)
+                .addCanvasClient(sTorusClipCanvasClient)
                 .runWithComparer(new MSSIMComparer(0.90));
     }
 
     @SmallTest
     public void testCircleWithPoints() {
         createTest()
-                .addCanvasClient(sCircleClipCanvasClient)
+                .addCanvasClient(sTorusClipCanvasClient)
                 .runWithVerifier(new SamplePointVerifier(
                         new Point[] {
                                 // inside of circle
@@ -142,5 +143,30 @@ public class PathClippingTests extends ActivityTestBase {
                     }
                 })
                 .runWithComparer(new MSSIMComparer(0.90));
+    }
+
+    @SmallTest
+    public void testWebViewClipWithCircle() {
+        createTest()
+                // golden client - draw a simple non-AA circle
+                .addCanvasClient(new CanvasClient() {
+                    @Override
+                    public void draw(Canvas canvas, int width, int height) {
+                        Paint paint = new Paint();
+                        paint.setAntiAlias(false);
+                        paint.setColor(Color.BLUE);
+                        canvas.drawOval(0, 0, width, height, paint);
+                    }
+                }, false)
+                // verify against solid color webview, clipped to its parent oval
+                .addLayout(R.layout.circle_clipped_webview, new ViewInitializer() {
+                    @Override
+                    public void intializeView(View view) {
+                        WebView webview = (WebView)view.findViewById(R.id.webview);
+                        assertNotNull(webview);
+                        webview.loadData("<body style=\"background-color:blue\">", null, null);
+                    }
+                })
+                .runWithComparer(new MSSIMComparer(0.95));
     }
 }

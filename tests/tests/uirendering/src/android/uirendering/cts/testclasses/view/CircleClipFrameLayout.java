@@ -18,31 +18,37 @@ package android.uirendering.cts.testclasses.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Path;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-public class UnclippedBlueView extends FrameLayout {
-    public UnclippedBlueView(Context context) {
+public class CircleClipFrameLayout extends FrameLayout {
+    final Path mClipPath = new Path();
+    public CircleClipFrameLayout(Context context) {
         this(context, null);
     }
 
-    public UnclippedBlueView(Context context, AttributeSet attrs) {
+    public CircleClipFrameLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public UnclippedBlueView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CircleClipFrameLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public UnclippedBlueView(Context context, AttributeSet attrs,
-            int defStyleAttr, int defStyleRes) {
+    public CircleClipFrameLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        setWillNotDraw(false);
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.BLUE);
+    protected void dispatchDraw(Canvas canvas) {
+        canvas.save();
+
+        mClipPath.reset();
+        mClipPath.addOval(0, 0, getWidth(), getHeight(), Path.Direction.CW);
+        canvas.clipPath(mClipPath);
+        super.dispatchDraw(canvas);
+
+        canvas.restore();
     }
 }
