@@ -546,13 +546,6 @@ public class DrawableTest extends AndroidTestCase {
         mockDrawable.setDither(false);
     }
 
-    public void testGetDither() {
-        MockDrawable mockDrawable = new MockDrawable();
-
-        // isDither simply returns false for Drawable superclass
-        assertFalse((mockDrawable.isDither()));
-    }
-
     public void testSetHotspotBounds() {
         MockDrawable mockDrawable = new MockDrawable();
 

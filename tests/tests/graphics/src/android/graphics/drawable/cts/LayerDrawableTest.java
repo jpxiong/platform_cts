@@ -502,19 +502,6 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertTrue(mockDrawable2.hasCalledSetDither());
     }
 
-    public void testGetDither() {
-        MockDrawable mockDrawable1 = new MockDrawable();
-        MockDrawable mockDrawable2 = new MockDrawable();
-        Drawable[] array = new Drawable[] { mockDrawable1, mockDrawable2 };
-        LayerDrawable layerDrawable = new LayerDrawable(array);
-
-        layerDrawable.setDither(true);
-        assertTrue(layerDrawable.isDither());
-
-        layerDrawable.setDither(false);
-        assertFalse(layerDrawable.isDither());
-    }
-
     public void testSetHotspotBounds() {
         Rect bounds = new Rect(10, 15, 100, 150);
         MockDrawable mockDrawable1 = new MockDrawable();
@@ -1465,11 +1452,6 @@ public class LayerDrawableTest extends AndroidTestCase {
         public void setDither(boolean dither) {
             mDither = dither;
             mCalledSetDither = true;
-        }
-
-        @Override
-        public boolean isDither() {
-            return mDither;
         }
 
         public boolean hasCalledSetDither() {
