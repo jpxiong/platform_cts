@@ -380,4 +380,11 @@
   ],
   bug: 18030049
 }
+{
+  description: "URLConnection fails for unknown reasons",
+  names: [
+    "libcore.java.net.URLConnectionTest#testConnectViaHttpProxyToHttpsUsingBadProxyAndHttpResponseCache fails"
+  ],
+  bug: 22033061
+}
 ]
