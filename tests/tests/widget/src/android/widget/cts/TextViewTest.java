@@ -2615,6 +2615,88 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         assertTrue(mTextView.getHeight() <= maxLines * mTextView.getLineHeight());
     }
 
+    public int calculateTextWidth(String text) {
+        mTextView = findTextView(R.id.textview_text);
+
+        // Set the TextView width as the half of the whole text.
+        float[] widths = new float[text.length()];
+        mTextView.getPaint().getTextWidths(text, widths);
+        float textfieldWidth = 0.0f;
+        for (int i = 0; i < text.length(); ++i) {
+            textfieldWidth += widths[i];
+        }
+        return (int)textfieldWidth;
+
+    }
+
+    @UiThreadTest
+    public void testHyphenationNotHappen_frequencyNone() {
+        final int[] BREAK_STRATEGIES = {
+            Layout.BREAK_STRATEGY_SIMPLE, Layout.BREAK_STRATEGY_HIGH_QUALITY,
+            Layout.BREAK_STRATEGY_BALANCED };
+
+        mTextView = findTextView(R.id.textview_text);
+
+        for (int breakStrategy : BREAK_STRATEGIES) {
+            for (int charWidth = 10; charWidth < 120; charWidth += 5) {
+                // Change the text view's width to charWidth width.
+                mTextView.setWidth(calculateTextWidth(LONG_TEXT.substring(0, charWidth)));
+
+                mTextView.setText(LONG_TEXT);
+                mTextView.setBreakStrategy(breakStrategy);
+
+                mTextView.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE);
+
+                mTextView.requestLayout();
+                mTextView.onPreDraw();  // For freezing the layout.
+                Layout layout = mTextView.getLayout();
+
+                final int lineCount = layout.getLineCount();
+                for (int line = 0; line < lineCount; ++line) {
+                    final int lineEnd = layout.getLineEnd(line);
+                    // In any width, any break strategy, hyphenation should not happen if
+                    // HYPHENATION_FREQUENCY_NONE is specified.
+                    assertTrue(lineEnd == LONG_TEXT.length() ||
+                            Character.isWhitespace(LONG_TEXT.charAt(lineEnd - 1)));
+                }
+            }
+        }
+    }
+
+    @UiThreadTest
+    public void testHyphenationNotHappen_breakStrategySimple() {
+        final int[] HYPHENATION_FREQUENCIES = {
+            Layout.HYPHENATION_FREQUENCY_NORMAL, Layout.HYPHENATION_FREQUENCY_FULL,
+            Layout.HYPHENATION_FREQUENCY_NONE };
+
+        mTextView = findTextView(R.id.textview_text);
+
+        for (int hyphenationFrequency: HYPHENATION_FREQUENCIES) {
+            for (int charWidth = 10; charWidth < 120; charWidth += 5) {
+                // Change the text view's width to charWidth width.
+                mTextView.setWidth(calculateTextWidth(LONG_TEXT.substring(0, charWidth)));
+
+                mTextView.setText(LONG_TEXT);
+                mTextView.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
+
+                mTextView.setHyphenationFrequency(hyphenationFrequency);
+
+                mTextView.requestLayout();
+                mTextView.onPreDraw();  // For freezing the layout.
+                Layout layout = mTextView.getLayout();
+
+                final int lineCount = layout.getLineCount();
+                for (int line = 0; line < lineCount; ++line) {
+                    final int lineEnd = layout.getLineEnd(line);
+                    // In any width, any hyphenation frequency, hyphenation should not happen if
+                    // BREAK_STRATEGY_SIMPLE is specified.
+                    assertTrue(lineEnd == LONG_TEXT.length() ||
+                            Character.isWhitespace(LONG_TEXT.charAt(lineEnd - 1)));
+                }
+            }
+        }
+    }
+
     @UiThreadTest
     public void testSetMaxLinesException() {
         mTextView = new TextView(mActivity);
