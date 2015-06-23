@@ -347,6 +347,7 @@
   ],
   bug: 18030049
 },
+<<<<<<< HEAD
 {
   description: "The new recording test is not yet passing on all devices",
   names: [
