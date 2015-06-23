@@ -395,6 +395,15 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             // Ensure that max YUV size matches max JPEG size
             Size maxYuvSize = CameraTestUtils.getMaxSize(
                     config.getOutputSizes(ImageFormat.YUV_420_888));
+            Size maxFastYuvSize = maxYuvSize;
+
+            Size[] slowYuvSizes = config.getHighResolutionOutputSizes(ImageFormat.YUV_420_888);
+            assertTrue("Null slow YUV size array not allowed with BURST_CAPTURE capability!",
+                    slowYuvSizes != null);
+            if (slowYuvSizes.length > 0) {
+                Size maxSlowYuvSize = CameraTestUtils.getMaxSize(slowYuvSizes);
+                maxYuvSize = CameraTestUtils.getMaxSize(new Size[]{maxYuvSize, maxSlowYuvSize});
+            }
             Size maxJpegSize = CameraTestUtils.getMaxSize(config.getOutputSizes(ImageFormat.JPEG));
 
             boolean haveMaxYuv = maxYuvSize != null ?
@@ -413,19 +422,29 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             boolean haveAwbLock = CameraTestUtils.getValueNotNull(
                     c, CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
 
-            // Ensure that YUV output is fast enough - needs to be at least 20 fps
+            // Ensure that max YUV output is fast enough - needs to be at least 10 fps
 
             long maxYuvRate =
                 config.getOutputMinFrameDuration(ImageFormat.YUV_420_888, maxYuvSize);
-            final long MIN_DURATION_BOUND_NS = 50000000; // 50 ms, 20 fps
+            final long MIN_MAXSIZE_DURATION_BOUND_NS = 100000000; // 100 ms, 10 fps
+            boolean haveMaxYuvRate = maxYuvRate <= MIN_MAXSIZE_DURATION_BOUND_NS;
 
-            boolean haveMaxYuvRate = maxYuvRate <= MIN_DURATION_BOUND_NS;
+            // Ensure that some >=8MP YUV output is fast enough - needs to be at least 20 fps
+
+            long maxFastYuvRate =
+                    config.getOutputMinFrameDuration(ImageFormat.YUV_420_888, maxFastYuvSize);
+            final long MIN_8MP_DURATION_BOUND_NS = 200000000; // 50 ms, 20 fps
+            boolean haveFastYuvRate = maxFastYuvRate <= MIN_8MP_DURATION_BOUND_NS;
+
+            final int SIZE_8MP_BOUND = 8000000;
+            boolean havefast8MPYuv = (maxFastYuvSize.getWidth() * maxFastYuvSize.getHeight()) >
+                    SIZE_8MP_BOUND;
 
             // Ensure that there's an FPS range that's fast enough to capture at above
-            // minFrameDuration, for full-auto bursts
+            // minFrameDuration, for full-auto bursts at the fast resolutions
             Range[] fpsRanges = CameraTestUtils.getValueNotNull(
                     c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
-            float minYuvFps = 1.f / maxYuvRate;
+            float minYuvFps = 1.f / maxFastYuvRate;
 
             boolean haveFastAeTargetFps = false;
             for (Range<Integer> r : fpsRanges) {
@@ -454,10 +473,17 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 mIds[counter]),
                         haveMaxYuv);
                 assertTrue(
-                        String.format("BURST-capable camera device %s YUV frame rate is too slow" +
+                        String.format("BURST-capable camera device %s max-resolution " +
+                                "YUV frame rate is too slow" +
                                 "(%d ns min frame duration reported, less than %d ns expected)",
-                                mIds[counter], maxYuvRate, MIN_DURATION_BOUND_NS),
+                                mIds[counter], maxYuvRate, MIN_MAXSIZE_DURATION_BOUND_NS),
                         haveMaxYuvRate);
+                assertTrue(
+                        String.format("BURST-capable camera device %s >= 8MP YUV output " +
+                                "frame rate is too slow" +
+                                "(%d ns min frame duration reported, less than %d ns expected)",
+                                mIds[counter], maxYuvRate, MIN_8MP_DURATION_BOUND_NS),
+                        haveFastYuvRate);
                 assertTrue(
                         String.format("BURST-capable camera device %s does not list an AE target " +
                                 " FPS range with min FPS >= %f, for full-AUTO bursts",
@@ -553,6 +579,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     // Verify camera can output the reprocess input formats and sizes.
                     Size[] inputSizes = configs.getInputSizes(input);
                     Size[] outputSizes = configs.getOutputSizes(input);
+                    Size[] highResOutputSizes = configs.getHighResolutionOutputSizes(input);
                     assertTrue("no input size supported for format " + input,
                             inputSizes.length > 0);
                     assertTrue("no output size supported for format " + input,
@@ -560,7 +587,9 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
                     for (Size inputSize : inputSizes) {
                         assertTrue("Camera must be able to output the supported reprocessing " +
-                            "input size", arrayContains(outputSizes, inputSize));
+                                "input size",
+                                arrayContains(outputSizes, inputSize) ||
+                                arrayContains(highResOutputSizes, inputSize));
                     }
                 }
             }
@@ -618,6 +647,13 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                         config.isOutputSupportedFor(format));
                 List<Size> supportedSizes = CameraTestUtils.getAscendingOrderSizes(
                         Arrays.asList(config.getOutputSizes(format)), /*ascending*/true);
+                if (arrayContains(actualCapabilities,
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)) {
+                    supportedSizes.addAll(
+                        Arrays.asList(config.getHighResolutionOutputSizes(format)));
+                    supportedSizes = CameraTestUtils.getAscendingOrderSizes(
+                        supportedSizes, /*ascending*/true);
+                }
                 assertTrue("Supported format " + format + " has no sizes listed",
                         supportedSizes.size() > 0);
                 for (int i = 0; i < supportedSizes.size(); i++) {
