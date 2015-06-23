@@ -115,19 +115,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                     continue;
                 }
 
-                Size[] targetCaptureSizes =
-                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
-                                StaticMetadata.StreamDirection.Output);
-
-                assertTrue("No capture sizes available for RAW format!",
-                        targetCaptureSizes.length != 0);
-                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-                Size activeArraySize = new Size(activeArray.width(), activeArray.height());
-                assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
-                        activeArray.height() > 0);
-                // TODO: Allow PixelArraySize also.
-                assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
-                        targetCaptureSizes, activeArraySize);
+                Size activeArraySize = mStaticInfo.getRawDimensChecked();
 
                 // Create capture image reader
                 CameraTestUtils.SimpleImageReaderListener captureListener
@@ -202,19 +190,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                     continue;
                 }
 
-                Size[] targetCaptureSizes =
-                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
-                                StaticMetadata.StreamDirection.Output);
-
-                assertTrue("No capture sizes available for RAW format!",
-                        targetCaptureSizes.length != 0);
-                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-                Size activeArraySize = new Size(activeArray.width(), activeArray.height());
-                assertTrue("Missing ActiveArraySize", activeArray.width() > 0 &&
-                        activeArray.height() > 0);
-                // TODO: Allow PixelArraySize also.
-                assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
-                        targetCaptureSizes, activeArraySize);
+                Size activeArraySize = mStaticInfo.getRawDimensChecked();
 
                 Size[] targetPreviewSizes =
                         mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.YUV_420_888,
@@ -322,19 +298,7 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                     continue;
                 }
 
-                Size[] targetCaptureSizes =
-                        mStaticInfo.getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
-                                StaticMetadata.StreamDirection.Output);
-
-                assertTrue("No capture sizes available for RAW format!",
-                        targetCaptureSizes.length != 0);
-                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-                Size activeArraySize = new Size(activeArray.width(), activeArray.height());
-                assertTrue("Active array has invalid size!", activeArray.width() > 0 &&
-                        activeArray.height() > 0);
-                // TODO: Allow PixelArraySize also.
-                assertArrayContains("Available sizes for RAW format must include ActiveArraySize",
-                        targetCaptureSizes, activeArraySize);
+                Size activeArraySize = mStaticInfo.getRawDimensChecked();
 
                 // Get largest jpeg size
                 Size[] targetJpegSizes =
@@ -369,8 +333,8 @@ public class DngCreatorTest extends Camera2AndroidTestCase {
                         Bitmap.Config.ARGB_8888);
 
                 Size rawBitmapSize = new Size(rawBitmap.getWidth(), rawBitmap.getHeight());
-                assertTrue("Raw bitmap size must be equal to active array size.",
-                        rawBitmapSize.equals(activeArraySize));
+                assertTrue("Raw bitmap size must be equal to either pre-correction active array" +
+                        " size or pixel array size.", rawBitmapSize.equals(activeArraySize));
 
                 byte[] rawPlane = new byte[raw.getPlanes()[0].getRowStride() * raw.getHeight()];
 

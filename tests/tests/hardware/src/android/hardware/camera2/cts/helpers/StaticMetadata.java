@@ -41,6 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static android.hardware.camera2.cts.helpers.AssertHelpers.*;
+
 /**
  * Helpers to get common static info out of the camera.
  *
@@ -743,6 +745,26 @@ public class StaticMetadata {
     }
 
     /**
+     * Get and check pre-correction active array size.
+     */
+    public Rect getPreCorrectedActiveArraySizeChecked() {
+        Key<Rect> key = CameraCharacteristics.SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE;
+        Rect activeArray = getValueFromKeyNonNull(key);
+
+        if (activeArray == null) {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        Size pixelArraySize = getPixelArraySizeChecked();
+        checkTrueForKey(key, "values left/top are invalid", activeArray.left >= 0 && activeArray.top >= 0);
+        checkTrueForKey(key, "values width/height are invalid",
+                activeArray.width() <= pixelArraySize.getWidth() &&
+                activeArray.height() <= pixelArraySize.getHeight());
+
+        return activeArray;
+    }
+
+    /**
      * Get and check active array size.
      */
     public Rect getActiveArraySizeChecked() {
@@ -760,6 +782,29 @@ public class StaticMetadata {
                 activeArray.height() <= pixelArraySize.getHeight());
 
         return activeArray;
+    }
+
+    /**
+     * Get the dimensions to use for RAW16 buffers.
+     */
+    public Size getRawDimensChecked() throws Exception {
+        Size[] targetCaptureSizes = getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
+                        StaticMetadata.StreamDirection.Output);
+        Assert.assertTrue("No capture sizes available for RAW format!",
+                targetCaptureSizes.length != 0);
+        Rect activeArray = getPreCorrectedActiveArraySizeChecked();
+        Size preCorrectionActiveArraySize =
+                new Size(activeArray.width(), activeArray.height());
+        Size pixelArraySize = getPixelArraySizeChecked();
+        Assert.assertTrue("Missing pre-correction active array size", activeArray.width() > 0 &&
+                activeArray.height() > 0);
+        Assert.assertTrue("Missing pixel array size", pixelArraySize.getWidth() > 0 &&
+                pixelArraySize.getHeight() > 0);
+        Size[] allowedArraySizes = new Size[] { preCorrectionActiveArraySize,
+                pixelArraySize };
+        return assertArrayContainsAnyOf("Available sizes for RAW format" +
+                " must include either the pre-corrected active array size, or the full " +
+                "pixel array size", targetCaptureSizes, allowedArraySizes);
     }
 
     /**
