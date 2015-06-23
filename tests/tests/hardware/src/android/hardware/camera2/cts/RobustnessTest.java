@@ -198,21 +198,17 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         sanityCheckConfigurationTables(TABLES);
 
         for (String id : mCameraIds) {
+            openDevice(id);
 
             // Find the concrete max sizes for each format/resolution combination
+            MaxStreamSizes maxSizes = new MaxStreamSizes(mStaticInfo, id);
 
-            CameraCharacteristics cc = mCameraManager.getCameraCharacteristics(id);
-
-            MaxStreamSizes maxSizes = new MaxStreamSizes(cc, id);
-
-            final StaticMetadata staticInfo = new StaticMetadata(cc);
             String streamConfigurationMapString =
-                    cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).toString();
+                    mStaticInfo.getCharacteristics().get(
+                            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).toString();
             if (VERBOSE) {
                 Log.v(TAG, "StreamConfigurationMap: " + streamConfigurationMapString);
             }
-
-            openDevice(id);
 
             // Always run legacy-level tests
 
@@ -222,7 +218,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
             // Then run higher-level tests if applicable
 
-            if (!staticInfo.isHardwareLevelLegacy()) {
+            if (!mStaticInfo.isHardwareLevelLegacy()) {
 
                 // If not legacy, at least limited, so run limited-level tests
 
@@ -232,20 +228,20 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
                 // Check for BURST_CAPTURE, FULL and RAW and run those if appropriate
 
-                if (staticInfo.isCapabilitySupported(
+                if (mStaticInfo.isCapabilitySupported(
                         CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)) {
                     for (int[] config : BURST_COMBINATIONS) {
                         testOutputCombination(id, config, maxSizes);
                     }
                 }
 
-                if (staticInfo.isHardwareLevelFull()) {
+                if (mStaticInfo.isHardwareLevelFull()) {
                     for (int[] config : FULL_COMBINATIONS) {
                         testOutputCombination(id, config, maxSizes);
                     }
                 }
 
-                if (staticInfo.isCapabilitySupported(
+                if (mStaticInfo.isCapabilitySupported(
                         CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
                     for (int[] config : RAW_COMBINATIONS) {
                         testOutputCombination(id, config, maxSizes);
@@ -316,8 +312,8 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
         for (String id : mCameraIds) {
             CameraCharacteristics cc = mCameraManager.getCameraCharacteristics(id);
-            MaxStreamSizes maxSizes = new MaxStreamSizes(cc, id);
             StaticMetadata staticInfo = new StaticMetadata(cc);
+            MaxStreamSizes maxSizes = new MaxStreamSizes(staticInfo, id);
 
             // Skip the test for legacy devices.
             if (staticInfo.isHardwareLevelLegacy()) {
@@ -396,15 +392,15 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         static final int VGA = 3;
         static final int RESOLUTION_COUNT = 4;
 
-        public MaxStreamSizes(CameraCharacteristics cc, String cameraId) {
-            StreamConfigurationMap configs =
-                    cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            Size[] privSizes = configs.getOutputSizes(SurfaceTexture.class);
-            Size[] yuvSizes = configs.getOutputSizes(ImageFormat.YUV_420_888);
-            Size[] jpegSizes = configs.getOutputSizes(ImageFormat.JPEG);
-            Size[] rawSizes = configs.getOutputSizes(ImageFormat.RAW_SENSOR);
+        public MaxStreamSizes(StaticMetadata sm, String cameraId) {
+            Size[] privSizes = sm.getAvailableSizesForFormatChecked(ImageFormat.PRIVATE,
+                    StaticMetadata.StreamDirection.Output);
+            Size[] yuvSizes = sm.getAvailableSizesForFormatChecked(ImageFormat.YUV_420_888,
+                    StaticMetadata.StreamDirection.Output);
+            Size[] jpegSizes = sm.getJpegOutputSizesChecked();
+            Size[] rawSizes = sm.getRawOutputSizesChecked();
 
-            maxRawSize = (rawSizes != null) ? CameraTestUtils.getMaxSize(rawSizes) : null;
+            maxRawSize = (rawSizes.length != 0) ? CameraTestUtils.getMaxSize(rawSizes) : null;
 
             maxPrivSizes[PREVIEW] = getMaxSize(privSizes, PREVIEW_SIZE_BOUND);
             maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, PREVIEW_SIZE_BOUND);
@@ -418,6 +414,8 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             maxYuvSizes[MAXIMUM] = CameraTestUtils.getMaxSize(yuvSizes);
             maxJpegSizes[MAXIMUM] = CameraTestUtils.getMaxSize(jpegSizes);
 
+            StreamConfigurationMap configs = sm.getCharacteristics().get(
+                    CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             maxInputPrivSize = CameraTestUtils.getMaxSize(
                     configs.getInputSizes(ImageFormat.PRIVATE));
             maxInputYuvSize = CameraTestUtils.getMaxSize(

@@ -1168,7 +1168,7 @@ public class StaticMetadata {
      *
      * @return Empty size array if jpeg output is not supported
      */
-    public Size[] getJpegOutputSizeChecked() {
+    public Size[] getJpegOutputSizesChecked() {
         return getAvailableSizesForFormatChecked(ImageFormat.JPEG,
                 StreamDirection.Output);
     }
@@ -1236,6 +1236,22 @@ public class StaticMetadata {
      * @return The sizes of the given format, empty array if no available size is found.
      */
     public Size[] getAvailableSizesForFormatChecked(int format, StreamDirection direction) {
+        return getAvailableSizesForFormatChecked(format, direction,
+                /*fastSizes*/true, /*slowSizes*/true);
+    }
+
+    /**
+     * Get available sizes for given format and direction, and whether to limit to slow or fast
+     * resolutions.
+     *
+     * @param format The format for the requested size array.
+     * @param direction The stream direction, input or output.
+     * @param fastSizes whether to include getOutputSizes() sizes (generally faster)
+     * @param slowSizes whether to include getHighResolutionOutputSizes() sizes (generally slower)
+     * @return The sizes of the given format, empty array if no available size is found.
+     */
+    public Size[] getAvailableSizesForFormatChecked(int format, StreamDirection direction,
+            boolean fastSizes, boolean slowSizes) {
         Key<StreamConfigurationMap> key =
                 CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
         StreamConfigurationMap config = getValueFromKeyNonNull(key);
@@ -1244,11 +1260,27 @@ public class StaticMetadata {
             return new Size[0];
         }
 
-        Size[] sizes;
+        Size[] sizes = null;
 
         switch (direction) {
             case Output:
-                sizes = config.getOutputSizes(format);
+                Size[] fastSizeList = null;
+                Size[] slowSizeList = null;
+                if (fastSizes) {
+                    fastSizeList = config.getOutputSizes(format);
+                }
+                if (slowSizes) {
+                    slowSizeList = config.getHighResolutionOutputSizes(format);
+                }
+                if (fastSizeList != null && slowSizeList != null) {
+                    sizes = new Size[slowSizeList.length + fastSizeList.length];
+                    System.arraycopy(fastSizeList, 0, sizes, 0, fastSizeList.length);
+                    System.arraycopy(slowSizeList, 0, sizes, fastSizeList.length, slowSizeList.length);
+                } else if (fastSizeList != null) {
+                    sizes = fastSizeList;
+                } else if (slowSizeList != null) {
+                    sizes = slowSizeList;
+                }
                 break;
             case Input:
                 sizes = config.getInputSizes(format);
