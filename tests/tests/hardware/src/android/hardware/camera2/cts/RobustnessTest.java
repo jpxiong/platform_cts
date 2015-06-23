@@ -416,10 +416,12 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
             StreamConfigurationMap configs = sm.getCharacteristics().get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            maxInputPrivSize = CameraTestUtils.getMaxSize(
-                    configs.getInputSizes(ImageFormat.PRIVATE));
-            maxInputYuvSize = CameraTestUtils.getMaxSize(
-                    configs.getInputSizes(ImageFormat.YUV_420_888));
+            Size[] privInputSizes = configs.getInputSizes(ImageFormat.PRIVATE);
+            maxInputPrivSize = privInputSizes != null ?
+                    CameraTestUtils.getMaxSize(privInputSizes) : null;
+            Size[] yuvInputSizes = configs.getInputSizes(ImageFormat.YUV_420_888);
+            maxInputYuvSize = yuvInputSizes != null ?
+                    CameraTestUtils.getMaxSize(yuvInputSizes) : null;
 
             // Must always be supported, add unconditionally
             final Size vgaSize = new Size(640, 480);
@@ -559,16 +561,17 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         boolean supportOpaqueReprocess = staticInfo.isCapabilitySupported(
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING);
 
+        // Skip the configuration if the format is not supported for reprocessing.
+        if ((reprocessConfig[0] == YUV && !supportYuvReprocess) ||
+                (reprocessConfig[0] == PRIV && !supportOpaqueReprocess)) {
+            return;
+        }
+
         try {
             // reprocessConfig[0:1] is input
             InputConfiguration inputConfig = getInputConfig(
                     Arrays.copyOfRange(reprocessConfig, 0, 2), maxSizes);
 
-            // Skip the configuration if the format is not supported for reprocessing.
-            if ((inputConfig.getFormat() == ImageFormat.YUV_420_888 && !supportYuvReprocess) ||
-                    (inputConfig.getFormat() == ImageFormat.PRIVATE && !supportOpaqueReprocess)) {
-                return;
-            }
 
             inputReader = ImageReader.newInstance(inputConfig.getWidth(), inputConfig.getHeight(),
                     inputConfig.getFormat(), NUM_REPROCESS_CAPTURES);
