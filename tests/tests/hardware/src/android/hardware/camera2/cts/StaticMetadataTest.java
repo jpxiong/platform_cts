@@ -102,7 +102,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
             }
 
             // Max jpeg resolution must be very close to  sensor resolution
-            Size[] jpegSizes = configs.getOutputSizes(ImageFormat.JPEG);
+            Size[] jpegSizes = mStaticInfo.getJpegOutputSizesChecked();
             Size maxJpegSize = CameraTestUtils.getMaxSize(jpegSizes);
             mCollector.expectSizesAreSimilar(
                     "Active array size and max JPEG size should be similar",
