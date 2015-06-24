@@ -29,6 +29,8 @@ import java.util.concurrent.Semaphore;
  * received.
  */
 public class MockConnectionService extends CtsConnectionService {
+    public static final int CONNECTION_PRESENTATION =  TelecomManager.PRESENTATION_ALLOWED;
+
     /**
      * Used to control whether the {@link MockVideoProvider} will be created when connections are
      * created.  Used by {@link VideoCallTest#testVideoCallDelayProvider()} to test scenario where
@@ -44,7 +46,7 @@ public class MockConnectionService extends CtsConnectionService {
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
             ConnectionRequest request) {
         final MockConnection connection = new MockConnection();
-        connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
+        connection.setAddress(request.getAddress(), CONNECTION_PRESENTATION);
         if (mCreateVideoProvider) {
             connection.createMockVideoProvider();
         } else {
@@ -61,7 +63,7 @@ public class MockConnectionService extends CtsConnectionService {
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
             ConnectionRequest request) {
         final MockConnection connection = new MockConnection();
-        connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
+        connection.setAddress(request.getAddress(), CONNECTION_PRESENTATION);
         connection.createMockVideoProvider();
         connection.setVideoState(request.getVideoState());
 

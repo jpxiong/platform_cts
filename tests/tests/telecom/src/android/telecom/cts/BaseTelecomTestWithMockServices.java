@@ -282,7 +282,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             extras.putInt(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE, videoState);
         }
 
-        mTelecomManager.placeCall(getTestNumber(), extras);
+        mTelecomManager.placeCall(createTestNumber(), extras);
     }
 
     /**
@@ -290,8 +290,12 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      * calls if multiple calls to the same number are placed within a short period of time which
      * can cause certain tests to fail.
      */
-    Uri getTestNumber() {
-        return Uri.fromParts("tel", String.valueOf(sCounter++), null);
+    Uri createTestNumber() {
+        return Uri.fromParts("tel", String.valueOf(++sCounter), null);
+    }
+
+    public static Uri getTestNumber() {
+        return Uri.fromParts("tel", String.valueOf(sCounter), null);
     }
 
     void assertNumCalls(final MockInCallService inCallService, final int numCalls) {
