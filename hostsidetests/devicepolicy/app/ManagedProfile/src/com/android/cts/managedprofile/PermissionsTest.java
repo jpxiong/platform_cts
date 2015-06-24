@@ -30,6 +30,8 @@ import org.junit.Ignore;
 public class PermissionsTest extends BaseManagedProfileTest {
 
     private static final String SIMPLE_APP_PACKAGE_NAME = "com.android.cts.launcherapps.simpleapp";
+    private static final String SIMPLE_PRE_M_APP_PACKAGE_NAME =
+            "com.android.cts.launcherapps.simplepremapp";
     private static final String PERMISSION_NAME = "android.permission.READ_CONTACTS";
 
     @Override
@@ -47,8 +49,8 @@ public class PermissionsTest extends BaseManagedProfileTest {
         mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
-        assertTrue(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME) ==
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
         assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
                 PackageManager.PERMISSION_DENIED);
@@ -56,8 +58,8 @@ public class PermissionsTest extends BaseManagedProfileTest {
         mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-        assertTrue(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME) ==
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay denied
         assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
@@ -66,8 +68,8 @@ public class PermissionsTest extends BaseManagedProfileTest {
         mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
-        assertTrue(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME) ==
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
                 DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
         assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
                 PackageManager.PERMISSION_GRANTED);
@@ -75,8 +77,8 @@ public class PermissionsTest extends BaseManagedProfileTest {
         mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-        assertTrue(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME) ==
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay granted
         assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
@@ -96,5 +98,30 @@ public class PermissionsTest extends BaseManagedProfileTest {
                 DevicePolicyManager.PERMISSION_POLICY_PROMPT);
         assertEquals(mDevicePolicyManager.getPermissionPolicy(ADMIN_RECEIVER_COMPONENT),
                 DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+    }
+
+    public void testPermissionGrantStatePreMApp() {
+        // These tests are to make sure that pre-M apps are not granted runtime permissions
+        // by a profile owner
+        PackageManager pm = mContext.getPackageManager();
+        assertFalse(mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME,
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED));
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        // Install time permissions should always be granted
+        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_PRE_M_APP_PACKAGE_NAME),
+                PackageManager.PERMISSION_GRANTED);
+
+        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME,
+                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        // Install time permissions should always be granted
+        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_PRE_M_APP_PACKAGE_NAME),
+                PackageManager.PERMISSION_GRANTED);
     }
 }
