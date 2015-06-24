@@ -59,6 +59,7 @@ public class BaseDeviceOwnerTest extends AndroidTestCase {
     }
 
     static void assertDeviceOwner(DevicePolicyManager dpm) {
+        assertNotNull(dpm);
         assertTrue(dpm.isAdminActive(getWho()));
         assertTrue(dpm.isDeviceOwnerApp(PACKAGE_NAME));
     }

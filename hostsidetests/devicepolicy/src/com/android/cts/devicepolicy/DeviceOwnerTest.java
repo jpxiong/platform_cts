@@ -37,6 +37,10 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
     private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
     private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
 
+    private static final String WIFI_CONFIG_CREATOR_PKG =
+            "com.android.cts.deviceowner.wificonfigcreator";
+    private static final String WIFI_CONFIG_CREATOR_APK = "CtsWifiConfigCreator.apk";
+
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             DEVICE_OWNER_PKG + ".BaseDeviceOwnerTest$BasicAdminReceiver";
     private static final String CLEAR_DEVICE_OWNER_TEST_CLASS =
@@ -110,6 +114,18 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
 
     public void testSystemUpdatePolicy() throws Exception {
         executeDeviceOwnerTest("SystemUpdatePolicyTest");
+    }
+
+    public void testWifiConfigLockdown() throws Exception {
+        final boolean hasWifi = hasDeviceFeature("android.hardware.wifi");
+        if (hasWifi && mHasFeature) {
+            try {
+                installApp(WIFI_CONFIG_CREATOR_APK);
+                executeDeviceOwnerTest("WifiConfigLockdownTest");
+            } finally {
+                getDevice().uninstallPackage(WIFI_CONFIG_CREATOR_PKG);
+            }
+        }
     }
 
     private void executeDeviceOwnerTest(String testClassName) throws Exception {

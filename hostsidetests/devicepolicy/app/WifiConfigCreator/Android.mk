@@ -1,4 +1,4 @@
-# Copyright (C) 2014 The Android Open Source Project
+# Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_PACKAGE_NAME := CtsDeviceOwnerApp
-
+# Don't include this package in any target.
 LOCAL_MODULE_TAGS := optional
 
+# When built, explicitly put it in the data partition.
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner cts-junit
+LOCAL_PACKAGE_NAME := CtsWifiConfigCreator
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner compatibility-device-util_v2
+LOCAL_STATIC_JAVA_LIBRARIES := compatibility-device-util_v2
 
 LOCAL_SDK_VERSION := current
 
