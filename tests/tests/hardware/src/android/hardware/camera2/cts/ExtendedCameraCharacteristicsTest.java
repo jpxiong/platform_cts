@@ -373,7 +373,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     /**
      * Test values for static metadata used by the BURST capability.
      */
-    public void testStaticBurstCharacteristics() {
+    public void testStaticBurstCharacteristics() throws Exception {
         int counter = 0;
         final float SIZE_ERROR_MARGIN = 0.03f;
         for (CameraCharacteristics c : mCharacteristics) {
@@ -404,7 +404,9 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 Size maxSlowYuvSize = CameraTestUtils.getMaxSize(slowYuvSizes);
                 maxYuvSize = CameraTestUtils.getMaxSize(new Size[]{maxYuvSize, maxSlowYuvSize});
             }
-            Size maxJpegSize = CameraTestUtils.getMaxSize(config.getOutputSizes(ImageFormat.JPEG));
+
+            Size maxJpegSize = CameraTestUtils.getMaxSize(CameraTestUtils.getSupportedSizeForFormat(
+                    ImageFormat.JPEG, mIds[counter], mCameraManager));
 
             boolean haveMaxYuv = maxYuvSize != null ?
                 (maxJpegSize.getWidth() <= maxYuvSize.getWidth() &&
@@ -599,7 +601,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     /**
      * Cross-check StreamConfigurationMap output
      */
-    public void testStreamConfigurationMap() {
+    public void testStreamConfigurationMap() throws Exception {
         int counter = 0;
         for (CameraCharacteristics c : mCharacteristics) {
             Log.i(TAG, "testStreamConfigurationMap: Testing camera ID " + mIds[counter]);
@@ -754,7 +756,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             SurfaceTexture st = new SurfaceTexture(1);
             Surface surf = new Surface(st);
 
-            Size[] opaqueSizes = config.getOutputSizes(SurfaceTexture.class);
+            Size[] opaqueSizes = CameraTestUtils.getSupportedSizeForClass(SurfaceTexture.class,
+                    mIds[counter], mCameraManager);
             assertTrue("Opaque format has no sizes listed",
                     opaqueSizes.length > 0);
             for (Size size : opaqueSizes) {
@@ -798,7 +801,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
      * Test high speed capability and cross-check the high speed sizes and fps ranges from
      * the StreamConfigurationMap.
      */
-    public void testConstrainedHighSpeedCapability() {
+    public void testConstrainedHighSpeedCapability() throws Exception {
+        int counter = 0;
         for (CameraCharacteristics c : mCharacteristics) {
             int[] capabilities = CameraTestUtils.getValueNotNull(
                     c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
@@ -809,7 +813,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 List<Size> highSpeedSizes = Arrays.asList(config.getHighSpeedVideoSizes());
                 assertTrue("High speed sizes shouldn't be empty", highSpeedSizes.size() > 0);
-                Size[] allSizes = config.getOutputSizes(ImageFormat.PRIVATE);
+                Size[] allSizes = CameraTestUtils.getSupportedSizeForFormat(ImageFormat.PRIVATE,
+                        mIds[counter], mCameraManager);
                 assertTrue("Normal size for PRIVATE format shouldn't be null or empty",
                         allSizes != null && allSizes.length > 0);
                 for (Size size: highSpeedSizes) {
@@ -869,6 +874,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     }
                 }
             }
+            counter++;
         }
     }
 

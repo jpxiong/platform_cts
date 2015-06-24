@@ -947,6 +947,44 @@ public class CameraTestUtils extends Assert {
         Size[] availableSizes = configMap.getOutputSizes(format);
         assertArrayNotEmpty(availableSizes, "availableSizes should not be empty for format: "
                 + format);
+        Size[] highResAvailableSizes = configMap.getHighResolutionOutputSizes(format);
+        if (highResAvailableSizes != null && highResAvailableSizes.length > 0) {
+            Size[] allSizes = new Size[availableSizes.length + highResAvailableSizes.length];
+            System.arraycopy(availableSizes, 0, allSizes, 0,
+                    availableSizes.length);
+            System.arraycopy(highResAvailableSizes, 0, allSizes, availableSizes.length,
+                    highResAvailableSizes.length);
+            availableSizes = allSizes;
+        }
+        if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
+        return availableSizes;
+    }
+
+    /**
+     * Get the available output sizes for the given class.
+     *
+     */
+    public static Size[] getSupportedSizeForClass(Class klass, String cameraId,
+            CameraManager cameraManager) throws CameraAccessException {
+        CameraCharacteristics properties = cameraManager.getCameraCharacteristics(cameraId);
+        assertNotNull("Can't get camera characteristics!", properties);
+        if (VERBOSE) {
+            Log.v(TAG, "get camera characteristics for camera: " + cameraId);
+        }
+        StreamConfigurationMap configMap =
+                properties.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] availableSizes = configMap.getOutputSizes(klass);
+        assertArrayNotEmpty(availableSizes, "availableSizes should not be empty for class: "
+                + klass);
+        Size[] highResAvailableSizes = configMap.getHighResolutionOutputSizes(ImageFormat.PRIVATE);
+        if (highResAvailableSizes != null && highResAvailableSizes.length > 0) {
+            Size[] allSizes = new Size[availableSizes.length + highResAvailableSizes.length];
+            System.arraycopy(availableSizes, 0, allSizes, 0,
+                    availableSizes.length);
+            System.arraycopy(highResAvailableSizes, 0, allSizes, availableSizes.length,
+                    highResAvailableSizes.length);
+            availableSizes = allSizes;
+        }
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
     }
@@ -970,10 +1008,9 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedPreviewSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
-        CameraCharacteristics props = cameraManager.getCameraCharacteristics(cameraId);
-        StreamConfigurationMap config =
-                props.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        Size[] rawSizes = config.getOutputSizes(android.view.SurfaceHolder.class);
+
+        Size[] rawSizes = getSupportedSizeForClass(android.view.SurfaceHolder.class, cameraId,
+                cameraManager);
         assertArrayNotEmpty(rawSizes,
                 "Available sizes for SurfaceHolder class should not be empty");
         if (VERBOSE) {
@@ -1059,10 +1096,9 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedVideoSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
-        CameraCharacteristics props = cameraManager.getCameraCharacteristics(cameraId);
-        StreamConfigurationMap config =
-                props.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        Size[] rawSizes = config.getOutputSizes(android.media.MediaRecorder.class);
+
+        Size[] rawSizes = getSupportedSizeForClass(android.media.MediaRecorder.class,
+                cameraId, cameraManager);
         assertArrayNotEmpty(rawSizes,
                 "Available sizes for MediaRecorder class should not be empty");
         if (VERBOSE) {
