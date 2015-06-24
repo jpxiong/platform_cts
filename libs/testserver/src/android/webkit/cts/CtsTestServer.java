@@ -1014,7 +1014,7 @@ public class CtsTestServer {
                         conn.receiveRequestEntity( (HttpEntityEnclosingRequest) request);
                     }
 
-                    mExecutorService.submit(new HandleResponseTask(conn, request));
+                    mExecutorService.execute(new HandleResponseTask(conn, request));
                 } catch (IOException e) {
                     // normal during shutdown, ignore
                     Log.w(TAG, e);
@@ -1045,7 +1045,7 @@ public class CtsTestServer {
             return path.equals(SHUTDOWN_PREFIX);
         }
 
-        private class HandleResponseTask implements Callable<Void> {
+        private class HandleResponseTask implements Runnable {
 
             private DefaultHttpServerConnection mConnection;
 
@@ -1058,12 +1058,15 @@ public class CtsTestServer {
             }
 
             @Override
-            public Void call() throws Exception {
-                HttpResponse response = mServer.getResponse(mRequest);
-                mConnection.sendResponseHeader(response);
-                mConnection.sendResponseEntity(response);
-                mConnection.close();
-                return null;
+            public void run() {
+                try {
+                    HttpResponse response = mServer.getResponse(mRequest);
+                    mConnection.sendResponseHeader(response);
+                    mConnection.sendResponseEntity(response);
+                    mConnection.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error handling request:", e);
+                }
             }
         }
     }
