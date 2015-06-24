@@ -86,10 +86,6 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 mCollector.expectTrue("Full device must contain BURST_CAPTURE capability",
                         availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE));
 
-                // Max resolution fps must be >= 20.
-                mCollector.expectTrue("Full device must support at least 20fps for max resolution",
-                        getFpsForMaxSize(id) >= MIN_FPS_FOR_FULL_DEVICE);
-
                 // Need support per frame control
                 mCollector.expectTrue("Full device must support per frame control",
                         mStaticInfo.isPerFrameControlSupported());
