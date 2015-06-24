@@ -263,6 +263,20 @@ public abstract class ActivityTestBase extends
             }
         }
 
+        /**
+         * Runs a test where each testcase is run without verification. Should only be used
+         * where custom CanvasClients, Views, or ViewInitializers do their own internal
+         * test assertions.
+         */
+        public void runWithoutVerification() {
+            runWithVerifier(new BitmapVerifier() {
+                @Override
+                public boolean verify(int[] bitmap, int offset, int stride, int width, int height) {
+                    return true;
+                }
+            });
+        }
+
         public TestCaseBuilder addWebView(String webViewUrl,
                 @Nullable ViewInitializer viewInitializer) {
             return addWebView(webViewUrl, viewInitializer, false)
