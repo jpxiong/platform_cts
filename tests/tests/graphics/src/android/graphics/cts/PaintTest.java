@@ -809,7 +809,6 @@ public class PaintTest extends AndroidTestCase {
     }
 
     public void testReset() {
-
         Paint p  = new Paint();
         ColorFilter c = new ColorFilter();
         MaskFilter m  = new MaskFilter();
@@ -845,7 +844,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(null, p.getShader());
         assertEquals(null, p.getTypeface());
         assertEquals(null, p.getXfermode());
-
     }
 
     public void testSetLinearText() {
@@ -1182,6 +1180,51 @@ public class PaintTest extends AndroidTestCase {
         } catch (Exception e) {
             fail("Should throw an IndexOutOfBoundsException.");
         }
+    }
+
+    public void testGetRunAdvance_nonzeroIndex() {
+        Paint p = new Paint();
+        final String text = "Android powers hundreds of millions of mobile " +
+                "devices in more than 190 countries around the world. It's" +
+                "the largest installed base of any mobile platform and" +
+                "growing fast—every day another million users power up their" +
+                "Android devices for the first time and start looking for" +
+                "apps, games, and other digital content.";
+        // Test offset index does not affect width.
+        final float widthAndroidFirst = p.getRunAdvance(
+                text, 0, 7, 0, text.length(), false, 7);
+        final float widthAndroidSecond = p.getRunAdvance(
+                text, 215, 222, 0, text.length(), false, 222);
+        assertTrue(Math.abs(widthAndroidFirst - widthAndroidSecond) < 1);
+    }
+
+    public void testGetRunAdvance_glyphDependingContext() {
+        Paint p = new Paint();
+        // Test the context change the character shape.
+        // First character should be isolated form because the context ends at index 1.
+        final float isolatedFormWidth = p.getRunAdvance("\u0644\u0644", 0, 1, 0, 1, true, 1);
+        // First character should be initial form because the context ends at index 2.
+        final float initialFormWidth = p.getRunAdvance("\u0644\u0644", 0, 1, 0, 2, true, 1);
+        assertTrue(isolatedFormWidth > initialFormWidth);
+    }
+
+    public void testGetRunAdvance_arabic() {
+        Paint p = new Paint();
+        // Test total width is equals to sum of each character's width.
+        // "What is Unicode?" in Arabic.
+        final String text =
+                "\u0645\u0627\u0020\u0647\u064A\u0020\u0627\u0644\u0634" +
+                "\u0641\u0631\u0629\u0020\u0627\u0644\u0645\u0648\u062D" +
+                "\u062F\u0629\u0020\u064A\u0648\u0646\u064A\u0643\u0648" +
+                "\u062F\u061F";
+        final float totalWidth = p.getRunAdvance(
+                text, 0, text.length(), 0, text.length(), true, text.length());
+        float sumOfCharactersWidth = 0;
+        for (int i = 0; i < text.length(); i++) {
+            sumOfCharactersWidth += p.getRunAdvance(
+                    text, i, i + 1, 0, text.length(), true, i + 1);
+        }
+        assertTrue(Math.abs(totalWidth - sumOfCharactersWidth) < 1);
     }
 
     public void testGetOffsetForAdvance() {
