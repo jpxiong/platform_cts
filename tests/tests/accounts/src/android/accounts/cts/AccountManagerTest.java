@@ -1452,27 +1452,14 @@ public class AccountManagerTest extends ActivityInstrumentationTestCase2<Account
     }
 
     /**
-     * Tests the setting of lastAuthenticatedTime on accountAuthenticated being
-     * successful.
-     */
-    public void testLastAuthenticatedTimeAfterAccountAuthenticated() throws IOException,
-            AuthenticatorException, OperationCanceledException {
-        long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
-        mockAuthenticator.callAccountAuthenticated();
-        long accountAuthenticatedTime = getLastAuthenticatedTime(ACCOUNT);
-        assertTrue(accountAuthenticatedTime > accountAddTime);
-    }
-
-    /**
-     * Tests the setting of lastAuthenticatedTime on setPassword being
-     * successful.
+     * LastAuthenticatedTime on setPassword should not be disturbed.
      */
     public void testLastAuthenticatedTimeAfterSetPassword() throws IOException,
             AuthenticatorException, OperationCanceledException {
         long accountAddTime = addAccountAndReturnAccountAddedTime(ACCOUNT, ACCOUNT_PASSWORD);
         mockAuthenticator.callSetPassword();
         long setPasswordTime = getLastAuthenticatedTime(ACCOUNT);
-        assertTrue(setPasswordTime > accountAddTime);
+        assertTrue(setPasswordTime == accountAddTime);
     }
 
     /**
@@ -1947,7 +1934,14 @@ public class AccountManagerTest extends ActivityInstrumentationTestCase2<Account
 
     private long addAccountAndReturnAccountAddedTime(Account account, String password)
             throws OperationCanceledException, AuthenticatorException, IOException {
-        addAccountExplicitly(account, password, null /* userData */);
+        addAccount(am,
+                ACCOUNT_TYPE,
+                AUTH_TOKEN_TYPE,
+                REQUIRED_FEATURES,
+                OPTIONS_BUNDLE,
+                mActivity,
+                null /* callback */,
+                null /* handler */);
         return getLastAuthenticatedTime(account);
     }
 
