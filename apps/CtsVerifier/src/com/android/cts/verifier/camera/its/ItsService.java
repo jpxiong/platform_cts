@@ -1077,10 +1077,10 @@ public class ItsService extends Service implements SensorEventListener {
                                     "Zero stream configs available for requested format: %s",
                                     sformat));
                         }
-                        width = sizes[0].getWidth();
+                        width = ItsUtils.getMaxSize(sizes).getWidth();
                     }
                     if (height <= 0) {
-                        height = sizes[0].getHeight();
+                        height = ItsUtils.getMaxSize(sizes).getHeight();
                     }
 
                     outputSizes[i] = new Size(width, height);
