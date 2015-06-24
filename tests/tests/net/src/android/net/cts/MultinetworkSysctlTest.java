@@ -27,9 +27,9 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 
 /**
- * Tests for multinetwork functionality.
+ * Tests for multinetwork sysctl functionality.
  */
-public class MultinetworkTest extends AndroidTestCase {
+public class MultinetworkSysctlTest extends AndroidTestCase {
 
     // Global sysctls. Must be present and set to 1.
     private static final String[] GLOBAL_SYSCTLS = {
