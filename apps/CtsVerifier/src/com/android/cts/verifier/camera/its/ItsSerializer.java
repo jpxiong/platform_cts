@@ -151,6 +151,19 @@ public class ItsSerializer {
                         cfgArray.put(obj);
                     }
                 }
+                sizes = map.getHighResolutionOutputSizes(fmts[fi]);
+                if (sizes != null) {
+                    for (int si = 0; si < Array.getLength(sizes); si++) {
+                        JSONObject obj = new JSONObject();
+                        obj.put("format", fmts[fi]);
+                        obj.put("width",sizes[si].getWidth());
+                        obj.put("height", sizes[si].getHeight());
+                        obj.put("input", false);
+                        obj.put("minFrameDuration",
+                                map.getOutputMinFrameDuration(fmts[fi],sizes[si]));
+                        cfgArray.put(obj);
+                    }
+                }
             }
         }
         mapObj.put("availableStreamConfigurations", cfgArray);

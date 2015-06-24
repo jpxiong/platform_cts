@@ -128,10 +128,24 @@ public class ItsUtils {
         if (configMap == null) {
             throw new ItsException("Failed to get stream config");
         }
-        return configMap.getOutputSizes(format);
+        Size[] normalSizes = configMap.getOutputSizes(format);
+        Size[] slowSizes = configMap.getHighResolutionOutputSizes(format);
+        Size[] allSizes = null;
+        if (normalSizes != null && slowSizes != null) {
+            allSizes = new Size[normalSizes.length + slowSizes.length];
+            System.arraycopy(normalSizes, 0, allSizes, 0,
+                    normalSizes.length);
+            System.arraycopy(slowSizes, 0, allSizes, normalSizes.length,
+                    slowSizes.length);
+        } else if (normalSizes != null) {
+            allSizes = normalSizes;
+        } else if (slowSizes != null) {
+            allSizes = slowSizes;
+        }
+        return allSizes;
     }
 
-    private static Size getMaxSize(Size[] sizes) {
+    public static Size getMaxSize(Size[] sizes) {
         if (sizes == null || sizes.length == 0) {
             throw new IllegalArgumentException("sizes was empty");
         }
@@ -252,4 +266,3 @@ public class ItsUtils {
         }
     }
 }
-
