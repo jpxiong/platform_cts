@@ -774,6 +774,10 @@ public class CameraTestUtils extends Assert {
      * Check if image size and format match given size and format.
      */
     public static void checkImage(Image image, int width, int height, int format) {
+        // Image reader will wrap YV12/NV21 image by YUV_420_888
+        if (format == ImageFormat.NV21 || format == ImageFormat.YV12) {
+            format = ImageFormat.YUV_420_888;
+        }
         assertNotNull("Input image is invalid", image);
         assertEquals("Format doesn't match", format, image.getFormat());
         assertEquals("Width doesn't match", width, image.getWidth());

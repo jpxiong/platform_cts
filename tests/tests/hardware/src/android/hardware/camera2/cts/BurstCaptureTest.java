@@ -56,6 +56,12 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Legacy camera doesn't report min frame duration" +
+                            ". Skip the test");
+                    continue;
+                }
+
                 yuvBurstTestByCamera(id);
             } finally {
                 closeDevice();
@@ -108,13 +114,11 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
             }
         }
 
-        if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
-            assertTrue(String.format("Cam %s: Target FPS range of (%d, %d) must be supported",
-                    cameraId, minBurstFps, minBurstFps), foundConstantMaxYUVRange);
-            assertTrue(String.format(
-                    "Cam %s: Target FPS range of (x, %d) where x <= 15 must be supported",
-                    cameraId, minBurstFps), foundYUVStreamingRange);
-        }
+        assertTrue(String.format("Cam %s: Target FPS range of (%d, %d) must be supported",
+                cameraId, minBurstFps, minBurstFps), foundConstantMaxYUVRange);
+        assertTrue(String.format(
+                "Cam %s: Target FPS range of (x, %d) where x <= 15 must be supported",
+                cameraId, minBurstFps), foundYUVStreamingRange);
         assertTrue(String.format("Cam %s: No target FPS range found with minimum FPS above " +
                         " 1/minFrameDuration (%d fps, duration %d ns) for full-resolution YUV",
                         cameraId, minBurstFps, minStillFrameDuration),
