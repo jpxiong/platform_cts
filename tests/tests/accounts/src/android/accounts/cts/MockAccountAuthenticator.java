@@ -151,6 +151,8 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         this.mAuthTokenType = authTokenType;
         this.mRequiredFeatures = requiredFeatures;
         this.mOptionsAddAccount = options;
+        AccountManager am = AccountManager.get(mContext);
+        am.addAccountExplicitly(AccountManagerTest.ACCOUNT, "fakePassword", null);
         return createResultBundle();
     }
 
