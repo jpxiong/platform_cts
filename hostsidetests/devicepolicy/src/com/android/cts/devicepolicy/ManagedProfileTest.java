@@ -31,6 +31,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
 
     private static final String SIMPLE_APP_APK = "CtsSimpleApp.apk";
+    private static final String SIMPLE_PRE_M_APP_APK = "CtsSimplePreMApp.apk";
 
     private static final String INTENT_SENDER_PKG = "com.android.cts.intent.sender";
     private static final String INTENT_SENDER_APK = "CtsIntentSenderApp.apk";
@@ -417,9 +418,18 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
-        installApp(SIMPLE_APP_APK);
+        installAppAsUser(SIMPLE_APP_APK, mUserId);
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
                 "testPermissionGrantState", mUserId));
+    }
+
+    public void testPermissionGrantPreMApp() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        installAppAsUser(SIMPLE_PRE_M_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionGrantStatePreMApp", mUserId));
     }
 
     private void disableActivityForUser(String activityName, int userId)
