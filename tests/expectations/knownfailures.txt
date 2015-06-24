@@ -179,5 +179,12 @@
     "android.hardware.camera2.cts.ImageReaderTest#testAllOutputYUVResolutions"
   ],
   bug: 18689511
+},
+{
+  description: "The new prepare performance test is not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.SurfaceViewPreviewTest#testPreparePerformance"
+  ],
+  bug: 17989532
 }
 ]
