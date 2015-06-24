@@ -17,7 +17,15 @@
 #include <android/log.h>
 #include <jni.h>
 #include <string.h>
+#include <time.h>
 
+#if defined(ARCH_SUPPORTS_SECCOMP)
+#include <linux/filter.h>
+#include <linux/seccomp.h>
+#include <sys/syscall.h>
+#endif
+
+#include "seccomp_sample_program.h"
 #include "seccomp-tests/tests/test_harness.h"
 
 // Forward declare from seccomp_bpf_tests.c.
@@ -46,9 +54,33 @@ jboolean android_security_cts_SeccompBpfTest_runKernelUnitTest(
     return false;
 }
 
+jboolean android_security_cts_SeccompBpfTest_installTestFilter(JNIEnv*, jclass) {
+#if !defined(ARCH_SUPPORTS_SECCOMP)
+  return false;
+#else
+  struct sock_fprog prog = GetTestSeccompFilterProgram();
+
+  if (prog.len == 0)
+    return false;
+
+  int rv = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, SECCOMP_FILTER_FLAG_TSYNC, &prog);
+  return rv == 0;
+#endif
+}
+
+jint android_security_cts_SeccompBpfTest_getClockBootTime(JNIEnv*, jclass) {
+  struct timespec ts;
+  int rv = clock_gettime(CLOCK_BOOTTIME, &ts);
+  return rv;
+}
+
 static JNINativeMethod methods[] = {
     { "runKernelUnitTest", "(Ljava/lang/String;)Z",
         (void*)android_security_cts_SeccompBpfTest_runKernelUnitTest },
+    { "installTestFilter", "()Z",
+        (void*)android_security_cts_SeccompBpfTest_installTestFilter },
+    { "getClockBootTime", "()I",
+        (void*)android_security_cts_SeccompBpfTest_getClockBootTime },
 };
 
 int register_android_os_cts_SeccompTest(JNIEnv* env) {
