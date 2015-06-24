@@ -22,6 +22,7 @@ import android.transition.Transition.TransitionListener;
  * Listener captures whether each of the methods is called.
  */
 class SimpleTransitionListener implements TransitionListener {
+    public Transition transition;
 
     public boolean started;
 
@@ -36,6 +37,7 @@ class SimpleTransitionListener implements TransitionListener {
     @Override
     public synchronized void onTransitionStart(Transition transition) {
         started = true;
+        this.transition = transition;
         notifyAll();
     }
 
