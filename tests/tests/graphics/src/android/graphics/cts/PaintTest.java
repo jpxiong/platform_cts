@@ -928,6 +928,20 @@ public class PaintTest extends AndroidTestCase {
         assertMeasureText(text, textChars, textSpan, 4, 7, widths[4] + widths[5] + widths[6]);
     }
 
+    public void testMeasureTextContext() {
+       Paint p = new Paint();
+       // Arabic LAM, which is different width depending on context
+       String shortString = "\u0644";
+       String longString = "\u0644\u0644\u0644";
+       char[] longChars = longString.toCharArray();
+       SpannedString longSpanned = new SpannedString(longString);
+       float width = p.measureText(shortString);
+       // Verify that measurement of substring is consistent no matter what surrounds it.
+       assertMeasureText(longString, longChars, longSpanned, 0, 1, width);
+       assertMeasureText(longString, longChars, longSpanned, 1, 2, width);
+       assertMeasureText(longString, longChars, longSpanned, 2, 3, width);
+    }
+
     public void testMeasureTextWithLongText() {
         // This test is not compatible with 4.0.3
         if ("4.0.3".equals(Build.VERSION.RELEASE)) {
