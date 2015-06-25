@@ -55,7 +55,6 @@ import java.util.Date;
  */
 public class RVCVRecordActivity extends Activity {
     private static final String TAG = "RVCVRecordActivity";
-    //private static final boolean LOCAL_LOGD = true;
     private static final boolean LOCAL_LOGV = false;
 
     private MotionIndicatorView mIndicatorView;
@@ -489,9 +488,7 @@ public class RVCVRecordActivity extends Activity {
             float fovH =  mCamera.getParameters().getVerticalViewAngle();
 
             mRecorder = new MediaRecorder();
-
             mCamera.unlock();
-
             mRecorder.setCamera(mCamera);
 
             mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -514,6 +511,7 @@ public class RVCVRecordActivity extends Activity {
                 mRecorder.prepare();
             } catch (IOException e) {
                 Log.e(TAG, "Preparation for recording failed.");
+                return;
             }
 
             try {
@@ -523,6 +521,7 @@ public class RVCVRecordActivity extends Activity {
                 mRecorder.reset();
                 mRecorder.release();
                 mCamera.lock();
+                return;
             }
             mRunning = true;
         }
@@ -663,14 +662,14 @@ public class RVCVRecordActivity extends Activity {
             }
         }
     }
-    
+
     /**
      *  Rotation sensor logger class
      */
     class RVSensorLogger implements SensorEventListener {
         private final String TAG = "RVSensorLogger";
 
-        private final static int SENSOR_RATE = 100;
+        private final static int SENSOR_RATE = SensorManager.SENSOR_DELAY_FASTEST;
         RangeCoveredRegister mRegister;
         int mAxis;
         RVCVRecordActivity mActivity;
