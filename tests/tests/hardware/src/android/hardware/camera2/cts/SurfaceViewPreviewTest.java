@@ -191,8 +191,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             // Lock AE if possible to improve stability
             previewRequest.set(CaptureRequest.CONTROL_AE_LOCK, true);
             mSession.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
-            waitForResultValue(resultListener, CaptureResult.CONTROL_AE_STATE,
-                    CaptureResult.CONTROL_AE_STATE_LOCKED, MAX_RESULTS_TO_WAIT);
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                // Legacy mode doesn't output AE state
+                waitForResultValue(resultListener, CaptureResult.CONTROL_AE_STATE,
+                        CaptureResult.CONTROL_AE_STATE_LOCKED, MAX_RESULTS_TO_WAIT);
+            }
         }
 
         // Measure frame rate for a bit
