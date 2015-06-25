@@ -1616,6 +1616,41 @@
     The Spanish audio track should be selected.
     </string>
 
+    <string name="tv_time_shift_test">TV app time shift test</string>
+    <string name="tv_time_shift_test_info">
+    This test verifies that the TV app invokes proper time shift APIs in the framwork.
+    </string>
+    <string name="tv_time_shift_test_pause_resume">
+    Press the \"Launch TV app\" button. Verify that the playback control is available.
+    Pause the playback and then resume it.
+    </string>
+    <string name="tv_time_shift_test_verify_resume_after_pause">
+    The playback should be resumed after pause.
+    </string>
+    <string name="tv_time_shift_test_verify_position_tracking">
+    The playback position tracking should be activated.
+    </string>
+    <string name="tv_time_shift_test_speed_rate">
+    Press the \"Launch TV app\" button. Verify that the playback control is available.
+    Rewind the playback and in a few seconds fast-forward it.
+    </string>
+    <string name="tv_time_shift_test_verify_rewind">
+    The playback should be rewinded.
+    </string>
+    <string name="tv_time_shift_test_verify_fast_forward">
+    The playback should be fast-forwarded.
+    </string>
+    <string name="tv_time_shift_test_seek">
+    Press the \"Launch TV app\" button. Verify that the playback control is available.
+    Seek to previous and then seek to next.
+    </string>
+    <string name="tv_time_shift_test_verify_seek_to_previous">
+    The playback position should be moved to the previous position.
+    </string>
+    <string name="tv_time_shift_test_verify_seek_to_next">
+    The playback position should be moved to the next position.
+    </string>
+
     <string name="overlay_view_text">Overlay View Dummy Text</string>
     <string name="fake_rating">Fake</string>
 
