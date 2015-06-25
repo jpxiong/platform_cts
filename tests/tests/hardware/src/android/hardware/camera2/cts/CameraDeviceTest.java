@@ -36,6 +36,7 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.params.MeteringRectangle;
+import android.media.ImageReader;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
@@ -50,9 +51,15 @@ import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import android.util.Size;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -592,6 +599,98 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
             finally {
                 closeDevice(mCameraIds[i], mCameraMockListener);
+            }
+        }
+    }
+
+    /**
+     * Verify creating sessions back to back.
+     */
+    public void testCreateSessions() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i], mCameraMockListener);
+                waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
+
+                testCreateSessionsByCamera(mCameraIds[i]);
+            }
+            finally {
+                closeDevice(mCameraIds[i], mCameraMockListener);
+            }
+        }
+    }
+
+    /**
+     * Verify creating sessions back to back and only the last one is valid for
+     * submitting requests.
+     */
+    private void testCreateSessionsByCamera(String cameraId) throws Exception {
+        final int NUM_SESSIONS = 3;
+        final int SESSION_TIMEOUT_MS = 1000;
+        final int CAPTURE_TIMEOUT_MS = 3000;
+
+        if (VERBOSE) {
+            Log.v(TAG, "Testing creating sessions for camera " + cameraId);
+        }
+
+        Size yuvSize = getSortedSizesForFormat(cameraId, mCameraManager, ImageFormat.YUV_420_888,
+                /*bound*/null).get(0);
+        Size jpegSize = getSortedSizesForFormat(cameraId, mCameraManager, ImageFormat.JPEG,
+                /*bound*/null).get(0);
+
+        // Create a list of image readers. JPEG for last one and YUV for the rest.
+        List<ImageReader> imageReaders = new ArrayList<>();
+        List<CameraCaptureSession> allSessions = new ArrayList<>();
+
+        try {
+            for (int i = 0; i < NUM_SESSIONS - 1; i++) {
+                imageReaders.add(ImageReader.newInstance(yuvSize.getWidth(), yuvSize.getHeight(),
+                        ImageFormat.YUV_420_888, /*maxImages*/1));
+            }
+            imageReaders.add(ImageReader.newInstance(jpegSize.getWidth(), jpegSize.getHeight(),
+                    ImageFormat.JPEG, /*maxImages*/1));
+
+            // Create multiple sessions back to back.
+            MultipleSessionCallback sessionListener =
+                    new MultipleSessionCallback(/*failOnConfigureFailed*/true);
+            for (int i = 0; i < NUM_SESSIONS; i++) {
+                List<Surface> outputs = new ArrayList<>();
+                outputs.add(imageReaders.get(i).getSurface());
+                mCamera.createCaptureSession(outputs, sessionListener, mHandler);
+            }
+
+            // Verify we get onConfigured() for all sessions.
+            allSessions = sessionListener.getAllSessions(NUM_SESSIONS,
+                    SESSION_TIMEOUT_MS * NUM_SESSIONS);
+            assertEquals(String.format("Got %d sessions but configured %d sessions",
+                    allSessions.size(), NUM_SESSIONS), allSessions.size(), NUM_SESSIONS);
+
+            // Verify all sessions except the last one are closed.
+            for (int i = 0; i < NUM_SESSIONS - 1; i++) {
+                sessionListener.waitForSessionClose(allSessions.get(i), SESSION_TIMEOUT_MS);
+            }
+
+            // Verify we can capture a frame with the last session.
+            CameraCaptureSession session = allSessions.get(allSessions.size() - 1);
+            SimpleCaptureCallback captureListener = new SimpleCaptureCallback();
+            ImageReader reader = imageReaders.get(imageReaders.size() - 1);
+            SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+            reader.setOnImageAvailableListener(imageListener, mHandler);
+
+            CaptureRequest.Builder builder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            builder.addTarget(reader.getSurface());
+            CaptureRequest request = builder.build();
+
+            session.capture(request, captureListener, mHandler);
+            captureListener.getCaptureResultForRequest(request, CAPTURE_TIMEOUT_MS);
+            imageListener.getImage(CAPTURE_TIMEOUT_MS).close();
+        } finally {
+            for (ImageReader reader : imageReaders) {
+                reader.close();
+            }
+            for (CameraCaptureSession session : allSessions) {
+                session.close();
             }
         }
     }
@@ -1528,5 +1627,98 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         mSessionMockListener = null;
         mSessionWaiter = null;
+    }
+
+    /**
+     * A camera capture session listener that keeps all the configured and closed sessions.
+     */
+    private class MultipleSessionCallback extends CameraCaptureSession.StateCallback {
+        public static final int SESSION_CONFIGURED = 0;
+        public static final int SESSION_CLOSED = 1;
+
+        final List<CameraCaptureSession> mSessions = new ArrayList<>();
+        final Map<CameraCaptureSession, Integer> mSessionStates = new HashMap<>();
+        CameraCaptureSession mCurrentConfiguredSession = null;
+
+        final ReentrantLock mLock = new ReentrantLock();
+        final Condition mNewStateCond = mLock.newCondition();
+
+        final boolean mFailOnConfigureFailed;
+
+        /**
+         * If failOnConfigureFailed is true, it calls fail() when onConfigureFailed() is invoked
+         * for any session.
+         */
+        public MultipleSessionCallback(boolean failOnConfigureFailed) {
+            mFailOnConfigureFailed = failOnConfigureFailed;
+        }
+
+        @Override
+        public void onClosed(CameraCaptureSession session) {
+            mLock.lock();
+            mSessionStates.put(session, SESSION_CLOSED);
+            mNewStateCond.signal();
+            mLock.unlock();
+        }
+
+        @Override
+        public void onConfigured(CameraCaptureSession session) {
+            mLock.lock();
+            mSessions.add(session);
+            mSessionStates.put(session, SESSION_CONFIGURED);
+            mNewStateCond.signal();
+            mLock.unlock();
+        }
+
+        @Override
+        public void onConfigureFailed(CameraCaptureSession session) {
+            if (mFailOnConfigureFailed) {
+                fail("Configuring a session failed");
+            }
+        }
+
+        /**
+         * Get a number of sessions that have been configured.
+         */
+        public List<CameraCaptureSession> getAllSessions(int numSessions, int timeoutMs)
+                throws Exception {
+            long remainingTime = timeoutMs;
+            mLock.lock();
+            try {
+                while (mSessions.size() < numSessions) {
+                    long startTime = SystemClock.elapsedRealtime();
+                    boolean ret = mNewStateCond.await(remainingTime, TimeUnit.MILLISECONDS);
+                    remainingTime -= (SystemClock.elapsedRealtime() - startTime);
+                    ret &= remainingTime > 0;
+
+                    assertTrue("Get " + numSessions + " sessions timed out after " + timeoutMs +
+                            "ms", ret);
+                }
+
+                return mSessions;
+            } finally {
+                mLock.unlock();
+            }
+        }
+
+        /**
+         * Wait until a previously-configured sessoin is closed or it times out.
+         */
+        public void waitForSessionClose(CameraCaptureSession session, int timeoutMs) throws Exception {
+            long remainingTime = timeoutMs;
+            mLock.lock();
+            try {
+                while (mSessionStates.get(session).equals(SESSION_CLOSED) == false) {
+                    long startTime = SystemClock.elapsedRealtime();
+                    boolean ret = mNewStateCond.await(remainingTime, TimeUnit.MILLISECONDS);
+                    remainingTime -= (SystemClock.elapsedRealtime() - startTime);
+                    ret &= remainingTime > 0;
+
+                    assertTrue("Wait for session close timed out after " + timeoutMs + "ms", ret);
+                }
+            } finally {
+                mLock.unlock();
+            }
+        }
     }
 }
