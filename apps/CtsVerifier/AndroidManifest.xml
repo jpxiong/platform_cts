@@ -1449,6 +1449,17 @@
                     android:value="android.software.live_tv" />
         </activity>
 
+        <activity android:name=".tv.TimeShiftTestActivity"
+                android:label="@string/tv_time_shift_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_tv" />
+            <meta-data android:name="test_required_features"
+                    android:value="android.software.live_tv" />
+        </activity>
+
         <activity android:name=".screenpinning.ScreenPinningTestActivity"
             android:label="@string/screen_pinning_test">
             <intent-filter>
@@ -1458,12 +1469,6 @@
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
             <meta-data android:name="test_excluded_features"
                        android:value="android.hardware.type.television:android.software.leanback:android.hardware.type.watch" />
-        </activity>
-
-        <activity android:name=".tv.MockTvInputSettingsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
 
         <activity android:name=".tv.MockTvInputSetupActivity">
