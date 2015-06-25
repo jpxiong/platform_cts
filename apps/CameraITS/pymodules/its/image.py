@@ -757,6 +757,25 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
 
     return patches
 
+def compute_image_sharpness(img):
+    """Calculate the sharpness of input image.
+
+    Args:
+        img: Numpy float RGB/luma image array, with pixel values in [0,1].
+
+    Returns:
+        A sharpness estimation value based on the average of gradient magnitude.
+        Larger value means the image is sharper.
+    """
+    chans = img.shape[2]
+    assert(chans == 1 or chans == 3)
+    luma = img
+    if (chans == 3):
+        luma = 0.299 * img[:,:,0] + 0.587 * img[:,:,1] + 0.114 * img[:,:,2]
+
+    [gy, gx] = numpy.gradient(luma)
+    return numpy.average(numpy.sqrt(gy*gy + gx*gx))
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
