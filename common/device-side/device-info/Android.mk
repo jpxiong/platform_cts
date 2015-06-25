@@ -25,3 +25,5 @@ LOCAL_MODULE := compatibility-device-info
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
