@@ -152,7 +152,7 @@ public final class ExpectationStore {
 
     private void readExpectation(JsonReader reader, ModeId mode) throws IOException {
         boolean isFailure = false;
-        Result result = Result.SUCCESS;
+        Result result = Result.EXEC_FAILED;
         Pattern pattern = MATCH_ALL_PATTERN;
         Set<String> names = new LinkedHashSet<String>();
         Set<String> tags = new LinkedHashSet<String>();
@@ -170,6 +170,12 @@ public final class ExpectationStore {
             } else if (name.equals("names")) {
                 readStrings(reader, names);
             } else if (name.equals("failure")) {
+                // isFailure is somewhat arbitrarily keyed on the existence of a "failure"
+                // element instead of looking at the "result" field. There are only about 5
+                // expectations in our entire expectation store that have this tag.
+                //
+                // TODO: Get rid of it and the "failures" map and just use the outcomes
+                // map for everything. Both uses seem useless.
                 isFailure = true;
                 names.add(reader.nextString());
             } else if (name.equals("pattern")) {
