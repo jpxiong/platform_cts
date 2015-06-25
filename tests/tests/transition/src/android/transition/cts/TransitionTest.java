@@ -219,5 +219,28 @@ public class TransitionTest extends BaseTransitionTest {
         assertEquals(R.id.redSquare, mTargets.get(0).getId());
         endTransition();
     }
+
+    public void testIsTransitionRequired() throws Throwable {
+        enterScene(R.layout.scene1);
+        mTransition = new NotRequiredTransition();
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TransitionManager.beginDelayedTransition(mSceneRoot, mTransition);
+                mActivity.findViewById(R.id.hello).setVisibility(View.GONE);
+            }
+        });
+        waitForStart();
+        assertEquals(0, mTargets.size());
+        endTransition();
+    }
+
+    private class NotRequiredTransition extends TestTransition {
+        @Override
+        public boolean isTransitionRequired(TransitionValues startValues,
+                TransitionValues newValues) {
+            return false;
+        }
+    }
 }
 
