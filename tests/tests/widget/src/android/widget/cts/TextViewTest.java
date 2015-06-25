@@ -1764,6 +1764,39 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
     }
 
     @UiThreadTest
+    public void testSaveInstanceState() {
+        TextView originalTextView = new TextView(mActivity);
+        final String text = "This is a string";
+        originalTextView.setText(text);
+        originalTextView.setFreezesText(true);  // needed to actually save state
+        Parcelable state = originalTextView.onSaveInstanceState();
+
+        TextView restoredTextView = new TextView(mActivity);
+        restoredTextView.onRestoreInstanceState(state);
+        assertEquals(text, restoredTextView.getText().toString());
+    }
+
+    @UiThreadTest
+    public void testSaveInstanceStateSelection() {
+        TextView originalTextView = new TextView(mActivity);
+        final String text = "This is a string";
+        final Spannable spannable = new SpannableString(text);
+        originalTextView.setText(spannable);
+        originalTextView.setTextIsSelectable(true);
+        Selection.setSelection((Spannable) originalTextView.getText(), 5, 7);
+        originalTextView.setFreezesText(true);  // needed to actually save state
+        Parcelable state = originalTextView.onSaveInstanceState();
+
+        TextView restoredTextView = new TextView(mActivity);
+        // Setting a selection only has an effect on a TextView when it is selectable.
+        restoredTextView.setTextIsSelectable(true);
+        restoredTextView.onRestoreInstanceState(state);
+        assertEquals(text, restoredTextView.getText().toString());
+        assertEquals(5, restoredTextView.getSelectionStart());
+        assertEquals(7, restoredTextView.getSelectionEnd());
+    }
+
+    @UiThreadTest
     public void testSetText() {
         TextView tv = findTextView(R.id.textview_text);
 
