@@ -55,6 +55,18 @@ public class RVCVXCheckTestActivity
     private boolean mRecordSuccessful = false;
     private boolean mOpenCVLoadSuccessful = false;
 
+    private static class Criterion {
+        public static final float roll_rms_error = 0.15f;
+        public static final float pitch_rms_error = 0.15f;
+        public static final float yaw_rms_error = 0.25f;
+
+        public static final float roll_max_error = 0.30f;
+        public static final float pitch_max_error = 0.30f;
+        public static final float yaw_max_error = 0.45f;
+
+        public static final float sensor_period_stdev = 0.25e-3f;
+    };
+
 
     /**
      * The activity setup collects all the required data for test cases.
@@ -226,8 +238,10 @@ public class RVCVXCheckTestActivity
 
         String message = "Test Roll Axis Accuracy";
 
-        Assert.assertEquals("Roll RMS error", 0.0, mReport.roll_rms_error, 0.15);
-        Assert.assertEquals("Roll max error", 0.0, mReport.roll_max_error, 0.35);
+        Assert.assertEquals("Roll RMS error", 0.0, mReport.roll_rms_error,
+                Criterion.roll_rms_error);
+        Assert.assertEquals("Roll max error", 0.0, mReport.roll_max_error,
+                Criterion.roll_max_error);
         return message;
     }
 
@@ -239,8 +253,10 @@ public class RVCVXCheckTestActivity
 
         String message = "Test Pitch Axis Accuracy";
 
-        Assert.assertEquals("Pitch RMS error", 0.0, mReport.pitch_rms_error, 0.15);
-        Assert.assertEquals("Pitch max error", 0.0, mReport.pitch_max_error, 0.35);
+        Assert.assertEquals("Pitch RMS error", 0.0, mReport.pitch_rms_error,
+                Criterion.pitch_rms_error);
+        Assert.assertEquals("Pitch max error", 0.0, mReport.pitch_max_error,
+                Criterion.pitch_max_error);
         return message;
     }
 
@@ -252,8 +268,10 @@ public class RVCVXCheckTestActivity
 
         String message = "Test Yaw Axis Accuracy";
 
-        Assert.assertEquals("Yaw RMS error", 0.0, mReport.yaw_rms_error, 0.2);
-        Assert.assertEquals("Yaw max error", 0.0, mReport.yaw_max_error, 0.4);
+        Assert.assertEquals("Yaw RMS error", 0.0, mReport.yaw_rms_error,
+                Criterion.yaw_rms_error);
+        Assert.assertEquals("Yaw max error", 0.0, mReport.yaw_max_error,
+                Criterion.yaw_max_error);
         return message;
     }
 
@@ -265,8 +283,9 @@ public class RVCVXCheckTestActivity
 
         String message = "Test Sensor Period";
 
-        Assert.assertEquals("Sensor Period Mean", 5e-3, mReport.sensor_period_avg, 0.2e-3);
-        Assert.assertEquals("Sensor Period Stdev", 0.0, mReport.sensor_period_stdev, 0.5e-3);
+        // we do not know what the maximum frequency can be, so just test the stdev value
+        Assert.assertEquals("Sensor sample period stdev.", 0.0, mReport.sensor_period_stdev,
+                Criterion.sensor_period_stdev);
         return message;
     }
 
