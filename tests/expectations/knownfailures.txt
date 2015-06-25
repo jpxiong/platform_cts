@@ -151,13 +151,6 @@
   bug: 17144778
 },
 {
-  description: "Roboto font tests are not yet known good on all devices",
-  names: [
-    "android.uirendering.cts.testclasses.FontRenderingTests"
-  ],
-  bug: 17109280
-},
-{
   description: "android.keystore tests will replace these tests",
   names: [
     "com.android.org.conscrypt.MacTest#test_getInstance_OpenSSL_ENGINE",
