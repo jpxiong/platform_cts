@@ -127,22 +127,17 @@
   bug: 17508787
 },
 {
-  description: "New tests recently added for Android Enterprise. To be moved out of CTS-staging as soon as they show that they are stable",
+  description: "These tests fail on some devices.",
   names: [
-    "com.android.cts.devicepolicy.LauncherAppsMultiUserTest#testGetActivitiesForNonProfileFails",
-    "com.android.cts.devicepolicy.LauncherAppsMultiUserTest#testNoLauncherCallbackPackageAddedSecondaryUser",
-    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testGetActivitiesWithProfile",
-    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageAddedProfile",
-    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageRemovedProfile",
-    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageChangedProfile",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testInstallAppMainUser",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageAddedMainUser",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageRemovedMainUser",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageChangedMainUser",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherNonExportedAppFails",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLaunchNonExportActivityFails",
-    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLaunchMainActivity"
-  ]
+    "android.uirendering.cts.testclasses.ExactCanvasTests#testBlueRect",
+    "android.uirendering.cts.testclasses.ExactCanvasTests#testBluePaddedSquare",
+    "android.uirendering.cts.testclasses.ViewClippingTests#testSimplePaddingClip",
+    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleClipBoundsClip",
+    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleOutlineClip",
+    "android.uirendering.cts.testclasses.ViewClippingTests#testSimpleBoundsClip",
+    "android.uirendering.cts.testclasses.InfrastructureTests#testViewInitializer"
+  ],
+  bug: 17511118
 },
 {
   description: "This test failed on devices that use effect off loading. In addition it uses hidden apis",
