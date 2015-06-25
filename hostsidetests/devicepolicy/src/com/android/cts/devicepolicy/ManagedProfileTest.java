@@ -46,6 +46,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
     private static final String FEATURE_BLUETOOTH = "android.hardware.bluetooth";
+    private static final String FEATURE_CAMERA = "android.hardware.camera";
     private int mUserId;
 
     @Override
@@ -256,6 +257,52 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "testListenUsingRfcommWithServiceRecord", mUserId));
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".BluetoothTest",
                 "testGetRemoteDevice", mUserId));
+    }
+
+    public void testCameraPolicy() throws Exception {
+        boolean hasCamera = hasDeviceFeature(FEATURE_CAMERA);
+        if (!mHasFeature || !hasCamera) {
+            return;
+        }
+        try {
+            setDeviceAdmin(MANAGED_PROFILE_PKG + "/.PrimaryUserDeviceAdmin");
+
+            // Disable managed profile camera.
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testDisableCameraInManagedProfile",
+                    mUserId));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testIsCameraEnabledInPrimaryProfile",
+                    0));
+
+            // Enable managed profile camera.
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testEnableCameraInManagedProfile",
+                    mUserId));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testIsCameraEnabledInPrimaryProfile",
+                    0));
+
+            // Disable primary profile camera.
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testDisableCameraInPrimaryProfile",
+                    0));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testIsCameraEnabledInManagedProfile",
+                    mUserId));
+
+            // Enable primary profile camera.
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testEnableCameraInPrimaryProfile",
+                    0));
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CameraPolicyTest",
+                    "testIsCameraEnabledInManagedProfile",
+                    mUserId));
+        } finally {
+            final String adminHelperClass = ".PrimaryUserAdminHelper";
+            assertTrue("Clear device admin failed", runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
+                    adminHelperClass, "testClearDeviceAdmin", 0 /* user 0 */));
+        }
     }
 
     public void testManagedContacts() throws Exception {

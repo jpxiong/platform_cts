@@ -16,5 +16,6 @@
     <uses-policies>
          <reset-password />
          <limit-password />
+         <disable-camera />
     </uses-policies>
 </device-admin>
