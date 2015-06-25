@@ -614,6 +614,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             throws Exception {
         final int NUM_SINGLE_SHOT_TEST = 5;
         final int FRAMEDROP_TOLERANCE = 8;
+        final int FRAME_SIZE_15M = 15000000;
+        final float FRAME_DROP_TOLERENCE_FACTOR = 1.5f;
+        int kFrameDrop_Tolerence = FRAMEDROP_TOLERANCE;
+
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
@@ -649,6 +653,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     videoSnapshotSz = candidateSize;
                 }
             }
+            if (videoSnapshotSz.getWidth() * videoSnapshotSz.getHeight() > FRAME_SIZE_15M)
+                kFrameDrop_Tolerence = (int)(FRAMEDROP_TOLERANCE * FRAME_DROP_TOLERENCE_FACTOR);
 
             /**
              * Only test full res snapshot when below conditions are all true.
@@ -762,8 +768,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                                 "Camera %d Video size %s: Number of dropped frames %d must not"
                                 + " be larger than %d",
                                 cameraId, videoSz.toString(), totalDroppedFrames,
-                                FRAMEDROP_TOLERANCE),
-                        FRAMEDROP_TOLERANCE, totalDroppedFrames);
+                                kFrameDrop_Tolerence),
+                        kFrameDrop_Tolerence, totalDroppedFrames);
             }
             closeImageReader();
         }
