@@ -43,7 +43,7 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
 public class SignatureTest extends AndroidTestCase {
-    private static final String EXPECTED_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
+    static final String EXPECTED_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
 
     private static final String[] EXPECTED_SIGNATURE_ALGORITHMS = {
         "NONEwithRSA",
@@ -209,6 +209,9 @@ public class SignatureTest extends AndroidTestCase {
             new TreeMap<String, byte[]>(String.CASE_INSENSITIVE_ORDER);
     static {
         // From RI
+        LONG_MSG_KAT_SIGNATURES.put("NONEwithECDSA", HexEncoding.decode(
+                "304502206e4039608a66ce118821eeca3e2af7f530f51d1ce8089685a13f49010e3cd58b02210083a5"
+                + "fe62a171f1b1d775fad712128a223d6b63336e0248783652474221cb3193"));
         LONG_MSG_KAT_SIGNATURES.put("SHA1withECDSA", HexEncoding.decode(
                 "3044022075f09bb5c87d883c088ca2ad263bbe1754ab614f727465bc43695d3521eaccf80220460e4e"
                 + "32421e6f4398cd9b7fbb31a1d1f2961f26b9783620f6413f0e6f7efb84"));
@@ -509,7 +512,7 @@ public class SignatureTest extends AndroidTestCase {
             KeyPair keyPair = getKeyPairForSignatureAlgorithm(algorithm, keyPairs);
 
             try {
-                if (algorithm.toLowerCase(Locale.US).startsWith("nonewith")) {
+                if (algorithm.toLowerCase(Locale.US).startsWith("nonewithrsa")) {
                     // This algorithm cannot accept large messages
                     Signature signature = Signature.getInstance(algorithm);
                     signature.initSign(keyPair.getPrivate());
