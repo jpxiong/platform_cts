@@ -731,7 +731,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         Surface output3Surface = new Surface(output3);
         try {
             mSession.prepare(output3Surface);
-            fail("Preparing surface not part of session must throw IllegalArgumentException");
+            // Legacy camera prepare always succeed
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                fail("Preparing surface not part of session must throw IllegalArgumentException");
+            }
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -752,7 +755,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         try {
             mSession.prepare(output1Surface);
-            fail("Preparing already-used surface must throw IllegalArgumentException");
+            // Legacy camera prepare always succeed
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                fail("Preparing already-used surface must throw IllegalArgumentException");
+            }
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -770,7 +776,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         try {
             mSession.prepare(output1Surface);
-            fail("Preparing surface used in previous session must throw IllegalArgumentException");
+            // Legacy camera prepare always succeed
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                fail("Preparing surface used in previous session must throw " +
+                        "IllegalArgumentException");
+            }
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -787,7 +797,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         try {
             mSession.prepare(output3Surface);
-            fail("Preparing already-used surface must throw IllegalArgumentException");
+            // Legacy camera prepare always succeed
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                fail("Preparing already-used surface must throw IllegalArgumentException");
+            }
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -809,7 +822,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
         try {
             mSession.prepare(output1Surface);
-            fail("Preparing surface used in previous session must throw IllegalArgumentException");
+            // Legacy camera prepare always succeed
+            if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                fail("Preparing surface used in previous session must throw " +
+                        "IllegalArgumentException");
+            }
         } catch (IllegalArgumentException e) {
             // expected
         }
