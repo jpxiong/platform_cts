@@ -503,7 +503,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
                     // sync.getTolerance() is MediaSync's tolerance of the playback rate, whereas
                     // PLAYBACK_RATE_TOLERANCE_PERCENT / 100 is our test's tolerance.
                     // We need to add both to get an upperbound for allowable error.
-                    mediaDurationUs * (sync.getTolerance() + PLAYBACK_RATE_TOLERANCE_PERCENT / 100)
+                    mediaDurationUs * (sync.getTolerance() + PLAYBACK_RATE_TOLERANCE_PERCENT / 100.)
                             + TIME_MEASUREMENT_TOLERANCE_US);
         }
 
