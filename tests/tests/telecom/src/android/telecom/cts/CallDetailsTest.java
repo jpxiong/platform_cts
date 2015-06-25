@@ -18,7 +18,6 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.net.Uri;
 import android.telecom.Call;
@@ -40,6 +39,8 @@ import static org.junit.Assert.assertThat;
  */
 public class CallDetailsTest extends BaseTelecomTestWithMockServices {
 
+    private MockInCallService mInCallService;
+    private Call mCall;
     public static final int CONNECTION_CAPABILITIES =
             Connection.CAPABILITY_HOLD | Connection.CAPABILITY_MUTE |
             /**
@@ -54,42 +55,34 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
     public static final String CALLER_DISPLAY_NAME = "CTS test";
     public static final int CALLER_DISPLAY_NAME_PRESENTATION = TelecomManager.PRESENTATION_ALLOWED;
 
-    private StatusHints mStatusHints;
-    private Bundle mExtras = new Bundle();
-
-    private MockInCallService mInCallService;
-    private Call mCall;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (TestUtils.shouldTestTelecom(mContext)) {
             PhoneAccount account = setupConnectionService(
-                    new MockConnectionService() {
-                        @Override
-                        public Connection onCreateOutgoingConnection(
-                                PhoneAccountHandle connectionManagerPhoneAccount,
-                                ConnectionRequest request) {
-                            Connection connection = super.onCreateOutgoingConnection(
-                                    connectionManagerPhoneAccount,
-                                    request);
-                            // Modify the connection object created with local values.
-                            connection.setConnectionCapabilities(CONNECTION_CAPABILITIES);
-                            connection.setCallerDisplayName(
-                                    CALLER_DISPLAY_NAME,
-                                    CALLER_DISPLAY_NAME_PRESENTATION);
-                            connection.setExtras(mExtras);
-                            mStatusHints = new StatusHints(
-                                    "CTS test",
-                                    Icon.createWithResource(
-                                            getInstrumentation().getContext(),
-                                            R.drawable.ic_phone_24dp),
-                                            null);
-                            connection.setStatusHints(mStatusHints);
-                            lock.release();
-                            return connection;
-                        }
-                    }, FLAG_REGISTER | FLAG_ENABLE);
+                new MockConnectionService() {
+                    @Override
+                    public Connection onCreateOutgoingConnection(
+                            PhoneAccountHandle connectionManagerPhoneAccount,
+                            ConnectionRequest request) {
+                        Connection connection = super.onCreateOutgoingConnection(
+                                connectionManagerPhoneAccount,
+                                request);
+                        // Modify the connection object created with local values.
+                        connection.setConnectionCapabilities(CONNECTION_CAPABILITIES);
+                        connection.setCallerDisplayName(
+                                CALLER_DISPLAY_NAME,
+                                CALLER_DISPLAY_NAME_PRESENTATION);
+                        Bundle extras = new Bundle();
+                        extras.putString(
+                                TelecomManager.GATEWAY_PROVIDER_PACKAGE,
+                                PACKAGE);
+                        connection.setExtras(extras);
+                        lock.release();
+                        return connection;
+                    }
+                }, FLAG_REGISTER | FLAG_ENABLE);
 
         }
         /** Place a call as a part of the setup before we test the various
@@ -160,13 +153,7 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      */
     public void testExtras() {
         assertThat(mCall.getDetails().getExtras(), is(Bundle.class));
-    }
-
-    /**
-     * Tests whether the getIntentExtras() getter returns the correct object.
-     */
-    public void testIntentExtras() {
-        assertThat(mCall.getDetails().getIntentExtras(), is(Bundle.class));
+        assertEquals(PACKAGE, mCall.getDetails().getExtras().getString(TelecomManager.GATEWAY_PROVIDER_PACKAGE));
     }
 
     /**
@@ -197,17 +184,12 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      */
     public void testStatusHints() {
         assertThat(mCall.getDetails().getStatusHints(), is(StatusHints.class));
-        assertEquals(mStatusHints.getLabel(), mCall.getDetails().getStatusHints().getLabel());
-        assertEquals(
-                mStatusHints.getIcon().toString(),
-                mCall.getDetails().getStatusHints().getIcon().toString());
-        assertEquals(mStatusHints.getExtras(), mCall.getDetails().getStatusHints().getExtras());
     }
 
     /**
-     * Tests whether the getVideoState() getter returns the correct object.
+     * Tests whether the getVideoProfile() getter returns the correct object.
      */
-    public void testVideoState() {
+    public void testVideoProfile() {
         assertThat(mCall.getDetails().getVideoState(), is(Integer.class));
     }
 }
