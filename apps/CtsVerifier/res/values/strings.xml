@@ -26,6 +26,7 @@
     <!-- Strings for TestListActivity -->
     <string name="test_category_audio">Audio</string>
     <string name="test_category_camera">Camera</string>
+    <string name="test_category_car">Car</string>
     <string name="test_category_device_admin">Device Administration</string>
     <string name="test_category_hardware">Hardware</string>
     <string name="test_category_networking">Networking</string>
@@ -86,6 +87,15 @@
         device and verify that all rows in the policy list are green. Red items indicate policy
         settings that were not loaded properly.
     </string>
+    <string name="car_dock_test">Car Dock Test</string>
+    <string name="car_dock_test_desc">This test ensures that car mode opens the app associated with
+        car dock when going into car mode. Click on "Enable Car Mode" to start the test. Clicking on
+        the button will either bring up a disambiguation dialog asking which app to open or
+        immediately open the CAR_DOCK application. Select the "CTS Verifier" app if the dialog pops up,
+        which open the CAR_DOCK application. In the CAR_DOCK application, press the home button, which
+        will enable the pass button if the framework correctly tries to open the CAR_DOCk app again.</string>
+    <string name="car_mode_enable">Enable Car Mode</string>
+    <string name="car_dock_activity_text">Press the Home button</string>
     <string name="da_no_policy">1. Press the \"Generate Policy\" to create a random device
         policy\n\n2. Press \"Apply Policy\" to put the policy into effect.\n\n3. Reboot your
         device and return to this test in the CTS Verifier.
