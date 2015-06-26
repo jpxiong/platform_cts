@@ -87,6 +87,7 @@ cts_support_packages := \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
     CtsSimpleApp \
+    CtsSimplePreMApp \
     CtsSomeAccessibilityServices \
     CtsThemeDeviceApp \
     TestDeviceSetup \
