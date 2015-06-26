@@ -172,7 +172,8 @@ public abstract class InteractiveVerifierActivity extends PassFailButtons.Activi
     @Override
     protected void onResume() {
         super.onResume();
-        if (mCurrentTest.autoStart()) {
+        //To avoid NPE during onResume,before start to iterate next test order
+        if (mCurrentTest!= null && mCurrentTest.autoStart()) {
             mCurrentTest.status = READY;
         }
         next();
