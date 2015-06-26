@@ -485,6 +485,7 @@ public class AutoCompleteTextViewTest extends
                 }
             }.run();
         } else {
+            Thread.sleep(200);
             mInstrumentation.sendStringSync(STRING_TEST);
             new PollingCheck() {
                 @Override
