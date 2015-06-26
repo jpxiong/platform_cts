@@ -1243,7 +1243,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertFalse(view.fitSystemWindows(insets));
         assertFalse(view.fitSystemWindows(null));
 
-        view = new MockView(mActivity, attrs, com.android.internal.R.attr.fitsSystemWindows);
+        view = new MockView(mActivity, attrs, android.R.attr.fitsSystemWindows);
         assertFalse(view.fitSystemWindows(insets));
         assertFalse(view.fitSystemWindows(null));
     }

@@ -243,7 +243,7 @@ public class CompoundButtonTest extends AndroidTestCase {
         compoundButton.setChecked(true);
         int[] checkedState = compoundButton.onCreateDrawableState(0);
         assertEquals(state[0], checkedState[0]);
-        assertEquals(com.android.internal.R.attr.state_checked,
+        assertEquals(android.R.attr.state_checked,
                 checkedState[checkedState.length - 1]);
 
         // compoundButton is not checked again.

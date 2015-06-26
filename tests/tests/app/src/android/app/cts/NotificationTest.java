@@ -77,7 +77,7 @@ public class NotificationTest extends AndroidTestCase {
         mNotification.tickerText = TICKER_TEXT;
 
         final RemoteViews contentView = new RemoteViews(mContext.getPackageName(),
-                com.android.internal.R.layout.status_bar_latest_event_content);
+                android.R.layout.simple_list_item_1);
         mNotification.contentView = contentView;
         mNotification.defaults = 0;
         mNotification.flags = 0;
