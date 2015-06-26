@@ -444,30 +444,6 @@ public class StaticLayoutTest extends AndroidTestCase {
         assertTrue(mDefaultLayout.getEllipsisCount(3) == 0);
         assertTrue(mDefaultLayout.getEllipsisCount(4) == 0);
         assertTrue(mDefaultLayout.getEllipsisCount(5) > 0);
-
-        // Single line case and TruncateAt.END so that we have some ellipsis
-        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
-                TextUtils.TruncateAt.END,
-                1);
-        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
-
-        // Single line case and TruncateAt.MIDDLE so that we have some ellipsis
-        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
-                TextUtils.TruncateAt.MIDDLE,
-                1);
-        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
-
-        // Single line case and TruncateAt.END so that we have some ellipsis
-        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
-                TextUtils.TruncateAt.END,
-                1);
-        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
-
-        // Single line case and TruncateAt.MARQUEE so that we have NO ellipsis
-        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
-                TextUtils.TruncateAt.MARQUEE,
-                1);
-        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
     }
 
     /*
@@ -512,6 +488,65 @@ public class StaticLayoutTest extends AndroidTestCase {
                 mDefaultPaint, outerWidth, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD,
                 false, null, ellipsizedWidth);
         assertEquals(outerWidth, layout.getEllipsizedWidth());
+    }
+
+    public void testEllipsis_singleLine() {
+        {
+            // Single line case and TruncateAt.END so that we have some ellipsis
+            StaticLayout layout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                    TextUtils.TruncateAt.END, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+        }
+        {
+            // Single line case and TruncateAt.MIDDLE so that we have some ellipsis
+            StaticLayout layout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                    TextUtils.TruncateAt.MIDDLE, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+        }
+        {
+            // Single line case and TruncateAt.END so that we have some ellipsis
+            StaticLayout layout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                    TextUtils.TruncateAt.END, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+        }
+        {
+            // Single line case and TruncateAt.MARQUEE so that we have NO ellipsis
+            StaticLayout layout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                    TextUtils.TruncateAt.MARQUEE, 1);
+            assertTrue(layout.getEllipsisCount(0) == 0);
+        }
+
+        final String text = "\u3042" // HIRAGANA LETTER A
+                + "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+        final float textWidth = mDefaultPaint.measureText(text);
+        final int halfWidth = (int)(textWidth / 2.0f);
+        {
+            StaticLayout layout = new StaticLayout(text, 0, text.length(), mDefaultPaint,
+                    halfWidth, DEFAULT_ALIGN, TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    SPACE_MULTI, SPACE_ADD, false, TextUtils.TruncateAt.END, halfWidth, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+            assertTrue(layout.getEllipsisStart(0) > 0);
+        }
+        {
+            StaticLayout layout = new StaticLayout(text, 0, text.length(), mDefaultPaint,
+                    halfWidth, DEFAULT_ALIGN, TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    SPACE_MULTI, SPACE_ADD, false, TextUtils.TruncateAt.START, halfWidth, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+            assertEquals(0, mDefaultLayout.getEllipsisStart(0));
+        }
+        {
+            StaticLayout layout = new StaticLayout(text, 0, text.length(), mDefaultPaint,
+                    halfWidth, DEFAULT_ALIGN, TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    SPACE_MULTI, SPACE_ADD, false, TextUtils.TruncateAt.MIDDLE, halfWidth, 1);
+            assertTrue(layout.getEllipsisCount(0) > 0);
+            assertTrue(layout.getEllipsisStart(0) > 0);
+        }
+        {
+            StaticLayout layout = new StaticLayout(text, 0, text.length(), mDefaultPaint,
+                    halfWidth, DEFAULT_ALIGN, TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                    SPACE_MULTI, SPACE_ADD, false, TextUtils.TruncateAt.MARQUEE, halfWidth, 1);
+            assertEquals(0, layout.getEllipsisCount(0));
+        }
     }
 
     /**
