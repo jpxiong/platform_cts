@@ -15,19 +15,23 @@
  */
 package android.transition.cts;
 
+import com.android.cts.transition.R;
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.transition.Scene;
 import android.transition.TransitionManager;
 import android.transition.TransitionValues;
 import android.transition.Visibility;
+import android.view.Choreographer;
+import android.view.Choreographer.FrameCallback;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
-import com.android.cts.transition.R;
 
 public class BaseTransitionTest extends ActivityInstrumentationTestCase2<TransitionActivity> {
     protected TransitionActivity mActivity;
@@ -55,10 +59,10 @@ public class BaseTransitionTest extends ActivityInstrumentationTestCase2<Transit
     }
 
     protected static void waitForStart(SimpleTransitionListener listener) throws InterruptedException {
-        long endTime = System.currentTimeMillis() + 50;
+        long endTime = SystemClock.uptimeMillis() + 50;
         synchronized (listener) {
             while (!listener.started) {
-                long now = System.currentTimeMillis();
+                long now = SystemClock.uptimeMillis();
                 long waitTime = endTime - now;
                 if (waitTime <= 0) {
                     throw new InterruptedException();
@@ -74,10 +78,10 @@ public class BaseTransitionTest extends ActivityInstrumentationTestCase2<Transit
 
     protected static void waitForEnd(SimpleTransitionListener listener, long waitMillis)
             throws InterruptedException {
-        long endTime = System.currentTimeMillis() + waitMillis;
+        long endTime = SystemClock.uptimeMillis() + waitMillis;
         synchronized (listener) {
             while (!listener.ended) {
-                long now = System.currentTimeMillis();
+                long now = SystemClock.uptimeMillis();
                 long waitTime = endTime - now;
                 if (waitTime <= 0) {
                     throw new InterruptedException();
@@ -116,6 +120,36 @@ public class BaseTransitionTest extends ActivityInstrumentationTestCase2<Transit
             }
         });
         getInstrumentation().waitForIdleSync();
+    }
+
+    // Waits at least one frame and it could be more. The animated values should have changed
+    // from the previously recorded values by the end of this method.
+    protected void waitForAnimationFrame() throws Throwable {
+        final boolean[] tripped = new boolean[] { false };
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Choreographer.getInstance().postFrameCallbackDelayed(new FrameCallback() {
+                    @Override
+                    public void doFrame(long frameTimeNanos) {
+                        synchronized (tripped) {
+                            tripped[0] = true;
+                            tripped.notifyAll();
+                        }
+                    }
+                }, 16); // make sure it is the next animation frame.
+            }
+        });
+        synchronized (tripped) {
+            long endTime = SystemClock.uptimeMillis() + 60;
+            while (!tripped[0]) {
+                long waitTime = endTime - SystemClock.uptimeMillis();
+                if (waitTime <= 0) {
+                    throw new InterruptedException();
+                }
+                tripped.wait(waitTime);
+            }
+        }
     }
 
     public class TestTransition extends Visibility {
