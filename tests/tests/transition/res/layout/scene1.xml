@@ -16,14 +16,23 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:transitionName="holder"
+                android:id="@+id/holder">
     <View android:layout_width="10dp"
           android:layout_height="10dp"
           android:background="#F00"
+          android:transitionName="red"
           android:id="@+id/redSquare" />
     <View android:layout_width="10dp"
           android:layout_height="10dp"
           android:background="#0F0"
+          android:transitionName="green"
           android:id="@+id/greenSquare"
           android:layout_below="@+id/redSquare" />
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:transitionName="hello"
+              android:text="@string/hello"
+              android:id="@+id/hello"/>
 </RelativeLayout>

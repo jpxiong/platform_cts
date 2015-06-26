@@ -20,7 +20,6 @@ import com.android.cts.transition.R;
 import android.transition.Scene;
 import android.transition.TransitionManager;
 import android.view.View;
-import android.widget.FrameLayout;
 
 public class TransitionManagerTest extends BaseTransitionTest {
 
@@ -43,6 +42,9 @@ public class TransitionManagerTest extends BaseTransitionTest {
         assertFalse(mTransition.listener.resumed);
         assertFalse(mTransition.listener.paused);
         assertFalse(mTransition.listener.canceled);
+        assertNotNull(mTransition.listener.transition);
+        assertEquals(TestTransition.class, mTransition.listener.transition.getClass());
+        assertTrue(mTransition != mTransition.listener.transition);
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -60,6 +62,9 @@ public class TransitionManagerTest extends BaseTransitionTest {
         assertFalse(mTransition.listener.resumed);
         assertFalse(mTransition.listener.paused);
         assertFalse(mTransition.listener.canceled);
+        assertNotNull(mTransition.listener.transition);
+        assertEquals(TestTransition.class, mTransition.listener.transition.getClass());
+        assertTrue(mTransition != mTransition.listener.transition);
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -86,7 +91,9 @@ public class TransitionManagerTest extends BaseTransitionTest {
         assertFalse(mTransition.listener.resumed);
         assertFalse(mTransition.listener.paused);
         assertFalse(mTransition.listener.canceled);
-
+        assertNotNull(mTransition.listener.transition);
+        assertEquals(TestTransition.class, mTransition.listener.transition.getClass());
+        assertTrue(mTransition != mTransition.listener.transition);
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -132,7 +139,9 @@ public class TransitionManagerTest extends BaseTransitionTest {
         assertFalse(mTransition.listener.resumed);
         assertFalse(mTransition.listener.paused);
         assertFalse(mTransition.listener.canceled);
-
+        assertNotNull(mTransition.listener.transition);
+        assertEquals(TestTransition.class, mTransition.listener.transition.getClass());
+        assertTrue(mTransition != mTransition.listener.transition);
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
