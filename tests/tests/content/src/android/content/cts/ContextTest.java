@@ -17,16 +17,16 @@
 package android.content.cts;
 
 import com.android.cts.content.R;
-import com.android.internal.util.XmlUtils;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
+import android.content.cts.util.XmlUtils;
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
-import android.content.res.XmlResourceParser;
 import android.content.res.Resources.NotFoundException;
 import android.content.res.Resources.Theme;
+import android.content.res.TypedArray;
+import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;

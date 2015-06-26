@@ -16,17 +16,16 @@
 
 package android.view.cts;
 
+import com.android.cts.view.R;
+
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.test.InstrumentationTestCase;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
-
+import android.view.cts.util.XmlUtils;
 import android.widget.LinearLayout;
-import com.android.internal.util.XmlUtils;
-import com.android.cts.view.R;
-
 
 public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
 
