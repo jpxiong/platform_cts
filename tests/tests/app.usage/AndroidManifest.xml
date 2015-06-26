@@ -32,6 +32,7 @@
         <activity android:name=".Activities$ActivityTwo" />
         <activity android:name=".Activities$ActivityThree" />
         <activity android:name=".Activities$ActivityFour" />
+        <activity android:name=".ActivityTransitionActivity" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
