@@ -129,14 +129,14 @@ public class BaseTransitionTest extends ActivityInstrumentationTestCase2<Transit
         @Override
         public Animator onAppear(ViewGroup sceneRoot, View view, TransitionValues startValues,
                 TransitionValues endValues) {
-            mTargets.add(view);
+            mTargets.add(endValues.view);
             return ObjectAnimator.ofFloat(BaseTransitionTest.this, "mAnimatedValue", 0, 1);
         }
 
         @Override
         public Animator onDisappear(ViewGroup sceneRoot, View view, TransitionValues startValues,
                 TransitionValues endValues) {
-            mTargets.add(view);
+            mTargets.add(startValues.view);
             return ObjectAnimator.ofFloat(BaseTransitionTest.this, "mAnimatedValue", 1, 0);
         }
     }
