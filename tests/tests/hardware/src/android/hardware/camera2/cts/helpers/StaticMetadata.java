@@ -73,6 +73,46 @@ public class StaticMetadata {
     private final CheckLevel mLevel;
     private final CameraErrorCollector mCollector;
 
+    // Index with android.control.aeMode
+    public static final String[] AE_MODE_NAMES = new String[] {
+        "AE_MODE_OFF",
+        "AE_MODE_ON",
+        "AE_MODE_ON_AUTO_FLASH",
+        "AE_MODE_ON_ALWAYS_FLASH",
+        "AE_MODE_ON_AUTO_FLASH_REDEYE"
+    };
+
+    // Index with android.control.afMode
+    public static final String[] AF_MODE_NAMES = new String[] {
+        "AF_MODE_OFF",
+        "AF_MODE_AUTO",
+        "AF_MODE_MACRO",
+        "AF_MODE_CONTINUOUS_VIDEO",
+        "AF_MODE_CONTINUOUS_PICTURE",
+        "AF_MODE_EDOF"
+    };
+
+    // Index with android.control.aeState
+    public static final String[] AE_STATE_NAMES = new String[] {
+        "AE_STATE_INACTIVE",
+        "AE_STATE_SEARCHING",
+        "AE_STATE_CONVERGED",
+        "AE_STATE_LOCKED",
+        "AE_STATE_FLASH_REQUIRED",
+        "AE_STATE_PRECAPTURE"
+    };
+
+    // Index with android.control.afState
+    public static final String[] AF_STATE_NAMES = new String[] {
+        "AF_STATE_INACTIVE",
+        "AF_STATE_PASSIVE_SCAN",
+        "AF_STATE_PASSIVE_FOCUSED",
+        "AF_STATE_ACTIVE_SCAN",
+        "AF_STATE_FOCUSED_LOCKED",
+        "AF_STATE_NOT_FOCUSED_LOCKED",
+        "AF_STATE_PASSIVE_UNFOCUSED"
+    };
+
     public enum CheckLevel {
         /** Only log warnings for metadata check failures. Execution continues. */
         WARN,
