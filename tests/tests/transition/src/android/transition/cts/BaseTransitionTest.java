@@ -107,6 +107,17 @@ public class BaseTransitionTest extends ActivityInstrumentationTestCase2<Transit
         });
     }
 
+    protected void enterScene(final int layoutId) throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Scene scene = Scene.getSceneForLayout(mSceneRoot, layoutId, mActivity);
+                scene.enter();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+    }
+
     public class TestTransition extends Visibility {
         public final SimpleTransitionListener listener = new SimpleTransitionListener();
 

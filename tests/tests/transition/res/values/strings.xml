@@ -15,4 +15,6 @@
 -->
 <resources>
     <string name="add_button">Add Button</string>
+    <string name="hello">Hello</string>
+    <string name="world">World</string>
 </resources>
