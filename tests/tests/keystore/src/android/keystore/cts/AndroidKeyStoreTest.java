@@ -34,6 +34,7 @@ import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.interfaces.ECKey;
@@ -1918,5 +1919,65 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         } catch (BadPaddingException e) {
             // pass on exception as it is expected
         }
+    }
+
+    public void testKeyStore_PrivateKeyEntry_RSA_PublicKeyWorksWithCrypto()
+            throws Exception {
+        mKeyStore.load(null, null);
+        mKeyStore.setKeyEntry(TEST_ALIAS_2,
+                KeyFactory.getInstance("RSA").generatePrivate(
+                        new PKCS8EncodedKeySpec(FAKE_RSA_KEY_1)),
+                null, // no password (it's not even supported)
+                new Certificate[] {generateCertificate(FAKE_RSA_USER_1)});
+        PublicKey publicKey = mKeyStore.getCertificate(TEST_ALIAS_2).getPublicKey();
+        assertNotNull(publicKey);
+
+        Signature.getInstance("SHA256withRSA").initVerify(publicKey);
+        Signature.getInstance("NONEwithRSA").initVerify(publicKey);
+        Signature.getInstance("SHA256withRSA/PSS").initVerify(publicKey);
+
+        Cipher.getInstance("RSA/ECB/PKCS1Padding").init(Cipher.ENCRYPT_MODE, publicKey);
+        Cipher.getInstance("RSA/ECB/NoPadding").init(Cipher.ENCRYPT_MODE, publicKey);
+        Cipher.getInstance("RSA/ECB/OAEPPadding").init(Cipher.ENCRYPT_MODE, publicKey);
+    }
+
+    public void testKeyStore_PrivateKeyEntry_EC_PublicKeyWorksWithCrypto()
+            throws Exception {
+        mKeyStore.load(null, null);
+        mKeyStore.setKeyEntry(TEST_ALIAS_1,
+                KeyFactory.getInstance("EC").generatePrivate(
+                        new PKCS8EncodedKeySpec(FAKE_EC_KEY_1)),
+                null, // no password (it's not even supported)
+                new Certificate[] {generateCertificate(FAKE_EC_USER_1)});
+        PublicKey publicKey = mKeyStore.getCertificate(TEST_ALIAS_1).getPublicKey();
+        assertNotNull(publicKey);
+
+        Signature.getInstance("SHA256withECDSA").initVerify(publicKey);
+        Signature.getInstance("NONEwithECDSA").initVerify(publicKey);
+    }
+
+    public void testKeyStore_TrustedCertificateEntry_RSA_PublicKeyWorksWithCrypto()
+            throws Exception {
+        mKeyStore.load(null, null);
+        mKeyStore.setCertificateEntry(TEST_ALIAS_2, generateCertificate(FAKE_RSA_USER_1));
+        PublicKey publicKey = mKeyStore.getCertificate(TEST_ALIAS_2).getPublicKey();
+        assertNotNull(publicKey);
+
+        Signature.getInstance("SHA256withRSA").initVerify(publicKey);
+        Signature.getInstance("NONEwithRSA").initVerify(publicKey);
+
+        Cipher.getInstance("RSA/ECB/PKCS1Padding").init(Cipher.ENCRYPT_MODE, publicKey);
+        Cipher.getInstance("RSA/ECB/NoPadding").init(Cipher.ENCRYPT_MODE, publicKey);
+    }
+
+    public void testKeyStore_TrustedCertificateEntry_EC_PublicKeyWorksWithCrypto()
+            throws Exception {
+        mKeyStore.load(null, null);
+        mKeyStore.setCertificateEntry(TEST_ALIAS_1, generateCertificate(FAKE_EC_USER_1));
+        PublicKey publicKey = mKeyStore.getCertificate(TEST_ALIAS_1).getPublicKey();
+        assertNotNull(publicKey);
+
+        Signature.getInstance("SHA256withECDSA").initVerify(publicKey);
+        Signature.getInstance("NONEwithECDSA").initVerify(publicKey);
     }
 }
