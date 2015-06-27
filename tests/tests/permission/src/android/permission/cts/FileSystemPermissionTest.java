@@ -29,6 +29,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -355,6 +356,23 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
+    }
+
+    @MediumTest
+    public void testDeviceTreeCpuCurrent() throws Exception {
+        final File f = new File("/proc/device-tree/cpus");
+        assertTrue(f.exists());
+        String[] dir = f.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File pathname, String name) {
+                return (pathname.isDirectory() && name.matches("cpu@[0-9]+"));
+            }
+        });
+
+        for(String cpuDir : dir) {
+            File fCpu = new File(cpuDir + "/current");
+            assertTrue(f.canRead());
+        }
     }
 
     private static boolean isDirectoryWritable(File directory) {
