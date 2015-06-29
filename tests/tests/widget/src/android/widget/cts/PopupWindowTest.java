@@ -75,7 +75,7 @@ public class PopupWindowTest extends
 
         new PopupWindow(mActivity, null);
 
-        new PopupWindow(mActivity, null, com.android.internal.R.attr.popupWindowStyle);
+        new PopupWindow(mActivity, null, android.R.attr.popupWindowStyle);
 
         mPopupWindow = new PopupWindow();
         assertEquals(0, mPopupWindow.getWidth());
@@ -143,12 +143,8 @@ public class PopupWindowTest extends
         // default is -1
         assertEquals(-1, mPopupWindow.getAnimationStyle());
 
-        mPopupWindow.setAnimationStyle(com.android.internal.R.style.Animation_Toast);
-        assertEquals(com.android.internal.R.style.Animation_Toast,
-                mPopupWindow.getAnimationStyle());
-
-        mPopupWindow.setAnimationStyle(com.android.internal.R.style.Animation_DropDownDown);
-        assertEquals(com.android.internal.R.style.Animation_DropDownDown,
+        mPopupWindow.setAnimationStyle(android.R.style.Animation_Toast);
+        assertEquals(android.R.style.Animation_Toast,
                 mPopupWindow.getAnimationStyle());
 
         // abnormal values
