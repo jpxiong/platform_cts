@@ -831,7 +831,6 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             MediaCodec codec, ByteBuffer[] outputBuffers,
             int index, MediaCodec.BufferInfo info) {
         ByteBuffer output = outputBuffers[index];
-        output.clear();
         int l = info.size;
         ByteBuffer copied = ByteBuffer.allocate(l);
         output.get(copied.array(), 0, l);
