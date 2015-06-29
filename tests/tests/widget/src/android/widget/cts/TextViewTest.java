@@ -4488,7 +4488,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
                 final Bundle args = new Bundle();
                 args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
                 args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, text.length());
-                mTextView.performAccessibilityActionInternal(
+                mTextView.performAccessibilityAction(
                         AccessibilityNodeInfo.ACTION_SET_SELECTION, args);
             }
         });
@@ -4518,7 +4518,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
                 final Bundle args = new Bundle();
                 args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
                 args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, text.length());
-                mTextView.performAccessibilityActionInternal(
+                mTextView.performAccessibilityAction(
                         AccessibilityNodeInfo.ACTION_SET_SELECTION, args);
 
             }

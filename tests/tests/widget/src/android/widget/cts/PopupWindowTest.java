@@ -894,9 +894,29 @@ public class PopupWindowTest extends
         private int mTransitionCount;
 
         private MockTransition() {
-            addListener(new Transition.TransitionListenerAdapter() {
+            addListener(new Transition.TransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+
+                }
+
                 public void onTransitionEnd(Transition transition) {
                     mTransitionCount++;
+                }
+
+                @Override
+                public void onTransitionCancel(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionPause(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionResume(Transition transition) {
+
                 }
             });
         }

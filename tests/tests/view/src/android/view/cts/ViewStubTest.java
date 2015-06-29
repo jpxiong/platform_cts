@@ -18,8 +18,6 @@ package android.view.cts;
 
 import com.android.cts.view.R;
 
-import dalvik.annotation.KnownFailure;
-
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
