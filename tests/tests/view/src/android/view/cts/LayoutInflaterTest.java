@@ -17,7 +17,7 @@
 package android.view.cts;
 
 import com.android.cts.view.R;
-import com.android.internal.util.XmlUtils;
+import android.view.cts.util.XmlUtils;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -29,7 +29,6 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.util.Xml;

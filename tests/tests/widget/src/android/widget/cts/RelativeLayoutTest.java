@@ -17,8 +17,6 @@
 package android.widget.cts;
 
 import com.android.cts.widget.R;
-import com.android.internal.util.XmlUtils;
-
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.RelativeLayout;
+import android.widget.cts.util.XmlUtils;
 
 import java.io.IOException;
 

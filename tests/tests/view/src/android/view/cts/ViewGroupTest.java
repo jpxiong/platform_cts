@@ -16,7 +16,7 @@
 
 package android.view.cts;
 
-import com.android.internal.util.XmlUtils;
+import android.view.cts.util.XmlUtils;
 
 
 import android.content.Context;
