@@ -25,6 +25,7 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.params.InputConfiguration;
@@ -57,6 +58,12 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
     private static final int CONFIGURE_TIMEOUT = 5000; //ms
     private static final int CAPTURE_TIMEOUT = 1000; //ms
+
+    // For testTriggerInteractions
+    private static final int PREVIEW_WARMUP_FRAMES = 60;
+    private static final int MAX_RESULT_STATE_CHANGE_WAIT_FRAMES = 100;
+    private static final int MAX_TRIGGER_SEQUENCE_FRAMES = 180; // 6 sec at 30 fps
+    private static final int MAX_RESULT_STATE_POSTCHANGE_WAIT_FRAMES = 10;
 
     /**
      * Test that a {@link CameraCaptureSession} can be configured with a {@link Surface} containing
@@ -345,6 +352,634 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 closeDevice(id);
             }
         }
+    }
+
+    public void testBasicTriggerSequence() throws Exception {
+
+        for (String id : mCameraIds) {
+            Log.i(TAG, String.format("Testing Camera %s", id));
+
+            openDevice(id);
+            try {
+                // Legacy devices do not support precapture trigger; don't test devices that
+                // can't focus
+                if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+
+                int[] availableAfModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+                int[] availableAeModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
+
+                for (int afMode : availableAfModes) {
+
+                    if (afMode == CameraCharacteristics.CONTROL_AF_MODE_OFF ||
+                            afMode == CameraCharacteristics.CONTROL_AF_MODE_EDOF) {
+                        // Only test AF modes that have meaningful trigger behavior
+                        continue;
+                    }
+
+                    for (int aeMode : availableAeModes) {
+                        if (aeMode ==  CameraCharacteristics.CONTROL_AE_MODE_OFF) {
+                            // Only test AE modes that have meaningful trigger behavior
+                            continue;
+                        }
+
+                        SurfaceTexture preview = new SurfaceTexture(/*random int*/ 1);
+
+                        CaptureRequest.Builder previewRequest =
+                                prepareTriggerTestSession(preview, aeMode, afMode);
+
+                        SimpleCaptureCallback captureListener =
+                                new CameraTestUtils.SimpleCaptureCallback();
+
+                        mCameraSession.setRepeatingRequest(previewRequest.build(), captureListener,
+                                mHandler);
+
+                        // Cancel triggers
+
+                        cancelTriggersAndWait(previewRequest, captureListener, afMode);
+
+                        //
+                        // Standard sequence - AF trigger then AE trigger
+
+                        if (VERBOSE) {
+                            Log.v(TAG, String.format("Triggering AF"));
+                        }
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_START);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+
+                        CaptureRequest triggerRequest = previewRequest.build();
+                        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+                        CaptureResult triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        int afState = triggerResult.get(CaptureResult.CONTROL_AF_STATE);
+                        boolean focusComplete = false;
+
+                        for (int i = 0;
+                             i < MAX_TRIGGER_SEQUENCE_FRAMES && !focusComplete;
+                             i++) {
+
+                            focusComplete = verifyAfSequence(afMode, afState, focusComplete);
+
+                            CaptureResult focusResult = captureListener.getCaptureResult(
+                                    CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            afState = focusResult.get(CaptureResult.CONTROL_AF_STATE);
+                        }
+
+                        assertTrue("Focusing never completed!", focusComplete);
+
+                        // Standard sequence - Part 2 AE trigger
+
+                        if (VERBOSE) {
+                            Log.v(TAG, String.format("Triggering AE"));
+                        }
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+
+                        triggerRequest = previewRequest.build();
+                        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+                        triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+
+                        int aeState = triggerResult.get(CaptureResult.CONTROL_AE_STATE);
+
+                        boolean precaptureComplete = false;
+
+                        for (int i = 0;
+                             i < MAX_TRIGGER_SEQUENCE_FRAMES && !precaptureComplete;
+                             i++) {
+
+                            precaptureComplete = verifyAeSequence(aeState, precaptureComplete);
+
+                            CaptureResult precaptureResult = captureListener.getCaptureResult(
+                                CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            aeState = precaptureResult.get(CaptureResult.CONTROL_AE_STATE);
+                        }
+
+                        assertTrue("Precapture sequence never completed!", precaptureComplete);
+
+                        for (int i = 0; i < MAX_RESULT_STATE_POSTCHANGE_WAIT_FRAMES; i++) {
+                            CaptureResult postPrecaptureResult = captureListener.getCaptureResult(
+                                CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            aeState = postPrecaptureResult.get(CaptureResult.CONTROL_AE_STATE);
+                            assertTrue("Late transition to PRECAPTURE state seen",
+                                    aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE);
+                        }
+
+                        // Done
+
+                        stopCapture(/*fast*/ false);
+                        preview.release();
+                    }
+
+                }
+
+            } finally {
+                closeDevice(id);
+            }
+        }
+
+    }
+
+    public void testSimultaneousTriggers() throws Exception {
+        for (String id : mCameraIds) {
+            Log.i(TAG, String.format("Testing Camera %s", id));
+
+            openDevice(id);
+            try {
+                // Legacy devices do not support precapture trigger; don't test devices that
+                // can't focus
+                if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+
+                int[] availableAfModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+                int[] availableAeModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
+
+                for (int afMode : availableAfModes) {
+
+                    if (afMode == CameraCharacteristics.CONTROL_AF_MODE_OFF ||
+                            afMode == CameraCharacteristics.CONTROL_AF_MODE_EDOF) {
+                        // Only test AF modes that have meaningful trigger behavior
+                        continue;
+                    }
+
+                    for (int aeMode : availableAeModes) {
+                        if (aeMode ==  CameraCharacteristics.CONTROL_AE_MODE_OFF) {
+                            // Only test AE modes that have meaningful trigger behavior
+                            continue;
+                        }
+
+                        SurfaceTexture preview = new SurfaceTexture(/*random int*/ 1);
+
+                        CaptureRequest.Builder previewRequest =
+                                prepareTriggerTestSession(preview, aeMode, afMode);
+
+                        SimpleCaptureCallback captureListener =
+                                new CameraTestUtils.SimpleCaptureCallback();
+
+                        mCameraSession.setRepeatingRequest(previewRequest.build(), captureListener,
+                                mHandler);
+
+                        // Cancel triggers
+
+                        cancelTriggersAndWait(previewRequest, captureListener, afMode);
+
+                        //
+                        // Trigger AF and AE together
+
+                        if (VERBOSE) {
+                            Log.v(TAG, String.format("Triggering AF and AE together"));
+                        }
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_START);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+
+                        CaptureRequest triggerRequest = previewRequest.build();
+                        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+                        CaptureResult triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        int aeState = triggerResult.get(CaptureResult.CONTROL_AE_STATE);
+                        int afState = triggerResult.get(CaptureResult.CONTROL_AF_STATE);
+
+                        boolean precaptureComplete = false;
+                        boolean focusComplete = false;
+
+                        for (int i = 0;
+                             i < MAX_TRIGGER_SEQUENCE_FRAMES &&
+                                     !(focusComplete && precaptureComplete);
+                             i++) {
+
+                            focusComplete = verifyAfSequence(afMode, afState, focusComplete);
+                            precaptureComplete = verifyAeSequence(aeState, precaptureComplete);
+
+                            CaptureResult sequenceResult = captureListener.getCaptureResult(
+                                    CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            afState = sequenceResult.get(CaptureResult.CONTROL_AF_STATE);
+                            aeState = sequenceResult.get(CaptureResult.CONTROL_AE_STATE);
+                        }
+
+                        assertTrue("Precapture sequence never completed!", precaptureComplete);
+                        assertTrue("Focus sequence never completed!", focusComplete);
+
+                        // Done
+
+                        stopCapture(/*fast*/ false);
+                        preview.release();
+
+                    }
+                }
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testAfThenAeTrigger() throws Exception {
+        for (String id : mCameraIds) {
+            Log.i(TAG, String.format("Testing Camera %s", id));
+
+            openDevice(id);
+            try {
+                // Legacy devices do not support precapture trigger; don't test devices that
+                // can't focus
+                if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+
+                int[] availableAfModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+                int[] availableAeModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
+
+                for (int afMode : availableAfModes) {
+
+                    if (afMode == CameraCharacteristics.CONTROL_AF_MODE_OFF ||
+                            afMode == CameraCharacteristics.CONTROL_AF_MODE_EDOF) {
+                        // Only test AF modes that have meaningful trigger behavior
+                        continue;
+                    }
+
+                    for (int aeMode : availableAeModes) {
+                        if (aeMode ==  CameraCharacteristics.CONTROL_AE_MODE_OFF) {
+                            // Only test AE modes that have meaningful trigger behavior
+                            continue;
+                        }
+
+                        SurfaceTexture preview = new SurfaceTexture(/*random int*/ 1);
+
+                        CaptureRequest.Builder previewRequest =
+                                prepareTriggerTestSession(preview, aeMode, afMode);
+
+                        SimpleCaptureCallback captureListener =
+                                new CameraTestUtils.SimpleCaptureCallback();
+
+                        mCameraSession.setRepeatingRequest(previewRequest.build(), captureListener,
+                                mHandler);
+
+                        // Cancel triggers
+
+                        cancelTriggersAndWait(previewRequest, captureListener, afMode);
+
+                        //
+                        // AF with AE a request later
+
+                        if (VERBOSE) {
+                            Log.v(TAG, "Trigger AF, then AE trigger on next request");
+                        }
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_START);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+
+                        CaptureRequest triggerRequest = previewRequest.build();
+                        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+
+                        CaptureRequest triggerRequest2 = previewRequest.build();
+                        mCameraSession.capture(triggerRequest2, captureListener, mHandler);
+
+                        CaptureResult triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        int afState = triggerResult.get(CaptureResult.CONTROL_AF_STATE);
+
+                        boolean precaptureComplete = false;
+                        boolean focusComplete = false;
+
+                        focusComplete = verifyAfSequence(afMode, afState, focusComplete);
+
+                        triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest2, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        afState = triggerResult.get(CaptureResult.CONTROL_AF_STATE);
+                        int aeState = triggerResult.get(CaptureResult.CONTROL_AE_STATE);
+
+                        for (int i = 0;
+                             i < MAX_TRIGGER_SEQUENCE_FRAMES &&
+                                     !(focusComplete && precaptureComplete);
+                             i++) {
+
+                            focusComplete = verifyAfSequence(afMode, afState, focusComplete);
+                            precaptureComplete = verifyAeSequence(aeState, precaptureComplete);
+
+                            CaptureResult sequenceResult = captureListener.getCaptureResult(
+                                    CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            afState = sequenceResult.get(CaptureResult.CONTROL_AF_STATE);
+                            aeState = sequenceResult.get(CaptureResult.CONTROL_AE_STATE);
+                        }
+
+                        assertTrue("Precapture sequence never completed!", precaptureComplete);
+                        assertTrue("Focus sequence never completed!", focusComplete);
+
+                        // Done
+
+                        stopCapture(/*fast*/ false);
+                        preview.release();
+
+                    }
+                }
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testAeThenAfTrigger() throws Exception {
+        for (String id : mCameraIds) {
+            Log.i(TAG, String.format("Testing Camera %s", id));
+
+            openDevice(id);
+            try {
+                // Legacy devices do not support precapture trigger; don't test devices that
+                // can't focus
+                if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+
+                int[] availableAfModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+                int[] availableAeModes = mStaticInfo.getCharacteristics().get(
+                    CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
+
+                for (int afMode : availableAfModes) {
+
+                    if (afMode == CameraCharacteristics.CONTROL_AF_MODE_OFF ||
+                            afMode == CameraCharacteristics.CONTROL_AF_MODE_EDOF) {
+                        // Only test AF modes that have meaningful trigger behavior
+                        continue;
+                    }
+
+                    for (int aeMode : availableAeModes) {
+                        if (aeMode ==  CameraCharacteristics.CONTROL_AE_MODE_OFF) {
+                            // Only test AE modes that have meaningful trigger behavior
+                            continue;
+                        }
+
+                        SurfaceTexture preview = new SurfaceTexture(/*random int*/ 1);
+
+                        CaptureRequest.Builder previewRequest =
+                                prepareTriggerTestSession(preview, aeMode, afMode);
+
+                        SimpleCaptureCallback captureListener =
+                                new CameraTestUtils.SimpleCaptureCallback();
+
+                        mCameraSession.setRepeatingRequest(previewRequest.build(), captureListener,
+                                mHandler);
+
+                        // Cancel triggers
+
+                        cancelTriggersAndWait(previewRequest, captureListener, afMode);
+
+                        //
+                        // AE with AF a request later
+
+                        if (VERBOSE) {
+                            Log.v(TAG, "Trigger AE, then AF trigger on next request");
+                        }
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+
+                        CaptureRequest triggerRequest = previewRequest.build();
+                        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+                        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                                CaptureRequest.CONTROL_AF_TRIGGER_START);
+                        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+
+                        CaptureRequest triggerRequest2 = previewRequest.build();
+                        mCameraSession.capture(triggerRequest2, captureListener, mHandler);
+
+                        CaptureResult triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        int aeState = triggerResult.get(CaptureResult.CONTROL_AE_STATE);
+
+                        boolean precaptureComplete = false;
+                        boolean focusComplete = false;
+
+                        precaptureComplete = verifyAeSequence(aeState, precaptureComplete);
+
+                        triggerResult = captureListener.getCaptureResultForRequest(
+                                triggerRequest2, MAX_RESULT_STATE_CHANGE_WAIT_FRAMES);
+                        int afState = triggerResult.get(CaptureResult.CONTROL_AF_STATE);
+                        aeState = triggerResult.get(CaptureResult.CONTROL_AE_STATE);
+
+                        for (int i = 0;
+                             i < MAX_TRIGGER_SEQUENCE_FRAMES &&
+                                     !(focusComplete && precaptureComplete);
+                             i++) {
+
+                            focusComplete = verifyAfSequence(afMode, afState, focusComplete);
+                            precaptureComplete = verifyAeSequence(aeState, precaptureComplete);
+
+                            CaptureResult sequenceResult = captureListener.getCaptureResult(
+                                    CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+                            afState = sequenceResult.get(CaptureResult.CONTROL_AF_STATE);
+                            aeState = sequenceResult.get(CaptureResult.CONTROL_AE_STATE);
+                        }
+
+                        assertTrue("Precapture sequence never completed!", precaptureComplete);
+                        assertTrue("Focus sequence never completed!", focusComplete);
+
+                        // Done
+
+                        stopCapture(/*fast*/ false);
+                        preview.release();
+
+                    }
+                }
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    private CaptureRequest.Builder prepareTriggerTestSession(
+            SurfaceTexture preview, int aeMode, int afMode) throws Exception {
+        Log.i(TAG, String.format("Testing AE mode %s, AF mode %s",
+                        StaticMetadata.AE_MODE_NAMES[aeMode],
+                        StaticMetadata.AF_MODE_NAMES[afMode]));
+
+
+        Surface previewSurface = new Surface(preview);
+
+        preview.setDefaultBufferSize(640, 480);
+
+        ArrayList<Surface> sessionOutputs = new ArrayList<>();
+        sessionOutputs.add(previewSurface);
+
+        createSession(sessionOutputs);
+
+        CaptureRequest.Builder previewRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+        previewRequest.addTarget(previewSurface);
+
+        previewRequest.set(CaptureRequest.CONTROL_AE_MODE, aeMode);
+        previewRequest.set(CaptureRequest.CONTROL_AF_MODE, afMode);
+
+        return previewRequest;
+    }
+
+    private void cancelTriggersAndWait(CaptureRequest.Builder previewRequest,
+            SimpleCaptureCallback captureListener, int afMode) throws Exception {
+        previewRequest.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
+        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL);
+
+        CaptureRequest triggerRequest = previewRequest.build();
+        mCameraSession.capture(triggerRequest, captureListener, mHandler);
+
+        // Wait for a few frames to initialize 3A
+
+        CaptureResult previewResult = null;
+        int afState;
+        int aeState;
+
+        for (int i = 0; i < PREVIEW_WARMUP_FRAMES; i++) {
+            previewResult = captureListener.getCaptureResult(
+                    CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
+            if (VERBOSE) {
+                afState = previewResult.get(CaptureResult.CONTROL_AF_STATE);
+                aeState = previewResult.get(CaptureResult.CONTROL_AE_STATE);
+                Log.v(TAG, String.format("AF state: %s, AE state: %s",
+                                StaticMetadata.AF_STATE_NAMES[afState],
+                                StaticMetadata.AE_STATE_NAMES[aeState]));
+            }
+        }
+
+        // Verify starting states
+
+        afState = previewResult.get(CaptureResult.CONTROL_AF_STATE);
+        aeState = previewResult.get(CaptureResult.CONTROL_AE_STATE);
+
+        switch (afMode) {
+            case CaptureResult.CONTROL_AF_MODE_AUTO:
+            case CaptureResult.CONTROL_AF_MODE_MACRO:
+                assertTrue(String.format("AF state not INACTIVE, is %s",
+                                StaticMetadata.AF_STATE_NAMES[afState]),
+                        afState == CaptureResult.CONTROL_AF_STATE_INACTIVE);
+                break;
+            case CaptureResult.CONTROL_AF_MODE_CONTINUOUS_PICTURE:
+            case CaptureResult.CONTROL_AF_MODE_CONTINUOUS_VIDEO:
+                // After several frames, AF must no longer be in INACTIVE state
+                assertTrue(String.format("In AF mode %s, AF state not PASSIVE_SCAN" +
+                                ", PASSIVE_FOCUSED, or PASSIVE_UNFOCUSED, is %s",
+                                StaticMetadata.AF_MODE_NAMES[afMode],
+                                StaticMetadata.AF_STATE_NAMES[afState]),
+                        afState == CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN ||
+                        afState == CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED ||
+                        afState == CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED);
+                break;
+            default:
+                fail("unexpected af mode");
+        }
+
+        // After several frames, AE must no longer be in INACTIVE state
+        assertTrue(String.format("AE state must be SEARCHING, CONVERGED, " +
+                        "or FLASH_REQUIRED, is %s", StaticMetadata.AE_STATE_NAMES[aeState]),
+                aeState == CaptureResult.CONTROL_AE_STATE_SEARCHING ||
+                aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED ||
+                aeState == CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED);
+    }
+
+    private boolean verifyAfSequence(int afMode, int afState, boolean focusComplete) {
+        if (focusComplete) {
+            assertTrue(String.format("AF Mode %s: Focus lock lost after convergence: AF state: %s",
+                            StaticMetadata.AF_MODE_NAMES[afMode],
+                            StaticMetadata.AF_STATE_NAMES[afState]),
+                    afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED ||
+                    afState ==CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED);
+            return focusComplete;
+        }
+        if (VERBOSE) {
+            Log.v(TAG, String.format("AF mode: %s, AF state: %s",
+                            StaticMetadata.AF_MODE_NAMES[afMode],
+                            StaticMetadata.AF_STATE_NAMES[afState]));
+        }
+        switch (afMode) {
+            case CaptureResult.CONTROL_AF_MODE_AUTO:
+            case CaptureResult.CONTROL_AF_MODE_MACRO:
+                assertTrue(String.format("AF mode %s: Unexpected AF state %s",
+                                StaticMetadata.AF_MODE_NAMES[afMode],
+                                StaticMetadata.AF_STATE_NAMES[afState]),
+                        afState == CaptureResult.CONTROL_AF_STATE_ACTIVE_SCAN ||
+                        afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED ||
+                        afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED);
+                focusComplete =
+                        (afState != CaptureResult.CONTROL_AF_STATE_ACTIVE_SCAN);
+                break;
+            case CaptureResult.CONTROL_AF_MODE_CONTINUOUS_PICTURE:
+                assertTrue(String.format("AF mode %s: Unexpected AF state %s",
+                                StaticMetadata.AF_MODE_NAMES[afMode],
+                                StaticMetadata.AF_STATE_NAMES[afState]),
+                        afState == CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN ||
+                        afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED ||
+                        afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED);
+                focusComplete =
+                        (afState != CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN);
+                break;
+            case CaptureResult.CONTROL_AF_MODE_CONTINUOUS_VIDEO:
+                assertTrue(String.format("AF mode %s: Unexpected AF state %s",
+                                StaticMetadata.AF_MODE_NAMES[afMode],
+                                StaticMetadata.AF_STATE_NAMES[afState]),
+                        afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED ||
+                        afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED);
+                focusComplete = true;
+                break;
+            default:
+                fail("Unexpected AF mode: " + StaticMetadata.AF_MODE_NAMES[afMode]);
+        }
+        return focusComplete;
+    }
+
+    private boolean verifyAeSequence(int aeState, boolean precaptureComplete) {
+        if (precaptureComplete) {
+            assertTrue("Precapture state seen after convergence",
+                    aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE);
+            return precaptureComplete;
+        }
+        if (VERBOSE) {
+            Log.v(TAG, String.format("AE state: %s", StaticMetadata.AE_STATE_NAMES[aeState]));
+        }
+        switch (aeState) {
+            case CaptureResult.CONTROL_AE_STATE_PRECAPTURE:
+                // scan still continuing
+                break;
+            case CaptureResult.CONTROL_AE_STATE_CONVERGED:
+            case CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED:
+                // completed
+                precaptureComplete = true;
+                break;
+            default:
+                fail(String.format("Precapture sequence transitioned to "
+                                + "state %s incorrectly!", StaticMetadata.AE_STATE_NAMES[aeState]));
+                break;
+        }
+        return precaptureComplete;
     }
 
     /**
