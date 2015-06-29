@@ -18,7 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.widget.R;
 
-
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
 import android.view.View;
