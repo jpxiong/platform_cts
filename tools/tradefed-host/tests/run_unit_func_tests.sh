@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,4 +45,4 @@ for JAR in $JARS; do
 done
 
 java $RDBG_FLAG \
-  -cp ${JAR_PATH} com.android.tradefed.command.Console run singleCommand host -n --class com.android.cts.tradefed.UnitTests "$@"
+  -cp ${JAR_PATH} com.android.tradefed.command.Console run singleCommand host --class com.android.cts.tradefed.FuncTests "$@"

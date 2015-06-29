@@ -1058,6 +1058,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         if (!mSkipDeviceInfo) {
             String abi = AbiFormatter.getDefaultAbi(device, "");
             DeviceInfoCollector.collectDeviceInfo(device, abi, ctsBuild.getTestCasesDir(), listener);
+            DeviceInfoCollector.collectExtendedDeviceInfo(
+                device, abi, ctsBuild.getTestCasesDir(), listener, mBuildInfo);
         }
     }
 
