@@ -17,7 +17,6 @@
 package android.widget.cts;
 
 import com.android.cts.widget.R;
-import com.google.android.collect.Lists;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -43,13 +42,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -729,7 +726,8 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
     @MediumTest
     public void testRequestLayout() throws Exception {
         ListView listView = new ListView(mActivity);
-        List<String> items = Lists.newArrayList("hello");
+        List<String> items = new ArrayList<>();
+        items.add("hello");
         Adapter<String> adapter = new Adapter<String>(mActivity, 0, items);
         listView.setAdapter(adapter);
 
@@ -753,7 +751,8 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
         ListView listView = new ListView(mActivity);
         // We use a header as the unselectable item to remain after the selectable one is removed.
         listView.addHeaderView(new View(mActivity), null, false);
-        List<String> items = Lists.newArrayList("hello");
+        List<String> items = new ArrayList<>();
+        items.add("hello");
         Adapter<String> adapter = new Adapter<String>(mActivity, 0, items);
         listView.setAdapter(adapter);
 
