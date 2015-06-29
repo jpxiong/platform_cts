@@ -358,7 +358,11 @@ public class PopupWindowTest extends
         assertTrue(maxAvailableHeightWithOffset <= avaliable);
 
         anchorView = mActivity.findViewById(R.id.anchor_lower);
-        avaliable = getDisplay().getHeight() - anchorView.getHeight();
+        // On some devices the view might actually have larger size than the physical display
+        // due to chin and content will be laid out as if outside of the display. We need to use
+        // larger from the display height and the main view height.
+        avaliable = Math.max(getDisplay().getHeight(),
+                mActivity.findViewById(android.R.id.content).getHeight()) - anchorView.getHeight();
         maxAvailableHeight = mPopupWindow.getMaxAvailableHeight(anchorView);
         assertTrue(maxAvailableHeight > 0);
         assertTrue(maxAvailableHeight <= avaliable);
