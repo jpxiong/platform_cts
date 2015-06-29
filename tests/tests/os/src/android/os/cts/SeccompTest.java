@@ -51,9 +51,6 @@ public class SeccompTest extends AndroidTestCase {
     }
 
     public void testSeccomp() {
-        if (CpuFeatures.isArm64Cpu() || CpuFeatures.isArm64CpuIn32BitMode()) {
-            return; // seccomp not yet supported on arm64
-        }
         if (OSFeatures.needsSeccompSupport()) {
             assertTrue("Please enable seccomp support "
                        + "in your kernel (CONFIG_SECCOMP_FILTER=y)",
