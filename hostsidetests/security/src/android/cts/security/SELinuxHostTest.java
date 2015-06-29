@@ -66,6 +66,7 @@ public class SELinuxHostTest extends DeviceTestCase {
     private File deviceFcFile;
     private File devicePcFile;
     private File deviceSvcFile;
+    private File seappNeverAllowFile;
 
     /**
      * A reference to the device under test.
@@ -133,6 +134,7 @@ public class SELinuxHostTest extends DeviceTestCase {
         aospFcFile = copyResourceToTempFile("/general_file_contexts");
         aospPcFile = copyResourceToTempFile("/general_property_contexts");
         aospSvcFile = copyResourceToTempFile("/general_service_contexts");
+        seappNeverAllowFile = copyResourceToTempFile("/general_seapp_neverallows");
     }
 
     /**
@@ -204,14 +206,12 @@ public class SELinuxHostTest extends DeviceTestCase {
      * @throws Exception
      */
     public void testValidSeappContexts() throws Exception {
-        File OutputFile = File.createTempFile("seapp_output", ".tmp");
-        OutputFile.deleteOnExit();
 
         /* run checkseapp on seapp_contexts */
         ProcessBuilder pb = new ProcessBuilder(checkSeapp.getAbsolutePath(),
                 "-p", devicePolicyFile.getAbsolutePath(),
-                deviceSeappFile.getAbsolutePath(),
-                "-o", OutputFile.getAbsolutePath());
+                seappNeverAllowFile.getAbsolutePath(),
+                deviceSeappFile.getAbsolutePath());
         pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         pb.redirectErrorStream(true);
         Process p = pb.start();
