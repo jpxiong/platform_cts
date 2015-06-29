@@ -49,7 +49,7 @@ import java.util.List;
  * android.permission.ACCESS_LOCATION_EXTRA_COMMANDS to send extra commands to GPS provider
  */
 public class LocationManagerTest extends InstrumentationTestCase {
-    private static final long TEST_TIME_OUT = 5000;
+    private static final long TEST_TIME_OUT = 10000;
 
     private static final String TEST_MOCK_PROVIDER_NAME = "test_provider";
 
