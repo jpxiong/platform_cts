@@ -184,7 +184,7 @@ public class ListPopupWindowTest extends
         final View upperAnchor = mActivity.findViewById(R.id.anchor_upper);
         mPopupWindow.setAnchorView(upperAnchor);
         mPopupWindow.setWindowLayoutType(
-                WindowManager.LayoutParams.TYPE_APPLICATION_ABOVE_SUB_PANEL);
+                WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -197,7 +197,7 @@ public class ListPopupWindowTest extends
 
         WindowManager.LayoutParams p = (WindowManager.LayoutParams)
                 mPopupWindow.getListView().getRootView().getLayoutParams();
-        assertEquals(WindowManager.LayoutParams.TYPE_APPLICATION_ABOVE_SUB_PANEL, p.type);
+        assertEquals(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL, p.type);
 
         dismissPopup();
     }

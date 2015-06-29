@@ -32,13 +32,9 @@ import android.test.AndroidTestCase;
 import android.text.format.DateUtils;
 import android.webkit.cts.CtsTestServer;
 
-import com.google.android.collect.Sets;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class DownloadManagerTest extends AndroidTestCase {
 
@@ -309,7 +305,7 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     private class DownloadCompleteReceiver extends BroadcastReceiver {
-        private HashSet<Long> mCompleteIds = Sets.newHashSet();
+        private HashSet<Long> mCompleteIds = new HashSet<>();
 
         public DownloadCompleteReceiver() {
         }
