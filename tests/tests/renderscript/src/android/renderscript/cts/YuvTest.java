@@ -97,11 +97,11 @@ public class YuvTest extends RSBaseCompute {
         Allocation ta = Allocation.createSized(mRS, Element.U8(mRS), tmp.length);
         ta.copyFrom(tmp);
 
-
         ScriptIntrinsicYuvToRGB syuv = ScriptIntrinsicYuvToRGB.create(mRS, Element.U8(mRS));
         syuv.setInput(ta);
         syuv.forEach(aout);
-
+        
+        mVerify.set_gAllowedIntError(2); // this will allow for less strict implementation
         ScriptC_yuv script = new ScriptC_yuv(mRS);
         script.invoke_makeRef(ay, au, av, aref);
 
@@ -141,7 +141,8 @@ public class YuvTest extends RSBaseCompute {
         }
         ta.copyFrom(tmp);
         script.invoke_makeRef(ay, au, av, aref);
-
+        
+        mVerify.set_gAllowedIntError(2); // this will allow for less strict implementation
         syuv.setInput(ta);
         syuv.forEach(aout);
         mVerify.invoke_verify(aref, aout, ay);
@@ -186,6 +187,7 @@ public class YuvTest extends RSBaseCompute {
         }
         ta.copyFrom(tmp);
         script.invoke_makeRef(ay, au, av, aref);
+        mVerify.set_gAllowedIntError(2); // this will allow for less strict implementation
 
         syuv.setInput(ta);
         syuv.forEach(aout);
@@ -236,6 +238,7 @@ public class YuvTest extends RSBaseCompute {
         mVerify.invoke_verify(aref, aout, ay);
 
         mRS.finish();
+        mVerify.set_gAllowedFloatError(0.01f); // this will allow for less strict implementation
         mVerify.invoke_checkError();
         waitForMessage();
         checkForErrors();
@@ -266,11 +269,13 @@ public class YuvTest extends RSBaseCompute {
             tmp[i++] = bv[j];
             tmp[i++] = bu[j];
         }
+
         ta.copyFrom(tmp);
         script.invoke_makeRef_f4(ay, au, av, aref);
 
         script.set_mInput(ta);
         script.forEach_cvt_f4(aout);
+        mVerify.set_gAllowedFloatError(0.01f); // this will allow for less strict implementation
         mVerify.invoke_verify(aref, aout, ay);
 
         mRS.finish();

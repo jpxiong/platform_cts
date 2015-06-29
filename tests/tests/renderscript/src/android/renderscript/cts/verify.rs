@@ -17,12 +17,13 @@
 #include "shared.rsh"
 
 int gAllowedIntError = 0;
+float gAllowedFloatError = 0.0001f;
 static bool hadError = false;
 static int2 errorLoc = {0,0};
 
 
 static bool compare_float(float f1, float f2) {
-    if (fabs(f1-f2) > 0.0001f) {
+    if (fabs(f1-f2) > gAllowedFloatError) {
         hadError = true;
         return false;
     }
