@@ -33,6 +33,9 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
                                apache-commons-math \
                                androidplot \
                                ctsverifier-opencv \
+                               core-tests \
+                               mockito-target \
+                               mockwebserver \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 

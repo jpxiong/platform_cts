@@ -1165,6 +1165,23 @@
     <string name="caboot_reboot_desc">Please reboot the device and return to this test.</string>
     <string name="caboot_after_boot">AFTER REBOOTING: Check that there is a notification that the network may be monitored. Opening that notification should show a dialog box giving more information, with a button to check trusted credentials. This should open up the same view of trusted credentials that you get via the "Check credentials" button.</string>
 
+    <!-- Strings for KeyChain -->
+    <string name="keychain_test">KeyChain Storage Test</string>
+    <string name="keychain_info">This test checks that credentials installed to the system can be granted, retrieved, and used to create valid HTTPS connections.</string>
+    <string name="keychain_reset">Reset</string>
+    <string name="keychain_skip">Skip</string>
+    <string name="keychain_setup_desc">The first step sets up an internal KeyStore and generates credentials to use for the remainder of the test.\n\n
+ Touch \'Next\' to begin.</string>
+    <string name="keychain_install_desc">Credentials generated. Touch \'Next\' to install them to the system keychain.\n\n
+The container for the credentials will not be protected with a password; if prompted for one, leave that field blank.\n\n
+During installation you may be prompted for a name - accept the default suggestion.\n\n
+In the case that these credentials were already installed, you may skip this step.</string>
+    <string name="keychain_https_desc">The last test involves setting up an HTTPS connection using credentials from the KeyChain.\n\n
+You should be prompted to select credentials; choose the ones you just installed in the previous step.</string>
+    <string name="keychain_reset_desc">Before marking this test as passed, touch \'Next\' to open security settings and reset the following items:\n
+ 1. Clear device credentials.\n
+ 2. Change the lock screen type to \'None\'.</string>
+
     <!-- Strings for Widget -->
     <string name="widget_framework_test">Widget Framework Test</string>
     <string name="widget_framework_test_info">This test checks some basic features of the widget
