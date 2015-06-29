@@ -52,17 +52,17 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
 
         new Spinner(mTargetContext, null);
 
-        new Spinner(mTargetContext, null, com.android.internal.R.attr.spinnerStyle);
+        new Spinner(mTargetContext, null, android.R.attr.spinnerStyle);
 
         new Spinner(mTargetContext, Spinner.MODE_DIALOG);
 
-        new Spinner(mTargetContext, null, com.android.internal.R.attr.spinnerStyle,
+        new Spinner(mTargetContext, null, android.R.attr.spinnerStyle,
                 Spinner.MODE_DIALOG);
 
-        new Spinner(mTargetContext, null, com.android.internal.R.attr.spinnerStyle, 0,
+        new Spinner(mTargetContext, null, android.R.attr.spinnerStyle, 0,
                 Spinner.MODE_DIALOG);
 
-        new Spinner(mTargetContext, null, com.android.internal.R.attr.spinnerStyle, 0,
+        new Spinner(mTargetContext, null, android.R.attr.spinnerStyle, 0,
                 Spinner.MODE_DIALOG, mTargetContext.getTheme());
 
         Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner1);
@@ -173,7 +173,7 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
     public void testGetPopupContext() {
         Theme theme = mTargetContext.getResources().newTheme();
         Spinner themeSpinner = new Spinner(mTargetContext, null,
-                com.android.internal.R.attr.spinnerStyle, 0, Spinner.MODE_DIALOG, theme);
+                android.R.attr.spinnerStyle, 0, Spinner.MODE_DIALOG, theme);
         assertNotSame(mTargetContext, themeSpinner.getPopupContext());
         assertSame(theme, themeSpinner.getPopupContext().getTheme());
 
