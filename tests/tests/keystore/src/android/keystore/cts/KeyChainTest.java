@@ -27,6 +27,42 @@ public class KeyChainTest extends AndroidTestCase {
         assertTrue("RSA must be supported", KeyChain.isKeyAlgorithmSupported("RSA"));
     }
 
+    public void testNullPrivateKeyArgumentsFail() {
+        try {
+            KeyChain.getPrivateKey(null, null);
+            fail("NullPointerException was expected for null arguments to "
+                    + "KeyChain.getPrivateKey(Context, String)");
+        } catch (NullPointerException expected) {
+        }
+    }
+
+    public void testNullPrivateKeyAliasArgumentFails() {
+        try {
+            KeyChain.getPrivateKey(this, null);
+            fail("NullPointerException was expected with null String argument to "
+                        + "KeyChain.getPrivateKey(Context, String).");
+        } catch (NullPointerException expected) {
+        }
+    }
+
+    public void testNullPrivateKeyContextArgumentFails() {
+        try {
+            KeyChain.getPrivateKey(null, "");
+            fail("NullPointerException was expected with null Context argument to "
+                    + "KeyChain.getPrivateKey(Context, String).");
+        } catch (NullPointerException expected) {
+        }
+    }
+
+    public void testGetPrivateKeyOnMainThreadFails() {
+        try {
+            KeyChain.getPrivateKey(this, "");
+            fail("IllegalStateException was expected for calling "
+                    + "KeyChain.getPrivateKey(Context, String) on main thread");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
     /**
      * Tests whether the required algorithms are backed by a Keymaster HAL that
      * binds the key material to the specific device it was created or imported
