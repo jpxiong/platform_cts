@@ -84,7 +84,7 @@ public class StrictModeTest extends AndroidTestCase {
     }
 
     private String readLogSince(long millis) throws Exception {
-        final SimpleDateFormat format = new SimpleDateFormat("MM-DD HH:mm:ss.SSS");
+        final SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
         final Process proc = new ProcessBuilder("logcat", "-t", format.format(new Date(millis)))
                 .redirectErrorStream(true).start();
 
