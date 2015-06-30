@@ -17,13 +17,14 @@
 #include "shared.rsh"
 
 int gAllowedIntError = 0;
-double gAllowedFloatError = 0.00000001;
-double gAllowedDoubleError = 0.00000000001;
+float gAllowedFloatError = 0.0001f;
+double gAllowedFloatMatError = 0.00000001;
+double gAllowedDoubleMatError = 0.00000000001;
 static bool hadError = false;
 static int2 errorLoc = {0,0};
 
 static bool compare_float(float f1, float f2) {
-    if (fabs(f1-f2) > 0.0001f) {
+    if (fabs(f1-f2) > gAllowedFloatError) {
         hadError = true;
         return false;
     }
@@ -316,7 +317,7 @@ static bool verify_CMatrix(rs_allocation in1, rs_allocation in2, double l2Norm, 
             float2 pref = rsGetElementAt_float2(in1, x, y);
             float2 ptst = rsGetElementAt_float2(in2, x, y);
             double absErr = (pref.x - ptst.x) * (pref.x - ptst.x) + (pref.y - ptst.y) * (pref.y - ptst.y);
-            if (absErr > l2Norm * gAllowedFloatError) {
+            if (absErr > l2Norm * gAllowedFloatMatError) {
                 errorLoc.x = x;
                 errorLoc.y = y;
                 hadError = true;
@@ -340,7 +341,7 @@ static bool verify_SMatrix(rs_allocation in1, rs_allocation in2, double l2Norm, 
             float pref = rsGetElementAt_float(in1, x, y);
             float ptst = rsGetElementAt_float(in2, x, y);
             double absErr = (pref - ptst) * (pref - ptst);
-            if (absErr > l2Norm * gAllowedFloatError) {
+            if (absErr > l2Norm * gAllowedFloatMatError) {
                 errorLoc.x = x;
                 errorLoc.y = y;
                 hadError = true;
@@ -364,7 +365,7 @@ static bool verify_ZMatrix(rs_allocation in1, rs_allocation in2, double l2Norm, 
             double2 pref = rsGetElementAt_double2(in1, x, y);
             double2 ptst = rsGetElementAt_double2(in2, x, y);
             double absErr = (pref.x - ptst.x) * (pref.x - ptst.x) + (pref.y - ptst.y) * (pref.y - ptst.y);
-            if (absErr > l2Norm * gAllowedDoubleError) {
+            if (absErr > l2Norm * gAllowedDoubleMatError) {
                 errorLoc.x = x;
                 errorLoc.y = y;
                 hadError = true;
@@ -388,7 +389,7 @@ static bool verify_DMatrix(rs_allocation in1, rs_allocation in2, double l2Norm, 
             double pref = rsGetElementAt_double(in1, x, y);
             double ptst = rsGetElementAt_double(in2, x, y);
             double absErr = (pref - ptst) * (pref - ptst);
-            if (absErr > l2Norm * gAllowedDoubleError) {
+            if (absErr > l2Norm * gAllowedDoubleMatError) {
                 errorLoc.x = x;
                 errorLoc.y = y;
                 hadError = true;
