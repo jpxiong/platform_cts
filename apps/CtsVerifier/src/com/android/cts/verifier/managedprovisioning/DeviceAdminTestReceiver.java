@@ -22,9 +22,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Profile owner receiver for BYOD flow test.
@@ -32,6 +30,16 @@ import android.widget.Toast;
  */
 public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
         private static final String TAG = "DeviceAdminTestReceiver";
+        private static final String DEVICE_OWNER_PKG =
+                "com.android.cts.verifier";
+        private static final String ADMIN_RECEIVER_TEST_CLASS =
+                DEVICE_OWNER_PKG + ".managedprovisioning.DeviceAdminTestReceiver";
+        private static final ComponentName RECEIVER_COMPONENT_NAME = new ComponentName(
+                DEVICE_OWNER_PKG, ADMIN_RECEIVER_TEST_CLASS);
+
+        public static ComponentName getReceiverComponentName() {
+            return RECEIVER_COMPONENT_NAME;
+        }
 
         @Override
         public void onProfileProvisioningComplete(Context context, Intent intent) {
