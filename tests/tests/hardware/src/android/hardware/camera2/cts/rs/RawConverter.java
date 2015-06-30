@@ -608,8 +608,11 @@ public class RawConverter {
         float[] referenceNeutral = new float[3];
         map(inverseInterpolatedCC, cameraNeutral, /*out*/referenceNeutral);
         if (DEBUG) Log.d(TAG, "Reference neutral: " + Arrays.toString(referenceNeutral));
-        float[] D = new float[] { 1/referenceNeutral[0], 0, 0,  0, 1/referenceNeutral[1], 0, 0, 0,
-                1/referenceNeutral[2] };
+        float maxNeutral = Math.max(Math.max(referenceNeutral[0], referenceNeutral[1]),
+                referenceNeutral[2]);
+        float[] D = new float[] { maxNeutral/referenceNeutral[0], 0, 0,
+                                  0, maxNeutral/referenceNeutral[1], 0,
+                                  0, 0, maxNeutral/referenceNeutral[2] };
         if (DEBUG) Log.d(TAG, "Reference Neutral Diagonal: " + Arrays.toString(D));
 
         float[] intermediate = new float[9];
