@@ -341,6 +341,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 Log.i(TAG, "Testing AE precapture cancel for jpeg capture for Camera " + id);
                 openDevice(id);
 
+                // Legacy device doesn't support AE precapture trigger
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skipping AE precapture trigger cancel test on legacy devices");
+                    continue;
+                }
+
                 takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null,
                         /*addAeTriggerCancel*/true);
             } finally {
