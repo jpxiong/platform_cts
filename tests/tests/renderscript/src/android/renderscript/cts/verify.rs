@@ -389,7 +389,7 @@ static bool verify_DMatrix(rs_allocation in1, rs_allocation in2, double l2Norm, 
             double pref = rsGetElementAt_double(in1, x, y);
             double ptst = rsGetElementAt_double(in2, x, y);
             double absErr = (pref - ptst) * (pref - ptst);
-            if (absErr > l2Norm * gAllowedDoubleError) {
+            if (absErr > l2Norm * gAllowedDoubleMatError) {
                 errorLoc.x = x;
                 errorLoc.y = y;
                 hadError = true;
