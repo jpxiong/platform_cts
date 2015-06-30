@@ -1366,9 +1366,11 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="snsr_rotation_vector_set_final">Place the device back to the reference position.</string>
     <string name="snsr_rotation_vector_verification">Angular deviation [%1$4.1f %2$4.1f %3$4.1f]. Current: %4$f deg. Max tolerated: %5$f.</string>
 
+    <!-- Strings common for BYOD and DO managed provisioning tests. -->
+    <string name="afw_device_admin">CTS Verifier - AfW Admin</string>
+
     <!-- Strings for BYOD managed provisioning tests (ByodFlowTestActivity) -->
     <string name="test_category_managed_provisioning">Managed Provisioning</string>
-    <string name="provisioning_byod_device_admin">CTS Verifier - BYOD Admin</string>
     <string name="provisioning_byod">BYOD Managed Provisioning</string>
     <string name="provisioning_byod_info">
         This test exercises the BYOD managed provisioning flow.
@@ -1454,7 +1456,7 @@ You should be prompted to select credentials; choose the ones you just installed
         Navigate to Device administrators and confirm that:\n
         \n
         - Both Personal and Work categories exist.\n
-        - \"CTS Verifier - BYOD Admin\" exists under the Work category, and is activated.\n
+        - \"CTS Verifier - AfW Admin\" exists under the Work category, and is activated.\n
         \n
         Use the Back button to return to this page.
     </string>
@@ -1525,6 +1527,40 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="device_owner_negative_test">Device owner negative test</string>
     <string name="device_owner_negative_test_info">Please click the "Start provisioning" button, and when you see a warning dialog telling the device is already set up, select "pass". Otherwise, select "fail".</string>
     <string name="start_device_owner_provisioning_button">Start provisioning</string>
+    <string name="positive_device_owner">Device Owner Tests</string>
+    <string name="device_owner_positive_tests">Device Owner positive tests</string>
+    <string name="device_owner_positive_tests_instructions">
+            The positive device owner tests verify policies on a corporate owned device.\n
+            Press below button first, follow steps described in the dialog that pops up,
+            then proceed to the test cases.\n
+            Pressing \'back\', \'pass\' or \'fail\' on this test page will remove the device owner.\n
+            Alternatively, you can run the \'Remove device owner\' test. Ideally, that test should
+            be run last so that it does not interfere with other tests.
+    </string>
+    <string name="device_owner_positive_tests_info">
+            The positive device owner tests verify policies on a corporate owned device.\n
+            Press below button first, follow steps described in the dialog that pops up,
+            then proceed to the test cases.\n
+            Pressing \'back\', \'pass\' or \'fail\' on this test page will remove the device owner.\n
+            Alternatively, you can run the \'Remove device owner\' test. Ideally, that test should
+            be run last so that it does not interfere with other tests.
+    </string>
+    <string name="device_owner_positive_category">Device Owner Tests</string>
+    <string name="set_device_owner_button_label">Set up device owner</string>
+    <string name="set_device_owner_dialog_title">Set up device owner</string>
+    <string name="set_device_owner_dialog_text">
+            Please set the device owner by enabling USB debugging on the device and issuing the following command on the host:\n
+            adb shell dpm set-device-owner \'com.android.cts.verifier/com.android.cts.verifier.managedprovisioning.DeviceAdminTestReceiver\'
+    </string>
+    <string name="device_owner_remove_device_owner_test">Remove device owner</string>
+    <string name="device_owner_remove_device_owner_test_info">
+            Please check in Settings &gt; Security &gt; Device Administrators if CTSVerifier is
+            Device Owner. Then press the button below, and check that CTSVerifier is NOT Device
+            Owner anymore.
+    </string>
+    <string name="remove_device_owner_button">Remove device owner</string>
+    <string name="device_owner_check_device_owner_test">Check device owner</string>
+    <string name="device_owner_incorrect_device_owner">Missing or incorrect device owner: CTSVerifier is not DO!</string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
