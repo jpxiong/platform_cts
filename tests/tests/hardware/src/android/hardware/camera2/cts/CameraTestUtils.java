@@ -23,6 +23,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraConstrainedHighSpeedCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraCharacteristics;
@@ -711,7 +712,8 @@ public class CameraTestUtils extends Assert {
                 session.isReprocessable());
         String sessionType = isHighSpeed ? "High Speed" : "Normal";
         assertTrue("Capture session type must be " + sessionType,
-                session.isConstrainedHighSpeed() == isHighSpeed);
+                isHighSpeed ==
+                CameraConstrainedHighSpeedCaptureSession.class.isAssignableFrom(session.getClass()));
 
         return session;
     }
