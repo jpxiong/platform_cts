@@ -398,9 +398,7 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             Size maxFastYuvSize = maxYuvSize;
 
             Size[] slowYuvSizes = config.getHighResolutionOutputSizes(ImageFormat.YUV_420_888);
-            assertTrue("Null slow YUV size array not allowed with BURST_CAPTURE capability!",
-                    slowYuvSizes != null);
-            if (slowYuvSizes.length > 0) {
+            if (haveBurstCapability && slowYuvSizes != null && slowYuvSizes.length > 0) {
                 Size maxSlowYuvSize = CameraTestUtils.getMaxSize(slowYuvSizes);
                 maxYuvSize = CameraTestUtils.getMaxSize(new Size[]{maxYuvSize, maxSlowYuvSize});
             }
@@ -469,6 +467,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                 (maxSyncLatency <= MAX_LATENCY_BOUND) && (maxSyncLatency >= 0);
 
             if (haveBurstCapability) {
+                assertTrue("Must have slow YUV size array when BURST_CAPTURE capability is defined!",
+                        slowYuvSizes != null);
                 assertTrue(
                         String.format("BURST-capable camera device %s does not have maximum YUV " +
                                 "size that is at least max JPEG size",
@@ -510,6 +510,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                                 mIds[counter]),
                         haveAwbLock);
             } else {
+                assertTrue("Must have null slow YUV size array when no BURST_CAPTURE capability!",
+                        slowYuvSizes == null);
                 assertTrue(
                         String.format("Camera device %s has all the requirements for BURST" +
                                 " capability but does not report it!", mIds[counter]),
