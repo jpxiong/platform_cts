@@ -18,12 +18,19 @@ package android.keystore.cts;
 
 import android.security.KeyPairGeneratorSpec;
 import android.security.KeyStoreParameter;
+import android.security.keystore.KeyProperties;
+import android.security.keystore.KeyProtection;
 import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
+import android.test.suitebuilder.annotation.LargeTest;
+
+import com.android.cts.keystore.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
@@ -52,7 +59,9 @@ import java.util.Set;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
@@ -706,6 +715,8 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
+
         // Wipe any existing entries in the KeyStore
         KeyStore ksTemp = KeyStore.getInstance("AndroidKeyStore");
         ksTemp.load(null, null);
@@ -717,6 +728,21 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
         // Get a new instance because some tests need it uninitialized
         mKeyStore = KeyStore.getInstance("AndroidKeyStore");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null, null);
+            Enumeration<String> aliases = keyStore.aliases();
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                keyStore.deleteEntry(alias);
+            }
+        } finally {
+            super.tearDown();
+        }
     }
 
     private PrivateKey generatePrivateKey(String keyType, byte[] fakeKey1) throws Exception {
@@ -1979,5 +2005,284 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
         Signature.getInstance("SHA256withECDSA").initVerify(publicKey);
         Signature.getInstance("NONEwithECDSA").initVerify(publicKey);
+    }
+
+    private static final int MIN_SUPPORTED_KEY_COUNT = 10000;
+
+    @LargeTest
+    public void testKeyStore_LargeNumberOfKeysSupported_RSA() throws Exception {
+        // This test imports key1, then lots of other keys, then key2, and then confirms that
+        // key1 and key2 backed by Android Keystore work fine. The assumption is that if the
+        // underlying implementation has a limit on the number of keys, it'll either delete the
+        // oldest key (key1), or will refuse to add keys (key2).
+
+        Certificate cert1 = TestUtils.getRawResX509Certificate(getContext(), R.raw.rsa_key1_cert);
+        PrivateKey privateKey1 = TestUtils.getRawResPrivateKey(getContext(), R.raw.rsa_key1_pkcs8);
+        String entryName1 = "test0";
+
+        Certificate cert2 = TestUtils.getRawResX509Certificate(getContext(), R.raw.rsa_key2_cert);
+        PrivateKey privateKey2 = TestUtils.getRawResPrivateKey(getContext(), R.raw.rsa_key2_pkcs8);
+        String entryName2 = "test" + MIN_SUPPORTED_KEY_COUNT;
+
+        Certificate cert3 = generateCertificate(FAKE_RSA_USER_1);
+        PrivateKey privateKey3 = generatePrivateKey("RSA", FAKE_RSA_KEY_1);
+
+        mKeyStore.load(null);
+        try {
+            KeyProtection protectionParams = new KeyProtection.Builder(
+                    KeyProperties.PURPOSE_SIGN)
+                    .setDigests(KeyProperties.DIGEST_SHA256)
+                    .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                    .build();
+            mKeyStore.setEntry(entryName1,
+                    new KeyStore.PrivateKeyEntry(privateKey1, new Certificate[] {cert1}),
+                    protectionParams);
+
+            // Import key3 many of times, under different aliases.
+            for (int i = 1; i < MIN_SUPPORTED_KEY_COUNT; i++) {
+                String entryAlias = "test" + i;
+                try {
+                    mKeyStore.setEntry(entryAlias,
+                            new KeyStore.PrivateKeyEntry(privateKey3, new Certificate[] {cert3}),
+                            protectionParams);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Entry " + entryAlias + " import failed", e);
+                }
+            }
+
+            mKeyStore.setEntry(entryName2,
+                    new KeyStore.PrivateKeyEntry(privateKey2, new Certificate[] {cert2}),
+                    protectionParams);
+            PrivateKey keystorePrivateKey2 = (PrivateKey) mKeyStore.getKey(entryName2, null);
+            PrivateKey keystorePrivateKey1 = (PrivateKey) mKeyStore.getKey(entryName1, null);
+
+            byte[] message = "This is a test".getBytes("UTF-8");
+
+            Signature sig = Signature.getInstance("SHA256withRSA");
+            sig.initSign(keystorePrivateKey1);
+            sig.update(message);
+            byte[] signature = sig.sign();
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initVerify(cert1.getPublicKey());
+            sig.update(message);
+            assertTrue(sig.verify(signature));
+
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initSign(keystorePrivateKey2);
+            sig.update(message);
+            signature = sig.sign();
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initVerify(cert2.getPublicKey());
+            sig.update(message);
+            assertTrue(sig.verify(signature));
+        } finally {
+            // Clean up Keystore without using KeyStore.aliases() which can't handle this many
+            // entries.
+            for (int i = 0; i <= MIN_SUPPORTED_KEY_COUNT; i++) {
+                mKeyStore.deleteEntry("test" + i);
+            }
+        }
+    }
+
+    @LargeTest
+    public void testKeyStore_LargeNumberOfKeysSupported_EC() throws Exception {
+        // This test imports key1, then lots of other keys, then key2, and then confirms that
+        // key1 and key2 backed by Android Keystore work fine. The assumption is that if the
+        // underlying implementation has a limit on the number of keys, it'll either delete the
+        // oldest key (key1), or will refuse to add keys (key2).
+
+        Certificate cert1 = TestUtils.getRawResX509Certificate(getContext(), R.raw.ec_key1_cert);
+        PrivateKey privateKey1 = TestUtils.getRawResPrivateKey(getContext(), R.raw.ec_key1_pkcs8);
+        String entryName1 = "test0";
+
+        Certificate cert2 = TestUtils.getRawResX509Certificate(getContext(), R.raw.ec_key2_cert);
+        PrivateKey privateKey2 = TestUtils.getRawResPrivateKey(getContext(), R.raw.ec_key2_pkcs8);
+        String entryName2 = "test" + MIN_SUPPORTED_KEY_COUNT;
+
+        Certificate cert3 = generateCertificate(FAKE_EC_USER_1);
+        PrivateKey privateKey3 = generatePrivateKey("EC", FAKE_EC_KEY_1);
+
+        mKeyStore.load(null);
+        try {
+            KeyProtection protectionParams = new KeyProtection.Builder(
+                    KeyProperties.PURPOSE_SIGN)
+                    .setDigests(KeyProperties.DIGEST_SHA256)
+                    .build();
+            mKeyStore.setEntry(entryName1,
+                    new KeyStore.PrivateKeyEntry(privateKey1, new Certificate[] {cert1}),
+                    protectionParams);
+
+            // Import key3 many of times, under different aliases.
+            for (int i = 1; i < MIN_SUPPORTED_KEY_COUNT; i++) {
+                String entryAlias = "test" + i;
+                try {
+                    mKeyStore.setEntry(entryAlias,
+                            new KeyStore.PrivateKeyEntry(privateKey3, new Certificate[] {cert3}),
+                            protectionParams);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Entry " + entryAlias + " import failed", e);
+                }
+            }
+
+            mKeyStore.setEntry(entryName2,
+                    new KeyStore.PrivateKeyEntry(privateKey2, new Certificate[] {cert2}),
+                    protectionParams);
+            PrivateKey keystorePrivateKey2 = (PrivateKey) mKeyStore.getKey(entryName2, null);
+            PrivateKey keystorePrivateKey1 = (PrivateKey) mKeyStore.getKey(entryName1, null);
+
+            byte[] message = "This is a test".getBytes("UTF-8");
+
+            Signature sig = Signature.getInstance("SHA256withECDSA");
+            sig.initSign(keystorePrivateKey1);
+            sig.update(message);
+            byte[] signature = sig.sign();
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initVerify(cert1.getPublicKey());
+            sig.update(message);
+            assertTrue(sig.verify(signature));
+
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initSign(keystorePrivateKey2);
+            sig.update(message);
+            signature = sig.sign();
+            sig = Signature.getInstance(sig.getAlgorithm());
+            sig.initVerify(cert2.getPublicKey());
+            sig.update(message);
+            assertTrue(sig.verify(signature));
+        } finally {
+            // Clean up Keystore without using KeyStore.aliases() which can't handle this many
+            // entries.
+            for (int i = 0; i <= MIN_SUPPORTED_KEY_COUNT; i++) {
+                mKeyStore.deleteEntry("test" + i);
+            }
+        }
+    }
+
+    @LargeTest
+    public void testKeyStore_LargeNumberOfKeysSupported_AES() throws Exception {
+        // This test imports key1, then lots of other keys, then key2, and then confirms that
+        // key1 and key2 backed by Android Keystore work fine. The assumption is that if the
+        // underlying implementation has a limit on the number of keys, it'll either delete the
+        // oldest key (key1), or will refuse to add keys (key2).
+
+        SecretKey key1 =
+                new SecretKeySpec(HexEncoding.decode("010203040506070809fafbfcfdfeffcc"), "AES");
+        String entryName1 = "test0";
+
+        SecretKey key2 =
+                new SecretKeySpec(HexEncoding.decode("808182838485868788897a7b7c7d7e7f"), "AES");
+        String entryName2 = "test" + MIN_SUPPORTED_KEY_COUNT;
+
+        SecretKey key3 =
+                new SecretKeySpec(HexEncoding.decode("33333333333333333333777777777777"), "AES");
+
+        mKeyStore.load(null);
+        try {
+            KeyProtection protectionParams = new KeyProtection.Builder(
+                    KeyProperties.PURPOSE_ENCRYPT)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .build();
+            mKeyStore.setEntry(entryName1, new KeyStore.SecretKeyEntry(key1), protectionParams);
+
+            // Import key3 many of times, under different aliases.
+            for (int i = 1; i < MIN_SUPPORTED_KEY_COUNT; i++) {
+                String entryAlias = "test" + i;
+                try {
+                    mKeyStore.setEntry(entryAlias, new KeyStore.SecretKeyEntry(key3), protectionParams);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Entry " + entryAlias + " import failed", e);
+                }
+            }
+
+            mKeyStore.setEntry(entryName2, new KeyStore.SecretKeyEntry(key2), protectionParams);
+            SecretKey keystoreKey2 = (SecretKey) mKeyStore.getKey(entryName2, null);
+            SecretKey keystoreKey1 = (SecretKey) mKeyStore.getKey(entryName1, null);
+
+            byte[] plaintext = "This is a test".getBytes("UTF-8");
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, keystoreKey1);
+            byte[] ciphertext = cipher.doFinal(plaintext);
+            AlgorithmParameters cipherParams = cipher.getParameters();
+            cipher = Cipher.getInstance(cipher.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, key1, cipherParams);
+            MoreAsserts.assertEquals(plaintext, cipher.doFinal(ciphertext));
+
+            cipher = Cipher.getInstance(cipher.getAlgorithm());
+            cipher.init(Cipher.ENCRYPT_MODE, keystoreKey2);
+            ciphertext = cipher.doFinal(plaintext);
+            cipherParams = cipher.getParameters();
+            cipher = Cipher.getInstance(cipher.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, key2, cipherParams);
+            MoreAsserts.assertEquals(plaintext, cipher.doFinal(ciphertext));
+        } finally {
+            // Clean up Keystore without using KeyStore.aliases() which can't handle this many
+            // entries.
+            for (int i = 0; i <= MIN_SUPPORTED_KEY_COUNT; i++) {
+                mKeyStore.deleteEntry("test" + i);
+            }
+        }
+    }
+
+    @LargeTest
+    public void testKeyStore_LargeNumberOfKeysSupported_HMAC() throws Exception {
+        // This test imports key1, then lots of other keys, then key2, and then confirms that
+        // key1 and key2 backed by Android Keystore work fine. The assumption is that if the
+        // underlying implementation has a limit on the number of keys, it'll either delete the
+        // oldest key (key1), or will refuse to add keys (key2).
+
+        SecretKey key1 = new SecretKeySpec(
+                HexEncoding.decode("010203040506070809fafbfcfdfeffcc"), "HmacSHA256");
+        String entryName1 = "test0";
+
+        SecretKey key2 = new SecretKeySpec(
+                HexEncoding.decode("808182838485868788897a7b7c7d7e7f"), "HmacSHA256");
+        String entryName2 = "test" + MIN_SUPPORTED_KEY_COUNT;
+
+        SecretKey key3 = new SecretKeySpec(
+                HexEncoding.decode("33333333333333333333777777777777"), "HmacSHA256");
+
+        mKeyStore.load(null);
+        try {
+            KeyProtection protectionParams = new KeyProtection.Builder(
+                    KeyProperties.PURPOSE_SIGN)
+                    .build();
+            mKeyStore.setEntry(entryName1, new KeyStore.SecretKeyEntry(key1), protectionParams);
+
+            // Import key3 many of times, under different aliases.
+            for (int i = 1; i < MIN_SUPPORTED_KEY_COUNT; i++) {
+                String entryAlias = "test" + i;
+                try {
+                    mKeyStore.setEntry(entryAlias, new KeyStore.SecretKeyEntry(key3), protectionParams);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Entry " + entryAlias + " import failed", e);
+                }
+            }
+
+            mKeyStore.setEntry(entryName2, new KeyStore.SecretKeyEntry(key2), protectionParams);
+            SecretKey keystoreKey2 = (SecretKey) mKeyStore.getKey(entryName2, null);
+            SecretKey keystoreKey1 = (SecretKey) mKeyStore.getKey(entryName1, null);
+
+            byte[] message = "This is a test".getBytes("UTF-8");
+            Mac mac = Mac.getInstance(key1.getAlgorithm());
+            mac.init(keystoreKey1);
+            MoreAsserts.assertEquals(
+                    HexEncoding.decode(
+                            "905e36f5a175f4ca54ad56b860b46f6502f883a90628dca2d33a953fb7224eaf"),
+                    mac.doFinal(message));
+
+            mac = Mac.getInstance(key2.getAlgorithm());
+            mac.init(keystoreKey2);
+            MoreAsserts.assertEquals(
+                    HexEncoding.decode(
+                            "59b57e77e4e2cb36b5c7b84af198ac004327bc549de6931a1b5505372dd8c957"),
+                    mac.doFinal(message));
+        } finally {
+            // Clean up Keystore without using KeyStore.aliases() which can't handle this many
+            // entries.
+            for (int i = 0; i <= MIN_SUPPORTED_KEY_COUNT; i++) {
+                mKeyStore.deleteEntry("test" + i);
+            }
+        }
     }
 }
