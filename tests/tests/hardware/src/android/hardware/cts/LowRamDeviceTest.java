@@ -152,7 +152,7 @@ public class LowRamDeviceTest extends AndroidTestCase {
     private void assertMinMemoryMb(long minMb) {
 
         long totalMemoryMb = getTotalMemory() / ONE_MEGABYTE;
-        boolean lowRam = totalMemoryMb <= minMb * 1.5;
+        boolean lowRam = totalMemoryMb <= 512;
         boolean lowRamDevice = mActivityManager.isLowRamDevice();
 
         Log.i(TAG, String.format("minMb=%,d", minMb));
