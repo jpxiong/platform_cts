@@ -40,6 +40,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -354,7 +355,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                             | KeyProperties.PURPOSE_ENCRYPT
                             | KeyProperties.PURPOSE_DECRYPT)
                     .setDigests(KeyProperties.DIGEST_NONE)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                     .setCertificateSubject(TEST_DN_1)
                     .setCertificateSerialNumber(TEST_SERIAL_1)
                     .setCertificateNotBefore(NOW)
@@ -381,7 +382,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                             | KeyProperties.PURPOSE_ENCRYPT
                             | KeyProperties.PURPOSE_DECRYPT)
                     .setDigests(KeyProperties.DIGEST_NONE)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                     .setCertificateSubject(TEST_DN_2)
                     .setCertificateSerialNumber(TEST_SERIAL_2)
                     .setCertificateNotBefore(NOW)
@@ -410,7 +411,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                         | KeyProperties.PURPOSE_ENCRYPT
                         | KeyProperties.PURPOSE_DECRYPT)
                 .setDigests(KeyProperties.DIGEST_NONE)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                 .setCertificateSubject(TEST_DN_1)
                 .setCertificateSerialNumber(TEST_SERIAL_1)
                 .setCertificateNotBefore(NOW)
@@ -435,7 +436,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                         | KeyProperties.PURPOSE_ENCRYPT
                         | KeyProperties.PURPOSE_DECRYPT)
                 .setDigests(KeyProperties.DIGEST_NONE)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                 .setCertificateSubject(TEST_DN_2)
                 .setCertificateSerialNumber(TEST_SERIAL_2)
                 .setCertificateNotBefore(NOW)
@@ -839,6 +840,75 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 2048, RSAKeyGenParameterSpec.F0));
     }
 
+    public void testGenerate_RSA_IndCpaEnforced() throws Exception {
+        KeyGenParameterSpec.Builder goodBuilder = new KeyGenParameterSpec.Builder(
+                TEST_ALIAS_1, KeyProperties.PURPOSE_ENCRYPT)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1);
+        assertKeyGenInitSucceeds("RSA", goodBuilder.build());
+
+        // Should be fine because IND-CPA restriction applies only to encryption keys
+        assertKeyGenInitSucceeds("RSA",
+                TestUtils.buildUpon(goodBuilder, KeyProperties.PURPOSE_DECRYPT)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .build());
+
+        assertKeyGenInitThrowsInvalidAlgorithmParameterException("RSA",
+                TestUtils.buildUpon(goodBuilder)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .build());
+
+        assertKeyGenInitSucceeds("RSA",
+                TestUtils.buildUpon(goodBuilder)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .setRandomizedEncryptionRequired(false)
+                        .build());
+
+        // Should fail because PKCS#7 padding doesn't work with RSA
+        assertKeyGenInitThrowsInvalidAlgorithmParameterException("RSA",
+                TestUtils.buildUpon(goodBuilder)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                        .build());
+    }
+
+    public void testGenerate_EC_IndCpaEnforced() throws Exception {
+        KeyGenParameterSpec.Builder goodBuilder = new KeyGenParameterSpec.Builder(
+                TEST_ALIAS_2, KeyProperties.PURPOSE_ENCRYPT);
+        assertKeyGenInitSucceeds("EC", goodBuilder.build());
+
+        // Should be fine because IND-CPA restriction applies only to encryption keys
+        assertKeyGenInitSucceeds("EC",
+                TestUtils.buildUpon(goodBuilder, KeyProperties.PURPOSE_DECRYPT)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .build());
+
+        assertKeyGenInitThrowsInvalidAlgorithmParameterException("EC",
+                TestUtils.buildUpon(goodBuilder)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .build());
+
+        assertKeyGenInitSucceeds("EC",
+                TestUtils.buildUpon(goodBuilder)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .setRandomizedEncryptionRequired(false)
+                        .build());
+    }
+
+    private void assertKeyGenInitSucceeds(String algorithm, AlgorithmParameterSpec params)
+            throws Exception {
+        KeyPairGenerator generator = getGenerator(algorithm);
+        generator.initialize(params);
+    }
+
+    private void assertKeyGenInitThrowsInvalidAlgorithmParameterException(
+            String algorithm, AlgorithmParameterSpec params) throws Exception {
+        KeyPairGenerator generator = getGenerator(algorithm);
+        try {
+            generator.initialize(params);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+    }
+
     private void assertKeyGenUsingECSizeOnlyUsesCorrectCurve(
             int keySizeBits, ECParameterSpec expectedParams) throws Exception {
         KeyPairGenerator generator = getEcGenerator();
@@ -1161,12 +1231,17 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
 
     private KeyPairGenerator getRsaGenerator()
             throws NoSuchAlgorithmException, NoSuchProviderException {
-        return KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
+        return getGenerator("RSA");
     }
 
     private KeyPairGenerator getEcGenerator()
             throws NoSuchAlgorithmException, NoSuchProviderException {
-        return KeyPairGenerator.getInstance("EC", "AndroidKeyStore");
+        return getGenerator("EC");
+    }
+
+    private KeyPairGenerator getGenerator(String algorithm)
+            throws NoSuchAlgorithmException, NoSuchProviderException {
+        return KeyPairGenerator.getInstance(algorithm, "AndroidKeyStore");
     }
 
     private static void assertOneOf(int actual, int... expected) {

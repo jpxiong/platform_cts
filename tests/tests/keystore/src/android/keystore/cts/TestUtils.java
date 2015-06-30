@@ -475,6 +475,48 @@ abstract class TestUtils extends Assert {
         return result;
     }
 
+    static KeyGenParameterSpec.Builder buildUpon(
+            KeyGenParameterSpec.Builder builder) {
+        return buildUponInternal(builder, null);
+    }
+
+    static KeyGenParameterSpec.Builder buildUpon(
+            KeyGenParameterSpec.Builder builder, int newPurposes) {
+        return buildUponInternal(builder, newPurposes);
+    }
+
+    private static KeyGenParameterSpec.Builder buildUponInternal(
+            KeyGenParameterSpec.Builder builder, Integer newPurposes) {
+        KeyGenParameterSpec spec = builder.build();
+        int purposes = (newPurposes == null) ? spec.getPurposes() : newPurposes;
+        KeyGenParameterSpec.Builder result =
+                new KeyGenParameterSpec.Builder(spec.getKeystoreAlias(), purposes);
+        if (spec.getKeySize() >= 0) {
+            result.setKeySize(spec.getKeySize());
+        }
+        if (spec.getAlgorithmParameterSpec() != null) {
+            result.setAlgorithmParameterSpec(spec.getAlgorithmParameterSpec());
+        }
+        result.setCertificateNotBefore(spec.getCertificateNotBefore());
+        result.setCertificateNotAfter(spec.getCertificateNotAfter());
+        result.setCertificateSerialNumber(spec.getCertificateSerialNumber());
+        result.setCertificateSubject(spec.getCertificateSubject());
+        result.setBlockModes(spec.getBlockModes());
+        if (spec.isDigestsSpecified()) {
+            result.setDigests(spec.getDigests());
+        }
+        result.setEncryptionPaddings(spec.getEncryptionPaddings());
+        result.setSignaturePaddings(spec.getSignaturePaddings());
+        result.setKeyValidityStart(spec.getKeyValidityStart());
+        result.setKeyValidityForOriginationEnd(spec.getKeyValidityForOriginationEnd());
+        result.setKeyValidityForConsumptionEnd(spec.getKeyValidityForConsumptionEnd());
+        result.setRandomizedEncryptionRequired(spec.isRandomizedEncryptionRequired());
+        result.setUserAuthenticationRequired(spec.isUserAuthenticationRequired());
+        result.setUserAuthenticationValidityDurationSeconds(
+                spec.getUserAuthenticationValidityDurationSeconds());
+        return result;
+    }
+
     static KeyPair getKeyPairForKeyAlgorithm(String keyAlgorithm, Iterable<KeyPair> keyPairs) {
         for (KeyPair keyPair : keyPairs) {
             if (keyAlgorithm.equalsIgnoreCase(keyPair.getPublic().getAlgorithm())) {
