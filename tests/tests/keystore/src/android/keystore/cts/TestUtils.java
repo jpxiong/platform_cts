@@ -33,6 +33,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -62,6 +63,10 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.SecretKeySpec;
 
 abstract class TestUtils extends Assert {
+
+    static final String EXPECTED_CRYPTO_OP_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
+
+
     private TestUtils() {}
 
     /**
@@ -417,6 +422,18 @@ abstract class TestUtils extends Assert {
                 (PrivateKey) keyStore.getKey(alias, null));
     }
 
+    static SecretKey importIntoAndroidKeyStore(
+            String alias,
+            SecretKey key,
+            KeyProtection keyProtection) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        keyStore.setEntry(alias,
+                new KeyStore.SecretKeyEntry(key),
+                keyProtection);
+        return (SecretKey) keyStore.getKey(alias, null);
+    }
+
     static byte[] drain(InputStream in) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[16 * 1024];
@@ -465,5 +482,20 @@ abstract class TestUtils extends Assert {
             }
         }
         throw new IllegalArgumentException("No KeyPair for key algorithm " + keyAlgorithm);
+    }
+
+    static byte[] generateLargeKatMsg(byte[] seed, int msgSizeBytes) throws Exception {
+        byte[] result = new byte[msgSizeBytes];
+        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        int resultOffset = 0;
+        int resultRemaining = msgSizeBytes;
+        while (resultRemaining > 0) {
+            seed = digest.digest(seed);
+            int chunkSize = Math.min(seed.length, resultRemaining);
+            System.arraycopy(seed, 0, result, resultOffset, chunkSize);
+            resultOffset += chunkSize;
+            resultRemaining -= chunkSize;
+        }
+        return result;
     }
 }
