@@ -1561,6 +1561,48 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="remove_device_owner_button">Remove device owner</string>
     <string name="device_owner_check_device_owner_test">Check device owner</string>
     <string name="device_owner_incorrect_device_owner">Missing or incorrect device owner: CTSVerifier is not DO!</string>
+    <string name="device_owner_wifi_lockdown_test">WiFi configuration lockdown</string>
+    <string name="device_owner_wifi_lockdown_info">
+            Please enter the SSID and auth method of an available WiFi Access Point and press the button to create a
+            WiFi configuration. This configuration can be seen on Settings &gt; WiFi. The test cases
+            are going use this config. Please go through test cases in order (from top to bottom).
+    </string>
+    <string name="switch_wifi_lockdown_off_button">WiFi config lockdown off</string>
+    <string name="switch_wifi_lockdown_on_button">WiFi config lockdown on</string>
+    <string name="wifi_lockdown_go_settings_wifi_button">Go to WiFi Settings</string>
+    <string name="device_owner_wifi_key_management_none_button">None</string>
+    <string name="device_owner_wifi_key_management_wpa_button">WPA</string>
+    <string name="device_owner_wifi_key_management_wep_button">WEP</string>
+    <string name="create_wifi_config_button_label">Create WiFi configuration</string>
+    <string name="wifi_lockdown_add_network_failed_dialog_title">WiFi configuration could not be created</string>
+    <string name="wifi_lockdown_add_network_failed_dialog_text">
+            There was an error during creation of WiFi configuration. Check if WiFi is switched on.
+    </string>
+    <string name="device_owner_wifi_config_unlocked_modification_test">Unlocked config is modifiable in Settings</string>
+    <string name="device_owner_wifi_config_unlocked_modification_test_info">
+            Please press the button to ensure WiFi config lockdown is NOT in effect. Then go to
+            Settings &gt; WiFi and see if the CTSVerifier created WiFi configuration can be edited.
+            Please make sure you can connect to it. The test is successful if the config is editable
+            and can be connected to.
+    </string>
+    <string name="device_owner_wifi_config_locked_modification_test">Locked config is not modifiable in Settings</string>
+    <string name="device_owner_wifi_config_locked_modification_test_info">
+            Please press the button to ensure WiFi config lockdown is in effect. Then go to
+            Settings &gt; WiFi and see if the CTSVerifier created WiFi configuration can NOT be edited
+            or removed. The test is successful if the config is NOT modifiable.
+    </string>
+    <string name="device_owner_wifi_config_locked_connection_test">Locked config can be connected to</string>
+    <string name="device_owner_wifi_config_locked_connection_test_info">
+            Please press the button to ensure WiFi config lockdown is in effect. Then go to
+            Settings &gt; WiFi and see if the CTSVerifier created WiFi configuration can be connected
+            to manually. The test is successful if the connection can be established.
+    </string>
+    <string name="device_owner_wifi_config_unlocked_removal_test">Unlocked config can be forgotten in Settings</string>
+    <string name="device_owner_wifi_config_unlocked_removal_test_info">
+            Please press the button to ensure WiFi config lockdown is NOT in effect. Then go to
+            Settings &gt; WiFi and see if the CTSVerifier created WiFi configuration can be forgotten.
+            The test is successful if the config could be forgotten and is removed from the list of saved configs.
+    </string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
