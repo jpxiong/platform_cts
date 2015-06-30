@@ -20,7 +20,6 @@ import com.android.cts.keystore.R;
 
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Provider.Service;
@@ -43,7 +42,8 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
 public class SignatureTest extends AndroidTestCase {
-    static final String EXPECTED_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
+
+    static final String EXPECTED_PROVIDER_NAME = TestUtils.EXPECTED_CRYPTO_OP_PROVIDER_NAME;
 
     private static final String[] EXPECTED_SIGNATURE_ALGORITHMS = {
         "NONEwithRSA",
@@ -487,24 +487,9 @@ public class SignatureTest extends AndroidTestCase {
         }
     }
 
-    private static byte[] generateLargeKatMsg(byte[] seed, int msgSizeBytes) throws Exception {
-        byte[] result = new byte[msgSizeBytes];
-        MessageDigest digest = MessageDigest.getInstance("SHA-512");
-        int resultOffset = 0;
-        int resultRemaining = msgSizeBytes;
-        while (resultRemaining > 0) {
-            seed = digest.digest(seed);
-            int chunkSize = Math.min(seed.length, resultRemaining);
-            System.arraycopy(seed, 0, result, resultOffset, chunkSize);
-            resultOffset += chunkSize;
-            resultRemaining -= chunkSize;
-        }
-        return result;
-    }
-
     public void testLongMsgKat() throws Exception {
         Collection<KeyPair> keyPairs = importDefaultKatKeyPairs();
-        byte[] message = generateLargeKatMsg(LONG_MSG_KAT_SEED, LONG_MSG_KAT_SIZE_BYTES);
+        byte[] message = TestUtils.generateLargeKatMsg(LONG_MSG_KAT_SEED, LONG_MSG_KAT_SIZE_BYTES);
 
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(provider);
@@ -952,6 +937,7 @@ public class SignatureTest extends AndroidTestCase {
         }
         return signature.sign();
     }
+
     private void assertSignatureVerifiesFedUsingFixedSizeChunks(
             String algorithm,
             Provider provider,
