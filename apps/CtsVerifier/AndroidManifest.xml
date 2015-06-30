@@ -1327,6 +1327,10 @@
                 android:autoRemoveFromRecents="true"
                 android:stateNotNeeded="true"/>
 
+        <activity android:name=".managedprovisioning.WifiLockdownTestActivity"
+                android:label="@string/device_owner_wifi_lockdown_test">
+        </activity>
+
         <activity android:name=".managedprovisioning.ByodFlowTestActivity"
                 android:launchMode="singleTask"
                 android:label="@string/provisioning_byod">
