@@ -1603,6 +1603,28 @@ You should be prompted to select credentials; choose the ones you just installed
             Settings &gt; WiFi and see if the CTSVerifier created WiFi configuration can be forgotten.
             The test is successful if the config could be forgotten and is removed from the list of saved configs.
     </string>
+    <string name="device_owner_disable_statusbar_test">Disable status bar</string>
+    <string name="device_owner_disable_statusbar_test_info">
+            Please press the below button to disable the status bar and verify that quick settings, notifications
+            and the assist gesture are no longer available.\n
+            Next, press the button to reenable the status bar and verify that quick settings, notification
+            and the assist gesture are available again.\n
+            Please mark the test accordingly.
+    </string>
+    <string name="device_owner_disable_statusbar_button">Disable status bar</string>
+    <string name="device_owner_reenable_statusbar_button">Reenable status bar</string>
+    <string name="device_owner_disable_keyguard_test">Disable keyguard</string>
+    <string name="device_owner_disable_keyguard_test_info">
+            Note that any device passwords that you might have set will be deleted during this test.\n
+            Please press the below button to disable the keyguard. Press the power button on your device to
+            switch off the screen. Then press the power button to switch the screen back on and verify that
+            no keyguard was shown.\n
+            Next, press the button to reenable the keyguard and repeat the above steps, this time verifying that
+            a keyguard was shown again.\n
+            Please mark the test accordingly.
+    </string>
+    <string name="device_owner_disable_keyguard_button">Disable keyguard</string>
+    <string name="device_owner_reenable_keyguard_button">Reenable keyguard</string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
