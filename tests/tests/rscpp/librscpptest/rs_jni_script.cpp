@@ -29,6 +29,7 @@
 
 #include <ScriptC_primitives.h>
 #include <ScriptC_instance.h>
+#include <ScriptC_vector.h>
 
 using namespace android::RSC;
 
@@ -134,3 +135,50 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSScriptTest_testIn
     return passed;
 }
 
+// Define some reasonable types for use with the vector invoke testing.
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+typedef unsigned long ulong;
+
+#define TEST_VECTOR_INVOKE(L, U) \
+L temp_##L = 0; \
+vector->invoke_vector_test_##L(temp_##L); \
+U##2 temp_##L##2; \
+vector->invoke_vector_test_##L##2(temp_##L##2); \
+U##3 temp_##L##3; \
+vector->invoke_vector_test_##L##3(temp_##L##3); \
+U##4 temp_##L##4; \
+vector->invoke_vector_test_##L##4(temp_##L##4);
+
+
+/*
+ * Test that vector invoke C++ reflection is working/present.
+ */
+extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSScriptTest_testVector(JNIEnv * env,
+                                                                                     jclass obj,
+                                                                                     jstring pathObj)
+{
+    const char * path = env->GetStringUTFChars(pathObj, nullptr);
+    sp<RS> mRS = new RS();
+    mRS->init(path);
+    env->ReleaseStringUTFChars(pathObj, path);
+    MessageHandlerFunc_t mHandler = rsMsgHandler;
+    mRS->setMessageHandler(mHandler);
+
+    bool passed = true;
+    sp<ScriptC_vector> vector = new ScriptC_vector(mRS);
+
+    TEST_VECTOR_INVOKE(float, Float)
+    TEST_VECTOR_INVOKE(double, Double)
+    TEST_VECTOR_INVOKE(char, Byte)
+    TEST_VECTOR_INVOKE(uchar, UByte)
+    TEST_VECTOR_INVOKE(short, Short)
+    TEST_VECTOR_INVOKE(ushort, UShort)
+    TEST_VECTOR_INVOKE(int, Int)
+    TEST_VECTOR_INVOKE(uint, UInt)
+    TEST_VECTOR_INVOKE(long, Long)
+    TEST_VECTOR_INVOKE(ulong, ULong)
+
+    return passed;
+}

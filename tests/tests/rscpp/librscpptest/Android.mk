@@ -38,7 +38,8 @@ LOCAL_SRC_FILES += \
     clear_object.rs \
     foreach.rs \
     fe_all.rs \
-    noroot.rs
+    noroot.rs \
+    vector.rs
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 LOCAL_C_INCLUDES += frameworks/rs/cpp

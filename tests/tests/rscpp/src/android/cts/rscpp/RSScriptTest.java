@@ -36,4 +36,9 @@ public class RSScriptTest extends RSCppTest {
     public void testRSScriptTestInstance() {
         assertTrue(testInstance(this.getContext().getCacheDir().toString()));
     }
+
+    native boolean testVector(String path);
+    public void testRSScriptTestVector() {
+        assertTrue(testVector(this.getContext().getCacheDir().toString()));
+    }
 }
