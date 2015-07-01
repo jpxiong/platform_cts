@@ -338,4 +338,163 @@ public class BNNMTest extends RSBaseCompute {
         assertTrue(testWithTolerance(c_byte, c_byte_output));
 
     }
+
+    // This test multiplies matrices where the results are expected to fall
+    // slightly outside the 0 to 255 valid output range. This test ensures the
+    // values get clamped to that range, rather than wrapping around.
+    public void testClamping() {
+        // The A matrix is:
+        // |   1 |   4 |
+        // |   2 |   5 |
+        // |   3 |   6 |
+        byte[] a_data = unsignedToSignedByte(new int[] {
+                1, 2, 3,
+                4, 5, 6,
+            });
+        final int a_rows = 3;
+        final int a_cols = 2;
+        final int a_offset = 0;
+        // The B matrix is:
+        // |  -1 |  -2 |  -3 |  -4 |
+        // |  -5 |  -6 |  -7 |  -8 |
+        // |  99 | -40 | -11 | -15 |
+        byte[] b_data = unsignedToSignedByte(new int[] {
+                126, 122, 226,
+                125, 121, 87,
+                124, 120, 116,
+                123, 119, 112,
+            });
+        final int b_cols = 4;
+        final int b_offset = 127;
+        // EightBitGemm implements C = B.transposed() * A,
+        // so we expect to get these results:
+        // 1*-1 + 2*-5 + 3* 99 + 128 = 414 (clamped to 255)
+        // 1*-2 + 2*-6 + 3*-40 + 128 = -6 (clamped to 0)
+        // 1*-3 + 2*-7 + 3*-11 + 128 = 78
+        // 1*-4 + 2*-8 + 3*-15 + 128 = 63
+        // 4*-1 + 5*-5 + 6* 99 + 128 = 693 (clamped to 255)
+        // 4*-2 + 5*-6 + 6*-40 + 128 = -150 (clamped to 0)
+        // 4*-3 + 5*-7 + 6*-11 + 128 = 15
+        // 4*-4 + 5*-8 + 6*-15 + 128 = -18 (clamped to 0)
+        // | 255 | 255 |
+        // |   0 |   0 |
+        // |  78 |  15 |
+        // |  63 |   0 |
+        final int c_offset = 128;
+        final int c_shift = 21;
+        final int c_mult_int = (1 << c_shift);
+        byte[] expected_data = unsignedToSignedByte(new int[] {
+              255, 0, 78, 63,
+              255, 0, 15, 0,
+            });
+
+        final int m = a_cols;
+        final int n = b_cols;
+        final int k = a_rows;
+
+        byte[] c_byte_output = runBNNM(m, n, k, a_data, a_offset, b_data, b_offset,
+                                       c_offset, c_mult_int);
+        assertTrue(testWithTolerance(expected_data, c_byte_output));
+    }
+
+    // This tests the exception handling for a_offset and b_offset.
+    public void testExceptionHandling() {
+        // The A matrix is:
+        // |   1 |   4 |
+        // |   2 |   5 |
+        // |   3 |   6 |
+        byte[] a_data = unsignedToSignedByte(new int[] {
+                1, 2, 3,
+                4, 5, 6,
+            });
+        final int a_rows = 3;
+        final int a_cols = 2;
+        // The B matrix is:
+        // |  -1 |  -2 |  -3 |  -4 |
+        // |  -5 |  -6 |  -7 |  -8 |
+        // |  -9 | -10 | -11 | -12 |
+        byte[] b_data = unsignedToSignedByte(new int[] {
+                11, 7, 3,
+                10, 6, 2,
+                9, 5, 1,
+                8, 4, 0,
+            });
+        final int b_cols = 4;
+        // EightBitGemm implements C = B.transposed() * A,
+        // so we expect to get these results:
+        // 1*-1 + 2*-5 + 3*-9 + 128 = 90
+        // 1*-2 + 2*-6 + 3*-10 + 128 = 84
+        // 1*-3 + 2*-7 + 3*-11 + 128 = 78
+        // 1*-4 + 2*-8 + 3*-12 + 128 = 72
+        // 4*-1 + 5*-5 + 6*-9 + 128 = 45
+        // 4*-2 + 5*-6 + 6*-10 + 128 = 30
+        // 4*-3 + 5*-7 + 6*-11 + 128 = 15
+        // 4*-4 + 5*-8 + 6*-12 + 128 = 0
+        // | 90 |  45 |
+        // | 84 |  30 |
+        // | 78 | 15 |
+        // | 72 | 0 |
+        final int c_offset = 128;
+        final int c_shift = 21;
+        final int c_mult_int = (1 << c_shift);
+        byte[] expected_data = unsignedToSignedByte(new int[] {
+                90, 84, 78, 72,
+                45, 30, 15, 0,
+            });
+
+        final int m = a_cols;
+        final int n = b_cols;
+        final int k = a_rows;
+
+        Allocation A, B, C;
+        Type.Builder builder = new Type.Builder(mRS, Element.U8(mRS));
+        Type a_type = builder.setX(k).setY(m).create();
+        Type b_type = builder.setX(k).setY(n).create();
+        Type c_type = builder.setX(n).setY(m).create();
+
+        A = Allocation.createTyped(mRS, a_type);
+        B = Allocation.createTyped(mRS, b_type);
+        C = Allocation.createTyped(mRS, c_type);
+
+        A.copyFrom(a_data);
+        B.copyFrom(b_data);
+        // C doesn't matter, is output only
+
+        ScriptIntrinsicBLAS blas = ScriptIntrinsicBLAS.create(mRS);
+        try {
+            int a_offset = 0;
+            int b_offset = 12;
+            blas.BNNM(A, a_offset, B, b_offset, C, c_offset, c_mult_int);
+        } catch (RSRuntimeException e) {
+            fail("should NOT throw RSRuntimeException for valid offsets");
+        }
+        try {
+            int a_offset = -23;
+            int b_offset = 12;
+            blas.BNNM(A, a_offset, B, b_offset, C, c_offset, c_mult_int);
+            fail("should throw RSRuntimeException for invalid offsets: a_offset < 0");
+        } catch (RSRuntimeException e) {
+        }
+        try {
+            int a_offset = 888;
+            int b_offset = 12;
+            blas.BNNM(A, a_offset, B, b_offset, C, c_offset, c_mult_int);
+            fail("should throw RSRuntimeException for invalid offsets: a_offset > 255");
+        } catch (RSRuntimeException e) {
+        }
+        try {
+            int a_offset = 0;
+            int b_offset = -1;
+            blas.BNNM(A, a_offset, B, b_offset, C, c_offset, c_mult_int);
+            fail("should throw RSRuntimeException for invalid offsets: b_offset < 0");
+        } catch (RSRuntimeException e) {
+        }
+        try {
+            int a_offset = 0;
+            int b_offset = 256;
+            blas.BNNM(A, a_offset, B, b_offset, C, c_offset, c_mult_int);
+            fail("should throw RSRuntimeException for invalid offsets: b_offset > 255");
+        } catch (RSRuntimeException e) {
+        }
+    }
 }
