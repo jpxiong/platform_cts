@@ -67,6 +67,57 @@ public class ActionModeTest extends ActivityInstrumentationTestCase2<ActionModeC
         assertTrue(callback.mIsOnGetContentRectCalled);
     }
 
+    public void testSetAndGetTitleOptionalHint() {
+        MockActionMode actionMode = new MockActionMode();
+
+        // Check default value.
+        assertFalse(actionMode.getTitleOptionalHint());
+        // Test set and get.
+        actionMode.setTitleOptionalHint(true);
+        assertTrue(actionMode.getTitleOptionalHint());
+        actionMode.setTitleOptionalHint(false);
+        assertFalse(actionMode.getTitleOptionalHint());
+    }
+
+    public void testSetAndGetTag() {
+        MockActionMode actionMode = new MockActionMode();
+        Object tag = new Object();
+
+        // Check default value.
+        assertNull(actionMode.getTag());
+
+        actionMode.setTag(tag);
+        assertSame(tag, actionMode.getTag());
+    }
+
+    public void testIsTitleOptional() {
+        MockActionMode actionMode = new MockActionMode();
+
+        // Check default value.
+        assertFalse(actionMode.isTitleOptional());
+    }
+
+    public void testIsUiFocusable() {
+        MockActionMode actionMode = new MockActionMode();
+
+        // Check default value.
+        assertTrue(actionMode.isUiFocusable());
+    }
+
+    public void testHide() {
+        MockActionMode actionMode = new MockActionMode();
+
+        actionMode.hide(0);
+        actionMode.hide(ActionMode.DEFAULT_HIDE_DURATION);
+    }
+
+    public void testOnWindowFocusChanged() {
+        MockActionMode actionMode = new MockActionMode();
+
+        actionMode.onWindowFocusChanged(true);
+        actionMode.onWindowFocusChanged(false);
+    }
+
     private static class MockActionModeCallback2 extends ActionMode.Callback2 {
         boolean mIsOnGetContentRectCalled = false;
 
