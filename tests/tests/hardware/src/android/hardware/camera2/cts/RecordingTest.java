@@ -60,7 +60,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG_DUMP = Log.isLoggable(TAG, Log.DEBUG);
     private static final int RECORDING_DURATION_MS = 3000;
-    private static final int DURATION_MARGIN_MS = 600;
+    private static final float DURATION_MARGIN = 0.2f;
     private static final double FRAME_DURATION_ERROR_TOLERANCE_MS = 3.0;
     private static final int BIT_RATE_1080P = 16000000;
     private static final int BIT_RATE_MIN = 64000;
@@ -1080,7 +1080,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void validateRecording(Size sz, int durationMs) throws Exception {
+    private void validateRecording(Size sz, int expectedDurationMs) throws Exception {
         File outFile = new File(mOutMediaFileName);
         assertTrue("No video is recorded", outFile.exists());
 
@@ -1108,15 +1108,16 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             int duration = (int) (durationUs / 1000);
             if (VERBOSE) {
                 Log.v(TAG, String.format("Video duration: recorded %dms, expected %dms",
-                                         duration, durationMs));
+                                         duration, expectedDurationMs));
             }
 
             // TODO: Don't skip this for video snapshot
             if (!mStaticInfo.isHardwareLevelLegacy()) {
                 assertTrue(String.format(
                         "Camera %s: Video duration doesn't match: recorded %dms, expected %dms.",
-                        mCamera.getId(), duration, durationMs),
-                        Math.abs(duration - durationMs) < DURATION_MARGIN_MS);
+                        mCamera.getId(), duration, expectedDurationMs),
+                        Math.abs(duration - expectedDurationMs) <
+                        DURATION_MARGIN * expectedDurationMs);
             }
         } finally {
             extractor.release();
