@@ -600,10 +600,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             } else if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 codecOutputBuffers = codec.getOutputBuffers();
             } else if (index >= 0) {
-                if (lastOutputTimeNs > 0 &&
-                    (info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) == 0) {
-                    long diff = System.nanoTime() - lastOutputTimeNs;
-                    mEncoderFrameTimeDiff[mCurrentTestRound][mEncodedOutputBuffer.size() - 1] = diff;
+                if (lastOutputTimeNs > 0) {
+                    int pos = mEncodedOutputBuffer.size() - 1;
+                    if (pos < mEncoderFrameTimeDiff[mCurrentTestRound].length) {
+                        long diff = System.nanoTime() - lastOutputTimeNs;
+                        mEncoderFrameTimeDiff[mCurrentTestRound][pos] = diff;
+                    }
                 }
                 lastOutputTimeNs = System.nanoTime();
 
@@ -899,8 +901,11 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 // only do YUV compare on EOS frame if the buffer size is none-zero
                 if (info.size > 0) {
                     if (lastOutputTimeNs > 0) {
-                        long diff = System.nanoTime() - lastOutputTimeNs;
-                        mDecoderFrameTimeDiff[mCurrentTestRound][outFrameCount - 1] = diff;
+                        int pos = outFrameCount - 1;
+                        if (pos < mDecoderFrameTimeDiff[mCurrentTestRound].length) {
+                            long diff = System.nanoTime() - lastOutputTimeNs;
+                            mDecoderFrameTimeDiff[mCurrentTestRound][pos] = diff;
+                        }
                     }
                     lastOutputTimeNs = System.nanoTime();
 
