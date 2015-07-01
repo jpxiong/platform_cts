@@ -587,6 +587,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testGetMaxSupportedInstances() {
+        StringBuilder xmlOverrides = new StringBuilder();
         MediaCodecList allCodecs = new MediaCodecList(MediaCodecList.ALL_CODECS);
         for (MediaCodecInfo info : allCodecs.getCodecInfos()) {
             Log.d(TAG, "codec: " + info.getName());
@@ -604,9 +605,25 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                     int actualMax = getActualMax(
                             info.isEncoder(), info.getName(), types[j], caps, max + 1);
                     Log.d(TAG, "actualMax " + actualMax + " vs reported max " + max);
-                    assertTrue(actualMax >= (int)(max * 0.9));
+                    if (actualMax < (int)(max * 0.9) || actualMax > (int) Math.ceil(max * 1.1)) {
+                        String codec = "<MediaCodec name=\"" + info.getName() +
+                                "\" type=\"" + types[j] + "\" >";
+                        String limit = "    <Limit name=\"concurrent-instances\" max=\"" +
+                                actualMax + "\" />";
+                        xmlOverrides.append(codec);
+                        xmlOverrides.append("\n");
+                        xmlOverrides.append(limit);
+                        xmlOverrides.append("\n");
+                        xmlOverrides.append("</MediaCodec>\n");
+                    }
                 }
             }
+        }
+
+        if (xmlOverrides.length() > 0) {
+            String failMessage = "In order to pass the test, please publish following " +
+                    "codecs' concurrent instances limit in /etc/media_codecs.xml: \n";
+           fail(failMessage + xmlOverrides.toString());
         }
     }
 }
