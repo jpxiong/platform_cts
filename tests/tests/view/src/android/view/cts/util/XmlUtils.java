@@ -16,8 +16,6 @@
 
 package android.view.cts.util;
 
-import com.android.internal.util.FastXmlSerializer;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
@@ -44,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** {@hide} */
 public class XmlUtils {
 
     public static void skipCurrentTag(XmlPullParser parser)
@@ -171,28 +168,6 @@ public class XmlUtils {
     }
 
     /**
-     * Flatten a Map into an output stream as XML.  The map can later be
-     * read back with readMapXml().
-     *
-     * @param val The map to be flattened.
-     * @param out Where to write the XML data.
-     *
-     * @see #writeMapXml(Map, String, XmlSerializer)
-     * @see #writeListXml
-     * @see #writeValueXml
-     * @see #readMapXml
-     */
-    public static final void writeMapXml(Map val, OutputStream out)
-            throws XmlPullParserException, IOException {
-        XmlSerializer serializer = new FastXmlSerializer();
-        serializer.setOutput(out, StandardCharsets.UTF_8.name());
-        serializer.startDocument(null, true);
-        serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-        writeMapXml(val, null, serializer);
-        serializer.endDocument();
-    }
-
-    /**
      * Flatten a List into an output stream as XML.  The list can later be
      * read back with readListXml().
      *
@@ -224,7 +199,6 @@ public class XmlUtils {
      *             none.
      * @param out XmlSerializer to write the map into.
      *
-     * @see #writeMapXml(Map, OutputStream)
      * @see #writeListXml
      * @see #writeValueXml
      * @see #readMapXml
@@ -244,7 +218,6 @@ public class XmlUtils {
      * @param out XmlSerializer to write the map into.
      * @param callback Method to call when an Object type is not recognized.
      *
-     * @see #writeMapXml(Map, OutputStream)
      * @see #writeListXml
      * @see #writeValueXml
      * @see #readMapXml
@@ -278,7 +251,6 @@ public class XmlUtils {
      * @param val The map to be flattened.
      * @param out XmlSerializer to write the map into.
      *
-     * @see #writeMapXml(Map, OutputStream)
      * @see #writeListXml
      * @see #writeValueXml
      * @see #readMapXml

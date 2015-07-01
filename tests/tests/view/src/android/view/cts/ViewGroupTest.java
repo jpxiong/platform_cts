@@ -458,7 +458,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         MockTextView textView = new MockTextView(mContext);
         vg.addView(textView);
         vg.requestChildFocus(textView, null);
-        textView.setFrame(1, 1, 100, 100);
+        textView.layout(1, 1, 100, 100);
 
         assertTrue(vg.dispatchKeyEvent(event));
     }
@@ -529,7 +529,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         d.getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
-        vg.setFrame(0, 0, screenWidth, screenHeight);
+        vg.layout(0, 0, screenWidth, screenHeight);
         vg.setLayoutParams(new ViewGroup.LayoutParams(screenWidth, screenHeight));
 
         MockTextView textView = new MockTextView(mContext);
@@ -554,7 +554,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         assertFalse(vg.dispatchTouchEvent(me));
         assertNull(mMotionEvent);
 
-        textView.setFrame(0, 0, screenWidth, screenHeight);
+        textView.layout(0, 0, screenWidth, screenHeight);
         assertTrue(vg.dispatchTouchEvent(me));
         assertSame(me, mMotionEvent);
     }
@@ -568,7 +568,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
         MockTextView textView = new MockTextView(mContext);
         vg.addView(textView);
-        textView.setFrame(1, 1, 100, 100);
+        textView.layout(1, 1, 100, 100);
         vg.requestChildFocus(textView, null);
         assertTrue(vg.dispatchTrackballEvent(me));
     }
@@ -579,7 +579,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         assertFalse(vg.dispatchUnhandledMove(textView, View.FOCUS_DOWN));
 
         vg.addView(textView);
-        textView.setFrame(1, 1, 100, 100);
+        textView.layout(1, 1, 100, 100);
         vg.requestChildFocus(textView, null);
         assertTrue(vg.dispatchUnhandledMove(textView, View.FOCUS_DOWN));
     }
@@ -769,13 +769,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         MockViewGroup vg = new MockViewGroup(mContext);
         MockTextView textView = new MockTextView(mContext);
 
-        textView.setFrame(1, 1, 100, 100);
+        textView.layout(1, 1, 100, 100);
         Rect rect = new Rect(1, 1, 50, 50);
         Point p = new Point();
         assertFalse(vg.getChildVisibleRect(textView, rect, p));
 
-        textView.setFrame(0, 0, 0, 0);
-        vg.setFrame(20, 20, 60, 60);
+        textView.layout(0, 0, 0, 0);
+        vg.layout(20, 20, 60, 60);
         rect = new Rect(10, 10, 40, 40);
         p = new Point();
         assertTrue(vg.getChildVisibleRect(textView, rect, p));
@@ -998,7 +998,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
             // expected
         }
         vg.addView(textView);
-        textView.setFrame(1, 2, 3, 4);
+        textView.layout(1, 2, 3, 4);
         Rect rect = new Rect();
         vg.offsetDescendantRectToMyCoords(textView, rect);
         assertEquals(2, rect.bottom);
@@ -1009,7 +1009,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     public void testOffsetRectIntoDescendantCoords() {
         MockViewGroup vg = new MockViewGroup(mContext);
-        vg.setFrame(10, 20, 30, 40);
+        vg.layout(10, 20, 30, 40);
         MockTextView textView = new MockTextView(mContext);
 
         try {
@@ -1019,7 +1019,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         } catch (RuntimeException e) {
             // expected
         }
-        textView.setFrame(1, 2, 3, 4);
+        textView.layout(1, 2, 3, 4);
         vg.addView(textView);
 
         Rect rect = new Rect(5, 6, 7, 8);
@@ -1376,8 +1376,8 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
         MockViewGroup vg = new MockViewGroup(mContext);
         MockTextView textView = new MockTextView(mContext);
-        textView.setFrame(1, 2, 30, 40);
-        vg.setFrame(1, 1, 100, 200);
+        textView.layout(1, 2, 30, 40);
+        vg.layout(1, 1, 100, 200);
         vg.setClipChildren(true);
 
         MockCanvas canvas = new MockCanvas(bitmap);
@@ -1434,7 +1434,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         final int frameRight = 100;
         final int frameBottom = 200;
         MockViewGroup vg = new MockViewGroup(mContext);
-        vg.setFrame(frameLeft, frameTop, frameRight, frameBottom);
+        vg.layout(frameLeft, frameTop, frameRight, frameBottom);
 
         vg.setClipToPadding(true);
         MockCanvas canvas = new MockCanvas();
@@ -1911,11 +1911,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         }
 
         @Override
-        public boolean setFrame(int l, int t, int r, int b) {
-            return super.setFrame(l, t, r, b);
-        }
-
-        @Override
         public void dispatchRestoreInstanceState(
                 SparseArray<Parcelable> container) {
             isDispatchRestoreInstanceStateCalled = true;
@@ -1942,11 +1937,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         public void refreshDrawableState() {
             mIsRefreshDrawableStateCalled = true;
             super.refreshDrawableState();
-        }
-
-        @Override
-        public boolean gatherTransparentRegion(Region region) {
-            return false;
         }
 
         @Override
@@ -2162,21 +2152,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         }
 
         @Override
-        public boolean setFrame(int left, int top, int right, int bottom) {
-            return super.setFrame(left, top, right, bottom);
-        }
-
-        @Override
-        public boolean isChildrenDrawnWithCacheEnabled() {
-            return super.isChildrenDrawnWithCacheEnabled();
-        }
-
-        @Override
-        public void setChildrenDrawnWithCacheEnabled(boolean enabled) {
-            super.setChildrenDrawnWithCacheEnabled(enabled);
-        }
-
-        @Override
         public void measureChild(View child, int parentWidthMeasureSpec,
                 int parentHeightMeasureSpec) {
             measureChildCalledTime++;
@@ -2326,6 +2301,21 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         protected void resetResolvedDrawables() {
             super.resetResolvedDrawables();
             resetResolvedDrawablesCount++;
+        }
+
+        @Override
+        public boolean setFrame(int left, int top, int right, int bottom) {
+            return super.setFrame(left, top, right, bottom);
+        }
+
+        @Override
+        public void setChildrenDrawnWithCacheEnabled(boolean enabled) {
+            super.setChildrenDrawnWithCacheEnabled(enabled);
+        }
+
+        @Override
+        public boolean isChildrenDrawnWithCacheEnabled() {
+            return super.isChildrenDrawnWithCacheEnabled();
         }
     }
 
