@@ -17,6 +17,6 @@
     <include name="common-config" />
     <!-- Put SensorService in restricted mode so that only CTS tests will be able to get access to
     sensors -->
-    <option name="run-command:run-command" value="dumpsys sensorservice restrict" />
+    <option name="run-command:run-command" value="dumpsys sensorservice restrict .cts." />
     <option name="run-command:teardown-command" value="dumpsys sensorservice enable" />
 </configuration>
