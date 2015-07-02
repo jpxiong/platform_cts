@@ -211,6 +211,9 @@ def convert_capture_to_planes(cap, props=None):
     if cap["format"] == "raw10":
         assert(props is not None)
         cap = unpack_raw10_capture(cap, props)
+    if cap["format"] == "raw12":
+        assert(props is not None)
+        cap = unpack_raw12_capture(cap, props)
     if cap["format"] == "yuv":
         y = cap["data"][0:w*h]
         u = cap["data"][w*h:w*h*5/4]
@@ -229,6 +232,36 @@ def convert_capture_to_planes(cap, props=None):
         img = numpy.ndarray(shape=(h*w,), dtype='<u2',
                             buffer=cap["data"][0:w*h*2])
         img = img.astype(numpy.float32).reshape(h,w) / white_level
+        # Crop the raw image to the active array region.
+        if props.has_key("android.sensor.info.activeArraySize") \
+                and props["android.sensor.info.activeArraySize"] is not None \
+                and props.has_key("android.sensor.info.pixelArraySize") \
+                and props["android.sensor.info.pixelArraySize"] is not None:
+            # Note that the Rect class is defined such that the left,top values
+            # are "inside" while the right,bottom values are "outside"; that is,
+            # it's inclusive of the top,left sides only. So, the width is
+            # computed as right-left, rather than right-left+1, etc.
+            wfull = props["android.sensor.info.pixelArraySize"]["width"]
+            hfull = props["android.sensor.info.pixelArraySize"]["height"]
+            xcrop = props["android.sensor.info.activeArraySize"]["left"]
+            ycrop = props["android.sensor.info.activeArraySize"]["top"]
+            wcrop = props["android.sensor.info.activeArraySize"]["right"]-xcrop
+            hcrop = props["android.sensor.info.activeArraySize"]["bottom"]-ycrop
+            assert(wfull >= wcrop >= 0)
+            assert(hfull >= hcrop >= 0)
+            assert(wfull - wcrop >= xcrop >= 0)
+            assert(hfull - hcrop >= ycrop >= 0)
+            if w == wfull and h == hfull:
+                # Crop needed; extract the center region.
+                img = img[ycrop:ycrop+hcrop,xcrop:xcrop+wcrop]
+                w = wcrop
+                h = hcrop
+            elif w == wcrop and h == hcrop:
+                # No crop needed; image is already cropped to the active array.
+                None
+            else:
+                raise its.error.Error('Invalid image size metadata')
+        # Separate the image planes.
         imgs = [img[::2].reshape(w*h/2)[::2].reshape(h/2,w/2,1),
                 img[::2].reshape(w*h/2)[1::2].reshape(h/2,w/2,1),
                 img[1::2].reshape(w*h/2)[::2].reshape(h/2,w/2,1),
