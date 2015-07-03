@@ -16,15 +16,18 @@
 
 package android.net.cts;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import android.net.Credentials;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.test.AndroidTestCase;
+
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class LocalSocketTest extends AndroidTestCase{
     public final static String mSockAddr = "com.android.net.LocalSocketTest";
@@ -166,6 +169,122 @@ public class LocalSocketTest extends AndroidTestCase{
             fail("testLocalSocketSecondary shouldn't come to here");
         } catch (UnsupportedOperationException e) {
             // expected
+        }
+    }
+
+    public void testAvailable() throws Exception {
+        LocalServerSocket localServerSocket = new LocalServerSocket(mSockAddr);
+        LocalSocket clientSocket = new LocalSocket();
+
+        // establish connection between client and server
+        LocalSocketAddress locSockAddr = new LocalSocketAddress(mSockAddr);
+        clientSocket.connect(locSockAddr);
+        assertTrue(clientSocket.isConnected());
+        LocalSocket serverSocket = localServerSocket.accept();
+
+        OutputStream clientOutputStream = clientSocket.getOutputStream();
+        InputStream serverInputStream = serverSocket.getInputStream();
+        assertEquals(0, serverInputStream.available());
+
+        byte[] buffer = new byte[50];
+        clientOutputStream.write(buffer);
+        assertEquals(50, serverInputStream.available());
+
+        InputStream clientInputStream = clientSocket.getInputStream();
+        OutputStream serverOutputStream = serverSocket.getOutputStream();
+        assertEquals(0, clientInputStream.available());
+        serverOutputStream.write(buffer);
+        assertEquals(50, serverInputStream.available());
+
+        clientSocket.close();
+        serverSocket.close();
+    }
+
+    public void testFlush() throws Exception {
+        LocalServerSocket localServerSocket = new LocalServerSocket(mSockAddr);
+        LocalSocket clientSocket = new LocalSocket();
+
+        // establish connection between client and server
+        LocalSocketAddress locSockAddr = new LocalSocketAddress(mSockAddr);
+        clientSocket.connect(locSockAddr);
+        assertTrue(clientSocket.isConnected());
+        LocalSocket serverSocket = localServerSocket.accept();
+
+        OutputStream clientOutputStream = clientSocket.getOutputStream();
+        InputStream serverInputStream = serverSocket.getInputStream();
+        testFlushWorks(clientOutputStream, serverInputStream);
+
+        OutputStream serverOutputStream = serverSocket.getOutputStream();
+        InputStream clientInputStream = clientSocket.getInputStream();
+        testFlushWorks(serverOutputStream, clientInputStream);
+
+        clientSocket.close();
+        serverSocket.close();
+    }
+
+    private void testFlushWorks(OutputStream outputStream, InputStream inputStream)
+            throws Exception {
+        final int bytesToTransfer = 50;
+        StreamReader inputStreamReader = new StreamReader(inputStream, bytesToTransfer);
+
+        byte[] buffer = new byte[bytesToTransfer];
+        outputStream.write(buffer);
+        assertEquals(bytesToTransfer, inputStream.available());
+
+        // Start consuming the data.
+        inputStreamReader.start();
+
+        // This doesn't actually flush any buffers, it just polls until the reader has read all the
+        // bytes.
+        outputStream.flush();
+
+        inputStreamReader.waitForCompletion(5000);
+        inputStreamReader.assertBytesRead(bytesToTransfer);
+        assertEquals(0, inputStream.available());
+    }
+
+    private static class StreamReader extends Thread {
+        private final InputStream is;
+        private final int expectedByteCount;
+        private final CountDownLatch completeLatch = new CountDownLatch(1);
+
+        private volatile Exception exception;
+        private int bytesRead;
+
+        private StreamReader(InputStream is, int expectedByteCount) {
+            this.is = is;
+            this.expectedByteCount = expectedByteCount;
+        }
+
+        @Override
+        public void run() {
+            try {
+                byte[] buffer = new byte[10];
+                int readCount;
+                while ((readCount = is.read(buffer)) >= 0) {
+                    bytesRead += readCount;
+                    if (bytesRead >= expectedByteCount) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                exception = e;
+            } finally {
+                completeLatch.countDown();
+            }
+        }
+
+        public void waitForCompletion(long waitMillis) throws Exception {
+            if (!completeLatch.await(waitMillis, TimeUnit.MILLISECONDS)) {
+                fail("Timeout waiting for completion");
+            }
+            if (exception != null) {
+                throw new Exception("Read failed", exception);
+            }
+        }
+
+        public void assertBytesRead(int expected) {
+            assertEquals(expected, bytesRead);
         }
     }
 }
