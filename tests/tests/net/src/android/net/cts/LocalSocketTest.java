@@ -116,7 +116,7 @@ public class LocalSocketTest extends AndroidTestCase{
 
     public void testAccessors() throws IOException{
         LocalSocket socket = new LocalSocket();
-        LocalSocketAddress addr = new LocalSocketAddress("secondary");
+        LocalSocketAddress addr = new LocalSocketAddress(mSockAddr);
 
         assertFalse(socket.isBound());
         socket.bind(addr);
@@ -170,6 +170,8 @@ public class LocalSocketTest extends AndroidTestCase{
         } catch (UnsupportedOperationException e) {
             // expected
         }
+
+        socket.close();
     }
 
     public void testAvailable() throws Exception {
@@ -198,6 +200,7 @@ public class LocalSocketTest extends AndroidTestCase{
 
         clientSocket.close();
         serverSocket.close();
+        localServerSocket.close();
     }
 
     public void testFlush() throws Exception {
@@ -220,6 +223,7 @@ public class LocalSocketTest extends AndroidTestCase{
 
         clientSocket.close();
         serverSocket.close();
+        localServerSocket.close();
     }
 
     private void testFlushWorks(OutputStream outputStream, InputStream inputStream)
