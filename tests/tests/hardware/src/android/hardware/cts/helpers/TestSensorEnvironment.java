@@ -40,6 +40,7 @@ public class TestSensorEnvironment {
     private final boolean mSensorMightHaveMoreListeners;
     private final int mSamplingPeriodUs;
     private final int mMaxReportLatencyUs;
+    private final boolean mIsDeviceSuspendTest;
 
     /**
      * Constructs an environment for sensor testing.
@@ -163,11 +164,27 @@ public class TestSensorEnvironment {
             boolean sensorMightHaveMoreListeners,
             int samplingPeriodUs,
             int maxReportLatencyUs) {
+        this(context,
+                sensor,
+                sensorMightHaveMoreListeners,
+                samplingPeriodUs,
+                maxReportLatencyUs,
+                false /* isDeviceSuspendTest */);
+    }
+
+    public TestSensorEnvironment(
+            Context context,
+            Sensor sensor,
+            boolean sensorMightHaveMoreListeners,
+            int samplingPeriodUs,
+            int maxReportLatencyUs,
+            boolean isDeviceSuspendTest) {
         mContext = context;
         mSensor = sensor;
         mSensorMightHaveMoreListeners = sensorMightHaveMoreListeners;
         mSamplingPeriodUs = samplingPeriodUs;
         mMaxReportLatencyUs = maxReportLatencyUs;
+        mIsDeviceSuspendTest = isDeviceSuspendTest;
     }
 
     /**
@@ -357,4 +374,9 @@ public class TestSensorEnvironment {
                 && mSamplingPeriodUs != SensorManager.SENSOR_DELAY_UI
                 && mSamplingPeriodUs != SensorManager.SENSOR_DELAY_NORMAL);
     }
+
+    public boolean isDeviceSuspendTest() {
+        return mIsDeviceSuspendTest;
+    }
 }
+

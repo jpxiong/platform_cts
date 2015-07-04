@@ -1200,6 +1200,23 @@
                        android:value="android.hardware.type.television:android.software.leanback" />
         </activity>
 -->
+          <activity
+                android:name="com.android.cts.verifier.sensors.DeviceSuspendTestActivity"
+                android:label="@string/snsr_device_suspend_test"
+                android:screenOrientation="nosensor" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+        </activity>
+
+        <receiver android:name="com.android.cts.verifier.sensors.DeviceSuspendTestActivity$AlarmReceiver">
+        </receiver>
+
+        <receiver android:name="com.android.cts.verifier.sensors.SignificantMotionTestActivity$AlarmReceiver">
+        </receiver>
+
         <activity
             android:name="com.android.cts.verifier.sensors.SignificantMotionTestActivity"
             android:label="@string/snsr_significant_motion_test"
