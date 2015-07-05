@@ -348,9 +348,9 @@ public class SensorTest extends SensorTestCase {
         TestSensorEventListener listener = new TestSensorEventListener(environment, handler);
 
         CountDownLatch eventLatch = mTestSensorManager.registerListener(listener, 1);
-        listener.waitForEvents(eventLatch, 1);
+        listener.waitForEvents(eventLatch, 1, true);
         CountDownLatch flushLatch = mTestSensorManager.requestFlush();
-        listener.waitForFlushComplete(flushLatch);
+        listener.waitForFlushComplete(flushLatch, true);
         listener.assertEventsReceivedInHandler();
     }
 
@@ -382,9 +382,9 @@ public class SensorTest extends SensorTestCase {
 
         // specifyHandler <= false, use the SensorManager API without Handler parameter
         CountDownLatch eventLatch = mTestSensorManager.registerListener(listener, 1, false);
-        listener.waitForEvents(eventLatch, 1);
+        listener.waitForEvents(eventLatch, 1, true);
         CountDownLatch flushLatch = mTestSensorManager.requestFlush();
-        listener.waitForFlushComplete(flushLatch);
+        listener.waitForFlushComplete(flushLatch, true);
         listener.assertEventsReceivedInHandler();
     }
 
@@ -581,10 +581,10 @@ public class SensorTest extends SensorTestCase {
             try {
                 CountDownLatch eventLatch = sensorManager.registerListener(listener, mEventCount);
                 if (sensorReportingMode == Sensor.REPORTING_MODE_CONTINUOUS) {
-                    listener.waitForEvents(eventLatch, mEventCount);
+                    listener.waitForEvents(eventLatch, mEventCount, true);
                 }
                 CountDownLatch flushLatch = sensorManager.requestFlush();
-                listener.waitForFlushComplete(flushLatch);
+                listener.waitForFlushComplete(flushLatch, true);
             } finally {
                 sensorManager.unregisterListener();
             }
