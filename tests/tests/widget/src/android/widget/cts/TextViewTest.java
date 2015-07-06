@@ -17,7 +17,6 @@
 package android.widget.cts;
 
 import com.android.cts.widget.R;
-import com.android.internal.util.FastMath;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -786,37 +785,37 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         float add = 1.2f;
         float mult = 1.4f;
         setLineSpacing(add, mult);
-        assertEquals(FastMath.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
         add = 0.0f;
         mult = 1.4f;
         setLineSpacing(add, mult);
-        assertEquals(FastMath.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
 
         // abnormal
         add = -1.2f;
         mult = 1.4f;
         setLineSpacing(add, mult);
-        assertEquals(FastMath.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
         add = -1.2f;
         mult = -1.4f;
         setLineSpacing(add, mult);
-        assertEquals(FastMath.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
         add = 1.2f;
         mult = 0.0f;
         setLineSpacing(add, mult);
-        assertEquals(FastMath.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
 
         // edge
         add = Float.MIN_VALUE;
         mult = Float.MIN_VALUE;
         setLineSpacing(add, mult);
         float expected = originalLineHeight * mult + add;
-        assertEquals(FastMath.round(expected), mTextView.getLineHeight());
+        assertEquals(Math.round(expected), mTextView.getLineHeight());
         add = Float.MAX_VALUE;
         mult = Float.MAX_VALUE;
         setLineSpacing(add, mult);
         expected = originalLineHeight * mult + add;
-        assertEquals(FastMath.round(expected), mTextView.getLineHeight());
+        assertEquals(Math.round(expected), mTextView.getLineHeight());
     }
 
     public void testInstanceState() {

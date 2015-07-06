@@ -21,8 +21,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.UserHandle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.test.InstrumentationTestCase;
@@ -39,19 +37,9 @@ public class QuickContactBadgeTest extends InstrumentationTestCase {
         final String plainMimeType = "text/plain";
         final Uri nonExistentContactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, 0);
         final CountDownLatch latch = new CountDownLatch(1);
-        Context context = new ContextWrapper(getInstrumentation().getContext()) {
+        final Context context = new ContextWrapper(getInstrumentation().getContext()) {
             @Override
             public void startActivity(Intent intent) {
-                testCallback(intent);
-            }
-
-            @Override
-            public void startActivityAsUser(Intent intent, UserHandle user) {
-                testCallback(intent);
-            }
-
-            @Override
-            public void startActivityAsUser(Intent intent, Bundle options, UserHandle user) {
                 testCallback(intent);
             }
 

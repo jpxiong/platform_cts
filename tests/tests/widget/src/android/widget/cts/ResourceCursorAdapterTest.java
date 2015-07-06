@@ -170,13 +170,19 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     }
 
     private static class MockResourceCursorAdapter extends ResourceCursorAdapter {
+        private final boolean mAutoRequery;
+
         public MockResourceCursorAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
+
+            mAutoRequery = false;
         }
 
         public MockResourceCursorAdapter(Context context, int layout,
                 Cursor c, boolean autoRequery) {
             super(context, layout, c, autoRequery);
+
+            mAutoRequery = autoRequery;
         }
 
         @Override
