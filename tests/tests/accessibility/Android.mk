@@ -26,4 +26,6 @@ LOCAL_PACKAGE_NAME := CtsAccessibilityTestCases
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
+LOCAL_SDK_VERSION := current
+
 include $(BUILD_CTS_PACKAGE)
