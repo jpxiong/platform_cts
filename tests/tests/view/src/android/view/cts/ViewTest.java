@@ -16,28 +16,26 @@
 
 package android.view.cts;
 
-import android.content.res.ColorStateList;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-
-import android.os.Bundle;
 import com.android.cts.view.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
-import com.google.android.collect.Lists;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -425,7 +423,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         assertTrue(view.isLayoutRequested());
 
         view.setParent(mMockParent);
-        assertFalse(mMockParent.hasRequestLayout());
+        assertTrue(mMockParent.hasRequestLayout());
+
+        mMockParent.reset();
         view.requestLayout();
         assertTrue(view.isLayoutRequested());
         assertTrue(mMockParent.hasRequestLayout());
@@ -1131,8 +1131,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         mockView2.setParent(mMockParent);
 
         mMockParent.dispatchSetSelected(true);
-        assertFalse(mockView1.isSelected());
-        assertFalse(mockView2.isSelected());
+        assertTrue(mockView1.isSelected());
+        assertTrue(mockView2.isSelected());
 
         mMockParent.dispatchSetSelected(false);
         assertFalse(mockView1.isSelected());
@@ -1155,8 +1155,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         mockView2.setParent(mMockParent);
 
         mMockParent.dispatchSetPressed(true);
-        assertFalse(mockView1.isPressed());
-        assertFalse(mockView2.isPressed());
+        assertTrue(mockView1.isPressed());
+        assertTrue(mockView2.isPressed());
 
         mMockParent.dispatchSetPressed(false);
         assertFalse(mockView1.isPressed());
@@ -3017,16 +3017,13 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
     @UiThreadTest
     public void testScrollbarStyle() {
-        MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
+        MockView view = (MockView) mActivity.findViewById(R.id.scroll_view);
         Bitmap bitmap = Bitmap.createBitmap(200, 300, Bitmap.Config.RGB_565);
         BitmapDrawable d = new BitmapDrawable(bitmap);
         view.setBackgroundDrawable(d);
         view.setHorizontalFadingEdgeEnabled(true);
         view.setVerticalFadingEdgeEnabled(true);
 
-        view.setHorizontalScrollBarEnabled(true);
-        view.setVerticalScrollBarEnabled(true);
-        view.initializeScrollbars(mActivity.obtainStyledAttributes(android.R.styleable.View));
         assertTrue(view.isHorizontalScrollBarEnabled());
         assertTrue(view.isVerticalScrollBarEnabled());
         int verticalScrollBarWidth = view.getVerticalScrollbarWidth();
@@ -3156,7 +3153,10 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
     public void testOnStartAndFinishTemporaryDetach() throws Throwable {
         final MockListView listView = new MockListView(mActivity);
-        List<String> items = Lists.newArrayList("1", "2", "3");
+        List<String> items = new ArrayList<>();
+        items.add("1");
+        items.add("2");
+        items.add("3");
         final Adapter<String> adapter = new Adapter<String>(mActivity, 0, items);
 
         runTestOnUiThread(new Runnable() {
@@ -3638,7 +3638,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         }
     }
 
-    private final static class MockViewParent extends View implements ViewParent {
+    private final static class MockViewParent extends ViewGroup {
         private boolean mHasClearChildFocus = false;
         private boolean mHasRequestLayout = false;
         private boolean mHasCreateContextMenu = false;
@@ -3678,12 +3678,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
         }
 
         @Override
-        protected void dispatchSetPressed(boolean pressed) {
+        public void dispatchSetPressed(boolean pressed) {
             super.dispatchSetPressed(pressed);
         }
 
         @Override
-        protected void dispatchSetSelected(boolean selected) {
+        public void dispatchSetSelected(boolean selected) {
             super.dispatchSetSelected(selected);
         }
 
@@ -3716,21 +3716,13 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
             return false;
         }
 
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+
+        }
+
         public boolean hasGetChildVisibleRect() {
             return mHasGetChildVisibleRect;
-        }
-
-        public void invalidateChild(View child, Rect r) {
-            mTempRect = new Rect(r);
-            mHasInvalidateChild = true;
-        }
-
-        public Rect getTempRect() {
-            return mTempRect;
-        }
-
-        public boolean hasInvalidateChild() {
-            return mHasInvalidateChild;
         }
 
         public ViewParent invalidateChildInParent(int[] location, Rect r) {
@@ -3753,6 +3745,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
         }
 
+        @Override
         public void requestLayout() {
             mHasRequestLayout = true;
         }
