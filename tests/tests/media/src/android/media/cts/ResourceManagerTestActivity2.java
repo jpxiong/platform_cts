@@ -28,9 +28,7 @@ public class ResourceManagerTestActivity2 extends ResourceManagerTestActivityBas
         Log.d(TAG, "onCreate called.");
         super.onCreate(savedInstanceState);
 
-        if (allocateCodecs(1) == 1) {
-          setResult(Activity.RESULT_OK);
-          finish();
-        }
+        int result = (allocateCodecs(1 /* max */) == 1) ? RESULT_OK : RESULT_CANCELED;
+        finishWithResult(result);
     }
 }

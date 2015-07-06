@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.Vector;
 
 public class ResourceManagerTestActivityBase extends Activity {
+    public static final int TYPE_NONSECURE = 0;
+    public static final int TYPE_SECURE = 1;
+    public static final int TYPE_MIX = 2;
+
     protected String TAG;
     private static final int IFRAME_INTERVAL = 10;  // 10 seconds between I-frames
     private static final String MIME = MediaFormat.MIMETYPE_VIDEO_AVC;
@@ -60,7 +64,7 @@ public class ResourceManagerTestActivityBase extends Activity {
 
     private MediaCodec.Callback mCallback = new TestCodecCallback();
 
-    private static MediaFormat getTestFormat(VideoCapabilities vcaps) {
+    private static MediaFormat getTestFormat(VideoCapabilities vcaps, boolean securePlayback) {
         int maxWidth = vcaps.getSupportedWidths().getUpper();
         int maxHeight = vcaps.getSupportedHeightsFor(maxWidth).getUpper();
         int maxBitrate = vcaps.getBitrateRange().getUpper();
@@ -73,14 +77,15 @@ public class ResourceManagerTestActivityBase extends Activity {
         format.setInteger(MediaFormat.KEY_BIT_RATE, maxBitrate);
         format.setInteger(MediaFormat.KEY_FRAME_RATE, maxFramerate);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+        format.setFeatureEnabled(CodecCapabilities.FEATURE_SecurePlayback, securePlayback);
         return format;
     }
 
-    private MediaCodecInfo getTestCodecInfo() {
+    private MediaCodecInfo getTestCodecInfo(boolean securePlayback) {
         // Use avc decoder for testing.
         boolean isEncoder = false;
 
-        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.ALL_CODECS);
         for (MediaCodecInfo info : mcl.getCodecInfos()) {
             if (info.isEncoder() != isEncoder) {
                 continue;
@@ -88,6 +93,17 @@ public class ResourceManagerTestActivityBase extends Activity {
             CodecCapabilities caps;
             try {
                 caps = info.getCapabilitiesForType(MIME);
+                boolean securePlaybackSupported =
+                        caps.isFeatureSupported(CodecCapabilities.FEATURE_SecurePlayback);
+                boolean securePlaybackRequired =
+                        caps.isFeatureRequired(CodecCapabilities.FEATURE_SecurePlayback);
+                if ((securePlayback && securePlaybackSupported) ||
+                        (!securePlayback && !securePlaybackRequired) ) {
+                    Log.d(TAG, "securePlayback " + securePlayback + " will use " + info.getName());
+                } else {
+                    Log.d(TAG, "securePlayback " + securePlayback + " skip " + info.getName());
+                    continue;
+                }
             } catch (IllegalArgumentException e) {
                 // mime is not supported
                 continue;
@@ -99,16 +115,48 @@ public class ResourceManagerTestActivityBase extends Activity {
     }
 
     protected int allocateCodecs(int max) {
-        MediaCodecInfo info = getTestCodecInfo();
-        if (info == null) {
-            // skip the test
-            return 0;
+        Bundle extras = getIntent().getExtras();
+        int type = TYPE_NONSECURE;
+        if (extras != null) {
+            type = extras.getInt("test-type", type);
+            Log.d(TAG, "type is: " + type);
         }
 
+        boolean shouldSkip = true;
+        boolean securePlayback;
+        if (type == TYPE_NONSECURE || type == TYPE_MIX) {
+            securePlayback = false;
+            MediaCodecInfo info = getTestCodecInfo(securePlayback);
+            if (info != null) {
+                shouldSkip = false;
+                allocateCodecs(max, info, securePlayback);
+            }
+        }
+
+        if (type == TYPE_SECURE || type == TYPE_MIX) {
+            securePlayback = true;
+            MediaCodecInfo info = getTestCodecInfo(securePlayback);
+            if (info != null) {
+                shouldSkip = false;
+                allocateCodecs(max, info, securePlayback);
+            }
+        }
+
+        if (shouldSkip) {
+            Log.d(TAG, "test skipped as there's no supported codec.");
+            finishWithResult(RESULT_OK);
+        }
+
+        Log.d(TAG, "allocateCodecs returned " + mCodecs.size());
+        return mCodecs.size();
+    }
+
+    protected void allocateCodecs(int max, MediaCodecInfo info, boolean securePlayback) {
         String name = info.getName();
-        VideoCapabilities vcaps = info.getCapabilitiesForType(MIME).getVideoCapabilities();
-        MediaFormat format = getTestFormat(vcaps);
-        for (int i = 0; i < max; ++i) {
+        CodecCapabilities caps = info.getCapabilitiesForType(MIME);
+        VideoCapabilities vcaps = caps.getVideoCapabilities();
+        MediaFormat format = getTestFormat(vcaps, securePlayback);
+        for (int i = mCodecs.size(); i < max; ++i) {
             try {
                 Log.d(TAG, "Create codec " + name + " #" + i);
                 MediaCodec codec = MediaCodec.createByCodecName(name);
@@ -129,8 +177,16 @@ public class ResourceManagerTestActivityBase extends Activity {
                 break;
             }
         }
+    }
 
-        return mCodecs.size();
+    protected void finishWithResult(int result) {
+        for (int i = 0; i < mCodecs.size(); ++i) {
+            Log.d(TAG, "release codec #" + i);
+            mCodecs.get(i).release();
+        }
+        setResult(result);
+        finish();
+        Log.d(TAG, "activity finished");
     }
 
     private void doUseCodecs() {
@@ -144,33 +200,45 @@ public class ResourceManagerTestActivityBase extends Activity {
             if (e.getErrorCode() == MediaCodec.CodecException.ERROR_RECLAIMED) {
                 Log.d(TAG, "Remove codec " + current + " from the list");
                 mCodecs.remove(current);
-                setResult(Activity.RESULT_OK);
-                finish();
+                mGotReclaimedException = true;
+                mUseCodecs = false;
             }
             return;
         }
     }
 
     private Thread mWorkerThread;
+    private volatile boolean mUseCodecs = true;
+    private volatile boolean mGotReclaimedException = false;
     protected void useCodecs() {
         mWorkerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (mUseCodecs) {
                     doUseCodecs();
+                    try {
+                        Thread.sleep(50 /* millis */);
+                    } catch (InterruptedException e) {}
+                }
+                if (mGotReclaimedException) {
+                    finishWithResult(RESULT_OK);
                 }
             }
         });
         mWorkerThread.start();
     }
 
+    protected void stopUsingCodecs() {
+        mUseCodecs = false;
+        try {
+            mWorkerThread.join(1000);
+        } catch (InterruptedException e) {
+        }
+    }
+
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy called.");
         super.onDestroy();
-
-        for (int i = 0; i < mCodecs.size(); ++i) {
-            mCodecs.get(i).release();
-        }
     }
 }
