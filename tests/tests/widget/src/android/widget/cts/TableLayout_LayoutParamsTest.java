@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.internal.R;
+import com.android.cts.widget.R;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -140,8 +140,7 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         XmlResourceParser parser = null;
         AttributeSet attrs = null;
         try {
-            parser = mTargetContext.getResources()
-                    .getXml(com.android.cts.widget.R.xml.base_attributes);
+            parser = mTargetContext.getResources().getXml(R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT
