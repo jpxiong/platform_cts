@@ -37,6 +37,9 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Tests for algorithm-agnostic functionality of MAC implementations backed by Android Keystore.
+ */
 public class MacTest extends TestCase {
 
     private static final String EXPECTED_PROVIDER_NAME = TestUtils.EXPECTED_CRYPTO_OP_PROVIDER_NAME;
@@ -95,7 +98,7 @@ public class MacTest extends TestCase {
     }
 
 
-    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final long DAY_IN_MILLIS = TestUtils.DAY_IN_MILLIS;
 
     public void testAlgorithmList() {
         // Assert that Android Keystore Provider exposes exactly the expected MAC algorithms. We
@@ -131,13 +134,13 @@ public class MacTest extends TestCase {
                 Mac mac = Mac.getInstance(algorithm);
                 mac.init(key);
                 assertSame(provider, mac.getProvider());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 throw new RuntimeException(algorithm + " failed", e);
             }
         }
     }
 
-    public void testGeneratedSignatureVerifies() throws Exception {
+    public void testMacGeneratedByAndroidKeyStoreVerifiesByAndroidKeyStore() throws Exception {
         SecretKey key = importDefaultKatKey();
 
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
@@ -145,14 +148,62 @@ public class MacTest extends TestCase {
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
                 // Generate a MAC
-                Mac mac = Mac.getInstance(algorithm);
+                Mac mac = Mac.getInstance(algorithm, provider);
                 mac.init(key);
                 byte[] message = "This is a test".getBytes("UTF-8");
                 byte[] macBytes = mac.doFinal(message);
 
-                assertMacVerifiesOneShot(algorithm, key, message, macBytes);
-            } catch (Exception e) {
+                assertMacVerifiesOneShot(algorithm, provider, key, message, macBytes);
+            } catch (Throwable e) {
                 throw new RuntimeException(algorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testMacGeneratedByAndroidKeyStoreVerifiesByHighestPriorityProvider()
+            throws Exception {
+        SecretKey key = getDefaultKatKey();
+        SecretKey keystoreKey = importDefaultKatKey();
+
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                // Generate a MAC
+                Mac mac = Mac.getInstance(algorithm, provider);
+                mac.init(keystoreKey);
+                byte[] message = "This is a test".getBytes("UTF-8");
+                byte[] macBytes = mac.doFinal(message);
+
+                assertMacVerifiesOneShot(algorithm, key, message, macBytes);
+            } catch (Throwable e) {
+                throw new RuntimeException(algorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testMacGeneratedByHighestPriorityProviderVerifiesByAndroidKeyStore()
+            throws Exception {
+        SecretKey key = getDefaultKatKey();
+        SecretKey keystoreKey = importDefaultKatKey();
+
+        Provider keystoreProvider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(keystoreProvider);
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            Provider signingProvider = null;
+            try {
+                // Generate a MAC
+                Mac mac = Mac.getInstance(algorithm);
+                mac.init(key);
+                signingProvider = mac.getProvider();
+                byte[] message = "This is a test".getBytes("UTF-8");
+                byte[] macBytes = mac.doFinal(message);
+
+                assertMacVerifiesOneShot(
+                        algorithm, keystoreProvider, keystoreKey, message, macBytes);
+            } catch (Throwable e) {
+                throw new RuntimeException(
+                        algorithm + " failed, signing provider: " + signingProvider, e);
             }
         }
     }
@@ -202,44 +253,88 @@ public class MacTest extends TestCase {
     }
 
     public void testInitFailsWhenNotAuthorizedToSign() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN);
         int badPurposes = KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
                 | KeyProperties.PURPOSE_VERIFY;
-        String algorithm = "HmacSHA512";
-        assertInitSucceeds(algorithm, algorithm, good.build());
-        assertInitThrowsInvalidKeyException(algorithm, algorithm,
-                TestUtils.buildUpon(good, badPurposes).build());
+
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParams(algorithm);
+                assertInitSucceeds(algorithm, good.build());
+                assertInitThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good, badPurposes).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitFailsWhenDigestNotAuthorized() throws Exception {
-        KeyProtection spec = new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN).build();
-        assertInitSucceeds("HmacSHA384", "HmacSHA384", spec);
-        assertInitThrowsInvalidKeyException("HmacSHA256", "HmacSHA384", spec);
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParams(algorithm);
+                assertInitSucceeds(algorithm, good.build());
+
+                String badKeyAlgorithm = ("HmacSHA256".equalsIgnoreCase(algorithm))
+                        ? "HmacSHA384" : "HmacSHA256";
+                assertInitThrowsInvalidKeyException(algorithm, badKeyAlgorithm, good.build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitFailsWhenKeyNotYetValid() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setKeyValidityStart(new Date(System.currentTimeMillis() - DAY_IN_MILLIS));
-        String algorithm = "HmacSHA224";
-        assertInitSucceeds(algorithm, algorithm, good.build());
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParams(algorithm)
+                        .setKeyValidityStart(new Date(System.currentTimeMillis() - DAY_IN_MILLIS));
+                assertInitSucceeds(algorithm, good.build());
 
-        Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
-        assertInitThrowsInvalidKeyException(algorithm, algorithm,
-                TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
+                Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
+                assertInitThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
-    public void testInitFailsWhenKeyNoLongerValid() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setKeyValidityForOriginationEnd(
-                        new Date(System.currentTimeMillis() + DAY_IN_MILLIS));
-        String algorithm = "HmacSHA1";
-        assertInitSucceeds(algorithm, algorithm, good.build());
+    public void testInitFailsWhenKeyNoLongerValidForOrigination() throws Exception {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParams(algorithm)
+                        .setKeyValidityForOriginationEnd(
+                                new Date(System.currentTimeMillis() + DAY_IN_MILLIS));
+                assertInitSucceeds(algorithm, good.build());
 
-        Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
-        assertInitThrowsInvalidKeyException(algorithm, algorithm,
-                TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
+                Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+                assertInitThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForOriginationEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitIgnoresThatKeyNoLongerValidForConsumption() throws Exception {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParams(algorithm)
+                        .setKeyValidityForConsumptionEnd(
+                                new Date(System.currentTimeMillis() + DAY_IN_MILLIS));
+                assertInitSucceeds(algorithm, good.build());
+
+                Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+                assertInitSucceeds(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForConsumptionEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     private void assertMacVerifiesOneShot(
@@ -247,7 +342,17 @@ public class MacTest extends TestCase {
             SecretKey key,
             byte[] message,
             byte[] mac) throws Exception {
-        Mac m = Mac.getInstance(algorithm);
+        assertMacVerifiesOneShot(algorithm, null, key, message, mac);
+    }
+
+    private void assertMacVerifiesOneShot(
+            String algorithm,
+            Provider provider,
+            SecretKey key,
+            byte[] message,
+            byte[] mac) throws Exception {
+        Mac m = (provider != null)
+                ? Mac.getInstance(algorithm, provider) : Mac.getInstance(algorithm);
         m.init(key);
         byte[] mac2 = m.doFinal(message);
         if (!Arrays.equals(mac, mac2)) {
@@ -272,7 +377,6 @@ public class MacTest extends TestCase {
                     + ", MAC (" + mac.length + " bytes): " + HexEncoding.encode(mac));
         }
     }
-
 
     private void assertMacVerifiesFedOneByteAtATime(
             String algorithm,
@@ -318,6 +422,11 @@ public class MacTest extends TestCase {
         }
     }
 
+    private void assertInitSucceeds(String algorithm, KeyProtection keyProtection)
+            throws Exception {
+        assertInitSucceeds(algorithm, algorithm, keyProtection);
+    }
+
     private void assertInitSucceeds(
             String macAlgorithm, String keyAlgorithm, KeyProtection keyProtection)
                     throws Exception {
@@ -326,30 +435,33 @@ public class MacTest extends TestCase {
         mac.init(key);
     }
 
+    private void assertInitThrowsInvalidKeyException(String algorithm, KeyProtection keyProtection)
+                    throws Exception {
+        assertInitThrowsInvalidKeyException(algorithm, algorithm, keyProtection);
+    }
+
     private void assertInitThrowsInvalidKeyException(
             String macAlgorithm, String keyAlgorithm, KeyProtection keyProtection)
                     throws Exception {
-        assertInitThrowsInvalidKeyException(null, macAlgorithm, keyAlgorithm, keyProtection);
-    }
-
-
-    private void assertInitThrowsInvalidKeyException(
-            String message, String macAlgorithm, String keyAlgorithm,
-            KeyProtection keyProtection) throws Exception {
         SecretKey key = importDefaultKatKey(keyAlgorithm, keyProtection);
         Mac mac = Mac.getInstance(macAlgorithm);
         try {
             mac.init(key);
-            fail(message);
+            fail("InvalidKeyException should have been thrown. MAC algorithm: " + macAlgorithm
+                    + ", key algorithm: " + keyAlgorithm);
         } catch (InvalidKeyException expected) {}
+    }
+
+    private SecretKey getDefaultKatKey() {
+        return new SecretKeySpec(KAT_KEY, "HmacSHA1");
     }
 
     private SecretKey importDefaultKatKey() throws Exception {
         return importDefaultKatKey("HmacSHA1",
                 new KeyProtection.Builder(
                         KeyProperties.PURPOSE_SIGN)
-                        .setDigests(KeyProperties.DIGEST_NONE,
-                                KeyProperties.DIGEST_SHA1, // TODO: Remove these digests
+                        .setDigests(
+                                KeyProperties.DIGEST_SHA1,
                                 KeyProperties.DIGEST_SHA224,
                                 KeyProperties.DIGEST_SHA256,
                                 KeyProperties.DIGEST_SHA384,
@@ -363,5 +475,10 @@ public class MacTest extends TestCase {
                 "test1",
                 new SecretKeySpec(KAT_KEY, keyAlgorithm),
                 keyProtection);
+    }
+
+    private static KeyProtection.Builder getWorkingImportParams(
+            @SuppressWarnings("unused") String algorithm) {
+        return new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN);
     }
 }
