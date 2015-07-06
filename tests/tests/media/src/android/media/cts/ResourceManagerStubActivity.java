@@ -53,7 +53,7 @@ public class ResourceManagerStubActivity extends Activity {
                     Context context = getApplicationContext();
                     Intent intent1 = new Intent(context, ResourceManagerTestActivity1.class);
                     startActivityForResult(intent1, mRequestCodes[0]);
-                    Thread.sleep(2000);  // wait for process to launch.
+                    Thread.sleep(5000);  // wait for process to launch and allocate all codecs.
 
                     Intent intent2 = new Intent(context, ResourceManagerTestActivity2.class);
                     startActivityForResult(intent2, mRequestCodes[1]);
