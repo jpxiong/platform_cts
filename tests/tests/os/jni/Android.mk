@@ -38,6 +38,12 @@ ifeq ($(strip $(TARGET_ARCH)),arm)
 	ARCH_SUPPORTS_SECCOMP = 1
 endif
 
+ifeq ($(strip $(TARGET_ARCH)),arm64)
+	ARCH_SUPPORTS_SECCOMP = 1
+	# Required for __NR_poll definition.
+	LOCAL_CFLAGS += -D__ARCH_WANT_SYSCALL_DEPRECATED
+endif
+
 ifeq ($(strip $(TARGET_ARCH)),x86)
 	ARCH_SUPPORTS_SECCOMP = 1
 endif

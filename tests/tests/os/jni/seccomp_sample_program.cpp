@@ -355,8 +355,6 @@ struct sock_filter kTestSeccompFilter[] = {
   {0x6, 0, 0, 0x30001},
 };
 #elif defined(__aarch64__)
-// Note: aarch64 is not required to support seccomp-bpf yet, but some Nexus
-// devices do support it. For completeness, this test BPF program is provided.
 struct sock_filter kTestSeccompFilter[] = {
   {0x20, 0, 0, 0x4},
   {0x15, 1, 0, 0xc00000b7},
