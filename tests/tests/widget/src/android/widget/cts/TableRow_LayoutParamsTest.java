@@ -16,7 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.internal.R;
+import com.android.cts.widget.R;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -91,8 +91,8 @@ public class TableRow_LayoutParamsTest
         assertEquals(0, layoutParams.span);
 
         TableCtsActivity activity = getActivity();
-        activity.setContentView(com.android.cts.widget.R.layout.table_layout_2);
-        int idTable = com.android.cts.widget.R.id.table2;
+        activity.setContentView(R.layout.table_layout_2);
+        int idTable = R.id.table2;
         TableLayout tableLayout = (TableLayout) activity.findViewById(idTable);
         View vVitural1 = ((TableRow) tableLayout.getChildAt(0)).getVirtualChildAt(1);
         layoutParams = (TableRow.LayoutParams) vVitural1.getLayoutParams();
@@ -186,8 +186,7 @@ public class TableRow_LayoutParamsTest
         XmlResourceParser parser = null;
         AttributeSet attrs = null;
         try {
-            parser = mTargetContext.getResources()
-                    .getXml(com.android.cts.widget.R.xml.base_attributes);
+            parser = mTargetContext.getResources().getXml(R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT

@@ -21,7 +21,6 @@ import java.io.File;
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.cts.util.PollingCheck;
-import android.cts.util.ReadElf;
 import android.cts.util.TestThread;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -39,7 +38,6 @@ import android.widget.FilterQueryProvider;
 import android.widget.TextView;
 
 import com.android.cts.widget.R;
-
 
 /**
  * Test {@link CursorAdapter}.
@@ -347,14 +345,23 @@ public class CursorAdapterTest extends InstrumentationTestCase {
     }
 
     private final class MockCursorAdapter extends CursorAdapter {
+        private final Context mContext;
+        private final boolean mAutoRequery;
+
         private boolean mContentChanged = false;
 
         public MockCursorAdapter(Context context, Cursor c) {
             super(context, c);
+
+            mContext = context;
+            mAutoRequery = false;
         }
 
         public MockCursorAdapter(Context context, Cursor c, boolean autoRequery) {
             super(context, c, autoRequery);
+
+            mContext = context;
+            mAutoRequery = autoRequery;
         }
 
         public Context getContext() {
