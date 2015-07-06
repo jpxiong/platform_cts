@@ -166,16 +166,6 @@ public class NotificationTest extends AndroidTestCase {
         assertNotNull(mNotification.contentView);
     }
 
-    public void testSetLatestEventInfo() {
-        mNotification = new Notification();
-        mNotification.icon = 1;
-        final Intent intent = new Intent();
-        final PendingIntent contentIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-        mNotification.setLatestEventInfo(mContext, CONTENT_TITLE, CONTENT_TEXT, contentIntent);
-        assertTrue(mNotification.contentView instanceof RemoteViews);
-        assertNotNull(mNotification.contentView);
-    }
-
     public void testToString() {
         mNotification = new Notification();
         assertNotNull(mNotification.toString());

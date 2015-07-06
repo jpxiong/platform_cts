@@ -31,4 +31,6 @@ LOCAL_PACKAGE_NAME := CtsAppTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsAppTestStubs
 
+LOCAL_SDK_VERSION := current
+
 include $(BUILD_CTS_PACKAGE)
