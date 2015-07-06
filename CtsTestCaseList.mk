@@ -87,6 +87,7 @@ cts_support_packages := \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsPermissionApp \
     CtsSimpleApp \
     CtsSimplePreMApp \
     CtsSomeAccessibilityServices \
