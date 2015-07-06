@@ -1340,6 +1340,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
         assertTrue(view.performContextClick());
         assertTrue(listener.hasOnContextClick());
+        assertSame(view, listener.getLastViewContextClicked());
     }
 
     public void testSetOnContextClickListener() {
@@ -3987,6 +3988,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
     private static final class OnContextClickListenerImpl implements OnContextClickListener {
         private boolean mHasContextClick = false;
+        private View mLastViewContextClicked;
 
         public boolean hasOnContextClick() {
             return mHasContextClick;
@@ -3994,11 +3996,17 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestCtsActivi
 
         public void reset() {
             mHasContextClick = false;
+            mLastViewContextClicked = null;
         }
 
         public boolean onContextClick(View v) {
             mHasContextClick = true;
+            mLastViewContextClicked = v;
             return true;
+        }
+
+        public View getLastViewContextClicked() {
+            return mLastViewContextClicked;
         }
     }
 
