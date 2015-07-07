@@ -810,6 +810,7 @@ public class DumpsysHostTest extends DeviceTestCase {
      */
     public void testGfxinfoFramestats() throws Exception {
         final String MARKER = "---PROFILEDATA---";
+        final int TIMESTAMP_COUNT = 14;
 
         String frameinfo = mDevice.executeShellCommand("dumpsys gfxinfo com.android.systemui framestats");
         assertNotNull(frameinfo);
@@ -831,15 +832,15 @@ public class DumpsysHostTest extends DeviceTestCase {
             assertTrue("First line was not the expected header",
                     line.startsWith("Flags,IntendedVsync,Vsync,OldestInputEvent" +
                             ",NewestInputEvent,HandleInputStart,AnimationStart" +
-                            ",PerformTraversalsStart,DrawStart,SyncStart" +
+                            ",PerformTraversalsStart,DrawStart,SyncQueued,SyncStart" +
                             ",IssueDrawCommandsStart,SwapBuffers,FrameCompleted"));
 
-            long[] numparts = new long[13];
+            long[] numparts = new long[TIMESTAMP_COUNT];
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
 
                 String[] parts = line.split(",");
-                assertTrue(parts.length >= 13);
-                for (int i = 0; i < 13; i++) {
+                assertTrue(parts.length >= TIMESTAMP_COUNT);
+                for (int i = 0; i < TIMESTAMP_COUNT; i++) {
                     numparts[i] = assertInteger(parts[i]);
                 }
                 if (numparts[0] != 0) {
@@ -850,12 +851,12 @@ public class DumpsysHostTest extends DeviceTestCase {
                 // assert time is flowing forwards, skipping index 3 & 4
                 // as those are input timestamps that may or may not be present
                 assertTrue(numparts[5] >= numparts[2]);
-                for (int i = 6; i < 13; i++) {
+                for (int i = 6; i < TIMESTAMP_COUNT; i++) {
                     assertTrue("Index " + i + " did not flow forward, " +
                             numparts[i] + " not larger than " + numparts[i - 1],
                             numparts[i] >= numparts[i-1]);
                 }
-                long totalDuration = numparts[12] - numparts[1];
+                long totalDuration = numparts[13] - numparts[1];
                 assertTrue("Frame did not take a positive amount of time to process",
                         totalDuration > 0);
                 assertTrue("Bogus frame duration, exceeds 100 seconds",
