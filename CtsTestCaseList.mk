@@ -87,6 +87,7 @@ cts_support_packages := \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsPermissionApp \
     CtsSimpleApp \
     CtsSimplePreMApp \
     CtsSomeAccessibilityServices \
@@ -96,6 +97,7 @@ cts_support_packages := \
     CtsUsbSerialTestApp \
     CtsVoiceInteractionService \
     CtsVoiceInteractionApp \
+    CtsVoiceSettingsService \
     $(cts_security_apps_list) \
     $(cts_security_keysets_list)
 
@@ -129,6 +131,7 @@ cts_test_packages := \
     CtsAppWidgetTestCases \
     CtsBluetoothTestCases \
     CtsCalendarcommon2TestCases \
+    CtsCallLogTestCases \
     CtsContentTestCases \
     CtsDatabaseTestCases \
     CtsDisplayTestCases \
@@ -184,6 +187,7 @@ cts_test_packages := \
     CtsUtilTestCases \
     CtsViewTestCases \
     CtsVoiceInteractionTestCases \
+    CtsVoiceSettingsTestCases \
     CtsWebkitTestCases \
     CtsWidgetTestCases
 
