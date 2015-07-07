@@ -71,7 +71,7 @@ def convert_capture_to_rgb_image(cap,
         y = cap["data"][0:w*h]
         u = cap["data"][w*h:w*h*5/4]
         v = cap["data"][w*h*5/4:w*h*6/4]
-        return convert_yuv420_to_rgb_image(y, u, v, w, h)
+        return convert_yuv420_planar_to_rgb_image(y, u, v, w, h)
     elif cap["format"] == "jpeg":
         return decompress_jpeg_to_rgb_image(cap["data"])
     elif cap["format"] == "raw":
@@ -371,10 +371,10 @@ def convert_raw_to_rgb_image(r_plane, gr_plane, gb_plane, b_plane,
     img = numpy.dot(img.reshape(w*h,3), ccm.T).reshape(h,w,3).clip(0.0,1.0)
     return img
 
-def convert_yuv420_to_rgb_image(y_plane, u_plane, v_plane,
-                                w, h,
-                                ccm_yuv_to_rgb=DEFAULT_YUV_TO_RGB_CCM,
-                                yuv_off=DEFAULT_YUV_OFFSETS):
+def convert_yuv420_planar_to_rgb_image(y_plane, u_plane, v_plane,
+                                       w, h,
+                                       ccm_yuv_to_rgb=DEFAULT_YUV_TO_RGB_CCM,
+                                       yuv_off=DEFAULT_YUV_OFFSETS):
     """Convert a YUV420 8-bit planar image to an RGB image.
 
     Args:
@@ -426,14 +426,20 @@ def load_rgb_image(fname):
 
 def load_yuv420_to_rgb_image(yuv_fname,
                              w, h,
+                             layout="planar",
                              ccm_yuv_to_rgb=DEFAULT_YUV_TO_RGB_CCM,
                              yuv_off=DEFAULT_YUV_OFFSETS):
     """Load a YUV420 image file, and return as an RGB image.
+
+    Supported layouts include "planar" and "nv21". The "yuv" formatted captures
+    returned from the device via do_capture are in the "planar" layout; other
+    layouts may only be needed for loading files from other sources.
 
     Args:
         yuv_fname: The path of the YUV420 file.
         w: The width of the image.
         h: The height of the image.
+        layout: (Optional) the layout of the YUV data (as a string).
         ccm_yuv_to_rgb: (Optional) the 3x3 CCM to convert from YUV to RGB.
         yuv_off: (Optional) offsets to subtract from each of Y,U,V values.
 
@@ -441,13 +447,24 @@ def load_yuv420_to_rgb_image(yuv_fname,
         RGB float-3 image array, with pixel values in [0.0, 1.0].
     """
     with open(yuv_fname, "rb") as f:
-        y = numpy.fromfile(f, numpy.uint8, w*h, "")
-        v = numpy.fromfile(f, numpy.uint8, w*h/4, "")
-        u = numpy.fromfile(f, numpy.uint8, w*h/4, "")
-        return convert_yuv420_to_rgb_image(y,u,v,w,h,ccm_yuv_to_rgb,yuv_off)
+        if layout == "planar":
+            # Plane of Y, plane of V, plane of U.
+            y = numpy.fromfile(f, numpy.uint8, w*h, "")
+            v = numpy.fromfile(f, numpy.uint8, w*h/4, "")
+            u = numpy.fromfile(f, numpy.uint8, w*h/4, "")
+        elif layout == "nv21":
+            # Plane of Y, plane of interleaved VUVUVU...
+            y = numpy.fromfile(f, numpy.uint8, w*h, "")
+            vu = numpy.fromfile(f, numpy.uint8, w*h/2, "")
+            v = vu[0::2]
+            u = vu[1::2]
+        else:
+            raise its.error.Error('Unsupported image layout')
+        return convert_yuv420_planar_to_rgb_image(
+                y,u,v,w,h,ccm_yuv_to_rgb,yuv_off)
 
-def load_yuv420_to_yuv_planes(yuv_fname, w, h):
-    """Load a YUV420 image file, and return separate Y, U, and V plane images.
+def load_yuv420_planar_to_yuv_planes(yuv_fname, w, h):
+    """Load a YUV420 planar image file, and return Y, U, and V plane images.
 
     Args:
         yuv_fname: The path of the YUV420 file.
