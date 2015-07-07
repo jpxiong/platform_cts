@@ -94,6 +94,8 @@ cts_support_packages := \
     TestDeviceSetup \
     CtsUiAutomatorApp \
     CtsUsbSerialTestApp \
+    CtsVoiceInteractionService \
+    CtsVoiceInteractionApp \
     $(cts_security_apps_list) \
     $(cts_security_keysets_list)
 
@@ -181,6 +183,7 @@ cts_test_packages := \
     CtsUsageStatsTestCases \
     CtsUtilTestCases \
     CtsViewTestCases \
+    CtsVoiceInteractionTestCases \
     CtsWebkitTestCases \
     CtsWidgetTestCases
 
