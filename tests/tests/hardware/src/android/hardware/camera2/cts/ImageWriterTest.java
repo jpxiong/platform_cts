@@ -131,6 +131,50 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
         }
     }
 
+    public void testAbandonedSurfaceExceptions() throws Exception {
+        final int READER_WIDTH = 1920;
+        final int READER_HEIGHT = 1080;
+        final int READER_FORMAT = ImageFormat.YUV_420_888;
+
+        // Verify that if the image writer's input surface is abandoned, dequeueing an image
+        // throws IllegalStateException
+        ImageReader reader = ImageReader.newInstance(READER_WIDTH, READER_HEIGHT, READER_FORMAT,
+                MAX_NUM_IMAGES);
+        ImageWriter writer = ImageWriter.newInstance(reader.getSurface(), MAX_NUM_IMAGES);
+
+        // Close image reader to abandon the input surface.
+        reader.close();
+
+        Image image;
+        try {
+            image = writer.dequeueInputImage();
+            fail("Should get an IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Expected
+        } finally {
+            writer.close();
+        }
+
+        // Verify that if the image writer's input surface is abandoned, queueing an image
+        // throws IllegalStateException
+        reader = ImageReader.newInstance(READER_WIDTH, READER_HEIGHT, READER_FORMAT,
+                MAX_NUM_IMAGES);
+        writer = ImageWriter.newInstance(reader.getSurface(), MAX_NUM_IMAGES);
+        image = writer.dequeueInputImage();
+
+        // Close image reader to abandon the input surface.
+        reader.close();
+
+        try {
+            writer.queueInputImage(image);
+            fail("Should get an IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Expected
+        } finally {
+            writer.close();
+        }
+    }
+
     private void readerWriterFormatTestByCamera(int format)  throws Exception {
         List<Size> sizes = getSortedSizesForFormat(mCamera.getId(), mCameraManager, format, null);
         Size maxSize = sizes.get(0);
