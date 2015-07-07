@@ -38,13 +38,16 @@ public class PrimaryUserAdminHelper extends AndroidTestCase {
      * Device admin can only be deactivated by itself and this test should be executed before the
      * device admin package can be uninstalled.
      */
-    public void testClearDeviceAdmin() {
-        try {
-            removeActiveAdmin(mDpm, PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT);
-        } catch (InterruptedException e) {
-            fail("Removal of device admin interrupted.");
+    public void testClearDeviceAdmin() throws Exception {
+        ComponentName cn = PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT;
+        if (mDpm.isAdminActive(cn)) {
+            mDpm.removeActiveAdmin(cn);
+            // Wait until device admin is not active (with 2 minutes timeout).
+            for (int i = 0; i < 2 * 60 && mDpm.isAdminActive(cn); i++) {
+                Thread.sleep(1000);  // 1 second.
+            }
         }
-        assertFalse(mDpm.isAdminActive(PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT));
+        assertFalse(mDpm.isAdminActive(cn));
     }
 
     /**
@@ -64,16 +67,5 @@ public class PrimaryUserAdminHelper extends AndroidTestCase {
         mDpm.setPasswordMinimumLength(
                 PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT, 0);
         assertTrue(mDpm.resetPassword("", 0));
-    }
-
-    private void removeActiveAdmin(DevicePolicyManager dpm, ComponentName cn)
-            throws InterruptedException {
-        if (mDpm.isAdminActive(cn)) {
-            mDpm.removeActiveAdmin(cn);
-            // Wait until device admin is not active.
-            for (int i = 0; i < 1000 && dpm.isAdminActive(cn); i++) {
-                Thread.sleep(100);
-            }
-        }
     }
 }
