@@ -17,11 +17,15 @@ package android.cts.util;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.net.Uri;
+import android.util.Range;
 import java.lang.reflect.Method;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -144,6 +148,40 @@ public class MediaUtils {
             Log.i(TAG, "no decoder for " + format);
             return false;
         }
+        return true;
+    }
+
+    public static boolean supports(String codecName, String mime, int w, int h) {
+        MediaCodec codec;
+        try {
+            codec = MediaCodec.createByCodecName(codecName);
+        } catch (IOException e) {
+            return false;
+        }
+
+        CodecCapabilities cap = null;
+        try {
+            cap = codec.getCodecInfo().getCapabilitiesForType(mime);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "not supported mime: " + mime);
+            codec.release();
+            return false;
+        }
+
+        VideoCapabilities vidCap = cap.getVideoCapabilities();
+        if (vidCap == null) {
+            Log.w(TAG, "not a video codec: " + codecName);
+            codec.release();
+            return false;
+        }
+        try {
+            Range<Double> fps = vidCap.getSupportedFrameRatesFor(w, h);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "unsupported size " + w + "x" + h);
+            codec.release();
+            return false;
+        }
+        codec.release();
         return true;
     }
 
