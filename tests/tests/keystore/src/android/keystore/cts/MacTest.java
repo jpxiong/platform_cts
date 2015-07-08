@@ -125,11 +125,12 @@ public class MacTest extends TestCase {
     }
 
     public void testAndroidKeyStoreKeysHandledByAndroidKeyStoreProvider() throws Exception {
-        SecretKey key = importDefaultKatKey();
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(provider);
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
+                SecretKey key = importDefaultKatKey(algorithm);
+
                 // Generate a MAC
                 Mac mac = Mac.getInstance(algorithm);
                 mac.init(key);
@@ -141,12 +142,12 @@ public class MacTest extends TestCase {
     }
 
     public void testMacGeneratedByAndroidKeyStoreVerifiesByAndroidKeyStore() throws Exception {
-        SecretKey key = importDefaultKatKey();
-
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(provider);
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
+                SecretKey key = importDefaultKatKey(algorithm);
+
                 // Generate a MAC
                 Mac mac = Mac.getInstance(algorithm, provider);
                 mac.init(key);
@@ -162,13 +163,13 @@ public class MacTest extends TestCase {
 
     public void testMacGeneratedByAndroidKeyStoreVerifiesByHighestPriorityProvider()
             throws Exception {
-        SecretKey key = getDefaultKatKey();
-        SecretKey keystoreKey = importDefaultKatKey();
-
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(provider);
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
+                SecretKey key = getDefaultKatKey(algorithm);
+                SecretKey keystoreKey = importDefaultKatKey(algorithm);
+
                 // Generate a MAC
                 Mac mac = Mac.getInstance(algorithm, provider);
                 mac.init(keystoreKey);
@@ -184,14 +185,14 @@ public class MacTest extends TestCase {
 
     public void testMacGeneratedByHighestPriorityProviderVerifiesByAndroidKeyStore()
             throws Exception {
-        SecretKey key = getDefaultKatKey();
-        SecretKey keystoreKey = importDefaultKatKey();
-
         Provider keystoreProvider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(keystoreProvider);
         for (String algorithm : EXPECTED_ALGORITHMS) {
             Provider signingProvider = null;
             try {
+                SecretKey key = getDefaultKatKey(algorithm);
+                SecretKey keystoreKey = importDefaultKatKey(algorithm);
+
                 // Generate a MAC
                 Mac mac = Mac.getInstance(algorithm);
                 mac.init(key);
@@ -209,11 +210,12 @@ public class MacTest extends TestCase {
     }
 
     public void testSmallMsgKat() throws Exception {
-        SecretKey key = importDefaultKatKey();
         byte[] message = SHORT_MSG_KAT_MESSAGE;
 
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
+                SecretKey key = importDefaultKatKey(algorithm);
+
                 byte[] goodMacBytes = SHORT_MSG_KAT_MACS.get(algorithm);
                 assertNotNull(goodMacBytes);
                 assertMacVerifiesOneShot(algorithm, key, message, goodMacBytes);
@@ -234,11 +236,12 @@ public class MacTest extends TestCase {
     }
 
     public void testLargeMsgKat() throws Exception {
-        SecretKey key = importDefaultKatKey();
         byte[] message = TestUtils.generateLargeKatMsg(LONG_MSG_KAT_SEED, LONG_MSG_KAT_SIZE_BYTES);
 
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
+                SecretKey key = importDefaultKatKey(algorithm);
+
                 byte[] goodMacBytes = LONG_MSG_KAT_MACS.get(algorithm);
                 assertNotNull(goodMacBytes);
                 assertMacVerifiesOneShot(algorithm,  key, message, goodMacBytes);
@@ -452,28 +455,21 @@ public class MacTest extends TestCase {
         } catch (InvalidKeyException expected) {}
     }
 
-    private SecretKey getDefaultKatKey() {
-        return new SecretKeySpec(KAT_KEY, "HmacSHA1");
+    private SecretKey getDefaultKatKey(String keyAlgorithm) {
+        return new SecretKeySpec(KAT_KEY, keyAlgorithm);
     }
 
-    private SecretKey importDefaultKatKey() throws Exception {
-        return importDefaultKatKey("HmacSHA1",
-                new KeyProtection.Builder(
-                        KeyProperties.PURPOSE_SIGN)
-                        .setDigests(
-                                KeyProperties.DIGEST_SHA1,
-                                KeyProperties.DIGEST_SHA224,
-                                KeyProperties.DIGEST_SHA256,
-                                KeyProperties.DIGEST_SHA384,
-                                KeyProperties.DIGEST_SHA512)
-                        .build());
+    private SecretKey importDefaultKatKey(String keyAlgorithm) throws Exception {
+        return importDefaultKatKey(
+                keyAlgorithm,
+                new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN).build());
     }
 
     private SecretKey importDefaultKatKey(
             String keyAlgorithm, KeyProtection keyProtection) throws Exception {
         return TestUtils.importIntoAndroidKeyStore(
                 "test1",
-                new SecretKeySpec(KAT_KEY, keyAlgorithm),
+                getDefaultKatKey(keyAlgorithm),
                 keyProtection);
     }
 
