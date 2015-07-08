@@ -16,23 +16,47 @@
 package com.android.cts.managedprofile;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.UserManager;
+import android.util.Log;
 
-import com.android.cts.managedprofile.BaseManagedProfileTest;
-
-import org.junit.Ignore;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test Runtime Permissions APIs in DevicePolicyManager.
  */
 public class PermissionsTest extends BaseManagedProfileTest {
+    private static final String TAG = "PermissionsTest";
 
-    private static final String SIMPLE_APP_PACKAGE_NAME = "com.android.cts.launcherapps.simpleapp";
+    private static final String PERMISSION_APP_PACKAGE_NAME
+            = "com.android.cts.permission.permissionapp";
     private static final String SIMPLE_PRE_M_APP_PACKAGE_NAME =
             "com.android.cts.launcherapps.simplepremapp";
     private static final String PERMISSION_NAME = "android.permission.READ_CONTACTS";
+
+    private static final String PERMISSIONS_ACTIVITY_NAME
+            = PERMISSION_APP_PACKAGE_NAME + ".PermissionActivity";
+    private static final String ACTION_CHECK_HAS_PERMISSION
+            = "com.android.cts.permission.action.CHECK_HAS_PERMISSION";
+    private static final String ACTION_REQUEST_PERMISSION
+            = "com.android.cts.permission.action.REQUEST_PERMISSION";
+    private static final String ACTION_PERMISSION_RESULT
+            = "com.android.cts.permission.action.PERMISSION_RESULT";
+    private static final String EXTRA_PERMISSION
+            = "com.android.cts.permission.extra.PERMISSION";
+    private static final String EXTRA_GRANT_STATE
+            = "com.android.cts.permission.extra.GRANT_STATE";
+    private static final int PERMISSION_ERROR = -2;
+
+    private PermissionBroadcastReceiver mReceiver;
+    private PackageManager mPackageManager;
 
     @Override
     protected void setUp() throws Exception {
@@ -42,86 +66,152 @@ public class PermissionsTest extends BaseManagedProfileTest {
         assertTrue(mDevicePolicyManager.isAdminActive(ADMIN_RECEIVER_COMPONENT));
         assertTrue(mDevicePolicyManager.isProfileOwnerApp(
                 ADMIN_RECEIVER_COMPONENT.getPackageName()));
+        mReceiver = new PermissionBroadcastReceiver();
+        mContext.registerReceiver(mReceiver, new IntentFilter(ACTION_PERMISSION_RESULT));
+        mPackageManager = mContext.getPackageManager();
     }
 
-    public void testPermissionGrantState() {
-        PackageManager pm = mContext.getPackageManager();
-        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
-        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
-                PackageManager.PERMISSION_DENIED);
+    @Override
+    protected void tearDown() throws Exception {
+        mContext.unregisterReceiver(mReceiver);
+        super.tearDown();
+    }
 
-        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+    public void testPermissionGrantState() throws Exception {
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
+        assertPermissionGrantState(PackageManager.PERMISSION_DENIED);
+
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay denied
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
-                PackageManager.PERMISSION_DENIED);
+        assertPermissionGrantState(PackageManager.PERMISSION_DENIED);
 
-        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
-        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
-                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
-                PackageManager.PERMISSION_GRANTED);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+        assertPermissionGrantState(PackageManager.PERMISSION_GRANTED);
 
-        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_APP_PACKAGE_NAME, PERMISSION_NAME),
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay granted
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_APP_PACKAGE_NAME),
-                PackageManager.PERMISSION_GRANTED);
+        assertPermissionGrantState(PackageManager.PERMISSION_GRANTED);
 
-        mDevicePolicyManager.setPermissionPolicy(ADMIN_RECEIVER_COMPONENT,
-                DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
-        assertEquals(mDevicePolicyManager.getPermissionPolicy(ADMIN_RECEIVER_COMPONENT),
-                DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
-
-        mDevicePolicyManager.setPermissionPolicy(ADMIN_RECEIVER_COMPONENT,
-                DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
-        assertEquals(mDevicePolicyManager.getPermissionPolicy(ADMIN_RECEIVER_COMPONENT),
-                DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
-
-        mDevicePolicyManager.setPermissionPolicy(ADMIN_RECEIVER_COMPONENT,
-                DevicePolicyManager.PERMISSION_POLICY_PROMPT);
-        assertEquals(mDevicePolicyManager.getPermissionPolicy(ADMIN_RECEIVER_COMPONENT),
-                DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
     }
 
-    public void testPermissionGrantStatePreMApp() {
+    public void testPermissionPolicy() throws Exception {
+        // reset permission to denied and unlocked
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+
+        // reset permission to denied and unlocked
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+    }
+
+    public void testPermissionMixedPolicies() throws Exception {
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+    }
+
+    public void testPermissionGrantStatePreMApp() throws Exception {
         // These tests are to make sure that pre-M apps are not granted runtime permissions
         // by a profile owner
-        PackageManager pm = mContext.getPackageManager();
+        assertSetPermissionGrantStatePreMApp(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
+        assertSetPermissionGrantStatePreMApp(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+    }
+
+    private void assertPermissionRequest(int expected) throws Exception {
+        Intent launchIntent = new Intent();
+        launchIntent.setComponent(new ComponentName(PERMISSION_APP_PACKAGE_NAME,
+                PERMISSIONS_ACTIVITY_NAME));
+        launchIntent.putExtra(EXTRA_PERMISSION, PERMISSION_NAME);
+        launchIntent.setAction(ACTION_REQUEST_PERMISSION);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(launchIntent);
+        assertEquals(expected, mReceiver.waitForBroadcast());
+        assertEquals(expected, mPackageManager.checkPermission(PERMISSION_NAME,
+                PERMISSION_APP_PACKAGE_NAME));
+    }
+
+    private void assertPermissionGrantState(int expected) throws Exception {
+        assertEquals(expected, mPackageManager.checkPermission(PERMISSION_NAME,
+                PERMISSION_APP_PACKAGE_NAME));
+        Intent launchIntent = new Intent();
+        launchIntent.setComponent(new ComponentName(PERMISSION_APP_PACKAGE_NAME,
+                PERMISSIONS_ACTIVITY_NAME));
+        launchIntent.putExtra(EXTRA_PERMISSION, PERMISSION_NAME);
+        launchIntent.setAction(ACTION_CHECK_HAS_PERMISSION);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(launchIntent);
+        assertEquals(expected, mReceiver.waitForBroadcast());
+    }
+
+    private void assertSetPermissionPolicy(int value) throws Exception {
+        mDevicePolicyManager.setPermissionPolicy(ADMIN_RECEIVER_COMPONENT,
+                value);
+        assertEquals(mDevicePolicyManager.getPermissionPolicy(ADMIN_RECEIVER_COMPONENT),
+                value);
+    }
+
+    private void assertSetPermissionGrantState(int value) throws Exception {
+        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME,
+                value);
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
+                value);
+    }
+
+    private void assertSetPermissionGrantStatePreMApp(int value) throws Exception {
         assertFalse(mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED));
+                value));
         assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME),
                 DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Install time permissions should always be granted
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_PRE_M_APP_PACKAGE_NAME),
+        assertEquals(mPackageManager.checkPermission(PERMISSION_NAME,
+                SIMPLE_PRE_M_APP_PACKAGE_NAME),
                 PackageManager.PERMISSION_GRANTED);
+    }
 
-        mDevicePolicyManager.setPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
-        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
-                SIMPLE_PRE_M_APP_PACKAGE_NAME, PERMISSION_NAME),
-                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-        // Install time permissions should always be granted
-        assertEquals(pm.checkPermission(PERMISSION_NAME, SIMPLE_PRE_M_APP_PACKAGE_NAME),
-                PackageManager.PERMISSION_GRANTED);
+    private class PermissionBroadcastReceiver extends BroadcastReceiver {
+        private BlockingQueue<Integer> mQueue = new ArrayBlockingQueue<Integer> (1);
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Integer result = new Integer(intent.getIntExtra(EXTRA_GRANT_STATE, PERMISSION_ERROR));
+            Log.d(TAG, "Grant state received " + result);
+            assertTrue(mQueue.add(result));
+        }
+
+        public int waitForBroadcast() throws Exception {
+            Integer result = mQueue.poll(30, TimeUnit.SECONDS);
+            mQueue.clear();
+            assertNotNull(result);
+            Log.d(TAG, "Grant state retrieved " + result.intValue());
+            return result.intValue();
+        }
     }
 }
