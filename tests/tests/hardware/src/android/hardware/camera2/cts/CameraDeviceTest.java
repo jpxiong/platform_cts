@@ -34,6 +34,7 @@ import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.media.ImageReader;
@@ -282,6 +283,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                             sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
                         continue;
                     }
+                    // Skip non-PREVIEW templates for non-color output
+                    if (!mStaticInfo.isColorOutputSupported() &&
+                            sTemplates[j] != CameraDevice.TEMPLATE_PREVIEW) {
+                        continue;
+                    }
                     CaptureRequest.Builder capReq = mCamera.createCaptureRequest(sTemplates[j]);
                     assertNotNull("Failed to create capture request", capReq);
                     if (mStaticInfo.areKeysAvailable(CaptureRequest.SENSOR_EXPOSURE_TIME)) {
@@ -405,9 +411,6 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
      */
     public void testChainedOperation() throws Throwable {
 
-        // Set up single dummy target
-        createDefaultImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
-                /*listener*/ null);
         final ArrayList<Surface> outputs = new ArrayList<>();
         outputs.add(mReaderSurface);
 
@@ -546,6 +549,12 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             Throwable result;
 
+            if (!(new StaticMetadata(mCameraManager.getCameraCharacteristics(mCameraIds[i]))).
+                    isColorOutputSupported()) {
+                Log.i(TAG, "Camera " + mCameraIds[i] + " does not support color outputs, skipping");
+                continue;
+            }
+
             // Start chained cascade
             ChainedCameraListener cameraListener = new ChainedCameraListener();
             mCameraManager.openCamera(mCameraIds[i], cameraListener, mHandler);
@@ -594,6 +603,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             try {
                 openDevice(mCameraIds[i], mCameraMockListener);
                 waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
 
                 prepareTestByCamera();
             }
@@ -611,6 +625,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             try {
                 openDevice(mCameraIds[i], mCameraMockListener);
                 waitForDeviceState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
 
                 testCreateSessionsByCamera(mCameraIds[i]);
             }
@@ -982,6 +1001,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                                 sTemplates[j] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
                             continue;
                         }
+                        // Skip non-PREVIEW templates for non-color output
+                        if (!mStaticInfo.isColorOutputSupported() &&
+                                sTemplates[j] != CameraDevice.TEMPLATE_PREVIEW) {
+                            continue;
+                        }
                         captureSingleShot(mCameraIds[i], sTemplates[j], repeating, abort);
                     }
                 }
@@ -989,13 +1013,16 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     // Test: burst of one shot
                     captureBurstShot(mCameraIds[i], sTemplates, 1, repeating, abort);
 
+                    int template = mStaticInfo.isColorOutputSupported() ?
+                        CameraDevice.TEMPLATE_STILL_CAPTURE :
+                        CameraDevice.TEMPLATE_PREVIEW;
                     int[] templates = new int[] {
-                            CameraDevice.TEMPLATE_STILL_CAPTURE,
-                            CameraDevice.TEMPLATE_STILL_CAPTURE,
-                            CameraDevice.TEMPLATE_STILL_CAPTURE,
-                            CameraDevice.TEMPLATE_STILL_CAPTURE,
-                            CameraDevice.TEMPLATE_STILL_CAPTURE
-                            };
+                        template,
+                        template,
+                        template,
+                        template,
+                        template
+                    };
 
                     // Test: burst of 5 shots of the same template type
                     captureBurstShot(mCameraIds[i], templates, templates.length, repeating, abort);
@@ -1075,6 +1102,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     templates[i] == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT) {
                 continue;
             }
+            // Skip non-PREVIEW templates for non-color outpu
+            if (!mStaticInfo.isColorOutputSupported() &&
+                    templates[i] != CameraDevice.TEMPLATE_PREVIEW) {
+                continue;
+            }
             CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(templates[i]);
             assertNotNull("Failed to create capture request", requestBuilder);
             requestBuilder.addTarget(mReaderSurface);
@@ -1134,6 +1166,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         // Create a new session listener each time, it's not reusable across cameras
         mSessionMockListener = spy(new BlockingSessionCallback());
         mSessionWaiter = mSessionMockListener.getStateWaiter();
+
+        if (!mStaticInfo.isColorOutputSupported()) {
+            createDefaultImageReader(getMaxDepthSize(mCamera.getId(), mCameraManager),
+                    ImageFormat.DEPTH16, MAX_NUM_IMAGES, new ImageDropperListener());
+        }
 
         List<Surface> outputSurfaces = new ArrayList<>(Arrays.asList(mReaderSurface));
         mCamera.createCaptureSession(outputSurfaces, mSessionMockListener, mHandler);
@@ -1229,9 +1266,9 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
 
     private void checkAfMode(CaptureRequest.Builder request, int template,
             CameraCharacteristics props) {
-        boolean hasFocuser = !props.getKeys().contains(CameraCharacteristics.
-                LENS_INFO_MINIMUM_FOCUS_DISTANCE) ||
-                props.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE) > 0f;
+        boolean hasFocuser = props.getKeys().contains(CameraCharacteristics.
+                LENS_INFO_MINIMUM_FOCUS_DISTANCE) &&
+                (props.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE) > 0f);
 
         if (!hasFocuser) {
             return;
@@ -1272,6 +1309,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         if (template == CameraDevice.TEMPLATE_MANUAL) {
             return;
         }
+
+        if (!mStaticInfo.isColorOutputSupported()) return;
 
         List<Integer> availableAntiBandingModes =
                 Arrays.asList(toObject(mStaticInfo.getAeAvailableAntiBandingModesChecked()));
@@ -1324,12 +1363,16 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         // 3A settings--AE/AWB/AF.
-        int maxRegionsAe = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
-        int maxRegionsAwb = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
-        int maxRegionsAf = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
+        Integer maxRegionsAeVal = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
+        int maxRegionsAe = maxRegionsAeVal != null ? maxRegionsAeVal : 0;
+        Integer maxRegionsAwbVal = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
+        int maxRegionsAwb = maxRegionsAwbVal != null ? maxRegionsAwbVal : 0;
+        Integer maxRegionsAfVal = props.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
+        int maxRegionsAf = maxRegionsAfVal != null ? maxRegionsAfVal : 0;
+
+        checkFpsRange(request, template, props);
 
         checkAfMode(request, template, props);
-        checkFpsRange(request, template, props);
         checkAntiBandingMode(request, template);
 
         if (template == CameraDevice.TEMPLATE_MANUAL) {
@@ -1339,45 +1382,47 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
                     CaptureRequest.CONTROL_AWB_MODE_OFF);
         } else {
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON);
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
-            mCollector.expectKeyValueEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
-            // if AE lock is not supported, expect the control key to be non-exist or false
-            if (mStaticInfo.isAeLockSupported() || request.get(CONTROL_AE_LOCK) != null) {
-                mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
-            }
+            if (mStaticInfo.isColorOutputSupported()) {
+                mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON);
+                mCollector.expectKeyValueEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
+                mCollector.expectKeyValueEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
+                        CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+                // if AE lock is not supported, expect the control key to be non-exist or false
+                if (mStaticInfo.isAeLockSupported() || request.get(CONTROL_AE_LOCK) != null) {
+                    mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
+                }
 
-            mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER,
-                    CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+                mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER,
+                        CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
 
-            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
-                    CaptureRequest.CONTROL_AWB_MODE_AUTO);
-            // if AWB lock is not supported, expect the control key to be non-exist or false
-            if (mStaticInfo.isAwbLockSupported() || request.get(CONTROL_AWB_LOCK) != null) {
-                mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
-            }
+                mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE,
+                        CaptureRequest.CONTROL_AWB_MODE_AUTO);
+                // if AWB lock is not supported, expect the control key to be non-exist or false
+                if (mStaticInfo.isAwbLockSupported() || request.get(CONTROL_AWB_LOCK) != null) {
+                    mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
+                }
 
-            // Check 3A regions.
-            if (VERBOSE) {
-                Log.v(TAG, String.format("maxRegions is: {AE: %s, AWB: %s, AF: %s}",
-                        maxRegionsAe, maxRegionsAwb, maxRegionsAf));
-            }
-            if (maxRegionsAe > 0) {
-                mCollector.expectKeyValueNotNull(request, CONTROL_AE_REGIONS);
-                MeteringRectangle[] aeRegions = request.get(CONTROL_AE_REGIONS);
-                checkMeteringRect(aeRegions);
-            }
-            if (maxRegionsAwb > 0) {
-                mCollector.expectKeyValueNotNull(request, CONTROL_AWB_REGIONS);
-                MeteringRectangle[] awbRegions = request.get(CONTROL_AWB_REGIONS);
-                checkMeteringRect(awbRegions);
-            }
-            if (maxRegionsAf > 0) {
-                mCollector.expectKeyValueNotNull(request, CONTROL_AF_REGIONS);
-                MeteringRectangle[] afRegions = request.get(CONTROL_AF_REGIONS);
-                checkMeteringRect(afRegions);
+                // Check 3A regions.
+                if (VERBOSE) {
+                    Log.v(TAG, String.format("maxRegions is: {AE: %s, AWB: %s, AF: %s}",
+                                    maxRegionsAe, maxRegionsAwb, maxRegionsAf));
+                }
+                if (maxRegionsAe > 0) {
+                    mCollector.expectKeyValueNotNull(request, CONTROL_AE_REGIONS);
+                    MeteringRectangle[] aeRegions = request.get(CONTROL_AE_REGIONS);
+                    checkMeteringRect(aeRegions);
+                }
+                if (maxRegionsAwb > 0) {
+                    mCollector.expectKeyValueNotNull(request, CONTROL_AWB_REGIONS);
+                    MeteringRectangle[] awbRegions = request.get(CONTROL_AWB_REGIONS);
+                    checkMeteringRect(awbRegions);
+                }
+                if (maxRegionsAf > 0) {
+                    mCollector.expectKeyValueNotNull(request, CONTROL_AF_REGIONS);
+                    MeteringRectangle[] afRegions = request.get(CONTROL_AF_REGIONS);
+                    checkMeteringRect(afRegions);
+                }
             }
         }
 
@@ -1446,10 +1491,12 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
 
         // ISP-processing settings.
-        mCollector.expectKeyValueEquals(
-                request, STATISTICS_FACE_DETECT_MODE,
-                CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF);
-        mCollector.expectKeyValueEquals(request, FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+        if (mStaticInfo.isColorOutputSupported()) {
+            mCollector.expectKeyValueEquals(
+                    request, STATISTICS_FACE_DETECT_MODE,
+                    CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+        }
 
         List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
         if (mStaticInfo.areKeysAvailable(STATISTICS_LENS_SHADING_MAP_MODE)) {
@@ -1608,6 +1655,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 } else if (sLegacySkipTemplates.contains(template) &&
                         mStaticInfo.isHardwareLevelLegacy()) {
                     // OK
+                } else if (template != CameraDevice.TEMPLATE_PREVIEW &&
+                        mStaticInfo.isDepthOutputSupported() &&
+                        !mStaticInfo.isColorOutputSupported()) {
+                    // OK, depth-only devices need only support PREVIEW template
                 } else {
                     throw e; // rethrow
                 }

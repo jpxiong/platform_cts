@@ -73,8 +73,10 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
             Size sensorSize = new Size(activeRect.width(), activeRect.height());
             List<Integer> availableCaps = mStaticInfo.getAvailableCapabilitiesChecked();
 
-            mCollector.expectTrue("All device must contains BACKWARD_COMPATIBLE capability",
-                    availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE));
+            mCollector.expectTrue("All devices must contains BACKWARD_COMPATIBLE capability or " +
+                    "DEPTH_OUTPUT capabillity" ,
+                    availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE) ||
+                    availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT) );
 
             if (mStaticInfo.isHardwareLevelFull()) {
                 // Capability advertisement must be right.
@@ -91,18 +93,25 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                         mStaticInfo.isPerFrameControlSupported());
             }
 
+            if (mStaticInfo.isHardwareLevelLegacy()) {
+                mCollector.expectTrue("Legacy devices must contain BACKWARD_COMPATIBLE capability",
+                        availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE));
+            }
+
             if (availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
                 mCollector.expectTrue("MANUAL_SENSOR capability always requires " +
                         "READ_SENSOR_SETTINGS capability as well",
                         availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS));
             }
 
-            // Max jpeg resolution must be very close to  sensor resolution
-            Size[] jpegSizes = mStaticInfo.getJpegOutputSizesChecked();
-            Size maxJpegSize = CameraTestUtils.getMaxSize(jpegSizes);
-            mCollector.expectSizesAreSimilar(
+            if (mStaticInfo.isColorOutputSupported()) {
+                // Max jpeg resolution must be very close to  sensor resolution
+                Size[] jpegSizes = mStaticInfo.getJpegOutputSizesChecked();
+                Size maxJpegSize = CameraTestUtils.getMaxSize(jpegSizes);
+                mCollector.expectSizesAreSimilar(
                     "Active array size and max JPEG size should be similar",
                     sensorSize, maxJpegSize, SIZE_ERROR_MARGIN);
+            }
 
             // TODO: test all the keys mandatory for all capability devices.
         }
@@ -127,9 +136,9 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 mCollector.expectTrue("max number of processed (non-stalling) output streams" +
                         "must be >= 3 for FULL device",
                         maxNumStreamsProc >= 3);
-            } else {
+            } else if (mStaticInfo.isColorOutputSupported()) {
                 mCollector.expectTrue("max number of processed (non-stalling) output streams" +
-                        "must be >= 2 for LIMITED device",
+                        "must be >= 2 for devices that support color output",
                         maxNumStreamsProc >= 2);
             }
         }
@@ -319,7 +328,7 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
                 Boolean contrastCurveModeSupported = false;
                 Boolean gammaAndPresetModeSupported = false;
                 Boolean offColorAberrationModeSupported = false;
-                if (mStaticInfo.isHardwareLevelLimitedOrBetter()) {
+                if (mStaticInfo.isHardwareLevelLimitedOrBetter() && mStaticInfo.isColorOutputSupported()) {
                     int[] tonemapModes = mStaticInfo.getAvailableToneMapModesChecked();
                     List<Integer> modeList = (tonemapModes.length == 0) ?
                             new ArrayList<Integer>() :

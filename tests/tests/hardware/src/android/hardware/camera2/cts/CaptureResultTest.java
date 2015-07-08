@@ -97,10 +97,16 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-                // Create image reader and surface.
-                Size size = mOrderedPreviewSizes.get(0);
-                createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
-                        new ImageDropperListener());
+                if (mStaticInfo.isColorOutputSupported()) {
+                    // Create image reader and surface.
+                    Size size = mOrderedPreviewSizes.get(0);
+                    createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                            new ImageDropperListener());
+                } else {
+                    Size size = getMaxDepthSize(id, mCameraManager);
+                    createDefaultImageReader(size, ImageFormat.DEPTH16, MAX_NUM_IMAGES,
+                            new ImageDropperListener());
+                }
 
                 // Configure output streams.
                 List<Surface> outputSurfaces = new ArrayList<Surface>(1);
@@ -158,9 +164,15 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 }
 
                 // Create image reader and surface.
-                Size size = mOrderedPreviewSizes.get(0);
-                createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
-                        new ImageDropperListener());
+                if (mStaticInfo.isColorOutputSupported()) {
+                    Size size = mOrderedPreviewSizes.get(0);
+                    createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                            new ImageDropperListener());
+                } else {
+                    Size size = getMaxDepthSize(id, mCameraManager);
+                    createDefaultImageReader(size, ImageFormat.DEPTH16, MAX_NUM_IMAGES,
+                            new ImageDropperListener());
+                }
 
                 // Configure output streams.
                 List<Surface> outputSurfaces = new ArrayList<Surface>(1);
@@ -263,6 +275,10 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             SimpleImageReaderListener prevListener = new SimpleImageReaderListener();
             try {
                 openDevice(id);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
 
                 CaptureRequest.Builder previewBuilder =
                         mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -469,6 +485,8 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT)) {
             waiverKeys.add(CaptureResult.LENS_POSE_ROTATION);
             waiverKeys.add(CaptureResult.LENS_POSE_TRANSLATION);
+            waiverKeys.add(CaptureResult.LENS_INTRINSIC_CALIBRATION);
+            waiverKeys.add(CaptureResult.LENS_RADIAL_DISTORTION);
         }
 
         if (mStaticInfo.getAeMaxRegionsChecked() == 0) {
@@ -539,12 +557,12 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             waiverKeys.add(CaptureResult.LENS_FILTER_DENSITY);
         }
 
-        if (mStaticInfo.isHardwareLevelLimited()) {
+        if (mStaticInfo.isHardwareLevelLimited() && mStaticInfo.isColorOutputSupported()) {
             return waiverKeys;
         }
 
         /*
-         * Hardware Level = LEGACY
+         * Hardware Level = LEGACY or no regular output is supported
          */
         waiverKeys.add(CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER);
         waiverKeys.add(CaptureResult.CONTROL_AE_STATE);
@@ -557,6 +575,30 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
         waiverKeys.add(CaptureResult.CONTROL_AE_TARGET_FPS_RANGE);
         waiverKeys.add(CaptureResult.CONTROL_AF_TRIGGER);
+
+        if (mStaticInfo.isHardwareLevelLegacy()) {
+            return waiverKeys;
+        }
+
+        /*
+         * Regular output not supported, only depth, waive color-output-related keys
+         */
+        waiverKeys.add(CaptureResult.CONTROL_SCENE_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_EFFECT_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE);
+        waiverKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
+        waiverKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
+        waiverKeys.add(CaptureResult.COLOR_CORRECTION_ABERRATION_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AE_ANTIBANDING_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION);
+        waiverKeys.add(CaptureResult.CONTROL_AE_LOCK);
+        waiverKeys.add(CaptureResult.CONTROL_AE_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AF_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AWB_MODE);
+        waiverKeys.add(CaptureResult.CONTROL_AWB_LOCK);
+        waiverKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
+        waiverKeys.add(CaptureResult.FLASH_MODE);
+        waiverKeys.add(CaptureResult.SCALER_CROP_REGION);
 
         return waiverKeys;
     }
@@ -706,6 +748,8 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
         resultKeys.add(CaptureResult.LENS_POSE_ROTATION);
         resultKeys.add(CaptureResult.LENS_POSE_TRANSLATION);
+        resultKeys.add(CaptureResult.LENS_INTRINSIC_CALIBRATION);
+        resultKeys.add(CaptureResult.LENS_RADIAL_DISTORTION);
         resultKeys.add(CaptureResult.LENS_FOCUS_RANGE);
         resultKeys.add(CaptureResult.LENS_STATE);
         resultKeys.add(CaptureResult.NOISE_REDUCTION_MODE);

@@ -50,6 +50,9 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
                 Log.i(TAG, "Testing YUV Burst for camera " + id);
                 openDevice(id);
 
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                }
                 if (!mStaticInfo.isAeLockSupported() || !mStaticInfo.isAwbLockSupported()) {
                     Log.i(TAG, "AE/AWB lock is not supported in camera " + id +
                             ". Skip the test");

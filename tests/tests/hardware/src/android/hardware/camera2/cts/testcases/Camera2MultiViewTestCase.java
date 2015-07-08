@@ -362,9 +362,11 @@ public class Camera2MultiViewTestCase extends
                     mCameraId, mCameraListener, mHandler);
             mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(mCameraId),
                     CheckLevel.ASSERT, /*collector*/null);
-            mOrderedPreviewSizes = getSupportedPreviewSizes(
-                    mCameraId, mCameraManager,
-                    getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
+            if (mStaticInfo.isColorOutputSupported()) {
+                mOrderedPreviewSizes = getSupportedPreviewSizes(
+                        mCameraId, mCameraManager,
+                        getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
+            }
             assertNotNull(String.format("Failed to open camera device ID: %s", mCameraId), mCamera);
         }
 
@@ -414,4 +416,3 @@ public class Camera2MultiViewTestCase extends
         }
     }
 }
-

@@ -268,7 +268,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // Without manual sensor control, exposure time cannot be verified
                 if (!mStaticInfo.isCapabilitySupported(
                         CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
-                    return;
+                    continue;
                 }
 
                 int[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
@@ -300,6 +300,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i]);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
 
                 Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
 
@@ -327,6 +332,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i]);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
 
                 SimpleCaptureCallback listener = new SimpleCaptureCallback();
                 CaptureRequest.Builder requestBuilder =
@@ -364,7 +374,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 faceDetectionTestByCamera();
             } finally {
                 closeDevice();
@@ -479,7 +493,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 awbModeAndLockTestByCamera();
             } finally {
                 closeDevice();
@@ -494,7 +511,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 afModeTestByCamera();
             } finally {
                 closeDevice();
@@ -517,7 +537,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     Log.i(TAG, "Camera " + id + " doesn't support any stabilization modes");
                     continue;
                 }
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 stabilizationTestByCamera();
             } finally {
                 closeDevice();
@@ -533,7 +556,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 Size maxPreviewSize = mOrderedPreviewSizes.get(0);
                 digitalZoomTestByCamera(maxPreviewSize);
             } finally {
@@ -550,7 +576,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 digitalZoomPreviewCombinationTestByCamera();
             } finally {
                 closeDevice();
@@ -581,7 +610,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 effectModeTestByCamera();
             } finally {
                 closeDevice();

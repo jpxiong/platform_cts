@@ -109,7 +109,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
      * case, there is no way for client to know the exact preview frame
      * arrival time. To approximate this time, a companion YUV420_888 stream is
      * created. The first YUV420_888 Image coming out of the ImageReader is treated
-     * as the first preview arrival time.
+     * as the first preview arrival time.</p>
+     * <p>
+     * For depth-only devices, timing is done with the DEPTH16 format instead.
      * </p>
      */
     public void testCameraLaunch() throws Exception {
@@ -124,7 +126,15 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         int counter = 0;
         for (String id : mCameraIds) {
             try {
-                initializeImageReader(id, ImageFormat.YUV_420_888);
+                mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(id));
+                if (mStaticInfo.isColorOutputSupported()) {
+                    initializeImageReader(id, ImageFormat.YUV_420_888);
+                } else {
+                    assertTrue("Depth output must be supported if regular output isn't!",
+                            mStaticInfo.isDepthOutputSupported());
+                    initializeImageReader(id, ImageFormat.DEPTH16);
+                }
+
                 SimpleImageListener imageListener = null;
                 long startTimeMs, openTimeMs, configureTimeMs, previewStartedTimeMs;
                 for (int i = 0; i < NUM_TEST_LOOPS; i++) {
@@ -222,6 +232,12 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
+
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
+
 
                 boolean partialsExpected = mStaticInfo.getPartialResultCount() > 1;
                 long startTimeMs;
@@ -656,7 +672,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
 
         CaptureRequest.Builder previewBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        previewBuilder.addTarget(mPreviewSurface);
+        if (mStaticInfo.isColorOutputSupported()) {
+            previewBuilder.addTarget(mPreviewSurface);
+        }
         previewBuilder.addTarget(mReaderSurface);
         mSession.setRepeatingRequest(previewBuilder.build(), listener, mHandler);
         imageListener.waitForImageAvailable(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
@@ -671,7 +689,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         }
         mSessionListener = new BlockingSessionCallback();
         List<Surface> outputSurfaces = new ArrayList<>();
-        outputSurfaces.add(mPreviewSurface);
+        if (mStaticInfo.isColorOutputSupported()) {
+            outputSurfaces.add(mPreviewSurface);
+        }
         outputSurfaces.add(mReaderSurface);
         mSession = CameraTestUtils.configureCameraSession(mCamera, outputSurfaces,
                 mSessionListener, mHandler);
@@ -683,8 +703,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
      * @param format The format used to create ImageReader instance.
      */
     private void initializeImageReader(String cameraId, int format) throws Exception {
-        mOrderedPreviewSizes = CameraTestUtils.getSupportedPreviewSizes(
-                cameraId, mCameraManager,
+        mOrderedPreviewSizes = CameraTestUtils.getSortedSizesForFormat(
+                cameraId, mCameraManager, format,
                 CameraTestUtils.getPreviewSizeBound(mWindowManager,
                     CameraTestUtils.PREVIEW_SIZE_BOUND));
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
