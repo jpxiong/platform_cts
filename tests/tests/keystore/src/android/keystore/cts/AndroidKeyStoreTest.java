@@ -2009,9 +2009,9 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         Signature.getInstance("NONEwithECDSA").initVerify(publicKey);
     }
 
-    private static final int MIN_SUPPORTED_KEY_COUNT = 2000;
+    private static final int MIN_SUPPORTED_KEY_COUNT = 1500;
     private static final long MINUTE_IN_MILLIS = 1000 * 60;
-    private static final long LARGE_NUMBER_OF_KEYS_TEST_MAX_DURATION_MILLIS = 3 * MINUTE_IN_MILLIS;
+    private static final long LARGE_NUMBER_OF_KEYS_TEST_MAX_DURATION_MILLIS = 2 * MINUTE_IN_MILLIS;
 
     private static boolean isDeadlineReached(long startTimeMillis, long durationMillis) {
         long nowMillis = System.currentTimeMillis();
@@ -2072,6 +2072,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
                     throw new RuntimeException("Entry " + entryAlias + " import failed", e);
                 }
             }
+            Log.i(TAG, "Imported " + latestImportedEntryNumber + " keys");
             if (latestImportedEntryNumber < MIN_SUPPORTED_KEY_COUNT) {
                 fail("Failed to import " + MIN_SUPPORTED_KEY_COUNT + " keys in "
                         + (System.currentTimeMillis() - testStartTimeMillis)
@@ -2108,9 +2109,14 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         } finally {
             // Clean up Keystore without using KeyStore.aliases() which can't handle this many
             // entries.
+            Log.i(TAG, "Deleting imported keys");
             for (int i = 0; i <= latestImportedEntryNumber; i++) {
+                if ((i > 0) && ((i % 1000) == 0)) {
+                    Log.i(TAG, "Deleted " + i + " keys");
+                }
                 mKeyStore.deleteEntry("test" + i);
             }
+            Log.i(TAG, "Deleted " + (latestImportedEntryNumber + 1) + " keys");
         }
     }
 
@@ -2164,6 +2170,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
                     throw new RuntimeException("Entry " + entryAlias + " import failed", e);
                 }
             }
+            Log.i(TAG, "Imported " + latestImportedEntryNumber + " keys");
             if (latestImportedEntryNumber < MIN_SUPPORTED_KEY_COUNT) {
                 fail("Failed to import " + MIN_SUPPORTED_KEY_COUNT + " keys in "
                         + (System.currentTimeMillis() - testStartTimeMillis)
@@ -2200,9 +2207,14 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         } finally {
             // Clean up Keystore without using KeyStore.aliases() which can't handle this many
             // entries.
+            Log.i(TAG, "Deleting imported keys");
             for (int i = 0; i <= latestImportedEntryNumber; i++) {
+                if ((i > 0) && ((i % 1000) == 0)) {
+                    Log.i(TAG, "Deleted " + i + " keys");
+                }
                 mKeyStore.deleteEntry("test" + i);
             }
+            Log.i(TAG, "Deleted " + (latestImportedEntryNumber + 1) + " keys");
         }
     }
 
@@ -2254,6 +2266,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
                     throw new RuntimeException("Entry " + entryAlias + " import failed", e);
                 }
             }
+            Log.i(TAG, "Imported " + latestImportedEntryNumber + " keys");
             if (latestImportedEntryNumber < MIN_SUPPORTED_KEY_COUNT) {
                 fail("Failed to import " + MIN_SUPPORTED_KEY_COUNT + " keys in "
                         + (System.currentTimeMillis() - testStartTimeMillis)
@@ -2285,9 +2298,14 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         } finally {
             // Clean up Keystore without using KeyStore.aliases() which can't handle this many
             // entries.
+            Log.i(TAG, "Deleting imported keys");
             for (int i = 0; i <= latestImportedEntryNumber; i++) {
+                if ((i > 0) && ((i % 1000) == 0)) {
+                    Log.i(TAG, "Deleted " + i + " keys");
+                }
                 mKeyStore.deleteEntry("test" + i);
             }
+            Log.i(TAG, "Deleted " + (latestImportedEntryNumber + 1) + " keys");
         }
     }
 
@@ -2337,6 +2355,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
                     throw new RuntimeException("Entry " + entryAlias + " import failed", e);
                 }
             }
+            Log.i(TAG, "Imported " + latestImportedEntryNumber + " keys");
             if (latestImportedEntryNumber < MIN_SUPPORTED_KEY_COUNT) {
                 fail("Failed to import " + MIN_SUPPORTED_KEY_COUNT + " keys in "
                         + (System.currentTimeMillis() - testStartTimeMillis)
@@ -2366,9 +2385,14 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
         } finally {
             // Clean up Keystore without using KeyStore.aliases() which can't handle this many
             // entries.
+            Log.i(TAG, "Deleting imported keys");
             for (int i = 0; i <= latestImportedEntryNumber; i++) {
+                if ((i > 0) && ((i % 1000) == 0)) {
+                    Log.i(TAG, "Deleted " + i + " keys");
+                }
                 mKeyStore.deleteEntry("test" + i);
             }
+            Log.i(TAG, "Deleted " + (latestImportedEntryNumber + 1) + " keys");
         }
     }
 }
