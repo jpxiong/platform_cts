@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.SystemProperties;
 import android.system.Os;
 import android.system.OsConstants;
 import android.system.StructStatVfs;
@@ -360,6 +361,19 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     @MediumTest
     public void testDeviceTreeCpuCurrent() throws Exception {
+        String arch = System.getProperty("os.arch");
+        String flavor = SystemProperties.get("ro.build.flavor");
+        String[] osVersion = System.getProperty("os.version").split("\\.");
+        /*
+         * Perform the test for only arm-based architecture and
+         * kernel version 3.10 and above.
+         */
+        if (!arch.contains("arm") ||
+            Integer.parseInt(osVersion[0]) < 2 ||
+            (Integer.parseInt(osVersion[0]) == 3 &&
+             Integer.parseInt(osVersion[1]) < 10) ||
+             flavor.contains("sprout") || flavor.contains("sprout_b"))
+            return;
         final File f = new File("/proc/device-tree/cpus");
         assertTrue(f.exists());
         String[] dir = f.list(new FilenameFilter() {
