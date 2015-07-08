@@ -23,6 +23,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCharacteristics.Key;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.params.BlackLevelPattern;
 import android.hardware.camera2.params.ColorSpaceTransform;
@@ -544,58 +545,83 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Integer maxNumInputStreams =
                     c.get(CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS);
+            int[] availableEdgeModes = c.get(CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES);
+            int[] availableNoiseReductionModes = c.get(
+                    CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES);
 
             int[] inputFormats = configs.getInputFormats();
 
-            assertFalse("Doesn't support reprocessing but report input format: " +
-                    Arrays.toString(inputFormats), !supportYUV && !supportOpaque &&
-                    inputFormats.length > 0);
+            boolean supportZslEdgeMode = false;
+            boolean supportZslNoiseReductionMode = false;
 
-            assertFalse("Doesn't support reprocessing but max number of input stream is " +
-                    maxNumInputStreams, !supportYUV && !supportOpaque &&
-                    maxNumInputStreams != null && maxNumInputStreams != 0);
+            if (availableEdgeModes != null) {
+                supportZslEdgeMode = Arrays.asList(CameraTestUtils.toObject(availableEdgeModes)).
+                        contains(CaptureRequest.EDGE_MODE_ZERO_SHUTTER_LAG);
+            }
+
+            if (availableNoiseReductionModes != null) {
+                supportZslNoiseReductionMode = Arrays.asList(
+                        CameraTestUtils.toObject(availableNoiseReductionModes)).contains(
+                        CaptureRequest.NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG);
+            }
 
             if (supportYUV || supportOpaque) {
-                assertTrue("Support reprocessing but max number of input stream is " +
+                mCollector.expectTrue("Support reprocessing but max number of input stream is " +
                         maxNumInputStreams, maxNumInputStreams != null && maxNumInputStreams > 0);
+                mCollector.expectTrue("Support reprocessing but EDGE_MODE_ZERO_SHUTTER_LAG is " +
+                        "not supported", supportZslEdgeMode);
+                mCollector.expectTrue("Support reprocessing but " +
+                        "NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG is not supported",
+                        supportZslNoiseReductionMode);
 
                 // Verify mandatory input formats are supported
-                assertTrue("YUV_420_888 input must be supported for YUV reprocessing",
+                mCollector.expectTrue("YUV_420_888 input must be supported for YUV reprocessing",
                         !supportYUV || arrayContains(inputFormats, ImageFormat.YUV_420_888));
-                assertTrue("PRIVATE input must be supported for OPAQUE reprocessing",
+                mCollector.expectTrue("PRIVATE input must be supported for OPAQUE reprocessing",
                         !supportOpaque || arrayContains(inputFormats, ImageFormat.PRIVATE));
 
                 // max capture stall must be reported if one of the reprocessing is supported.
                 final int MAX_ALLOWED_STALL_FRAMES = 4;
                 Integer maxCaptureStall = c.get(CameraCharacteristics.REPROCESS_MAX_CAPTURE_STALL);
-                assertTrue("max capture stall must be non-null and no larger than "
+                mCollector.expectTrue("max capture stall must be non-null and no larger than "
                         + MAX_ALLOWED_STALL_FRAMES,
                         maxCaptureStall != null && maxCaptureStall <= MAX_ALLOWED_STALL_FRAMES);
 
                 for (int input : inputFormats) {
                     // Verify mandatory output formats are supported
                     int[] outputFormats = configs.getValidOutputFormatsForInput(input);
-                    assertTrue("YUV_420_888 output must be supported for reprocessing",
+                    mCollector.expectTrue("YUV_420_888 output must be supported for reprocessing",
                             arrayContains(outputFormats, ImageFormat.YUV_420_888));
-                    assertTrue("JPEG output must be supported for reprocessing",
+                    mCollector.expectTrue("JPEG output must be supported for reprocessing",
                             arrayContains(outputFormats, ImageFormat.JPEG));
 
                     // Verify camera can output the reprocess input formats and sizes.
                     Size[] inputSizes = configs.getInputSizes(input);
                     Size[] outputSizes = configs.getOutputSizes(input);
                     Size[] highResOutputSizes = configs.getHighResolutionOutputSizes(input);
-                    assertTrue("no input size supported for format " + input,
+                    mCollector.expectTrue("no input size supported for format " + input,
                             inputSizes.length > 0);
-                    assertTrue("no output size supported for format " + input,
+                    mCollector.expectTrue("no output size supported for format " + input,
                             outputSizes.length > 0);
 
                     for (Size inputSize : inputSizes) {
-                        assertTrue("Camera must be able to output the supported reprocessing " +
-                                "input size",
+                        mCollector.expectTrue("Camera must be able to output the supported " +
+                                "reprocessing input size",
                                 arrayContains(outputSizes, inputSize) ||
                                 arrayContains(highResOutputSizes, inputSize));
                     }
                 }
+            } else {
+                mCollector.expectTrue("Doesn't support reprocessing but report input format: " +
+                        Arrays.toString(inputFormats), inputFormats.length == 0);
+                mCollector.expectTrue("Doesn't support reprocessing but max number of input " +
+                        "stream is " + maxNumInputStreams,
+                        maxNumInputStreams == null || maxNumInputStreams == 0);
+                mCollector.expectTrue("Doesn't support reprocessing but " +
+                        "EDGE_MODE_ZERO_SHUTTER_LAG is supported", !supportZslEdgeMode);
+                mCollector.expectTrue("Doesn't support reprocessing but " +
+                        "NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG is supported",
+                        !supportZslNoiseReductionMode);
             }
         }
     }
