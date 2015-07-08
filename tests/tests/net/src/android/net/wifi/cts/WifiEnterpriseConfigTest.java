@@ -94,7 +94,7 @@ public class WifiEnterpriseConfigTest extends AndroidTestCase {
         // Hotspot 2.0 related attributes
         config.setPlmn(PLMN);
         assertTrue(config.getPlmn().equals(PLMN));
-        config.setPlmn(REALM);
+        config.setRealm(REALM);
         assertTrue(config.getRealm().equals(REALM));
         config.setAltSubjectMatch(ALT_SUBJECT_MATCH);
         assertTrue(config.getAltSubjectMatch().equals(ALT_SUBJECT_MATCH));
