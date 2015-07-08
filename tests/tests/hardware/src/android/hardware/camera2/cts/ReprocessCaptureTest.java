@@ -979,7 +979,6 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
      *   2. NOISE_REDUCTION_MODE
      *   3. REPROCESS_EFFECTIVE_EXPOSURE_FACTOR (only for YUV reprocess)
      */
-
     private void testReprocessRequestKeys(String cameraId, Size inputSize, int inputFormat,
             Size reprocessOutputSize, int reprocessOutputFormat) throws Exception {
         if (VERBOSE) {
@@ -989,10 +988,13 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         }
 
         final Integer[] EDGE_MODES = {CaptureRequest.EDGE_MODE_FAST,
-                CaptureRequest.EDGE_MODE_HIGH_QUALITY, CaptureRequest.EDGE_MODE_OFF};
+                CaptureRequest.EDGE_MODE_HIGH_QUALITY, CaptureRequest.EDGE_MODE_OFF,
+                CaptureRequest.EDGE_MODE_ZERO_SHUTTER_LAG};
         final Integer[] NR_MODES = {CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY,
-                CaptureRequest.NOISE_REDUCTION_MODE_OFF, CaptureRequest.NOISE_REDUCTION_MODE_FAST};
-        final Float[] EFFECTIVE_EXP_FACTORS = {null, 1.0f, 2.5f};
+                CaptureRequest.NOISE_REDUCTION_MODE_OFF,
+                CaptureRequest.NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG,
+                CaptureRequest.NOISE_REDUCTION_MODE_FAST};
+        final Float[] EFFECTIVE_EXP_FACTORS = {null, 1.0f, 2.5f, 4.0f};
         int numFrames = EDGE_MODES.length;
 
         try {

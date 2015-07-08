@@ -1461,6 +1461,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             }
         }
 
+        // Edge enhancement and noise reduction modes
+        boolean supportReprocessing =
+                availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING) ||
+                availableCaps.contains(REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING);
+
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
             // Not enforce high quality here, as some devices may not effectively have high quality
             // mode.
@@ -1513,7 +1518,23 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                             request, NOISE_REDUCTION_MODE, CaptureRequest.NOISE_REDUCTION_MODE_OFF);
                 }
             }
+        } else if (template == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG && supportReprocessing) {
+            mCollector.expectKeyValueEquals(request, EDGE_MODE,
+                    CaptureRequest.EDGE_MODE_ZERO_SHUTTER_LAG);
+            mCollector.expectKeyValueEquals(request, NOISE_REDUCTION_MODE,
+                    CaptureRequest.NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG);
+        } else {
+            if (mStaticInfo.areKeysAvailable(EDGE_MODE)) {
+                mCollector.expectKeyValueNotNull(request, EDGE_MODE);
+            }
 
+            if (mStaticInfo.areKeysAvailable(NOISE_REDUCTION_MODE)) {
+                mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
+            }
+        }
+
+        // Tone map and lens shading modes.
+        if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
             mCollector.expectEquals("Tonemap mode must be present in request if " +
                             "available tonemap modes are present in metadata, and vice-versa.",
                     mStaticInfo.areKeysAvailable(CameraCharacteristics.
@@ -1540,14 +1561,6 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                             STATISTICS_LENS_SHADING_MAP_MODE_ON);
             }
         } else {
-            if (mStaticInfo.areKeysAvailable(EDGE_MODE)) {
-                mCollector.expectKeyValueNotNull(request, EDGE_MODE);
-            }
-
-            if (mStaticInfo.areKeysAvailable(NOISE_REDUCTION_MODE)) {
-                mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
-            }
-
             if (mStaticInfo.areKeysAvailable(TONEMAP_MODE)) {
                 mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE,
                         CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE);
