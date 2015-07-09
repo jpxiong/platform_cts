@@ -90,8 +90,12 @@ def main():
 
         its.caps.skip_unless(its.caps.read_3a(props) and
                              its.caps.per_frame_control(props) and
+                             its.caps.edge_mode(props, 0) and
                              (its.caps.yuv_reprocess(props) or
                               its.caps.private_reprocess(props)))
+
+        # If reprocessing is supported, ZSL EE mode must be avaiable.
+        assert(its.caps.edge_mode(props, 3))
 
         reprocess_formats = []
         if (its.caps.yuv_reprocess(props)):
@@ -108,13 +112,18 @@ def main():
         # Get the sharpness for each edge mode for regular requests
         sharpness_regular = []
         edge_mode_reported_regular = []
-        for edge_mode in range(3):
+        for edge_mode in range(4):
+            # Skip unavailable modes
+            if not its.caps.edge_mode(props, edge_mode):
+                edge_mode_reported_regular.append(edge_mode)
+                sharpness_regular.append(0)
+                continue
             ret = test_edge_mode(cam, edge_mode, s, e, fd, out_surface)
             edge_mode_reported_regular.append(ret["edge_mode"])
             sharpness_regular.append(ret["sharpness"])
 
         print "Reported edge modes:", edge_mode_reported_regular
-        print "Sharpness with EE mode [0,1,2]:", sharpness_regular
+        print "Sharpness with EE mode [0,1,2,3]:", sharpness_regular
 
         # Get the sharpness for each reprocess format and edge mode for
         # reprocess requests.
@@ -125,7 +134,13 @@ def main():
             # List of sharpness
             sharpnesses = []
             edge_mode_reported = []
-            for edge_mode in range(3):
+            for edge_mode in range(4):
+                # Skip unavailable modes
+                if not its.caps.edge_mode(props, edge_mode):
+                    edge_mode_reported.append(edge_mode)
+                    sharpnesses.append(0)
+                    continue
+
                 ret = test_edge_mode(cam, edge_mode, s, e, fd, out_surface,
                     reprocess_format)
                 edge_mode_reported.append(ret["edge_mode"])
@@ -135,24 +150,31 @@ def main():
             edge_mode_reported_reprocess.append(edge_mode_reported)
 
             print "Reported edge modes:", edge_mode_reported
-            print "Sharpness with EE mode [0,1,2] for %s reprocess:" % \
+            print "Sharpness with EE mode [0,1,2,3] for %s reprocess:" % \
                 (reprocess_format) , sharpnesses
 
-        # Verify the results
-        assert(edge_mode_reported_regular == [0,1,2])
-        assert(sharpness_regular[1] >
-            sharpness_regular[0] * (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
-        assert(sharpness_regular[2] >
-            sharpness_regular[0] * (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+        # Verify reported modes for regular results
+        assert(edge_mode_reported_regular == [0,1,2,3])
+        # Verify the images for all modes are not too blurrier than OFF.
+        for edge_mode in [1, 2, 3]:
+            if its.caps.edge_mode(props, edge_mode):
+                assert(sharpness_regular[edge_mode] >
+                    sharpness_regular[0] *
+                    (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+        # Verify the image for ZSL are not too sharper than OFF
+        assert(sharpness_regular[3] <
+                sharpness_regular[0] * (1.0 + THRESHOLD_RELATIVE_SHARPNESS_DIFF))
 
-        # Verify the reprocess
+        # Verify sharpness of reprocess captures are similar to sharpness of
+        # regular captures.
         for reprocess_format in range(len(reprocess_formats)):
-            assert(edge_mode_reported_reprocess[reprocess_format] == [0,1,2])
-            for edge_mode in range(3):
-                assert(sharpnesses_reprocess[reprocess_format][edge_mode] >=
-                    (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF) *
-                    sharpnesses_reprocess[reprocess_format][0] *
-                    sharpness_regular[edge_mode] / sharpness_regular[0])
+            assert(edge_mode_reported_reprocess[reprocess_format] == [0,1,2,3])
+            for edge_mode in range(4):
+                if its.caps.edge_mode(props, edge_mode):
+                    assert(sharpnesses_reprocess[reprocess_format][edge_mode] >=
+                        (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF) *
+                        sharpnesses_reprocess[reprocess_format][0] *
+                        sharpness_regular[edge_mode] / sharpness_regular[0])
 
 if __name__ == '__main__':
     main()
