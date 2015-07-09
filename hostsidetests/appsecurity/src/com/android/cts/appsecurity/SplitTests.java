@@ -293,6 +293,10 @@ public class SplitTests extends DeviceTestCase implements IAbiReceiver, IBuildRe
         private List<File> mApks = new ArrayList<>();
         private boolean mUseNaturalAbi;
 
+        public InstallMultiple() {
+            addArg("-g");
+        }
+
         InstallMultiple addArg(String arg) {
             mArgs.add(arg);
             return this;
