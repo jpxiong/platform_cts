@@ -345,8 +345,8 @@ public class CursorAdapterTest extends InstrumentationTestCase {
     }
 
     private final class MockCursorAdapter extends CursorAdapter {
-        private final Context mContext;
-        private final boolean mAutoRequery;
+        private Context mContext;
+        private boolean mAutoRequery;
 
         private boolean mContentChanged = false;
 
@@ -391,6 +391,9 @@ public class CursorAdapterTest extends InstrumentationTestCase {
         @Override
         public void init(Context context, Cursor c, boolean autoRequery) {
             super.init(context, c, autoRequery);
+
+            mContext = context;
+            mAutoRequery = autoRequery;
         }
 
         @Override
