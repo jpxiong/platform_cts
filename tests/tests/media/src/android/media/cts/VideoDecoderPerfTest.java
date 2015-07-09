@@ -42,7 +42,7 @@ import java.util.ArrayList;
 
 public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     private static final String TAG = "VideoDecoderPerfTest";
-    private static final int TOTAL_FRAMES = 3000;
+    private static final int TOTAL_FRAMES = 1000;
     private static final int NUMBER_OF_REPEAT = 2;
     private static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC;
     private static final String VIDEO_VP8 = MediaFormat.MIMETYPE_VIDEO_VP8;
@@ -156,6 +156,7 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
                     assert sampleSize >= 0:
                         "extractor.readSampleData returns negative.";
                     long presentationTimeUs = extractor.getSampleTime();
+                    extractor.advance();
                     if (++inputNum == stopAtSample) {
                         Log.d(TAG, "saw input EOS (stop at sample).");
                         sawInputEOS = true; // tag this sample as EOS
@@ -335,13 +336,13 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     }
 
     public void testH263176x144() throws Exception {
-        decode(VIDEO_HEVC,
+        decode(VIDEO_H263,
                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
                176, 144);
     }
 
     public void testH263352x288() throws Exception {
-        decode(VIDEO_HEVC,
+        decode(VIDEO_H263,
                R.raw.video_352x288_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
                352, 288);
     }
