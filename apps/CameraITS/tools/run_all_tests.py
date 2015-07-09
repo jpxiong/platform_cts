@@ -42,7 +42,7 @@ def main():
             "test_ev_compensation_basic",
             "test_yuv_plus_jpeg"
         ],
-        "scene2":[]
+        "scene2":[],
         "scene3":[]
     }
 
@@ -52,7 +52,7 @@ def main():
     scene_req = {
         "scene0" : None,
         "scene1" : "A grey card covering at least the middle 30% of the scene",
-        "scene2" : "A picture containing human faces"
+        "scene2" : "A picture containing human faces",
         "scene3" : "A chart containing sharp edges like ISO 12233"
     }
     tests = []
