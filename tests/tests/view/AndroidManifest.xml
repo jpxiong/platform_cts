@@ -150,7 +150,11 @@
         <activity android:name="android.view.cts.GestureDetectorCtsActivity"
             android:label="GestureDetectorCtsActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-            
+
+        <activity android:name="android.view.cts.ScaleGestureDetectorCtsActivity"
+            android:label="ScaleGestureDetectorCtsActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
         <activity android:name="android.view.cts.GLSurfaceViewCtsActivity"
             android:label="GLSurfaceViewCts"/>
 
