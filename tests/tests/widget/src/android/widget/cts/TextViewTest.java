@@ -809,13 +809,14 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         add = Float.MIN_VALUE;
         mult = Float.MIN_VALUE;
         setLineSpacing(add, mult);
-        float expected = originalLineHeight * mult + add;
-        assertEquals(Math.round(expected), mTextView.getLineHeight());
+        assertEquals(Math.round(originalLineHeight * mult + add), mTextView.getLineHeight());
+
+        // edge case where the behavior of Math.round() deviates from
+        // FastMath.round(), requiring us to use an explicit 0 value
         add = Float.MAX_VALUE;
         mult = Float.MAX_VALUE;
         setLineSpacing(add, mult);
-        expected = originalLineHeight * mult + add;
-        assertEquals(Math.round(expected), mTextView.getLineHeight());
+        assertEquals(0, mTextView.getLineHeight());
     }
 
     public void testInstanceState() {

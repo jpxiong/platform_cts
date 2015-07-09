@@ -175,7 +175,8 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
         public MockResourceCursorAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
 
-            mAutoRequery = false;
+            // Default is true.
+            mAutoRequery = true;
         }
 
         public MockResourceCursorAdapter(Context context, int layout,
