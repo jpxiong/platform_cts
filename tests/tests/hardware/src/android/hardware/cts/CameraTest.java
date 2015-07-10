@@ -861,14 +861,15 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
     }
 
     private void testJpegExifByCamera(boolean recording) throws Exception {
-        Camera.Parameters parameters = mCamera.getParameters();
         if (!recording) mCamera.startPreview();
-        double focalLength = parameters.getFocalLength();
         Date date = new Date(System.currentTimeMillis());
         String localDatetime = new SimpleDateFormat("yyyy:MM:dd HH:").format(date);
 
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
+
+        Camera.Parameters parameters = mCamera.getParameters();
+        double focalLength = parameters.getFocalLength();
 
         // Test various exif tags.
         ExifInterface exif = new ExifInterface(JPEG_PATH);
