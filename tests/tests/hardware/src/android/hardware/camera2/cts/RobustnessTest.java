@@ -19,11 +19,13 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static android.hardware.camera2.cts.RobustnessTest.MaxOutputSizes.*;
 
+import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.CaptureFailure;
@@ -35,7 +37,9 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.util.Log;
 import android.util.Size;
+import android.view.Display;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -220,7 +224,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
             CameraCharacteristics cc = mCameraManager.getCameraCharacteristics(id);
 
-            MaxOutputSizes maxSizes = new MaxOutputSizes(cc, id);
+            MaxOutputSizes maxSizes = new MaxOutputSizes(cc, id, getContext());
 
             final StaticMetadata staticInfo = new StaticMetadata(cc);
 
@@ -286,7 +290,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         static final int VGA = 3;
         static final int RESOLUTION_COUNT = 4;
 
-        public MaxOutputSizes(CameraCharacteristics cc, String cameraId) {
+        public MaxOutputSizes(CameraCharacteristics cc, String cameraId, Context context) {
             StreamConfigurationMap configs =
                     cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Size[] privSizes = configs.getOutputSizes(SurfaceTexture.class);
@@ -294,11 +298,13 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             Size[] jpegSizes = configs.getOutputSizes(ImageFormat.JPEG);
             Size[] rawSizes = configs.getOutputSizes(ImageFormat.RAW_SENSOR);
 
+            Size maxPreviewSize = getMaxPreviewSize(context, cameraId);
+
             maxRawSize = (rawSizes != null) ? CameraTestUtils.getMaxSize(rawSizes) : null;
 
-            maxPrivSizes[PREVIEW] = getMaxSize(privSizes, PREVIEW_SIZE_BOUND);
-            maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, PREVIEW_SIZE_BOUND);
-            maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, PREVIEW_SIZE_BOUND);
+            maxPrivSizes[PREVIEW] = getMaxSize(privSizes, maxPreviewSize);
+            maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, maxPreviewSize);
+            maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, maxPreviewSize);
 
             maxPrivSizes[RECORD] = getMaxRecordingSize(cameraId);
             maxYuvSizes[RECORD]  = getMaxRecordingSize(cameraId);
@@ -548,4 +554,35 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         return sz;
     }
 
+    private static Size getMaxPreviewSize(Context context, String cameraId) {
+        try {
+            WindowManager windowManager =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = windowManager.getDefaultDisplay();
+
+            int width = display.getWidth();
+            int height = display.getHeight();
+
+            if (height > width) {
+                height = width;
+                width = display.getHeight();
+            }
+
+            CameraManager camMgr =
+                (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+            List<Size> orderedPreviewSizes = CameraTestUtils.getSupportedPreviewSizes(
+                cameraId, camMgr, PREVIEW_SIZE_BOUND);
+
+            if (orderedPreviewSizes != null) {
+                for (Size size : orderedPreviewSizes) {
+                    if (width >= size.getWidth() &&
+                        height >= size.getHeight())
+                        return size;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getMaxPreviewSize Failed. "+e.toString());
+        }
+        return PREVIEW_SIZE_BOUND;
+    }
 }
