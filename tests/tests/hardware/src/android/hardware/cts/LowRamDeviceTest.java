@@ -92,8 +92,11 @@ public class LowRamDeviceTest extends AndroidTestCase {
                 lessThanDpi(density, DENSITY_MEDIUM, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
                 lessThanDpi(density, DENSITY_LOW, screenSize, SCREENLAYOUT_SIZE_XLARGE)) {
 
-            assertFalse("Device is not expected to be 64-bit", supports64Bit);
-            assertMinMemoryMb(424);
+            if (supports64Bit) {
+                assertMinMemoryMb(704);
+            } else {
+                assertMinMemoryMb(424);
+            }
         } else if (greaterThanDpi(density, DENSITY_XHIGH, screenSize,
                 SCREENLAYOUT_SIZE_NORMAL, SCREENLAYOUT_SIZE_SMALL) ||
                 greaterThanDpi(density, DENSITY_TV, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
