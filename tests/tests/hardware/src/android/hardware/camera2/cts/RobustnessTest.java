@@ -19,11 +19,13 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static android.hardware.camera2.cts.RobustnessTest.MaxStreamSizes.*;
 
+import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
@@ -38,7 +40,9 @@ import android.media.ImageReader;
 import android.media.ImageWriter;
 import android.util.Log;
 import android.util.Size;
+import android.view.Display;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import com.android.ex.camera2.blocking.BlockingSessionCallback;
 
@@ -208,7 +212,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             openDevice(id);
 
             // Find the concrete max sizes for each format/resolution combination
-            MaxStreamSizes maxSizes = new MaxStreamSizes(mStaticInfo, id);
+            MaxStreamSizes maxSizes = new MaxStreamSizes(mStaticInfo, id, getContext());
 
             String streamConfigurationMapString =
                     mStaticInfo.getCharacteristics().get(
@@ -320,7 +324,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         for (String id : mCameraIds) {
             CameraCharacteristics cc = mCameraManager.getCameraCharacteristics(id);
             StaticMetadata staticInfo = new StaticMetadata(cc);
-            MaxStreamSizes maxSizes = new MaxStreamSizes(staticInfo, id);
+            MaxStreamSizes maxSizes = new MaxStreamSizes(staticInfo, id, getContext());
 
             // Skip the test for legacy devices.
             if (staticInfo.isHardwareLevelLegacy()) {
@@ -1027,7 +1031,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         static final int VGA = 3;
         static final int RESOLUTION_COUNT = 4;
 
-        public MaxStreamSizes(StaticMetadata sm, String cameraId) {
+        public MaxStreamSizes(StaticMetadata sm, String cameraId, Context context) {
             Size[] privSizes = sm.getAvailableSizesForFormatChecked(ImageFormat.PRIVATE,
                     StaticMetadata.StreamDirection.Output);
             Size[] yuvSizes = sm.getAvailableSizesForFormatChecked(ImageFormat.YUV_420_888,
@@ -1035,11 +1039,13 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             Size[] jpegSizes = sm.getJpegOutputSizesChecked();
             Size[] rawSizes = sm.getRawOutputSizesChecked();
 
+            Size maxPreviewSize = getMaxPreviewSize(context, cameraId);
+
             maxRawSize = (rawSizes.length != 0) ? CameraTestUtils.getMaxSize(rawSizes) : null;
 
-            maxPrivSizes[PREVIEW] = getMaxSize(privSizes, PREVIEW_SIZE_BOUND);
-            maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, PREVIEW_SIZE_BOUND);
-            maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, PREVIEW_SIZE_BOUND);
+            maxPrivSizes[PREVIEW] = getMaxSize(privSizes, maxPreviewSize);
+            maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, maxPreviewSize);
+            maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, maxPreviewSize);
 
             maxPrivSizes[RECORD] = getMaxRecordingSize(cameraId);
             maxYuvSizes[RECORD]  = getMaxRecordingSize(cameraId);
@@ -1486,4 +1492,35 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         return sz;
     }
 
+    private static Size getMaxPreviewSize(Context context, String cameraId) {
+        try {
+            WindowManager windowManager =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = windowManager.getDefaultDisplay();
+
+            int width = display.getWidth();
+            int height = display.getHeight();
+
+            if (height > width) {
+                height = width;
+                width = display.getHeight();
+            }
+
+            CameraManager camMgr =
+                (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+            List<Size> orderedPreviewSizes = CameraTestUtils.getSupportedPreviewSizes(
+                cameraId, camMgr, PREVIEW_SIZE_BOUND);
+
+            if (orderedPreviewSizes != null) {
+                for (Size size : orderedPreviewSizes) {
+                    if (width >= size.getWidth() &&
+                        height >= size.getHeight())
+                        return size;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getMaxPreviewSize Failed. "+e.toString());
+        }
+        return PREVIEW_SIZE_BOUND;
+    }
 }
