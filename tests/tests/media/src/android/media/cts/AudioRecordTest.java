@@ -678,174 +678,192 @@ public class AudioRecordTest extends CtsAndroidTestCase {
             listener = new MockOnRecordPositionUpdateListener(record);
         }
 
-        if (markerPeriodsPerSecond != 0) {
-            mMarkerPeriodInFrames = TEST_SR / markerPeriodsPerSecond;
-            mMarkerPosition = mMarkerPeriodInFrames;
-            assertEquals(AudioRecord.SUCCESS,
-                    record.setNotificationMarkerPosition(mMarkerPosition));
-        } else {
-            mMarkerPeriodInFrames = 0;
-        }
         final int updatePeriodInFrames = (periodsPerSecond == 0)
                 ? 0 : TEST_SR / periodsPerSecond;
-        assertEquals(AudioRecord.SUCCESS,
-                record.setPositionNotificationPeriod(updatePeriodInFrames));
-
-        listener.start(TEST_SR);
-        record.startRecording();
-        assertEquals(AudioRecord.RECORDSTATE_RECORDING, record.getRecordingState());
-        long startTime = System.currentTimeMillis();
-
-        // For our tests, we could set test duration by timed sleep or by # frames received.
-        // Since we don't know *exactly* when AudioRecord actually begins recording,
-        // we end the test by # frames read.
-        final int numChannels =  AudioFormat.channelCountFromInChannelMask(TEST_CONF);
-        final int bytesPerSample = AudioFormat.getBytesPerSample(TEST_FORMAT);
-        final int bytesPerFrame = numChannels * bytesPerSample;
-        // careful about integer overflow in the formula below:
-        final int targetSamples = (int)((long)TEST_TIME_MS * TEST_SR * numChannels / 1000);
-        final int BUFFER_FRAMES = 512;
-        final int BUFFER_SAMPLES = BUFFER_FRAMES * numChannels;
-        // TODO: verify behavior when buffer size is not a multiple of frame size.
-
         // After starting, there is no guarantee when the first frame of data is read.
         long firstSampleTime = 0;
-        int samplesRead = 0;
-        if (useByteBuffer) {
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(BUFFER_SAMPLES * bytesPerSample);
-            while (samplesRead < targetSamples) {
-                // the first time through, we read a single frame.
-                // this sets the recording anchor position.
-                int amount = samplesRead == 0 ? numChannels :
-                    Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                amount *= bytesPerSample;    // in bytes
-                // read always places data at the start of the byte buffer with
-                // position and limit are ignored.  test this by setting
-                // position and limit to arbitrary values here.
-                final int lastPosition = 7;
-                final int lastLimit = 13;
-                byteBuffer.position(lastPosition);
-                byteBuffer.limit(lastLimit);
-                int ret = blocking ? record.read(byteBuffer, amount) :
-                    record.read(byteBuffer, amount, AudioRecord.READ_NON_BLOCKING);
-                // so long as amount requested in bytes is a multiple of the frame size
-                // we expect the byte buffer request to be filled.  Caution: the
-                // byte buffer data will be in native endian order, not Java order.
-                if (blocking) {
-                    assertEquals(amount, ret);
-                } else {
-                    assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
-                }
-                // position, limit are not changed by read().
-                assertEquals(lastPosition, byteBuffer.position());
-                assertEquals(lastLimit, byteBuffer.limit());
-                if (samplesRead == 0 && ret > 0) {
-                    firstSampleTime = System.currentTimeMillis();
-                }
-                samplesRead += ret / bytesPerSample;
+
+        // blank final variables: all successful paths will initialize the times.
+        final long endTime;
+        final long startTime;
+        final long stopTime;
+
+        try {
+            if (markerPeriodsPerSecond != 0) {
+                mMarkerPeriodInFrames = TEST_SR / markerPeriodsPerSecond;
+                mMarkerPosition = mMarkerPeriodInFrames;
+                assertEquals(AudioRecord.SUCCESS,
+                        record.setNotificationMarkerPosition(mMarkerPosition));
+            } else {
+                mMarkerPeriodInFrames = 0;
             }
-        } else {
-            switch (TEST_FORMAT) {
-            case AudioFormat.ENCODING_PCM_8BIT: {
-                // For 8 bit data, use bytes
-                byte[] byteData = new byte[BUFFER_SAMPLES];
+
+            assertEquals(AudioRecord.SUCCESS,
+                    record.setPositionNotificationPeriod(updatePeriodInFrames));
+
+            listener.start(TEST_SR);
+            record.startRecording();
+            assertEquals(AudioRecord.RECORDSTATE_RECORDING, record.getRecordingState());
+            startTime = System.currentTimeMillis();
+
+            // For our tests, we could set test duration by timed sleep or by # frames received.
+            // Since we don't know *exactly* when AudioRecord actually begins recording,
+            // we end the test by # frames read.
+            final int numChannels =  AudioFormat.channelCountFromInChannelMask(TEST_CONF);
+            final int bytesPerSample = AudioFormat.getBytesPerSample(TEST_FORMAT);
+            final int bytesPerFrame = numChannels * bytesPerSample;
+            // careful about integer overflow in the formula below:
+            final int targetSamples = (int)((long)TEST_TIME_MS * TEST_SR * numChannels / 1000);
+            final int BUFFER_FRAMES = 512;
+            final int BUFFER_SAMPLES = BUFFER_FRAMES * numChannels;
+            // TODO: verify behavior when buffer size is not a multiple of frame size.
+
+            int samplesRead = 0;
+            if (useByteBuffer) {
+                ByteBuffer byteBuffer =
+                        ByteBuffer.allocateDirect(BUFFER_SAMPLES * bytesPerSample);
                 while (samplesRead < targetSamples) {
                     // the first time through, we read a single frame.
                     // this sets the recording anchor position.
                     int amount = samplesRead == 0 ? numChannels :
                         Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                    int ret = blocking ? record.read(byteData, 0, amount) :
-                        record.read(byteData, 0, amount, AudioRecord.READ_NON_BLOCKING);
+                    amount *= bytesPerSample;    // in bytes
+                    // read always places data at the start of the byte buffer with
+                    // position and limit are ignored.  test this by setting
+                    // position and limit to arbitrary values here.
+                    final int lastPosition = 7;
+                    final int lastLimit = 13;
+                    byteBuffer.position(lastPosition);
+                    byteBuffer.limit(lastLimit);
+                    int ret = blocking ? record.read(byteBuffer, amount) :
+                        record.read(byteBuffer, amount, AudioRecord.READ_NON_BLOCKING);
+                    // so long as amount requested in bytes is a multiple of the frame size
+                    // we expect the byte buffer request to be filled.  Caution: the
+                    // byte buffer data will be in native endian order, not Java order.
                     if (blocking) {
                         assertEquals(amount, ret);
                     } else {
-                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
+                        assertTrue("0 <= " + ret + " <= " + amount,
+                                0 <= ret && ret <= amount);
                     }
+                    // position, limit are not changed by read().
+                    assertEquals(lastPosition, byteBuffer.position());
+                    assertEquals(lastLimit, byteBuffer.limit());
                     if (samplesRead == 0 && ret > 0) {
                         firstSampleTime = System.currentTimeMillis();
                     }
-                    samplesRead += ret;
+                    samplesRead += ret / bytesPerSample;
                 }
-            } break;
-            case AudioFormat.ENCODING_PCM_16BIT: {
-                // For 16 bit data, use shorts
-                short[] shortData = new short[BUFFER_SAMPLES];
-                while (samplesRead < targetSamples) {
-                    // the first time through, we read a single frame.
-                    // this sets the recording anchor position.
-                    int amount = samplesRead == 0 ? numChannels :
-                        Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                    int ret = blocking ? record.read(shortData, 0, amount) :
-                        record.read(shortData, 0, amount, AudioRecord.READ_NON_BLOCKING);
-                    if (blocking) {
-                        assertEquals(amount, ret);
-                    } else {
-                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
+            } else {
+                switch (TEST_FORMAT) {
+                case AudioFormat.ENCODING_PCM_8BIT: {
+                    // For 8 bit data, use bytes
+                    byte[] byteData = new byte[BUFFER_SAMPLES];
+                    while (samplesRead < targetSamples) {
+                        // the first time through, we read a single frame.
+                        // this sets the recording anchor position.
+                        int amount = samplesRead == 0 ? numChannels :
+                            Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
+                        int ret = blocking ? record.read(byteData, 0, amount) :
+                            record.read(byteData, 0, amount, AudioRecord.READ_NON_BLOCKING);
+                        if (blocking) {
+                            assertEquals(amount, ret);
+                        } else {
+                            assertTrue("0 <= " + ret + " <= " + amount,
+                                    0 <= ret && ret <= amount);
+                        }
+                        if (samplesRead == 0 && ret > 0) {
+                            firstSampleTime = System.currentTimeMillis();
+                        }
+                        samplesRead += ret;
                     }
-                    if (samplesRead == 0 && ret > 0) {
-                        firstSampleTime = System.currentTimeMillis();
+                } break;
+                case AudioFormat.ENCODING_PCM_16BIT: {
+                    // For 16 bit data, use shorts
+                    short[] shortData = new short[BUFFER_SAMPLES];
+                    while (samplesRead < targetSamples) {
+                        // the first time through, we read a single frame.
+                        // this sets the recording anchor position.
+                        int amount = samplesRead == 0 ? numChannels :
+                            Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
+                        int ret = blocking ? record.read(shortData, 0, amount) :
+                            record.read(shortData, 0, amount, AudioRecord.READ_NON_BLOCKING);
+                        if (blocking) {
+                            assertEquals(amount, ret);
+                        } else {
+                            assertTrue("0 <= " + ret + " <= " + amount,
+                                    0 <= ret && ret <= amount);
+                        }
+                        if (samplesRead == 0 && ret > 0) {
+                            firstSampleTime = System.currentTimeMillis();
+                        }
+                        samplesRead += ret;
                     }
-                    samplesRead += ret;
+                } break;
+                case AudioFormat.ENCODING_PCM_FLOAT: {
+                    float[] floatData = new float[BUFFER_SAMPLES];
+                    while (samplesRead < targetSamples) {
+                        // the first time through, we read a single frame.
+                        // this sets the recording anchor position.
+                        int amount = samplesRead == 0 ? numChannels :
+                            Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
+                        int ret = record.read(floatData, 0, amount, blocking ?
+                                AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
+                        if (blocking) {
+                            assertEquals(amount, ret);
+                        } else {
+                            assertTrue("0 <= " + ret + " <= " + amount,
+                                    0 <= ret && ret <= amount);
+                        }
+                        if (samplesRead == 0 && ret > 0) {
+                            firstSampleTime = System.currentTimeMillis();
+                        }
+                        samplesRead += ret;
+                    }
+                } break;
                 }
-            } break;
-            case AudioFormat.ENCODING_PCM_FLOAT: {
-                float[] floatData = new float[BUFFER_SAMPLES];
-                while (samplesRead < targetSamples) {
-                    // the first time through, we read a single frame.
-                    // this sets the recording anchor position.
-                    int amount = samplesRead == 0 ? numChannels :
-                        Math.min(BUFFER_SAMPLES, targetSamples - samplesRead);
-                    int ret = record.read(floatData, 0, amount, blocking ?
-                            AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
-                    if (blocking) {
-                        assertEquals(amount, ret);
-                    } else {
-                        assertTrue("0 <= " + ret + " <= " + amount, 0 <= ret && ret <= amount);
-                    }
-                    if (samplesRead == 0 && ret > 0) {
-                        firstSampleTime = System.currentTimeMillis();
-                    }
-                    samplesRead += ret;
-                }
-            } break;
             }
+
+            // We've read all the frames, now check the record timing.
+            endTime = System.currentTimeMillis();
+            //Log.d(TAG, "first sample time " + (firstSampleTime - startTime)
+            //        + " test time " + (endTime - firstSampleTime));
+            // Verify recording starts within 200 ms of record.startRecording() (typical 100ms)
+            // Verify recording completes within 50 ms of expected test time (typical 20ms)
+            assertEquals(0, firstSampleTime - startTime, 200);
+            assertEquals(TEST_TIME_MS, endTime - firstSampleTime, auditRecording ? 1000 : 50);
+
+            // Even though we've read all the frames we want, the events may not be sent to
+            // the listeners (events are handled through a separate internal callback thread).
+            // One must sleep to make sure the last event(s) come in.
+            Thread.sleep(30);
+
+            record.stop();
+            assertEquals(AudioRecord.RECORDSTATE_STOPPED, record.getRecordingState());
+
+            stopTime = System.currentTimeMillis();
+
+            // stop listening - we should be done.
+            // Caution M behavior and likely much earlier:
+            // we assume no events can happen after stop(), but this may not
+            // always be true as stop can take 100ms to complete (as it may disable
+            // input recording on the hal); thus the event handler may be block with
+            // valid events, issuing right after stop completes. Except for those events,
+            // no other events should show up after stop.
+            // This behavior may change in the future but we account for it here in testing.
+            listener.stop();
+
+            // clean up
+            if (makeSomething != null) {
+                makeSomething.join();
+            }
+
+        } finally {
+            listener.release();
+            // we must release the record immediately as it is a system-wide
+            // resource needed for other tests.
+            record.release();
         }
-
-        // We've read all the frames, now check the record timing.
-        final long endTime = System.currentTimeMillis();
-        //Log.d(TAG, "first sample time " + (firstSampleTime - startTime)
-        //        + " test time " + (endTime - firstSampleTime));
-        // Verify recording starts within 200 ms of record.startRecording() (typical 100ms)
-        // Verify recording completes within 50 ms of expected test time (typical 20ms)
-        assertEquals(0, firstSampleTime - startTime, 200);
-        assertEquals(TEST_TIME_MS, endTime - firstSampleTime, auditRecording ? 1000 : 50);
-
-        // Even though we've read all the frames we want, the events may not be sent to
-        // the listeners (events are handled through a separate internal callback thread).
-        // One must sleep to make sure the last event(s) come in.
-        Thread.sleep(30);
-
-        record.stop();
-        assertEquals(AudioRecord.RECORDSTATE_STOPPED, record.getRecordingState());
-
-        final long stopTime = System.currentTimeMillis();
-
-        // stop listening - we should be done.
-        // Caution M behavior and likely much earlier:
-        // we assume no events can happen after stop(), but this may not
-        // always be true as stop can take 100ms to complete (as it may disable
-        // input recording on the hal); thus the event handler may be block with
-        // valid events, issuing right after stop completes. Except for those events,
-        // no other events should show up after stop.
-        // This behavior may change in the future but we account for it here in testing.
-        listener.stop();
-
-        // clean up
-        if (makeSomething != null) {
-            makeSomething.join();
-        }
-        listener.release();
-        record.release();
         if (auditRecording) { // don't check timing if auditing (messes up timing)
             return;
         }
@@ -993,6 +1011,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         }
 
         public synchronized void release() {
+            stop();
             mAudioRecord.setRecordPositionUpdateListener(null);
             mAudioRecord = null;
         }
