@@ -17,6 +17,7 @@ import static com.android.ex.camera2.blocking.BlockingSessionCallback.*;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraConstrainedHighSpeedCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -525,7 +526,8 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
             requestBuilder.addTarget(mPreviewSurface);
             requestBuilder.addTarget(mRecordingSurface);
-            slowMoRequests = mCamera.createConstrainedHighSpeedRequestList(requestBuilder.build());
+            slowMoRequests = ((CameraConstrainedHighSpeedCaptureSession) mSession).
+                    createHighSpeedRequestList(requestBuilder.build());
         } else {
             CaptureRequest.Builder recordingRequestBuilder =
                     mCamera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
