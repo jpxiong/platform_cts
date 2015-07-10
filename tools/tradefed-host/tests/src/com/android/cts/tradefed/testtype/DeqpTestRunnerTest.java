@@ -106,7 +106,7 @@ public class DeqpTestRunnerTest extends TestCase {
          * {@inheritDoc}
          */
         @Override
-        public void recoverComLinkKilled() throws DeviceNotAvailableException {
+        public void recoverCommandNotCompleted() throws DeviceNotAvailableException {
         }
     };
 
@@ -1717,11 +1717,14 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
 
-        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
-                .andReturn("").once();
-
         EasyMock.expect(mockDevice.pushString("{dEQP-GLES3{loss{instance}}}\n", CASE_LIST_FILE_NAME))
                 .andReturn(true).once();
+
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
+                .andReturn("").once();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(false).once();
+        EasyMock.expect(mockDevice.pushString("", LOG_FILE_NAME)).andReturn(true).once();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(true).once();
 
         String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \""
@@ -1753,10 +1756,10 @@ public class DeqpTestRunnerTest extends TestCase {
         });
 
         if (!recoverySuccessful) {
-            mockRecovery.recoverComLinkKilled();
+            mockRecovery.recoverCommandNotCompleted();
             EasyMock.expectLastCall().andThrow(new DeviceNotAvailableException()).once();
         } else {
-            mockRecovery.recoverComLinkKilled();
+            mockRecovery.recoverCommandNotCompleted();
             EasyMock.expectLastCall().once();
 
             // retry running config B
@@ -1860,7 +1863,7 @@ public class DeqpTestRunnerTest extends TestCase {
                     recovery.recoverConnectionRefused();
                     break;
                 case FAIL_LINK_KILLED:
-                    recovery.recoverComLinkKilled();
+                    recovery.recoverCommandNotCompleted();
                     break;
             }
         }
@@ -2141,7 +2144,7 @@ public class DeqpTestRunnerTest extends TestCase {
         orderedControl.replay();
         recovery.setDevice(mockDevice);
         recovery.setSleepProvider(mockSleepProvider);
-        recovery.recoverComLinkKilled();
+        recovery.recoverCommandNotCompleted();
         orderedControl.verify();
     }
 
@@ -2312,16 +2315,216 @@ public class DeqpTestRunnerTest extends TestCase {
         EasyMock.verify(mockDevice, mockIDevice);
     }
 
+    /**
+     * Test log file precreate persistent failure
+     */
+    public void testPrecreate_persistentFailure() throws Exception {
+        final TestIdentifier testId = new TestIdentifier("dEQP-GLES3.precreate", "test");
+        final String testTrie = "{dEQP-GLES3{precreate{test}}}";
+
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        tests.add(testId);
+
+        Map<TestIdentifier, List<Map<String, String>>> instance = new HashMap<>();
+        instance.put(testId, DEFAULT_INSTANCE_ARGS);
+
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+        DeqpTestRunner.ISleepProvider mockSleepProvider =
+                EasyMock.createMock(DeqpTestRunner.ISleepProvider.class);
+        DeqpTestRunner.IRecovery mockRecovery =
+                EasyMock.createMock(DeqpTestRunner.IRecovery.class);
+
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instance);
+        deqpTest.setAbi(UnitTests.ABI);
+        deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
+        deqpTest.setSleepProvider(mockSleepProvider);
+        deqpTest.setRecovery(mockRecovery);
+
+        mockRecovery.setDevice(mockDevice);
+        EasyMock.expectLastCall().atLeastOnce();
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+                .andReturn(Integer.toString(version)).atLeastOnce();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
+            andReturn("").once();
+
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true),
+                EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName())))).andReturn(null)
+                .once();
+
+        expectRenderConfigQuery(mockDevice,
+                "--deqp-gl-config-name=rgba8888d24s8 --deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window --deqp-gl-major-version=3 "
+                + "--deqp-gl-minor-version=0");
+
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
+                .andReturn("").once();
+
+        EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME))
+                .andReturn(true).once();
+
+        // fail persistently...
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
+                .andReturn("").anyTimes();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(true).anyTimes();
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expectLastCall().anyTimes();
+
+        // ..and when retries won't help, trigger recovery tactics
+        mockRecovery.recoverCommandNotCompleted();
+        EasyMock.expectLastCall().andThrow(new DeviceNotAvailableException()).once();
+
+        mockListener.testRunStarted(ID, 1);
+        EasyMock.expectLastCall().once();
+
+        EasyMock.replay(mockDevice, mockIDevice);
+        EasyMock.replay(mockListener);
+        EasyMock.replay(mockSleepProvider);
+        EasyMock.replay(mockRecovery);
+        try {
+            deqpTest.run(mockListener);
+            fail("expected DeviceNotAvailableException");
+        } catch (DeviceNotAvailableException ex) {
+            // expected
+        }
+        EasyMock.verify(mockRecovery);
+        EasyMock.verify(mockSleepProvider);
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice, mockIDevice);
+    }
+
+    /**
+     * Test log file precreate transient failure
+     */
+    public void testPrecreate_transientFailure() throws Exception {
+        final TestIdentifier testId = new TestIdentifier("dEQP-GLES3.precreate", "test");
+        final String testPath = "dEQP-GLES3.precreate.test";
+        final String testTrie = "{dEQP-GLES3{precreate{test}}}";
+        final String output = "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=2014.x\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=releaseId\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=0xcafebabe\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Name=targetName\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=SessionInfo\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-SessionInfo-Value=android\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=BeginTestCase\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-BeginTestCase-TestCasePath=" + testPath + "\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Code=Pass\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-TestCaseResult-Details=DetailPass\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=TestCaseResult\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndTestCase\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_STATUS: dEQP-EventType=EndSession\r\n"
+                + "INSTRUMENTATION_STATUS_CODE: 0\r\n"
+                + "INSTRUMENTATION_CODE: 0\r\n";
+
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        tests.add(testId);
+
+        Map<TestIdentifier, List<Map<String, String>>> instance = new HashMap<>();
+        instance.put(testId, DEFAULT_INSTANCE_ARGS);
+
+        ITestInvocationListener mockListener
+                = EasyMock.createStrictMock(ITestInvocationListener.class);
+        ITestDevice mockDevice = EasyMock.createMock(ITestDevice.class);
+        IDevice mockIDevice = EasyMock.createMock(IDevice.class);
+        DeqpTestRunner.ISleepProvider mockSleepProvider =
+                EasyMock.createMock(DeqpTestRunner.ISleepProvider.class);
+
+        DeqpTestRunner deqpTest = new DeqpTestRunner(NAME, NAME, tests, instance);
+        deqpTest.setAbi(UnitTests.ABI);
+        deqpTest.setDevice(mockDevice);
+        deqpTest.setBuildHelper(new StubCtsBuildHelper());
+        deqpTest.setSleepProvider(mockSleepProvider);
+
+        int version = 3 << 16;
+        EasyMock.expect(mockDevice.getProperty("ro.opengles.version"))
+                .andReturn(Integer.toString(version)).atLeastOnce();
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
+            andReturn("").once();
+
+        EasyMock.expect(mockDevice.installPackage(EasyMock.<File>anyObject(),
+                EasyMock.eq(true),
+                EasyMock.eq(AbiUtils.createAbiFlag(UnitTests.ABI.getName())))).andReturn(null)
+                .once();
+
+        expectRenderConfigQuery(mockDevice,
+                "--deqp-gl-config-name=rgba8888d24s8 --deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window --deqp-gl-major-version=3 "
+                + "--deqp-gl-minor-version=0");
+
+        // fail once
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
+                .andReturn("").once();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(true).once();
+        mockSleepProvider.sleep(EasyMock.gt(0));
+        EasyMock.expectLastCall().once();
+
+        String commandLine = String.format(
+                "--deqp-caselist-file=%s --deqp-gl-config-name=rgba8888d24s8 "
+                + "--deqp-screen-rotation=unspecified "
+                + "--deqp-surface-type=window "
+                + "--deqp-log-images=disable "
+                + "--deqp-watchdog=enable",
+                CASE_LIST_FILE_NAME);
+
+        runInstrumentationLineAndAnswer(mockDevice, mockIDevice, testTrie, commandLine,
+                output);
+
+        EasyMock.expect(mockDevice.uninstallPackage(EasyMock.eq(DEQP_ONDEVICE_PKG))).
+            andReturn("").once();
+
+        mockListener.testRunStarted(ID, 1);
+        EasyMock.expectLastCall().once();
+
+        mockListener.testStarted(EasyMock.eq(testId));
+        EasyMock.expectLastCall().once();
+
+        mockListener.testEnded(EasyMock.eq(testId), EasyMock.<Map<String, String>>notNull());
+        EasyMock.expectLastCall().once();
+
+        mockListener.testRunEnded(EasyMock.anyLong(), EasyMock.<Map<String, String>>notNull());
+        EasyMock.expectLastCall().once();
+
+        EasyMock.replay(mockDevice, mockIDevice);
+        EasyMock.replay(mockListener);
+        EasyMock.replay(mockSleepProvider);
+        deqpTest.run(mockListener);
+        EasyMock.verify(mockSleepProvider);
+        EasyMock.verify(mockListener);
+        EasyMock.verify(mockDevice, mockIDevice);
+    }
+
     private void runInstrumentationLineAndAnswer(ITestDevice mockDevice, IDevice mockIDevice,
             final String testTrie, final String cmd, final String output) throws Exception {
         EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + CASE_LIST_FILE_NAME)))
                 .andReturn("").once();
 
-        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
-                .andReturn("").once();
-
         EasyMock.expect(mockDevice.pushString(testTrie + "\n", CASE_LIST_FILE_NAME))
                 .andReturn(true).once();
+
+        EasyMock.expect(mockDevice.executeShellCommand(EasyMock.eq("rm " + LOG_FILE_NAME)))
+                .andReturn("").once();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(false).once();
+        EasyMock.expect(mockDevice.pushString("", LOG_FILE_NAME)).andReturn(true).once();
+        EasyMock.expect(mockDevice.doesFileExist(LOG_FILE_NAME)).andReturn(true).once();
 
         String command = String.format(
                 "am instrument %s -w -e deqpLogFileName \"%s\" -e deqpCmdLine \"%s\" "
