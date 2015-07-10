@@ -321,6 +321,9 @@ public class AudioRecordTest extends CtsAndroidTestCase {
     // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord built with
     // an empty Builder matches the documentation / expected values
     public void testAudioRecordBuilderDefault() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testAudioRecordBuilderDefault";
         // expected values below match the AudioRecord.Builder documentation
@@ -352,6 +355,9 @@ public class AudioRecordTest extends CtsAndroidTestCase {
     // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord built with
     // an incomplete AudioFormat matches the documentation / expected values
     public void testAudioRecordBuilderPartialFormat() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testAudioRecordBuilderPartialFormat";
         final int expectedRate = 16000;
@@ -380,6 +386,9 @@ public class AudioRecordTest extends CtsAndroidTestCase {
     // Test AudioRecord.Builder to verify the observed configuration of an AudioRecord matches
     // the parameters used in the builder
     public void testAudioRecordBuilderParams() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testAudioRecordBuilderParams";
         final int expectedRate = 8000;
@@ -418,6 +427,9 @@ public class AudioRecordTest extends CtsAndroidTestCase {
 
     // Test AudioRecord to ensure we can build after a failure.
     public void testAudioRecordBufferSize() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         // constants for test
         final String TEST_NAME = "testAudioRecordBufferSize";
 
