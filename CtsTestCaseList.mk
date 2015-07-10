@@ -86,6 +86,7 @@ cts_support_packages := \
     CtsIntentSenderApp \
     CtsLauncherAppsTests \
     CtsLauncherAppsTestsSupport \
+    CtsLeanbackJank \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
@@ -148,6 +149,7 @@ cts_test_packages := \
     CtsGraphics2TestCases \
     CtsHardwareTestCases \
     CtsJankTestCases \
+    CtsLeanbackJankTestCases \
     CtsJobSchedulerDeviceTestCases \
     CtsJniTestCases \
     CtsKeystoreTestCases \
