@@ -501,6 +501,50 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "testPermissionMixedPolicies", mUserId));
     }
 
+    public void testPermissionAppUpdate() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_setDeniedState", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkDenied", mUserId));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkDenied", mUserId));
+
+        assertNull(getDevice().uninstallPackage(PERMISSIONS_APP_PKG));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_setGrantedState", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkGranted", mUserId));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkGranted", mUserId));
+
+        assertNull(getDevice().uninstallPackage(PERMISSIONS_APP_PKG));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_setAutoDeniedPolicy", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkDenied", mUserId));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkDenied", mUserId));
+
+        assertNull(getDevice().uninstallPackage(PERMISSIONS_APP_PKG));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_setAutoGrantedPolicy", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkGranted", mUserId));
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                "testPermissionUpdate_checkGranted", mUserId));
+    }
+
     public void testPermissionGrantPreMApp() throws Exception {
         if (!mHasFeature) {
             return;

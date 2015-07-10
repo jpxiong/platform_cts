@@ -80,6 +80,7 @@ public class PermissionsTest extends BaseManagedProfileTest {
     public void testPermissionGrantState() throws Exception {
         assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
         assertPermissionGrantState(PackageManager.PERMISSION_DENIED);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
 
         assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay denied
@@ -87,12 +88,11 @@ public class PermissionsTest extends BaseManagedProfileTest {
 
         assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
         assertPermissionGrantState(PackageManager.PERMISSION_GRANTED);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
 
         assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
         // Should stay granted
         assertPermissionGrantState(PackageManager.PERMISSION_GRANTED);
-
-        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
     }
 
     public void testPermissionPolicy() throws Exception {
@@ -102,11 +102,21 @@ public class PermissionsTest extends BaseManagedProfileTest {
 
         assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
         assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+        // permission should be locked, so changing the policy should not change the grant state
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
 
         // reset permission to denied and unlocked
         assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
 
         assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+        // permission should be locked, so changing the policy should not change the grant state
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
         assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
 
         assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
@@ -132,6 +142,46 @@ public class PermissionsTest extends BaseManagedProfileTest {
 
         assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
         assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+    }
+
+    public void testPermissionUpdate_setDeniedState() throws Exception {
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED);
+    }
+
+    public void testPermissionUpdate_setAutoDeniedPolicy() throws Exception {
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+    }
+
+    public void testPermissionUpdate_checkDenied() throws Exception {
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED);
+        assertPermissionGrantState(PackageManager.PERMISSION_DENIED);
+    }
+
+    public void testPermissionUpdate_setGrantedState() throws Exception {
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        assertSetPermissionGrantState(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+    }
+
+    public void testPermissionUpdate_setAutoGrantedPolicy() throws Exception {
+        assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
+                PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_AUTO_GRANT);
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+    }
+
+    public void testPermissionUpdate_checkGranted() throws Exception {
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
+        assertPermissionGrantState(PackageManager.PERMISSION_GRANTED);
     }
 
     public void testPermissionGrantStatePreMApp() throws Exception {
