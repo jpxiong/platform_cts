@@ -26,15 +26,15 @@ import com.android.compatibility.common.util.WifiConfigCreator;
 
 import java.util.List;
 
-import static com.android.compatibility.common.util.WifiConfigCreator.CREATE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_CREATE_WIFI_CONFIG;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_NETID;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_PASSWORD;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_SECURITY_TYPE;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_SSID;
-import static com.android.compatibility.common.util.WifiConfigCreator.REMOVE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_REMOVE_WIFI_CONFIG;
 import static com.android.compatibility.common.util.WifiConfigCreator.SECURITY_TYPE_NONE;
 import static com.android.compatibility.common.util.WifiConfigCreator.SECURITY_TYPE_WPA;
-import static com.android.compatibility.common.util.WifiConfigCreator.UPDATE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_UPDATE_WIFI_CONFIG;
 
 /**
  * Testing WiFi configuration lockdown by Device Owner
@@ -58,7 +58,7 @@ public class WifiConfigLockdownTest extends BaseDeviceOwnerTest {
                 Settings.Global.WIFI_DEVICE_OWNER_CONFIGS_LOCKDOWN, "1");
         mConfigCreator.addNetwork(ORIGINAL_DEVICE_OWNER_SSID, true, SECURITY_TYPE_WPA,
                 ORIGINAL_PASSWORD);
-        startRegularActivity(CREATE_WIFI_CONFIG_ACTION, -1, ORIGINAL_REGULAR_SSID,
+        startRegularActivity(ACTION_CREATE_WIFI_CONFIG, -1, ORIGINAL_REGULAR_SSID,
                 SECURITY_TYPE_WPA, ORIGINAL_PASSWORD);
     }
 
@@ -116,7 +116,7 @@ public class WifiConfigLockdownTest extends BaseDeviceOwnerTest {
         int updateCount = 0;
         for (WifiConfiguration config : configs) {
             if (areMatchingSsids(ORIGINAL_DEVICE_OWNER_SSID, config.SSID)) {
-                startRegularActivity(UPDATE_WIFI_CONFIG_ACTION, config.networkId,
+                startRegularActivity(ACTION_UPDATE_WIFI_CONFIG, config.networkId,
                         CHANGED_DEVICE_OWNER_SSID, SECURITY_TYPE_NONE, null);
                 ++updateCount;
             }
@@ -142,7 +142,7 @@ public class WifiConfigLockdownTest extends BaseDeviceOwnerTest {
         int removeCount = 0;
         for (WifiConfiguration config : configs) {
             if (areMatchingSsids(ORIGINAL_DEVICE_OWNER_SSID, config.SSID)) {
-                startRegularActivity(REMOVE_WIFI_CONFIG_ACTION, config.networkId,
+                startRegularActivity(ACTION_REMOVE_WIFI_CONFIG, config.networkId,
                         null, SECURITY_TYPE_NONE, null);
                 ++removeCount;
             }
