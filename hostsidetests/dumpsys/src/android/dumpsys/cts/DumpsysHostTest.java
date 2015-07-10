@@ -689,7 +689,7 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkSignalStrength(String[] parts) {
-        assertEquals(9, parts.length);
+        assertTrue(parts.length >= 9);
         assertInteger(parts[4]); // none
         assertInteger(parts[5]); // poor
         assertInteger(parts[6]); // moderate
