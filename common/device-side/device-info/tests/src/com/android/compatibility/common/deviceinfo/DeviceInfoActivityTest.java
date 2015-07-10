@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<SampleDeviceInfo> {
 
     private static final String EXPECTED_FILE_PATH =
-            "/storage/emulated/0/device-info-files/SampleDeviceInfo.json";
+            "/storage/emulated/0/device-info-files/SampleDeviceInfo.deviceinfo.json";
     private static final String EXPECTED_JSON_CONTENT = "{\n" +
       "  \"foo\": {\n" +
       "    \"foo_boolean\": true,\n" +

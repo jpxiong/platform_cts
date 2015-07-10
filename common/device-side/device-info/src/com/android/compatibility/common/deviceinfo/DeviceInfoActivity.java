@@ -135,8 +135,8 @@ public abstract class DeviceInfoActivity extends Activity {
             return false;
         }
 
-        // Create file at /sdcard/device-info-files/<class_name>.json
-        final File jsonFile = new File(dir, getClass().getSimpleName() + ".json");
+        // Create file at /sdcard/device-info-files/<class_name>.deviceinfo.json
+        final File jsonFile = new File(dir, getClass().getSimpleName() + ".deviceinfo.json");
         try {
             jsonFile.createNewFile();
         } catch (Exception e) {

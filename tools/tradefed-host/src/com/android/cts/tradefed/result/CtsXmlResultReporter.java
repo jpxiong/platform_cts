@@ -331,7 +331,7 @@ public class CtsXmlResultReporter
     private void checkExtendedDeviceInfoMetrics(Map<String, String> runMetrics) {
         for (Map.Entry<String, String> metricEntry : runMetrics.entrySet()) {
             String value = metricEntry.getValue();
-            if (!value.endsWith(".json")) {
+            if (!value.endsWith(".deviceinfo.json")) {
                 CLog.e(String.format("%s failed: %s", metricEntry.getKey(), value));
             }
         }
