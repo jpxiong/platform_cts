@@ -149,9 +149,12 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
             if (eventTimestampNs < lowerThresholdNs || eventTimestampNs > upperThresholdNs) {
                 if (failures.size() < TRUNCATE_MESSAGE_LENGTH) {
                     builder.append("position=").append(i);
-                    builder.append(", timestamp=").append(eventTimestampNs).append("ns");
-                    builder.append(", expected=[").append(lowerThresholdNs);
-                    builder.append(", ").append(upperThresholdNs).append("]ns; ");
+                    builder.append(", timestamp=").append(String.format("%.2fms",
+                                nanosToMillis(eventTimestampNs)));
+                    builder.append(", expected=[").append(String.format("%.2fms",
+                                nanosToMillis(lowerThresholdNs)));
+                    builder.append(", ").append(String.format("%.2f]ms; ",
+                                nanosToMillis(upperThresholdNs)));
                 }
                 failures.add(new IndexedEvent(i, event));
             }
