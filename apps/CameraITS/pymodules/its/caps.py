@@ -307,6 +307,35 @@ def private_reprocess(props):
     return props.has_key("android.request.availableCapabilities") and \
            4 in props["android.request.availableCapabilities"]
 
+def noise_reduction_mode(props, mode):
+    """Returns whether a device supports the noise reduction mode.
+
+    Args:
+        props: Camera properties objects.
+        mode: Integer, indicating the noise reduction mode to check for
+              availability.
+
+    Returns:
+        Boolean.
+    """
+    return props.has_key(
+            "android.noiseReduction.availableNoiseReductionModes") and mode \
+            in props["android.noiseReduction.availableNoiseReductionModes"];
+
+def edge_mode(props, mode):
+    """Returns whether a device supports the edge mode.
+
+    Args:
+        props: Camera properties objects.
+        mode: Integer, indicating the edge mode to check for availability.
+
+    Returns:
+        Boolean.
+    """
+    return props.has_key(
+            "android.edge.availableEdgeModes") and mode \
+            in props["android.edge.availableEdgeModes"];
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
