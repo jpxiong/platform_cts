@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -65,6 +66,7 @@ import javax.crypto.spec.SecretKeySpec;
 abstract class TestUtils extends Assert {
 
     static final String EXPECTED_CRYPTO_OP_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
+    static final String EXPECTED_PROVIDER_NAME = "AndroidKeyStore";
 
     static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
@@ -558,6 +560,31 @@ abstract class TestUtils extends Assert {
         }
         byte[] result = new byte[length];
         System.arraycopy(array, 0, result, result.length - array.length, array.length);
+        return result;
+    }
+
+    static boolean contains(int[] array, int value) {
+        for (int element : array) {
+            if (element == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean isHmacAlgorithm(String algorithm) {
+        return algorithm.toUpperCase(Locale.US).startsWith("HMAC");
+    }
+
+    static String getHmacAlgorithmDigest(String algorithm) {
+        String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+        if (!algorithmUpperCase.startsWith("HMAC")) {
+            return null;
+        }
+        String result = algorithmUpperCase.substring("HMAC".length());
+        if (result.startsWith("SHA")) {
+            result = "SHA-" + result.substring("SHA".length());
+        }
         return result;
     }
 }
