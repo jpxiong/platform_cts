@@ -52,12 +52,19 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     private static final String VIDEO_MPEG4 = MediaFormat.MIMETYPE_VIDEO_MPEG4;
 
     private Resources mResources;
-    private DeviceReportLog mReportLog = new DeviceReportLog();
+    private DeviceReportLog mReportLog;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mResources = mContext.getResources();
+        mReportLog = new DeviceReportLog();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        mReportLog.deliverReportToHost(getInstrumentation());
+        super.tearDown();
     }
 
     private static String[] getDecoderName(String mime) {
