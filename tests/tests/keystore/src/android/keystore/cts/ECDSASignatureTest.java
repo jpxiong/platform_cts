@@ -109,10 +109,7 @@ public class ECDSASignatureTest extends TestCase {
         assertTrue(signature.verify(sigBytes));
 
         // Assert that the message is left-padded with zero bits
-        byte[] fullLengthMessage = new byte[keySizeBits / 8];
-        System.arraycopy(message, 0,
-                fullLengthMessage, fullLengthMessage.length - message.length,
-                message.length);
+        byte[] fullLengthMessage = TestUtils.leftPadWithZeroBytes(message, keySizeBits / 8);
         signature.update(fullLengthMessage);
         assertTrue(signature.verify(sigBytes));
     }

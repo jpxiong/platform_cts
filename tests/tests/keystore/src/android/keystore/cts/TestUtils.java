@@ -66,6 +66,8 @@ abstract class TestUtils extends Assert {
 
     static final String EXPECTED_CRYPTO_OP_PROVIDER_NAME = "AndroidKeyStoreBCWorkaround";
 
+    static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+
 
     private TestUtils() {}
 
@@ -526,6 +528,15 @@ abstract class TestUtils extends Assert {
         throw new IllegalArgumentException("No KeyPair for key algorithm " + keyAlgorithm);
     }
 
+    static Key getKeyForKeyAlgorithm(String keyAlgorithm, Iterable<? extends Key> keys) {
+        for (Key key : keys) {
+            if (keyAlgorithm.equalsIgnoreCase(key.getAlgorithm())) {
+                return key;
+            }
+        }
+        throw new IllegalArgumentException("No Key for key algorithm " + keyAlgorithm);
+    }
+
     static byte[] generateLargeKatMsg(byte[] seed, int msgSizeBytes) throws Exception {
         byte[] result = new byte[msgSizeBytes];
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
@@ -538,6 +549,15 @@ abstract class TestUtils extends Assert {
             resultOffset += chunkSize;
             resultRemaining -= chunkSize;
         }
+        return result;
+    }
+
+    static byte[] leftPadWithZeroBytes(byte[] array, int length) {
+        if (array.length >= length) {
+            return array;
+        }
+        byte[] result = new byte[length];
+        System.arraycopy(array, 0, result, result.length - array.length, array.length);
         return result;
     }
 }

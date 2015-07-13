@@ -41,6 +41,10 @@ import android.security.keystore.KeyProtection;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
+/**
+ * Tests for algorithm-agnostic functionality of {@code Signature} implementations backed by Android
+ * Keystore.
+ */
 public class SignatureTest extends AndroidTestCase {
 
     static final String EXPECTED_PROVIDER_NAME = TestUtils.EXPECTED_CRYPTO_OP_PROVIDER_NAME;
@@ -321,7 +325,7 @@ public class SignatureTest extends AndroidTestCase {
                 + "f04e3de1460e60e9be7a42b1ddff0c"));
     }
 
-    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final long DAY_IN_MILLIS = TestUtils.DAY_IN_MILLIS;
 
     public void testAlgorithmList() {
         // Assert that Android Keystore Provider exposes exactly the expected signature algorithms.
@@ -356,7 +360,43 @@ public class SignatureTest extends AndroidTestCase {
                 expectedSigAlgsLowerCase.toArray(new String[0]));
     }
 
-    public void testGeneratedSignatureVerifies() throws Exception {
+    public void testAndroidKeyStoreKeysHandledByAndroidKeyStoreProviderWhenSigning()
+            throws Exception {
+        Collection<KeyPair> keyPairs = importDefaultKatKeyPairs();
+
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyPair keyPair = getKeyPairForSignatureAlgorithm(sigAlgorithm, keyPairs);
+                Signature signature = Signature.getInstance(sigAlgorithm);
+                signature.initSign(keyPair.getPrivate());
+                assertSame(provider, signature.getProvider());
+            } catch (Throwable e) {
+                throw new RuntimeException(sigAlgorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testAndroidKeyStorePublicKeysAcceptedByHighestPriorityProviderWhenVerifying()
+            throws Exception {
+        Collection<KeyPair> keyPairs = importDefaultKatKeyPairs();
+
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyPair keyPair = getKeyPairForSignatureAlgorithm(sigAlgorithm, keyPairs);
+                Signature signature = Signature.getInstance(sigAlgorithm);
+                signature.initVerify(keyPair.getPublic());
+            } catch (Throwable e) {
+                throw new RuntimeException(sigAlgorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testSignatureGeneratedByAndroidKeyStoreVerifiesByAndroidKeyStore()
+            throws Exception {
         Collection<KeyPair> keyPairs = importDefaultKatKeyPairs();
 
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
@@ -366,9 +406,8 @@ public class SignatureTest extends AndroidTestCase {
                 KeyPair keyPair = getKeyPairForSignatureAlgorithm(sigAlgorithm, keyPairs);
 
                 // Generate a signature
-                Signature signature = Signature.getInstance(sigAlgorithm);
+                Signature signature = Signature.getInstance(sigAlgorithm, provider);
                 signature.initSign(keyPair.getPrivate());
-                assertSame(provider, signature.getProvider());
                 byte[] message = "This is a test".getBytes("UTF-8");
                 signature.update(message);
                 byte[] sigBytes = signature.sign();
@@ -376,13 +415,88 @@ public class SignatureTest extends AndroidTestCase {
                 // Assert that it verifies using our own Provider
                 assertSignatureVerifiesOneShot(
                         sigAlgorithm, provider, keyPair.getPublic(), message, sigBytes);
-
-                // Assert that it verifies using whatever Provider is chosen by JCA by
-                // default for this signature algorithm and public key.
-                assertSignatureVerifiesOneShot(
-                        sigAlgorithm, keyPair.getPublic(), message, sigBytes);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 throw new RuntimeException(sigAlgorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testSignatureGeneratedByAndroidKeyStoreVerifiesByHighestPriorityProvider()
+            throws Exception {
+        Collection<KeyPair> keyPairs = getDefaultKatKeyPairs();
+        Collection<KeyPair> keystoreKeyPairs = importDefaultKatKeyPairs();
+
+        Provider keystoreProvider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(keystoreProvider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                PrivateKey keystorePrivateKey =
+                        getKeyPairForSignatureAlgorithm(sigAlgorithm, keystoreKeyPairs)
+                                .getPrivate();
+
+                // Generate a signature
+                Signature signature = Signature.getInstance(sigAlgorithm, keystoreProvider);
+                signature.initSign(keystorePrivateKey);
+                byte[] message = "This is a test".getBytes("UTF-8");
+                signature.update(message);
+                byte[] sigBytes = signature.sign();
+
+                // Assert that it verifies using whatever Provider is chosen by JCA by default for
+                // this signature algorithm and public key.
+                PublicKey publicKey =
+                        getKeyPairForSignatureAlgorithm(sigAlgorithm, keyPairs).getPublic();
+                Provider verificationProvider;
+                try {
+                    signature = Signature.getInstance(sigAlgorithm);
+                    signature.initVerify(publicKey);
+                    verificationProvider = signature.getProvider();
+                } catch (InvalidKeyException e) {
+                    // No providers support verifying signatures using this algorithm and key.
+                    continue;
+                }
+                assertSignatureVerifiesOneShot(
+                        sigAlgorithm, verificationProvider, publicKey, message, sigBytes);
+            } catch (Throwable e) {
+                throw new RuntimeException(sigAlgorithm + " failed", e);
+            }
+        }
+    }
+
+    public void testSignatureGeneratedByHighestPriorityProviderVerifiesByAndroidKeyStore()
+            throws Exception {
+        Collection<KeyPair> keyPairs = getDefaultKatKeyPairs();
+        Collection<KeyPair> keystoreKeyPairs = importDefaultKatKeyPairs();
+
+        Provider keystoreProvider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(keystoreProvider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            Provider signingProvider = null;
+            try {
+                PrivateKey privateKey =
+                        getKeyPairForSignatureAlgorithm(sigAlgorithm, keyPairs).getPrivate();
+
+                // Generate a signature
+                Signature signature;
+                try {
+                    signature = Signature.getInstance(sigAlgorithm);
+                    signature.initSign(privateKey);
+                    signingProvider = signature.getProvider();
+                } catch (InvalidKeyException e) {
+                    // No providers support signing using this algorithm and key.
+                    continue;
+                }
+                byte[] message = "This is a test".getBytes("UTF-8");
+                signature.update(message);
+                byte[] sigBytes = signature.sign();
+
+                // Assert that the signature verifies using the Android Keystore provider.
+                PublicKey keystorePublicKey =
+                        getKeyPairForSignatureAlgorithm(sigAlgorithm, keystoreKeyPairs).getPublic();
+                assertSignatureVerifiesOneShot(
+                        sigAlgorithm, keystoreProvider, keystorePublicKey, message, sigBytes);
+            } catch (Throwable e) {
+                throw new RuntimeException(
+                        sigAlgorithm + " failed, signing provider: " + signingProvider, e);
             }
         }
     }
@@ -417,9 +531,8 @@ public class SignatureTest extends AndroidTestCase {
                         algorithm, provider, keyPair.getPublic(), message, goodSigWithBitFlip);
 
                 // Sign the message in one go
-                Signature signature = Signature.getInstance(algorithm);
+                Signature signature = Signature.getInstance(algorithm, provider);
                 signature.initSign(keyPair.getPrivate());
-                assertSame(provider, signature.getProvider());
                 signature.update(message);
                 byte[] generatedSigBytes = signature.sign();
                 boolean deterministicSignatureScheme =
@@ -451,7 +564,7 @@ public class SignatureTest extends AndroidTestCase {
                 }
 
                 // Sign the message by feeding it into the Signature one byte at a time
-                signature = Signature.getInstance(signature.getAlgorithm());
+                signature = Signature.getInstance(signature.getAlgorithm(), provider);
                 signature.initSign(keyPair.getPrivate());
                 for (int i = 0; i < message.length; i++) {
                     signature.update(message[i]);
@@ -499,9 +612,8 @@ public class SignatureTest extends AndroidTestCase {
             try {
                 if (algorithm.toLowerCase(Locale.US).startsWith("nonewithrsa")) {
                     // This algorithm cannot accept large messages
-                    Signature signature = Signature.getInstance(algorithm);
+                    Signature signature = Signature.getInstance(algorithm, provider);
                     signature.initSign(keyPair.getPrivate());
-                    assertSame(provider, signature.getProvider());
                     try {
                         signature.update(message);
                         signature.sign();
@@ -514,7 +626,7 @@ public class SignatureTest extends AndroidTestCase {
                     byte[] sigBytes = SHORT_MSG_KAT_SIGNATURES.get(
                             "SHA256" + algorithm.substring("NONE".length()));
                     assertNotNull(sigBytes);
-                    signature = Signature.getInstance(algorithm);
+                    signature = Signature.getInstance(algorithm, provider);
                     signature.initVerify(keyPair.getPublic());
                     try {
                         signature.update(message);
@@ -534,9 +646,8 @@ public class SignatureTest extends AndroidTestCase {
                         algorithm, provider, keyPair.getPublic(), message, goodSigBytes, 718871);
 
                 // Sign the message in one go
-                Signature signature = Signature.getInstance(algorithm);
+                Signature signature = Signature.getInstance(algorithm, provider);
                 signature.initSign(keyPair.getPrivate());
-                assertSame(provider, signature.getProvider());
                 signature.update(message);
                 byte[] generatedSigBytes = signature.sign();
                 boolean deterministicSignatureScheme =
@@ -566,10 +677,8 @@ public class SignatureTest extends AndroidTestCase {
                 }
 
                 // Sign the message by feeding it into the Signature one byte at a time
-                signature = Signature.getInstance(signature.getAlgorithm());
                 generatedSigBytes = generateSignatureFedUsingFixedSizeChunks(
                         algorithm, provider, keyPair.getPrivate(), message, 444307);
-                signature.initSign(keyPair.getPrivate());
                 if (deterministicSignatureScheme) {
                     MoreAsserts.assertEquals(goodSigBytes, generatedSigBytes);
                 } else {
@@ -600,114 +709,226 @@ public class SignatureTest extends AndroidTestCase {
 
     public void testInitVerifySucceedsDespiteMissingAuthorizations() throws Exception {
         KeyProtection spec = new KeyProtection.Builder(0).build();
-        assertInitVerifySucceeds("SHA256withECDSA", spec);
-        assertInitVerifySucceeds("SHA256withRSA", spec);
-        assertInitVerifySucceeds("SHA256withRSA/PSS", spec);
+
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                assertInitVerifySucceeds(algorithm, spec);
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitSignFailsWhenNotAuthorizedToSign() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_NONE);
         int badPurposes = KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
                 | KeyProperties.PURPOSE_VERIFY;
 
-        assertInitSignSucceeds("SHA256withECDSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA256withECDSA",
-                TestUtils.buildUpon(good, badPurposes).build());
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
+                assertInitSignThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good, badPurposes).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-        assertInitSignSucceeds("SHA256withRSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA256withRSA",
-                TestUtils.buildUpon(good, badPurposes).build());
+    public void testInitVerifyIgnoresThatNotAuthorizedToVerify() throws Exception {
+        int badPurposes = KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
+                | KeyProperties.PURPOSE_SIGN;
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignSucceeds("SHA256withRSA/PSS", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA256withRSA/PSS",
-                TestUtils.buildUpon(good, badPurposes).build());
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good, badPurposes).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitSignFailsWhenDigestNotAuthorized() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_SHA384);
-        String badDigest = KeyProperties.DIGEST_SHA256;
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
 
-        assertInitSignSucceeds("SHA384withECDSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA384withECDSA",
-                TestUtils.buildUpon(good).setDigests(badDigest).build());
+                String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+                String badDigest =
+                        (algorithmUpperCase.startsWith("SHA256")) ? "SHA-384" : "SHA-256";
+                assertInitSignThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good).setDigests(badDigest).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-        assertInitSignSucceeds("SHA384withRSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA384withRSA",
-                TestUtils.buildUpon(good).setDigests(badDigest).build());
+    public void testInitVerifyIgnoresThatDigestNotAuthorized() throws Exception {
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignSucceeds("SHA384withRSA/PSS", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA384withRSA/PSS",
-                TestUtils.buildUpon(good).setDigests(badDigest).build());
+                String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+                String badDigest =
+                        (algorithmUpperCase.startsWith("SHA256")) ? "SHA-384" : "SHA-256";
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good).setDigests(badDigest).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitSignFailsWhenPaddingNotAuthorized() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_SHA512);
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+                String badPaddingScheme;
+                if (algorithmUpperCase.endsWith("WITHECDSA")) {
+                    // Test does not apply to ECDSA because ECDSA doesn't any signature padding
+                    // schemes.
+                    continue;
+                } else if (algorithmUpperCase.endsWith("WITHRSA")) {
+                    badPaddingScheme = KeyProperties.SIGNATURE_PADDING_RSA_PSS;
+                } else if (algorithmUpperCase.endsWith("WITHRSA/PSS")) {
+                    badPaddingScheme = KeyProperties.SIGNATURE_PADDING_RSA_PKCS1;
+                } else {
+                    throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+                }
 
-        // Does not apply to ECDSA because it doesn't any signature padding schemes
-        // assertInitSignThrowsInvalidKeyException("SHA256withECDSA", builder.build());
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-        assertInitSignSucceeds("SHA512withRSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA512withRSA",
-                TestUtils.buildUpon(good)
-                        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS)
-                        .build());
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
+                assertInitSignThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good).setSignaturePaddings(badPaddingScheme).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignSucceeds("SHA512withRSA/PSS", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA512withRSA/PSS",
-                TestUtils.buildUpon(good)
-                        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-                        .build());
+    public void testInitVerifyIgnoresThatPaddingNotAuthorized() throws Exception {
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+                String badPaddingScheme;
+                if (algorithmUpperCase.endsWith("WITHECDSA")) {
+                    // Test does not apply to ECDSA because ECDSA doesn't any signature padding
+                    // schemes.
+                    continue;
+                } else if (algorithmUpperCase.endsWith("WITHRSA")) {
+                    badPaddingScheme = KeyProperties.SIGNATURE_PADDING_RSA_PSS;
+                } else if (algorithmUpperCase.endsWith("WITHRSA/PSS")) {
+                    badPaddingScheme = KeyProperties.SIGNATURE_PADDING_RSA_PKCS1;
+                } else {
+                    throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+                }
+
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good).setSignaturePaddings(badPaddingScheme).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     public void testInitSignFailsWhenKeyNotYetValid() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_SHA224);
         Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
-        assertInitSignSucceeds("SHA224withECDSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withECDSA",
-                TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
-
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-        assertInitSignSucceeds("SHA224withRSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA",
-                TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
-
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignSucceeds("SHA224withRSA/PSS", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS",
-                TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
+                assertInitSignThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
-    public void testInitSignFailsWhenKeyNoLongerValid() throws Exception {
-        KeyProtection.Builder good = new KeyProtection.Builder(
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_SHA224);
+    public void testInitVerifyIgnoresThatKeyNotYetValid() throws Exception {
+        Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitSignFailsWhenKeyNoLongerValidForOrigination() throws Exception {
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
-        assertInitSignSucceeds("SHA224withECDSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withECDSA",
-                TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
+                assertInitSignThrowsInvalidKeyException(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForOriginationEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
-        assertInitSignSucceeds("SHA224withRSA", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA",
-                TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
+    public void testInitVerifyIgnoresThatKeyNoLongerValidForOrigination() throws Exception {
+        Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForOriginationEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 
-        good.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-        assertInitSignSucceeds("SHA224withRSA/PSS", good.build());
-        assertInitSignThrowsInvalidKeyException("SHA224withRSA/PSS",
-                TestUtils.buildUpon(good).setKeyValidityForOriginationEnd(badEndDate).build());
+    public void testInitSignIgnoresThatKeyNoLongerValidForConsumption() throws Exception {
+        Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForSigning(algorithm);
+                assertInitSignSucceeds(algorithm, good.build());
+                assertInitSignSucceeds(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForConsumptionEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitVerifyIgnoresThatKeyNoLongerValidForConsumption() throws Exception {
+        Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
+        for (String algorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            try {
+                KeyProtection.Builder good = getWorkingImportParamsForVerifying(algorithm);
+                assertInitVerifySucceeds(algorithm, good.build());
+                assertInitVerifySucceeds(algorithm,
+                        TestUtils.buildUpon(good)
+                                .setKeyValidityForConsumptionEnd(badEndDate)
+                                .build());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
     }
 
     private void assertInitVerifySucceeds(
@@ -732,7 +953,7 @@ public class SignatureTest extends AndroidTestCase {
                 TestUtils.getRawResX509Certificate(getContext(), certResId),
                 keyProtection)
                 .getPublic();
-        Signature signature = Signature.getInstance(signatureAlgorithm);
+        Signature signature = Signature.getInstance(signatureAlgorithm, EXPECTED_PROVIDER_NAME);
         signature.initVerify(publicKey);
     }
 
@@ -758,7 +979,7 @@ public class SignatureTest extends AndroidTestCase {
                 TestUtils.getRawResX509Certificate(getContext(), certResId),
                 keyProtection)
                 .getPrivate();
-        Signature signature = Signature.getInstance(signatureAlgorithm);
+        Signature signature = Signature.getInstance(signatureAlgorithm, EXPECTED_PROVIDER_NAME);
         signature.initSign(privateKey);
     }
 
@@ -793,7 +1014,7 @@ public class SignatureTest extends AndroidTestCase {
                 TestUtils.getRawResX509Certificate(getContext(), certResId),
                 keyProtection)
                 .getPrivate();
-        Signature signature = Signature.getInstance(signatureAlgorithm);
+        Signature signature = Signature.getInstance(signatureAlgorithm, EXPECTED_PROVIDER_NAME);
         try {
             signature.initSign(privateKey);
             fail(message);
@@ -828,6 +1049,19 @@ public class SignatureTest extends AndroidTestCase {
             Iterable<KeyPair> keyPairs) {
         return TestUtils.getKeyPairForKeyAlgorithm(
                 getKeyAlgorithmForSignatureAlgorithm(signatureAlgorithm), keyPairs);
+    }
+
+    private Collection<KeyPair> getDefaultKatKeyPairs() throws Exception {
+        return Arrays.asList(
+                new KeyPair(
+                        TestUtils.getRawResX509Certificate(getContext(), R.raw.rsa_key1_cert)
+                                .getPublicKey(),
+                        TestUtils.getRawResPrivateKey(getContext(), R.raw.rsa_key1_pkcs8)),
+                new KeyPair(
+                        TestUtils.getRawResX509Certificate(getContext(), R.raw.ec_key1_cert)
+                                .getPublicKey(),
+                        TestUtils.getRawResPrivateKey(getContext(), R.raw.ec_key1_pkcs8))
+                );
     }
 
     private Collection<KeyPair> importDefaultKatKeyPairs() throws Exception {
@@ -962,5 +1196,28 @@ public class SignatureTest extends AndroidTestCase {
                     + ", signature (" + signature.length + " bytes): "
                     + HexEncoding.encode(signature));
         }
+    }
+
+    private static KeyProtection.Builder getWorkingImportParamsForSigning(String algorithm) {
+        KeyProtection.Builder result = new KeyProtection.Builder(
+                KeyProperties.PURPOSE_SIGN)
+                .setDigests(KeyProperties.DIGEST_NONE);
+        String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+        if (algorithmUpperCase.endsWith("WITHECDSA")) {
+            // No need for padding
+        } else if (algorithmUpperCase.endsWith("WITHRSA")) {
+            result.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
+        } else if (algorithmUpperCase.endsWith("WITHRSA/PSS")) {
+            result.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
+        } else {
+            throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        }
+        return result;
+    }
+
+    private static KeyProtection.Builder getWorkingImportParamsForVerifying(String algorithm) {
+        return TestUtils.buildUpon(
+                getWorkingImportParamsForSigning(algorithm),
+                KeyProperties.PURPOSE_VERIFY);
     }
 }
