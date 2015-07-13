@@ -56,7 +56,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
     private static final String LOG_TAG = "MediaSyncTest";
 
     private final long NO_TIMESTAMP = -1;
-    private final int PLAYBACK_RATE_TOLERANCE_PERCENT = 2;
+    private final float FLOAT_PLAYBACK_RATE_TOLERANCE = .02f;
     private final long TIME_MEASUREMENT_TOLERANCE_US = 20000;
     final int INPUT_RESOURCE_ID =
             R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
@@ -501,9 +501,9 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
                     mediaDurationUs,
                     playTimeUs * playbackRate,
                     // sync.getTolerance() is MediaSync's tolerance of the playback rate, whereas
-                    // PLAYBACK_RATE_TOLERANCE_PERCENT / 100 is our test's tolerance.
+                    // FLOAT_PLAYBACK_RATE_TOLERANCE is our test's tolerance.
                     // We need to add both to get an upperbound for allowable error.
-                    mediaDurationUs * (sync.getTolerance() + PLAYBACK_RATE_TOLERANCE_PERCENT / 100.)
+                    mediaDurationUs * (sync.getTolerance() + FLOAT_PLAYBACK_RATE_TOLERANCE)
                             + TIME_MEASUREMENT_TOLERANCE_US);
         }
 
