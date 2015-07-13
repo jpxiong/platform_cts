@@ -45,6 +45,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 abstract class BlockCipherTestBase extends AndroidTestCase {
@@ -828,21 +829,33 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
     }
 
     public void testUpdateAADNotSupported() throws Exception {
-        createCipher();
-        initKat(Cipher.ENCRYPT_MODE);
         if (isAuthenticatedCipher()) {
-            assertUpdateAADSupported();
-        } else {
-            assertUpdateAADNotSupported();
+            // Not applicable to authenticated ciphers where updateAAD is supported.
+            return;
         }
 
         createCipher();
+        initKat(Cipher.ENCRYPT_MODE);
+        assertUpdateAADNotSupported();
+
+        createCipher();
         initKat(Cipher.DECRYPT_MODE);
-        if (isAuthenticatedCipher()) {
-            assertUpdateAADSupported();
-        } else {
-            assertUpdateAADNotSupported();
+        assertUpdateAADNotSupported();
+    }
+
+    public void testUpdateAADSupported() throws Exception {
+        if (!isAuthenticatedCipher()) {
+            // Not applicable to unauthenticated ciphers where updateAAD is not supported.
+            return;
         }
+
+        createCipher();
+        initKat(Cipher.ENCRYPT_MODE);
+        assertUpdateAADSupported();
+
+        createCipher();
+        initKat(Cipher.DECRYPT_MODE);
+        assertUpdateAADSupported();
     }
 
     private void assertUpdateAADNotSupported() throws Exception {
@@ -1235,7 +1248,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
                 subarray(buffer, outputOffsetInBuffer, outputEndIndexInBuffer));
     }
 
-    private void createCipher() throws NoSuchAlgorithmException,
+    protected void createCipher() throws NoSuchAlgorithmException,
             NoSuchPaddingException  {
         mCipher = Cipher.getInstance(getTransformation());
     }
@@ -1279,7 +1292,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         return importKey(getKatKey());
     }
 
-    private SecretKey importKey(byte[] keyMaterial) {
+    protected SecretKey importKey(byte[] keyMaterial) {
         try {
             int keyId = mNextKeyId++;
             String keyAlias = "key" + keyId;
@@ -1318,75 +1331,75 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         }
     }
 
-    private void initKat(int opmode)
+    protected void initKat(int opmode)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         init(opmode, getKey(), getKatAlgorithmParameterSpec());
     }
 
-    private void init(int opmode, Key key, AlgorithmParameters spec)
+    protected void init(int opmode, Key key, AlgorithmParameters spec)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         mCipher.init(opmode, key, spec);
         mOpmode = opmode;
     }
 
-    private void init(int opmode, Key key, AlgorithmParameters spec, SecureRandom random)
+    protected void init(int opmode, Key key, AlgorithmParameters spec, SecureRandom random)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         mCipher.init(opmode, key, spec, random);
         mOpmode = opmode;
     }
 
-    private void init(int opmode, Key key, AlgorithmParameterSpec spec)
+    protected void init(int opmode, Key key, AlgorithmParameterSpec spec)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         mCipher.init(opmode, key, spec);
         mOpmode = opmode;
     }
 
-    private void init(int opmode, Key key, AlgorithmParameterSpec spec, SecureRandom random)
+    protected void init(int opmode, Key key, AlgorithmParameterSpec spec, SecureRandom random)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         mCipher.init(opmode, key, spec, random);
         mOpmode = opmode;
     }
 
-    private void init(int opmode, Key key) throws InvalidKeyException {
+    protected void init(int opmode, Key key) throws InvalidKeyException {
         mCipher.init(opmode, key);
         mOpmode = opmode;
     }
 
-    private void init(int opmode, Key key, SecureRandom random) throws InvalidKeyException {
+    protected void init(int opmode, Key key, SecureRandom random) throws InvalidKeyException {
         mCipher.init(opmode, key, random);
         mOpmode = opmode;
     }
 
-    private byte[] doFinal() throws IllegalBlockSizeException, BadPaddingException {
+    protected byte[] doFinal() throws IllegalBlockSizeException, BadPaddingException {
         return mCipher.doFinal();
     }
 
-    private byte[] doFinal(byte[] input) throws IllegalBlockSizeException, BadPaddingException {
+    protected byte[] doFinal(byte[] input) throws IllegalBlockSizeException, BadPaddingException {
         return mCipher.doFinal(input);
     }
 
-    private byte[] doFinal(byte[] input, int inputOffset, int inputLen)
+    protected byte[] doFinal(byte[] input, int inputOffset, int inputLen)
             throws IllegalBlockSizeException, BadPaddingException {
         return mCipher.doFinal(input, inputOffset, inputLen);
     }
 
-    private int doFinal(byte[] input, int inputOffset, int inputLen, byte[] output)
+    protected int doFinal(byte[] input, int inputOffset, int inputLen, byte[] output)
             throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
         return mCipher.doFinal(input, inputOffset, inputLen, output);
     }
 
-    private int doFinal(byte[] input, int inputOffset, int inputLen, byte[] output,
+    protected int doFinal(byte[] input, int inputOffset, int inputLen, byte[] output,
             int outputOffset) throws ShortBufferException, IllegalBlockSizeException,
             BadPaddingException {
         return mCipher.doFinal(input, inputOffset, inputLen, output, outputOffset);
     }
 
-    private int doFinal(byte[] output, int outputOffset) throws IllegalBlockSizeException,
+    protected int doFinal(byte[] output, int outputOffset) throws IllegalBlockSizeException,
             ShortBufferException, BadPaddingException {
         return mCipher.doFinal(output, outputOffset);
     }
 
-    private int doFinal(ByteBuffer input, ByteBuffer output) throws ShortBufferException,
+    protected int doFinal(ByteBuffer input, ByteBuffer output) throws ShortBufferException,
             IllegalBlockSizeException, BadPaddingException {
         return mCipher.doFinal(input, output);
     }
@@ -1415,21 +1428,21 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         }
     }
 
-    private byte[] update(byte[] input) {
+    protected byte[] update(byte[] input) {
         byte[] output = mCipher.update(input);
         assertUpdateOutputSize(
                 (input != null) ? input.length : 0, (output != null) ? output.length : 0);
         return output;
     }
 
-    private byte[] update(byte[] input, int offset, int len) {
+    protected byte[] update(byte[] input, int offset, int len) {
         byte[] output = mCipher.update(input, offset, len);
         assertUpdateOutputSize(len, (output != null) ? output.length : 0);
 
         return output;
     }
 
-    private int update(byte[] input, int offset, int len, byte[] output)
+    protected int update(byte[] input, int offset, int len, byte[] output)
             throws ShortBufferException {
         int outputLen = mCipher.update(input, offset, len, output);
         assertUpdateOutputSize(len, outputLen);
@@ -1437,7 +1450,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         return outputLen;
     }
 
-    private int update(byte[] input, int offset, int len, byte[] output, int outputOffset)
+    protected int update(byte[] input, int offset, int len, byte[] output, int outputOffset)
             throws ShortBufferException {
         int outputLen = mCipher.update(input, offset, len, output, outputOffset);
         assertUpdateOutputSize(len, outputLen);
@@ -1445,7 +1458,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         return outputLen;
     }
 
-    private int update(ByteBuffer input, ByteBuffer output) throws ShortBufferException {
+    protected int update(ByteBuffer input, ByteBuffer output) throws ShortBufferException {
         int inputLimitBefore = input.limit();
         int outputLimitBefore = output.limit();
         int inputLen = input.remaining();
@@ -1463,8 +1476,20 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         return outputLen;
     }
 
+    protected void updateAAD(byte[] input) {
+        mCipher.updateAAD(input);
+    }
+
+    protected void updateAAD(byte[] input, int offset, int len) {
+        mCipher.updateAAD(input, offset, len);
+    }
+
+    protected void updateAAD(ByteBuffer input) {
+        mCipher.updateAAD(input);
+    }
+
     @SuppressWarnings("unused")
-    private static void assertEquals(Buffer expected, Buffer actual) {
+    protected static void assertEquals(Buffer expected, Buffer actual) {
         throw new RuntimeException(
                 "Comparing ByteBuffers using their .equals is probably not what you want"
                 + " -- use assertByteBufferEquals instead.");
@@ -1474,7 +1499,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
      * Asserts that the position, limit, and capacity of the provided buffers are the same, and that
      * their contents (from position {@code 0} to capacity) are the same.
      */
-    private static void assertByteBufferEquals(ByteBuffer expected, ByteBuffer actual) {
+    protected static void assertByteBufferEquals(ByteBuffer expected, ByteBuffer actual) {
         if (expected == null) {
             if (actual == null) {
                 return;
@@ -1504,7 +1529,7 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
                         buffer.array(), buffer.arrayOffset(), buffer.capacity()) + "]";
     }
 
-    private static boolean equals(byte[] arr1, int offset1, int len1, byte[] arr2, int offset2,
+    protected static boolean equals(byte[] arr1, int offset1, int len1, byte[] arr2, int offset2,
             int len2) {
         if (arr1 == null) {
             return (arr2 == null);
@@ -1523,13 +1548,13 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         }
     }
 
-    private static byte[] subarray(byte[] array, int beginIndex, int endIndex) {
+    protected static byte[] subarray(byte[] array, int beginIndex, int endIndex) {
         byte[] result = new byte[endIndex - beginIndex];
         System.arraycopy(array, beginIndex, result, 0, result.length);
         return result;
     }
 
-    private static byte[] concat(byte[]... arrays) {
+    protected static byte[] concat(byte[]... arrays) {
         int resultLength = 0;
         for (byte[] array : arrays) {
             resultLength += (array != null) ? array.length : 0;
@@ -1546,11 +1571,11 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
         return result;
     }
 
-    private static void assertEquals(byte[] expected, byte[] actual) {
+    protected static void assertEquals(byte[] expected, byte[] actual) {
         assertEquals(null, expected, actual);
     }
 
-    private static void assertEquals(String message, byte[] expected, byte[] actual) {
+    protected static void assertEquals(String message, byte[] expected, byte[] actual) {
         if (!Arrays.equals(expected, actual)) {
             StringBuilder detail = new StringBuilder();
             if (expected != null) {
@@ -1571,5 +1596,52 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
                 fail(detail.toString());
             }
         }
+    }
+
+    protected final void assertInitRejectsIvParameterSpec(byte[] iv) throws Exception {
+        Key key = importKey(getKatKey());
+        createCipher();
+        IvParameterSpec spec = new IvParameterSpec(iv);
+        try {
+            init(Cipher.ENCRYPT_MODE, key, spec);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.WRAP_MODE, key, spec);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.DECRYPT_MODE, key, spec);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.UNWRAP_MODE, key, spec);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        AlgorithmParameters param = AlgorithmParameters.getInstance("AES");
+        param.init(new IvParameterSpec(iv));
+        try {
+            init(Cipher.ENCRYPT_MODE, key, param);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.WRAP_MODE, key, param);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.DECRYPT_MODE, key, param);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
+
+        try {
+            init(Cipher.UNWRAP_MODE, key, param);
+            fail();
+        } catch (InvalidAlgorithmParameterException expected) {}
     }
 }

@@ -54,4 +54,8 @@ abstract class AESECBCipherTestBase extends BlockCipherTestBase {
         }
         return null;
     }
+
+    public void testInitRejectsIvParameterSpec() throws Exception {
+        assertInitRejectsIvParameterSpec(new byte[getBlockSize()]);
+    }
 }
