@@ -45,7 +45,8 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.compute_target_exposure(props) and
-                             its.caps.per_frame_control(props))
+                             its.caps.per_frame_control(props) and
+                             its.caps.noise_reduction_mode(props, 0))
 
         # NR mode 0 with low gain
         e, s = its.target.get_target_exposure_combos(cam)["minSensitivity"]
@@ -62,37 +63,51 @@ def main():
             ref_variance.append(its.image.compute_image_variances(tile)[0])
         print "Ref variances:", ref_variance
 
-        for i in range(3):
-            # NR modes 0, 1, 2 with high gain
+        # NR modes 0, 1, 2, 3, 4 with high gain
+        for mode in range(5):
+            # Skip unavailable modes
+            if not its.caps.noise_reduction_mode(props, mode):
+                nr_modes_reported.append(mode)
+                for channel in range(3):
+                    variances[channel].append(0)
+                continue;
+
             e, s = its.target.get_target_exposure_combos(cam)["maxSensitivity"]
             req = its.objects.manual_capture_request(s, e)
-            req["android.noiseReduction.mode"] = i
+            req["android.noiseReduction.mode"] = mode
             cap = cam.do_capture(req)
             nr_modes_reported.append(
                     cap["metadata"]["android.noiseReduction.mode"])
             its.image.write_image(
                     its.image.convert_capture_to_rgb_image(cap),
-                    "%s_high_gain_nr=%d.jpg" % (NAME, i))
+                    "%s_high_gain_nr=%d.jpg" % (NAME, mode))
             planes = its.image.convert_capture_to_planes(cap)
             for j in range(3):
                 img = planes[j]
                 tile = its.image.get_image_patch(img, 0.45, 0.45, 0.1, 0.1)
                 variance = its.image.compute_image_variances(tile)[0]
                 variances[j].append(variance / ref_variance[j])
-        print "Variances with NR mode [0,1,2]:", variances
+        print "Variances with NR mode [0,1,2,3,4]:", variances
 
     # Draw a plot.
     for j in range(3):
-        pylab.plot(range(3), variances[j], "rgb"[j])
+        pylab.plot(range(5), variances[j], "rgb"[j])
     matplotlib.pyplot.savefig("%s_plot_variances.png" % (NAME))
 
-    assert(nr_modes_reported == [0,1,2])
+    assert(nr_modes_reported == [0,1,2,3,4])
 
     # Check that the variance of the NR=0 image is higher than for the
     # NR=1 and NR=2 images.
     for j in range(3):
-        for i in range(1,3):
-            assert(variances[j][i] < variances[j][0])
+        for mode in [1,2]:
+            if its.caps.noise_reduction_mode(props, mode):
+                assert(variances[j][mode] < variances[j][0])
+                # Variance of MINIMAL should be higher than for FAST, HQ
+                if its.caps.noise_reduction_mode(props, 3):
+                    assert(variances[j][mode] < variances[j][3])
+                # Variance of ZSL should be higher than for FAST, HQ
+                if its.caps.noise_reduction_mode(props, 4):
+                    assert(variances[j][mode] < variances[j][4])
 
 if __name__ == '__main__':
     main()
