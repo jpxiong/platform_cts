@@ -351,7 +351,7 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         }
     }
 
-    private static void logCommand(String... cmd) throws Exception {
+    public static void logCommand(String... cmd) throws Exception {
         final Process proc = new ProcessBuilder(cmd).redirectErrorStream(true).start();
 
         final ByteArrayOutputStream buf = new ByteArrayOutputStream();

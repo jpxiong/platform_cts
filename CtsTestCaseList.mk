@@ -19,6 +19,8 @@ cts_security_apps_list := \
     CtsDocumentClient \
     CtsExternalStorageApp \
     CtsInstrumentationAppDiffCert \
+    CtsUsePermissionApp \
+    CtsUsePermissionAppCompat \
     CtsPermissionDeclareApp \
     CtsPermissionDeclareAppCompat \
     CtsReadExternalStorageApp \
