@@ -34,7 +34,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Provider.Service;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECKey;
@@ -48,7 +51,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -99,12 +107,49 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
     private static final Date DEFAULT_CERT_NOT_BEFORE = new Date(0L); // Jan 1 1970
     private static final Date DEFAULT_CERT_NOT_AFTER = new Date(2461449600000L); // Jan 1 2048
 
+    private static final String EXPECTED_PROVIDER_NAME = TestUtils.EXPECTED_PROVIDER_NAME;
+
+    private static final String[] EXPECTED_ALGORITHMS = {
+        "EC",
+        "RSA",
+    };
+
+    private static final Map<String, Integer> DEFAULT_KEY_SIZES =
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static {
+        DEFAULT_KEY_SIZES.put("EC", 256);
+        DEFAULT_KEY_SIZES.put("RSA", 2048);
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mRng = new CountingSecureRandom();
         mKeyStore = KeyStore.getInstance("AndroidKeyStore");
         mKeyStore.load(null, null);
+    }
+
+    public void testAlgorithmList() {
+        // Assert that Android Keystore Provider exposes exactly the expected KeyPairGenerator
+        // algorithms. We don't care whether the algorithms are exposed via aliases, as long as
+        // canonical names of algorithms are accepted. If the Provider exposes extraneous
+        // algorithms, it'll be caught because it'll have to expose at least one Service for such an
+        // algorithm, and this Service's algorithm will not be in the expected set.
+
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        Set<Service> services = provider.getServices();
+        Set<String> actualAlgsLowerCase = new HashSet<String>();
+        Set<String> expectedAlgsLowerCase = new HashSet<String>(
+                Arrays.asList(TestUtils.toLowerCase(EXPECTED_ALGORITHMS)));
+        for (Service service : services) {
+            if ("KeyPairGenerator".equalsIgnoreCase(service.getType())) {
+                String algLowerCase = service.getAlgorithm().toLowerCase(Locale.US);
+                actualAlgsLowerCase.add(algLowerCase);
+            }
+        }
+
+        TestUtils.assertContentsInAnyOrder(actualAlgsLowerCase,
+                expectedAlgsLowerCase.toArray(new String[0]));
     }
 
     public void testInitialize_LegacySpec() throws Exception {
@@ -161,6 +206,143 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
             getEcGenerator().initialize(1024, new SecureRandom());
             fail("KeyPairGenerator should not support setting the key size");
         } catch (IllegalArgumentException success) {
+        }
+    }
+
+    public void testDefaultKeySize() throws Exception {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                int expectedSizeBits = DEFAULT_KEY_SIZES.get(algorithm);
+                KeyPairGenerator generator = getGenerator(algorithm);
+                generator.initialize(getWorkingSpec().build());
+                KeyPair keyPair = generator.generateKeyPair();
+                assertEquals(expectedSizeBits,
+                        TestUtils.getKeyInfo(keyPair.getPrivate()).getKeySize());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitWithUnknownBlockModeFails() {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyPairGenerator generator = getGenerator(algorithm);
+                try {
+                    generator.initialize(getWorkingSpec().setBlockModes("weird").build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitWithUnknownEncryptionPaddingFails() {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyPairGenerator generator = getGenerator(algorithm);
+                try {
+                    generator.initialize(getWorkingSpec().setEncryptionPaddings("weird").build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitWithUnknownSignaturePaddingFails() {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyPairGenerator generator = getGenerator(algorithm);
+                try {
+                    generator.initialize(getWorkingSpec().setSignaturePaddings("weird").build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitWithUnknownDigestFails() {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyPairGenerator generator = getGenerator(algorithm);
+                try {
+                    generator.initialize(getWorkingSpec().setDigests("weird").build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testInitRandomizedEncryptionRequiredButViolatedFails() throws Exception {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                KeyPairGenerator generator = getGenerator(algorithm);
+                try {
+                    generator.initialize(getWorkingSpec(
+                            KeyProperties.PURPOSE_ENCRYPT)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                            .build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
+    public void testGenerateHonorsAuthorizations() throws Exception {
+        Date keyValidityStart = new Date(System.currentTimeMillis() - TestUtils.DAY_IN_MILLIS);
+        Date keyValidityForOriginationEnd =
+                new Date(System.currentTimeMillis() + TestUtils.DAY_IN_MILLIS);
+        Date keyValidityForConsumptionEnd =
+                new Date(System.currentTimeMillis() + 3 * TestUtils.DAY_IN_MILLIS);
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                String[] blockModes =
+                        new String[] {KeyProperties.BLOCK_MODE_GCM, KeyProperties.BLOCK_MODE_CBC};
+                String[] encryptionPaddings =
+                        new String[] {KeyProperties.ENCRYPTION_PADDING_RSA_OAEP,
+                                KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1};
+                String[] digests =
+                        new String[] {KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA1};
+                int purposes = KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_ENCRYPT;
+                KeyPairGenerator generator = getGenerator(algorithm);
+                generator.initialize(getWorkingSpec(purposes)
+                        .setBlockModes(blockModes)
+                        .setEncryptionPaddings(encryptionPaddings)
+                        .setDigests(digests)
+                        .setKeyValidityStart(keyValidityStart)
+                        .setKeyValidityForOriginationEnd(keyValidityForOriginationEnd)
+                        .setKeyValidityForConsumptionEnd(keyValidityForConsumptionEnd)
+                        .build());
+                KeyPair keyPair = generator.generateKeyPair();
+                assertEquals(algorithm, keyPair.getPrivate().getAlgorithm());
+
+                KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
+                assertEquals(purposes, keyInfo.getPurposes());
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(blockModes), keyInfo.getBlockModes());
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(encryptionPaddings), keyInfo.getEncryptionPaddings());
+                TestUtils.assertContentsInAnyOrder(Arrays.asList(digests), keyInfo.getDigests());
+                MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
+                assertEquals(keyValidityStart, keyInfo.getKeyValidityStart());
+                assertEquals(keyValidityForOriginationEnd,
+                        keyInfo.getKeyValidityForOriginationEnd());
+                assertEquals(keyValidityForConsumptionEnd,
+                        keyInfo.getKeyValidityForConsumptionEnd());
+                assertFalse(keyInfo.isUserAuthenticationRequired());
+                assertFalse(keyInfo.isUserAuthenticationRequirementEnforcedBySecureHardware());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
         }
     }
 
@@ -1257,5 +1439,13 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         fail(((message != null) ? message + ". " : "")
                 + "Expected one of " + Arrays.asList(expected)
                 + ", actual: <" + actual + ">");
+    }
+
+    private KeyGenParameterSpec.Builder getWorkingSpec() {
+        return getWorkingSpec(0);
+    }
+
+    private KeyGenParameterSpec.Builder getWorkingSpec(int purposes) {
+        return new KeyGenParameterSpec.Builder(TEST_ALIAS_1, purposes);
     }
 }
