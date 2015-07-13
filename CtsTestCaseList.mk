@@ -97,6 +97,7 @@ cts_support_packages := \
     CtsUsbSerialTestApp \
     CtsVoiceInteractionService \
     CtsVoiceInteractionApp \
+    CtsVoiceSettingsService \
     $(cts_security_apps_list) \
     $(cts_security_keysets_list)
 
@@ -186,6 +187,7 @@ cts_test_packages := \
     CtsUtilTestCases \
     CtsViewTestCases \
     CtsVoiceInteractionTestCases \
+    CtsVoiceSettingsTestCases \
     CtsWebkitTestCases \
     CtsWidgetTestCases
 
