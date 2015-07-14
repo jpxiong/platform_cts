@@ -87,7 +87,7 @@ public class MockVideoProvider extends VideoProvider {
      */
     @Override
     public void onSendSessionModifyRequest(VideoProfile fromProfile, VideoProfile toProfile) {
-        receiveSessionModifyResponse(Connection.VideoProvider.SESSION_MODIFY_REQUEST_SUCCESS,
+        super.receiveSessionModifyResponse(Connection.VideoProvider.SESSION_MODIFY_REQUEST_SUCCESS,
                 toProfile, toProfile);
         mMockConnection.setVideoState(toProfile.getVideoState());
     }
@@ -111,7 +111,7 @@ public class MockVideoProvider extends VideoProvider {
      */
     @Override
     public void onRequestConnectionDataUsage() {
-        setCallDataUsage(DATA_USAGE);
+        super.setCallDataUsage(DATA_USAGE);
     }
 
     @Override
@@ -126,11 +126,11 @@ public class MockVideoProvider extends VideoProvider {
     private void handleCameraChange(String cameraId) {
         mCameraId = cameraId;
         if (CAMERA_FRONT.equals(mCameraId)) {
-            changeCameraCapabilities(new VideoProfile.CameraCapabilities(CAMERA_FRONT_DIMENSIONS,
-                    CAMERA_FRONT_DIMENSIONS));
+            super.changeCameraCapabilities(new VideoProfile.CameraCapabilities(
+                    CAMERA_FRONT_DIMENSIONS, CAMERA_FRONT_DIMENSIONS));
         } else if (CAMERA_BACK.equals(mCameraId)) {
-            changeCameraCapabilities(new VideoProfile.CameraCapabilities(CAMERA_BACK_DIMENSIONS,
-                    CAMERA_BACK_DIMENSIONS));
+            super.changeCameraCapabilities(new VideoProfile.CameraCapabilities(
+                    CAMERA_BACK_DIMENSIONS, CAMERA_BACK_DIMENSIONS));
         }
     }
 
@@ -140,7 +140,7 @@ public class MockVideoProvider extends VideoProvider {
      * @param videoQuality The video quality.
      */
     public void sendMockVideoQuality(int videoQuality) {
-        changeVideoQuality(videoQuality);
+        super.changeVideoQuality(videoQuality);
     }
 
     /**
@@ -149,7 +149,7 @@ public class MockVideoProvider extends VideoProvider {
      * @param event The call session event.
      */
     public void sendMockCallSessionEvent(int event) {
-        handleCallSessionEvent(event);
+        super.handleCallSessionEvent(event);
     }
 
     /**
@@ -158,7 +158,7 @@ public class MockVideoProvider extends VideoProvider {
      * @param width The peer width.
      */
     public void sendMockPeerWidth(int width) {
-        changePeerDimensions(width, width);
+        super.changePeerDimensions(width, width);
     }
 
     /**
@@ -167,7 +167,7 @@ public class MockVideoProvider extends VideoProvider {
      * @param request The requested profile.
      */
     public void sendMockSessionModifyRequest(VideoProfile request) {
-        receiveSessionModifyRequest(request);
+        super.receiveSessionModifyRequest(request);
     }
 
     public int getDeviceOrientation() {

@@ -38,57 +38,67 @@ public class MockConnection extends Connection {
 
     @Override
     public void onAnswer() {
-        onAnswer(VideoProfile.STATE_AUDIO_ONLY);
+        super.onAnswer();
     }
 
     @Override
     public void onAnswer(int videoState) {
+        super.onAnswer(videoState);
         this.videoState = videoState;
         setActive();
     }
 
     @Override
     public void onReject() {
+        super.onReject();
         setDisconnected(new DisconnectCause(DisconnectCause.REJECTED));
     }
 
     @Override
     public void onHold() {
+        super.onHold();
         setOnHold();
     }
 
     @Override
     public void onUnhold() {
+        super.onUnhold();
         setActive();
     }
 
     @Override
     public void onDisconnect() {
+        super.onDisconnect();
         setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
         destroy();
     }
 
     @Override
     public void onAbort() {
+        super.onAbort();
     }
 
     @Override
     public void onPlayDtmfTone(char c) {
+        super.onPlayDtmfTone(c);
         mDtmfString += c;
     }
 
     @Override
     public void onStopDtmfTone() {
+        super.onStopDtmfTone();
         mDtmfString += ".";
     }
 
     @Override
     public void onCallAudioStateChanged(CallAudioState state) {
+        super.onCallAudioStateChanged(state);
         mCallAudioState = state;
     }
 
     @Override
     public void onStateChanged(int state) {
+        super.onStateChanged(state);
         mState = state;
     }
 
