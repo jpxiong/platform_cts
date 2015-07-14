@@ -20,6 +20,7 @@ import com.android.cts.media.R;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
@@ -38,6 +39,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.File;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -596,14 +598,33 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
+    private Camera mCamera;
     private void testRecordedVideoPlaybackWithAngle(int angle) throws Exception {
-        final int width = RECORDED_VIDEO_WIDTH;
-        final int height = RECORDED_VIDEO_HEIGHT;
+        int width = RECORDED_VIDEO_WIDTH;
+        int height = RECORDED_VIDEO_HEIGHT;
         final String file = RECORDED_FILE;
         final long durationMs = RECORDED_DURATION_MS;
 
         if (!hasCamera()) {
             return;
+        }
+
+        boolean isSupported = false;
+        mCamera = Camera.open(0);
+        Camera.Parameters parameters = mCamera.getParameters();
+        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+        for (Camera.Size size : previewSizes)
+        {
+            if (size.width == width && size.height == height) {
+                isSupported = true;
+                break;
+            }
+        }
+        mCamera.release();
+        mCamera = null;
+        if (!isSupported) {
+            width = previewSizes.get(0).width;
+            height = previewSizes.get(0).height;
         }
         checkOrientation(angle);
         recordVideo(width, height, angle, file, durationMs);
