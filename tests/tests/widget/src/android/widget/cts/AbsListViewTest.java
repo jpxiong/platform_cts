@@ -194,7 +194,6 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewCt
         assertSame(mListView, onScrollListener.getView());
         assertEquals(mListView.getChildCount(), onScrollListener.getVisibleItemCount());
         assertEquals(mCountryList.length, onScrollListener.getTotalItemCount());
-        assertEquals(OnScrollListener.SCROLL_STATE_IDLE, onScrollListener.getScrollState());
 
         assertTrue(onScrollListener.isOnScrollCalled());
         assertTrue(onScrollListener.isOnScrollStateChangedCalled());
