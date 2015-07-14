@@ -18,9 +18,13 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.shouldTestTelecom;
 
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
+import android.telecom.StatusHints;
+import android.telecom.TelecomManager;
 import android.test.AndroidTestCase;
 
 import java.util.concurrent.Semaphore;
@@ -109,6 +113,163 @@ public class ConnectionTest extends AndroidTestCase {
             return;
         }
         fail("Connection should not move out of STATE_DISCONNECTED");
+    }
+
+    public void testSetAndGetCallerDisplayName() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        connection.setCallerDisplayName("Test User", TelecomManager.PRESENTATION_ALLOWED);
+        assertEquals("Test User", connection.getCallerDisplayName());
+        assertEquals(TelecomManager.PRESENTATION_ALLOWED,
+                connection.getCallerDisplayNamePresentation());
+    }
+
+    public void testSetAndGetAddress() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        final Uri address = Uri.fromParts("tel", "1234567", null);
+        connection.setAddress(address, TelecomManager.PRESENTATION_UNKNOWN);
+        assertEquals(address, connection.getAddress());
+        assertEquals(TelecomManager.PRESENTATION_UNKNOWN, connection.getAddressPresentation());
+    }
+
+    public void testSetAndGetConnectionCapabilities() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        final int capabilities = Connection.CAPABILITY_HOLD | Connection.CAPABILITY_CAN_PAUSE_VIDEO
+                | Connection.CAPABILITY_MANAGE_CONFERENCE | Connection.CAPABILITY_RESPOND_VIA_TEXT;
+
+        connection.setConnectionCapabilities(capabilities);
+
+        assertEquals(capabilities, connection.getConnectionCapabilities());
+    }
+
+    public void testSetAndGetDisconnectCause() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+        assertEquals(Connection.STATE_NEW, connection.getState());
+
+        final DisconnectCause disconnectCause = new DisconnectCause(DisconnectCause.REJECTED,
+                "No friends", "No friends to talk to", "No friends to talk to");
+
+        connection.setDisconnected(disconnectCause);
+
+        assertEquals(Connection.STATE_DISCONNECTED, connection.getState());
+        assertEquals(disconnectCause, connection.getDisconnectCause());
+    }
+
+    public void testSetAndGetAudioModeIsVoip() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        assertFalse(connection.getAudioModeIsVoip());
+        connection.setAudioModeIsVoip(true);
+        assertTrue(connection.getAudioModeIsVoip());
+    }
+
+    public void testSetAndGetExtras() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        assertEquals(null, connection.getExtras());
+
+        final Bundle extras = new Bundle();
+        extras.putBoolean("test-extra-key", true);
+        connection.setExtras(extras);
+
+        final Bundle retrieved = connection.getExtras();
+        assertNotNull(retrieved);
+        assertTrue(extras.getBoolean("test-extra-key"));
+    }
+
+    public void testSetAndGetStatusHints() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        assertEquals(null, connection.getStatusHints());
+
+        final StatusHints statusHints = new StatusHints("Test", null, null);
+        connection.setStatusHints(statusHints);
+        assertEquals(statusHints, connection.getStatusHints());
+    }
+
+    public void testSetAndGetRingbackRequested() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        assertFalse(connection.isRingbackRequested());
+
+        connection.setRingbackRequested(true);
+        assertTrue(connection.isRingbackRequested());
+    }
+
+    public void testSetAndGetVideoProvider() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        final Semaphore lock = new Semaphore(0);
+        Connection connection = createConnection(lock);
+        waitForStateChange(lock);
+
+        assertNull(connection.getVideoProvider());
+
+        final Connection.VideoProvider videoProvider = new MockVideoProvider(null);
+        connection.setVideoProvider(videoProvider);
+        assertEquals(videoProvider, connection.getVideoProvider());
+    }
+
+    public void testStateToString() {
+        assertEquals("INITIALIZING", Connection.stateToString(Connection.STATE_INITIALIZING));
+        assertEquals("NEW", Connection.stateToString(Connection.STATE_INITIALIZING));
+        assertEquals("RINGING", Connection.stateToString(Connection.STATE_INITIALIZING));
+        assertEquals("DIALING", Connection.stateToString(Connection.STATE_DIALING));
+        assertEquals("ACTIVE", Connection.stateToString(Connection.STATE_ACTIVE));
+        assertEquals("HOLDING", Connection.stateToString(Connection.STATE_HOLDING));
+        assertEquals("DISCONNECTED", Connection.stateToString(Connection.STATE_DISCONNECTED));
     }
 
     private static Connection createConnection(final Semaphore lock) {
