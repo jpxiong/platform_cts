@@ -18,7 +18,9 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-DEVICE_INFO_ACTIVITIES := com.android.cts.deviceinfo.SampleDeviceInfo
+DEVICE_INFO_PERMISSIONS :=
+
+DEVICE_INFO_ACTIVITIES :=
 
 LOCAL_PACKAGE_NAME := CtsDeviceInfo
 

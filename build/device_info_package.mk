@@ -18,12 +18,11 @@
 
 DEVICE_INFO_PACKAGE := com.android.compatibility.common.deviceinfo
 DEVICE_INFO_INSTRUMENT := com.android.compatibility.common.deviceinfo.DeviceInfoInstrument
-DEVICE_INFO_PERMISSIONS := android.permission.WRITE_EXTERNAL_STORAGE
+DEVICE_INFO_PERMISSIONS += android.permission.WRITE_EXTERNAL_STORAGE
+DEVICE_INFO_ACTIVITIES += $(DEVICE_INFO_PACKAGE).GenericDeviceInfo
 
 # Add the base device info
 LOCAL_STATIC_JAVA_LIBRARIES += compatibility-device-info
-
-# DEVICE_INFO_ACTIVITIES += $(DEVICE_INFO_PACKAGE).GenericDeviceInfo
 
 # Generator of APK manifests.
 MANIFEST_GENERATOR_JAR := $(HOST_OUT_JAVA_LIBRARIES)/compatibility-manifest-generator.jar
@@ -35,7 +34,9 @@ $(manifest_xml): PRIVATE_INFO_PERMISSIONS := $(foreach permission, $(DEVICE_INFO
 $(manifest_xml): PRIVATE_INFO_ACTIVITIES := $(foreach activity,$(DEVICE_INFO_ACTIVITIES),-a $(activity))
 $(manifest_xml): PRIVATE_PACKAGE := $(DEVICE_INFO_PACKAGE)
 $(manifest_xml): PRIVATE_INSTRUMENT := $(DEVICE_INFO_INSTRUMENT)
-$(manifest_xml): $(MANIFEST_GENERATOR_JAR)
+
+# Regenerate manifest.xml if the generator jar, */cts-device-info/Android.mk, or this file is changed.
+$(manifest_xml): $(MANIFEST_GENERATOR_JAR) $(LOCAL_PATH)/Android.mk cts/build/device_info_package.mk
 	$(hide) echo Generating manifest for $(PRIVATE_NAME)
 	$(hide) mkdir -p $(dir $@)
 	$(hide) $(MANIFEST_GENERATOR) \
