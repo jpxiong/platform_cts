@@ -117,6 +117,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
     public void testCallCapabilities() {
         assertThat(mCall.getDetails().getCallCapabilities(), is(Integer.class));
         assertEquals(CALL_CAPABILITIES, mCall.getDetails().getCallCapabilities());
+        assertTrue(mCall.getDetails().can(Call.Details.CAPABILITY_HOLD));
+        assertTrue(mCall.getDetails().can(Call.Details.CAPABILITY_MUTE));
+        assertFalse(mCall.getDetails().can(Call.Details.CAPABILITY_MANAGE_CONFERENCE));
+        assertFalse(mCall.getDetails().can(Call.Details.CAPABILITY_RESPOND_VIA_TEXT));
     }
 
     /**
