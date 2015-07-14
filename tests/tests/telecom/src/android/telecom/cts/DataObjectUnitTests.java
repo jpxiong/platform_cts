@@ -26,6 +26,8 @@ import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.os.Process;
+import android.os.UserHandle;
 import android.telecom.CallAudioState;
 import android.telecom.ConnectionRequest;
 import android.telecom.DisconnectCause;
@@ -43,14 +45,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Verifies the parcelable interface of all the telecom objects.
+ * Verifies that the setter, getter and parcelable interfaces of the Telecom data objects are
+ * working as intended.
  */
 public class DataObjectUnitTests extends InstrumentationTestCase {
 
 
-    /**
-     * Tests the PhoneAccount object creation and recreation from a Parcel.
-     */
     public void testPhoneAccount() throws Exception {
         Context context = getInstrumentation().getContext();
         PhoneAccountHandle accountHandle = new PhoneAccountHandle(
@@ -75,6 +75,7 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(PhoneAccount.CAPABILITY_CALL_PROVIDER, account.getCapabilities());
         assertEquals(Color.RED, account.getHighlightColor());
         assertEquals(LABEL, account.getShortDescription());
+        assertEquals(LABEL, account.getLabel());
         assertEquals(Arrays.asList("tel"), account.getSupportedUriSchemes());
         assertEquals(phoneIcon.toString(), account.getIcon().toString());
         assertEquals(0, account.describeContents());
@@ -98,9 +99,32 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         p.recycle();
     }
 
-    /**
-     * Tests the ConnectionRequest object creation and recreation from a Parcel.
-     */
+    public void testPhoneAccountHandle() throws Exception {
+        final ComponentName component = new ComponentName(PACKAGE, COMPONENT);
+        final UserHandle userHandle = Process.myUserHandle();
+        PhoneAccountHandle accountHandle = new PhoneAccountHandle(
+                component,
+                ACCOUNT_ID,
+                userHandle);
+        assertNotNull(accountHandle);
+        assertEquals(component, accountHandle.getComponentName());
+        assertEquals(ACCOUNT_ID, accountHandle.getId());
+        assertEquals(userHandle, accountHandle.getUserHandle());
+        assertEquals(0, accountHandle.describeContents());
+
+        // Create a parcel of the object and recreate the object back
+        // from the parcel.
+        Parcel p = Parcel.obtain();
+        accountHandle.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        PhoneAccountHandle unparcelled = PhoneAccountHandle.CREATOR.createFromParcel(p);
+        assertEquals(accountHandle, unparcelled);
+        assertEquals(accountHandle.getComponentName(), unparcelled.getComponentName());
+        assertEquals(accountHandle.getId(), unparcelled.getId());
+        assertEquals(accountHandle.getUserHandle(), unparcelled.getUserHandle());
+        p.recycle();
+    }
+
     public void testConnectionRequest() throws Exception {
         PhoneAccountHandle accountHandle = new PhoneAccountHandle(
                 new ComponentName(PACKAGE, COMPONENT),
@@ -138,11 +162,7 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         p.recycle();
     }
 
-    /**
-     * Tests the DisconnectCause object creation and recreation from a Parcel.
-     */
     public void testDisconnectCause() throws Exception {
-        Context context = getInstrumentation().getContext();
         final CharSequence label = "Out of service area";
         final CharSequence description = "Mobile network not available";
         final String reason = "CTS Testing";
@@ -175,9 +195,6 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         p.recycle();
     }
 
-    /**
-     * Tests the StatusHints object creation and recreation from a Parcel.
-     */
     public void testStatusHints() throws Exception {
         Context context = getInstrumentation().getContext();
         final CharSequence label = "Wi-Fi call";
@@ -214,9 +231,6 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         p.recycle();
     }
 
-    /**
-     * Tests the GatewayInfo object creation and recreation from a Parcel.
-     */
     public void testGatewayInfo() throws Exception {
         final CharSequence label = "Wi-Fi call";
         Uri originalAddress = Uri.parse("http://www.google.com");
@@ -229,6 +243,7 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(gatewayAddress, info.getGatewayAddress());
         assertEquals(originalAddress, info.getOriginalAddress());
         assertEquals(0, info.describeContents());
+        assertFalse(info.isEmpty());
 
         // Create a parcel of the object and recreate the object back
         // from the parcel.
@@ -243,9 +258,6 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         p.recycle();
     }
 
-    /**
-     * Tests the CallAudioState object creation and recreation from a Parcel.
-     */
     public void testCallAudioState() throws Exception {
         CallAudioState audioState = new CallAudioState(
                 true,
@@ -255,6 +267,7 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(CallAudioState.ROUTE_EARPIECE, audioState.getRoute());
         assertEquals(CallAudioState.ROUTE_WIRED_OR_EARPIECE, audioState.getSupportedRouteMask());
         assertEquals(0, audioState.describeContents());
+        assertEquals("EARPIECE", CallAudioState.audioRouteToString(audioState.getRoute()));
 
         // Create a parcel of the object and recreate the object back
         // from the parcel.
@@ -267,6 +280,42 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(CallAudioState.ROUTE_WIRED_OR_EARPIECE, parcelAudioState.getSupportedRouteMask());
         assertEquals(0, parcelAudioState.describeContents());
         assertEquals(audioState, parcelAudioState);
+        p.recycle();
+    }
+
+    public void testVideoProfile() throws Exception {
+        VideoProfile videoProfile = new VideoProfile(VideoProfile.STATE_BIDIRECTIONAL,
+                VideoProfile.QUALITY_HIGH);
+        assertEquals(VideoProfile.STATE_BIDIRECTIONAL, videoProfile.getVideoState());
+        assertEquals(VideoProfile.QUALITY_HIGH, videoProfile.getQuality());
+        assertEquals(0, videoProfile.describeContents());
+        assertEquals("Audio Tx Rx", VideoProfile.videoStateToString(videoProfile.getVideoState()));
+
+        // Create a parcel of the object and recreate the object back from the parcel.
+        Parcel p = Parcel.obtain();
+        videoProfile.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        VideoProfile unparcelled = VideoProfile.CREATOR.createFromParcel(p);
+        assertEquals(videoProfile.getQuality(), unparcelled.getQuality());
+        assertEquals(videoProfile.getVideoState(), unparcelled.getVideoState());
+        p.recycle();
+    }
+
+    public void testCameraCapabilities() throws Exception {
+        VideoProfile.CameraCapabilities cameraCapabilities =
+                new VideoProfile.CameraCapabilities(500, 1000);
+        assertEquals(500, cameraCapabilities.getWidth());
+        assertEquals(1000, cameraCapabilities.getHeight());
+        assertEquals(0, cameraCapabilities.describeContents());
+
+        // Create a parcel of the object and recreate the object back from the parcel.
+        Parcel p = Parcel.obtain();
+        cameraCapabilities.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        VideoProfile.CameraCapabilities unparcelled =
+                VideoProfile.CameraCapabilities.CREATOR.createFromParcel(p);
+        assertEquals(cameraCapabilities.getWidth(), unparcelled.getWidth());
+        assertEquals(cameraCapabilities.getHeight(), unparcelled.getHeight());
         p.recycle();
     }
 }
