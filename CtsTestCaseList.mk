@@ -128,6 +128,7 @@ cts_test_packages := \
     CtsAccessibilityServiceTestCases \
     CtsAccessibilityTestCases \
     CtsAdminTestCases \
+    CtsAlarmClockTestCases \
     CtsAnimationTestCases \
     CtsAppTestCases \
     CtsAppWidgetTestCases \
