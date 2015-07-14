@@ -42,7 +42,7 @@ import android.widget.Toast;
 public class BleAdvertiserService extends Service {
 
     public static final boolean DEBUG = true;
-    public static final String TAG = "BleAdvertiseService";
+    public static final String TAG = "BleAdvertiserService";
 
     public static final int COMMAND_START_ADVERTISE = 0;
     public static final int COMMAND_STOP_ADVERTISE = 1;
