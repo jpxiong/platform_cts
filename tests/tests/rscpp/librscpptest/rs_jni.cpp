@@ -24,8 +24,7 @@
 #include <RenderScript.h>
 
 #define  LOG_TAG    "rscpptest"
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOG_TAG,__VA_ARGS__)
 
 using namespace android::RSC;
 
@@ -72,7 +71,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSInitTest_initTest
     for (int i = 0; i < 1000; i++) {
         sp<RS> rs = new RS();
         r &= rs->init(path);
-        LOGE("Native iteration %i, returned %i", i, (int)r);
+        LOGV("Native iteration %i, returned %i", i, (int)r);
     }
     env->ReleaseStringUTFChars(pathObj, path);
     return r;
