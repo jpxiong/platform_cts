@@ -658,6 +658,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             } catch (InterruptedException e) {
                 // don't care
             }
+            cleanupGl();
             mCompositionThread = null;
             mSurface = null;
             mStartCompletionSemaphore = null;
@@ -967,6 +968,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
 
             public void cleanup() {
                 mNumTextureUpdated.set(0);
+                mVerticesData.clear();
                 if (mTextureId != 0) {
                     int[] textures = new int[] {
                             mTextureId
