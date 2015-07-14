@@ -114,9 +114,9 @@ public class EventOrderingVerification extends AbstractSensorVerification {
         if (mPreviousEvent == null) {
             mMaxTimestamp = event.timestamp;
         } else {
-            if (event.timestamp < mMaxTimestamp) {
+            if (event.timestamp <= mMaxTimestamp) {
                 mOutOfOrderEvents.add(new IndexedEventPair(mIndex, event, mPreviousEvent));
-            } else if (event.timestamp > mMaxTimestamp) {
+            } else {
                 mMaxTimestamp = event.timestamp;
             }
         }
