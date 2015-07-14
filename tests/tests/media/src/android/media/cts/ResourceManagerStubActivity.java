@@ -28,6 +28,27 @@ public class ResourceManagerStubActivity extends Activity {
     private int[] mRequestCodes = {0, 1};
     private boolean[] mResults = {false, false};
     private int mNumResults = 0;
+    private int mType1 = ResourceManagerTestActivityBase.TYPE_NONSECURE;
+    private int mType2 = ResourceManagerTestActivityBase.TYPE_NONSECURE;
+    private boolean mWaitForReclaim = true;
+
+    private static final String ERROR_INSUFFICIENT_RESOURCES =
+            "* Please check if the omx component is returning OMX_ErrorInsufficientResources " +
+            "properly when the codec failure is due to insufficient resource.\n";
+    private static final String ERROR_SUPPORTS_MULTIPLE_SECURE_CODECS =
+            "* Please check if this platform supports multiple concurrent secure codec " +
+            "instances. If not, please add below setting in /etc/media_codecs.xml in order " +
+            "to pass the test:\n" +
+            "    <Settings>\n" +
+            "       <Setting name=\"supports-multiple-secure-codecs\" value=\"false\" />\n" +
+            "    </Settings>\n";
+    private static final String ERROR_SUPPORTS_SECURE_WITH_NON_SECURE_CODEC =
+            "* Please check if this platform supports co-exist of secure and non-secure codec. " +
+            "If not, please add below setting in /etc/media_codecs.xml in order to pass the " +
+            "test:\n" +
+            "    <Settings>\n" +
+            "       <Setting name=\"supports-secure-with-non-secure-codec\" value=\"false\" />\n" +
+            "    </Settings>\n";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +57,7 @@ public class ResourceManagerStubActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "Activity " + requestCode + " finished.");
+        Log.d(TAG, "Activity " + requestCode + " finished with resultCode " + resultCode);
         mResults[requestCode] = (resultCode == RESULT_OK);
         if (++mNumResults == mResults.length) {
             synchronized (mFinishEvent) {
@@ -45,17 +66,28 @@ public class ResourceManagerStubActivity extends Activity {
         }
     }
 
-    public boolean testReclaimResource() throws InterruptedException {
+    public void testReclaimResource(int type1, int type2) throws InterruptedException {
+        mType1 = type1;
+        mType2 = type2;
+        if (type1 != ResourceManagerTestActivityBase.TYPE_MIX && type1 != type2) {
+            // in this case, activity2 may not need to reclaim codec from activity1.
+            mWaitForReclaim = false;
+        } else {
+            mWaitForReclaim = true;
+        }
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
                     Context context = getApplicationContext();
                     Intent intent1 = new Intent(context, ResourceManagerTestActivity1.class);
+                    intent1.putExtra("test-type", mType1);
+                    intent1.putExtra("wait-for-reclaim", mWaitForReclaim);
                     startActivityForResult(intent1, mRequestCodes[0]);
                     Thread.sleep(5000);  // wait for process to launch and allocate all codecs.
 
                     Intent intent2 = new Intent(context, ResourceManagerTestActivity2.class);
+                    intent2.putExtra("test-type", mType2);
                     startActivityForResult(intent2, mRequestCodes[1]);
 
                     synchronized (mFinishEvent) {
@@ -67,11 +99,29 @@ public class ResourceManagerStubActivity extends Activity {
             }
         };
         thread.start();
-        thread.join(10000);
+        thread.join(20000 /* millis */);
+        Thread.sleep(5000);  // give the gc a chance to release test activities.
 
+        boolean result = true;
         for (int i = 0; i < mResults.length; ++i) {
-            Assert.assertTrue("Result from activity " + i + " is a fail.", mResults[i]);
+            if (!mResults[i]) {
+                Log.e(TAG, "Result from activity " + i + " is a fail.");
+                result = false;
+                break;
+            }
         }
-        return true;
+        if (!result) {
+            String failMessage = "The potential reasons for the failure:\n";
+            StringBuilder reasons = new StringBuilder();
+            reasons.append(ERROR_INSUFFICIENT_RESOURCES);
+            if (mType1 != mType2) {
+                reasons.append(ERROR_SUPPORTS_SECURE_WITH_NON_SECURE_CODEC);
+            }
+            if (mType1 == ResourceManagerTestActivityBase.TYPE_MIX &&
+                    mType2 == ResourceManagerTestActivityBase.TYPE_SECURE) {
+                reasons.append(ERROR_SUPPORTS_MULTIPLE_SECURE_CODECS);
+            }
+            Assert.assertTrue(failMessage + reasons.toString(), result);
+        }
     }
 }
