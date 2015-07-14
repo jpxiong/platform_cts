@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TrafficStatsTest extends AndroidTestCase {
     private static final String LOG_TAG = "TrafficStatsTest";
-
     public void testValidMobileStats() {
         // We can't assume a mobile network is even present in this test, so
         // we simply assert that a valid value is returned.
@@ -208,26 +207,37 @@ public class TrafficStatsTest extends AndroidTestCase {
         final int minExpectedExtraPackets = 5;
 
 
+        // Some other tests don't cleanup connections correctly.
+        // They have the same UID, so we discount their lingering traffic
+        // which happens only on non-localhost, such as TCP FIN retranmission packets
+        long deltaTxOtherPackets = (totalTxPacketsAfter - totalTxPacketsBefore) - uidTxDeltaPackets;
+        long deltaRxOtherPackets = (totalRxPacketsAfter - totalRxPacketsBefore) - uidRxDeltaPackets;
+        if (deltaTxOtherPackets > 0 || deltaRxOtherPackets > 0) {
+            Log.i(LOG_TAG, "lingering traffic data: " + deltaTxOtherPackets + "/" + deltaRxOtherPackets);
+            // Make sure that not too many non-localhost packets are accounted for
+            assertTrue("too many non-localhost packets on the sam UID", deltaTxOtherPackets + deltaTxOtherPackets < 20);
+        }
+
         assertTrue("uidtxp: " + uidTxPacketsBefore + " -> " + uidTxPacketsAfter + " delta=" + uidTxDeltaPackets +
             " Wanted: " + uidTxDeltaPackets + ">=" + packetCount + "+" + minExpectedExtraPackets + " && " +
-            uidTxDeltaPackets + "<=" + packetCount + "+" + packetCount + "+" + maxExpectedExtraPackets,
+            uidTxDeltaPackets + "<=" + packetCount + "+" + packetCount + "+" + maxExpectedExtraPackets + "+" + deltaTxOtherPackets,
             uidTxDeltaPackets >= packetCount + minExpectedExtraPackets &&
-            uidTxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets);
+            uidTxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets + deltaTxOtherPackets);
         assertTrue("uidrxp: " + uidRxPacketsBefore + " -> " + uidRxPacketsAfter + " delta=" + uidRxDeltaPackets +
             " Wanted: " + uidRxDeltaPackets + ">=" + packetCount + "+" + minExpectedExtraPackets + " && " +
             uidRxDeltaPackets + "<=" + packetCount + "+" + packetCount + "+" + maxExpectedExtraPackets,
             uidRxDeltaPackets >= packetCount + minExpectedExtraPackets &&
-            uidRxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets);
+            uidRxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets + deltaRxOtherPackets);
         assertTrue("uidtxb: " + uidTxBytesBefore + " -> " + uidTxBytesAfter + " delta=" + uidTxDeltaBytes +
             " Wanted: " + uidTxDeltaBytes + ">=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(minExpectedExtraPackets, 0) + " && " +
             uidTxDeltaBytes + "<=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0),
             uidTxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(minExpectedExtraPackets, 0) &&
-            uidTxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0));
+            uidTxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets + deltaTxOtherPackets, 0));
         assertTrue("uidrxb: " + uidRxBytesBefore + " -> " + uidRxBytesAfter + " delta=" + uidRxDeltaBytes +
             " Wanted: " + uidRxDeltaBytes + ">=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(minExpectedExtraPackets, 0) + " && " +
             uidRxDeltaBytes + "<=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0),
             uidRxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(minExpectedExtraPackets, 0) &&
-            uidRxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0));
+            uidRxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets + deltaRxOtherPackets, 0));
 
         // Localhost traffic *does* count against total stats.
         // Fudge by 132 packets of 1500 bytes not related to the test.
