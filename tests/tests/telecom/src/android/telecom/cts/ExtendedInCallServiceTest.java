@@ -69,7 +69,8 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
         assertMuteState(connection, false);
 
-        inCallService.setMuted(true);
+        // Explicitly call super implementation to enable detection of CTS coverage
+        ((InCallService) inCallService).setMuted(true);
 
         assertMuteState(connection, true);
         assertMuteState(inCallService, true);
@@ -95,7 +96,8 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         // Only test speaker and earpiece modes because the other modes are dependent on having
         // a bluetooth headset or wired headset connected.
 
-        inCallService.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
+        // Explicitly call super implementation to enable detection of CTS coverage
+        ((InCallService) inCallService).setAudioRoute(CallAudioState.ROUTE_SPEAKER);
         assertAudioRoute(connection, CallAudioState.ROUTE_SPEAKER);
         assertAudioRoute(inCallService, CallAudioState.ROUTE_SPEAKER);
 
