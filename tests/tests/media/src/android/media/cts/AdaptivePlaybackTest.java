@@ -447,7 +447,8 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                             this, c, mediaIx) {
                         public void run() {
                             try {
-                                mDecoder.configureAndStart(stepFormat(), stepSurface());
+                                //mDecoder.configureAndStart(stepFormat(), stepSurface());
+                                if(mDecoder.configureAndStart(stepFormat(), stepSurface())){
                                 int decodedFrames = -mDecoder.queueInputBufferRange(
                                         stepMedia(),
                                         0 /* startFrame */,
@@ -461,6 +462,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                                 warn(mDecoder.getWarnings());
                                 mDecoder.clearWarnings();
                                 mDecoder.flush();
+	                            }
                             } finally {
                                 mDecoder.stop();
                             }
@@ -856,10 +858,16 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
             mWarnings.clear();
         }
 
-        public void configureAndStart(MediaFormat format, TestSurface surface) {
+        public boolean configureAndStart(MediaFormat format, TestSurface surface) {
             mSurface = surface;
             Log.i(TAG, "configure(" + format + ", " + mSurface.getSurface() + ")");
-            mCodec.configure(format, mSurface.getSurface(), null /* crypto */, 0 /* flags */);
+            try{
+			mCodec.configure(format, mSurface.getSurface(), null /* crypto */, 0 /* flags */);
+			}
+			catch (Exception e){
+				Log.i(TAG, "Unsupported Codec");
+				return false;
+			}
             Log.i(TAG, "start");
             mCodec.start();
             mInputBuffers = mCodec.getInputBuffers();
@@ -869,6 +877,7 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                   mOutputBuffers.length + "output[" +
                   (mOutputBuffers[0] == null ? null : mOutputBuffers[0].capacity()) + "]");
             mQueuedEos = false;
+            return true;
         }
 
         public void stop() {
