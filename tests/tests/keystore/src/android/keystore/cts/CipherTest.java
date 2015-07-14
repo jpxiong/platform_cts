@@ -917,6 +917,128 @@ public class CipherTest extends AndroidTestCase {
         }
     }
 
+    public void testEntropyConsumption() throws Exception {
+        // Assert that encryption consumes the correct amount of entropy from the provided
+        // SecureRandom and that decryption consumes no entropy.
+
+        Collection<SecretKey> secretKeys = importDefaultKatSecretKeys();
+        Collection<KeyPair> keyPairs = importDefaultKatKeyPairs();
+
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+
+        CountingSecureRandom rng = new CountingSecureRandom();
+        for (String transformation : EXPECTED_ALGORITHMS) {
+            try {
+                Cipher cipher = Cipher.getInstance(transformation, provider);
+                Key encryptionKey = getEncryptionKey(transformation, secretKeys, keyPairs);
+
+                // Cipher.init may only consume entropy for generating the IV.
+                rng.resetCounters();
+                cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, rng);
+                int expectedEntropyBytesConsumedDuringInit;
+                String transformationUpperCase = transformation.toUpperCase(Locale.US);
+                if (transformationUpperCase.startsWith("AES")) {
+                    String blockMode = transformationUpperCase.split("/")[1];
+                    // Entropy should consumed for IV generation only.
+                    switch (blockMode) {
+                        case "ECB":
+                            expectedEntropyBytesConsumedDuringInit = 0;
+                            break;
+                        case "CBC":
+                        case "CTR":
+                            expectedEntropyBytesConsumedDuringInit = 16;
+                            break;
+                        case "GCM":
+                            expectedEntropyBytesConsumedDuringInit = 12;
+                            break;
+                        default:
+                            throw new RuntimeException("Unsupported block mode " + blockMode);
+                    }
+                } else if (transformationUpperCase.startsWith("RSA")) {
+                    expectedEntropyBytesConsumedDuringInit = 0;
+                } else {
+                    throw new RuntimeException("Unsupported transformation: " + transformation);
+                }
+                assertEquals(expectedEntropyBytesConsumedDuringInit, rng.getOutputSizeBytes());
+                AlgorithmParameters params = cipher.getParameters();
+
+                // Cipher.update should not consume entropy.
+                byte[] plaintext = new byte[16];
+                Arrays.fill(plaintext, (byte) 0x1);
+                rng.resetCounters();
+                byte[] ciphertext = cipher.update(plaintext);
+                assertEquals(0, rng.getOutputSizeBytes());
+
+                // Cipher.doFinal may consume entropy to pad the message (RSA only).
+                rng.resetCounters();
+                ciphertext = TestUtils.concat(ciphertext, cipher.doFinal());
+                int expectedEntropyBytesConsumedDuringDoFinal;
+                if (transformationUpperCase.startsWith("AES")) {
+                    expectedEntropyBytesConsumedDuringDoFinal = 0;
+                } else if (transformationUpperCase.startsWith("RSA")) {
+                    // Entropy should not be consumed during Cipher.init.
+                    if (transformationUpperCase.contains("/OAEP")) {
+                        if (transformationUpperCase.endsWith("/OAEPPADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 160 / 8;
+                        } else if (transformationUpperCase.endsWith(
+                                "OAEPWITHSHA-1ANDMGF1PADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 160 / 8;
+                        } else if (transformationUpperCase.endsWith(
+                                "OAEPWITHSHA-224ANDMGF1PADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 224 / 8;
+                        } else if (transformationUpperCase.endsWith(
+                                "OAEPWITHSHA-256ANDMGF1PADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 256 / 8;
+                        } else if (transformationUpperCase.endsWith(
+                                "OAEPWITHSHA-384ANDMGF1PADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 384 / 8;
+                        } else if (transformationUpperCase.endsWith(
+                                "OAEPWITHSHA-512ANDMGF1PADDING")) {
+                            expectedEntropyBytesConsumedDuringDoFinal = 512 / 8;
+                        } else {
+                            throw new RuntimeException("Unsupported OAEP padding scheme: "
+                                    + transformation);
+                        }
+                    } else if (transformationUpperCase.endsWith("/PKCS1PADDING")) {
+                        expectedEntropyBytesConsumedDuringDoFinal =
+                                (((RSAKey) encryptionKey).getModulus().bitLength() + 7) / 8;
+                    } else if (transformationUpperCase.endsWith("/NOPADDING")) {
+                        expectedEntropyBytesConsumedDuringDoFinal = 0;
+                    } else {
+                        throw new RuntimeException(
+                                "Unknown padding in transformation: " + transformation);
+                    }
+                } else {
+                    throw new RuntimeException("Unsupported transformation: " + transformation);
+                }
+                assertEquals(expectedEntropyBytesConsumedDuringDoFinal, rng.getOutputSizeBytes());
+
+                // Assert that when initialization parameters are provided when encrypting, no
+                // entropy is consumed by Cipher.init. This is because Cipher.init should only
+                // use entropy for generating an IV which in this case no longer needs to be
+                // generated because it's specified in the parameters.
+                cipher = Cipher.getInstance(transformation, provider);
+                rng.resetCounters();
+                cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, params, rng);
+                assertEquals(0, rng.getOutputSizeBytes());
+                Key key = getDecryptionKey(transformation, secretKeys, keyPairs);
+                rng.resetCounters();
+                cipher = Cipher.getInstance(transformation, provider);
+                cipher.init(Cipher.DECRYPT_MODE, key, params, rng);
+                assertEquals(0, rng.getOutputSizeBytes());
+                rng.resetCounters();
+                cipher.update(ciphertext);
+                assertEquals(0, rng.getOutputSizeBytes());
+                rng.resetCounters();
+                cipher.doFinal();
+                assertEquals(0, rng.getOutputSizeBytes());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + transformation, e);
+            }
+        }
+    }
+
     private AlgorithmParameterSpec getWorkingDecryptionParameterSpec(String transformation) {
         String transformationUpperCase = transformation.toUpperCase();
         if (transformationUpperCase.startsWith("RSA/")) {
