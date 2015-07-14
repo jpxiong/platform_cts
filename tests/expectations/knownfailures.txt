@@ -174,5 +174,22 @@
     "android.hardware.camera2.cts.SurfaceViewPreviewTest#testPreparePerformance"
   ],
   bug: 17989532
+},
+{
+  description: "The new AE/AF trigger tests are not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.RobustnessTest#testBasicTriggerSequence",
+    "android.hardware.camera2.cts.RobustnessTest#testSimultaneousTriggers",
+    "android.hardware.camera2.cts.RobustnessTest#testAfThenAeTrigger",
+    "android.hardware.camera2.cts.RobustnessTest#testAeThenAfTrigger"
+  ],
+  bug: 22180706
+},
+{
+  description: "The new create session test is not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.CameraDeviceTest#testCreateSessions"
+  ],
+  bug: 22092756
 }
 ]
