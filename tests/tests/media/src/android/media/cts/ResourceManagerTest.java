@@ -26,11 +26,41 @@ public class ResourceManagerTest
         super("com.android.cts.media", ResourceManagerStubActivity.class);
     }
 
-    public void testReclaimResource() throws Exception {
+    private void doTestReclaimResource(int type1, int type2) throws Exception {
         Bundle extras = new Bundle();
         ResourceManagerStubActivity activity = launchActivity(
                 "com.android.cts.media", ResourceManagerStubActivity.class, extras);
-        activity.testReclaimResource();
+        activity.testReclaimResource(type1, type2);
         activity.finish();
+    }
+
+    public void testReclaimResourceNonsecureVsNonsecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_NONSECURE,
+                ResourceManagerTestActivityBase.TYPE_NONSECURE);
+    }
+
+    public void testReclaimResourceNonsecureVsSecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_NONSECURE,
+                ResourceManagerTestActivityBase.TYPE_SECURE);
+    }
+
+    public void testReclaimResourceSecureVsNonsecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_SECURE,
+                ResourceManagerTestActivityBase.TYPE_NONSECURE);
+    }
+
+    public void testReclaimResourceSecureVsSecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_SECURE,
+                ResourceManagerTestActivityBase.TYPE_SECURE);
+    }
+
+    public void testReclaimResourceMixVsNonsecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_MIX,
+                ResourceManagerTestActivityBase.TYPE_NONSECURE);
+    }
+
+    public void testReclaimResourceMixVsSecure() throws Exception {
+        doTestReclaimResource(ResourceManagerTestActivityBase.TYPE_MIX,
+                ResourceManagerTestActivityBase.TYPE_SECURE);
     }
 }
