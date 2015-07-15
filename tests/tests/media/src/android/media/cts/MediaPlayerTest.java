@@ -643,10 +643,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         MediaRecorder recorder = new MediaRecorder();
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        if (hasMicrophone()) {
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        }
         recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         recorder.setOutputFile(file);
         recorder.setOrientationHint(angle);
         recorder.setVideoSize(w, h);
