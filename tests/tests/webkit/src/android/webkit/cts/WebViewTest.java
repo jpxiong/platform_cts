@@ -867,14 +867,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "Find all instances of a word on the page and highlight them.</p>";
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p + p + "</body></html>", "text/html", null);
-        WaitForFindResultsListener l = new WaitForFindResultsListener();
-        mOnUiThread.setFindListener(l);
 
         // highlight all the strings found
         mOnUiThread.findAll("all");
-        // make sure the findAll action is completed before findNext
-        l.get();
-        mOnUiThread.setFindListener(null);
+        getInstrumentation().waitForIdleSync();
 
         int previousScrollY = mOnUiThread.getScrollY();
 
