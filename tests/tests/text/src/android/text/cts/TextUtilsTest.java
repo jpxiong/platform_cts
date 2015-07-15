@@ -44,9 +44,6 @@ import android.text.style.URLSpan;
 import android.util.Log;
 import android.util.StringBuilderPrinter;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -2033,11 +2030,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertTrue(builder.length() > 0);
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutDirectionFromLocale",
-            args = {Locale.class}
-    )
     public void testGetLayoutDirectionFromLocale() {
         assertEquals(LAYOUT_DIRECTION_LTR,
                 TextUtils.getLayoutDirectionFromLocale(null));

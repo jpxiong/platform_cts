@@ -19,7 +19,6 @@ package android.text.format.cts;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.text.format.DateUtils;
-import dalvik.annotation.KnownFailure;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
