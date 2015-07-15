@@ -27,10 +27,10 @@ import junit.framework.Assert;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
@@ -114,7 +114,7 @@ abstract class TestUtils extends Assert {
         }
     }
 
-    private static int getKeySizeBits(Key key) {
+    static int getKeySizeBits(Key key) {
         if (key instanceof ECKey) {
             return ((ECKey) key).getParams().getCurve().getField().getFieldSize();
         } else if (key instanceof RSAKey) {
@@ -374,18 +374,6 @@ abstract class TestUtils extends Assert {
         return result;
     }
 
-    static Certificate generateSelfSignedCert(String keyAlgorithm) throws Exception {
-        KeyPairGenerator generator =
-                KeyPairGenerator.getInstance(keyAlgorithm, "AndroidKeyStore");
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                "test1",
-                KeyProperties.PURPOSE_SIGN)
-                .build());
-        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-        keyStore.load(null);
-        return keyStore.getCertificate("test1");
-    }
-
     static PrivateKey getRawResPrivateKey(Context context, int resId) throws Exception {
         byte[] pkcs8EncodedForm;
         try (InputStream in = context.getResources().openRawResource(resId)) {
@@ -438,6 +426,50 @@ abstract class TestUtils extends Assert {
         return (SecretKey) keyStore.getKey(alias, null);
     }
 
+    static ImportedKey importIntoAndroidKeyStore(
+            String alias, Context context, int privateResId, int certResId, KeyProtection params)
+                    throws Exception {
+        Certificate originalCert = TestUtils.getRawResX509Certificate(context, certResId);
+        PublicKey originalPublicKey = originalCert.getPublicKey();
+        PrivateKey originalPrivateKey = TestUtils.getRawResPrivateKey(context, privateResId);
+
+        // Check that the domain parameters match between the private key and the public key. This
+        // is to catch accidental errors where a test provides the wrong resource ID as one of the
+        // parameters.
+        if (!originalPublicKey.getAlgorithm().equalsIgnoreCase(originalPrivateKey.getAlgorithm())) {
+            throw new IllegalArgumentException("Key algorithm mismatch."
+                    + " Public: " + originalPublicKey.getAlgorithm()
+                    + ", private: " + originalPrivateKey.getAlgorithm());
+        }
+        String keyAlgorithm = originalPublicKey.getAlgorithm();
+        if (KeyProperties.KEY_ALGORITHM_EC.equalsIgnoreCase(keyAlgorithm)) {
+            ECParameterSpec publicKeyParams = ((ECKey) originalPublicKey).getParams();
+            ECParameterSpec privateKeyParams = ((ECKey) originalPrivateKey).getParams();
+            assertECParameterSpecEqualsIgnoreSeedIfNotPresent(
+                    publicKeyParams, privateKeyParams);
+        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
+            BigInteger publicKeyModulus = ((RSAKey) originalPublicKey).getModulus();
+            BigInteger privateKeyModulus = ((RSAKey) originalPrivateKey).getModulus();
+            if (!publicKeyModulus.equals(privateKeyModulus)) {
+                throw new IllegalArgumentException("RSA key pair modulus mismatch."
+                        + " Public (" + publicKeyModulus.bitLength() + " bit): "
+                        + publicKeyModulus.toString(16)
+                        + ", private (" + privateKeyModulus.bitLength() + " bit): "
+                        + privateKeyModulus.toString(16));
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
+        }
+
+        KeyPair keystoreBacked = TestUtils.importIntoAndroidKeyStore(
+                alias, originalPrivateKey, originalCert,
+                params);
+        return new ImportedKey(
+                alias,
+                new KeyPair(originalCert.getPublicKey(), originalPrivateKey),
+                keystoreBacked);
+    }
+
     static byte[] drain(InputStream in) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[16 * 1024];
@@ -448,19 +480,26 @@ abstract class TestUtils extends Assert {
         return result.toByteArray();
     }
 
+    static KeyProtection.Builder buildUpon(KeyProtection params) {
+        return buildUponInternal(params, null);
+    }
+
+    static KeyProtection.Builder buildUpon(KeyProtection params, int newPurposes) {
+        return buildUponInternal(params, newPurposes);
+    }
+
     static KeyProtection.Builder buildUpon(
             KeyProtection.Builder builder) {
-        return buildUponInternal(builder, null);
+        return buildUponInternal(builder.build(), null);
     }
 
     static KeyProtection.Builder buildUpon(
             KeyProtection.Builder builder, int newPurposes) {
-        return buildUponInternal(builder, newPurposes);
+        return buildUponInternal(builder.build(), newPurposes);
     }
 
     private static KeyProtection.Builder buildUponInternal(
-            KeyProtection.Builder builder, Integer newPurposes) {
-        KeyProtection spec = builder.build();
+            KeyProtection spec, Integer newPurposes) {
         int purposes = (newPurposes == null) ? spec.getPurposes() : newPurposes;
         KeyProtection.Builder result = new KeyProtection.Builder(purposes);
         result.setBlockModes(spec.getBlockModes());
@@ -479,19 +518,26 @@ abstract class TestUtils extends Assert {
         return result;
     }
 
+    static KeyGenParameterSpec.Builder buildUpon(KeyGenParameterSpec spec) {
+        return buildUponInternal(spec, null);
+    }
+
+    static KeyGenParameterSpec.Builder buildUpon(KeyGenParameterSpec spec, int newPurposes) {
+        return buildUponInternal(spec, newPurposes);
+    }
+
     static KeyGenParameterSpec.Builder buildUpon(
             KeyGenParameterSpec.Builder builder) {
-        return buildUponInternal(builder, null);
+        return buildUponInternal(builder.build(), null);
     }
 
     static KeyGenParameterSpec.Builder buildUpon(
             KeyGenParameterSpec.Builder builder, int newPurposes) {
-        return buildUponInternal(builder, newPurposes);
+        return buildUponInternal(builder.build(), newPurposes);
     }
 
     private static KeyGenParameterSpec.Builder buildUponInternal(
-            KeyGenParameterSpec.Builder builder, Integer newPurposes) {
-        KeyGenParameterSpec spec = builder.build();
+            KeyGenParameterSpec spec, Integer newPurposes) {
         int purposes = (newPurposes == null) ? spec.getPurposes() : newPurposes;
         KeyGenParameterSpec.Builder result =
                 new KeyGenParameterSpec.Builder(spec.getKeystoreAlias(), purposes);
@@ -588,6 +634,95 @@ abstract class TestUtils extends Assert {
         return result;
     }
 
+    static String getSignatureAlgorithmDigest(String algorithm) {
+        String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+        int withIndex = algorithmUpperCase.indexOf("WITH");
+        if (withIndex == -1) {
+            throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        }
+        String digest = algorithmUpperCase.substring(0, withIndex);
+        if (digest.startsWith("SHA")) {
+            digest = "SHA-" + digest.substring("SHA".length());
+        }
+        return digest;
+    }
+
+    static String getSignatureAlgorithmPadding(String algorithm) {
+        String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+        if (algorithmUpperCase.endsWith("WITHECDSA")) {
+            return null;
+        } else if (algorithmUpperCase.endsWith("WITHRSA")) {
+            return KeyProperties.SIGNATURE_PADDING_RSA_PKCS1;
+        } else if (algorithmUpperCase.endsWith("WITHRSA/PSS")) {
+            return KeyProperties.SIGNATURE_PADDING_RSA_PSS;
+        } else {
+            throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        }
+    }
+
+    static String getSignatureAlgorithmKeyAlgorithm(String algorithm) {
+        String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
+        if (algorithmUpperCase.endsWith("WITHECDSA")) {
+            return KeyProperties.KEY_ALGORITHM_EC;
+        } else if ((algorithmUpperCase.endsWith("WITHRSA"))
+                || (algorithmUpperCase.endsWith("WITHRSA/PSS"))) {
+            return KeyProperties.KEY_ALGORITHM_RSA;
+        } else {
+            throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        }
+    }
+
+    static boolean isKeyLongEnoughForSignatureAlgorithm(String algorithm, Key key) {
+        String keyAlgorithm = key.getAlgorithm();
+        if (KeyProperties.KEY_ALGORITHM_EC.equalsIgnoreCase(keyAlgorithm)) {
+            // No length restrictions for ECDSA
+            return true;
+        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
+            // No length restrictions for RSA
+            String digest = getSignatureAlgorithmDigest(algorithm);
+            int digestOutputSizeBits = getDigestOutputSizeBits(digest);
+            if (digestOutputSizeBits == -1) {
+                // No digesting -- assume the key is long enough for the message
+                return true;
+            }
+            String paddingScheme = getSignatureAlgorithmPadding(algorithm);
+            int paddingOverheadBytes;
+            if (KeyProperties.SIGNATURE_PADDING_RSA_PKCS1.equalsIgnoreCase(paddingScheme)) {
+                paddingOverheadBytes = 30;
+            } else if (KeyProperties.SIGNATURE_PADDING_RSA_PSS.equalsIgnoreCase(paddingScheme)) {
+                paddingOverheadBytes = 22;
+            } else {
+                throw new IllegalArgumentException(
+                        "Unsupported signature padding scheme: " + paddingScheme);
+            }
+            int minKeySizeBytes = paddingOverheadBytes + (digestOutputSizeBits + 7) / 8 + 1;
+            int keySizeBytes = ((RSAKey) key).getModulus().bitLength() / 8;
+            return keySizeBytes >= minKeySizeBytes;
+        } else {
+            throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
+        }
+    }
+
+    static int getDigestOutputSizeBits(String digest) {
+        if (KeyProperties.DIGEST_NONE.equals(digest)) {
+            return -1;
+        } else if (KeyProperties.DIGEST_MD5.equals(digest)) {
+            return 128;
+        } else if (KeyProperties.DIGEST_SHA1.equals(digest)) {
+            return 160;
+        } else if (KeyProperties.DIGEST_SHA224.equals(digest)) {
+            return 224;
+        } else if (KeyProperties.DIGEST_SHA256.equals(digest)) {
+            return 256;
+        } else if (KeyProperties.DIGEST_SHA384.equals(digest)) {
+            return 384;
+        } else if (KeyProperties.DIGEST_SHA512.equals(digest)) {
+            return 512;
+        } else {
+            throw new IllegalArgumentException("Unsupported digest: " + digest);
+        }
+    }
+
     static byte[] concat(byte[] arr1, byte[] arr2) {
         return concat(arr1, 0, (arr1 != null) ? arr1.length : 0,
                 arr2, 0, (arr2 != null) ? arr2.length : 0);
@@ -620,5 +755,25 @@ abstract class TestUtils extends Assert {
         byte[] result = new byte[len];
         System.arraycopy(arr, offset, result, 0, len);
         return result;
+    }
+
+    static KeyProtection getMinimalWorkingImportParametersForSigningingWith(
+            String signatureAlgorithm) {
+        String keyAlgorithm = getSignatureAlgorithmKeyAlgorithm(signatureAlgorithm);
+        String digest = getSignatureAlgorithmDigest(signatureAlgorithm);
+        if (KeyProperties.KEY_ALGORITHM_EC.equalsIgnoreCase(keyAlgorithm)) {
+            return new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN)
+                    .setDigests(digest)
+                    .build();
+        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
+            String padding = getSignatureAlgorithmPadding(signatureAlgorithm);
+            return new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN)
+                    .setDigests(digest)
+                    .setSignaturePaddings(padding)
+                    .build();
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported signature algorithm: " + signatureAlgorithm);
+        }
     }
 }
