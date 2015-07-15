@@ -16,8 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.KnownFailure;
-
 import android.cts.util.WidgetTestUtils;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
