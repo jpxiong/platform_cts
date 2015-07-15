@@ -509,7 +509,7 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
      * Determines if two color values are approximately equal.
      */
     private static boolean approxEquals(int expected, int actual) {
-        final int MAX_DELTA = 4;
+        final int MAX_DELTA = 7;
         return Math.abs(expected - actual) <= MAX_DELTA;
     }
 
