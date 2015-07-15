@@ -17,6 +17,7 @@ package com.android.cts.verifier.camera.video;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -144,17 +145,28 @@ public class CameraVideoActivity extends PassFailButtons.Activity
     private boolean prepareVideoRecorder() {
 
         mMediaRecorder = new MediaRecorder();
+        CamcorderProfile profile = CamcorderProfile.get(mCurrentCameraId, mCurrentVideoSizeId);
 
         // Step 1: unlock and set camera to MediaRecorder
         mCamera.unlock();
         mMediaRecorder.setCamera(mCamera);
 
         // Step 2: set sources
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        if (hasMicrophone()) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         // Step 3: set a CamcorderProfile
-        mMediaRecorder.setProfile(CamcorderProfile.get(mCurrentCameraId, mCurrentVideoSizeId));
+        if (hasMicrophone()) {
+            mMediaRecorder.setProfile(profile);
+        } else {
+            mMediaRecorder.setOutputFormat(profile.fileFormat);
+            mMediaRecorder.setVideoFrameRate(profile.videoFrameRate);
+            mMediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+            mMediaRecorder.setVideoEncodingBitRate(profile.videoBitRate);
+            mMediaRecorder.setVideoEncoder(profile.videoCodec);
+        }
 
         // Step 4: set output file
         outputVideoFile = getOutputMediaFile(MEDIA_TYPE_VIDEO);
@@ -765,6 +777,11 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 .setPositiveButton(R.string.fail_quit, dialogClickListener)
                 .setNegativeButton(R.string.cancel, dialogClickListener)
                 .show();
+    }
+
+    private boolean hasMicrophone() {
+        return CameraVideoActivity.this.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
     }
 
 }
