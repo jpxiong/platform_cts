@@ -156,16 +156,18 @@ public class ResourceManagerTestActivityBase extends Activity {
         CodecCapabilities caps = info.getCapabilitiesForType(MIME);
         VideoCapabilities vcaps = caps.getVideoCapabilities();
         MediaFormat format = getTestFormat(vcaps, securePlayback);
+        MediaCodec codec = null;
         for (int i = mCodecs.size(); i < max; ++i) {
             try {
                 Log.d(TAG, "Create codec " + name + " #" + i);
-                MediaCodec codec = MediaCodec.createByCodecName(name);
+                codec = MediaCodec.createByCodecName(name);
                 codec.setCallback(mCallback);
                 Log.d(TAG, "Configure codec " + format);
                 codec.configure(format, null, null, 0);
                 Log.d(TAG, "Start codec " + format);
                 codec.start();
                 mCodecs.add(codec);
+                codec = null;
             } catch (IllegalArgumentException e) {
                 Log.d(TAG, "IllegalArgumentException " + e.getMessage());
                 break;
@@ -176,6 +178,11 @@ public class ResourceManagerTestActivityBase extends Activity {
                 Log.d(TAG, "CodecException 0x" + Integer.toHexString(e.getErrorCode()));
                 break;
             }
+        }
+        if (codec != null) {
+            Log.d(TAG, "release codec");
+            codec.release();
+            codec = null;
         }
     }
 
