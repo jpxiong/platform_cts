@@ -73,8 +73,6 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     private boolean mHasRearCamera = false;
     private boolean mHasFrontCamera = false;
 
-    private boolean mHasAudio = false;
-
     public MediaRecorderStressTest() {
         super(MediaFrameworkTest.class);
     }
@@ -84,7 +82,6 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
                 getInstrumentation().getTargetContext().getPackageManager();
         mHasRearCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA);
         mHasFrontCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
-        mHasAudio = packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE);
         int cameraId = 0;
         CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
         mVideoEncoder = profile.videoCodec;
@@ -337,6 +334,17 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
         output.close();
     }
 
+    public void validateRecordedVideo(String recordedFile) throws Exception {
+        MediaPlayer mp = new MediaPlayer();
+        mp.setDataSource(recordedFile);
+        mp.prepare();
+        int duration = mp.getDuration();
+        if (duration <= 0){
+            assertTrue("stressRecordAndPlayback", false);
+        }
+        mp.release();
+    }
+
     public void removeRecodedVideo(String filename){
         File video = new File(filename);
         Log.v(TAG, "remove recorded video " + filename);
@@ -382,17 +390,13 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
 
             mRecorder.setOnErrorListener(mRecorderErrorCallback);
             mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            if (mHasAudio) {
-                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            }
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             mRecorder.setOutputFile(filename);
             mRecorder.setVideoFrameRate(mFrameRate);
             mRecorder.setVideoSize(mVideoWidth, mVideoHeight);
             mRecorder.setVideoEncoder(mVideoEncoder);
-            if (mHasAudio) {
-                mRecorder.setAudioEncoder(mAudioEncoder);
-            }
+            mRecorder.setAudioEncoder(mAudioEncoder);
             Log.v(TAG, "mediaRecorder setPreview");
             mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
             mRecorder.prepare();
@@ -406,13 +410,10 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
             mp.setDataSource(filename);
             mp.setDisplay(MediaFrameworkTest.getSurfaceView().getHolder());
             mp.prepare();
-            // validate recording duration
-            if (mp.getDuration() <= 0){
-                assertTrue("stressRecordAndPlayback", false);
-            }
             mp.start();
             Thread.sleep(mRecordDuration);
             mp.release();
+            validateRecordedVideo(filename);
             if (mRemoveVideo) {
                 removeRecodedVideo(filename);
             }

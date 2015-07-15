@@ -985,23 +985,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void recordVideo(CamcorderProfile profile,
             SurfaceHolder holder) throws Exception {
         MediaRecorder recorder = new MediaRecorder();
-        boolean recordAudio = hasMicrophone();
         try {
             // Pass the camera from the test application to media recorder.
             recorder.setCamera(mCamera);
-            if (recordAudio) {
-                recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-            }
+            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            if (recordAudio) {
-                recorder.setProfile(profile);
-            } else {
-                recorder.setOutputFormat(profile.fileFormat);
-                recorder.setVideoFrameRate(profile.videoFrameRate);
-                recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
-                recorder.setVideoEncodingBitRate(profile.videoBitRate);
-                recorder.setVideoEncoder(profile.videoCodec);
-            }
+            recorder.setProfile(profile);
             recorder.setOutputFile("/dev/null");
             recorder.setPreviewDisplay(holder.getSurface());
             recorder.prepare();
@@ -2398,22 +2387,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             SurfaceHolder holder) throws Exception {
         mCamera.unlock();
         MediaRecorder recorder = new MediaRecorder();
-        boolean recordAudio = hasMicrophone();
         try {
             recorder.setCamera(mCamera);
-            if (recordAudio) {
-                recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-            }
+            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            if (recordAudio) {
-                recorder.setProfile(profile);
-            } else {
-                recorder.setOutputFormat(profile.fileFormat);
-                recorder.setVideoFrameRate(profile.videoFrameRate);
-                recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
-                recorder.setVideoEncodingBitRate(profile.videoBitRate);
-                recorder.setVideoEncoder(profile.videoCodec);
-            }
+            recorder.setProfile(profile);
             recorder.setOutputFile("/dev/null");
             recorder.setPreviewDisplay(holder.getSurface());
             recorder.prepare();
@@ -2861,22 +2839,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mCamera.startPreview();
             mCamera.unlock();
             MediaRecorder recorder = new MediaRecorder();
-            boolean recordAudio = hasMicrophone();
             try {
                 recorder.setCamera(mCamera);
-                if (recordAudio) {
-                    recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-                }
+                recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
                 recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-                if (recordAudio) {
-                    recorder.setProfile(profile);
-                } else {
-                    recorder.setOutputFormat(profile.fileFormat);
-                    recorder.setVideoFrameRate(profile.videoFrameRate);
-                    recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
-                    recorder.setVideoEncodingBitRate(profile.videoBitRate);
-                    recorder.setVideoEncoder(profile.videoCodec);
-                }
+                recorder.setProfile(profile);
                 recorder.setOutputFile("/dev/null");
                 recorder.setPreviewDisplay(holder.getSurface());
                 recorder.prepare();
@@ -2981,11 +2948,5 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         terminateMessageLooper();
     }
-
-    private boolean hasMicrophone() {
-        return getActivity().getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_MICROPHONE);
-    }
-
 
 }
