@@ -37,6 +37,7 @@ import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.Stat;
+import com.android.cts.util.TimeoutReq;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -223,18 +224,22 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         doTestGoog(VIDEO_AVC, 720, 480);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testAvc1280x0720Other() throws Exception {
         doTestOther(VIDEO_AVC, 1280, 720);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testAvc1280x0720Goog() throws Exception {
         doTestGoog(VIDEO_AVC, 1280, 720);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testAvc1920x1080Other() throws Exception {
         doTestOther(VIDEO_AVC, 1920, 1080);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testAvc1920x1080Goog() throws Exception {
         doTestGoog(VIDEO_AVC, 1920, 1080);
     }
@@ -256,18 +261,22 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         doTestGoog(VIDEO_VP8, 640, 360);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testVp81280x0720Other() throws Exception {
         doTestOther(VIDEO_VP8, 1280, 720);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testVp81280x0720Goog() throws Exception {
         doTestGoog(VIDEO_VP8, 1280, 720);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testVp81920x1080Other() throws Exception {
         doTestOther(VIDEO_VP8, 1920, 1080);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testVp81920x1080Goog() throws Exception {
         doTestGoog(VIDEO_VP8, 1920, 1080);
     }
@@ -314,10 +323,12 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         doTestGoog(VIDEO_MPEG4, 640, 480);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testMpeg41280x0720Other() throws Exception {
         doTestOther(VIDEO_MPEG4, 1280, 720);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testMpeg41280x0720Goog() throws Exception {
         doTestGoog(VIDEO_MPEG4, 1280, 720);
     }
