@@ -28,11 +28,11 @@ import java.util.List;
  * A simple activity to create and manage wifi configurations.
  */
 public class WifiConfigCreator {
-    public static final String CREATE_WIFI_CONFIG_ACTION =
+    public static final String ACTION_CREATE_WIFI_CONFIG =
             "com.android.compatibility.common.util.CREATE_WIFI_CONFIG";
-    public static final String UPDATE_WIFI_CONFIG_ACTION =
+    public static final String ACTION_UPDATE_WIFI_CONFIG =
             "com.android.compatibility.common.util.UPDATE_WIFI_CONFIG";
-    public static final String REMOVE_WIFI_CONFIG_ACTION =
+    public static final String ACTION_REMOVE_WIFI_CONFIG =
             "com.android.compatibility.common.util.REMOVE_WIFI_CONFIG";
     public static final String EXTRA_NETID = "extra-netid";
     public static final String EXTRA_SSID = "extra-ssid";
