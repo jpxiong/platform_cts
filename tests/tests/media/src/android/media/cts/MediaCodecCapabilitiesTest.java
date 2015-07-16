@@ -587,6 +587,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
     }
 
     public void testGetMaxSupportedInstances() {
+        final int MAX_INSTANCES = 32;
         StringBuilder xmlOverrides = new StringBuilder();
         MediaCodecList allCodecs = new MediaCodecList(MediaCodecList.ALL_CODECS);
         for (MediaCodecInfo info : allCodecs.getCodecInfos()) {
@@ -603,7 +604,7 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
 
                 if (shouldTestActual(caps)) {
                     int actualMax = getActualMax(
-                            info.isEncoder(), info.getName(), types[j], caps, max + 1);
+                            info.isEncoder(), info.getName(), types[j], caps, MAX_INSTANCES);
                     Log.d(TAG, "actualMax " + actualMax + " vs reported max " + max);
                     if (actualMax < (int)(max * 0.9) || actualMax > (int) Math.ceil(max * 1.1)) {
                         String codec = "<MediaCodec name=\"" + info.getName() +
