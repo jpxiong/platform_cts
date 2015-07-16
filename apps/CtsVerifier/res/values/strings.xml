@@ -1837,4 +1837,27 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="audio_routingnotification_recHeader">AudioRecord Routing Notifications</string>
     <string name="audio_routingnotification_trackRoutingMsg">AudioTrack rerouting</string>
     <string name="audio_routingnotification_recordRoutingMsg">AudioRecord rerouting</string>
+
+    <!-- Audio Loopback Latency Test -->
+    <string name="audio_loopback_test">Audio Loopback Latency Test</string>
+     <string name="audio_loopback_info">
+          This test requires the Loopback Plug. Please connect a Loopback Plug on the headset
+          connector, and proceed with the instructions on the screen.
+          The system will measure the input-output audio latency by injecting a pulse on the output,
+          and computing the distance between replicas of the pulse.
+          You can vary the Audio Level slider to ensure the pulse will feed back at adecuate levels.
+          Repeat until a confidence level >= 0.6 is achieved.
+    </string>
+    <string name="audio_loopback_instructions">
+          Please connect a "Loopback Plug" and press "Loopback Plug Ready".
+    </string>
+    <string name="audio_loopback_plug_ready_btn">Loopback Plug Ready</string>
+    <string name="audio_loopback_instructions2">
+          Set the audio level to a suitable value, then press Test button.
+          It might require multiple tries until a confidence >= 0.6 is achieved.
+    </string>
+    <string name="audio_loopback_level_text">Audio Level</string>
+    <string name="audio_loopback_test_btn">Test</string>
+    <string name="audio_loopback_results_text">Results...</string>
+
 </resources>
