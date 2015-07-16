@@ -65,7 +65,7 @@ import junit.framework.AssertionFailedError;
  */
 @LargeTest
 public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivity> {
-    private static String TAG = "CameraTest";
+    private static final String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.hardware";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private final String JPEG_PATH = Environment.getExternalStorageDirectory().getPath() +

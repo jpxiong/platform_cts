@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<MediaFrameworkTest> {
 
-    private static String TAG = "MediaRecorderStressTest";
+    private static final String TAG = "MediaRecorderStressTest";
     private static final int NUMBER_OF_CAMERA_STRESS_LOOPS = 50;
     private static final int NUMBER_OF_RECORDER_STRESS_LOOPS = 50;
     private static final int NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS = 25;
