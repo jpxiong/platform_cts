@@ -32,7 +32,6 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
-import com.android.cts.util.ReportLog;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 
@@ -52,12 +51,19 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     private static final String VIDEO_MPEG4 = MediaFormat.MIMETYPE_VIDEO_MPEG4;
 
     private Resources mResources;
-    private DeviceReportLog mReportLog = new DeviceReportLog();
+    private DeviceReportLog mReportLog;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mResources = mContext.getResources();
+        mReportLog = new DeviceReportLog();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        mReportLog.deliverReportToHost(getInstrumentation());
+        super.tearDown();
     }
 
     private static String[] getDecoderName(String mime) {
@@ -97,6 +103,8 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
                 Log.d(TAG, "round #" + i + " decode to buffer");
                 doDecode(name, video, TOTAL_FRAMES, null);
             }
+            // use 0 for summary line, detail for each test config is in the report.
+            mReportLog.printSummary("average fps", 0, ResultType.HIGHER_BETTER, ResultUnit.FPS);
         }
     }
 
@@ -222,9 +230,6 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         String message = "average fps for " + testConfig;
         double fps = (double)outputNum / ((finish - start) / 1000.0);
         mReportLog.printValue(message, fps, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-
-        message = "frame time diff for " + testConfig + ": " + Arrays.toString(frameTimeDiff);
-        mReportLog.printValue(message, 0, ResultType.NEUTRAL, ResultUnit.NONE);
     }
 
     public void testH264320x240() throws Exception {
