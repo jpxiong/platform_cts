@@ -47,14 +47,18 @@ public class PermissionActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         final Intent received = getIntent();
+        Log.d(TAG, "Started with " + received);
+
         final String action = received.getAction();
         mPermission = received.getStringExtra(EXTRA_PERMISSION);
         if (ACTION_REQUEST_PERMISSION.equals(action)) {
+            Log.d(TAG, "Requesting permission " + mPermission);
             requestPermissions(new String[] {mPermission}, PERMISSIONS_REQUEST_CODE);
         } else if (ACTION_CHECK_HAS_PERMISSION.equals(action)) {
+            Log.d(TAG, "Checking permission " + mPermission);
             sendResultBroadcast(checkSelfPermission(mPermission));
-            finish();
         } else {
             Log.w(TAG, "Unknown intent received: " + received);
             finish();
@@ -73,7 +77,6 @@ public class PermissionActivity extends Activity {
             Log.d(TAG, "Received valid permission result: " + grantResults[0]);
             sendResultBroadcast(grantResults[0]);
         }
-        finish();
     }
 
     private void sendResultBroadcast(int result) {
@@ -81,5 +84,6 @@ public class PermissionActivity extends Activity {
         Intent broadcast = new Intent(ACTION_PERMISSION_RESULT);
         broadcast.putExtra(EXTRA_GRANT_STATE, result);
         sendBroadcast(broadcast);
+        finish();
     }
 }
