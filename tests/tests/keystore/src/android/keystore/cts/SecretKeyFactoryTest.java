@@ -94,9 +94,7 @@ public class SecretKeyFactoryTest extends TestCase {
                 int purposes;
                 if (TestUtils.isHmacAlgorithm(algorithm)) {
                     String digest = TestUtils.getHmacAlgorithmDigest(algorithm);
-                    String anotherDigest = KeyProperties.DIGEST_SHA256.equalsIgnoreCase(digest)
-                            ? KeyProperties.DIGEST_SHA512 : KeyProperties.DIGEST_SHA256;
-                    digests = new String[] {anotherDigest, digest};
+                    digests = new String[] {digest};
                     purposes = KeyProperties.PURPOSE_SIGN;
                 } else {
                     digests = new String[] {KeyProperties.DIGEST_SHA384};
