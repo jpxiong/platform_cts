@@ -43,7 +43,7 @@ LOCAL_PACKAGE_NAME := CtsVerifier
 
 LOCAL_AAPT_FLAGS += --version-name "5.0_r1.91 $(BUILD_NUMBER)"
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni
+LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni libaudioloopback_jni
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
