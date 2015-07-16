@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkConfig;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
@@ -125,6 +126,17 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         NetworkInfo ni = mCm.getActiveNetworkInfo();
 
         assertTrue("You must have an active network connection to complete CTS", ni != null);
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ni.getType()));
+        assertTrue(ni.getState() == State.CONNECTED);
+    }
+
+    public void testGetActiveNetwork() {
+        Network network = mCm.getActiveNetwork();
+        assertTrue("You must have an active network connection to complete CTS", network != null);
+
+        NetworkInfo ni = mCm.getNetworkInfo(network);
+        assertTrue("Network returned from getActiveNetwork was invalid", ni != null);
+        // Similar to testGetActiveNetworkInfo above.
         assertTrue(ConnectivityManager.isNetworkTypeValid(ni.getType()));
         assertTrue(ni.getState() == State.CONNECTED);
     }
