@@ -212,7 +212,6 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
                     // cause an error. Thus, there's no need to account for its ciphertext.
                 }
                 int actualOutputSize = mCipher.getOutputSize(input);
-                System.out.println("*** buffered: " + buffered + ", input: " + input + ", min: " + minExpectedOutputSize + ", actual: " + actualOutputSize);
                 if (actualOutputSize < minExpectedOutputSize) {
                     fail("getOutputSize(" + input + ") underestimated output size when buffered == "
                             + buffered + ". min expected: <"
@@ -290,7 +289,6 @@ abstract class BlockCipherTestBase extends AndroidTestCase {
                     minExpectedOutputSize = 0;
                 }
                 int actualOutputSize = mCipher.getOutputSize(input);
-                System.out.println("*** buffered: " + buffered + ", input: " + input + ", min: " + minExpectedOutputSize + ", actual: " + actualOutputSize);
                 if (actualOutputSize < minExpectedOutputSize) {
                     fail("getOutputSize(" + input + ") underestimated output size when buffered == "
                             + buffered + ". min expected: <"
